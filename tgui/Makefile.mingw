@@ -1,0 +1,14 @@
+FLAGS=-I"C:/documents and settings/trent gamblin/local/include" -DMONSTER2 -I"C:/a5_d3d/include"
+LINKOPTS=-L.
+
+all: lib
+
+lib: tgui.o
+	ar rc libtgui.a tgui.o
+	ranlib libtgui.a
+
+tgui.o: tgui.cpp tgui.hpp
+	g++ $(FLAGS) -c tgui.cpp -o tgui.o
+
+clean:
+	rm -f libtgui.a *.o

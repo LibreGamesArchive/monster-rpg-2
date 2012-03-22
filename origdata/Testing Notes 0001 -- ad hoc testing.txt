@@ -1,0 +1,16 @@
+
+
+--This seems to happen in a few other places where it's possible to  
+walk past the point that's supposed to trigger a location transition.   
+It's possible to get inside the castle doors from the outside but not  
+go to the interior
+
+--went to castle level, went up in castle to 2nd floor.  Went down the  
+exit opposite the one I came up.  Transition effect started and went  
+to a red square centered on the page and stayed there.  Left the app  
+running.  eventually, it returned to the SpringBoard.  This was after  
+going to a number of the other levels, so it does look like a low  
+memory issue (aka a leak).  I was able to use the righthand stairs  
+other times.
+
+Crashlog for this crash:  LowMemory-2009-09-21-215535.crash

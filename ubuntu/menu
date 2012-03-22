@@ -1,0 +1,3 @@
+?package(monster-rpg2): needs="X11" \
+             section="Games/Adventure" \
+             title="Monster RPG 2" command="/opt/monster-rpg2/monster2"

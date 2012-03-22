@@ -1,0 +1,13 @@
+override CFLAGS+=-I${HOME}/local/include -DMONSTER2
+
+all: lib
+
+lib: tgui.o
+	ar rc libtgui.a tgui.o
+	ranlib libtgui.a
+
+tgui.o: tgui.cpp tgui.hpp
+	g++ $(CFLAGS) -c tgui.cpp -o tgui.o
+
+clean:
+	rm -f libtgui.a *.o

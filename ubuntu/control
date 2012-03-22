@@ -1,0 +1,13 @@
+Source: monster-rpg2
+Section: games
+Priority: extra
+Maintainer: Trent Gamblin <trent@gamblin.ca>
+Build-Depends: debhelper (>= 7.0.50~), cmake, imagemagick, libgl1-mesa-dev, libglu1-mesa-dev, libglib2.0-dev, libgtk2.0-dev, libpango1.0-dev, libpng-dev, libx11-dev, libxcursor-dev, libxinerama-dev, libxrandr-dev, libxxf86vm-dev, libxpm-dev, zlib1g-dev
+Standards-Version: 3.9.1
+Homepage: http://www.monster-rpg.com/
+
+Package: monster-rpg2
+Architecture: i386 amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, monster-rpg-2-data (= 1.10.0-1ubuntu1)
+Description: Monster RPG 2
+ Monster RPG 2 is a fantasy quest that spans continents and worlds and lets you take a simple villager and develop her into a hero with the power to save her world. The next instalment in the classic Monster RPG series, Monster RPG 2 is a turn-based role-playing game with enough variety, plot twists, secrets, and scenery to keep even the old school players coming back for more. If you loved the 16 bit classics on systems like SNES, you'll love this game. If you've never heard of those games, you're in for a real treat!

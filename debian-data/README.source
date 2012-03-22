@@ -1,0 +1,7 @@
+monster-rpg-2-data for Debian
+------------------
+
+Nothing special should be needed to build Monster RPG 2 from the source package, so long as you use the dpkg/debuild tools to do it.
+
+
+

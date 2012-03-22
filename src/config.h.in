@@ -1,0 +1,10 @@
+#ifndef CONFIG_H_IN
+#define CONFIG_H_IN
+
+#cmakedefine A5_D3D
+#cmakedefine A5_OGL
+
+#cmakedefine _CRT_SECURE_NO_WARNINGS
+
+#endif
+

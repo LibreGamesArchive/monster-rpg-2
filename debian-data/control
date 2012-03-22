@@ -1,0 +1,14 @@
+Source: monster-rpg-2-data
+Section: games
+Priority: extra
+Maintainer: Thomas Fjellstrom <thomas@fjellstrom.ca>
+Build-Depends: debhelper (>= 7.0.50~)
+Standards-Version: 3.9.1
+Homepage: http://www.monster-rpg.com/
+
+Package: monster-rpg-2-data
+Architecture: any
+Description: Monster RPG 2 - data files
+ Monster RPG 2 is a fantasy quest that spans continents and worlds and lets you take a simple villager and develop her into a hero with the power to save her world. The next instalment in the classic Monster RPG series, Monster RPG 2 is a turn-based role-playing game with enough variety, plot twists, secrets, and scenery to keep even the old school players coming back for more. If you loved the 16 bit classics on systems like SNES, you'll love this game. If you've never heard of those games, you're in for a real treat!
+ .
+ This package contains all of the architecture independent files such as music, sound effects, maps and graphics

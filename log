@@ -1,0 +1,1470 @@
+------------------------------------------------------------------------
+r1135 | trent | 2011-03-15 09:23:02 -0600 (Tue, 15 Mar 2011) | 1 line
+
+Fixed bug reported by Roger Stace: Examining empty inventory slot crashes
+------------------------------------------------------------------------
+r1134 | trent | 2011-03-15 08:59:27 -0600 (Tue, 15 Mar 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1109 | trent | 2011-03-09 10:12:05 -0700 (Wed, 09 Mar 2011) | 1 line
+
+Merge from morpgpc1.0. Bit of work on translation
+------------------------------------------------------------------------
+r1105 | trent | 2011-03-08 08:31:44 -0700 (Tue, 08 Mar 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1103 | trent | 2011-03-08 07:41:48 -0700 (Tue, 08 Mar 2011) | 1 line
+
+Add missing 'uniform' to tex_bot in warp shader (GLSL)
+------------------------------------------------------------------------
+r1102 | trent | 2011-03-08 07:41:03 -0700 (Tue, 08 Mar 2011) | 1 line
+
+Add -static to allegro lib
+------------------------------------------------------------------------
+r1100 | trent | 2011-03-07 20:01:06 -0700 (Mon, 07 Mar 2011) | 1 line
+
+Update Windows binaries.. added new profile pictures
+------------------------------------------------------------------------
+r1099 | trent | 2011-03-06 20:50:29 -0700 (Sun, 06 Mar 2011) | 1 line
+
+Made warp2 shader work on cards that don't support non-power-of-two textures
+------------------------------------------------------------------------
+r1098 | trent | 2011-03-06 20:23:58 -0700 (Sun, 06 Mar 2011) | 1 line
+
+Make shadow_shader work with cards that don't support non-power-of-two textures
+------------------------------------------------------------------------
+r1097 | trent | 2011-03-06 19:15:23 -0700 (Sun, 06 Mar 2011) | 1 line
+
+Pass BH to shader instead of using magic number
+------------------------------------------------------------------------
+r1096 | trent | 2011-03-06 19:14:29 -0700 (Sun, 06 Mar 2011) | 1 line
+
+Set buffer with cheap_shader at time of use. Add missing clear that hides ugly stuff on some drivers when preserving aspect ratio.
+------------------------------------------------------------------------
+r1095 | trent | 2011-03-06 12:43:31 -0700 (Sun, 06 Mar 2011) | 1 line
+
+Build Linux version with Release Allegro 5 libs
+------------------------------------------------------------------------
+r1094 | trent | 2011-03-06 12:42:31 -0700 (Sun, 06 Mar 2011) | 1 line
+
+D3D 'fragcoords' go bottom to top also -- fixed shadow shader
+------------------------------------------------------------------------
+r1093 | trent | 2011-03-06 12:42:04 -0700 (Sun, 06 Mar 2011) | 1 line
+
+Specify enter OR space can be used as action button in help. Draw help text with drop shadow
+------------------------------------------------------------------------
+r1092 | trent | 2011-03-06 12:35:13 -0700 (Sun, 06 Mar 2011) | 1 line
+
+Fix off by 1 height in mDrawFrame. Draw drop shadow text with more drop shadow (full corner)
+------------------------------------------------------------------------
+r1091 | trent | 2011-03-05 18:40:05 -0700 (Sat, 05 Mar 2011) | 1 line
+
+Uncomment -mwindows
+------------------------------------------------------------------------
+r1090 | trent | 2011-03-05 18:39:38 -0700 (Sat, 05 Mar 2011) | 1 line
+
+Fix up new HLSL shaders after trying them for the first time
+------------------------------------------------------------------------
+r1089 | trent | 2011-03-05 16:02:05 -0700 (Sat, 05 Mar 2011) | 1 line
+
+Toggle a tile solid
+------------------------------------------------------------------------
+r1088 | trent | 2011-03-04 23:26:36 -0700 (Fri, 04 Mar 2011) | 1 line
+
+Make m_draw_rectangle take floats and fix rectangles drawn for FakeWidgets
+------------------------------------------------------------------------
+r1087 | trent | 2011-03-04 22:59:04 -0700 (Fri, 04 Mar 2011) | 1 line
+
+Fixed shadow shader -- gl_FragCoord.y runs from bottom to top of window
+------------------------------------------------------------------------
+r1085 | trent | 2011-03-04 18:02:16 -0700 (Fri, 04 Mar 2011) | 1 line
+
+Clear BOTH front and back buffer before exiting
+------------------------------------------------------------------------
+r1084 | trent | 2011-03-04 17:41:48 -0700 (Fri, 04 Mar 2011) | 1 line
+
+Silence warning
+------------------------------------------------------------------------
+r1083 | trent | 2011-03-04 14:08:34 -0700 (Fri, 04 Mar 2011) | 1 line
+
+Clear the backbuffer and flip the display before exit so no ghost image is left behind on some drivers
+------------------------------------------------------------------------
+r1082 | trent | 2011-03-04 14:08:07 -0700 (Fri, 04 Mar 2011) | 1 line
+
+Draw the triangle as a triangle
+------------------------------------------------------------------------
+r1081 | trent | 2011-03-04 09:55:19 -0700 (Fri, 04 Mar 2011) | 1 line
+
+Use a simpler battle transition because some cards can't handle the old one
+------------------------------------------------------------------------
+r1080 | trent | 2011-03-04 08:45:37 -0700 (Fri, 04 Mar 2011) | 1 line
+
+Try to simplify warp shader more
+------------------------------------------------------------------------
+r1079 | trent | 2011-03-04 08:37:07 -0700 (Fri, 04 Mar 2011) | 1 line
+
+Fix overwritten Makefile
+------------------------------------------------------------------------
+r1078 | trent | 2011-03-04 08:18:28 -0700 (Fri, 04 Mar 2011) | 1 line
+
+Fix bugs in warp shader simplification
+------------------------------------------------------------------------
+r1077 | trent | 2011-03-04 08:11:47 -0700 (Fri, 04 Mar 2011) | 1 line
+
+Simplify warp shader
+------------------------------------------------------------------------
+r1076 | trent | 2011-03-04 07:55:23 -0700 (Fri, 04 Mar 2011) | 1 line
+
+Simplify shadow shader
+------------------------------------------------------------------------
+r1075 | trent | 2011-03-04 02:27:57 -0700 (Fri, 04 Mar 2011) | 1 line
+
+Work around bugs in some opengl drivers by drawing pixels as small rectangles
+------------------------------------------------------------------------
+r1074 | trent | 2011-03-04 00:27:11 -0700 (Fri, 04 Mar 2011) | 1 line
+
+Fixed up the shadow shader HLSL code
+------------------------------------------------------------------------
+r1073 | trent | 2011-03-03 23:01:58 -0700 (Thu, 03 Mar 2011) | 1 line
+
+Use a shader for drop shadows
+------------------------------------------------------------------------
+r1072 | trent | 2011-03-03 11:49:25 -0700 (Thu, 03 Mar 2011) | 1 line
+
+Add BASS shared libraries
+------------------------------------------------------------------------
+r1071 | trent | 2011-03-03 11:21:21 -0700 (Thu, 03 Mar 2011) | 1 line
+
+Don't wait for button release after tapping forward dialog (but do wait delay notification on polled descriptor
+------------------------------------------------------------------------
+r1070 | trent | 2011-03-03 11:20:17 -0700 (Thu, 03 Mar 2011) | 1 line
+
+Remove old debug printf
+------------------------------------------------------------------------
+r1069 | trent | 2011-03-03 11:19:51 -0700 (Thu, 03 Mar 2011) | 1 line
+
+Remove pc-data
+------------------------------------------------------------------------
+r1068 | thomas | 2011-03-03 09:48:33 -0700 (Thu, 03 Mar 2011) | 1 line
+
+latest ubuntu/debian packaging changes, build split packages
+------------------------------------------------------------------------
+r1067 | trent | 2011-03-03 04:51:42 -0700 (Thu, 03 Mar 2011) | 1 line
+
+Workaround for macboook keyboard. Fix messy config file. Bugfix: don't draw ellipses <= 0 radius
+------------------------------------------------------------------------
+r1066 | trent | 2011-03-01 17:15:09 -0700 (Tue, 01 Mar 2011) | 1 line
+
+Change to the warp shader made for D3D
+------------------------------------------------------------------------
+r1065 | trent | 2011-03-01 17:14:39 -0700 (Tue, 01 Mar 2011) | 1 line
+
+Change description of package in debian control file
+------------------------------------------------------------------------
+r1064 | trent | 2011-03-01 11:49:25 -0700 (Tue, 01 Mar 2011) | 1 line
+
+Use RESOURCES_PATH to find data
+------------------------------------------------------------------------
+r1063 | thomas | 2011-03-01 11:46:24 -0700 (Tue, 01 Mar 2011) | 1 line
+
+rename package to monsterrpg2 from morpgpc
+------------------------------------------------------------------------
+r1062 | thomas | 2011-03-01 10:50:06 -0700 (Tue, 01 Mar 2011) | 1 line
+
+fix the last few remaining known dpkg issues
+------------------------------------------------------------------------
+r1061 | thomas | 2011-03-01 08:37:48 -0700 (Tue, 01 Mar 2011) | 1 line
+
+more packaging changes
+------------------------------------------------------------------------
+r1060 | thomas | 2011-03-01 05:59:27 -0700 (Tue, 01 Mar 2011) | 1 line
+
+more debian/ubuntu packaging work
+------------------------------------------------------------------------
+r1059 | trent | 2011-02-28 23:44:48 -0700 (Mon, 28 Feb 2011) | 1 line
+
+Fixed archery, volcano scene, and shooter for opengl/linux
+------------------------------------------------------------------------
+r1058 | thomas | 2011-02-28 21:38:53 -0700 (Mon, 28 Feb 2011) | 1 line
+
+update to lua-fixed and merge the src/Makefile.unix changes
+------------------------------------------------------------------------
+r1057 | trent | 2011-02-28 21:24:54 -0700 (Mon, 28 Feb 2011) | 1 line
+
+Load the right bassflac library on Linux
+------------------------------------------------------------------------
+r1056 | trent | 2011-02-28 20:55:23 -0700 (Mon, 28 Feb 2011) | 1 line
+
+Allow MONSTER2_DATA again
+------------------------------------------------------------------------
+r1055 | trent | 2011-02-28 20:46:37 -0700 (Mon, 28 Feb 2011) | 1 line
+
+Fixed a bunch of warnings
+------------------------------------------------------------------------
+r1054 | trent | 2011-02-28 20:46:14 -0700 (Mon, 28 Feb 2011) | 1 line
+
+name lua library 'lua-fixed'
+------------------------------------------------------------------------
+r1053 | trent | 2011-02-28 20:03:41 -0700 (Mon, 28 Feb 2011) | 1 line
+
+Change makefile to name executable monster2 instead of monster2-opengl
+------------------------------------------------------------------------
+r1052 | trent | 2011-02-28 19:52:18 -0700 (Mon, 28 Feb 2011) | 1 line
+
+Don't link to libjpeg
+------------------------------------------------------------------------
+r1051 | trent | 2011-02-28 19:49:03 -0700 (Mon, 28 Feb 2011) | 1 line
+
+Added bass24 dir with bass libs and header
+------------------------------------------------------------------------
+r1050 | thomas | 2011-02-28 19:28:02 -0700 (Mon, 28 Feb 2011) | 1 line
+
+apply some linux/ubuntu changes
+------------------------------------------------------------------------
+r1049 | trent | 2011-02-27 23:19:40 -0700 (Sun, 27 Feb 2011) | 1 line
+
+Bugfixes, minor feature enhancements
+------------------------------------------------------------------------
+r1048 | trent | 2011-02-26 18:27:48 -0700 (Sat, 26 Feb 2011) | 1 line
+
+Adding bin/ remove some stuff
+------------------------------------------------------------------------
+r1047 | trent | 2011-02-26 17:35:23 -0700 (Sat, 26 Feb 2011) | 1 line
+
+Removed lots of files, moved some
+------------------------------------------------------------------------
+r1046 | trent | 2011-02-26 17:29:35 -0700 (Sat, 26 Feb 2011) | 1 line
+
+Remove lots of unused files. Move some files
+------------------------------------------------------------------------
+r1045 | trent | 2011-02-26 17:19:47 -0700 (Sat, 26 Feb 2011) | 1 line
+
+Many bugfixes
+------------------------------------------------------------------------
+r1044 | trent | 2011-02-25 18:54:12 -0700 (Fri, 25 Feb 2011) | 1 line
+
+Fixed shooter 101%. Start using only m_draw*
+------------------------------------------------------------------------
+r1043 | trent | 2011-02-25 10:23:50 -0700 (Fri, 25 Feb 2011) | 1 line
+
+I think I got the shooter working
+------------------------------------------------------------------------
+r1042 | trent | 2011-02-24 16:35:00 -0700 (Thu, 24 Feb 2011) | 1 line
+
+Remove some 'work' bitmaps in spell/item effect code. Remove lots of A4 code. Make input events work more reliably. Remove dead code. Add callbacks for d3d resource release/restore. Use big depth surface everywhere. Add screen tiny and smaller modes. Scale loading screen different for different resolutions. Fix slight offset error of beach battle arrow. Use slightly larger buffers for audio streaming. Redo a lot of code in the shooter mini game, hopefully improved it especially on slower systems (also simplified the code a lot). Use m_set_target_bitmap everywhere instead of al_set_target_bitmap in some places. Add some fades in various places, mainly around the title menu. Fixed green line in castle tilemap.
+------------------------------------------------------------------------
+r1037 | trent | 2011-02-19 17:38:27 -0700 (Sat, 19 Feb 2011) | 1 line
+
+Fixed shooter for Windows
+------------------------------------------------------------------------
+r1036 | trent | 2011-02-19 17:37:47 -0700 (Sat, 19 Feb 2011) | 1 line
+
+Remove unused code from Configuration constructor
+------------------------------------------------------------------------
+r1035 | trent | 2011-02-19 17:37:16 -0700 (Sat, 19 Feb 2011) | 1 line
+
+Don't allow focussing empty scrollinglist widget. Caused crashes
+------------------------------------------------------------------------
+r1034 | trent | 2011-02-19 17:36:45 -0700 (Sat, 19 Feb 2011) | 1 line
+
+Fix lost/found shader handling. Use scale of 3 when in small_screen mode. Use sin instead of cos in Windows/HLSL warp shader
+------------------------------------------------------------------------
+r1033 | trent | 2011-02-19 17:35:18 -0700 (Sat, 19 Feb 2011) | 1 line
+
+Correct a typo: x -> y
+------------------------------------------------------------------------
+r1032 | trent | 2011-02-19 05:50:22 -0700 (Sat, 19 Feb 2011) | 1 line
+
+initial backport to Direct3d
+------------------------------------------------------------------------
+r1027 | trent | 2011-02-16 15:20:25 -0700 (Wed, 16 Feb 2011) | 1 line
+
+Committing up to first Mac App Store submission
+------------------------------------------------------------------------
+r954 | trent | 2011-01-30 10:02:02 -0700 (Sun, 30 Jan 2011) | 1 line
+
+Committing Mac/PC version 1.0 with lua-fixed
+------------------------------------------------------------------------
+r948 | trent | 2011-01-21 12:46:15 -0700 (Fri, 21 Jan 2011) | 1 line
+
+Delete txt models
+------------------------------------------------------------------------
+r947 | trent | 2011-01-21 12:44:49 -0700 (Fri, 21 Jan 2011) | 1 line
+
+Beta 2 I guess
+------------------------------------------------------------------------
+r944 | trent | 2011-01-19 10:55:31 -0700 (Wed, 19 Jan 2011) | 1 line
+
+Changing music back to caf for mac version
+------------------------------------------------------------------------
+r941 | trent | 2011-01-17 23:12:47 -0700 (Mon, 17 Jan 2011) | 1 line
+
+Screenshot preview owrks. bugfixes. add pc-data
+------------------------------------------------------------------------
+r940 | trent | 2011-01-17 21:08:25 -0700 (Mon, 17 Jan 2011) | 1 line
+
+Added PC map/1,2 buttons icons
+------------------------------------------------------------------------
+r939 | trent | 2011-01-17 20:41:42 -0700 (Mon, 17 Jan 2011) | 1 line
+
+Fixed some pc bugs
+------------------------------------------------------------------------
+r938 | trent | 2011-01-17 19:47:06 -0700 (Mon, 17 Jan 2011) | 1 line
+
+Fixed (tested this time) new input. Fix some loops etc.
+------------------------------------------------------------------------
+r937 | trent | 2011-01-17 16:51:27 -0700 (Mon, 17 Jan 2011) | 1 line
+
+Big input changes (untested) switched to OLD pc styles NEW input (??)... it's good
+------------------------------------------------------------------------
+r936 | trent | 2011-01-17 14:40:31 -0700 (Mon, 17 Jan 2011) | 1 line
+
+Runs through the first battle on PC
+------------------------------------------------------------------------
+r935 | trent | 2011-01-17 13:21:33 -0700 (Mon, 17 Jan 2011) | 1 line
+
+Slightly working codebase now on PC. Camera stay fixed with Eny at top left. Tiles are black.
+------------------------------------------------------------------------
+r934 | trent | 2011-01-16 19:47:37 -0700 (Sun, 16 Jan 2011) | 2 lines
+
+Branch pc re-port
+
+------------------------------------------------------------------------
+r932 | trent | 2011-01-16 19:40:06 -0700 (Sun, 16 Jan 2011) | 1 line
+
+committing outstanding changes before branching pc version
+------------------------------------------------------------------------
+r917 | trent | 2011-01-05 20:16:23 -0700 (Wed, 05 Jan 2011) | 1 line
+
+Many changes. Vibrate. Speed improvements. iPad support. Muting. Update for A5.1. Updates for premul alpha (not finished). Bugfixes. Hopefully fix issues with auto save. Half scale mode. Auto orientation. Maybe more.
+------------------------------------------------------------------------
+r784 | trent | 2010-11-16 13:32:35 -0700 (Tue, 16 Nov 2010) | 1 line
+
+Updating M2-iphone svn to version 1.6
+------------------------------------------------------------------------
+r497 | trent | 2010-06-10 17:53:07 -0600 (Thu, 10 Jun 2010) | 1 line
+
+1.4 really
+------------------------------------------------------------------------
+r494 | trent | 2010-06-09 13:18:52 -0600 (Wed, 09 Jun 2010) | 1 line
+
+1.4
+------------------------------------------------------------------------
+r493 | trent | 2010-06-01 10:31:07 -0600 (Tue, 01 Jun 2010) | 1 line
+
+Ready for final testing 1.4
+------------------------------------------------------------------------
+r492 | trent | 2010-05-25 15:54:29 -0600 (Tue, 25 May 2010) | 1 line
+
+1.4b4
+------------------------------------------------------------------------
+r491 | trent | 2010-05-21 19:48:48 -0600 (Fri, 21 May 2010) | 1 line
+
+1.4b3 released for testing
+------------------------------------------------------------------------
+r490 | trent | 2010-05-16 20:52:49 -0600 (Sun, 16 May 2010) | 1 line
+
+1.4b: Complete GLES 2.0 pass (total d-pad)
+------------------------------------------------------------------------
+r489 | trent | 2010-05-15 15:04:59 -0600 (Sat, 15 May 2010) | 1 line
+
+Bugfixes for GLES 2. Copied some Mesa functions, working shooter & archery.
+------------------------------------------------------------------------
+r488 | trent | 2010-05-11 15:28:24 -0600 (Tue, 11 May 2010) | 1 line
+
+All prepared for beta 1.4
+------------------------------------------------------------------------
+r487 | trent | 2010-05-10 08:57:08 -0600 (Mon, 10 May 2010) | 1 line
+
+ES 2 support in the works
+------------------------------------------------------------------------
+r482 | trent | 2010-04-16 18:02:25 -0600 (Fri, 16 Apr 2010) | 1 line
+
+Sync lite area scripts with full
+------------------------------------------------------------------------
+r481 | trent | 2010-04-16 17:59:17 -0600 (Fri, 16 Apr 2010) | 1 line
+
+Fix some bugs on iphone os 4.0
+------------------------------------------------------------------------
+r480 | trent | 2010-04-15 20:26:21 -0600 (Thu, 15 Apr 2010) | 1 line
+
+Tonnes of changes. Works on iphone 3gs with os 4.0. Using latest Allegro 4.9.
+------------------------------------------------------------------------
+r479 | trent | 2010-04-13 11:09:32 -0600 (Tue, 13 Apr 2010) | 1 line
+
+Initial work on supporting iphone os 4
+------------------------------------------------------------------------
+r478 | trent | 2010-04-13 10:50:36 -0600 (Tue, 13 Apr 2010) | 1 line
+
+Convert all pvrs back to pngs, and any 8 bit images to truecolor
+------------------------------------------------------------------------
+r435 | trent | 2010-04-04 16:44:50 -0600 (Sun, 04 Apr 2010) | 1 line
+
+This is 1.3
+------------------------------------------------------------------------
+r429 | trent | 2010-03-30 16:33:27 -0600 (Tue, 30 Mar 2010) | 1 line
+
+Added xcode project
+------------------------------------------------------------------------
+r428 | trent | 2010-03-30 16:24:36 -0600 (Tue, 30 Mar 2010) | 1 line
+
+Cleanup
+------------------------------------------------------------------------
+r427 | trent | 2010-03-30 16:18:20 -0600 (Tue, 30 Mar 2010) | 1 line
+
+Many tweaks and updates. New music player. Tutorial for all 3 input modes.
+------------------------------------------------------------------------
+r426 | trent | 2010-03-28 11:34:48 -0600 (Sun, 28 Mar 2010) | 1 line
+
+Almost ready for 1.3
+------------------------------------------------------------------------
+r424 | trent | 2010-03-25 13:19:28 -0600 (Thu, 25 Mar 2010) | 1 line
+
+Ramon touched up all the backgrounds. Replaced Apple's music picker with a custom one.
+------------------------------------------------------------------------
+r423 | trent | 2010-03-24 15:17:36 -0600 (Wed, 24 Mar 2010) | 1 line
+
+Add some remade media. Fixes for new hybrid input mode.
+------------------------------------------------------------------------
+r402 | trent | 2010-03-21 16:38:43 -0600 (Sun, 21 Mar 2010) | 1 line
+
+Make tapping seaside shopkeeper easier. Make all 3 input modes work right so far. Make transparency (shadows etc) work right.
+------------------------------------------------------------------------
+r392 | trent | 2010-03-20 16:10:51 -0600 (Sat, 20 Mar 2010) | 1 line
+
+Tweaked hybrid dpad mode (not enabled for most menus and dialogs etc)
+------------------------------------------------------------------------
+r390 | trent | 2010-03-20 11:14:26 -0600 (Sat, 20 Mar 2010) | 1 line
+
+Added tuning option. Configuration screen. Optimize a bit.
+------------------------------------------------------------------------
+r389 | trent | 2010-03-20 08:50:59 -0600 (Sat, 20 Mar 2010) | 1 line
+
+Added dpad panning. trunk/combat_bgs up to date.
+------------------------------------------------------------------------
+r367 | trent | 2010-03-19 09:39:35 -0600 (Fri, 19 Mar 2010) | 1 line
+
+Fixed leaks in music player
+------------------------------------------------------------------------
+r366 | trent | 2010-03-19 07:47:05 -0600 (Fri, 19 Mar 2010) | 1 line
+
+Add music player and controls
+------------------------------------------------------------------------
+r329 | trent | 2010-03-14 17:17:42 -0600 (Sun, 14 Mar 2010) | 1 line
+
+Lite and Full 1.2 alllmost done.
+------------------------------------------------------------------------
+r328 | trent | 2010-03-13 14:26:16 -0700 (Sat, 13 Mar 2010) | 1 line
+
+Cleaned up iphone-data-lite
+------------------------------------------------------------------------
+r327 | trent | 2010-03-13 13:44:40 -0700 (Sat, 13 Mar 2010) | 1 line
+
+FUCK
+------------------------------------------------------------------------
+r326 | trent | 2010-03-13 13:40:41 -0700 (Sat, 13 Mar 2010) | 1 line
+
+Commit alternate (grey) map buttons
+------------------------------------------------------------------------
+r325 | trent | 2010-03-13 13:39:00 -0700 (Sat, 13 Mar 2010) | 1 line
+
+Coming close to 1.2
+------------------------------------------------------------------------
+r314 | trent | 2010-03-11 17:23:56 -0700 (Thu, 11 Mar 2010) | 1 line
+
+Played through keep with onscreen pad, add some data, update lite data
+------------------------------------------------------------------------
+r310 | trent | 2010-03-10 15:43:49 -0700 (Wed, 10 Mar 2010) | 1 line
+
+Revert packtilemap.cpp to before trying pvrct textures
+------------------------------------------------------------------------
+r309 | trent | 2010-03-10 15:33:42 -0700 (Wed, 10 Mar 2010) | 1 line
+
+Update packtilemap for A4.9. Load special 1/2 icons for iphone.
+------------------------------------------------------------------------
+r306 | trent | 2010-03-10 14:30:14 -0700 (Wed, 10 Mar 2010) | 1 line
+
+Lots of work on dpad movement. Sub game works. Fix lots of minor bugs or annoyances.
+------------------------------------------------------------------------
+r304 | trent | 2010-03-07 20:02:24 -0700 (Sun, 07 Mar 2010) | 1 line
+
+New battle transition. Bug fixes for dpads
+------------------------------------------------------------------------
+r303 | trent | 2010-03-07 20:01:17 -0700 (Sun, 07 Mar 2010) | 1 line
+
+Add ads and on screen green/red buttons/dpad
+------------------------------------------------------------------------
+r297 | trent | 2010-03-07 07:14:39 -0700 (Sun, 07 Mar 2010) | 1 line
+
+Remove some lite data. Add optional dpad control (needs testing).
+------------------------------------------------------------------------
+r274 | trent | 2010-03-03 14:44:36 -0700 (Wed, 03 Mar 2010) | 1 line
+
+Add png front of chars for popups to svn 
+------------------------------------------------------------------------
+r273 | trent | 2010-03-03 14:44:03 -0700 (Wed, 03 Mar 2010) | 1 line
+
+Remove stuff from lite
+------------------------------------------------------------------------
+r272 | trent | 2010-03-03 14:40:45 -0700 (Wed, 03 Mar 2010) | 1 line
+
+
+------------------------------------------------------------------------
+r271 | trent | 2010-03-03 14:18:29 -0700 (Wed, 03 Mar 2010) | 1 line
+
+Added iphone-data-lite
+------------------------------------------------------------------------
+r262 | trent | 2010-02-25 07:05:13 -0700 (Thu, 25 Feb 2010) | 1 line
+
+Make lander buttons not stick
+------------------------------------------------------------------------
+r261 | trent | 2010-02-24 20:25:45 -0700 (Wed, 24 Feb 2010) | 1 line
+
+Red hotcorner
+------------------------------------------------------------------------
+r260 | trent | 2010-02-24 12:27:39 -0700 (Wed, 24 Feb 2010) | 1 line
+
+Fixes. Hot corner x
+------------------------------------------------------------------------
+r259 | trent | 2010-02-21 20:11:56 -0700 (Sun, 21 Feb 2010) | 1 line
+
+Give out less elixirs on volcano. Fix some minor bugs in lander game.
+------------------------------------------------------------------------
+r258 | trent | 2010-02-21 14:54:16 -0700 (Sun, 21 Feb 2010) | 1 line
+
+Use png for tilemap. Lots of small fixes. Bump version string to 1.0
+------------------------------------------------------------------------
+r257 | trent | 2010-02-19 15:33:52 -0700 (Fri, 19 Feb 2010) | 1 line
+
+death_blitted was uninitialized
+------------------------------------------------------------------------
+r256 | trent | 2010-02-19 15:22:06 -0700 (Fri, 19 Feb 2010) | 1 line
+
+Make death blits faster by allocating work bitmaps as necessary and only drawing tinted once
+------------------------------------------------------------------------
+r255 | trent | 2010-02-19 13:54:22 -0700 (Fri, 19 Feb 2010) | 1 line
+
+Make add_blit work if image off screen. Fixed up mountains*.pvr combat backgrounds.
+------------------------------------------------------------------------
+r254 | trent | 2010-02-19 11:27:30 -0700 (Fri, 19 Feb 2010) | 1 line
+
+Tilemap was being cut off by packtilemap.cpp. Water/tall grass was not drawn correctly. Make webbed.png bigger for bigger player sprites. Splash screen now works correctly thanks to Elias (A5 changed also). Added new 4.9 diff
+------------------------------------------------------------------------
+r253 | trent | 2010-02-18 16:50:36 -0700 (Thu, 18 Feb 2010) | 1 line
+
+vflip all pvrs (had some code wrong\!)
+------------------------------------------------------------------------
+r252 | trent | 2010-02-18 06:08:31 -0700 (Thu, 18 Feb 2010) | 1 line
+
+Better debug mode. Add fish back.
+------------------------------------------------------------------------
+r251 | trent | 2010-02-17 19:06:58 -0700 (Wed, 17 Feb 2010) | 1 line
+
+Use compressed PVRTC textures some places. Use less memory.
+------------------------------------------------------------------------
+r250 | trent | 2010-02-16 20:17:02 -0700 (Tue, 16 Feb 2010) | 1 line
+
+Lots of stuff... sorry
+------------------------------------------------------------------------
+r249 | trent | 2010-02-11 09:56:43 -0700 (Thu, 11 Feb 2010) | 1 line
+
+Converted all sounds and music to wav. Added unused tguiSetLayout function. Removed unused meditor2 data from iphone-data. Made MScrollingList arrows easier to press. Added MToggleList widget for debugging. Use vertex array of lines for popup shadows. Cheat by renaming all passed in sound/music names to .wav extension. Set forced milestones in loadGame instead of run() in main. Fix incorrect count parameter to glDrawArrays in shooter. Add less crabs. Fix incorrect vertex count in SprayEffect to al_draw_prim. Allow warping if DEBUG is defined.
+------------------------------------------------------------------------
+r248 | trent | 2010-02-08 03:45:08 -0700 (Mon, 08 Feb 2010) | 1 line
+
+Fix seaside shop for repairs.
+------------------------------------------------------------------------
+r247 | trent | 2010-02-07 14:38:34 -0700 (Sun, 07 Feb 2010) | 1 line
+
+Fix hot corner. Rename to Monster RPG 2, Mo. RPG 2 for ipod caption and MoRPG2 for app name. Auto save every time if quitting while in an area, except when shouldStartMap is set so that it doesn't save on a portal. Protect against previously mentioned case anyway, in game loading. Auto save both when pressing button and when quitting from the pause menu. Made Jade equipment better than Onyx. Fix up what looks like bugs in input handling, using a non existant keyboard on ipod. Finally fix tipper -- make him look at you when you talk to him in shyzu.
+------------------------------------------------------------------------
+r246 | trent | 2010-02-03 20:21:32 -0700 (Wed, 03 Feb 2010) | 1 line
+
+Save screenshot always when first entering area (unless scripted or something) instead of black screen
+------------------------------------------------------------------------
+r245 | trent | 2010-02-03 10:50:46 -0700 (Wed, 03 Feb 2010) | 1 line
+
+Fixup auto pan scriptify again. Bump version to 0062. Cover up harpy's lady parts. Fix lights upstairs in farmhouse. Fixup table size in farmhouse, inn, etc.
+------------------------------------------------------------------------
+r244 | trent | 2010-02-02 16:14:14 -0700 (Tue, 02 Feb 2010) | 1 line
+
+Lower gunnars desk and table in inn. Add elixir to empty hut in muttrace.
+------------------------------------------------------------------------
+r243 | trent | 2010-02-02 15:52:35 -0700 (Tue, 02 Feb 2010) | 1 line
+
+Fix up object->stop and area following. add some dialogue for mel about people of flowey can't hold city much longer. decrease the big delay in fort_start after tiggy comes around.
+------------------------------------------------------------------------
+r242 | trent | 2010-02-02 15:01:59 -0700 (Tue, 02 Feb 2010) | 1 line
+
+Fixup Object->stop
+------------------------------------------------------------------------
+r241 | trent | 2010-02-02 13:57:00 -0700 (Tue, 02 Feb 2010) | 1 line
+
+Auto save every time exiting game (death, quit, button). Disable Hot corner if player is there so you can stop.
+------------------------------------------------------------------------
+r240 | trent | 2010-02-02 10:50:48 -0700 (Tue, 02 Feb 2010) | 1 line
+
+Fix up tutorial a bit (shake vertically). Remove released = false in case that top left was tapped.
+------------------------------------------------------------------------
+r238 | trent | 2010-02-01 19:38:51 -0700 (Mon, 01 Feb 2010) | 1 line
+
+Play sample with new battle icons. Init MShadow properly. scriptify-pan quicker. New brighter orb bitmap (auto generated, remove png). Put bunch of craters in the moon valley.
+------------------------------------------------------------------------
+r237 | trent | 2010-01-31 19:01:48 -0700 (Sun, 31 Jan 2010) | 1 line
+
+Fix up auto panning on script.. balance experience curve and elixir cost some (hopefully for the better)
+------------------------------------------------------------------------
+r236 | trent | 2010-01-31 10:55:21 -0700 (Sun, 31 Jan 2010) | 1 line
+
+Fix some auto scriptify panning issues. Make loading screen always go 100% and clean up some of the gfx.
+------------------------------------------------------------------------
+r235 | trent | 2010-01-31 08:29:40 -0700 (Sun, 31 Jan 2010) | 1 line
+
+Prompt for archery second time. Shadows on popups. Icons for battle actions. Fix typo.
+------------------------------------------------------------------------
+r234 | trent | 2010-01-30 09:44:17 -0700 (Sat, 30 Jan 2010) | 1 line
+
+Remove delay when talking to rider on keep. Made wider area to exit jungle to town. Put new packed tilemap in place. Clean up magmod, beast, bigblue, beast, fireant. Bump version. Cleanup (minor) eny-loader. Autosave after each battle. Show right shadow for hurt enemies.
+------------------------------------------------------------------------
+r233 | trent | 2010-01-27 14:58:17 -0700 (Wed, 27 Jan 2010) | 1 line
+
+Made Gator more perspective correct. Added correct iTunesArtwork to origdata. Fix small bug in Object->stop
+------------------------------------------------------------------------
+r232 | trent | 2010-01-26 20:47:17 -0700 (Tue, 26 Jan 2010) | 1 line
+
+New launchpad. Fix unsolid wall.
+------------------------------------------------------------------------
+r231 | trent | 2010-01-26 17:13:58 -0700 (Tue, 26 Jan 2010) | 1 line
+
+Fix some bugs with the pathfinding/walking
+------------------------------------------------------------------------
+r230 | trent | 2010-01-26 14:31:55 -0700 (Tue, 26 Jan 2010) | 1 line
+
+Fix auto-scriptify panning for small areas. Fix tapping on yourself to stop (it would jitter the screen, sometimes for the rest of the level.
+------------------------------------------------------------------------
+r229 | trent | 2010-01-26 11:39:40 -0700 (Tue, 26 Jan 2010) | 1 line
+
+Bump version to 0057
+------------------------------------------------------------------------
+r228 | trent | 2010-01-26 11:35:53 -0700 (Tue, 26 Jan 2010) | 1 line
+
+Fix bug in Spray spell. Fix (hopefully for good now) scrolling to center in scenes. Fix some stray pixels in some enemies. Improved Gunnars initial dialogue. Scriptify player before speech bubble in eastern dock, seaside, seaside repaired when going on boat. Fix dialogue in seaside when going on boat without cleric. Fix floating LIFE! that shouldn't be Omnipotent in battle. Make attack spells always do at least 1 damage/good. Don't start battle with dialogue up (rarely happened when clicking a chest as soon as arriving on a tile. Always deplete item/mana when using/casting.
+------------------------------------------------------------------------
+r226 | trent | 2010-01-21 14:43:00 -0700 (Thu, 21 Jan 2010) | 1 line
+
+Made Sludge work if attacked from behind
+------------------------------------------------------------------------
+r225 | trent | 2010-01-20 20:44:43 -0700 (Wed, 20 Jan 2010) | 1 line
+
+Bump version to 0055. Make bottom beds all solid in barracks top floor.
+------------------------------------------------------------------------
+r224 | trent | 2010-01-20 20:06:27 -0700 (Wed, 20 Jan 2010) | 1 line
+
+Change to noweapon_ if ammo depleted while in battle. Fix gunnar sprite that had gun flash in wrong frame. Make only 1 wall fall if 1 golem beaten.
+------------------------------------------------------------------------
+r222 | trent | 2010-01-20 12:08:27 -0700 (Wed, 20 Jan 2010) | 1 line
+
+Fix some darker red dotted lines than the rest. Put some trees around the gold in the forest. Make double doors in BOTH seasides (repaired and not).
+------------------------------------------------------------------------
+r221 | trent | 2010-01-18 21:55:27 -0700 (Mon, 18 Jan 2010) | 1 line
+
+Made some enemies in darkside more powerful. Made double doors (on outside) for seaside shop. Made eny's battle animation not pause.
+------------------------------------------------------------------------
+r220 | trent | 2010-01-18 05:26:26 -0700 (Mon, 18 Jan 2010) | 1 line
+
+Increase cackle volume. Add flowers around Eny statue. Revert landing_area.png
+------------------------------------------------------------------------
+r219 | trent | 2010-01-17 07:43:39 -0700 (Sun, 17 Jan 2010) | 1 line
+
+Make items in battle display numbers again
+------------------------------------------------------------------------
+r218 | trent | 2010-01-16 20:47:04 -0700 (Sat, 16 Jan 2010) | 1 line
+
+Fix display of 'amounts' like HP/MP displayed when using an item in the pause menu
+------------------------------------------------------------------------
+r217 | trent | 2010-01-16 13:22:11 -0700 (Sat, 16 Jan 2010) | 1 line
+
+Make water flow properly in jungle
+------------------------------------------------------------------------
+r216 | trent | 2010-01-16 09:09:12 -0700 (Sat, 16 Jan 2010) | 1 line
+
+Added icon origdata
+------------------------------------------------------------------------
+r215 | trent | 2010-01-16 09:08:17 -0700 (Sat, 16 Jan 2010) | 1 line
+
+New EnyHasWeapon implementation. Align some EvilTig frames. Make Faelon not in room after beach battle.new icon. Revert overwritten keep.png
+------------------------------------------------------------------------
+r214 | trent | 2010-01-13 15:45:35 -0700 (Wed, 13 Jan 2010) | 1 line
+
+Bump version to 0054. New icon.
+------------------------------------------------------------------------
+r213 | trent | 2010-01-12 09:42:13 -0700 (Tue, 12 Jan 2010) | 1 line
+
+Fix some glitches in Underground_0 tiles
+------------------------------------------------------------------------
+r211 | trent | 2010-01-11 13:51:22 -0700 (Mon, 11 Jan 2010) | 1 line
+
+Use caf audio file for underwater shooter
+------------------------------------------------------------------------
+r210 | trent | 2010-01-11 12:19:57 -0700 (Mon, 11 Jan 2010) | 1 line
+
+Restore trash function. Lower tap to walk precision requirements
+------------------------------------------------------------------------
+r209 | trent | 2010-01-10 16:03:46 -0700 (Sun, 10 Jan 2010) | 1 line
+
+Convert mem alpha bitmaps to mem display bitmaps properly at start. Made Sevalecan stronger. Reposition relic in xml.
+------------------------------------------------------------------------
+r208 | trent | 2010-01-10 16:02:11 -0700 (Sun, 10 Jan 2010) | 1 line
+
+Added sim finger bitmaps
+------------------------------------------------------------------------
+r207 | trent | 2010-01-09 16:51:56 -0700 (Sat, 09 Jan 2010) | 1 line
+
+Had wrong image names for landing icon/lander mini game images
+------------------------------------------------------------------------
+r206 | trent | 2010-01-09 15:04:55 -0700 (Sat, 09 Jan 2010) | 1 line
+
+Disable printing save states to console and creating 9.save
+------------------------------------------------------------------------
+r205 | trent | 2010-01-09 14:32:56 -0700 (Sat, 09 Jan 2010) | 1 line
+
+Disable testing save state
+------------------------------------------------------------------------
+r204 | trent | 2010-01-09 13:09:29 -0700 (Sat, 09 Jan 2010) | 1 line
+
+Added hot corner for shake alternative. Made nearest arrow select if you miss one (MMultiChooser). Repeat swipe info in tutorial. Devolumize select.ogg. Make Lava enemy a bit stronger. Update tgui for hot corner.
+------------------------------------------------------------------------
+r203 | trent | 2010-01-08 21:06:02 -0700 (Fri, 08 Jan 2010) | 1 line
+
+Made hurt enemies not flash between anims quickly
+------------------------------------------------------------------------
+r201 | trent | 2010-01-08 15:45:24 -0700 (Fri, 08 Jan 2010) | 1 line
+
+Bump version to 0051. Use original sprites for Tiggy (others were scaled oddly).
+------------------------------------------------------------------------
+r200 | trent | 2010-01-08 14:53:34 -0700 (Fri, 08 Jan 2010) | 1 line
+
+Move position of clock closer to player for quick/slow spells
+------------------------------------------------------------------------
+r199 | trent | 2010-01-08 13:58:16 -0700 (Fri, 08 Jan 2010) | 1 line
+
+Amplify error.ogg and chomp.ogg
+------------------------------------------------------------------------
+r198 | trent | 2010-01-08 13:45:06 -0700 (Fri, 08 Jan 2010) | 1 line
+
+Made some tiles in jungle.area solid that shouldn't have been passable.
+------------------------------------------------------------------------
+r197 | trent | 2010-01-08 11:21:06 -0700 (Fri, 08 Jan 2010) | 1 line
+
+Fixed jungle stream horizontal tiles. Remove some fuzz from Creep.
+------------------------------------------------------------------------
+r196 | trent | 2010-01-08 08:25:30 -0700 (Fri, 08 Jan 2010) | 1 line
+
+Set loop mode pingpong on some player attacks. Fix looping ping pong anims (only ran once like non looping ones)
+------------------------------------------------------------------------
+r195 | trent | 2010-01-07 08:33:52 -0700 (Thu, 07 Jan 2010) | 1 line
+
+Make portal go to darkside portal not map
+------------------------------------------------------------------------
+r194 | trent | 2010-01-07 08:20:45 -0700 (Thu, 07 Jan 2010) | 1 line
+
+Restore keep image and keep_icon
+------------------------------------------------------------------------
+r193 | trent | 2010-01-07 05:11:40 -0700 (Thu, 07 Jan 2010) | 1 line
+
+Faelon only has 3 frames for poison
+------------------------------------------------------------------------
+r192 | trent | 2010-01-07 04:22:38 -0700 (Thu, 07 Jan 2010) | 1 line
+
+Fix bugs in Faelon xml. Fix poison display
+------------------------------------------------------------------------
+r190 | trent | 2010-01-06 05:11:16 -0700 (Wed, 06 Jan 2010) | 1 line
+
+Fix typo in Faelon battle xml
+------------------------------------------------------------------------
+r188 | trent | 2010-01-05 11:38:39 -0700 (Tue, 05 Jan 2010) | 1 line
+
+Bump version to 0048
+------------------------------------------------------------------------
+r187 | trent | 2010-01-04 16:43:16 -0700 (Mon, 04 Jan 2010) | 1 line
+
+Finished Tipper battle sprites. Fix bug with white magic spells in battle displaying wrong numbers
+------------------------------------------------------------------------
+r186 | trent | 2010-01-04 13:25:11 -0700 (Mon, 04 Jan 2010) | 1 line
+
+Play loading animation in a different thread than loading bitmaps (convert them from mem bmps after). New chomp.ogg
+------------------------------------------------------------------------
+r185 | trent | 2010-01-03 19:06:13 -0700 (Sun, 03 Jan 2010) | 1 line
+
+New portal map icon. Tweak timing of loading screen
+------------------------------------------------------------------------
+r184 | trent | 2010-01-03 17:07:30 -0700 (Sun, 03 Jan 2010) | 1 line
+
+Added new loading screen and completed all map area icons
+------------------------------------------------------------------------
+r183 | trent | 2010-01-03 11:58:06 -0700 (Sun, 03 Jan 2010) | 1 line
+
+Finished Mel battle sprites. Fixed some xml for battle sprites (must test these thoroughly\!
+------------------------------------------------------------------------
+r182 | trent | 2010-01-02 18:52:31 -0700 (Sat, 02 Jan 2010) | 1 line
+
+Updated 14 of 19 map icons
+------------------------------------------------------------------------
+r181 | trent | 2010-01-02 14:16:05 -0700 (Sat, 02 Jan 2010) | 1 line
+
+Fixup Rios battle sprite/xml. Finished Tiggy battle spritesheet.
+------------------------------------------------------------------------
+r180 | trent | 2010-01-02 13:48:40 -0700 (Sat, 02 Jan 2010) | 1 line
+
+Slow down white blinking. Fix guy in seasides speech about badge might be useful in seaside. Finished evilTig sprites. Update rios xml (3 frames not 4). Update Eny sprite (offsets)
+------------------------------------------------------------------------
+r179 | trent | 2010-01-01 12:00:29 -0700 (Fri, 01 Jan 2010) | 1 line
+
+Fix Rios xml. New Tiggy enemy sprites (need stand with broken staff)
+------------------------------------------------------------------------
+r178 | trent | 2010-01-01 08:54:49 -0700 (Fri, 01 Jan 2010) | 1 line
+
+Added noweapon_use anim to Eny battle spritesheet
+------------------------------------------------------------------------
+r177 | trent | 2010-01-01 08:30:39 -0700 (Fri, 01 Jan 2010) | 1 line
+
+Fixup Gunnar xml. Finihsed guard battle sprites
+------------------------------------------------------------------------
+r176 | trent | 2010-01-01 08:21:23 -0700 (Fri, 01 Jan 2010) | 1 line
+
+Finished Eny battle sprites
+------------------------------------------------------------------------
+r175 | trent | 2009-12-31 16:46:29 -0700 (Thu, 31 Dec 2009) | 1 line
+
+Delete launcher.dat (unused megabyte)
+------------------------------------------------------------------------
+r174 | trent | 2009-12-31 13:49:53 -0700 (Thu, 31 Dec 2009) | 1 line
+
+Finished Faelon battle sprites
+------------------------------------------------------------------------
+r173 | trent | 2009-12-31 13:21:39 -0700 (Thu, 31 Dec 2009) | 1 line
+
+Finished Rider and Rios battle animations
+------------------------------------------------------------------------
+r172 | trent | 2009-12-31 08:36:25 -0700 (Thu, 31 Dec 2009) | 1 line
+
+Added new gunnar battle sprite
+------------------------------------------------------------------------
+r171 | trent | 2009-12-30 16:41:59 -0700 (Wed, 30 Dec 2009) | 1 line
+
+Make player idle animations slower (battle). New beast (check\!). Remove save point from darkside (not a big problem just appeared in the bmp dump for the strategy guide).
+------------------------------------------------------------------------
+r170 | trent | 2009-12-27 21:46:56 -0700 (Sun, 27 Dec 2009) | 1 line
+
+Prefix is noweapon_ not noweapon
+------------------------------------------------------------------------
+r169 | trent | 2009-12-27 21:17:31 -0700 (Sun, 27 Dec 2009) | 1 line
+
+Fix beast
+------------------------------------------------------------------------
+r168 | trent | 2009-12-27 21:07:10 -0700 (Sun, 27 Dec 2009) | 1 line
+
+Increase volume of all sound effects. Rider cast animation froze when fighting him. Use MAX_SPELLS_IN_THIS_GAME in some places.
+------------------------------------------------------------------------
+r167 | trent | 2009-12-22 15:20:14 -0700 (Tue, 22 Dec 2009) | 1 line
+
+Made code to support players having animations with either weapons equipped or not. Add 'SFX Only' audio option. Normalized all sfx to make audible while ipod music is playing.
+------------------------------------------------------------------------
+r166 | trent | 2009-12-22 14:47:05 -0700 (Tue, 22 Dec 2009) | 1 line
+
+Remove weapon anims and xmls. Update player combat xml.
+------------------------------------------------------------------------
+r165 | trent | 2009-12-20 13:33:57 -0700 (Sun, 20 Dec 2009) | 1 line
+
+New Rider combat sprites
+------------------------------------------------------------------------
+r164 | trent | 2009-12-19 13:41:56 -0700 (Sat, 19 Dec 2009) | 1 line
+
+Add new Faelon battle sprites. New slice and ching sounds (mystic sword vs. staff)
+------------------------------------------------------------------------
+r163 | trent | 2009-12-18 14:01:53 -0700 (Fri, 18 Dec 2009) | 1 line
+
+Bump version to 0047. Work around iphone bug that caused fire button to lock to a down position in shooter
+------------------------------------------------------------------------
+r162 | trent | 2009-12-17 11:31:03 -0700 (Thu, 17 Dec 2009) | 1 line
+
+Made drag and drop behave properly again in items menu and store, hopefully with no side effects
+------------------------------------------------------------------------
+r161 | trent | 2009-12-16 14:14:27 -0700 (Wed, 16 Dec 2009) | 1 line
+
+Added trailer.mt2
+------------------------------------------------------------------------
+r159 | trent | 2009-12-16 09:53:12 -0700 (Wed, 16 Dec 2009) | 1 line
+
+Special fix for older save states
+------------------------------------------------------------------------
+r158 | trent | 2009-12-15 13:22:49 -0700 (Tue, 15 Dec 2009) | 1 line
+
+Make Tiggy go back to rest/stand position after casting in first battle
+------------------------------------------------------------------------
+r157 | trent | 2009-12-14 21:40:26 -0700 (Mon, 14 Dec 2009) | 1 line
+
+Don't save time when starting a new game
+------------------------------------------------------------------------
+r156 | trent | 2009-12-14 15:41:05 -0700 (Mon, 14 Dec 2009) | 1 line
+
+Added new Eny battle sprites. Added some graphics (title text + forum version) to origdata
+------------------------------------------------------------------------
+r155 | trent | 2009-12-13 17:33:20 -0700 (Sun, 13 Dec 2009) | 1 line
+
+Made fixup_players program that centers player sprites in spritesheets
+------------------------------------------------------------------------
+r154 | trent | 2009-12-13 13:12:51 -0700 (Sun, 13 Dec 2009) | 1 line
+
+Added new Eny and Faelon battle sprites (needs mods)
+------------------------------------------------------------------------
+r153 | trent | 2009-12-12 20:04:36 -0700 (Sat, 12 Dec 2009) | 1 line
+
+Remove printfs from allegro slowing down game
+------------------------------------------------------------------------
+r152 | trent | 2009-12-12 13:37:03 -0700 (Sat, 12 Dec 2009) | 1 line
+
+Add Eny statue to repaired Seaside
+------------------------------------------------------------------------
+r151 | trent | 2009-12-12 10:46:23 -0700 (Sat, 12 Dec 2009) | 1 line
+
+Added new improved Tode boss
+------------------------------------------------------------------------
+r150 | trent | 2009-12-11 12:44:15 -0700 (Fri, 11 Dec 2009) | 1 line
+
+Put music volume back up to 1 after sleeping in Muttrace
+------------------------------------------------------------------------
+r148 | trent | 2009-12-11 11:21:06 -0700 (Fri, 11 Dec 2009) | 1 line
+
+Make sure player is always walking exactly back to his original spot after taking his turn
+------------------------------------------------------------------------
+r147 | trent | 2009-12-11 11:20:06 -0700 (Fri, 11 Dec 2009) | 1 line
+
+Adjusted jungle village huts a little (turn bear skin around, make neater)
+------------------------------------------------------------------------
+r146 | trent | 2009-12-08 19:30:36 -0700 (Tue, 08 Dec 2009) | 1 line
+
+Added DoNoWaitForAnimationToFinish tag to Creep
+------------------------------------------------------------------------
+r145 | trent | 2009-12-08 08:32:11 -0700 (Tue, 08 Dec 2009) | 1 line
+
+Set Rider cast animation looping to false and tagged DoNotWaitForAnimationToFinish
+------------------------------------------------------------------------
+r143 | trent | 2009-12-07 20:12:17 -0700 (Mon, 07 Dec 2009) | 1 line
+
+Made hidden passage in keep more obvious
+------------------------------------------------------------------------
+r142 | trent | 2009-12-07 15:20:13 -0700 (Mon, 07 Dec 2009) | 1 line
+
+Only allow lighting each fire once in Fort. Fix some almost-magic-pink pixels in Keep_main_door.
+------------------------------------------------------------------------
+r141 | trent | 2009-12-07 12:17:25 -0700 (Mon, 07 Dec 2009) | 1 line
+
+Add sounds back to backlash of lightning vs. Gator
+------------------------------------------------------------------------
+r140 | trent | 2009-12-07 10:26:07 -0700 (Mon, 07 Dec 2009) | 1 line
+
+Fix typo in last commit
+------------------------------------------------------------------------
+r139 | trent | 2009-12-07 08:12:11 -0700 (Mon, 07 Dec 2009) | 1 line
+
+Fix two finger scrolling of lists. Fortress underwater chests could not be activated.
+------------------------------------------------------------------------
+r138 | trent | 2009-12-06 18:22:02 -0700 (Sun, 06 Dec 2009) | 1 line
+
+Remove two book cases so the way doesn't get blocked so easily by girl in library in Flowey
+------------------------------------------------------------------------
+r137 | trent | 2009-12-06 13:38:15 -0700 (Sun, 06 Dec 2009) | 1 line
+
+Allow shake to go back in Start Game screen even when focused on New Game
+------------------------------------------------------------------------
+r136 | trent | 2009-12-06 13:04:00 -0700 (Sun, 06 Dec 2009) | 1 line
+
+Focus issues with TGUI. Calling tguiInit instead of tguiPop.
+------------------------------------------------------------------------
+r135 | trent | 2009-12-06 08:53:32 -0700 (Sun, 06 Dec 2009) | 1 line
+
+Final? object graphics: Gunnar Witch Harpy village1/5/6/7 Guard. Fixes for beach battle
+------------------------------------------------------------------------
+r134 | trent | 2009-12-05 15:47:06 -0700 (Sat, 05 Dec 2009) | 1 line
+
+Tweak beach battle -- stand back up after turn and after all battles
+------------------------------------------------------------------------
+r133 | trent | 2009-12-05 14:00:07 -0700 (Sat, 05 Dec 2009) | 1 line
+
+Added hurt and unconscious frames to all players that have them so far. Made dead beach enemies pile up.
+------------------------------------------------------------------------
+r132 | trent | 2009-12-05 11:21:31 -0700 (Sat, 05 Dec 2009) | 1 line
+
+Move shadow of enemies up a little. Fix bugs with Golem battle timer. Added new Guard_profile.png
+------------------------------------------------------------------------
+r131 | trent | 2009-12-03 20:53:33 -0700 (Thu, 03 Dec 2009) | 1 line
+
+Close off use magic in pause instead of deselecting all arrows in multichooser. Updated object sprites: Rios villager2 villager3 villager4
+------------------------------------------------------------------------
+r130 | trent | 2009-12-03 14:28:58 -0700 (Thu, 03 Dec 2009) | 1 line
+
+Fixed odd tile with half axe shaft on it in castle. Move some dialog boxes around (top->bottom, bottom->top. Added a tagging system for animations: xml files can have <tag></tag> marks in the root of each animation, using any string in between. Only one implemented right now is DoNotWaitForAnimationToFinish which is only used by regular enemies for their cast animation, which makes the animation play simultaneously with the spell effect instead of starting the spell effect after the cast animation.
+------------------------------------------------------------------------
+r129 | trent | 2009-12-02 19:01:15 -0700 (Wed, 02 Dec 2009) | 1 line
+
+Added soldier sprite sheet
+------------------------------------------------------------------------
+r128 | trent | 2009-12-02 18:54:29 -0700 (Wed, 02 Dec 2009) | 1 line
+
+Added new object sprites: mokkan Stomper Kamwerere Tiggy Sludge Imp Goofball toddler Seaside_informant
+------------------------------------------------------------------------
+r127 | trent | 2009-12-02 12:45:09 -0700 (Wed, 02 Dec 2009) | 1 line
+
+New Toad and Squito sprites
+------------------------------------------------------------------------
+r126 | trent | 2009-12-01 20:01:53 -0700 (Tue, 01 Dec 2009) | 1 line
+
+Make some text appear at bottom of screen instead of top (in intro). Reset runtime and gold after starting an existing game, quitting, then starting a new game.
+------------------------------------------------------------------------
+r125 | trent | 2009-12-01 16:46:38 -0700 (Tue, 01 Dec 2009) | 1 line
+
+Add (tm) to Nooskewl logo. Add music to mr_hut-1 (same as outside).
+------------------------------------------------------------------------
+r124 | trent | 2009-11-30 17:14:25 -0700 (Mon, 30 Nov 2009) | 1 line
+
+Bump version to 0044
+------------------------------------------------------------------------
+r123 | trent | 2009-11-30 13:43:04 -0700 (Mon, 30 Nov 2009) | 1 line
+
+Fixed LONG STANDING issue of 'random' player being the initial target of item and white magic actions (it is now always the topmost player)
+------------------------------------------------------------------------
+r122 | trent | 2009-11-30 11:49:11 -0700 (Mon, 30 Nov 2009) | 1 line
+
+Fix bad closing looping tag in Spirit xml
+------------------------------------------------------------------------
+r121 | trent | 2009-11-30 11:28:31 -0700 (Mon, 30 Nov 2009) | 1 line
+
+Can't save on boat when seaside is repaired. Don't trigger battle on jungle edges. Animated portal properly.
+------------------------------------------------------------------------
+r120 | trent | 2009-11-29 17:55:15 -0700 (Sun, 29 Nov 2009) | 1 line
+
+Bump version to 0043. Make Sevalecan shoot anim reset.
+------------------------------------------------------------------------
+r119 | trent | 2009-11-28 10:06:44 -0700 (Sat, 28 Nov 2009) | 1 line
+
+Fixed launchpad for new rocket
+------------------------------------------------------------------------
+r118 | trent | 2009-11-27 05:48:23 -0700 (Fri, 27 Nov 2009) | 1 line
+
+Update Tipper sprite
+------------------------------------------------------------------------
+r117 | trent | 2009-11-26 21:25:57 -0700 (Thu, 26 Nov 2009) | 1 line
+
+New object sprites: ring_bearer, shyzu_male, shyzu_female, sensie, Tipper, SallyJones, Trent, gold
+------------------------------------------------------------------------
+r115 | trent | 2009-11-26 10:00:38 -0700 (Thu, 26 Nov 2009) | 1 line
+
+Add looping false to Tig cast
+------------------------------------------------------------------------
+r113 | trent | 2009-11-26 09:40:36 -0700 (Thu, 26 Nov 2009) | 1 line
+
+Lower quality of music to reduce file size
+------------------------------------------------------------------------
+r111 | trent | 2009-11-26 09:17:04 -0700 (Thu, 26 Nov 2009) | 1 line
+
+Set all float to 0 in enemies. Fix various problems with shadows. Added new map icons: darkside, portal. Added new object graphics: prisoner, shopkeep0, shopkeep1, Seaside_shopkeeper, pushbox, Portal. Complete Dragon animation/transformation.
+------------------------------------------------------------------------
+r110 | trent | 2009-11-24 20:02:27 -0700 (Tue, 24 Nov 2009) | 1 line
+
+Fix stall on attack from enemy without attack anim
+------------------------------------------------------------------------
+r109 | trent | 2009-11-24 19:02:18 -0700 (Tue, 24 Nov 2009) | 1 line
+
+Added some object sprites: some may need redone (the shopkeepers don't match their profiles, but it's not a big deal). The sprites are: shopkeep0 Seaside_shopkeeper medallion_box rock lander shopkeep1 Possessed
+------------------------------------------------------------------------
+r107 | trent | 2009-11-24 15:18:55 -0700 (Tue, 24 Nov 2009) | 1 line
+
+Fixed bugs with Golem battles exiting program. Don't save on ship. Put rocks on mountain area that looks like exit. Fixed Golem xml.
+------------------------------------------------------------------------
+r106 | trent | 2009-11-23 15:27:26 -0700 (Mon, 23 Nov 2009) | 1 line
+
+Spread out pause menu button on the right vertically. Put more space between up/down arrows for levelUp popup. Gave Dragon more HP. Most of new Dragon sprite is done.
+------------------------------------------------------------------------
+r105 | trent | 2009-11-22 19:31:12 -0700 (Sun, 22 Nov 2009) | 1 line
+
+Made floating enemies float and added shadows to all enemies. Added new Dragon sprite (incomplete).
+------------------------------------------------------------------------
+r104 | trent | 2009-11-21 09:42:46 -0700 (Sat, 21 Nov 2009) | 1 line
+
+Made it work on simulator
+------------------------------------------------------------------------
+r103 | trent | 2009-11-20 10:36:04 -0700 (Fri, 20 Nov 2009) | 1 line
+
+Added 4.9-myiphone.patch. KEEP IT UP TO DATE\!
+------------------------------------------------------------------------
+r102 | trent | 2009-11-20 07:08:32 -0700 (Fri, 20 Nov 2009) | 1 line
+
+Add Natasha Bita to special thanks. Add new cell_door, rocket, hidden_passage, home_door, gate sprites.
+------------------------------------------------------------------------
+r101 | trent | 2009-11-19 14:46:03 -0700 (Thu, 19 Nov 2009) | 1 line
+
+Added quotes for Dan 'Dasse' Evertsson in credits. Finished jungle_shop music.
+------------------------------------------------------------------------
+r100 | trent | 2009-11-19 14:21:48 -0700 (Thu, 19 Nov 2009) | 1 line
+
+Add microcat to credits. Fix some enemy animation timings. Finished tutorial.caf.
+------------------------------------------------------------------------
+r99 | trent | 2009-11-19 08:33:20 -0700 (Thu, 19 Nov 2009) | 1 line
+
+Added new Monster sprites. Added sprites: mate, Keep_mid_door, Keep_main_door, Mom, fortress_door, monk1m lady, Kitty, mushroom_bag, key, King, monk0, fruitTree.
+------------------------------------------------------------------------
+r98 | trent | 2009-11-18 19:55:24 -0700 (Wed, 18 Nov 2009) | 1 line
+
+Fixed previously 'fixed' bugs: using strength on enemy could do damage and attack animations not playing all the way through
+------------------------------------------------------------------------
+r96 | trent | 2009-11-17 21:04:41 -0700 (Tue, 17 Nov 2009) | 1 line
+
+Only one blip in level tap on arrow. Play full attack animation (untested). Never do damage when enemy is strong against a spell. Cure on zombies/mummy was wrong.
+------------------------------------------------------------------------
+r95 | trent | 2009-11-17 15:37:15 -0700 (Tue, 17 Nov 2009) | 1 line
+
+Fix up and change some map icons. Make credits text fade out during wave.
+------------------------------------------------------------------------
+r94 | trent | 2009-11-17 11:18:07 -0700 (Tue, 17 Nov 2009) | 1 line
+
+Finished new credits screen
+------------------------------------------------------------------------
+r93 | trent | 2009-11-17 10:36:18 -0700 (Tue, 17 Nov 2009) | 1 line
+
+Added remaining frames (cast) to Golem. 50% done new credits screen.
+------------------------------------------------------------------------
+r92 | trent | 2009-11-17 08:44:15 -0700 (Tue, 17 Nov 2009) | 1 line
+
+Added credit_bg and credit_font. Add music to jungle huts
+------------------------------------------------------------------------
+r91 | trent | 2009-11-17 05:40:05 -0700 (Tue, 17 Nov 2009) | 1 line
+
+Added 12okt music for launchpad
+------------------------------------------------------------------------
+r90 | trent | 2009-11-17 05:23:43 -0700 (Tue, 17 Nov 2009) | 1 line
+
+Added jungle shop and tutorial music. Added Kinggator origdata
+------------------------------------------------------------------------
+r89 | trent | 2009-11-16 14:06:27 -0700 (Mon, 16 Nov 2009) | 1 line
+
+Added Golem sprites. Still need cast anim.
+------------------------------------------------------------------------
+r88 | trent | 2009-11-16 13:58:06 -0700 (Mon, 16 Nov 2009) | 1 line
+
+Adjusted some frame timings on some enemies
+------------------------------------------------------------------------
+r87 | trent | 2009-11-16 12:52:53 -0700 (Mon, 16 Nov 2009) | 1 line
+
+Added new Wolf sprite
+------------------------------------------------------------------------
+r86 | trent | 2009-11-16 04:46:03 -0700 (Mon, 16 Nov 2009) | 1 line
+
+Fix point display for Vampire. Updated obj sprites: Goblin, sub, Girl, Golem, Rider, fire, dark_horse
+------------------------------------------------------------------------
+r85 | trent | 2009-11-15 19:51:53 -0700 (Sun, 15 Nov 2009) | 1 line
+
+Added those missing frames to Girl sprites. Copy fleer obj sprites to Mel.
+------------------------------------------------------------------------
+r84 | trent | 2009-11-14 13:34:11 -0700 (Sat, 14 Nov 2009) | 1 line
+
+Some new combat anims: Witch and Girl.. Girl is incomplete and the xml has a FIXME in it
+------------------------------------------------------------------------
+r83 | trent | 2009-11-12 21:01:50 -0700 (Thu, 12 Nov 2009) | 1 line
+
+New fat_old_guy, Gunnar, Farmer, Faelon, Guard, fleer sprites
+------------------------------------------------------------------------
+r82 | trent | 2009-11-12 08:10:41 -0700 (Thu, 12 Nov 2009) | 1 line
+
+Fixed Rend.png background, was grey
+------------------------------------------------------------------------
+r81 | trent | 2009-11-12 08:06:31 -0700 (Thu, 12 Nov 2009) | 1 line
+
+Can't save when golem timer on\!
+------------------------------------------------------------------------
+r80 | trent | 2009-11-12 07:23:21 -0700 (Thu, 12 Nov 2009) | 1 line
+
+New Daryl, drunkard1, Faelon, geisha, Doggy object sprites
+------------------------------------------------------------------------
+r79 | trent | 2009-11-11 18:49:16 -0700 (Wed, 11 Nov 2009) | 1 line
+
+Made levelUp easier by adding a popup with up/down buttons
+------------------------------------------------------------------------
+r78 | trent | 2009-11-11 08:22:39 -0700 (Wed, 11 Nov 2009) | 1 line
+
+There is no prepare anim for chef so use walk_n
+------------------------------------------------------------------------
+r76 | trent | 2009-11-10 19:08:48 -0700 (Tue, 10 Nov 2009) | 1 line
+
+Changed some animation sequences (e.g. Hornet does not move but to attack, Mage/Halberd/Stabber/more 3-frame actions slowed down). Fixed a shop bug where you can't buy or sell anything
+------------------------------------------------------------------------
+r75 | trent | 2009-11-09 10:26:52 -0700 (Mon, 09 Nov 2009) | 1 line
+
+Replace 'X' with 'icon' in map tutorial
+------------------------------------------------------------------------
+r73 | trent | 2009-11-09 09:25:43 -0700 (Mon, 09 Nov 2009) | 1 line
+
+Added new chest, blue_chest, big_momma, castledoors, Vulture
+------------------------------------------------------------------------
+r72 | trent | 2009-11-08 13:38:42 -0700 (Sun, 08 Nov 2009) | 1 line
+
+Added music to monastery
+------------------------------------------------------------------------
+r71 | trent | 2009-11-08 13:08:07 -0700 (Sun, 08 Nov 2009) | 1 line
+
+Reworked Twister spell for new graphic
+------------------------------------------------------------------------
+r70 | trent | 2009-11-08 08:03:13 -0700 (Sun, 08 Nov 2009) | 1 line
+
+Added new Vulture and Twister sprites from Ramon
+------------------------------------------------------------------------
+r68 | trent | 2009-11-05 16:34:04 -0700 (Thu, 05 Nov 2009) | 1 line
+
+Fix drag-and-drop issue (things remain floating). Update media: Stomper.png UFO.png Stomp.png Stump.png Stabber.png
+------------------------------------------------------------------------
+r67 | trent | 2009-11-05 08:44:17 -0700 (Thu, 05 Nov 2009) | 1 line
+
+Added some graphics from Tony. Fixed drag and drop bug (hopefully)
+------------------------------------------------------------------------
+r65 | trent | 2009-11-03 10:04:51 -0700 (Tue, 03 Nov 2009) | 1 line
+
+Added keep_icon.png
+------------------------------------------------------------------------
+r64 | trent | 2009-11-03 10:04:02 -0700 (Tue, 03 Nov 2009) | 1 line
+
+Fixed bugs add features and enemies (0033 here)
+------------------------------------------------------------------------
+r63 | trent | 2009-11-01 17:48:19 -0700 (Sun, 01 Nov 2009) | 1 line
+
+Add floating text for all white magic/items. Show exact numbers for these not always max. Show mana in orange. Rename Rent spell to Rend.
+------------------------------------------------------------------------
+r61 | trent | 2009-10-30 12:16:42 -0600 (Fri, 30 Oct 2009) | 1 line
+
+This is 0032-iBetaTest
+------------------------------------------------------------------------
+r60 | trent | 2009-10-30 08:46:01 -0600 (Fri, 30 Oct 2009) | 1 line
+
+Tweaked a couple map icons
+------------------------------------------------------------------------
+r59 | trent | 2009-10-30 08:40:51 -0600 (Fri, 30 Oct 2009) | 1 line
+
+New map icons
+------------------------------------------------------------------------
+r58 | trent | 2009-10-29 21:05:05 -0600 (Thu, 29 Oct 2009) | 1 line
+
+Added icons for a bunch of map places, still more to do. Display them.
+------------------------------------------------------------------------
+r57 | trent | 2009-10-29 14:00:14 -0600 (Thu, 29 Oct 2009) | 1 line
+
+Made archery meter 'accurate'. Can shake to cancel things in levelUp. Spells give HP when enemy has that strength. Added King/King Albert painting.
+------------------------------------------------------------------------
+r56 | trent | 2009-10-28 12:25:03 -0600 (Wed, 28 Oct 2009) | 1 line
+
+Added possibility for 'hurt' animation to enemies, and use it for Lava untested
+------------------------------------------------------------------------
+r55 | trent | 2009-10-28 09:30:13 -0600 (Wed, 28 Oct 2009) | 1 line
+
+Improved some character dialog. Made enemy anims reset (attack & cast). Made map not auto scroll
+------------------------------------------------------------------------
+r54 | trent | 2009-10-27 20:35:16 -0600 (Tue, 27 Oct 2009) | 1 line
+
+Fix up the top floor of the keep (black/missing tiles, added shadow to back to make back towers etc). Tidy up Flamer-alike enemy sprites. Made beast strong against electricity spells.
+------------------------------------------------------------------------
+r53 | trent | 2009-10-27 09:00:52 -0600 (Tue, 27 Oct 2009) | 1 line
+
+Turn fps counter off (on-screen). Add more noise to fire3. Make pink alpha in Fire3.png. Crop DarkTroll.
+------------------------------------------------------------------------
+r52 | trent | 2009-10-26 22:10:51 -0600 (Mon, 26 Oct 2009) | 1 line
+
+Added new sprites from Ramon: mushroom, Kromagma, Lava, Fire3
+------------------------------------------------------------------------
+r51 | trent | 2009-10-26 20:42:08 -0600 (Mon, 26 Oct 2009) | 1 line
+
+Prompt user before quiting tutorial on shake
+------------------------------------------------------------------------
+r50 | trent | 2009-10-26 18:04:37 -0600 (Mon, 26 Oct 2009) | 1 line
+
+Added some enemies fix some bugs etc...
+------------------------------------------------------------------------
+r49 | trent | 2009-10-24 20:05:32 -0600 (Sat, 24 Oct 2009) | 1 line
+
+Make dialog appear on right half of the screen (bug 181)
+------------------------------------------------------------------------
+r48 | trent | 2009-10-24 17:49:07 -0600 (Sat, 24 Oct 2009) | 1 line
+
+Added DarkMan and Grinner. Added 'rate this game' link.
+------------------------------------------------------------------------
+r47 | trent | 2009-10-23 11:31:29 -0600 (Fri, 23 Oct 2009) | 1 line
+
+Made unequiping stack items.
+------------------------------------------------------------------------
+r46 | trent | 2009-10-23 09:34:26 -0600 (Fri, 23 Oct 2009) | 1 line
+
+Re-add jungle_ambience.ogg
+------------------------------------------------------------------------
+r45 | trent | 2009-10-23 09:30:09 -0600 (Fri, 23 Oct 2009) | 1 line
+
+Bugfixes. Revert some tiles. Fix jungle ambience in jungle village. Some new enemu sprites
+------------------------------------------------------------------------
+r44 | trent | 2009-10-21 18:53:13 -0600 (Wed, 21 Oct 2009) | 1 line
+
+Make enemy work buffer 2/3 width of screen
+------------------------------------------------------------------------
+r43 | trent | 2009-10-21 11:53:33 -0600 (Wed, 21 Oct 2009) | 1 line
+
+Remove white dots from BigBlue's eyes
+------------------------------------------------------------------------
+r42 | trent | 2009-10-21 08:49:41 -0600 (Wed, 21 Oct 2009) | 1 line
+
+Allow opening eny cell door from the other side
+------------------------------------------------------------------------
+r41 | trent | 2009-10-21 07:48:24 -0600 (Wed, 21 Oct 2009) | 1 line
+
+Commit gradient font converter tool
+------------------------------------------------------------------------
+r40 | trent | 2009-10-21 07:37:26 -0600 (Wed, 21 Oct 2009) | 1 line
+
+Fix typo. Don't take extra turn when quickend if enemies all dead
+------------------------------------------------------------------------
+r39 | trent | 2009-10-21 07:22:21 -0600 (Wed, 21 Oct 2009) | 1 line
+
+Rename Demon to Fiend.
+------------------------------------------------------------------------
+r38 | trent | 2009-10-21 07:02:06 -0600 (Wed, 21 Oct 2009) | 1 line
+
+Tweak big blue. Hide gold until looking from tower. Use multipleTouchEnabled to make shooter better. Make Alien and Light stuff different.
+------------------------------------------------------------------------
+r37 | trent | 2009-10-20 18:56:40 -0600 (Tue, 20 Oct 2009) | 1 line
+
+Update plist and Version to 0027
+------------------------------------------------------------------------
+r36 | trent | 2009-10-20 17:15:10 -0600 (Tue, 20 Oct 2009) | 1 line
+
+Use Apple Lossless Audio Codec files in .caf (Core Audio) files
+------------------------------------------------------------------------
+r35 | trent | 2009-10-20 15:07:13 -0600 (Tue, 20 Oct 2009) | 1 line
+
+Fix corner bitmaps
+------------------------------------------------------------------------
+r34 | trent | 2009-10-20 14:30:27 -0600 (Tue, 20 Oct 2009) | 1 line
+
+Touched up bunch of enemy sprites. Add corner_bmp to all frames. Tweaked Vampire spell.
+------------------------------------------------------------------------
+r33 | trent | 2009-10-20 07:58:31 -0600 (Tue, 20 Oct 2009) | 1 line
+
+Made orb soft and always follow player
+------------------------------------------------------------------------
+r32 | trent | 2009-10-20 06:44:19 -0600 (Tue, 20 Oct 2009) | 1 line
+
+Loads of new enemy graphics. Make heals work on Mummies. Make revive work on undead.
+------------------------------------------------------------------------
+r31 | trent | 2009-10-19 21:49:43 -0600 (Mon, 19 Oct 2009) | 1 line
+
+Added a corner widget to break up the space in the pause menu.
+------------------------------------------------------------------------
+r30 | trent | 2009-10-19 20:35:02 -0600 (Mon, 19 Oct 2009) | 1 line
+
+Make volcano bridge not have battles to avoid confusion with two different terrains. Fix stone spell.
+------------------------------------------------------------------------
+r29 | trent | 2009-10-19 17:59:51 -0600 (Mon, 19 Oct 2009) | 1 line
+
+Close bug 163 -- Crash entering mrbig.area. Also fixed moon path tiles.
+------------------------------------------------------------------------
+r28 | trent | 2009-10-19 17:23:39 -0600 (Mon, 19 Oct 2009) | 1 line
+
+Fixed some tiles on moon_valley+tilemap that were off
+------------------------------------------------------------------------
+r27 | trent | 2009-10-19 09:01:30 -0600 (Mon, 19 Oct 2009) | 1 line
+
+Rename Dork to Peeper
+------------------------------------------------------------------------
+r26 | trent | 2009-10-19 08:57:33 -0600 (Mon, 19 Oct 2009) | 1 line
+
+Added gold to forest
+------------------------------------------------------------------------
+r25 | trent | 2009-10-18 16:32:17 -0600 (Sun, 18 Oct 2009) | 1 line
+
+Bring up to 0024
+------------------------------------------------------------------------
+r24 | trent | 2009-10-17 20:46:47 -0600 (Sat, 17 Oct 2009) | 1 line
+
+Fix some tiles. Fix some inventory bugs (hopefully). Rename Boa files Viper.
+------------------------------------------------------------------------
+r23 | trent | 2009-10-17 05:27:51 -0600 (Sat, 17 Oct 2009) | 1 line
+
+Fixed some tiles in jungle village. Fied typo in jungle_village.lua.
+------------------------------------------------------------------------
+r22 | trent | 2009-10-15 09:43:14 -0600 (Thu, 15 Oct 2009) | 1 line
+
+Fixup charm anim. Some new monsters from Ramon. Fixes to tilemap (minor). Fix archery game so it doesn't load over and over even if you beat it. Some printfs for debugging 3gs locking/fbo bug.
+------------------------------------------------------------------------
+r21 | trent | 2009-10-14 18:26:51 -0600 (Wed, 14 Oct 2009) | 1 line
+
+Made shadows all the same regardless of character width. Make exit cleanly.
+------------------------------------------------------------------------
+r20 | trent | 2009-10-13 16:28:59 -0600 (Tue, 13 Oct 2009) | 1 line
+
+Rename Halbred to Halberd
+------------------------------------------------------------------------
+r19 | trent | 2009-10-13 16:24:24 -0600 (Tue, 13 Oct 2009) | 1 line
+
+Meter in archery game. Eny 'defends' now not skips. Reword submarine prompt. Some new graphics from Ramon. Misc fixes/changes.
+------------------------------------------------------------------------
+r17 | trent | 2009-10-12 07:26:58 -0600 (Mon, 12 Oct 2009) | 1 line
+
+Add 4.9-diff (fixed leaks). Update for 0017
+------------------------------------------------------------------------
+r16 | trent | 2009-10-11 09:44:47 -0600 (Sun, 11 Oct 2009) | 1 line
+
+Face direction of activation
+------------------------------------------------------------------------
+r15 | trent | 2009-10-11 08:38:57 -0600 (Sun, 11 Oct 2009) | 1 line
+
+Made status in battle work and stats in pause show 0 for below 0 hp. Added shadows to players
+------------------------------------------------------------------------
+r14 | trent | 2009-10-10 21:04:14 -0600 (Sat, 10 Oct 2009) | 1 line
+
+Add highqualityoggs/wavs for modifications
+------------------------------------------------------------------------
+r13 | trent | 2009-10-10 21:03:00 -0600 (Sat, 10 Oct 2009) | 1 line
+
+Add some origdata. Fix corner tiles in mountain descent.
+------------------------------------------------------------------------
+r12 | trent | 2009-10-10 15:16:58 -0600 (Sat, 10 Oct 2009) | 1 line
+
+Fix pathfinding/screen clearing issue with fortress fall-through tiles
+------------------------------------------------------------------------
+r11 | trent | 2009-10-10 15:16:25 -0600 (Sat, 10 Oct 2009) | 1 line
+
+Clear messages on successful run from battle
+------------------------------------------------------------------------
+r10 | trent | 2009-10-10 14:37:28 -0600 (Sat, 10 Oct 2009) | 1 line
+
+Update some combat_media from Ramon. fixed music looping. 'Locked..' message could come up at same time as battle in fort_start -- fixed. Make version number SQUARE_BORDER.
+------------------------------------------------------------------------
+r8 | trent | 2009-10-10 13:03:28 -0600 (Sat, 10 Oct 2009) | 1 line
+
+Make raise/lower triggers work with pathfinding. Fix array out of bounds error.
+------------------------------------------------------------------------
+r7 | trent | 2009-10-10 12:04:56 -0600 (Sat, 10 Oct 2009) | 1 line
+
+Some spells had wrong elements (notably Bolt3 had ELEMENT_ICE) (issue 129).
+------------------------------------------------------------------------
+r6 | trent | 2009-10-10 09:22:15 -0600 (Sat, 10 Oct 2009) | 1 line
+
+Nothing
+------------------------------------------------------------------------
+r5 | trent | 2009-10-10 09:03:58 -0600 (Sat, 10 Oct 2009) | 1 line
+
+Keep player on screen at all times (among other bug fixes)
+------------------------------------------------------------------------
+r2 | trent | 2009-10-09 20:57:19 -0600 (Fri, 09 Oct 2009) | 1 line
+
+Attempt at making map music loop etter
+------------------------------------------------------------------------
+r1 | Trent Gamblin | 2009-10-09 17:50:53 -0600 (Fri, 09 Oct 2009) | 1 line
+
+
+------------------------------------------------------------------------

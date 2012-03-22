@@ -1,0 +1,75 @@
+//////////////////
+// combat_media //
+//////////////////
+
+AcidBall:
+-added shadows and highlights (same for SludgeBall)
+
+Awoken:
+-added detail
+-added shadow
+-re-shaded
+
+Banana:
+-added a little detail
+
+Boa:
+-added a little highlight/shadow on the head
+-changed angle of fangs slightly
+
+Carrot:
+-re-shaded
+-thickened arms and legs
+
+Creep:
+-brightened the darker blues so the detail can be seen
+
+Cub:
+-added a nose
+
+Daisy:
+-re-shaded the stem and leaves on frames 3-5
+
+DarkMan:
+-re-shaded
+-added small tattoos
+
+Devil:
+-added highlights
+
+Droplet:
+-re-shaded glove
+
+Efreet:
+-added highlights
+
+Eny: *unfinished*
+-redesigned
+
+EvilTig:
+-reshaded everything
+-fixed shape of face
+
+FireAnt:
+-added a bit of shading on antenna and teeth
+
+Goofball:
+-added some shading on the eyeball
+-shaded a bit near the nose to define it more
+
+Harpy:
+-fully remade
+
+Punch:
+-shaded to match Droplet's glove
+
+SludgeBall:
+-shaded to match AcidBall
+
+/////////////
+// objects //
+/////////////
+
+Eny:
+-added shoes, buttons
+-reshaded

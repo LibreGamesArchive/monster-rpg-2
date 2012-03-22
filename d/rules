@@ -1,0 +1,124 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+export BASEDIR=$(shell pwd)
+export PACKAGE_DIR=${BASEDIR}/..
+
+export INSTDIR=${PACKAGE_DIR}/inst
+export PKG_CONFIG_PATH=${INSTDIR}/lib/pkgconfig
+
+export MONSTER2_BASENAME=monster-rpg-2
+export ALLEGRO5_SRCDIR=${BASEDIR}/allegro-5.1
+
+export BUILDA5_DIR=${PACKAGE_DIR}/build-a5
+
+export LDFLAGS = -L${INSTDIR}/lib -L${HOME}/libs
+export CFLAGS = -Wall -g -fPIC -I${INSTDIR}/include -I${BASEDIR}/bass24
+
+INSTALL = install
+INSTALL_FILE    = $(INSTALL) -p    -o root -g root  -m  644
+INSTALL_PROGRAM = $(INSTALL) -p    -o root -g root  -m  755
+INSTALL_SCRIPT  = $(INSTALL) -p    -o root -g root  -m  755
+INSTALL_DIR     = $(INSTALL) -p -d -o root -g root  -m  755
+
+ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0
+else
+	CFLAGS += -O2
+endif
+
+ifeq (,$(filter nostrip,$(DEB_BUILD_OPTIONS)))
+	INSTALL_PROGRAM += -s
+endif
+
+ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+	MAKEFLAGS += -j$(NUMJOBS)
+endif
+
+LIBBASS_PATH=UNKNOWN
+ifeq ($(DEB_BUILD_ARCH),i386)
+LIBBASS_PATH=bass24/x86/
+else ifeq ($(DEB_BUILD_ARCH),amd64)
+LIBBASS_PATH=bass24/x64/
+else
+$(error unknown arch. bass is not available for $(DEB_BUILD_ARCH). only i386 and amd64 is supported.)
+endif
+
+
+${INSTDIR}/lib/liblua-fixed.a:
+	${MAKE} -C lua-fixed generic CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}"
+	${MAKE} -C lua-fixed install INSTALL_TOP=${INSTDIR}
+	ln -s ${INSTDIR}/include ${INSTDIR}/include/lua-fixed
+
+${INSTDIR}/lib/libtgui.a: ${INSTDIR}/lib/liballegro-debug-static.a
+	${MAKE} -f Makefile.unix -C tgui CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}"
+	${INSTALL} -p tgui/tgui.hpp ${INSTDIR}/include/tgui.hpp
+	${INSTALL} -p tgui/libtgui.a ${INSTDIR}/lib/libtgui.a
+
+${INSTDIR}/lib/liballegro-debug-static.a:
+	mkdir -p ${PACKAGE_DIR}/inst
+	mkdir -p ${BUILDA5_DIR}
+	(cd ${BUILDA5_DIR}; cmake -DSHARED=OFF -DCMAKE_BUILD_TYPE=Debug -DWANT_DEMO=OFF -DWANT_DOCS=OFF -DWANT_DEMO=OFF -DWANT_EXAMPLES=OFF -DWANT_TESTS=OFF -DWANT_IMAGE_JPG=OFF -DCMAKE_INSTALL_PREFIX=${INSTDIR} ${ALLEGRO5_SRCDIR})
+	${MAKE} -C ${BUILDA5_DIR} CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}"
+	${MAKE} -C ${BUILDA5_DIR} install
+
+build: ${INSTDIR}/lib/liblua-fixed.a ${INSTDIR}/lib/liballegro-debug-static.a ${INSTDIR}/lib/libtgui.a
+	${INSTALL} -p ${LIBBASS_PATH}/libbass.so ${INSTDIR}/lib
+	${MAKE} -f Makefile.unix -C src CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}"
+
+clean:
+	${MAKE} -C lua-fixed clean
+	${MAKE} -f Makefile.unix -C tgui clean
+	${MAKE} -f Makefile.unix -C src clean
+	rm -fr ${BUILDA5_DIR}
+	rm -fr ${INSTDIR}
+	rm -fr debian/${MONSTER2_BASENAME}
+	rm -f debian/files
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_prep
+	dh_installdirs
+	${MAKE} -C src -f Makefile.unix install DESTDIR=${BASEDIR}/debian/${MONSTER2_BASENAME}/opt/${MONSTER2_BASENAME}
+	${INSTALL_FILE} ${LIBBASS_PATH}/libbass.so debian/${MONSTER2_BASENAME}/opt/${MONSTER2_BASENAME}/libbass.so
+	${INSTALL_FILE} ${LIBBASS_PATH}/libbassflac.so debian/${MONSTER2_BASENAME}/opt/${MONSTER2_BASENAME}/libbassflac.so
+	${INSTALL_FILE} -D monster-rpg-2.desktop debian/${MONSTER2_BASENAME}/usr/share/applications/monster-rpg-2.desktop
+	${INSTALL_FILE} -D monster-rpg-2.png debian/${MONSTER2_BASENAME}/usr/share/pixmaps/monster-rpg-2.png
+
+install-indep:
+
+binary-indep: build install
+	
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installdocs
+	dh_installexamples
+	dh_installmenu
+	dh_installchangelogs
+	dh_strip
+	dh_link
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+
+%:
+	dh $@ 
+
+.PHONY: build clean binary-indep binary-arch binary install

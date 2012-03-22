@@ -1,0 +1,32 @@
+This product is DRM free and can be installed on any number of computers that
+the buyer personally owns. Distribution of this installer or any of the files
+contained within is prohibited.
+
+Copyrights
+==========
+
+External dependencies
+---------------------
+Portions of the source code of Monster RPG 2 are copyrighted by Brian Paul of
+the Mesa 3D project. Copyright (C) 1999-2007 Brian Paul All Rights Reserved.
+
+DejaVuSans.ttf (distributed with version 1.8 (iOS) and 1.1 (PC) and onwards is
+copyright of Bitstream, Inc: Copyright (c) 2003 by Bitstream, Inc. All Rights
+Reserved. Bitstream Vera is a trademark of Bitstream, Inc. DejaVu fonts can be
+obtained from http://dejavu-fonts.org/wiki/Main_Page. The full license is
+listed at http://dejavu-fonts.org/wiki/License
+
+Nooskewl copyrights
+-------------------
+The source code and engine are Copyright (C) 2007-2011 Nooskewl. The artwork
+(graphics, sounds, music, etc) are jointly copyrighted between Nooskewl and the
+original authors. Monster RPG 2 uses some work derived from the original
+"Monster 2" which is BSD licensed. Those works remain under BSD license and are
+copyright of their respective authors.
+
+"Monster 2", the product upon which Monster RPG 2 is based, is BSD licensed,
+and can be found at http://monster2.googlecode.com. "Monster 2" is also
+copyright of Nooskewl.
+
+For more information please contact us: http://nooskewl.com/contact/
+

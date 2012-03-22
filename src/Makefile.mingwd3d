@@ -1,0 +1,90 @@
+CXX=g++
+CC=gcc
+
+
+ifdef BUILD_EDITOR
+CFLAGS=-DA5_D3D -DEDITOR -I. -IEditor -I"c:/users/trent/code/include"
+else
+CFLAGS=-DA5_D3D -O2 -I. -I"c:/users/trent/code/include" -I"C:\a5_d3d\include" -I"c:\Program Files (x86)\Microsoft DirectX SDK (August 2007)\include" -g -static-libgcc -static-libstdc++
+endif
+
+
+LINKFLAGS=-L"c:/a5_d3d/lib" -L"c:/users/trent/code/lib" -mwindows -static-libgcc -static-libstdc++
+
+
+CXX_SRCS=\
+	3d.cpp\
+	Area.cpp\
+	Animation.cpp\
+	AnimationSet.cpp\
+	battle.cpp\
+	CombatActions.cpp\
+	Combatant.cpp\
+	CombatEntity.cpp\
+	CombatEnemy.cpp\
+	CombatPlayer.cpp\
+	Configuration.cpp\
+	debug.cpp\
+	equipment.cpp\
+	Frame.cpp\
+	GenericEffect.cpp\
+	graphics.cpp\
+	Image.cpp\
+	Input.cpp\
+	inventory.cpp\
+	io.cpp\
+	Items.cpp\
+	lander.cpp\
+	Object.cpp\
+	pause.cpp\
+	Player.cpp\
+	redundant.cpp\
+	script.cpp\
+	shooter.cpp\
+	sound.cpp\
+	Spells.cpp\
+	Tile.cpp\
+	translate.cpp\
+	util.cpp\
+	widgets.cpp\
+	xml.cpp
+
+
+C_SRCS=\
+	atlas.c\
+	atlas_accessor.c
+
+
+CXX_LIBOBJS=$(CXX_SRCS:.cpp=.o)
+OBJCXX_LIBOBJS=init.o
+C_LIBOBJS=$(C_SRCS:.c=.o)
+
+
+
+ALLEGROLIBS=-L"c:\a5_d3d\lib" -lallegro_shader-static -lallegro_acodec-static -lallegro_audio-static -lallegro_dialog-static -lallegro_primitives-static -lallegro_ttf-static -lallegro_font-static -lallegro_image-static -lallegro-static -lallegro_main-static
+STATIC_LIBS=-lkernel32 -luser32 -lgdi32 -lcomdlg32 -lole32 -lwinmm -lpsapi -ldxguid -lgdiplus -luuid -lshlwapi
+LIBS=-llua-fixed -ltgui $(ALLEGROLIBS) -lz -lopengl32 -lwinmm -lbass -lfreetype $(STATIC_LIBS) "c:\program files (x86)\microsoft directx sdk (august 2007)\lib\x86\d3dx9.lib"
+
+
+default: monster2
+
+
+monster2: $(CXX_LIBOBJS) $(OBJCXX_LIBOBJS) $(C_LIBOBJS) monster2.o
+	g++ $(LINKFLAGS) -o monster2-d3d \
+		$(CXX_LIBOBJS) $(OBJCXX_LIBOBJS) $(C_LIBOBJS) icon.res \
+		monster2.o $(LIBS)
+
+.cpp.o:
+	$(CXX) $(CXXFLAGS) $(CFLAGS) -c $<
+
+.c.o:
+	$(CC) $(CFLAGS) -c $<
+
+init.o: init.mm
+	$(CXX) -x c++ $(CXXFLAGS) $(CFLAGS) -c init.mm
+
+clean:
+	-rm *.o
+	-rm meditor2
+	-rm monster2 monster2-quickdraw
+

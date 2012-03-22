@@ -1,0 +1,92 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+export BASEDIR=$(shell pwd)
+export PACKAGE_DIR=${BASEDIR}/..
+
+export INSTDIR=${PACKAGE_DIR}/inst
+export PKG_CONFIG_PATH=${INSTDIR}/lib/pkgconfig
+
+export MONSTER2_PKGNAME=monster-rpg2
+export MONSTER2_BASENAME=monster-rpg-2
+
+export LDFLAGS = -L${INSTDIR}/lib -L${HOME}/libs
+export CFLAGS = -Wall -g -fPIC -I${INSTDIR}/include -I${BASEDIR}/bass24
+
+INSTALL = install
+INSTALL_FILE    = $(INSTALL) -p    -o root -g root  -m  644
+INSTALL_PROGRAM = $(INSTALL) -p    -o root -g root  -m  755
+INSTALL_SCRIPT  = $(INSTALL) -p    -o root -g root  -m  755
+INSTALL_DIR     = $(INSTALL) -p -d -o root -g root  -m  755
+
+ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0
+else
+	CFLAGS += -O2
+endif
+
+ifeq (,$(filter nostrip,$(DEB_BUILD_OPTIONS)))
+	INSTALL_PROGRAM += -s
+endif
+
+ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+	MAKEFLAGS += -j$(NUMJOBS)
+endif
+
+BIN_PATH=UNKNOWN
+ifeq ($(DEB_BUILD_ARCH),i386)
+BIN_PATH=i386/
+else ifeq ($(DEB_BUILD_ARCH),amd64)
+BIN_PATH=amd64/
+else
+$(error unknown arch. bass is not available for $(DEB_BUILD_ARCH). only i386 and amd64 is supported.)
+endif
+
+install:
+	dh_testdir
+	dh_testroot
+	dh_prep
+	dh_installdirs
+	${INSTALL_PROGRAM} -D ${BIN_PATH}/monster2 debian/${MONSTER2_PKGNAME}/opt/${MONSTER2_BASENAME}/monster2
+	${INSTALL_FILE} -D ${BIN_PATH}/libbass.so debian/${MONSTER2_PKGNAME}/opt/${MONSTER2_BASENAME}/libbass.so
+	${INSTALL_FILE} -D ${BIN_PATH}/libbassflac.so debian/${MONSTER2_PKGNAME}/opt/${MONSTER2_BASENAME}/libbassflac.so
+	${INSTALL_FILE} -D monster-rpg2.desktop debian/${MONSTER2_PKGNAME}/usr/share/applications/monster-rpg2.desktop
+	${INSTALL_FILE} -D monster-rpg2.png debian/${MONSTER2_PKGNAME}/usr/share/pixmaps/monster-rpg2.png
+	${INSTALL_FILE} -D overrides/monster-rpg2 debian/${MONSTER2_PKGNAME}/usr/share/lintian/overrides/monster-rpg2
+
+install-indep:
+
+binary-indep: install
+	
+binary-arch: install
+	dh_testdir
+	dh_testroot
+	dh_installdocs
+	dh_installexamples
+	dh_installmenu
+	dh_installchangelogs
+	dh_strip
+	dh_link
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+
+%:
+	dh $@ 
+
+.PHONY: binary-indep binary-arch binary install

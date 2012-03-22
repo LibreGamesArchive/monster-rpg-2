@@ -1,0 +1,122 @@
+monster-rpg2 (1.10.0-1ubuntu1) maverick; urgency=low
+
+  * Travelling fairy helps you out when you're low on supplies
+  * Better support for Intel GPUs on Linux
+  * Loads of tweaks and improvements on a small scale
+
+ -- Trent Gamblin <trent@gamblin.ca>  Wed, 30 Nov 2011 10:21:00 -0700
+
+monster-rpg2 (1.9.6-1) maverick; urgency=low
+
+  * Workaround shader compiler weirdness in Gallium drivers.
+
+ -- Trent Gamblin <trent@gamblin.ca>  Sat, 27 Jul 2011 04:50:00 -0700
+
+monster-rpg2 (1.9.5-1) maverick; urgency=low
+
+  * Depend on monster-rpg-2-data 1.9.1.
+
+ -- Trent Gamblin <trent@gamblin.ca>  Sat, 23 Jul 2011 06:33:00 -0700
+
+monster-rpg2 (1.9.4-1) maverick; urgency=low
+
+  * Tweaks and bugfixes.
+
+ -- Trent Gamblin <trent@gamblin.ca>  Sat, 23 Jul 2011 04:57:00 -0700
+
+monster-rpg2 (1.9.3-1) maverick; urgency=low
+
+  * Made icon bigger.
+
+ -- Trent Gamblin <trent@gamblin.ca>  Tue, 19 Jul 2011 14:11:00 -0700
+
+monster-rpg2 (1.9.2-1) maverick; urgency=low
+
+  * Changed icons.
+
+ -- Trent Gamblin <trent@gamblin.ca>  Tue, 19 Jul 2011 13:41:00 -0700
+
+monster-rpg2 (1.9.1-1) maverick; urgency=low
+
+  * Bugfix in A*
+
+ -- Trent Gamblin <trent@gamblin.ca>  Tue, 19 Jul 2011 10:56:00 -0700
+
+monster-rpg2 (1.9.0-1) maverick; urgency=low
+
+  * Many new translations. Some new artwork. Many tweaks and bugfixes.
+
+ -- Trent Gamblin <trent@gamblin.ca>  Mon, 18 Jul 2011 10:04:00 -0700
+
+monster-rpg2 (1.0.8-1) maverick; urgency=low
+
+  * Packaging fixes
+
+ -- Trent Gamblin <trent@gamblin.ca>  Thu, 05 May 2011 21:55:00 -0700
+
+monster-rpg2 (1.0.7-1) maverick; urgency=low
+
+  * Added Spanish, German, and Polish translations. Many bug fixes and
+    feature enhancements.
+
+ -- Trent Gamblin <trent@gamblin.ca>  Thu, 28 Apr 2011 14:42:00 -0700
+
+monster-rpg2 (1.0.6-1) maverick; urgency=low
+
+  * fix a shader
+
+ -- Thomas Fjellstrom <thomas@fjellstrom.ca>  Tue, 08 Mar 2011 14:14:23 -0700
+
+monster-rpg2 (1.0.5-1) maverick; urgency=low
+
+  * compile fix
+
+ -- Thomas Fjellstrom <thomas@fjellstrom.ca>  Tue, 08 Mar 2011 02:05:51 -0700
+
+monster-rpg2 (1.0.4-1) maverick; urgency=low
+
+  * fix linking issue
+
+ -- Thomas Fjellstrom <thomas@fjellstrom.ca>  Tue, 08 Mar 2011 01:34:53 -0700
+
+monster-rpg2 (1.0.3-1ubuntu2) maverick; urgency=low
+
+  * increment version so launchpad accepts the package
+
+ -- Thomas Fjellstrom <thomas@fjellstrom.ca>  Mon, 07 Mar 2011 22:53:53 -0700
+
+monster-rpg2 (1.0.3-1) maverick; urgency=low
+
+  * more svn updates
+
+ -- Thomas Fjellstrom <thomas@fjellstrom.ca>  Mon, 07 Mar 2011 21:54:12 -0700
+
+monster-rpg2 (1.0.2-1) maverick; urgency=low
+
+  * another svn update, plenty of fixes
+
+ -- Thomas Fjellstrom <thomas@fjellstrom.ca>  Sat, 05 Mar 2011 17:42:31 -0700
+
+monster-rpg2 (1.0.1-1ubuntu1) maverick; urgency=low
+
+  * updates from svn
+
+ -- Thomas Fjellstrom <thomas@fjellstrom.ca>  Fri, 04 Mar 2011 15:06:00 -0700
+
+monster-rpg2 (1.0-1ubuntu2) maverick; urgency=low
+
+  * fix dependency issue in debian/rules file, should allow parallel makes to work
+
+ -- Thomas Fjellstrom <thomas@fjellstrom.ca>  Tue, 01 Mar 2011 17:41:01 -0700
+
+monster-rpg2 (1.0-1ubuntu1) maverick; urgency=low
+
+  * fix some build dependency issues, actually tested with pbuilder this time.
+
+ -- Thomas Fjellstrom <thomas@fjellstrom.ca>  Tue, 01 Mar 2011 14:53:13 -0700
+
+monster-rpg2 (1.0-1) maverick; urgency=low
+
+  * Initial release
+
+ -- Thomas Fjellstrom <thomas@fjellstrom.ca>  Sat, 26 Feb 2011 19:07:29 -0700

@@ -1,0 +1,75 @@
+monster-rpg-2-data (1.10.0-1ubuntu1) maverick; urgency=low
+
+  * Travelling fairy helps you out when you're low on supplies
+  * Better support for Intel GPUs on Linux
+  * Loads of tweaks and improvements on a small scale
+
+ -- Trent Gamblin <trent@gamblin.ca>  Wed, 30 Nov 2011 10:21:00 -0700
+
+monster-rpg-2-data (1.9.1-1) maverick; urgency=low
+
+  * Enhanced some tiles.
+
+ -- Trent Gamblin <trent@gamblin.ca>  Sat, 23 Jul 2011 04:57:00 -0700
+
+monster-rpg-2-data (1.9.0-1) maverick; urgency=low
+
+  * New and updated data for monster-rpg2 1.9.0.
+
+ -- Trent Gamblin <trent@gamblin.ca>  Mon, 18 Jul 2011 10:04:00 -0700
+
+monster-rpg-2-data (1.0.8-1) maverick; urgency=low
+
+  * Packaging fixes
+
+ -- Trent Gamblin <trent@gamblin.ca>  Thu, 05 May 2011 21:55:00 -0700
+
+monster-rpg-2-data (1.0.7-1) maverick; urgency=low
+
+  * All new sound effects.
+  * Many new and enhanced media files.
+  * Bug fixes.
+
+ -- Trent Gamblin <trent@gamblin.ca>  Thu, 28 Apr 2011 14:54:00 -0700
+
+monster-rpg-2-data (1.0.6-1) maverick; urgency=low
+
+  * fix a shader
+
+ -- Thomas Fjellstrom <thomas@fjellstrom.ca>  Tue, 08 Mar 2011 14:14:37 -0700
+
+monster-rpg-2-data (1.0.5-1) maverick; urgency=low
+
+  * 
+
+ -- Thomas Fjellstrom <thomas@fjellstrom.ca>  Tue, 08 Mar 2011 02:05:56 -0700
+
+monster-rpg-2-data (1.0.4-1) maverick; urgency=low
+
+  * fix linking issues
+
+ -- Thomas Fjellstrom <thomas@fjellstrom.ca>  Tue, 08 Mar 2011 01:35:19 -0700
+
+monster-rpg-2-data (1.0.3-1) maverick; urgency=low
+
+  * more svn updates
+
+ -- Thomas Fjellstrom <thomas@fjellstrom.ca>  Mon, 07 Mar 2011 21:54:20 -0700
+
+monster-rpg-2-data (1.0.2-1) maverick; urgency=low
+
+  * nada, remove me
+
+ -- Thomas Fjellstrom <thomas@fjellstrom.ca>  Sat, 05 Mar 2011 17:42:53 -0700
+
+monster-rpg-2-data (1.0-2) maverick; urgency=low
+
+  * updates from svn
+
+ -- Thomas Fjellstrom <thomas@fjellstrom.ca>  Fri, 04 Mar 2011 15:06:23 -0700
+
+monster-rpg-2-data (1.0-1) maverick; urgency=low
+
+  * Initial release
+
+ -- Thomas Fjellstrom <thomas@fjellstrom.ca>  Wed, 2 Mar 2011 20:03:55 -0700
