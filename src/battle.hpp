@@ -114,7 +114,6 @@ private:
 	bool running;
 	bool boss_fight;
 	bool inWater;
-	MBITMAP *tmpbmp;
 	int musicFadeCount;
 	int currId;
 	bool can_run; // can never run from boss fight

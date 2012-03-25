@@ -177,7 +177,7 @@ extern bool reload_translation;
 extern int PRESERVE_TEXTURE;
 extern bool achievement_show;
 extern double achievement_time;
-extern ALLEGRO_BITMAP *achievement_bmp;
+extern MBITMAP *achievement_bmp;
 
 void init_shaders(void);
 void destroy_shaders(void);

@@ -28,6 +28,7 @@ static int vert_compare(const void *a, const void *b)
 	return ac - bc;
 }
 
+#if 0
 static int vert_compare_z(const void *a, const void *b)
 {
 	ALLEGRO_VERTEX *av = (ALLEGRO_VERTEX *)a;
@@ -53,6 +54,7 @@ static int vert_compare_z(const void *a, const void *b)
 		return -1;
 	return 1;
 }
+#endif
 
 
 // stuff allegro doesn't have yet
@@ -567,7 +569,7 @@ static void draw_model(MODEL *m)
 static void draw_model(MODEL *m, MBITMAP *texture)
 {
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-	al_draw_prim(m->verts, 0, texture, 0, m->num_verts, ALLEGRO_PRIM_TRIANGLE_LIST);
+	m_draw_prim(m->verts, 0, texture, 0, m->num_verts, ALLEGRO_PRIM_TRIANGLE_LIST);
 }
 
 static void clear_zbuffer(void)
@@ -1253,18 +1255,18 @@ static MODEL *create_ring(int sd /* subdivisions */, MBITMAP *texture)
 		m->verts[i*6+0].y = cos(angle) * outer_dist * scale;
 		m->verts[i*6+0].z = 1;
 		m->verts[i*6+0].u = 0;
-		m->verts[i*6+0].v = al_get_bitmap_height(texture)-1;
+		m->verts[i*6+0].v = m_get_bitmap_height(texture)-1;
 		m->verts[i*6+0].color = white;
 		m->verts[i*6+1].x = sin(angle2) * outer_dist * scale;
 		m->verts[i*6+1].y = cos(angle2) * outer_dist * scale;
 		m->verts[i*6+1].z = 1;
-		m->verts[i*6+1].u = al_get_bitmap_width(texture)-1;
-		m->verts[i*6+1].v = al_get_bitmap_height(texture)-1;
+		m->verts[i*6+1].u = m_get_bitmap_width(texture)-1;
+		m->verts[i*6+1].v = m_get_bitmap_height(texture)-1;
 		m->verts[i*6+1].color = white;
 		m->verts[i*6+2].x = sin(inner_angle) * inner_dist * scale;
 		m->verts[i*6+2].y = cos(inner_angle) * inner_dist * scale;
 		m->verts[i*6+2].z = 1;
-		m->verts[i*6+2].u = al_get_bitmap_width(texture)/2;
+		m->verts[i*6+2].u = m_get_bitmap_width(texture)/2;
 		m->verts[i*6+2].v = 0;
 		m->verts[i*6+2].color = white;
 		float tmp = angle2;
@@ -1280,14 +1282,14 @@ static MODEL *create_ring(int sd /* subdivisions */, MBITMAP *texture)
 		m->verts[i*6+4].x = sin(angle2) * inner_dist * scale;
 		m->verts[i*6+4].y = cos(angle2) * inner_dist * scale;
 		m->verts[i*6+4].z = 1;
-		m->verts[i*6+4].u = al_get_bitmap_width(texture)-1;
+		m->verts[i*6+4].u = m_get_bitmap_width(texture)-1;
 		m->verts[i*6+4].v = 0;
 		m->verts[i*6+4].color = white;
 		m->verts[i*6+5].x = sin(inner_angle) * outer_dist * scale;
 		m->verts[i*6+5].y = cos(inner_angle) * outer_dist * scale;
 		m->verts[i*6+5].z = 1;
-		m->verts[i*6+5].u = al_get_bitmap_width(texture)/2;
-		m->verts[i*6+5].v = al_get_bitmap_height(texture)-1;
+		m->verts[i*6+5].u = m_get_bitmap_width(texture)/2;
+		m->verts[i*6+5].v = m_get_bitmap_height(texture)-1;
 		m->verts[i*6+5].color = white;
 	}
 
@@ -1331,7 +1333,7 @@ void volcano_scene(void)
 	ring_texture = m_load_alpha_bitmap(getResource("media/ring_texture.png"));
 
 	MBITMAP *land_texture = m_load_bitmap(getResource("media/volcano_texture.png"));
-	MODEL *land_model = load_model(getResource("models/volcano_new.raw"), true, al_get_bitmap_width(land_texture));
+	MODEL *land_model = load_model(getResource("models/volcano_new.raw"), true, m_get_bitmap_width(land_texture));
 
 
 	MODEL *staff_model = load_model(getResource("models/staff.raw"));
@@ -1445,7 +1447,7 @@ void volcano_scene(void)
 
 			drawBufferToScreen(false);
 
-			m_set_target_bitmap(m_get_backbuffer());
+			al_set_target_backbuffer(display);
 			
 			clear_zbuffer();
 

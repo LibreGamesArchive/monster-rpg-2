@@ -358,7 +358,7 @@ void dragon_blackAnd0(AnimationSet *a)
 	a->setSubAnimation(std::string(animName));
 
 	long start = tguiCurrentTimeMillis();
-	while (tguiCurrentTimeMillis() < start+1000) {
+	while (tguiCurrentTimeMillis() < (unsigned long)start+1000) {
 		long elapsed = tguiCurrentTimeMillis() - start;
 		int i = elapsed / 100;
 		MCOLOR c;
@@ -393,7 +393,7 @@ void dragon_normal(AnimationSet *a, int frame)
 	m_flip_display();
 
 	long start = tguiCurrentTimeMillis();
-	while (tguiCurrentTimeMillis() < start+125) {
+	while (tguiCurrentTimeMillis() < (unsigned long)start+125) {
 		m_rest(0.001);
 	}
 }
@@ -405,7 +405,7 @@ void dragon_flash(AnimationSet *a, int frame, float startAlpha)
 	a->setSubAnimation(std::string(animName));
 	
 	long start = tguiCurrentTimeMillis();
-	while (tguiCurrentTimeMillis() < start+125) {
+	while (tguiCurrentTimeMillis() < (unsigned long)start+125) {
 		long elapsed = tguiCurrentTimeMillis() - start;
 		if (elapsed > 125) elapsed = 125;
 		float alpha = 1.0 - ((1.0/6.0) * ((float)elapsed/125));
@@ -434,7 +434,7 @@ void dragon_fade(AnimationSet *a, int fullframe, int fadeframe)
 	MBITMAP *fade = a->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 	
 	long start = tguiCurrentTimeMillis();
-	while (tguiCurrentTimeMillis() < start+125) {
+	while (tguiCurrentTimeMillis() < (unsigned long)start+125) {
 		long elapsed = tguiCurrentTimeMillis() - start;
 		if (elapsed > 125) elapsed = 125;
 		float alpha = 1.0 - (elapsed/125.0);
@@ -467,7 +467,7 @@ void dragon_players(AnimationSet *a)
 	}
 
 	long start = tguiCurrentTimeMillis();
-	while (tguiCurrentTimeMillis() < start+2000) {
+	while (tguiCurrentTimeMillis() < (unsigned long)start+2000) {
 		m_set_target_bitmap(buffer);
 		m_clear(black);
 		a->draw(dragon_x, dragon_y-a->getHeight(), dragon_flags);
@@ -927,25 +927,23 @@ void CombatEnemy::construct(std::string name, int x, int y, bool alpha)
 #endif
 }
 
-void CombatEnemy::mkdeath(void)
+class create_death_blit_data : public RecreateData
 {
-	if (use_programmable_pipeline)
-		return;
-	
-	if (work) {
-		m_destroy_bitmap(work);
-	}
-
+public:
 	AnimationSet *as;
-	if (printableName == std::string(_t("Girl"))) {
-		as = oldAnim;
-	}
-	else {
-		as = animSet;
-	}
-	
+	CombatLocation location;
+	~create_death_blit_data() {}
+};
+
+void create_death_blit(MBITMAP *bitmap, RecreateData *data)
+{
+	create_death_blit_data *d = (create_death_blit_data *)data;
+
+	AnimationSet *as = d->as;
+	CombatLocation location = d->location;
+
 	std::string old = as->getSubName();
-	
+
 	if (as->checkSubAnimationExists("hurt")) {
 		as->setSubAnimation("hurt");
 	}
@@ -959,10 +957,9 @@ void CombatEnemy::mkdeath(void)
 	MBITMAP *bmp = i->getBitmap();
 	int w = as->getWidth();
 	int h = as->getHeight();
-	
-	work = m_create_alpha_bitmap(w, h);
+
 	m_push_target_bitmap();
-	m_set_target_bitmap(work);
+	m_set_target_bitmap(bitmap);
 	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
 	death_blit_region(bmp, 0, 0, w, h, 0, 0, al_map_rgb_f(0.8, 0, 0.8), location == LOCATION_RIGHT ? 0 : ALLEGRO_FLIP_HORIZONTAL);
 	m_pop_target_bitmap();
@@ -970,12 +967,39 @@ void CombatEnemy::mkdeath(void)
 	as->setSubAnimation(old);
 }
 
+void CombatEnemy::mkdeath(void)
+{
+	if (use_programmable_pipeline)
+		return;
+	
+	if (work) {
+		m_destroy_bitmap(work);
+	}
+	
+	AnimationSet *as;
+	if (printableName == std::string(_t("Girl"))) {
+		as = oldAnim;
+	}
+	else {
+		as = animSet;
+	}
+	
+	int w = as->getWidth();
+	int h = as->getHeight();
+
+	create_death_blit_data *data = new create_death_blit_data;
+	data->as = as;
+	data->location = location;
+
+	work = m_create_alpha_bitmap(w, h, create_death_blit, data); // check
+}
+
 CombatEnemy::CombatEnemy(std::string name, int x, int y, bool alpha) :
 	Combatant(name, alpha)
 {
 	construct(name, x, y, alpha);
 	
-	//mkdeath();
+	mkdeath();
 }
 
 CombatEnemy::CombatEnemy(std::string name, int x, int y) :
@@ -983,7 +1007,7 @@ CombatEnemy::CombatEnemy(std::string name, int x, int y) :
 {
 	construct(name, x, y, false);
 	
-	//mkdeath();
+	mkdeath();
 }
 
 

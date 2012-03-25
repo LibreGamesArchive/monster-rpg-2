@@ -1175,7 +1175,7 @@ ActionHandler *RunHandler::act(int step, Battle *b)
 		if (p && p->getInfo().abilities.hp > 0) {
 			p->setX(p->getX() + speed*step);
 			int w = p->getAnimationSet()->getWidth();
-			if (p->getX() > -(w/2) && p->getX() < (BW+w/2)) {
+			if (p->getX() > -(w*2) && p->getX() < (BW+w*2)) {
 				done = false;
 			}
 		}
@@ -1550,7 +1550,7 @@ void CombatPlayer::draw(void)
 		if (use_programmable_pipeline) {
 			al_set_shader(display, brighten);
 			MBITMAP *sb = animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
-			al_set_shader_sampler(brighten, "tex", sb, 0);
+			al_set_shader_sampler(brighten, "tex", sb->bitmap, 0);
 			al_set_shader_float(brighten, "brightness", amountF);
 			al_use_shader(brighten, true);
 			m_draw_tinted_bitmap(sb, vcol, x-(w/2), y-h, flags);
@@ -1586,13 +1586,11 @@ void CombatPlayer::draw(void)
 				ww = BW - lock_x;
 			}
 
-			#define BMP m_get_target_bitmap()
-			
-			al_lock_bitmap(work, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
-			al_lock_bitmap(stoneTexture, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
+			m_lock_bitmap(work, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
+			m_lock_bitmap(stoneTexture, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
 
 			#ifndef __linux__
-			al_lock_bitmap_region(BMP, lock_x, y-h, ww, wh, ALLEGRO_PIXEL_FORMAT_ANY, 0);
+			al_lock_bitmap_region(al_get_target_bitmap(), lock_x, y-h, ww, wh, ALLEGRO_PIXEL_FORMAT_ANY, 0);
 			#endif
 		
 			for (int yy = 0; yy < wh; yy++) {
@@ -1621,14 +1619,12 @@ void CombatPlayer::draw(void)
 					#endif
 				}
 			}
-			al_unlock_bitmap(work);
-			al_unlock_bitmap(stoneTexture);
+			m_unlock_bitmap(work);
+			m_unlock_bitmap(stoneTexture);
 
 			#ifndef __linux__
-			al_unlock_bitmap(BMP);
+			al_unlock_bitmap(al_get_target_bitmap());
 			#endif
-
-			#undef BMP
 		}
 		else if (info.condition == CONDITION_MUSHROOM) {
 			m_draw_bitmap(mushroom, x-TILE_SIZE/2, y-TILE_SIZE, 0);
@@ -1749,12 +1745,6 @@ CombatPlayer::CombatPlayer(std::string name, int number, std::string prefix) :
 	itemIndex_display = -1;
 	spellIndex_display = -1;
 
-#ifdef IPHONE
-	//work = m_create_alpha_bitmap(64, 64);
-#else
-	//work = m_create_bitmap(32, 32);
-#endif
-
 	#ifndef LITE
 	charmAnim = new AnimationSet(getResource("combat_media/Charm.png"));
 	#endif
@@ -1771,10 +1761,6 @@ CombatPlayer::~CombatPlayer(void)
 
 	#ifndef LITE
 	delete charmAnim;
-	#endif
-
-	#ifndef IPHONE
-	//m_destroy_bitmap(work);
 	#endif
 }
 

@@ -3196,8 +3196,11 @@ void SwallowSpell::apply(void)
 	a->setSubAnimation("hit");
 	int w = a->getWidth();
 	int h = a->getHeight();
-	MBITMAP *bitmap = m_create_bitmap(w, h);
-	MBITMAP *oldTarget = m_get_target_bitmap();
+	int flags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags((flags | ALLEGRO_PRESERVE_TEXTURE) & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+	MBITMAP *bitmap = m_create_bitmap(w, h); // check
+	al_set_new_display_flags(flags);
+	ALLEGRO_BITMAP *oldTarget = al_get_target_bitmap();
 	m_set_target_bitmap(bitmap);
 #ifdef ALLEGRO4
 	clear_to_color(bitmap, makecol(255, 0, 255));
@@ -3208,9 +3211,9 @@ void SwallowSpell::apply(void)
 
 	m_draw_bitmap(stomach_circle, 0, 0, 0);
 
-	m_set_target_bitmap(oldTarget);
+	al_set_target_bitmap(oldTarget);
 
-	al_convert_mask_to_alpha(bitmap, al_map_rgb(255, 0, 255));
+	al_convert_mask_to_alpha(bitmap->bitmap, al_map_rgb(255, 0, 255));
 
 	float angle = ((float)(rand() % RAND_MAX)/RAND_MAX)*M_PI*2;
 

@@ -20,57 +20,57 @@ void loadIcons(void)
 {
 	icon_atlas = atlas_create(256, 256, 0, true);
 	
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/sword.png")), 0);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/helmet.png")), 1);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/potion.png")), 2);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/letter.png")), 3);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/sword.png")), 0);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/helmet.png")), 1);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/potion.png")), 2);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/letter.png")), 3);
 	#ifdef IPHONE
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/iphone_button1.png")), 4);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/iphone_button2.png")), 5);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/iphone_button1.png")), 4);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/iphone_button2.png")), 5);
 	#else
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/button1.png")), 4);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/button2.png")), 5);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/button1.png")), 4);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/button2.png")), 5);
 	#endif
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/mail.png")), 6);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/staff.png")), 7);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/ball.png")), 8);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/badge.png")), 9);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/robe.png")), 10);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/boots.png")), 11);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/fruit.png")), 12);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/juice.png")), 13);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/gun.png")), 14);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/rounds.png")), 15);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/vest.png")), 16);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/cap.png")), 17);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/ring.png")), 18);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/key.png")), 19);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/medallion.png")), 20);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/tophat.png")), 21);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/blank.png")), 22);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/scope.png")), 23);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/crystal.png")), 24);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/meatballs.png")), 25);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/orb.png")), 26);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/arrows.png")), 27);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/unchecked.png")), 28);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/checked.png")), 29);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/x.png")), 30);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/iphone_button2-1.png")), 31);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/iphone_button2-2.png")), 32);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/flint.png")), 33);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/mail.png")), 6);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/staff.png")), 7);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/ball.png")), 8);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/badge.png")), 9);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/robe.png")), 10);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/boots.png")), 11);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/fruit.png")), 12);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/juice.png")), 13);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/gun.png")), 14);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/rounds.png")), 15);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/vest.png")), 16);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/cap.png")), 17);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/ring.png")), 18);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/key.png")), 19);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/medallion.png")), 20);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/tophat.png")), 21);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/blank.png")), 22);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/scope.png")), 23);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/crystal.png")), 24);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/meatballs.png")), 25);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/orb.png")), 26);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/arrows.png")), 27);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/unchecked.png")), 28);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/checked.png")), 29);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/x.png")), 30);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/iphone_button2-1.png")), 31);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/iphone_button2-2.png")), 32);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/flint.png")), 33);
 
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/joypad_button_a.png")), 34);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/joypad_button_b.png")), 35);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/airplay_action.png")), 36);
-	atlas_add(icon_atlas, m_load_bitmap(getResource("icons/airplay_cancel.png")), 37);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/joypad_button_a.png")), 34);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/joypad_button_b.png")), 35);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/airplay_action.png")), 36);
+	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/airplay_cancel.png")), 37);
 
 	
 	atlas_finish(icon_atlas);
 	
 	for (int i = 0; i < 38; i++) {
 		ATLAS_ITEM *item = atlas_get_item_by_id(icon_atlas, i);
-		icons.push_back(atlas_get_item_sub_bitmap(item));
+		icons.push_back(new_mbitmap(atlas_get_item_sub_bitmap(item)));
 	}
 }
 //else {
@@ -208,7 +208,7 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 	m_save_blender();
 
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-	
+
 	if (use_programmable_pipeline && shadow) {
 		int buffer_true_w, buffer_true_h;
 		get_buffer_true_size(&buffer_true_w, &buffer_true_h);
@@ -350,7 +350,7 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 	
 	bool delayed = false;
 
-	ALLEGRO_BITMAP *tmp = al_clone_bitmap(buffer);
+	MBITMAP *tmp = m_clone_bitmap(buffer);
 
 	int w = 230;
 	int h = 100;
@@ -550,11 +550,14 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 
 	dpad_off();
 
-	ALLEGRO_BITMAP *tmp = m_create_bitmap(BW, BH); //al_clone_bitmap(buffer);
-	ALLEGRO_BITMAP *oldTarget = m_get_target_bitmap();
+	int flags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags((flags | ALLEGRO_PRESERVE_TEXTURE) & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+	MBITMAP *tmp = m_create_bitmap(BW, BH); // check
+	al_set_new_display_flags(flags);
+	ALLEGRO_BITMAP *oldTarget = al_get_target_bitmap();
 	m_set_target_bitmap(tmp);
 	m_draw_bitmap(buffer, 0, 0, 0);
-	m_set_target_bitmap(oldTarget);
+	al_set_target_bitmap(oldTarget);
 	
 	int w = 200;
 	int h = 65;
@@ -665,7 +668,7 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 {
 	dpad_off();
 	
-	ALLEGRO_BITMAP *tmp = al_clone_bitmap(buffer);
+	MBITMAP *tmp = m_clone_bitmap(buffer);
 	
 	int w = 230;
 	int h = 100;
@@ -829,7 +832,7 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 {
 	dpad_off();
 
-	ALLEGRO_BITMAP *tmp = al_clone_bitmap(buffer);
+	MBITMAP *tmp = m_clone_bitmap(buffer);
 	
 	int w = 160;
 	int h = 50;
@@ -1163,12 +1166,8 @@ void MSpeechDialog::drawText(void)
 		m_set_clip(xx+5, yy+3, xx+w-10, yy+h-10);
 		realDrawText(currentSection-1, 10, 5-(h-offset));
 		realDrawText(currentSection, 10, 5+offset);
-#ifdef WIZ
-		m_set_clip(0, 0, 320, 240);
-#else
-		MBITMAP *target = m_get_target_bitmap();
-		m_set_clip(0, 0, m_get_bitmap_width(target), m_get_bitmap_height(target));
-#endif
+		ALLEGRO_BITMAP *target = al_get_target_bitmap();
+		m_set_clip(0, 0, al_get_bitmap_width(target), al_get_bitmap_height(target));
 	}
 	else {
 		realDrawText(currentSection, 10, 4);
@@ -2476,10 +2475,10 @@ int MMap::update(int millis)
 		o->setPosition(points[selected].dest_x, points[selected].dest_y);
 		setObjectDirection(o, points[selected].dest_dir);
 		startArea(points[selected].dest_area);
-		MBITMAP *oldTarget = m_get_target_bitmap();
+		ALLEGRO_BITMAP *oldTarget = al_get_target_bitmap();
 		m_set_target_bitmap(buffer);
 		m_clear(black);
-		m_set_target_bitmap(oldTarget);
+		al_set_target_bitmap(oldTarget);
 		area->update(1);
 		m_set_target_bitmap(buffer);
 		area->draw();
@@ -3304,7 +3303,7 @@ int MSpellSelector::update(int millis)
 				strcpy(s, _t(info.spells[selected].c_str()));
 			int w = m_text_length(game_font, _t(s))+1;
 			m_push_target_bitmap();
-			dragBmp = m_create_alpha_bitmap(w, m_text_height(game_font)+4);
+			dragBmp = m_create_alpha_bitmap(w, m_text_height(game_font)+4); // check
 			m_set_target_bitmap(dragBmp);
 			m_clear(m_map_rgba(0, 0, 0, 0));
 			mTextout(game_font, s, 0, 2,
@@ -4307,7 +4306,7 @@ int MScrollingList::update(int millis)
 			sprintf(s, "%s", _t(items[selected].c_str()));
 			int w = m_text_length(game_font, _t(s))+1;
 			m_push_target_bitmap();
-			dragBmp = m_create_alpha_bitmap(w, m_text_height(game_font)+4);
+			dragBmp = m_create_alpha_bitmap(w, m_text_height(game_font)+4); // check
 			m_set_target_bitmap(dragBmp);
 			m_clear(m_map_rgba(0, 0, 0, 0));
 			mTextout(game_font, s, 0, 2,
@@ -4354,7 +4353,7 @@ int MScrollingList::update(int millis)
 		if (!ie.button1 == DOWN && holdTime != -1) {
 		#endif
 			use_input_event();
-			if (holdTime+250 > tguiCurrentTimeMillis()) {
+			if ((unsigned long)holdTime+250 > tguiCurrentTimeMillis()) {
 				clicked = true;
 			}
 			holdTime = -1;
@@ -4920,7 +4919,7 @@ int MItemSelector::update(int millis)
 				sprintf(s, "%d %s", inv->quantity, _t(getItemName(inv->index).c_str()));
 			int w = m_text_length(game_font, _t(s))+1;
 			m_push_target_bitmap();
-			dragBmp = m_create_alpha_bitmap(w, m_text_height(game_font)+4);
+			dragBmp = m_create_alpha_bitmap(w, m_text_height(game_font)+4); // check
 			m_set_target_bitmap(dragBmp);
 			m_clear(m_map_rgba(0, 0, 0, 0));
 			mTextout(game_font, s, 0, 2,
@@ -5451,7 +5450,7 @@ void MManSelector::draw()
 	al_draw_prim(lines, 0, 0, 0, 3*4*2*12, ALLEGRO_PRIM_LINE_LIST);
 
 	// Draw arrow
-	int xx = mans[pos].x * TILE_SIZE - area->getOriginX() + TILE_SIZE/2 - al_get_bitmap_width(arrow)/2;
+	int xx = mans[pos].x * TILE_SIZE - area->getOriginX() + TILE_SIZE/2 - m_get_bitmap_width(arrow)/2;
 	int yy = mans[pos].y * TILE_SIZE - area->getOriginY();
 	m_draw_bitmap(arrow, xx, yy, 0);
 	
@@ -5789,7 +5788,7 @@ void MMultiChooser::draw()
 		if (use_dpad) {
 			if (inset) {
 				if (alpha == 255) {
-					draw_x -= al_get_bitmap_width(arrow);
+					draw_x -= m_get_bitmap_width(arrow);
 				}
 				else {
 					alpha = 0;
@@ -6250,7 +6249,7 @@ int MPartySelector::update(int millis)
 							  );
 					int w = m_text_length(game_font, _t(s))+1;
 					m_push_target_bitmap();
-					dragBmp = m_create_alpha_bitmap(w, m_text_height(game_font)+4);
+					dragBmp = m_create_alpha_bitmap(w, m_text_height(game_font)+4); // check
 					m_set_target_bitmap(dragBmp);
 					m_clear(m_map_rgba(0, 0, 0, 0));
 					mTextout(game_font, _t(s), 0, 2,
@@ -6524,13 +6523,13 @@ void MIcon::draw()
 		m_draw_rectangle(
 			x+m_get_bitmap_width(bitmap)+10,
 			y-25,
-			x+100+10,
+			x+112+10,
 			y-10,
 			black, M_FILLED);
 		m_draw_rectangle(
 			x+m_get_bitmap_width(bitmap)+10,
 			y-25,
-			x+100+10,
+			x+112+10,
 			y-10,
 			white, 0);
 

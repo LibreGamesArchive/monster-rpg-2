@@ -11,7 +11,6 @@ void addImageView(void);
 void removeImageView(void);
 void openRatingSite(void);
 void openFeedbackSite(void);
-MBITMAP *m_load_pvr_bitmap(const char *filename);
 void showIpod(void);
 void shutdownIpod(void);
 bool iPodIsPlaying(void);

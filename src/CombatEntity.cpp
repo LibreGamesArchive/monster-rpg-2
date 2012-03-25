@@ -12,7 +12,7 @@ const float Bolt3Effect::MAX_AMPLITUDE = 10;
 const float AttackSwoosh::SPEED = 0.5f;
 const float Fire2Effect::RISE_SPEED = 0.05f;
 
-static ALLEGRO_BITMAP **bolt2_bmps;
+static MBITMAP **bolt2_bmps;
 static int bolt2_bmp_ref_count = 0;
 static int num_bolt2_bmps;
 
@@ -59,11 +59,11 @@ void draw_points_locked(ALLEGRO_VERTEX *verts, int n)
 	al_unlock_bitmap(target);
 }
 
-void get_bolt2_bitmaps(int n, ALLEGRO_BITMAP **bmps)
+void get_bolt2_bitmaps(int n, MBITMAP **bmps)
 {
 	num_bolt2_bmps = n;
 	if (bolt2_bmp_ref_count == 0) {
-		bolt2_bmps = new ALLEGRO_BITMAP *[n];
+		bolt2_bmps = new MBITMAP *[n];
 		for (int i = 0; i < num_bolt2_bmps; i++) {
 			char name[100];
 			sprintf(name, "Bolt2_%d.png", i);
@@ -81,7 +81,7 @@ void release_bolt2_bitmaps(void)
 	bolt2_bmp_ref_count--;
 	if (bolt2_bmp_ref_count == 0) {
 		for (int i = 0; i < num_bolt2_bmps; i++) {
-			al_destroy_bitmap(bolt2_bmps[i]);
+			m_destroy_bitmap(bolt2_bmps[i]);
 		}
 		delete[] bolt2_bmps;
 	}
@@ -172,6 +172,9 @@ CombatEntity::CombatEntity() :
 }
 
 
+CombatEntity::~CombatEntity()
+{
+}
 
 
 ExplodeEffect::ExplodeEffect(Combatant *target)
@@ -207,13 +210,6 @@ ExplodeEffect::ExplodeEffect(Combatant *target)
 		explosionCircles[i].count = 0;
 		explosionCircles[i].lifetime = 250 + rand() % 400;
 	}
-}
-
-
-
-CombatEntity::~CombatEntity()
-{
-	debug_message("~CombatEntity\n");
 }
 
 // return true when done
@@ -1277,7 +1273,7 @@ void WhirlpoolEffect::draw(void)
 			verts[i].x = ((target->getX()-m_get_bitmap_width(spiral)/2+(x*s)) + o);
 			verts[i].y = (target->getY()-8-m_get_bitmap_height(spiral)/6+y/3);
 			verts[i].z = 0;
-			verts[i].color = al_get_pixel(spiral, xx, yy);
+			verts[i].color = m_get_pixel(spiral, xx, yy);
 			i++;
 		}
 	}
@@ -1320,13 +1316,13 @@ WhirlpoolEffect::WhirlpoolEffect(Combatant *target) :
 	this->target = target;
 
 	spiral = m_load_alpha_bitmap(getResource("combat_media/Whirlpool.png"));
-	al_lock_bitmap(spiral, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
+	m_lock_bitmap(spiral, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
 }
 
 
 WhirlpoolEffect::~WhirlpoolEffect(void)
 {
-	al_unlock_bitmap(spiral);
+	m_unlock_bitmap(spiral);
 	m_destroy_bitmap(spiral);
 //	delete[] pixels;
 }
@@ -1403,7 +1399,7 @@ SlimeEffect::SlimeEffect(Combatant *target) :
 	}
 
 	#ifdef IPHONE
-	blob = al_create_bitmap(10, 10);
+	blob = m_create_bitmap(10, 10); // check
 	MBITMAP *t = m_get_target_bitmap();
 	m_set_target_bitmap(blob);
 	al_clear_to_color(m_map_rgba(0, 0, 0, 0));
@@ -1756,9 +1752,9 @@ void SludgeEffect::draw()
 
 	int yy = target->getY()-target->getAnimationSet()->getHeight();
 
-	al_lock_bitmap(bmp, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
+	m_lock_bitmap(bmp, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
 
-	ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[al_get_bitmap_width(bmp)*al_get_bitmap_height(bmp)];
+	ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[m_get_bitmap_width(bmp)*m_get_bitmap_height(bmp)];
 	int vcount = 0;
 
 	for (int i = top; i < m_get_bitmap_height(bmp); i++) {
@@ -1807,7 +1803,7 @@ void SludgeEffect::draw()
 
 	delete[] verts;
 
-	al_unlock_bitmap(bmp);
+	m_unlock_bitmap(bmp);
 
 	int puddle_max = m_get_bitmap_width(bmp) * 1.5f;
 
@@ -2005,28 +2001,17 @@ StompEffect::StompEffect(CombatLocation l) :
 
 	m_push_target_bitmap();
 	for (int i = 0; i < m_get_bitmap_width(tmp); i += 16) {
-#ifdef A5_OGL
-		int flags = al_get_new_bitmap_flags();
-		al_set_new_bitmap_flags(ALLEGRO_CONVERT_BITMAP|PRESERVE_TEXTURE);
-#endif
-		MBITMAP *b = m_create_alpha_bitmap(16, 16);
-#ifdef A5_OGL
-		al_set_new_bitmap_flags(flags);
-#endif
+		MBITMAP *b = m_create_alpha_bitmap(16, 16); // check
 		m_set_target_bitmap(b);
-#ifndef ALLEGRO4
 		m_save_blender();
 		m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, al_map_rgb(255, 255, 255));
-#endif
 		m_draw_bitmap_region(tmp, i, 0, i+16, 16, 0, 0, 0);
-#ifndef ALLEGRO4
 		m_restore_blender();
-#endif
 		puffs.push_back(b);
 	}
 	m_pop_target_bitmap();
 
-	//sample = loadSample("Stomp.ogg");
+	m_destroy_bitmap(tmp);
 
 	for (int i = 0; i < 40; i++) {
 		StompPuff p;
@@ -2683,7 +2668,7 @@ void Fire3Effect::draw(void)
 		float max = offs < H ? offs : H;
 		float alpha = y/max;
 		MCOLOR c = m_map_rgba(alpha*255, alpha*255, alpha*255, alpha);
-		al_draw_tinted_bitmap_region(fire_bmp, c, 0, y+sy, W, 1,
+		al_draw_tinted_bitmap_region(fire_bmp->bitmap, c, 0, y+sy, W, 1,
 			dx, dy-dest+y, 0);
 	}
 }
@@ -2740,17 +2725,18 @@ void Ice3Effect::draw(void)
 		m_draw_bitmap(icicle, x-m_get_bitmap_width(icicle)/2, yy-m_get_bitmap_height(icicle), 0);
 	}
 	else {
-		m_push_target_bitmap();
-		m_set_target_bitmap(tmp);
-#ifdef ALLEGRO4
-		m_clear(m_map_rgb(255, 0, 255));
-#else
-		m_clear(m_map_rgba(0, 0, 0, 0));
-#endif
-		m_draw_bitmap(icicle, 0, BELOW_GROUND-(dy - yy), 0);
-		m_pop_target_bitmap();
-		
-		m_draw_trans_bitmap(tmp, x-m_get_bitmap_width(icicle)/2, y-m_get_bitmap_height(icicle), alpha*255);
+		//m_draw_bitmap(icicle, 0, BELOW_GROUND-(dy - yy), 0);
+
+		//m_draw_trans_bitmap(tmp, x-m_get_bitmap_width(icicle)/2, y-m_get_bitmap_height(icicle), alpha*255);
+	
+		int cx, cy, cw, ch;
+		al_get_clipping_rectangle(&cx, &cy, &cw, &ch);
+		al_set_clipping_rectangle(x-m_get_bitmap_width(icicle)/2, y-m_get_bitmap_height(icicle),
+			m_get_bitmap_width(icicle), m_get_bitmap_height(icicle));
+
+		m_draw_trans_bitmap(icicle, x-m_get_bitmap_width(icicle)/2, y-m_get_bitmap_height(icicle)+BELOW_GROUND-(dy-yy), alpha*255);
+
+		al_set_clipping_rectangle(cx, cy, cw, ch);
 
 		for (int i = 0; i < NUM_PARTICLES; i++) {
 			particles[i].color.a = alpha;
@@ -2803,7 +2789,6 @@ Ice3Effect::Ice3Effect(Combatant *target) :
 	type = COMBATENTITY_TYPE_FRILL;
 
 	icicle = m_load_bitmap(getResource("combat_media/Ice3.png"));
-	tmp = m_create_bitmap(m_get_bitmap_width(icicle), m_get_bitmap_height(icicle));
 	
 	yy = sy = target->getY() - 200;
 	dy = target->getY() + BELOW_GROUND;
@@ -2823,7 +2808,6 @@ Ice3Effect::Ice3Effect(Combatant *target) :
 Ice3Effect::~Ice3Effect(void)
 {
 	m_destroy_bitmap(icicle);
-	m_destroy_bitmap(tmp);
 }
 
 static void draw_bolt_arc_worker1(MPoint &p1, MPoint &p2, MBITMAP *bmp)
@@ -2897,7 +2881,7 @@ static void draw_bolt_arc_worker1(MPoint &p1, MPoint &p2, MBITMAP *bmp)
 #endif
 	}
 
-	al_draw_prim(verts, 0, bmp, 0, vcount, ALLEGRO_PRIM_TRIANGLE_LIST);
+	m_draw_prim(verts, 0, bmp, 0, vcount, ALLEGRO_PRIM_TRIANGLE_LIST);
 }
 
 static void draw_bolt_arc_worker2(MPoint &p1, MPoint &p2)
@@ -3061,27 +3045,23 @@ Bolt3Effect::Bolt3Effect(Combatant *target) :
 	amp = 0.0f;
 	circ_rad = 0.0f;
 
-	//#ifdef IPHONE
 	cx = MAX_DIST;
 	cy = MAX_DIST;
-	predrawn = m_create_alpha_bitmap(MAX_DIST*2, MAX_DIST*2);
-	//#else
-	//cx = x;
-	//cy = y - target->getAnimationSet()->getHeight()/2;
-	//#endif
+	int flags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags((flags | ALLEGRO_PRESERVE_TEXTURE)&~ALLEGRO_NO_PRESERVE_TEXTURE);
+	predrawn = m_create_alpha_bitmap(MAX_DIST*2, MAX_DIST*2); // check
+	al_set_new_bitmap_flags(flags);
 
 	generate(5);
 	
-	//#ifdef IPHONE
 	cx = x;
 	cy = y - target->getAnimationSet()->getHeight()/2;
-	MBITMAP *old_target = m_get_target_bitmap();
+	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
 	m_set_target_bitmap(predrawn);
 	m_clear(m_map_rgba(0, 0, 0, 0));
 	draw_arcs(arcs);
-	m_set_target_bitmap(old_target);
+	al_set_target_bitmap(old_target);
 	angle = 0;
-	//#endif
 }
 
 
@@ -3165,79 +3145,6 @@ int TwisterEffect::getLifetime(void)
 
 void TwisterEffect::draw(void)
 {
-#if 0
-	MBITMAP *old_target = m_get_target_bitmap();
-	m_set_target_bitmap(bmp);
-
-	int amplitude = 20;
-
-	int h = m_get_bitmap_height(bmp);
-	int w = m_get_bitmap_width(bmp);
-
-	int loops = rotate_count / 5;
-	rotate_count -= loops*5;
-
-#ifndef ALLEGRO4
-	al_lock_bitmap(bmp, ALLEGRO_PIXEL_FORMAT_ANY, 0);
-#endif
-
-	for (int i = 0; i < loops; i++) {
-		for (int yy = 0; yy < h; yy++) {
-			int left = 0, right = w-1;
-			for (int x = 0; x < w; x++) {
-#ifdef ALLEGRO4
-				int pix = getpixel(bmp, x, yy);
-				if (pix == makecol(255, 0, 255))
-					continue;
-#else
-				MCOLOR c = m_get_pixel(bmp, x, yy);
-				unsigned char r, g, b, a;
-				m_unmap_rgba(c, &r, &g, &b, &a);
-				if (a != 255) continue;
-#endif
-				left = x;
-				break;
-			}
-			for (int x = w-1; x >= 0; x--) {
-#ifdef ALLEGRO4
-				int pix = getpixel(bmp, x, yy);
-				if (pix == makecol(255, 0, 255))
-					continue;
-#else
-				MCOLOR c = m_get_pixel(bmp, x, yy);
-				unsigned char r, g, b, a;
-				m_unmap_rgba(c, &r, &g, &b, &a);
-				if (a != 255) continue;
-#endif
-				right = x;
-				break;
-			}
-			MCOLOR tmp = m_get_pixel(bmp, left, yy);
-			for (int x = left; x < right; x++) {
-				int next = x+1;
-				MCOLOR c = m_get_pixel(bmp, next, yy);
-				m_put_pixel(x, yy, c);
-			}
-			m_put_pixel(right, yy, tmp);
-		}
-	}
-
-#ifndef ALLEGRO4
-	al_unlock_bitmap(bmp);
-#endif
-
-	m_set_target_bitmap(old_target);
-
-	for (int yy = 0; yy < h; yy++) {
-		float r = (float)yy/h*(M_PI*3);
-		float xx = sin(r+f) * amplitude;
-#ifdef ALLEGRO4
-		m_draw_bitmap_region_masked(bmp, 0, yy, w, 1, x-w/2+xx, y-h+yy, 0);
-#else
-		m_draw_bitmap_region(bmp, 0, yy, w, 1, x-w/2+xx, y-h+yy, 0);
-#endif
-	}
-#endif
 	int w = m_get_bitmap_width(bmp);
 	int h = m_get_bitmap_height(bmp);
 	float fl = ((float)count / getLifetime()) * (M_PI*6);
@@ -4754,15 +4661,15 @@ SwallowEffect::SwallowEffect(Combatant *caster, Combatant *target) :
 	int w = a->getWidth();
 	int h = a->getHeight();
 	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(ALLEGRO_CONVERT_BITMAP|PRESERVE_TEXTURE);
-	bitmap = m_create_bitmap(w, h);
+	al_set_new_bitmap_flags((flags|ALLEGRO_PRESERVE_TEXTURE)&~ALLEGRO_NO_PRESERVE_TEXTURE);
+	bitmap = m_create_bitmap(w, h); // check
 	al_set_new_bitmap_flags(flags);
 
-	MBITMAP *oldTarget = m_get_target_bitmap();
+	ALLEGRO_BITMAP *oldTarget = al_get_target_bitmap();
 	m_set_target_bitmap(bitmap);
 	my_clear_bitmap(bitmap);
 	a->draw(0, 0, 0);
-	m_set_target_bitmap(oldTarget);
+	al_set_target_bitmap(oldTarget);
 
 	angle = (float)(rand() % RAND_MAX)/RAND_MAX * M_PI * 2;
 }

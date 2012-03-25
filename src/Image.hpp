@@ -25,7 +25,7 @@ public:
 	bool load(const char *filename);
 	/* Copy from bitmap (coords are inclusive)
 	 */
-	bool load(MBITMAP *copy_from, int x1, int y1, int x2, int y2, bool is_pvr = false);
+	bool load(std::string filename, int x1, int y1, int x2, int y2);
 
 	void draw(int x, int y, int flags = 0);
 	void draw_trans(int x, int y, int alpha);

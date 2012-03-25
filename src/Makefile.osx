@@ -2,14 +2,10 @@ CXX=g++
 CC=gcc
 
 
-ifdef BUILD_EDITOR
-CFLAGS=-Wall -DA5_OGL -gdwarf-2 -DEDITOR -I. -IEditor -I/Users/trent/local/include
-else
-CFLAGS=-Wall -DA5_OGL -gdwarf-2 -O2 -I. -DKCM_AUDIO -I/Users/trent/local/include -ObjC++ -arch i386 -arch x86_64
-endif
+CFLAGS=-Wall -g -DA5_OGL -I. -IEditor -I/Users/trent/code/local/include -I/Users/trent/Downloads/JoypadSDKs/Mac/JoypadCocoaSDK
 
 
-LINKFLAGS=-L/Users/trent/local/lib -arch i386 -arch x86_64
+LINKFLAGS=-L/Users/trent/code/local/lib -L/Users/trent/Downloads/JoypadSDKs/Mac/JoypadCocoaSDK
 
 
 CXX_SRCS=\
@@ -30,12 +26,12 @@ CXX_SRCS=\
      GenericEffect.cpp\
      graphics.cpp\
      Image.cpp\
-     init.cpp\
      Input.cpp\
      inventory.cpp\
      io.cpp\
      Items.cpp\
      lander.cpp\
+     monster2.cpp\
      Object.cpp\
      pause.cpp\
      Player.cpp\
@@ -45,34 +41,37 @@ CXX_SRCS=\
      sound.cpp\
      Spells.cpp\
      Tile.cpp\
+     translate.cpp\
      util.cpp\
      widgets.cpp\
      xml.cpp
 
 
-C_SRCS=
+C_SRCS=atlas.c atlas_accessor.c
 
+OBJCXX_SRCS=\
+     init.mm\
+     joypad.mm\
+
+OBJC_SRCS=\
+     joypad_handler.m
 
 
 CXX_LIBOBJS=$(CXX_SRCS:.cpp=.o)
 C_LIBOBJS=$(C_SRCS:.c=.o)
+OBJCXX_LIBOBJS=$(OBJCXX_SRCS:.mm=.o)
+OBJC_LIBOBJS=$(OBJC_SRCS:.m=.o)
 
 
-ALLEGROLIBS=-lallegro_shader -lallegro_acodec -lallegro_audio -lallegro_dialog -lallegro_primitives -lallegro_font -lallegro_image -lallegro -lallegro_main
-LIBS=-llua-fixed -ltgui $(ALLEGROLIBS) -lz -framework OpenGL -framework Foundation
+ALLEGROLIBS=-lallegro_physfs -lallegro_shader-static -lallegro_dialog-static -lallegro_primitives-static -lallegro_font-static -lallegro_ttf-static -lallegro_image-static -lallegro-static -lallegro_main-static 
+LIBS=-llua-fixed -ltgui $(ALLEGROLIBS) -lz -framework OpenGL -framework Foundation -lbass -lJoypadCocoa -framework ApplicationServices -framework AppKit -framework IOKit -lfreetype -lphysfs
 
 
 default: monster2
 
 
-monster2: $(C_LIBOBJS) $(CXX_LIBOBJS) monster2.o
-	g++ $(LINKFLAGS) -o monster2 $(C_LIBOBJS) $(CXX_LIBOBJS) \
-		monster2.o $(LIBS)
-
-
-editor: $(C_LIBOBJS) $(CXX_LIBOBJS) Editor/editor.o
-	g++ $(LINKFLAGS) -o meditor2 $(C_LIBOBJS) $(CXX_LIBOBJS) \
-		editor.o $(LIBS)
+monster2: $(C_LIBOBJS) $(CXX_LIBOBJS) $(OBJCXX_LIBOBJS) $(OBJC_LIBOBJS)
+	g++ $(LINKFLAGS) -o monster2 $(C_LIBOBJS) $(CXX_LIBOBJS) $(OBJCXX_LIBOBJS) $(OBJC_LIBOBJS) $(LIBS)
 
 
 .cpp.o:
@@ -82,9 +81,16 @@ editor: $(C_LIBOBJS) $(CXX_LIBOBJS) Editor/editor.o
 .c.o:
 	$(CC) $(CFLAGS) -c $<
 
+init.o: init.mm
+	$(CXX) -ObjC++ $(CFLAGS) -c init.mm
+
+joypad.o: joypad.mm
+	$(CXX) -ObjC++ $(CFLAGS) -c joypad.mm
+
+joypad_handler.o: joypad_handler.m
+	$(CXX) -ObjC $(CFLAGS) -c joypad_handler.m
 
 clean:
 	-rm *.o
 	-rm meditor2
-	-rm monster2 monster2-quickdraw
 

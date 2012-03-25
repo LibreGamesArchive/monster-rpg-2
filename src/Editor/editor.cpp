@@ -755,10 +755,8 @@ int main(int argc, char *argv[])
 		black, grey, white, blue, big_font);
 	WgtMenuItem *fileExit = new WgtMenuItem(0, 81, 200, 16, "Exit",
 		black, grey, white, blue, big_font);
-#ifdef ALLEGRO4
 	WgtMenuItem *fileSaveBmp = new WgtMenuItem(0, 97, 200, 16, "Save bmp",
 		black, grey, white, blue, big_font);
-#endif
 
 	WgtMenuItem *editUndo = new WgtMenuItem(0, 17, 200, 16, "Undo",
 		black, grey, white, blue, big_font);
@@ -804,9 +802,7 @@ int main(int argc, char *argv[])
 	fileMenu->addItem(fileSave);
 	fileMenu->addItem(fileSaveAs);
 	fileMenu->addItem(fileExit);
-#ifdef ALLEGRO4
 	fileMenu->addItem(fileSaveBmp);
-#endif
 
 	editMenu->addItem(editUndo);
 	editMenu->addItem(editRedo);
@@ -1311,16 +1307,14 @@ int main(int argc, char *argv[])
 					}
 				}
 			}
-#ifdef ALLEGRO4
 			else if (widget == fileSaveBmp) {
 				char s[1000];
 				s[0] = 0;
-				if (getSaveName(s)) {
-					std::string str = std::string(s);
+				//if (getSaveName(s)) {
+					std::string str = "out.png";//std::string(s);
 					area->saveBmp(str);
-				}
+				//}
 			}
-#endif
 			else if (widget == fileNew) {
 				menuBar->hideMenus();
 				tguiSetParent(0);

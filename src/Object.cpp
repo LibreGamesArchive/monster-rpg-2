@@ -894,7 +894,7 @@ Fish::Fish(float x, float y)
 	w = m_get_bitmap_width(bmp);
 	h = m_get_bitmap_height(bmp);
 
-	tmpbmp = m_create_bitmap(w, h+MAX_WIGGLE*2);
+	tmpbmp = m_create_bitmap(w, h+MAX_WIGGLE*2); // check
 
 	alpha = 255;
 	alpha_target = 255 - rand()%128;

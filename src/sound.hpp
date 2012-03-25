@@ -2,7 +2,6 @@
 #define SOUND_HPP
 
 #if !defined KCM_AUDIO
-#include <bass.h>
 typedef HSAMPLE MSAMPLE;
 typedef int MSAMPLE_ID;
 #else

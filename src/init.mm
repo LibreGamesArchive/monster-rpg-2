@@ -34,9 +34,9 @@ extern "C" {
 void get_buffer_true_size(int *buffer_true_w, int *buffer_true_h)
 {
 #ifdef A5_OGL
-	al_get_opengl_texture_size(buffer, buffer_true_w, buffer_true_h);
+	al_get_opengl_texture_size(buffer->bitmap, buffer_true_w, buffer_true_h);
 #else
-	al_get_d3d_texture_size(buffer, buffer_true_w, buffer_true_h);
+	al_get_d3d_texture_size(buffer->bitmap, buffer_true_w, buffer_true_h);
 #endif
 }
 
@@ -108,8 +108,8 @@ bool do_pause_game = false;
 
 bool achievement_show = false;
 double achievement_time = 0;
-ALLEGRO_BITMAP *achievement_bmp;
-int PRESERVE_TEXTURE = 0;
+MBITMAP *achievement_bmp;
+int PRESERVE_TEXTURE = ALLEGRO_NO_PRESERVE_TEXTURE;
 bool reload_translation = false;
 static std::string replayMusicName = "";
 
@@ -270,11 +270,13 @@ ALLEGRO_MUTEX *switch_mutex;
 ALLEGRO_COND *switch_cond;
 uint32_t my_opengl_version;
 
+#if 0
 // should pause on background/switch out
 static bool should_pause_game(void)
 {
 	return (area && !battle && !player_scripted && !in_pause && !in_map);
 }
+#endif
 
 ScreenSize small_screen(void)
 {
@@ -316,6 +318,7 @@ bool is_ipad(void)
 	return value;
 }
 
+#ifdef ALLEGRO_WINDOWS
 static void print_windows_error(void)
 {
 #ifdef ALLEGRO_WINDOWS
@@ -327,6 +330,7 @@ static void print_windows_error(void)
 	LocalFree(buffer);
 #endif
 }
+#endif
 
 static int progress_percent = 0;
 
@@ -1256,6 +1260,12 @@ static void *thread_proc_minor(void *arg)
 				setAmbienceVolume(backup_ambience_volume);
 			}
 #endif
+			if (event.type == ALLEGRO_EVENT_DISPLAY_LOST) {
+				destroy_loaded_bitmaps = true;
+			}
+			else if (event.type == ALLEGRO_EVENT_DISPLAY_FOUND) {
+				reload_loaded_bitmaps = true;
+			}
 		}
 #ifdef IPHONE
 		double shake = al_iphone_get_last_shake_time();
@@ -1308,11 +1318,11 @@ static void *loader_proc(void *arg)
 	//m_set_target_bitmap(al_get_backbuffer(display));
 	show_progress(8);
 
-	ALLEGRO_BITMAP *deter_display_access_bmp;
+	MBITMAP *deter_display_access_bmp;
 	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
-	deter_display_access_bmp = al_create_bitmap(16, 16);
-	al_set_new_bitmap_flags(flags);
+	al_set_new_bitmap_flags(flags | ALLEGRO_MEMORY_BITMAP);
+	deter_display_access_bmp = m_create_bitmap(16, 16); // check
+	al_set_new_display_flags(flags);
 	m_set_target_bitmap(deter_display_access_bmp);
 
 	guiAnims = new AnimationSet(getResource("gui.png"));
@@ -1330,14 +1340,12 @@ static void *loader_proc(void *arg)
 
 	//orb_bmp = m_load_alpha_bitmap(getResource("media/orb_bmp.png"), true);
 	poison_bmp = m_load_alpha_bitmap(getResource("media/poison.png"), true);
-	poison_bmp_tmp = m_create_alpha_bitmap(
+	poison_bmp_tmp = m_create_alpha_bitmap( // check
 		m_get_bitmap_width(poison_bmp)+10,
 		m_get_bitmap_height(poison_bmp)+10);
-	poison_bmp_tmp2 = m_create_alpha_bitmap(
+	poison_bmp_tmp2 = m_create_alpha_bitmap( // check
 		m_get_bitmap_width(poison_bmp)+10,
 		m_get_bitmap_height(poison_bmp)+10);
-
-	//shakeAlternativeBitmap = m_load_bitmap(getResource("media/shakeAlternativeBitmap.png"));
 
 	for (int i = 0; i < 16; i++) {
 		triangle_lines[i*2].x = 0;
@@ -1363,18 +1371,17 @@ static void *loader_proc(void *arg)
 
 	debug_message("Tilemap loaded\n");
 
-	tile = m_create_bitmap(TILE_SIZE, TILE_SIZE);
+	tile = m_create_bitmap(TILE_SIZE, TILE_SIZE); // check
 
 	if (!tile) {
 		if (!native_error("Failed to create tile"))
 			return NULL;
 	}
 
-
 	// Set an icon
 	#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_MACOSX
 	MBITMAP *tmp_bmp = m_load_alpha_bitmap(getResource("staff.png"));
-	al_set_display_icon(display, tmp_bmp);
+	al_set_display_icon(display, tmp_bmp->bitmap);
 	m_destroy_bitmap(tmp_bmp);
 	#endif
 
@@ -1493,48 +1500,6 @@ static void *loader_proc(void *arg)
 	return NULL;
 }
 
-/*
- * We speed up drawing for some cards by using no blending on tiles
- * that don't need it.
- */
-static void findAlphaTiles(void)
-{
-	tileTransparent = new bool[numTiles];
-
-#ifdef EDITOR
-	for (int i = 0; i < numTiles; i++) {
-		tileTransparent[i] = true;
-	}
-#else
-	al_lock_bitmap(tilemap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
-	int wt = al_get_bitmap_width(tilemap) / TILE_SIZE;
-	for (int i = 0; i < numTiles; i++) {
-		int ii = mapping[i];
-		int startX = ii % wt * TILE_SIZE;
-		int startY = ii / wt * TILE_SIZE;
-		int endX = startX+TILE_SIZE;
-		int endY = startY+TILE_SIZE;
-		for (int y = startY; y < endY; y++) {
-			for (int x = startX; x < endX; x++) {
-				ALLEGRO_COLOR pixel;
-				pixel = al_get_pixel(tilemap, x, y);
-				unsigned char r, g, b, a;
-				al_unmap_rgba(pixel, &r, &g, &b, &a);
-				if (a != 255) {
-					tileTransparent[ii] = true;
-					goto next;
-				}
-			}
-		}
-		tileTransparent[ii] = false;
-next:
-		;
-	}
-	al_unlock_bitmap(tilemap);
-#endif
-}
-
-
 void destroyTilemap(void)
 {
 	if (tilemap)
@@ -1560,17 +1525,18 @@ bool loadTilemap(void)
 {
 	destroyTilemap();
 
+	/*
 	tilemap = m_load_alpha_bitmap(getResource("packed.png"));
 
-	if (!tilemap) {
-		if (!native_error("Failed to load tilemap"))
+	if (!native_error("Failed to load tilemap"))
 			return false;
 	}
+	*/
 
-	numTiles = (m_get_bitmap_width(tilemap)/TILE_SIZE) *
-		(m_get_bitmap_height(tilemap)/TILE_SIZE);
+	numTiles = (1024/16) * (1024/16);//(m_get_bitmap_width(tilemap)/TILE_SIZE) *
+		//(m_get_bitmap_height(tilemap)/TILE_SIZE);
 
-	findAlphaTiles();
+	//findAlphaTiles();
 
 	tilemap_data = new XMLData(getResource("tilemap.png.xml"));
 	trans_data = new XMLData(getResource("trans.xml"));
@@ -1895,9 +1861,9 @@ void init_shaders(void)
 		"uniform float BH;\n"
 		"void main() {\n"
 		// rx, ry is the closest point to gl_FragCoord on the rectangle
-		"   float frag_y = (BH-1.0) - gl_FragCoord.y;\n"
 		"   float rx, ry;\n"
 		"   float dx, dy;\n"
+		"   float frag_y = (160.0-1.0) - gl_FragCoord.y;\n"
 		"   rx = clamp(gl_FragCoord.x, x1, x2);\n"
 		"   ry = clamp(frag_y, y1, y2);\n"
 		"   dx = gl_FragCoord.x - rx;\n"
@@ -2938,10 +2904,10 @@ void init2_shaders(void)
 		al_set_shader_float(scale3x_linear_flipped, "vstep", 1.0/buffer_true_h);
 		al_set_shader_float(scale3x_linear_flipped, "offset_x", 0);
 		al_set_shader_float(scale3x_linear_flipped, "offset_y", 0);
-		al_set_shader_sampler(scale2x, "tex", scaleXX_buffer, 0);
-		al_set_shader_sampler(scale2x_flipped, "tex", scaleXX_buffer, 0);
-		al_set_shader_sampler(scale3x, "tex", scaleXX_buffer, 0);
-		al_set_shader_sampler(scale3x_flipped, "tex", scaleXX_buffer, 0);
+		al_set_shader_sampler(scale2x, "tex", scaleXX_buffer->bitmap, 0);
+		al_set_shader_sampler(scale2x_flipped, "tex", scaleXX_buffer->bitmap, 0);
+		al_set_shader_sampler(scale3x, "tex", scaleXX_buffer->bitmap, 0);
+		al_set_shader_sampler(scale3x_flipped, "tex", scaleXX_buffer->bitmap, 0);
 #endif
 		
 		
@@ -3074,6 +3040,9 @@ bool init(int *argc, char **argv[])
 	al_init_ttf_addon();
 	al_init_image_addon();
 	al_init_primitives_addon();
+	
+   	PHYSFS_init(myArgv[0]);
+	PHYSFS_addToSearchPath(getResource("tiles.zip"), 1);
 
 	int flags = 0;
 
@@ -3084,8 +3053,10 @@ bool init(int *argc, char **argv[])
 	al_set_new_display_flags(flags);
 
 #if !defined(IPHONE)
-	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_REQUIRE);
-	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 32, ALLEGRO_SUGGEST);
+	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_REQUIRE);
+	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 16, ALLEGRO_REQUIRE);
+	//al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_REQUIRE);
+	//al_set_new_display_option(ALLEGRO_COLOR_SIZE, 32, ALLEGRO_SUGGEST);
 	al_set_new_display_adapter(config.getAdapter());
 	
 	// set screenScale *for loading screen only*
@@ -3206,7 +3177,7 @@ bool init(int *argc, char **argv[])
 	}
 	
 #ifdef IPHONE
-	al_set_new_display_option(ALLEGRO_AUTO_CONVERT_BITMAPS, 1, ALLEGRO_REQUIRE);
+	//al_set_new_display_option(ALLEGRO_AUTO_CONVERT_BITMAPS, 1, ALLEGRO_REQUIRE);
 #endif
 
 	#ifdef IPHONE
@@ -3251,13 +3222,14 @@ bool init(int *argc, char **argv[])
    NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
    BOOL osVersionSupported = ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending);
    if (osVersionSupported) {
-   	PRESERVE_TEXTURE = ALLEGRO_PRESERVE_TEXTURE;
+   	// FIXME!
+   	//PRESERVE_TEXTURE = ALLEGRO_PRESERVE_TEXTURE;
    }
 
    [p drain];
 #endif
 
-	al_set_new_bitmap_flags(ALLEGRO_CONVERT_BITMAP|PRESERVE_TEXTURE);
+	al_set_new_bitmap_flags(PRESERVE_TEXTURE);
 
 	/*
 	UIDeviceOrientation uido = [[UIDevice currentDevice] orientation];	
@@ -3381,21 +3353,21 @@ bool init(int *argc, char **argv[])
 #endif
 
 	flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(ALLEGRO_NO_PRESERVE_TEXTURE|ALLEGRO_CONVERT_BITMAP);
-	buffer = al_create_bitmap(BW, BH);
-	overlay = al_create_bitmap(BW, BH);
+	//al_set_new_bitmap_flags(ALLEGRO_NO_PRESERVE_TEXTURE|ALLEGRO_CONVERT_BITMAP);
+	buffer = m_create_bitmap(BW, BH); // check
+	overlay = m_create_bitmap(BW, BH); // check
 
 	if (config.getFilterType() == FILTER_SCALE2X_LINEAR) {
-		scaleXX_buffer = al_create_bitmap(BW*2, BH*2);
+		scaleXX_buffer = m_create_bitmap(BW*2, BH*2); // check
 	}
 	else if (config.getFilterType() == FILTER_SCALE3X_LINEAR) {
-		scaleXX_buffer = al_create_bitmap(BW*3, BH*3);
+		scaleXX_buffer = m_create_bitmap(BW*3, BH*3); // check
 	}
 	else {
 		scaleXX_buffer = NULL;
 	}
 	
-	screenshot = al_create_bitmap(BW/2, BH/2);
+	screenshot = m_create_bitmap(BW/2, BH/2); // check
 
 	al_set_new_bitmap_flags(flags);
 
@@ -3488,7 +3460,7 @@ bool init(int *argc, char **argv[])
 	bg_loader = m_load_bitmap(getResource("media/bg-loader.png"));
 	bar_loader = m_load_bitmap(getResource("media/bar-loader.png"));
 	loading_loader = m_load_bitmap(getResource("media/loading-loader.png"));
-	MBITMAP *tmp = m_create_bitmap(BH, BW);
+	MBITMAP *tmp = m_create_bitmap(BH, BW); // check
 	corner_bmp = m_load_bitmap(getResource("media/corner.png"));
 
 	/* ON IPHONE WE LOAD EVERYTHING AS MEMORY BITMAP FIRST THEN
@@ -3544,7 +3516,7 @@ bool init(int *argc, char **argv[])
 			m_draw_bitmap_region(bar_loader, 0, 0, bw*(percent/100.0f), bh, bx, by, 0);
 			eny_loader->draw(BH/2-eny_loader->getWidth()/2-25, BW-eny_loader->getHeight()-35, 0);
 			dot_loader->draw(118, 24, 0);
-			m_set_target_bitmap(al_get_backbuffer(display));
+			al_set_target_backbuffer(display);
 			m_clear(black);
 #ifndef IPHONE
 			float scale = screenScale / 2.0f;
@@ -3603,6 +3575,8 @@ bool init(int *argc, char **argv[])
 		ttf_flags = ALLEGRO_TTF_MONOCHROME;
 	}
 
+	al_set_new_bitmap_flags((bflags | ALLEGRO_PRESERVE_TEXTURE) & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+
 	game_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 9, ttf_flags);
 	if (!game_font) {
 		if (!native_error("Failed to load game_font"))
@@ -3630,7 +3604,10 @@ bool init(int *argc, char **argv[])
 
 	m_push_target_bitmap();
 	m_save_blender();
+	int flgs = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags((flgs | ALLEGRO_PRESERVE_TEXTURE)&~ALLEGRO_NO_PRESERVE_TEXTURE);
 	orb_bmp = m_create_alpha_bitmap(80, 80);
+	al_set_new_bitmap_flags(flgs);
 	m_set_target_bitmap(orb_bmp);
 	m_set_blender(M_ONE, M_ZERO, white);
 	for (int yy = 0; yy < 80; yy++) {
@@ -3661,19 +3638,22 @@ bool init(int *argc, char **argv[])
 	poison_bmp_tmp2 = m_make_alpha_display_bitmap(poison_bmp_tmp2);
 
 
-	MBITMAP *__old_target__ = m_get_target_bitmap();
+	ALLEGRO_BITMAP *__old_target__ = al_get_target_bitmap();
 	m_save_blender();
-	shadow_sides[0] = m_create_alpha_bitmap(16, SHADOW_CORNER_SIZE);
-	shadow_sides[1] = m_create_alpha_bitmap(SHADOW_CORNER_SIZE, 16);
-	shadow_sides[2] = m_create_alpha_bitmap(16, SHADOW_CORNER_SIZE);
-	shadow_sides[3] = m_create_alpha_bitmap(SHADOW_CORNER_SIZE, 16);
+	flgs = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags((flgs|ALLEGRO_PRESERVE_TEXTURE)&~ALLEGRO_NO_PRESERVE_TEXTURE);
+	shadow_sides[0] = m_create_alpha_bitmap(16, SHADOW_CORNER_SIZE); // check
+	shadow_sides[1] = m_create_alpha_bitmap(SHADOW_CORNER_SIZE, 16); // check
+	shadow_sides[2] = m_create_alpha_bitmap(16, SHADOW_CORNER_SIZE); // check
+	shadow_sides[3] = m_create_alpha_bitmap(SHADOW_CORNER_SIZE, 16); // check
 	for (int i = 0; i < 4; i++) {
-		shadow_corners[i] = m_create_alpha_bitmap(SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE);
+		shadow_corners[i] = m_create_alpha_bitmap(SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE); // check
 		m_set_target_bitmap(shadow_corners[i]);
 		m_clear(m_map_rgba(0, 0, 0, 0));
 		m_set_target_bitmap(shadow_sides[i]);
 		m_clear(m_map_rgba(0, 0, 0, 0));
 	}
+	al_set_new_bitmap_flags(flgs);
 	for (int yy = 0; yy < SHADOW_CORNER_SIZE; yy++) {
 		for (int xx = 0; xx < SHADOW_CORNER_SIZE; xx++) {
 			int dx = xx;
@@ -3715,7 +3695,7 @@ bool init(int *argc, char **argv[])
 	m_draw_bitmap(shadow_sides[0], 0, 0, M_FLIP_VERTICAL);
 	m_set_target_bitmap(shadow_sides[1]);
 	m_draw_bitmap(shadow_sides[3], 0, 0, M_FLIP_HORIZONTAL);
-	m_set_target_bitmap(__old_target__);
+	al_set_target_bitmap(__old_target__);
 	m_restore_blender();
 
 	tile = m_make_display_bitmap(tile);
@@ -4025,7 +4005,7 @@ void toggle_fullscreen(void)
 	pause_joystick_repeat_events = true;
 	ScreenDescriptor *sd = config.getWantedGraphicsMode();
 	sd->fullscreen = !sd->fullscreen;
-	al_toggle_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, config.getWantedGraphicsMode()->fullscreen);
+	al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, config.getWantedGraphicsMode()->fullscreen);
 	set_screen_params();
 	tguiSetScreenSize(BW*screenScale, BH*screenScale);
 	//if (config.getWantedGraphicsMode()->fullscreen) {

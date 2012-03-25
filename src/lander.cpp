@@ -118,10 +118,10 @@ top:
 	ALLEGRO_STATE state;
 	al_store_state(&state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS | ALLEGRO_STATE_TARGET_BITMAP);
 	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
-	MBITMAP *lander_tmp = al_create_bitmap(30, 30);
-	al_set_target_bitmap(lander_tmp);
-	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
-	al_draw_bitmap(land_bmp, 3, 3, 0);
+	MBITMAP *lander_tmp = m_create_bitmap(30, 30); // check
+	m_set_target_bitmap(lander_tmp);
+	m_clear_to_color(al_map_rgba(0, 0, 0, 0));
+	m_draw_bitmap(land_bmp, 3, 3, 0);
 	al_restore_state(&state);
 	
 	AnimationSet *explosion = new AnimationSet(getResource("media/explosion.png"));
@@ -269,8 +269,8 @@ top:
 			
 			// end game logic check
 			// this drawing really has to be done here unfortunately
-			al_set_target_bitmap(lander_tmp);
-			al_clear_to_color(al_map_rgba(0, 0, 0, 0));
+			m_set_target_bitmap(lander_tmp);
+			m_clear_to_color(al_map_rgba(0, 0, 0, 0));
 			m_draw_rotated_bitmap(lander_mem, 15, 15, 15, 15, -(lander_angle-M_PI*3/2), 0);
 			
 			green = 0;

@@ -546,7 +546,7 @@ void levelUpCallback(int selected, LEVEL_UP_CALLBACK_DATA *d)
 		orig_values = ov2;
 	}
 
-	ALLEGRO_BITMAP *tmp = al_clone_bitmap(buffer);
+	MBITMAP *tmp = m_clone_bitmap(buffer);
 
 	MFrame_NormalDraw *frame = new MFrame_NormalDraw(x, y, width, height, true);
 

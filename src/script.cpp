@@ -1,5 +1,8 @@
 #include "monster2.hpp"
+
+#ifdef IPHONE
 #include "iphone.h"
+#endif
 
 static Player *pushed_players[MAX_PARTY] = { NULL, };
 static Player **strategy_players;
@@ -847,7 +850,10 @@ bool anotherDoDialogue(const char *text, bool clearbuf, bool top)
 
 	doDialogue(textS, top, 4, 10, false);
 
-	ALLEGRO_BITMAP *tmp = m_create_bitmap(BW, BH);
+	int flags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags((flags | ALLEGRO_PRESERVE_TEXTURE) & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+	MBITMAP *tmp = m_create_bitmap(BW, BH); // check
+	al_set_new_bitmap_flags(flags);
 	m_set_target_bitmap(tmp);
 	m_draw_bitmap(buffer, 0, 0, 0);
 	
@@ -1303,10 +1309,10 @@ int CClearBuffer(lua_State *stack)
 	int g = (int)lua_tonumber(stack, 2);
 	int b = (int)lua_tonumber(stack, 3);
 	
-	MBITMAP *oldTarget = m_get_target_bitmap();
+	ALLEGRO_BITMAP *oldTarget = al_get_target_bitmap();
 	m_set_target_bitmap(buffer);
 	m_clear(m_map_rgb(r, g, b));
-	m_set_target_bitmap(oldTarget);
+	al_set_target_bitmap(oldTarget);
 
 	return 0;
 }
@@ -2561,9 +2567,9 @@ int CSetTileLayer(lua_State *stack)
 	t->setAnimationNum(l, v);
 	if (v != -1) {
 		std::vector<int>& tileAnimationNums = area->getAnimationNums();
-		int n = mapping[tileAnimationNums[v]];
-		t->setTU(l, coord_map_x[n]);
-		t->setTV(l, coord_map_y[n]);
+		int n = area->newmap[tileAnimationNums[v]];
+		t->setTU(l, (n % area->tm_w) * TILE_SIZE);
+		t->setTV(l, (n / area->tm_w) * TILE_SIZE);
 	}
 
 	return 0;
@@ -3327,7 +3333,7 @@ static void get_shiney_stuff(int *x, int *y, ALLEGRO_COLOR *c)
 	static long lastCall = -1;
 	
 	if (lastCall != -1) {
-		if (lastCall+100 > tguiCurrentTimeMillis())
+		if ((unsigned long)lastCall+100 > tguiCurrentTimeMillis())
 			return;
 	}
 	

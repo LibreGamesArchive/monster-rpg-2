@@ -157,29 +157,16 @@ void AnimationSet::reset(void)
 
 AnimationSet::AnimationSet(const char *filename, bool alpha) :
 	currAnim(0),
-	prefix(""),
-	bitmap(NULL)
+	prefix("")
 {
 	std::vector<int> delays;
 	XMLData *xml;
 	std::string filenameS = std::string(filename);
 	std::string xml_filename = filenameS + ".xml";
 
-	if (alpha)
-		bitmap = m_load_alpha_bitmap(filename);
-	else
-		bitmap = m_load_bitmap(filename);
-
-	if (!bitmap) {
-		debug_message("Error loading animation set %s.\n", filename);
-		return;
-	}
-	debug_message("Loaded bitmap %s.\n", filename);
-
 	xml = new XMLData(xml_filename);
 	if (!xml) {
 		debug_message("Error loading xml %s.\n", xml_filename.c_str());
-		m_destroy_bitmap(bitmap);
 		return;
 	}
 
@@ -249,7 +236,7 @@ AnimationSet::AnimationSet(const char *filename, bool alpha) :
 			int y1 = y;
 			int x2 = x1+width;
 			int y2 = y + height;
-			image->load(bitmap, x1, y1, x2, y2, false);
+			image->load(filename, x1, y1, x2, y2);
 			Frame *frame = new Frame(image, delays[i]);
 			anim->addFrame(frame);
 		}
@@ -274,9 +261,6 @@ AnimationSet::AnimationSet(const char *filename, bool alpha) :
 	delete xml;
 
 	debug_message("Animation set %s loaded\n", filenameS.c_str());
-
-	m_destroy_bitmap(bitmap);
-	bitmap = NULL;
 }
 
 AnimationSet::~AnimationSet()
@@ -284,7 +268,5 @@ AnimationSet::~AnimationSet()
 	for (uint i = 0; i < anims.size(); i++)
 		delete anims[i];
 	anims.clear();
-	if (bitmap)
-		m_destroy_bitmap(bitmap);
 }
 

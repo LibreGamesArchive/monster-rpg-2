@@ -35,10 +35,10 @@ void add_blit(MBITMAP *src, int x, int y, MCOLOR color, float amount, int flags)
 void death_blit_region(MBITMAP *src, int x, int y, int w, int h, int dx, int dy, MCOLOR color, int flags);
 extern bool global_draw_controls;
 
-extern ALLEGRO_BITMAP *blueblocks[8];
-extern ALLEGRO_BITMAP *airplay_dpad;
-extern ALLEGRO_BITMAP *white_button;
-extern ALLEGRO_BITMAP *black_button;
-extern ALLEGRO_BITMAP *airplay_logo;
+extern MBITMAP *blueblocks[8];
+extern MBITMAP *airplay_dpad;
+extern MBITMAP *white_button;
+extern MBITMAP *black_button;
+extern MBITMAP *airplay_logo;
 extern double blueblock_times[7];
 

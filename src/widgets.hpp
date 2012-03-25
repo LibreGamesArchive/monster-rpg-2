@@ -418,7 +418,10 @@ public:
 		this->height = 15;
 		this->text = text;
 		clicked = false;
-		bmp = m_create_bitmap(width, 14);
+		int flags = al_get_new_bitmap_flags();
+		al_set_new_bitmap_flags((flags | ALLEGRO_PRESERVE_TEXTURE) & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+		bmp = m_create_bitmap(width, 14); // check
+		al_set_new_display_flags(flags);
 		m_push_target_bitmap();
 		m_set_target_bitmap(bmp);
 		mDrawFrame(2, 2, width-4, 20);
@@ -510,7 +513,7 @@ public:
 			m_get_mouse_state(&state);
 			int w = m_get_bitmap_width(icon);
 			int h = m_get_bitmap_height(icon);
-			al_draw_tinted_scaled_bitmap(icon, al_map_rgba_f(0.75f, 0.75f, 0.75f, 0.75f), 0, 0, w, h,
+			al_draw_tinted_scaled_bitmap(icon->bitmap, al_map_rgba_f(0.75f, 0.75f, 0.75f, 0.75f), 0, 0, w, h,
 				state.x-w, state.y-h, w*2, h*2, 0);
 		}
 	}

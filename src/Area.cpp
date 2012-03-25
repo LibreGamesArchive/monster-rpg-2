@@ -11,11 +11,13 @@ Area* area = 0;
 long roaming = 0;
 bool dpad_panning = false;
 
+#if 0
 #include "mapping.h"
 #ifdef EDITOR
 #include "coord_map_editor.h"
 #else
 #include "coord_map.h"
+#endif
 #endif
 
 const float ORB_RADIUS = 40.0f;
@@ -592,105 +594,6 @@ void Area::drawObject(int index)
 				m_draw_bitmap_region(bmp, 0, y, TILE_SIZE, depth, tx2*TILE_SIZE-getOriginX(), ty2*TILE_SIZE+y-getOriginY(), 0);
 			}
 		}
-		/*
-		if (anim1 != NULL && anim2 != NULL) {// && anim1 == anim2) {
-			MBITMAP *bmp = anim1->getCurrentFrame()->getImage()->getBitmap();
-			y2 += dimy;
-			y2 -= depth1;
-			int x = x2 % TILE_SIZE;
-			int y = y2 % TILE_SIZE;
-			int w = TILE_SIZE - x;
-			int h = TILE_SIZE - y;
-			int dx = (x2 - getOriginX());
-			int dy = (y2 - getOriginY());
-			if (tinting) {
-#if (defined A5_OGL || defined A5_D3D) && !defined WIZ && !defined NO_SHADERS
-				if (use_programmable_pipeline) {
-				al_set_shader(display, tinter);
-				al_set_shader_sampler(tinter, "tex", bmp, 0);
-				al_set_shader_float(tinter, "ratio", tint_ratio);
-				al_set_shader_float(tinter, "r", targetTint.r);
-				al_set_shader_float(tinter, "g", targetTint.g);
-				al_set_shader_float(tinter, "b", targetTint.b);
-				al_use_shader(tinter, true);
-				m_draw_bitmap_region(bmp, x, y, w, h, 
-					dx, dy, 0);
-				al_use_shader(tinter, false);
-				al_set_shader(display, default_shader);
-				}
-				else
-#endif
-				{
-				m_save_blender();
-				float d, r, g, b;
-				d = targetTint.r - 1;
-				r = 1+(tint_ratio*d);
-				d = targetTint.g - 1;
-				g = 1+(tint_ratio*d);
-				d = targetTint.b - 1;
-				b = 1+(tint_ratio*d);
-				m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, al_map_rgb_f(r, g, b));
-				m_draw_bitmap_region(bmp, x, y, w, h, 
-					dx, dy, 0);
-				m_restore_blender();
-				}
-			}
-			else {
-				m_draw_bitmap_region(bmp, x, y, w, h,
-					dx, dy, 0);
-			}
-
-			if (w == TILE_SIZE && h >= depth1)
-				goto drawUpper;
-
-
-			x = (x + w) % TILE_SIZE;
-			//y = (y + h) % TILE_SIZE;
-			y = y - (abs(sign(offsy))*y);
-			dx += w % TILE_SIZE;
-			dy += h % depth1;
-			w = TILE_SIZE - (w % TILE_SIZE);
-			h = depth1 - (h % depth1);
-
-
-			if (tinting) {
-#if (defined A5_OGL || defined A5_D3D) && !defined WIZ && !defined NO_SHADERS
-				if (use_programmable_pipeline) {
-				al_set_shader(display, tinter);
-				al_set_shader_sampler(tinter, "tex", bmp, 0);
-				al_set_shader_float(tinter, "ratio", tint_ratio);
-				al_set_shader_float(tinter, "r", targetTint.r);
-				al_set_shader_float(tinter, "g", targetTint.g);
-				al_set_shader_float(tinter, "b", targetTint.b);
-				al_use_shader(tinter, true);
-				m_draw_bitmap_region(bmp, x, y, w, h, 
-					dx, dy, 0);
-				al_use_shader(tinter, false);
-				al_set_shader(display, default_shader);
-				}
-				else
-#endif
-				{
-				m_save_blender();
-				float d, r, g, b;
-				d = targetTint.r - 1;
-				r = 1+(tint_ratio*d);
-				d = targetTint.g - 1;
-				g = 1+(tint_ratio*d);
-				d = targetTint.b - 1;
-				b = 1+(tint_ratio*d);
-				m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, al_map_rgb_f(r, g, b));
-				m_draw_bitmap_region(bmp, x, y, w, h, 
-					dx, dy, 0);
-				m_restore_blender();
-				}
-			}
-			else {
-				m_draw_bitmap_region(bmp, x, y, w, h,
-					dx, dy, 0);
-			}
-		}
-		*/
 	}
 	else {
 		int x = posx;
@@ -709,7 +612,7 @@ void Area::drawObject(int index)
 #if (defined A5_OGL || defined A5_D3D) && !defined WIZ && !defined NO_SHADERS
 				if (use_programmable_pipeline) {
 				al_set_shader(display, tinter);
-				al_set_shader_sampler(tinter, "tex", bmp, 0);
+				al_set_shader_sampler(tinter, "tex", bmp->bitmap, 0);
 				al_set_shader_float(tinter, "ratio", tint_ratio);
 				al_set_shader_float(tinter, "r", targetTint.r);
 				al_set_shader_float(tinter, "g", targetTint.g);
@@ -749,7 +652,7 @@ void Area::drawObject(int index)
 		}
 	}
 
-drawUpper:
+//drawUpper:
 	objects[index]->drawUpper();
 }
 
@@ -1191,6 +1094,7 @@ void Area::getWaterAnimation(int x, int y, Animation **anim, int *depth)
 /*
  * Blit a frame of a tile in a tilemap to a smaller tile-sized bitmap.
  */
+#ifdef EDITOR
 void blitTile(int tile, MBITMAP* tilemap, MBITMAP* dest)
 {
 	// FIXME: not really needed anymore
@@ -1209,7 +1113,7 @@ void blitTile(int tile, MBITMAP* tilemap, MBITMAP* dest)
 
 	m_restore_blender();
 }
-
+#endif
 
 void Area::drawLayer(int i, int bw, int bh)
 {
@@ -1266,8 +1170,10 @@ void Area::drawLayer(int i, int bw, int bh)
 			if (n >= 0 && n < (int)tileAnimations.size() && tileAnimationNums[n]) {
 				int mapped = tileAnimationNums[n];
 #else
-			if (n >= 0 && n < (int)tileAnimations.size() && mapping[tileAnimationNums[n]]) {
-				int mapped = mapping[tileAnimationNums[n]];
+			//if (n >= 0 && n < (int)tileAnimations.size() && mapping[tileAnimationNums[n]]) {
+			if (n >= 0 && n < (int)tileAnimations.size() && newmap[tileAnimationNums[n]]) {
+				//int mapped = mapping[tileAnimationNums[n]];
+				int mapped = newmap[tileAnimationNums[n]];
 #endif
 				std::map<int, anim_data>::iterator it  = anim_info.find(mapped);
 				float tu;
@@ -1411,7 +1317,7 @@ void Area::draw(int bw, int bh)
 			al_set_shader_float(tinter, "b", targetTint.b);
 			al_use_shader(tinter, true);
 		}
-		al_draw_prim(verts, 0, tilemap, 0, num_quads*6,
+		m_draw_prim(verts, 0, partial_tm, 0, num_quads*6,
 			ALLEGRO_PRIM_TRIANGLE_LIST);
 		if (tinting && use_programmable_pipeline) {
 			al_use_shader(tinter, false);
@@ -1494,7 +1400,7 @@ void Area::draw(int bw, int bh)
 			al_set_shader_float(tinter, "b", targetTint.b);
 			al_use_shader(tinter, true);
 		}
-		al_draw_prim(verts, 0, tilemap, 0, num_quads*6,
+		m_draw_prim(verts, 0, partial_tm, 0, num_quads*6,
 			ALLEGRO_PRIM_TRIANGLE_LIST);
 		if (tinting && use_programmable_pipeline) {
 			al_use_shader(tinter, false);
@@ -1510,6 +1416,7 @@ void Area::draw(int bw, int bh)
 		if (objects[i]->isHigh() && !objects[i]->isHidden())
 			objects[i]->draw();
 	}
+#ifndef EDITOR
 	if (name == "darkside") {
 		if (gameInfo.milestones[MS_GOT_ORB]) {
 			int player_posx, player_posy;
@@ -1549,8 +1456,31 @@ void Area::draw(int bw, int bh)
 	}
 	
 	sorted_objects.clear();
+#endif
 }
 
+#ifdef EDITOR
+void Area::saveBmp(std::string filename)
+{
+	int pixw = sizex * TILE_SIZE;
+	int pixh = sizey * TILE_SIZE;
+
+	int flags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags(flags | ALLEGRO_MEMORY_BITMAP);
+	MBITMAP *mem = m_create_bitmap(pixw, pixh); // check
+	al_set_new_display_flags(flags);
+
+	MBITMAP *target = al_get_target_bitmap();
+	al_set_target_bitmap(mem);
+	al_clear_to_color(al_map_rgb(0, 0, 0));
+	draw(pixw, pixh);
+	al_set_target_bitmap(target);
+
+	al_save_bitmap(filename.c_str(), mem);
+
+	m_destroy_bitmap(mem);
+}
+#endif
 
 Tile* Area::getTile(int x, int y)
 {
@@ -2061,6 +1991,7 @@ Tile* Area::loadTile(gzFile f)
 		for (int i = 0; i < TILE_LAYERS; i++) {
 			anims[i] = (int)igetl(f);
 			if (anims[i] >= 0) {
+#if 0
 #ifdef EDITOR
 				int n = tileAnimationNums[anims[i]];
 #else
@@ -2069,6 +2000,10 @@ Tile* Area::loadTile(gzFile f)
 				/* FIXME HARDCODED :(( */
 				tu[i] = coord_map_x[n];
 				tv[i] = coord_map_y[n];
+#endif
+				int n = newmap[tileAnimationNums[anims[i]]];
+				tu[i] = (n % tm_w) * TILE_SIZE;
+				tv[i] = (n / tm_w) * TILE_SIZE;
 			}
 		}
 		bool solid = my_pack_getc(f);
@@ -2223,6 +2158,7 @@ void Area::loadAnimation(int index, bool addIndex)
 	Frame *frame;
 	Animation *animation;
 	Image *image;
+	/*
 #ifdef EDITOR
 	int subx = coord_map_x[index];
 	int suby = coord_map_y[index];
@@ -2230,25 +2166,48 @@ void Area::loadAnimation(int index, bool addIndex)
 	int subx = coord_map_x[mapping[index]];
 	int suby = coord_map_y[mapping[index]];
 #endif
-	MBITMAP *subbmp = al_create_sub_bitmap(tilemap, subx, suby, TILE_SIZE, TILE_SIZE);
+*/
+	int subx = index % (512/TILE_SIZE);
+	int suby = index / (512/TILE_SIZE);
+
+	ALLEGRO_STATE st;
+	al_store_state(&st, ALLEGRO_STATE_BLENDER | ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
+	al_set_physfs_file_interface();
+	char nm[100];
+	sprintf(nm, "%d-%d.png", subx, suby);
+	MBITMAP *tmp = m_load_bitmap(nm);
+	al_set_standard_file_interface();
+	int xx = tm_used % tm_w;
+	int yy = tm_used / tm_w;
+	tm_used++;
+	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+	m_set_target_bitmap(partial_tm);
+	m_draw_bitmap(tmp, xx*TILE_SIZE, yy*TILE_SIZE, 0);
+	MBITMAP *subbmp = m_create_sub_bitmap(partial_tm, xx*TILE_SIZE, yy*TILE_SIZE, TILE_SIZE, TILE_SIZE); // check
+	m_destroy_bitmap(tmp);
+	al_restore_state(&st);
 	image = new Image();
 	int flags = al_get_new_bitmap_flags();
 	image->set(subbmp);
 	al_set_new_bitmap_flags(flags);
 #ifdef EDITOR
-	image->setTransparent(tileTransparent[index] || (alpha < 255));
+	//image->setTransparent(tileTransparent[index] || (alpha < 255));
 #else
-	image->setTransparent(tileTransparent[mapping[index]] || (alpha < 255));
+	//image->setTransparent(tileTransparent[mapping[index]] || (alpha < 255));
 #endif
 	frame = new Frame(image, delay);
 	animation = new Animation("hmm", alpha);
 	animation->addFrame(frame);
 	tileAnimations.push_back(animation);
-	if (addIndex)
+
+	if (addIndex) {
+		newmap[index] = tm_used-1;
 		tileAnimationNums.push_back(index);
+	}
 	
-	if (!data)
+	if (!data) {
 		return;
+	}
 
 	// animated tile
 
@@ -2258,6 +2217,11 @@ void Area::loadAnimation(int index, bool addIndex)
 	ad.current_frame = 0;
 	std::vector<int> tu;
 	std::vector<int> tv;
+
+	tu.push_back(xx*TILE_SIZE);
+	tv.push_back(yy*TILE_SIZE);
+
+	/*
 #ifdef EDITOR
 	tu.push_back(coord_map_x[index]);
 	tv.push_back(coord_map_y[index]);
@@ -2265,7 +2229,7 @@ void Area::loadAnimation(int index, bool addIndex)
 	tu.push_back(coord_map_x[mapping[index]]);
 	tv.push_back(coord_map_y[mapping[index]]);
 #endif
-
+*/
 	int i = 2;
 
 	for (;;) {
@@ -2276,6 +2240,7 @@ void Area::loadAnimation(int index, bool addIndex)
 			break;
 		std::string index_string = index_xml->getValue();
 		int index = atoi(index_string.c_str());
+		/*
 #ifdef EDITOR
 		int subx = coord_map_x[index];
 		int suby = coord_map_y[index];
@@ -2283,18 +2248,38 @@ void Area::loadAnimation(int index, bool addIndex)
 		int subx = coord_map_x[mapping[index]];
 		int suby = coord_map_y[mapping[index]];
 #endif
-		MBITMAP *subbmp = al_create_sub_bitmap(tilemap, subx, suby, TILE_SIZE, TILE_SIZE);
+*/
+		subx = index % (512/TILE_SIZE);
+		suby = index / (512/TILE_SIZE);
+
+
+		ALLEGRO_STATE st;
+		al_store_state(&st, ALLEGRO_STATE_BLENDER | ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
+		al_set_physfs_file_interface();
+		sprintf(nm, "%d-%d.png", subx, suby);
+		MBITMAP *tmp = m_load_bitmap(nm);
+		al_set_standard_file_interface();
+		int xx = tm_used % tm_w;
+		int yy = tm_used / tm_w;
+		tm_used++;
+		al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+		m_set_target_bitmap(partial_tm);
+		m_draw_bitmap(tmp, xx*TILE_SIZE, yy*TILE_SIZE, 0);
+		MBITMAP *subbmp = m_create_sub_bitmap(partial_tm, xx*TILE_SIZE, yy*TILE_SIZE, TILE_SIZE, TILE_SIZE); // check
+		m_destroy_bitmap(tmp);
+		al_restore_state(&st);
 		image = new Image();
-		int flags = al_get_new_bitmap_flags();
+		flags = al_get_new_bitmap_flags();
 		image->set(subbmp);
 		al_set_new_bitmap_flags(flags);
 #ifdef EDITOR
-		image->setTransparent(tileTransparent[index] || (alpha < 255));
+		//image->setTransparent(tileTransparent[index] || (alpha < 255));
 #else
-		image->setTransparent(tileTransparent[mapping[index]] || (alpha < 255));
+		//image->setTransparent(tileTransparent[mapping[index]] || (alpha < 255));
 #endif
 		frame = new Frame(image, delay);
 		animation->addFrame(frame);
+		/*
 #ifdef EDITOR
 		tu.push_back(coord_map_x[index]);
 		tv.push_back(coord_map_y[index]);
@@ -2302,27 +2287,27 @@ void Area::loadAnimation(int index, bool addIndex)
 		tu.push_back(coord_map_x[mapping[index]]);
 		tv.push_back(coord_map_y[mapping[index]]);
 #endif
+*/
+		tu.push_back(xx*TILE_SIZE);
+		tv.push_back(yy*TILE_SIZE);
+
 		i++;
 	}
-	
+
 	ad.tu = tu;
 	ad.tv = tv;
 #ifdef EDITOR
 	anim_info[index] = ad;
 #else
-	anim_info[mapping[index]] = ad;
+	//anim_info[mapping[index]] = ad;
+	anim_info[newmap[index]] = ad;
 #endif
 }
-
-
-
-
 
 std::vector<Tile *> &Area::getTiles(void)
 {
 	return tiles;
 }
-
 
 void Area::reloadAnimations(void)
 {
@@ -2336,12 +2321,58 @@ void Area::reloadAnimations(void)
 	}
 }
 
-
 void Area::load(std::string filename)
 {
 	gzFile f = gzopen(filename.c_str(), "rb");
 	if (!f)
 		throw ReadError();
+	
+	sizex = (int)igetl(f);
+	sizey = (int)igetl(f);
+		
+	int ntiles = 0;
+	tm_w = 0;
+	tm_h = 0;
+	tm_used = 0;
+	
+	// Count number of tiles used
+	int n = (int)igetl(f);
+	for (int i = 0; i < n; i++) {
+		int tileIndex = (int)igetl(f);
+
+		char num[100];
+		sprintf(num, "%d", tileIndex);
+		std::string number(num);
+
+		XMLData *data = tilemap_data->find(number);
+		
+		ntiles++;
+
+		if (data) {
+			int j = 2;
+			for (;;) {
+				char name[10];
+				sprintf(name, "%d", j);
+				XMLData *tmp = data->find(name);
+				if (!tmp)
+					break;
+				ntiles++;
+				j++;
+			}
+		}
+	}
+
+	int len = sqrt(ntiles);
+	len++;
+
+	tm_w = len;
+	tm_h = len;
+
+	int flgs = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags((flgs|ALLEGRO_PRESERVE_TEXTURE)&~ALLEGRO_NO_PRESERVE_TEXTURE);
+	partial_tm = m_create_alpha_bitmap(tm_w*TILE_SIZE, tm_h*TILE_SIZE); // check
+	al_set_new_bitmap_flags(flgs);
+	printf("partial flags=%d\n", al_get_bitmap_flags(partial_tm->bitmap));
 
 	char tmp[MAX_AREA_NAME];
 	ALLEGRO_PATH *path = al_create_path(filename.c_str());
@@ -2360,13 +2391,10 @@ void Area::load(std::string filename)
 	}
 
 	luaState = 0;
-	sizex = sizey = -1;
+
+	gzseek(f, 8, SEEK_SET);
 
 	try {
-
-	sizex = (int)igetl(f);
-	sizey = (int)igetl(f);
-
 		// Read animation indexes
 		int n = (int)igetl(f);
 		for (int i = 0; i < n; i++) {
@@ -2537,6 +2565,9 @@ Area::Area(void)
 
 Area::~Area()
 {
+	if (partial_tm)
+		m_destroy_bitmap(partial_tm);
+
 	if (luaState)
 		callLua(luaState, "stop", ">");
 

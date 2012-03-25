@@ -9,7 +9,9 @@
 #include "joypad.hpp"
 #endif
 
+#if defined IPHONE
 #include "iphone.h"
+#endif
 
 bool fairy_used = false;
 
@@ -426,9 +428,9 @@ void showItemInfo(int index, bool preserve_buffer)
 	
 	bool delayed = false;
 
-	ALLEGRO_BITMAP *tmp = NULL;
+	MBITMAP *tmp = NULL;
 	if (preserve_buffer) {
-		tmp = al_clone_bitmap(buffer);
+		tmp = m_clone_bitmap(buffer);
 	}
 	
 	int w = 200;
@@ -678,7 +680,7 @@ static bool choose_save_slot(int num, bool exists, void *data)
 			if (prompt("Overwrite?", "", 0, 0)) {
 				saveGame(getUserResource("%d.save", num), map_name);
 				if (screenshot) {
-					al_save_bitmap(getUserResource("%d.bmp", num), screenshot);
+					al_save_bitmap(getUserResource("%d.bmp", num), screenshot->bitmap);
 				}
 				else {
 					delete_file(getUserResource("%d.bmp", num));
@@ -691,7 +693,7 @@ static bool choose_save_slot(int num, bool exists, void *data)
 		else {
 			saveGame(getUserResource("%d.save", num), map_name);
 			if (screenshot) {
-				al_save_bitmap(getUserResource("%d.bmp", num), screenshot);
+				al_save_bitmap(getUserResource("%d.bmp", num), screenshot->bitmap);
 			}
 			else {
 				delete_file(getUserResource("%d.png", num));
@@ -866,7 +868,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	int item_index;
 	item_index = findUsedInventorySlot(CURE_INDEX);
 	if (item_index >= 0)
-		pts += 1 * inventory[item_index].quantity;
+		pts += 2 * inventory[item_index].quantity;
 	item_index = findUsedInventorySlot(CURE2_INDEX);
 	if (item_index >= 0)
 		pts += 4 * inventory[item_index].quantity;
@@ -2394,7 +2396,7 @@ void credits(void)
 				}
 
 				//glEnable(GL_TEXTURE_2D);
-				al_draw_prim(verts, 0, font, 0, vcount, ALLEGRO_PRIM_TRIANGLE_LIST);
+				m_draw_prim(verts, 0, font, 0, vcount, ALLEGRO_PRIM_TRIANGLE_LIST);
 				//glDisable(GL_TEXTURE_2D);
 				if (count >= times[0]) {
 					state = (SECTION_STATE)((int)state+1);
@@ -2464,7 +2466,7 @@ void credits(void)
 					}
 				}
 
-				al_draw_prim(verts, 0, font, 0, vcount, ALLEGRO_PRIM_TRIANGLE_LIST);
+				m_draw_prim(verts, 0, font, 0, vcount, ALLEGRO_PRIM_TRIANGLE_LIST);
 				if (count >= times[1]) {
 					state = (SECTION_STATE)((int)state+1);
 					count = 0;
@@ -2544,7 +2546,7 @@ void credits(void)
 					}
 				}
 
-				al_draw_prim(verts, 0, font, 0, vcount, ALLEGRO_PRIM_TRIANGLE_LIST);
+				m_draw_prim(verts, 0, font, 0, vcount, ALLEGRO_PRIM_TRIANGLE_LIST);
 				if (count >= times[2]) {
 					state = S_IN;
 					count = 0;
@@ -3163,7 +3165,7 @@ bool config_menu(bool start_on_fullscreen)
 
 //	MIcon *bg = new MIcon(0, 0, std::string(getResource("media/options_bg.png")), al_map_rgba(64, 64, 64, 255), false, NULL, false, //false, false, false);
 	
-	ALLEGRO_BITMAP *bg = al_load_bitmap(getResource("media/options_bg.png"));
+	MBITMAP *bg = m_load_bitmap(getResource("media/options_bg.png"));
 
 	int xx = 10;
 	int y = 10;
@@ -3423,7 +3425,8 @@ bool config_menu(bool start_on_fullscreen)
 				close_pressed = false;
 			}
 			
-			TGUIWidget *w = tguiUpdate();
+			//TGUIWidget *w = tguiUpdate();
+			tguiUpdate();
 			
 			#if defined(IPHONE) && !defined(LITE)
 			if (w && w == reset_game_center) {
@@ -3602,7 +3605,7 @@ bool config_menu(bool start_on_fullscreen)
 
 			m_set_target_bitmap(buffer);
 			
-			al_draw_tinted_bitmap(bg, al_map_rgba(64, 64, 64, 255), 0, 0, 0);
+			al_draw_tinted_bitmap(bg->bitmap, al_map_rgba(64, 64, 64, 255), 0, 0, 0);
 			
 			//m_clear(black);
 		
@@ -3654,7 +3657,7 @@ done:
 #endif
 	delete language_toggle;
 	
-	al_destroy_bitmap(bg);
+	m_destroy_bitmap(bg);
 	
 	tguiPop();
 
@@ -3699,7 +3702,7 @@ void pc_help(void)
 		""
 	};
 	
-	ALLEGRO_BITMAP *bg = m_load_bitmap(getResource("media/m2_controller_logo.png"));
+	MBITMAP *bg = m_load_bitmap(getResource("media/m2_controller_logo.png"));
 	bool first_frame = true;
 	
 	tguiPush();
@@ -3735,8 +3738,8 @@ void pc_help(void)
 			
 			m_clear(black);
 			
-			int w = al_get_bitmap_width(bg);
-			int h = al_get_bitmap_height(bg);
+			int w = m_get_bitmap_width(bg);
+			int h = m_get_bitmap_height(bg);
 			float r = 220.0f / w;
 			int ww = w * r;
 			int hh = h * r;
@@ -3958,7 +3961,7 @@ int title_menu(void)
 	}
 done:
 
-	al_destroy_bitmap(bg);
+	m_destroy_bitmap(bg);
 
 	for (int i = 0; i < curr_button; i++) {
 		tguiDeleteWidget(buttons[i]);

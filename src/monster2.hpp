@@ -11,7 +11,8 @@
 #if defined IPHONE
 #define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_RGBA_4444
 #elif defined A5_OGL
-#define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE
+//#define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE
+#define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_RGBA_4444
 #else
 #define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_ARGB_8888
 #endif
@@ -60,7 +61,10 @@
 #include <allegro5/allegro_native_dialog.h>
 #include <allegro5/allegro_shader.h>
 #include <allegro5/allegro_shader_glsl.h>
+#include <allegro5/allegro_physfs.h>
 #endif
+
+#include <physfs.h>
 
 #ifdef ALLEGRO_MACOSX
 //#include <objc/objc.h>
@@ -95,6 +99,10 @@
 #include "atlas.h"
 
 #include <zlib.h>
+
+#if !defined KCM_AUDIO
+#include <bass.h>
+#endif
 
 const int LETTER_INDEX = 3;
 
@@ -236,15 +244,11 @@ struct ScreenDescriptor {
 };
 
 
-#ifdef ALLEGRO4
-typedef BITMAP MBITMAP;
-struct MCOLOR {
-	float r, g, b, a;
+struct MBITMAP {
+	ALLEGRO_BITMAP *bitmap;
 };
-#else
-typedef ALLEGRO_BITMAP MBITMAP;
+
 typedef ALLEGRO_COLOR MCOLOR;
-#endif
 
 enum Direction {
 	DIRECTION_NONE = -1,
@@ -307,7 +311,9 @@ const float TWO_PI = (M_PI*2);
 #include "AnimationSet.hpp"
 #include "Tile.hpp"
 #include "Area.hpp"
+#ifdef IPHONE
 #include "iphone.h"
+#endif
 #include "init.hpp"
 #include "Configuration.hpp"
 #include "Input.hpp"

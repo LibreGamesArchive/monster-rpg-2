@@ -662,7 +662,7 @@ void initSound(void)
 	al_init_acodec_addon();
 
 	#if defined IPHONE || defined ALLEGRO_MACOSX
-	init_aac();
+	//init_aac();
 	#endif
 
 
@@ -1079,7 +1079,7 @@ void playMusic(std::string name, bool setLoopStart, unsigned int loopStart, bool
 	if (!force && musicName == name)
 		return;
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE_XX || defined ALLEGRO_MACOSX_XX
 	if (aac_playing) {
 		play_aac(NULL);
 		aac_playing = false;
@@ -1104,7 +1104,7 @@ void playMusic(std::string name, bool setLoopStart, unsigned int loopStart, bool
 	//music = al_stream_from_file(getResource("music/%s", name.c_str()), 4, 4096);
 	//if (name.find(".aac", 0) != std::string::npos) {
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE_XX || defined ALLEGRO_MACOSX_XX
 	if (name.find(".caf", 0) != std::string::npos) {
 		play_aac(getResource("music/%s", name.c_str()));
 		aac_playing = true;
@@ -1134,7 +1134,7 @@ void playMusic(std::string name, bool setLoopStart, unsigned int loopStart, bool
 		}
 
 		al_attach_audio_stream_to_mixer(music, al_get_default_mixer());
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE_XX || defined ALLEGRO_MACOSX_XX
 	}
 #endif
 
@@ -1151,7 +1151,7 @@ void playMusicVolumeOff(std::string name)
 	
 	musicName = name;
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE_XX || defined ALLEGRO_MACOSX_XX
 	if (aac_playing) {
 		play_aac(NULL);
 		aac_playing = false;

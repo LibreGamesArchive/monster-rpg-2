@@ -3,13 +3,14 @@ CC=gcc
 
 
 ifdef BUILD_EDITOR
-CFLAGS=-DA5_D3D -DEDITOR -I. -IEditor -I"c:/users/trent/code/include"
+CFLAGS=-DA5_D3D -DEDITOR -I. -IEditor -I"c:/users/trent/code/include" -fcheck-new
 else
-CFLAGS=-DA5_D3D -O2 -I. -I"c:/users/trent/code/include" -I"C:\a5_d3d\include" -I"c:\Program Files (x86)\Microsoft DirectX SDK (August 2007)\include" -g -static-libgcc -static-libstdc++
+CFLAGS=-DA5_D3D -O2 -I. -I"c:/users/trent/code/include" -I"C:\a5_d3d\include" -I"c:\Program Files (x86)\Microsoft DirectX SDK (August 2007)\include" -g -static-libgcc -static-libstdc++ -fcheck-new
 endif
 
-
-LINKFLAGS=-L"c:/a5_d3d/lib" -L"c:/users/trent/code/lib" -mwindows -static-libgcc -static-libstdc++
+# FIXME
+#LINKFLAGS=-L"c:/a5_d3d/lib" -L"c:/users/trent/code/lib" -mwindows -static-libgcc -static-libstdc++
+LINKFLAGS=-L"c:/a5_d3d/lib" -L"c:/users/trent/code/lib" -static-libgcc -static-libstdc++
 
 
 CXX_SRCS=\
@@ -61,9 +62,9 @@ C_LIBOBJS=$(C_SRCS:.c=.o)
 
 
 
-ALLEGROLIBS=-L"c:\a5_d3d\lib" -lallegro_shader-static -lallegro_acodec-static -lallegro_audio-static -lallegro_dialog-static -lallegro_primitives-static -lallegro_ttf-static -lallegro_font-static -lallegro_image-static -lallegro-static -lallegro_main-static
+ALLEGROLIBS=-L"c:\a5_d3d\lib" -lallegro_physfs-static -lallegro_shader-static -lallegro_acodec-static -lallegro_audio-static -lallegro_native_dialog-static -lallegro_primitives-static -lallegro_ttf-static -lallegro_font-static -lallegro_image-static -lallegro-static -lallegro_main-static
 STATIC_LIBS=-lkernel32 -luser32 -lgdi32 -lcomdlg32 -lole32 -lwinmm -lpsapi -ldxguid -lgdiplus -luuid -lshlwapi
-LIBS=-llua-fixed -ltgui $(ALLEGROLIBS) -lz -lopengl32 -lwinmm -lbass -lfreetype $(STATIC_LIBS) "c:\program files (x86)\microsoft directx sdk (august 2007)\lib\x86\d3dx9.lib"
+LIBS=-llua-fixed -ltgui $(ALLEGROLIBS) -lz -lopengl32 -lwinmm -lbass -lfreetype $(STATIC_LIBS) "c:\program files (x86)\microsoft directx sdk (august 2007)\lib\x86\d3dx9.lib" -lphysfs
 
 
 default: monster2

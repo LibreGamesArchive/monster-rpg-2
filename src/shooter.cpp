@@ -17,7 +17,7 @@ void vecXmat(double x, double y, double z, ALLEGRO_TRANSFORM *mat, double *ox, d
 	*ow = x*mat->m[0][3] + y*mat->m[1][3] + z*mat->m[2][3] + mat->m[3][3];
 }
 
-static void draw_billboard_bitmap(ALLEGRO_TRANSFORM *proj, ALLEGRO_BITMAP *b, int x, int y)
+static void draw_billboard_bitmap(ALLEGRO_TRANSFORM *proj, MBITMAP *b, int x, int y)
 {
 	double ox, oy, oz, ow;
 	//ALLEGRO_TRANSFORM t;
@@ -37,10 +37,10 @@ static void draw_billboard_bitmap(ALLEGRO_TRANSFORM *proj, ALLEGRO_BITMAP *b, in
 	oy += 1;
 	oy *= BH/2;
 
-	int dw = al_get_bitmap_width(b)*1.5*(1.0-oz);
-	int dh = al_get_bitmap_height(b)*1.5*(1.0-oz);
+	int dw = m_get_bitmap_width(b)*1.5*(1.0-oz);
+	int dh = m_get_bitmap_height(b)*1.5*(1.0-oz);
 	m_draw_scaled_bitmap(
-		b, 0, 0, al_get_bitmap_width(b), al_get_bitmap_height(b),
+		b, 0, 0, m_get_bitmap_width(b), m_get_bitmap_height(b),
 		ox-dw/2, oy-dh,
 		dw, dh,
 		0);
@@ -214,7 +214,7 @@ public:
 			proj,
 			b,
 			ox-cx,
-			oy-cy+al_get_bitmap_height(b)
+			oy-cy+m_get_bitmap_height(b)
 		);
 	}
 
@@ -456,7 +456,7 @@ static void render(int start, int end, MBITMAP *bmp)
 
 	const int xofs = (w/2)-32;
 
-	MBITMAP *old_target = al_get_target_bitmap();
+	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
 	m_set_target_bitmap(bmp);
 
 	for (int y = end; y > start; y--) {
@@ -513,8 +513,8 @@ static void render(int start, int end, MBITMAP *bmp)
 		}
 	}
 
-	al_draw_prim(verts, 0, underwater, 0, vcount, ALLEGRO_PRIM_TRIANGLE_LIST);
-	m_set_target_bitmap(old_target);
+	m_draw_prim(verts, 0, underwater, 0, vcount, ALLEGRO_PRIM_TRIANGLE_LIST);
+	al_set_target_bitmap(old_target);
 	
 	end_render = start;
 
@@ -639,8 +639,8 @@ static void draw(double cx, double cy)
 			draw_billboard_bitmap(
 				&proj,
 				crab_bmp,
-				crabs[i].x-cx+al_get_bitmap_width(crab_bmp)/2,
-				crabs[i].y-cy+al_get_bitmap_height(crab_bmp)
+				crabs[i].x-cx+m_get_bitmap_width(crab_bmp)/2,
+				crabs[i].y-cy+m_get_bitmap_height(crab_bmp)
 			);
 		}
 	}
@@ -650,7 +650,7 @@ static void draw(double cx, double cy)
 			&proj,
 			bullet,
 			bullets[i].x-cx,
-			bullets[i].y-cy+al_get_bitmap_height(bullet)
+			bullets[i].y-cy+m_get_bitmap_height(bullet)
 		);
 	}
 	// draw sharks
@@ -660,8 +660,8 @@ static void draw(double cx, double cy)
 			draw_billboard_bitmap(
 				&proj,
 				shark_bmp,
-				sharks[i].x-cx+al_get_bitmap_width(shark_bmp)/2,
-				sharks[i].y-cy+al_get_bitmap_height(shark_bmp)
+				sharks[i].x-cx+m_get_bitmap_width(shark_bmp)/2,
+				sharks[i].y-cy+m_get_bitmap_height(shark_bmp)
 			);
 		}
 	}
@@ -691,9 +691,9 @@ bool shooter(bool for_points)
 	int shark_value, crab_value;
 
 	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags & ~ALLEGRO_PRESERVE_TEXTURE);
-	bbot = al_create_bitmap(1024, 1024);
-	btop = al_create_bitmap(1024, 1024);
+	al_set_new_bitmap_flags((flags | ALLEGRO_NO_PRESERVE_TEXTURE) & ~ALLEGRO_PRESERVE_TEXTURE);
+	bbot = m_create_bitmap(1024, 1024); // check
+	btop = m_create_bitmap(1024, 1024); // check
 	al_set_new_bitmap_flags(flags);
 
 	if (config.getDifficulty() == CFG_DIFFICULTY_EASY) {
@@ -877,7 +877,7 @@ start:
 
 			if (!dead && solid[tx+ty*w]) {
 				dead = true;
-				Explosion *e = new Explosion(x, py-al_get_bitmap_height(sub_bmp));
+				Explosion *e = new Explosion(x, py-m_get_bitmap_height(sub_bmp));
 				explosions.push_back(e);
 				playPreloadedSample("explosion.ogg");
 			}
@@ -909,15 +909,15 @@ start:
 			for (cit = crabs.begin(); cit != crabs.end();) {
 				MPoint crab = *cit;
 				bool collision = false;
-				double dx = x - (crab.x+al_get_bitmap_width(crab_bmp)/2);
+				double dx = x - (crab.x+m_get_bitmap_width(crab_bmp)/2);
 				double dy = py - crab.y;
 				double dist = sqrt(dx*dx+dy*dy);
 				if (dist < 12) {
 					dead = true;
 					playPreloadedSample("explosion.ogg");
-					Explosion *e = new Explosion(x, py-al_get_bitmap_height(sub_bmp));
+					Explosion *e = new Explosion(x, py-m_get_bitmap_height(sub_bmp));
 					explosions.push_back(e);
-					e = new Explosion(crab.x+al_get_bitmap_width(crab_bmp)/2, crab.y);
+					e = new Explosion(crab.x+m_get_bitmap_width(crab_bmp)/2, crab.y);
 					explosions.push_back(e);
 					cit = crabs.erase(cit);
 					collision = true;
@@ -926,12 +926,12 @@ start:
 				std::vector<Bullet>::iterator bit;
 				for (bit = bullets.begin(); bit != bullets.end();) {
 					Bullet bull = *bit;
-					double dx = (crab.x+al_get_bitmap_width(crab_bmp)/2) - (bull.x+al_get_bitmap_width(bullet)/2);
+					double dx = (crab.x+m_get_bitmap_width(crab_bmp)/2) - (bull.x+m_get_bitmap_width(bullet)/2);
 					double dy = crab.y - bull.y;
 					double dist = sqrt(dx*dx+dy*dy);
 					if (dist < 10) {
 						playPreloadedSample("explosion.ogg");
-						Explosion *e = new Explosion(crab.x+al_get_bitmap_width(crab_bmp)/2, crab.y);
+						Explosion *e = new Explosion(crab.x+m_get_bitmap_width(crab_bmp)/2, crab.y);
 						explosions.push_back(e);
 						bit = bullets.erase(bit);
 						cit = crabs.erase(cit);
@@ -954,15 +954,15 @@ start:
 			for (sit = sharks.begin(); sit != sharks.end();) {
 				Shark shark = *sit;
 				bool collision = false;
-				double dx = x - (shark.x+al_get_bitmap_width(shark_bmp)/2);
+				double dx = x - (shark.x+m_get_bitmap_width(shark_bmp)/2);
 				double dy = py - shark.y;
 				double dist = sqrt(dx*dx+dy*dy);
 				if (dist < 20) {
 					dead = true;
 					playPreloadedSample("explosion.ogg");
-					Explosion *e = new Explosion(x, py-al_get_bitmap_height(sub_bmp));
+					Explosion *e = new Explosion(x, py-m_get_bitmap_height(sub_bmp));
 					explosions.push_back(e);
-					e = new Explosion(shark.x+al_get_bitmap_width(shark_bmp)/2, shark.y);
+					e = new Explosion(shark.x+m_get_bitmap_width(shark_bmp)/2, shark.y);
 					explosions.push_back(e);
 					sit = sharks.erase(sit);
 					collision = true;
@@ -971,12 +971,12 @@ start:
 				std::vector<Bullet>::iterator bit;
 				for (bit = bullets.begin(); bit != bullets.end();) {
 					Bullet bull = *bit;
-					double dx = (shark.x+al_get_bitmap_width(shark_bmp)/2) - (bull.x+al_get_bitmap_width(bullet)/2);
+					double dx = (shark.x+m_get_bitmap_width(shark_bmp)/2) - (bull.x+m_get_bitmap_width(bullet)/2);
 					double dy = shark.y - bull.y;
 					double dist = sqrt(dx*dx+dy*dy);
 					if (dist < 18) {
 						playPreloadedSample("explosion.ogg");
-						Explosion *e = new Explosion(shark.x+al_get_bitmap_width(shark_bmp)/2, shark.y);
+						Explosion *e = new Explosion(shark.x+m_get_bitmap_width(shark_bmp)/2, shark.y);
 						explosions.push_back(e);
 						bit = bullets.erase(bit);
 						sit = sharks.erase(sit);
@@ -1082,7 +1082,7 @@ start:
 				Bullet b;
 				b.fireTime = lastFire;
 				b.x = x;
-				b.y = py-al_get_bitmap_height(sub_bmp);
+				b.y = py-m_get_bitmap_height(sub_bmp);
 				bullets.push_back(b);
 			}
 			
@@ -1283,8 +1283,8 @@ done:
 	delete_zone(pause_zone);
 #endif
 
-	al_destroy_bitmap(bbot);
-	al_destroy_bitmap(btop);
+	m_destroy_bitmap(bbot);
+	m_destroy_bitmap(btop);
 
 	srand(seed);
 

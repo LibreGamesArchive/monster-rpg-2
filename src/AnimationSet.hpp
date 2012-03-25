@@ -18,7 +18,6 @@ public:
 	Animation* getCurrentAnimation();
 	int getWidth(); // gets width of current frame
 	int getHeight(); // gets height of current frame
-	MBITMAP *getBitmap(void) { return bitmap; }
 
 	void reset(void);
 	void draw(int x, int y, int flags = 0);
@@ -36,7 +35,6 @@ private:
 	int currAnim;
 	std::string prefix;
 	bool destroy;
-	MBITMAP *bitmap;
 };
 
 

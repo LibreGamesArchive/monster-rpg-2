@@ -130,12 +130,12 @@ void connect_second_display(void)
 	al_use_transform(&scale);
 	game_font_second_display = al_load_ttf_font(getResource("DejaVuSans.ttf"), 10, 0);
 	for (int i = 1; i < 9; i++) {
-		blueblocks[i-1] = al_load_bitmap(getResource("media/blueblocks%d.png", i));
+		blueblocks[i-1] = m_load_bitmap(getResource("media/blueblocks%d.png", i));
 	}
-	airplay_dpad = al_load_bitmap(getResource("media/airplay_pad.png"));
-	white_button = al_load_bitmap(getResource("media/whitebutton.png"));
-	black_button = al_load_bitmap(getResource("media/blackbutton.png"));
-	airplay_logo = al_load_bitmap(getResource("media/m2_controller_logo.png"));
+	airplay_dpad = m_load_bitmap(getResource("media/airplay_pad.png"));
+	white_button = m_load_bitmap(getResource("media/whitebutton.png"));
+	black_button = m_load_bitmap(getResource("media/blackbutton.png"));
+	airplay_logo = m_load_bitmap(getResource("media/m2_controller_logo.png"));
 	
 	al_set_target_bitmap(buffer);
 
@@ -151,6 +151,17 @@ void connect_second_display(void)
 bool is_close_pressed(void)
 {
 	// random tasks
+
+	if (destroy_loaded_bitmaps) {
+		_destroy_loaded_bitmaps();
+		destroy_loaded_bitmaps = false;
+		while (!reload_loaded_bitmaps) {
+			al_rest(0.01);
+		}
+		_reload_loaded_bitmaps();
+		reload_loaded_bitmaps = false;
+	}
+
 	if (reload_translation) {
 		load_translation(get_language_name(config.getLanguage()).c_str());
 		reload_translation = false;
@@ -174,12 +185,12 @@ bool is_close_pressed(void)
 			
 			al_destroy_font(game_font_second_display);
 			for (int i = 0; i < 8; i++) {
-				al_destroy_bitmap(blueblocks[i]);
+				m_destroy_bitmap(blueblocks[i]);
 			}
-			al_destroy_bitmap(airplay_dpad);
-			al_destroy_bitmap(white_button);
-			al_destroy_bitmap(black_button);
-			al_destroy_bitmap(airplay_logo);
+			m_destroy_bitmap(airplay_dpad);
+			m_destroy_bitmap(white_button);
+			m_destroy_bitmap(black_button);
+			m_destroy_bitmap(airplay_logo);
 			destroy_controller_shader();
 			al_destroy_display(controller_display);
 			controller_display = NULL;
@@ -917,7 +928,7 @@ int main(int argc, char *argv[])
 #endif
 
 	MBITMAP *nooskewl = m_load_bitmap(getResource("media/nooskewl.png"));
-
+	
 
 	if ((n = check_arg(argc, argv, "-stick")) != -1) {
 		int stick = atoi(argv[n+1]);

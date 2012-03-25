@@ -71,9 +71,7 @@ public:
 
 #ifdef EDITOR
 	Area(int w, int h) throw (std::bad_alloc);	// create empty area for editor
-#ifdef ALLEGRO4
 	void saveBmp(std::string filename);
-#endif
 #endif
 	
 	void followPlayer(bool follow);
@@ -123,7 +121,11 @@ private:
 	std::vector<int> tileAnimationNums;
 	//std::vector<Object*> sObjects;	// sorted objects
 	bool follow;
+#ifdef EDITOR
+	ALLEGRO_VERTEX verts[6*(240/16)*(160/16)*1000];
+#else
 	ALLEGRO_VERTEX verts[MAX_TILES*6*(TILE_LAYERS/2)];
+#endif
 	int num_quads;
 	struct anim_data {
 		int delay;
@@ -148,6 +150,13 @@ private:
 	std::vector<int> removedDuringActivate;
 
 	int update_count;
+
+public:
+	int tm_w;
+	int tm_h;
+	MBITMAP *partial_tm;
+	int tm_used;
+	std::map<int, int> newmap;
 };
 
 

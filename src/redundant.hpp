@@ -8,6 +8,12 @@ void destroy_string_bitmaps(void);
 void m_get_mouse_state(ALLEGRO_MOUSE_STATE *s);
 float my_get_opengl_version(void);
 
+class RecreateData
+{
+public:
+	virtual ~RecreateData() {}
+};
+
 
 #ifdef ALLEGRO4
 const int M_ZERO = 0;
@@ -24,27 +30,18 @@ const int M_INVERSE_ALPHA = ALLEGRO_INVERSE_ALPHA;
 const int M_FLIP_HORIZONTAL = 1;
 const int M_FLIP_VERTICAL = 2;
 
-#ifdef ALLEGRO4
-void m_draw_bitmap_region_masked(MBITMAP *bmp, int sx, int sy, int sw, int sh,
-	int dx, int dy, int flags);
-void m_set_blender(int src, int dst, MCOLOR color);
-void m_draw_bitmap_region(MBITMAP *bmp, int sx, int sy, int sw, int sh,
-	int dx, int dy, int flags);
-void m_draw_bitmap(MBITMAP *bmp, int x, int y, int flags);
-#else
 void my_clear_bitmap(MBITMAP *b);
 #define m_draw_bitmap(bmp, x, y, flags) \
-	al_draw_tinted_bitmap(bmp, _blend_color, (int)x, (int)y, flags)
+	al_draw_tinted_bitmap(bmp->bitmap, _blend_color, (int)x, (int)y, flags)
 #define m_draw_bitmap_region(bmp, sx, sy, sw, sh, dx, dy, flags) \
-	al_draw_tinted_bitmap_region(bmp, _blend_color, (int)sx, (int)sy, sw, sh, (int)dx, (int)dy, flags)
-#define m_draw_tinted_bitmap(bmp, tint, x, y, flags) al_draw_tinted_bitmap(bmp, tint, (int)x, (int)y, flags)
+	al_draw_tinted_bitmap_region(bmp->bitmap, _blend_color, (int)sx, (int)sy, sw, sh, (int)dx, (int)dy, flags)
+#define m_draw_tinted_bitmap(bmp, tint, x, y, flags) al_draw_tinted_bitmap(bmp->bitmap, tint, (int)x, (int)y, flags)
 #define m_draw_scaled_rotated_bitmap(bmp, cx, cy, dx, dy, xscale, yscale, angle, flags) \
-	al_draw_scaled_rotated_bitmap(bmp, cx, cy, (int)dx, (int)dy, xscale, yscale, angle, flags)
+	al_draw_scaled_rotated_bitmap(bmp->bitmap, cx, cy, (int)dx, (int)dy, xscale, yscale, angle, flags)
 #define m_draw_tinted_scaled_rotated_bitmap(bmp, tint, cx, cy, dx, dy, xscale, yscale, angle, flags) \
-	al_draw_tinted_scaled_rotated_bitmap(bmp, tint, cx, cy, (int)dx, (int)dy, xscale, yscale, angle, flags)
+	al_draw_tinted_scaled_rotated_bitmap(bmp->bitmap, tint, cx, cy, (int)dx, (int)dy, xscale, yscale, angle, flags)
 #define m_draw_tinted_scaled_bitmap(bmp, tint, sx, sy, sw, sh, dx, dy, dw, dh, flags) \
-	al_draw_tinted_scaled_bitmap(bmp, tint, (int)sx, (int)sx, sw, sh, (int)dx, (int)dy, dw, dh, flags)
-#endif
+	al_draw_tinted_scaled_bitmap(bmp->bitmap, tint, (int)sx, (int)sx, sw, sh, (int)dx, (int)dy, dw, dh, flags)
 
 void my_do_line(int x1, int y1, int x2, int y2, void *data, void (*proc)(int, int, void *));
 void my_do_circle(int x, int y, int radius, MCOLOR d,
@@ -59,7 +56,6 @@ int m_text_height(const MFONT *font);
 int m_text_length(const MFONT *font, const char *text);
 
 void m_set_target_bitmap(MBITMAP *b);
-MBITMAP *m_get_target_bitmap(void);			
 MCOLOR m_map_rgb(int r, int g, int b);
 MCOLOR m_map_rgba(int r, int g, int b, int a);
 MCOLOR m_map_rgb_f(float r, float g, float b);
@@ -78,9 +74,9 @@ int m_get_bitmap_width(MBITMAP *bmp);
 int m_get_bitmap_height(MBITMAP *bmp);
 MBITMAP *m_load_bitmap(const char *name, bool force_memory = false);
 MFONT *m_load_font(const char *name);
-MBITMAP *m_create_bitmap(int w, int h, int extra_flags = 0);
+MBITMAP *m_create_bitmap(int w, int h, void (*func)(MBITMAP *bitmap, RecreateData *data) = NULL, RecreateData *data = NULL); // check
+MBITMAP *m_create_sub_bitmap(MBITMAP *parent, int x, int y, int w, int h); // check
 void m_destroy_bitmap(MBITMAP *bmp);
-MBITMAP *m_get_backbuffer(void);
 void m_flip_display(void);
 void m_draw_circle(int x, int y, int radius, MCOLOR color, int flags);
 void m_rest(double seconds);
@@ -108,7 +104,7 @@ void m_draw_trans_bitmap(MBITMAP *b, int x, int y, int alpha);
 void m_destroy_font(MFONT *f);
 void m_draw_alpha_bitmap(MBITMAP *b, int x, int y);
 void m_draw_alpha_bitmap(MBITMAP *b, int x, int y, int flags);
-MBITMAP *m_create_alpha_bitmap(int w, int h);
+MBITMAP *m_create_alpha_bitmap(int w, int h, void (*func)(MBITMAP *bitmap, RecreateData *data) = NULL, RecreateData *data = NULL); // check
 MBITMAP *m_load_alpha_bitmap(const char *name, bool force_memory = false);
 
 #ifndef ALLEGRO4
@@ -129,9 +125,9 @@ void m_set_blender(int s, int d, MCOLOR c);
 void m_save_blender(void);
 void m_restore_blender(void);
 
-void set_linear_mag_filter(ALLEGRO_BITMAP *bitmap, bool on);
+void set_linear_mag_filter(MBITMAP *bitmap, bool on);
 
-#define m_get_pixel al_get_pixel
+#define m_get_pixel(b, x, y) al_get_pixel(b->bitmap, x, y)
 
 
 #define m_draw_pixel m_draw_trans_pixel
@@ -145,5 +141,43 @@ void set_linear_mag_filter(ALLEGRO_BITMAP *bitmap, bool on);
 
 #endif
 
-void m_draw_prim (const void* vtxs, const ALLEGRO_VERTEX_DECL* decl, ALLEGRO_BITMAP* texture, int start, int end, int type);
+MBITMAP *new_mbitmap(ALLEGRO_BITMAP *bitmap);
 
+enum LoadType {
+	LOAD_LOAD,
+	LOAD_CREATE
+};
+
+// use al_get_bitmap_(flags|format) to reload
+struct Load {
+	std::string filename;
+};
+
+struct Recreate {
+	void (*func)(MBITMAP *bitmap, RecreateData *data);
+	RecreateData *data;
+	int w, h;
+};
+
+struct LoadedBitmap {
+	LoadType load_type;
+	Load load;
+	Recreate recreate;
+	MBITMAP *bitmap;
+	int flags, format;
+};
+
+extern std::vector<LoadedBitmap> loaded_bitmaps;
+extern bool destroy_loaded_bitmaps;
+extern bool reload_loaded_bitmaps;
+void _destroy_loaded_bitmaps(void);
+void _reload_loaded_bitmaps(void);
+
+void m_draw_prim (const void* vtxs, const ALLEGRO_VERTEX_DECL* decl, MBITMAP* texture, int start, int end, int type);
+
+ALLEGRO_LOCKED_REGION *m_lock_bitmap(MBITMAP *b, int format, int flags);
+ALLEGRO_LOCKED_REGION *m_lock_bitmap_region(MBITMAP *b, int x, int y, int w, int h, int format, int flags);
+void m_unlock_bitmap(MBITMAP *b);
+MBITMAP *m_clone_bitmap(MBITMAP *b);
+
+#define m_clear_to_color al_clear_to_color

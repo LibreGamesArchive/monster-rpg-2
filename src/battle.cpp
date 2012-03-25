@@ -1231,8 +1231,6 @@ Battle::Battle(std::string name, bool can_run) :
 
 
 	bg = m_load_bitmap(getResource("combat_bgs/%s.png", area->getTerrain().c_str()));
-
-	tmpbmp = m_create_bitmap(100, 100);
 }
 
 extern bool fairy_used;
@@ -1257,8 +1255,6 @@ Battle::~Battle(void)
 	m_destroy_bitmap(bg);
 
 	messages.clear();
-
-	m_destroy_bitmap(tmpbmp);
 
 	entitiesToAddLater.clear();
 	force_posesToAddLater.clear();

@@ -35,7 +35,7 @@ public:
 
 
 	CombatEntity();
-	virtual ~CombatEntity() = 0;
+	virtual ~CombatEntity();
 
 protected:
 	CombatEntityType type;
@@ -490,7 +490,6 @@ protected:
 	int count;
 	CombatLocation location;
 	MBITMAP *foot;
-	//MSAMPLE sample;
 	std::vector<MBITMAP *> puffs;
 	std::vector<StompPuff> puffData;
 	bool puffed;
@@ -721,7 +720,6 @@ protected:
 	float sy, dy, yy;
 	int count;
 	MBITMAP *icicle;
-	MBITMAP *tmp;
 	Particle particles[NUM_PARTICLES];
 	float alpha;
 };
