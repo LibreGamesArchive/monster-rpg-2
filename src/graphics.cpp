@@ -16,7 +16,7 @@ extern "C" {
 }
 #endif
 
-#if defined IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 #include "joypad.hpp"
 #endif
 
@@ -61,13 +61,11 @@ int curr_orientation = 0;
 int next_orientation = 0;
 double orientation_change_start;
 float orientation_angle;
-#ifdef IPHONE
-//static ALLEGRO_TRANSFORM auto_orient_transform;
-#endif
 
 void draw_the_controls(bool draw_controls)
 {
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE
 	if ((airplay_connected || (config.getDpadType() == DPAD_TOTAL_1 || config.getDpadType() == DPAD_TOTAL_2)) || (use_dpad && dpad_buttons && draw_controls && global_draw_controls)) {
 		if (controller_display) {
 			if (joypad_connected()) {
@@ -78,7 +76,6 @@ void draw_the_controls(bool draw_controls)
 				al_store_state(&state, ALLEGRO_STATE_BLENDER);
 				al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ONE);
 				
-				//ScreenDescriptor *sd = config.getWantedGraphicsMode();
 				// 4 because the screen is scaled to have 960x640 "pixels" when created (960/240 = 4 etc)
 				float scalex = 4;
 				float scaley = 4;
@@ -135,7 +132,7 @@ void draw_the_controls(bool draw_controls)
 					float alpha = 1.0;
 					int sizex = m_get_bitmap_width(blueblocks[frame]);
 					int sizey = m_get_bitmap_height(blueblocks[frame]);
-					al_draw_tinted_bitmap(blueblocks[frame],
+					al_draw_tinted_bitmap(blueblocks[frame]->bitmap,
 						al_map_rgba_f(alpha, alpha, alpha, alpha),
 						centers[i][0]-sizex/2, centers[i][1]-sizey/2,
 						0
@@ -144,18 +141,22 @@ void draw_the_controls(bool draw_controls)
 				
 				al_restore_state(&state);
 
-				al_draw_bitmap(airplay_dpad, padx, pady, 0);
-				al_draw_bitmap(white_button, b1x, b1y, 0);
-				al_draw_bitmap(black_button, b2x, b2y, 0);
+				al_draw_bitmap(airplay_dpad->bitmap, padx, pady, 0);
+				al_draw_bitmap(white_button->bitmap, b1x, b1y, 0);
+				al_draw_bitmap(black_button->bitmap, b2x, b2y, 0);
 				
-				al_draw_bitmap(airplay_logo,
+				al_draw_bitmap(airplay_logo->bitmap,
 					960/2-m_get_bitmap_width(airplay_logo)/2,
 					640/2-m_get_bitmap_height(airplay_logo)/2-100,
 					0
 				);
 			}
 		}
-		else if (!joypad_connected() && (dpad_type == DPAD_TOTAL_2 || dpad_type == DPAD_HYBRID_2)) {
+		else
+#else
+		bool joypad_connected = false;
+#endif
+		if (!joypad_connected() && (dpad_type == DPAD_TOTAL_2 || dpad_type == DPAD_HYBRID_2)) {
 			ALLEGRO_COLOR light = al_map_rgb(100, 200, 100);
 			ALLEGRO_COLOR dark = al_map_rgb(150, 250, 150);
 			int x = BUTTON_SIZE+10;
@@ -191,38 +192,23 @@ void draw_the_controls(bool draw_controls)
 			m_draw_line(17, y+BUTTON_SIZE*3-7, 17+l, y+BUTTON_SIZE*3-7-l, dark);
 			m_draw_line(10+BUTTON_SIZE*3-7, y+BUTTON_SIZE*3-7, 10+BUTTON_SIZE*3-7-l, y+BUTTON_SIZE*3-7-l, dark);
 
-			/*
-			al_draw_rounded_rectangle(x, y, x+BUTTON_SIZE, y+BUTTON_SIZE,
-				5, 5, light, 2);
-			*/
 			al_draw_filled_triangle(x+4, y+BUTTON_SIZE-4, x+BUTTON_SIZE/2, y+4, x+BUTTON_SIZE-4, y+BUTTON_SIZE-4, light/*, 1*/);
 			al_draw_triangle(x+4, y+BUTTON_SIZE-4, x+BUTTON_SIZE/2, y+4, x+BUTTON_SIZE-4, y+BUTTON_SIZE-4, dark, 1);
 			
 			x = 10;
 			y += BUTTON_SIZE;
 		
-			/*
-			al_draw_rounded_rectangle(x, y, x+BUTTON_SIZE, y+BUTTON_SIZE,
-				5, 5, light, 2);
-				*/
 			al_draw_filled_triangle(x+4, y+BUTTON_SIZE/2, x+BUTTON_SIZE-4, y+4, x+BUTTON_SIZE-4, y+BUTTON_SIZE-4, light/*, 1*/);
 			al_draw_triangle(x+4, y+BUTTON_SIZE/2, x+BUTTON_SIZE-4, y+4, x+BUTTON_SIZE-4, y+BUTTON_SIZE-4, dark, 1);
 
 			x = 10+BUTTON_SIZE*2;
 			
-			/*
-			al_draw_rounded_rectangle(x, y, x+BUTTON_SIZE, y+BUTTON_SIZE,
-				5, 5, light, 2);
-				*/
 			al_draw_filled_triangle(x+BUTTON_SIZE-4, y+BUTTON_SIZE/2, x+4, y+BUTTON_SIZE-4, x+4, y+4, light/*, 1*/);
 			al_draw_triangle(x+BUTTON_SIZE-4, y+BUTTON_SIZE/2, x+4, y+BUTTON_SIZE-4, x+4, y+4, dark, 1);
 
 			x = 10+BUTTON_SIZE;
 			y += BUTTON_SIZE;
 		
-			/*
-			al_draw_rounded_rectangle(x, y, x+BUTTON_SIZE, y+BUTTON_SIZE, 5, 5, light, 2);
-			*/
 			al_draw_filled_triangle(x+4, y+4,
 				x+BUTTON_SIZE/2, y+BUTTON_SIZE-4,
 				x+BUTTON_SIZE-4, y+4, light/*, 1*/);
@@ -413,7 +399,7 @@ void draw_the_controls(bool draw_controls)
 				verts[i].color=al_map_rgb(255, 255, 255);
 			}
 
-			al_draw_prim(verts, 0, dpad_buttons, 0, nv,
+			m_draw_prim(verts, 0, dpad_buttons, 0, nv,
 				ALLEGRO_PRIM_TRIANGLE_LIST);
 		}
 	}
@@ -429,20 +415,20 @@ void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 	long now = tguiCurrentTimeMillis();
 	bool draw_red = ((now - last_shake_check) < 500);
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE
 	if (draw_red && global_draw_red && !path_head && !joypad_connected() && !airplay_connected) {
 #else
-	#ifdef ALLEGRO_MACOSX
+#ifdef ALLEGRO_MACOSX
 	bool jp_conn = joypad_connected();
-	#else
+#else
 	bool jp_conn = false;
-	#endif
+#endif
 	if (draw_red && global_draw_red && !path_head && !jp_conn) {
 #endif
 		m_draw_triangle(0, 0, 16, 0, 0, 16, m_map_rgb(255, 0, 0));
 	}
 	
-	#if defined(IPHONE) && !defined(LITE)
+#if defined(ALLEGRO_IPHONE) && !defined(LITE)
 	if (isGameCenterAPIAvailable())
 	{
 		if (achievement_show) {
@@ -455,27 +441,27 @@ void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 			float alpha = 1.0 - (diff / 3.0);
 			float scale = diff;
 			al_draw_tinted_scaled_rotated_bitmap(
-				achievement_bmp,
+				achievement_bmp->bitmap,
 				al_map_rgba_f(alpha, alpha, alpha, alpha),
 				m_get_bitmap_width(achievement_bmp)/2, m_get_bitmap_height(achievement_bmp)/2,
 				BW/2, BH/2, scale, scale, 0, 0
 			);
 		}
 	}
-	#endif
+#endif
 
-	#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	if (controller_display) {
 		al_set_target_backbuffer(controller_display);
 		al_clear_to_color(al_map_rgb(0, 0, 0));
 	}
-	#endif
+#endif
 
 	draw_the_controls(draw_controls);
 
 	m_set_target_bitmap(buf);
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	bool on = ((unsigned)tguiCurrentTimeMillis() % 1000) < 500;
 	const char *text = NULL;
 	if (onscreen_swipe_to_attack) {
@@ -543,7 +529,7 @@ void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 		omnipotentTexts[i].draw();
 	}
 	
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE
 	if (batteryIcon) {
 		float batteryLevel = getBatteryLevel();
 		if (batteryLevel >= 0 && batteryLevel <= 0.16) {
@@ -563,7 +549,7 @@ void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 
 	ALLEGRO_SHADER *scale2x_shader = NULL;
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE
 	if (airplay_connected) {
 		config.setFilterType(FILTER_NONE);
 	}
@@ -625,7 +611,7 @@ void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 		bufscale = screenScale;
 	}
 	
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE
 	ScreenDescriptor *sd = config.getWantedGraphicsMode();
 	
 	int dw, dh;
@@ -689,7 +675,7 @@ void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 		}
 	}
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE
 	ALLEGRO_COLOR tint;
 	tint = al_map_rgba_f(0.4, 0.4, 0.4, 0.4);
 	
@@ -920,7 +906,7 @@ static void fade(int startAlpha, int endAlpha, int length, MCOLOR color)
 	long total = 0;
 
 	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags((flags | ALLEGRO_NO_PRESERVE_TEXTURE) & ~ALLEGRO_PRESERVE_TEXTURE);
+	al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
 	MBITMAP *tmpbuf = m_create_bitmap(BW, BH); // check
 	al_set_new_bitmap_flags(flags);
 
@@ -1005,31 +991,31 @@ static bool transition(int initialRectSize, int endRectSize,
 	MBITMAP *bufdup = m_clone_bitmap(buffer);
 	al_set_new_bitmap_flags(oldflags);
 
-	#if defined IPHONE
-	#define PIXTYPE uint16_t
-	#define PIXSIZE 2
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#define PIXTYPE uint16_t
+#define PIXSIZE 2
 	if (!(buf_region = m_lock_bitmap(bufdup, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READONLY))) {
 		m_destroy_bitmap(bufcopy);
 		clear_input_events();
 		return false;
 	}
-	#else
-	#define PIXTYPE uint32_t
-	#define PIXSIZE 4
-	#ifdef ALLEGRO_WINDOWS
+#else
+#define PIXTYPE uint32_t
+#define PIXSIZE 4
+#ifdef ALLEGRO_WINDOWS
 	if (!(buf_region = m_lock_bitmap(bufdup, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_READONLY))) {
 		m_destroy_bitmap(bufcopy);
 		clear_input_events();
 		return false;
 	}
-	#else
+#else
 	if (!(buf_region = m_lock_bitmap(bufdup, ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE, ALLEGRO_LOCK_READONLY))) {
 		m_destroy_bitmap(bufcopy);
 		clear_input_events();
 		return false;
 	}
-	#endif
-	#endif
+#endif
+#endif
 		
 	unsigned long start = (unsigned long)(al_get_time()*1000);
 	unsigned long now = start;
@@ -1058,13 +1044,13 @@ static bool transition(int initialRectSize, int endRectSize,
 		/* draw focused area */
 		if (size != lastFocus) {
 			lastFocus = size;
-			#if defined ALLEGRO_WINDOWS
+#if defined ALLEGRO_WINDOWS
 			copy_region = m_lock_bitmap(bufcopy, ALLEGRO_PIXEL_FORMAT_ARGB_8888, 0);
-			#elif defined IPHONE
+#elif defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			copy_region = m_lock_bitmap(bufcopy, ALLEGRO_PIXEL_FORMAT_RGBA_4444, 0);
-			#else
+#else
 			copy_region = m_lock_bitmap(bufcopy, ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE, 0);
-			#endif
+#endif
 			for (int y = 0; y < BH; y += size) {
 				for (int x = 0; x < BW; x += size) {
 					char *getptr = (char *)buf_region->data +
@@ -1156,7 +1142,7 @@ void battleTransition(void)
 		int format = al_get_new_bitmap_format();
 		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
 		int flags = al_get_new_bitmap_flags();
-		al_set_new_bitmap_flags((flags | ALLEGRO_NO_PRESERVE_TEXTURE) & ~ALLEGRO_PRESERVE_TEXTURE);
+		al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
 		MBITMAP *bufcopy1 = m_create_bitmap(BW, BH); // check
 		MBITMAP *bufcopy2 = m_create_bitmap(BW, BH); // check
 		al_set_new_bitmap_flags(flags);
@@ -1254,29 +1240,12 @@ void battleTransition(void)
 	long now = tguiCurrentTimeMillis();
 	long start = now;
 	int length = 700;
-	//bool battleDrawn = false;
 	float angle = 0;
 
 	while ((now - start) < (length*2)) {
 		int elapsed = now - start;
 		angle = ((double)elapsed / (length*2.0)) * (M_PI*2);
 
-/*
-		if (elapsed > length) {
-			if (!battleDrawn) {
-				#ifdef IPHONE
-				m_set_target_bitmap(xfade_buf);
-				battle->draw();
-				battleDrawn = true;
-				#else
-				m_set_target_bitmap(buffer);
-				battle->draw();
-				battleDrawn = true;
-				#endif
-			}
-		}
-		else {
-		*/
 			ALLEGRO_STATE state;
 			al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
 			m_save_blender();
@@ -1287,7 +1256,6 @@ void battleTransition(void)
 			m_draw_bitmap(battle_buf, 0, 0, 0);
 			al_restore_state(&state);
 			m_restore_blender();
-		//}
 
 
 		ALLEGRO_STATE s;
@@ -1317,14 +1285,14 @@ void battleTransition(void)
 	clear_input_events();
 }
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flags)
 {
 	int src_w = m_get_bitmap_width(src);
 	int src_h = m_get_bitmap_height(src);
-	MBITMAP *target = al_get_target_bitmap();
-	int tw = m_get_bitmap_width(target);
-	int th = m_get_bitmap_height(target);
+	ALLEGRO_BITMAP *target = al_get_target_bitmap();
+	int tw = al_get_bitmap_width(target);
+	int th = al_get_bitmap_height(target);
 	int sx, sy;
 	int cx, cy, cw, ch;
 	
@@ -1377,7 +1345,7 @@ void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flag
 	
 	ALLEGRO_LOCKED_REGION *sreg = m_lock_bitmap_region(src, 0, sy, src_w, src_h, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READONLY);
 	if (!sreg) return;
-	ALLEGRO_LOCKED_REGION *dreg = m_lock_bitmap_region(target, dx, dy, src_w, src_h, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READWRITE);
+	ALLEGRO_LOCKED_REGION *dreg = al_lock_bitmap_region(target, dx, dy, src_w, src_h, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READWRITE);
 	if (!dreg) { m_unlock_bitmap(src); return; }
 
 	float src_factor = 1 - amount;
@@ -1432,7 +1400,7 @@ void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flag
 
 	
 	m_unlock_bitmap(src);
-	m_unlock_bitmap(target);
+	al_unlock_bitmap(target);
 }
 #else
 void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flags)
@@ -1505,12 +1473,12 @@ void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flag
 #endif
 
 // Turns sprite to grayscale then tints
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 void death_blit_region(MBITMAP *src, int x, int y, int w, int h, int dx, int dy, MCOLOR color, int flags)
 {
-	MBITMAP *target = al_get_target_bitmap();
-	int tw = m_get_bitmap_width(target);
-	int th = m_get_bitmap_height(target);
+	ALLEGRO_BITMAP *target = al_get_target_bitmap();
+	int tw = al_get_bitmap_width(target);
+	int th = al_get_bitmap_height(target);
 
 	if (dx < 0) {
 		x = -dx;
@@ -1530,7 +1498,7 @@ void death_blit_region(MBITMAP *src, int x, int y, int w, int h, int dx, int dy,
 	}
 
 	ALLEGRO_LOCKED_REGION *sreg = m_lock_bitmap_region(src, x, y, w, h, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READONLY);
-	ALLEGRO_LOCKED_REGION *dreg = m_lock_bitmap_region(target, dx, dy, w, h, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READWRITE);
+	ALLEGRO_LOCKED_REGION *dreg = al_lock_bitmap_region(target, dx, dy, w, h, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READWRITE);
 
 	for (int yy = 0; yy < h; yy++) {
 		unsigned char *sptr = ((unsigned char *)sreg->data + yy * sreg->pitch);
@@ -1571,7 +1539,7 @@ void death_blit_region(MBITMAP *src, int x, int y, int w, int h, int dx, int dy,
 	}
 	
 	m_unlock_bitmap(src);
-	m_unlock_bitmap(target);
+	al_unlock_bitmap(target);
 }
 #else
 void death_blit_region(MBITMAP *src, int x, int y, int w, int h, int dx, int dy, MCOLOR color, int flags)

@@ -47,11 +47,7 @@ static Spell *Fire1Factory(void)
 
 static Spell *Fire2Factory(void)
 {
-#ifdef IPHONE
 	playPreloadedSample("Fire2.ogg");
-#else
-	loadPlayDestroy("Fire2.ogg");
-#endif
 	return new Fire2Spell();
 }
 
@@ -3197,7 +3193,7 @@ void SwallowSpell::apply(void)
 	int w = a->getWidth();
 	int h = a->getHeight();
 	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags((flags | ALLEGRO_PRESERVE_TEXTURE) & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 	MBITMAP *bitmap = m_create_bitmap(w, h); // check
 	al_set_new_display_flags(flags);
 	ALLEGRO_BITMAP *oldTarget = al_get_target_bitmap();

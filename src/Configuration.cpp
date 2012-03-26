@@ -416,7 +416,7 @@ void Configuration::read()
 	if (!joyb1) { delete xml; throw ReadError(); }
 	XMLData* joyb2 = game->find("joyb2");
 	if (!joyb2) { delete xml; throw ReadError(); }
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	XMLData *xml_dpad_type = game->find("dpad_type");
 	if (xml_dpad_type) {
 		setDpadType(atoi(xml_dpad_type->getValue().c_str()));
@@ -424,6 +424,10 @@ void Configuration::read()
 	XMLData *xml_tellusertousedpad = game->find("tell_user_to_use_dpad");
 	if (xml_tellusertousedpad) {
 		setTellUserToUseDpad(atoi(xml_tellusertousedpad->getValue().c_str()));
+	}
+	XMLData *xml_swap_buttons = game->find("swap_buttons");
+	if (xml_swap_buttons) {
+		setSwapButtons(atoi(xml_swap_buttons->getValue().c_str()));
 	}
 #endif
 	XMLData *xml_difficulty = game->find("difficulty");
@@ -434,14 +438,10 @@ void Configuration::read()
 	if (xml_tuning) {
 		setTuning(atoi(xml_tuning->getValue().c_str()));
 	}
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE
 	XMLData *xml_shake_action = game->find("shake_action");
 	if (xml_shake_action) {
 		setShakeAction(atoi(xml_shake_action->getValue().c_str()));
-	}
-	XMLData *xml_swap_buttons = game->find("swap_buttons");
-	if (xml_swap_buttons) {
-		setSwapButtons(atoi(xml_swap_buttons->getValue().c_str()));
 	}
 	XMLData *xml_flip_screen = game->find("flip_screen");
 	if (xml_flip_screen) {
@@ -536,38 +536,30 @@ void Configuration::write()
 	XMLData* game = new XMLData("game", "");
 	XMLData* joyb1 = new XMLData("joyb1", my_itoa(getJoyButton1()));
 	XMLData* joyb2 = new XMLData("joyb2", my_itoa(getJoyButton2()));
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	XMLData* xml_dpad_type = new XMLData("dpad_type", old_control_mode < 0 ? my_itoa(getDpadType()) : my_itoa(old_control_mode));
 	XMLData* xml_tellusertousedpad = new XMLData("tell_user_to_use_dpad", my_itoa(getTellUserToUseDpad()));
+	XMLData *xml_swap_buttons = new XMLData("swap_buttons", my_itoa(getSwapButtons()));
 #endif
 	XMLData *xml_difficulty = new XMLData("difficulty", my_itoa(getDifficulty()));
 	XMLData *xml_tuning = new XMLData("tuning", my_itoa(getTuning()));
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	XMLData *xml_shake_action = new XMLData("shake_action", my_itoa(getShakeAction()));
-	XMLData *xml_swap_buttons = new XMLData("swap_buttons", my_itoa(getSwapButtons()));
-	/*
-	XMLData *xml_flip_screen;
-	if (config.getAutoRotation())
-		xml_flip_screen = new XMLData("flip_screen", my_itoa(0));
-	else
-		xml_flip_screen = new XMLData("flip_screen", my_itoa(getFlipScreen()));
-		*/
 	XMLData *xml_auto_rotate = new XMLData("auto_rotate", my_itoa(getAutoRotation()));
 #endif
 	XMLData* xml_lang = new XMLData("language", my_itoa(getLanguage()));
 
 	game->add(joyb1);
 	game->add(joyb2);
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	game->add(xml_dpad_type);
 	game->add(xml_tellusertousedpad);
+	game->add(xml_swap_buttons);
 #endif
 	game->add(xml_difficulty);
 	game->add(xml_tuning);
 #ifdef IPHONE
 	game->add(xml_shake_action);
-	game->add(xml_swap_buttons);
-	//game->add(xml_flip_screen);
 	game->add(xml_auto_rotate);
 #endif
 	game->add(xml_lang);
@@ -660,24 +652,21 @@ Configuration::Configuration() :
 	adapter(0),
 	axis(0),
 	xbox360(false)
-#ifdef WIZ
-	,gfxDriver(1) // Framebuffer must be default in case no libopengles_lite
-#endif
-#ifdef IPHONE
-	,cfg_tuning(CFG_TUNING_BALANCED)
-	,cfg_dpad_type(0)
-	,cfg_tellusertousedpad(true)
-	,cfg_shake_action(CFG_SHAKE_CANCEL)
-	,cfg_swap_buttons(false)
-	//,cfg_flip_screen(false)
-	,cfg_auto_rotation(2)
-#else
 	,cfg_tuning(CFG_TUNING_PERFORMANCE)
-#endif
 	,cfg_difficulty(CFG_DIFFICULTY_NORMAL)
 	,cfg_filter_type(FILTER_NONE)
 	,cfg_maintain_aspect_ratio(false)
 	,language(0)
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+	,cfg_tuning(CFG_TUNING_BALANCED)
+	,cfg_dpad_type(0)
+	,cfg_tellusertousedpad(true)
+	,cfg_swap_buttons(false)
+#endif
+#ifdef ALLEGRO_IPHONE
+	,cfg_shake_action(CFG_SHAKE_CANCEL)
+	,cfg_auto_rotation(2)
+#endif
 {
 #ifdef EDITOR
 	wantedMode.width = 800;

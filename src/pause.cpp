@@ -1,6 +1,6 @@
 #include "monster2.hpp"
 
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 #include <CoreFoundation/CoreFoundation.h>
 #include <CFNetwork/CFNetwork.h>
 #endif
@@ -9,7 +9,7 @@
 #include "joypad.hpp"
 #endif
 
-#if defined IPHONE
+#if defined ALLEGRO_IPHONE
 #include "iphone.h"
 #endif
 
@@ -141,7 +141,7 @@ std::string getTimeString(uint32_t runtime)
 }
 
 
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 static void showIpodControls(void)
 {
 	tguiPush();
@@ -305,9 +305,9 @@ static void maybeShowItemHelp(void)
 	int ms = lua_tonumber(state, -1)-1;
 	lua_pop(state, 1);
 	if (!gameInfo.milestones[ms]) {
-		#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		notify("Press the action button twice in one", "spot to use. Press in", "different spots to arrange.");
-		#endif
+#endif
 		gameInfo.milestones[ms] = true;
 	}
 }
@@ -668,7 +668,7 @@ done:
 	return;
 }
 
-#ifndef IPHONE
+#ifndef ALLEGRO_IPHONE
 #define delete_file remove
 #endif
 
@@ -801,12 +801,12 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 
 	dpad_off();
 	
-	#ifdef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (timer_on)
 		can_save = false;
 	else
 		can_save = true;
-	#endif
+#endif
 
 	if (!global_can_save)
 		can_save = false;
@@ -843,21 +843,21 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 
 	int yyy = 6;
 
-	#if defined IPHONE && !defined LITE
+#if (defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID) && !defined LITE
 	MIcon *game_center = NULL;
 	if (isGameCenterAPIAvailable()) {
 		game_center = new MIcon(128, yyy, getResource("game_center.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
 		yyy += 26;
 	}
-	#endif
+#endif
 	
-	#if defined IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	MIcon *joypad = NULL;
 	if (is_32_or_later()) {
 		joypad = new MIcon(128, yyy, getResource("joypad_icon.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
 		yyy += 26;
 	}
-	#endif
+#endif
 	MIcon *fairy = new MIcon(128, yyy, getResource("fairy.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
 
 	// add fairy to menu if you have < 40 "pts" worth of items, or 0 heals
@@ -905,15 +905,15 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 		}
 	}
 
-	#if defined(IPHONE) && !defined(LITE)
+#if defined(ALLEGRO_IPHONE) && !defined(LITE)
 	TGUIWidget *left_widget = game_center;
-	#elif defined(IPHONE) || defined(ALLEGRO_MACOSX)
+#elif defined(ALLEGRO_IPHONE) || defined(ALLEGRO_MACOSX)
 	TGUIWidget *left_widget = joypad;
-	#else
+#else
 	TGUIWidget *left_widget = NULL;
 	if (add_fairy && !fairy_used)
 		left_widget = fairy;
-	#endif
+#endif
 
 	MTextButton *mainItem = new MTextButton(162, yy, "Item", false, left_widget);
 
@@ -933,17 +933,17 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 		mainSave = new MLabel(162+m_text_height(game_font)/2+2, yy, "Save", m_map_rgb(128, 128, 128));
 	yy += yinc;
 	MTextButton *mainResume = new MTextButton(162, yy, "Play", false, left_widget);
-	#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGR_ANDROID
 	yy += yinc;
-	#endif
+#endif
 	MTextButton *mainQuit = new MTextButton(162, yy, "Quit", false, left_widget);
 	yy += yinc;
 	MTextButton *mainLevelUp = new MTextButton(162, yy, "Cheat", false, left_widget);
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE
 	MTextButton *mainMusic = new MTextButton(162, yy, "Music", false, left_widget);
 #endif
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE
 #ifndef LITE
 	if (game_center)
 		game_center->set_right_widget(mainItem);
@@ -1024,27 +1024,27 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	tguiAddWidget(mainExamine);
 	#endif
 	tguiAddWidget(mainSave);
-	#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	tguiAddWidget(mainResume);
-	#endif
+#endif
 	tguiAddWidget(mainQuit);
-	#ifdef IPHONE
-	#ifdef DEBUG
+#ifdef ALLEGRO_IPHONE
+#ifdef DEBUG
 	tguiAddWidget(mainLevelUp);
-	#endif
-	#endif
-	#ifdef IPHONE
+#endif
+#endif
+#ifdef ALLEGRO_IPHONE
 	tguiAddWidget(mainMusic);
-	#endif
+#endif
 
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 #ifndef LITE
 	if (game_center)
 		tguiAddWidget(game_center);
 #endif
 #endif
 
-#if defined IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	if (joypad)
 		tguiAddWidget(joypad);
 #endif
@@ -1446,7 +1446,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 			else if (widget == mainQuit) {
 				if (prompt("Really quit?", "", 0, 0)) {
 					ret = false;
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 					if (area) {
 						area->auto_save_game(0, true);
 					}
@@ -1463,7 +1463,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				tguiSetFocus(mainLevelUp);
 				section = MAIN;
 			}
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE
 			else if (widget == mainMusic) {
 				getInput()->set(false, false, false, false, false, false, false);
 				showIpodControls();
@@ -1576,12 +1576,12 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				section = MAIN;
 			}
 		
-			#if defined IPHONE || defined ALLEGRO_MACOSX
+#if defined IPHONE || defined ALLEGRO_MACOSX
 			else if (joypad && widget == joypad)
 			{
 				find_joypads();
 			}
-			#endif
+#endif
 
 			else if (widget == fairy)
 			{
@@ -1626,7 +1626,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				mainQuit->set_left_widget(NULL);
 			}
 			
-			#if defined IPHONE && !defined LITE
+#if defined IPHONE && !defined LITE
 			else if (game_center && widget == game_center)
 			{
 				al_stop_timer(logic_timer);
@@ -1638,7 +1638,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				al_start_timer(logic_timer);
 				al_start_timer(draw_timer);
 			}
-			#endif
+#endif
 
 			INPUT_EVENT ie = get_next_input_event();
 			if (section == MAIN && ie.button2 == DOWN) {
@@ -1684,9 +1684,9 @@ done:
 	delete mainResume;
 	delete mainQuit;
 	delete mainLevelUp;
-	#ifdef IPHONE
+#if defined IPHONE
 	delete mainMusic;
-	#endif
+#endif
 	if (have_mouse || !use_dpad)
 		delete dndForm;
 	delete partyStats;
@@ -1713,13 +1713,13 @@ done:
 	}
 	
 	delete fairy;
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 #ifndef LITE
 	delete game_center;
 #endif
 #endif
 
-#if defined IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	delete joypad;
 #endif
 
@@ -2683,7 +2683,7 @@ done:
 
 static SaveStateInfo save_info[10];
 static MScrollingList *save_list;
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 static SaveStateInfo auto_info[10];
 static MScrollingList *auto_list;
 #endif
@@ -2692,13 +2692,13 @@ static void load_save_info(void)
 {
 	for (int i = 0; i < 10; i++) {
 		getSaveStateInfo(i, save_info[i], false);
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		getSaveStateInfo(i, auto_info[i], true);
 #endif
 	}
 	
 	std::vector<std::string> save_strings;
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	std::vector<std::string> auto_strings;
 #endif
 
@@ -2712,7 +2712,7 @@ static void load_save_info(void)
 			);
 			save_strings.push_back(std::string(buf));
 		}
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		if (!(auto_info[i].exp == 0 && auto_info[i].gold == 0 && auto_info[i].time == 0)) {
 			sprintf(buf, "E:%d G:%d, %s",
 				auto_info[i].exp,
@@ -2725,12 +2725,12 @@ static void load_save_info(void)
 	}
 
 	save_list->setItems(save_strings);
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	auto_list->setItems(auto_strings);
 #endif
 
 	save_list->reset();
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	auto_list->reset();
 #endif
 }
@@ -2740,11 +2740,11 @@ static int get_num(const char *name, int n)
 	int i, j = 0;
 	for (i = 0; i < 10; i++) {
 		SaveStateInfo *ssi;
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		if (name[0] == '\0') {
 #endif
 			ssi = save_info;
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		}
 		else {
 			ssi = auto_info;
@@ -2779,7 +2779,7 @@ static void trash_save(int n)
 	trash(s, n);
 }
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 static void trash_auto(int n)
 {
 	char s[10];
@@ -2805,7 +2805,7 @@ struct CHOOSE_SAVESTATE_INFO {
 	bool isAuto;
 };
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGR_ANDROID
 static bool choose_copy_state(int n, bool exists, void *data)
 {
 	(void)data;
@@ -2891,11 +2891,11 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 
 	MFrame *frame = new MFrame(10, 35, 220, 110);
 	save_list = new MScrollingList(20, 45, 200, LIST_H, trash_save, BW-m_get_bitmap_width(trashcan)/2-5, BH-m_get_bitmap_height(trashcan)/2-5, show_savestate_info_callback, "");
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	auto_list = new MScrollingList(20, 45, 200, LIST_H, trash_auto, BW-m_get_bitmap_width(trashcan)/2-5, BH-m_get_bitmap_height(trashcan)/2-5, show_savestate_info_callback, "auto");
 #endif
 	MTab *save_tab = new MTab("Save", 10, 20);
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	int xx2 = 10 + m_text_length(game_font, _t("Save")) + 6;
 	int xx3 = xx2 + m_text_length(game_font, _t("Auto")) + 6;
 	MTab *auto_tab = new MTab("Auto", xx2, 20);
@@ -2903,7 +2903,7 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 #endif
 	MTextButton *new_game_button = new MTextButton(BW-m_text_length(game_font, _t("New Game..."))-20, 12-m_text_height(game_font)/2, "New Game...");
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	MTextButton *copy_button = new MTextButton(30, 50, "Copy Save");
 	MTextButton *paste_button = new MTextButton(30, 70, "Paste Save");
 #endif
@@ -2914,7 +2914,7 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 	tguiAddWidget(frame);
 	tguiAddWidget(save_list);
 	tguiAddWidget(save_tab);
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	tguiAddWidget(auto_tab);
 	tguiAddWidget(copypaste_tab);
 #endif
@@ -2923,7 +2923,7 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 	tguiSetFocus(new_game_button);
 
 	save_tab->setSelected(true);
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	auto_tab->setSelected(false);
 	copypaste_tab->setSelected(false);
 	int on = 0;
@@ -2951,7 +2951,7 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 
 			TGUIWidget *widget = tguiUpdate();
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			if (widget == save_tab) {
 				if (on != 0) {
 					save_tab->setSelected(true);
@@ -3039,7 +3039,7 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 					goto done;
 				}
 			}
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			else if (widget == auto_list) {
 				int sel = auto_list->getSelected();
 				if (sel >= 0) {
@@ -3069,7 +3069,7 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 				*existing = false;
 				goto done;
 			}
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			else if (widget == copy_button) {
 				choose_savestate_old("Choose state to copy", true, false, choose_copy_state, NULL);
 			}
@@ -3124,7 +3124,7 @@ done:
 	tguiDeleteWidget(save_list);
 	tguiDeleteWidget(trash_icon);
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	tguiDeleteWidget(copypaste_tab);
 	tguiDeleteWidget(auto_list);
 	tguiDeleteWidget(auto_tab);
@@ -3138,7 +3138,7 @@ done:
 	delete trash_icon;
 	delete save_list;
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	delete copy_button;
 	delete paste_button;
 	delete copypaste_tab;
@@ -3184,7 +3184,7 @@ bool config_menu(bool start_on_fullscreen)
 	
 	y += 13;
 
-#ifdef IPHONE
+#if defind ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	std::vector<std::string> input_choices;
 	input_choices.push_back("{027} Tap-and-go");
 	input_choices.push_back("{027} Hybrid input 1");
@@ -3212,7 +3212,7 @@ bool config_menu(bool start_on_fullscreen)
 	difficulty_toggle->setSelected(curr_difficulty);
 	y += 13;
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE
 	std::vector<std::string> shake_choices;
 	shake_choices.push_back("{027} Shake cancels");
 	shake_choices.push_back("{027} Shake changes songs (iPod)");
@@ -3232,7 +3232,7 @@ bool config_menu(bool start_on_fullscreen)
 
 	y += 13;
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	std::vector<std::string> swap_buttons_choices;
 	swap_buttons_choices.push_back("{027} Normal buttons (select, cancel)");
 	swap_buttons_choices.push_back("{027} Swap buttons (cancel, select)");
@@ -3241,10 +3241,10 @@ bool config_menu(bool start_on_fullscreen)
 	swap_buttons_toggle->setSelected(curr_swap_buttons);
 
 	y += 13;
-	
+#endif
+
+#if defined ALLEGRO_IPHONE
 	std::vector<std::string> flip_screen_choices;
-//	flip_screen_choices.push_back("{027} Normal screen orientation");
-//	flip_screen_choices.push_back("{027} Rotate screen 180 degrees");
 	flip_screen_choices.push_back("{027} Automatic screen rotation");
 	flip_screen_choices.push_back("{027} Lock current orientation");
 	MSingleToggle *flip_screen_toggle = new MSingleToggle(xx, y, flip_screen_choices);
@@ -3253,7 +3253,7 @@ bool config_menu(bool start_on_fullscreen)
 	y += 13;
 #endif
 
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	std::vector<std::string> filter_type_choices;
 	std::vector<int> filter_type_values;
 	filter_type_choices.push_back("{027} No filtering");
@@ -3302,15 +3302,17 @@ bool config_menu(bool start_on_fullscreen)
 	int start_aspect = curr_aspect;
 	(void)start_aspect;
 	aspect_toggle->setSelected(curr_aspect);
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE
 	if (is_ipad()) {
+#elif defined ALLEGRO_ANDROID
+	if (false) {
 #endif
 	y += 13;
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	}
 #endif
 
-#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	std::vector<std::string> fullscreen_choices;
 	fullscreen_choices.push_back("{027} Draw in a window");
 	fullscreen_choices.push_back("{027} Draw fullscreen");
@@ -3334,7 +3336,7 @@ bool config_menu(bool start_on_fullscreen)
 	
 	const char *reset_str = "Reset achievements";
 	MTextButton *reset_game_center = NULL;
-	#if defined IPHONE && !defined LITE
+	#if defined ALLEGRO_IPHONE && !defined LITE
 	if (isGameCenterAPIAvailable()) {
 		reset_game_center = new MTextButton(BW-2-(m_text_length(game_font, _t(reset_str))+m_get_bitmap_width(cursor)+1), BH-2-m_text_height(game_font), reset_str);
 	}
@@ -3349,31 +3351,34 @@ bool config_menu(bool start_on_fullscreen)
 	tguiAddWidget(parent);
 	tguiSetParent(parent);
 	tguiAddWidget(sound_toggle);
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (input_toggle) {
 		tguiAddWidget(input_toggle);
 	}
 #endif
 	tguiAddWidget(difficulty_toggle);
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	tguiAddWidget(shake_toggle);
 #endif
 	tguiAddWidget(tuning_toggle);
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	tguiAddWidget(swap_buttons_toggle);
+#endif
+
+#if defined ALLEGRO_IPHONE
 	tguiAddWidget(flip_screen_toggle);
 	tguiAddWidget(filter_type_toggle);
 #endif
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE
 	if (is_ipad()) {
 #endif
 		tguiAddWidget(aspect_toggle);
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE
 	}
 #endif
 
-#ifndef IPHONE
+#if !defned ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	tguiAddWidget(fullscreen_toggle);
 #endif
 	
@@ -3383,14 +3388,14 @@ bool config_menu(bool start_on_fullscreen)
 		tguiAddWidget(reset_game_center);
 	}
 
-#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (start_on_fullscreen) {
 		tguiSetFocus(fullscreen_toggle);
 	}
 	else {
 #endif
 		tguiSetFocus(sound_toggle);
-#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	}
 #endif
 
@@ -3425,10 +3430,9 @@ bool config_menu(bool start_on_fullscreen)
 				close_pressed = false;
 			}
 			
-			//TGUIWidget *w = tguiUpdate();
-			tguiUpdate();
+			TGUIWidget *w = tguiUpdate();
 			
-			#if defined(IPHONE) && !defined(LITE)
+#if defined(ALLEGRO_IPHONE) && !defined(LITE)
 			if (w && w == reset_game_center) {
 				char buf[200];
 				sprintf(buf, "%s?", _t("Reset achievements"));
@@ -3436,7 +3440,9 @@ bool config_menu(bool start_on_fullscreen)
 					resetAchievements();
 				}
 			}
-			#endif
+#else
+			(void)w;
+#endif
 
 			INPUT_EVENT ie = get_next_input_event();
 
@@ -3447,17 +3453,10 @@ bool config_menu(bool start_on_fullscreen)
 			}
 		}
 		
-#ifdef IPHONE
-		//int top_sel1 = aspect_toggle->getSelected();
-		//int top_sel2 = filter_type_toggle->getSelected();
-#endif
-		
 		if (language_toggle->getSelected() != curr_language) {
-			//al_stop_timer(logic_timer);
 			curr_language = language_toggle->getSelected();
 			config.setLanguage(curr_language);
 			load_translation(get_language_name(config.getLanguage()).c_str());
-			//al_start_timer(logic_timer);
 			if (reset_game_center)
 				reset_game_center->setX(BW-2-(m_text_length(game_font, _t(reset_str))+m_get_bitmap_width(cursor)+1));
 		}
@@ -3482,7 +3481,7 @@ bool config_menu(bool start_on_fullscreen)
 			}
 		}
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		if (input_toggle) {
 			sel = input_toggle->getSelected();
 			if (config.getDpadType() != sel) {
@@ -3525,7 +3524,7 @@ bool config_menu(bool start_on_fullscreen)
 			config.setDifficulty(sel);
 		}
 		
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 		sel = shake_toggle->getSelected();
 		if (sel != curr_shake) {
 			curr_shake = sel;
@@ -3540,10 +3539,12 @@ bool config_menu(bool start_on_fullscreen)
 			reinstall_timer = true;
 		}
 		
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		sel = swap_buttons_toggle->getSelected();
 		config.setSwapButtons(sel);
+#endif
 		
+#if defined ALLEGRO_IPHONE
 		sel = flip_screen_toggle->getSelected();
 		if (sel != curr_flip_screen)
 		{
@@ -3568,7 +3569,7 @@ bool config_menu(bool start_on_fullscreen)
 #endif
 		
 		int sel1 = aspect_toggle->getSelected();
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE
 		int sel2 = filter_type_toggle->getSelected();
 		int sel_filter = filter_type_values[sel2];
 		
@@ -3643,15 +3644,17 @@ done:
 	delete tuning_toggle;
 	delete aspect_toggle;
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (input_toggle)
 		delete input_toggle;
-	delete shake_toggle;
 	delete swap_buttons_toggle;
+#if defined ALLEGRO_IPHONE
+	delete shake_toggle;
 	delete flip_screen_toggle;
 	delete filter_type_toggle;
 	if (reset_game_center)
 		delete reset_game_center;	
+#endif
 #else
 	delete fullscreen_toggle;
 #endif
@@ -3665,13 +3668,10 @@ done:
 
 	pause_f_to_toggle_fullscreen = false;
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE
 	if (start_filter_type != curr_filter_type) {
 		notify("Filter changed", "You must restart", "Press OK");
 		int sel_filter = filter_type_values[curr_filter_type];
-		//if (sel_filter == FILTER_SCALE2X || sel_filter == FILTER_SCALE3X || sel_filter == FILTER_SCALE4X) {
-		//	config.setMaintainAspectRatio(true);
-		//}
 		config.setFilterType(sel_filter);
 		return true;
 	}
@@ -3833,7 +3833,7 @@ int title_menu(void)
 	
 	MTextButtonFullShadow *buttons[MAX_BUTTONS];
 	int oy = 100;
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	buttons[curr_button++] = new MTextButtonFullShadow(20, oy, "Continue");
 	buttons[curr_button++] = new MTextButtonFullShadow(20, oy+15, "Start/Load Game");
 	buttons[curr_button++] = new MTextButtonFullShadow(20, oy+30, "Tutorial");

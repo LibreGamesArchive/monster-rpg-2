@@ -24,7 +24,7 @@ void loadIcons(void)
 	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/helmet.png")), 1);
 	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/potion.png")), 2);
 	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/letter.png")), 3);
-	#ifdef IPHONE
+	#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/iphone_button1.png")), 4);
 	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/iphone_button2.png")), 5);
 	#else
@@ -551,7 +551,7 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 	dpad_off();
 
 	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags((flags | ALLEGRO_PRESERVE_TEXTURE) & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 	MBITMAP *tmp = m_create_bitmap(BW, BH); // check
 	al_set_new_display_flags(flags);
 	ALLEGRO_BITMAP *oldTarget = al_get_target_bitmap();
@@ -843,7 +843,7 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 	clear_input_events();
 		
 	const char *s1, *s2;
-#if defined IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	s1 = "No";
 	s2 = "Yes";
 #else
@@ -869,7 +869,7 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 	tguiAddWidget(w1);
 	tguiAddWidget(w2);
 
-	#if defined IPHONE || defined ALLEGRO_MACOSX
+	#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	if (choice)
 		tguiSetFocus(w2);
 	else
@@ -901,7 +901,7 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 			TGUIWidget *widget = tguiUpdate();
 			if (widget == w1) {
 				playPreloadedSample("select.ogg");
-				#if defined IPHONE || defined ALLEGRO_MACOSX
+				#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 				choice = false;
 				#else
 				choice = true;
@@ -910,7 +910,7 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 			}
 			else if (widget == w2) {
 				playPreloadedSample("select.ogg");
-				#if defined IPHONE || defined ALLEGRO_MACOSX
+				#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 				choice = true;
 				#else
 				choice = false;
@@ -950,7 +950,7 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 			if (tick < 800) {
 				int size = m_get_bitmap_width(cursor);
 				int rx = 0;
-#if defined IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 				if (w1->getFocus()) {
 					rx = BW/2-w/4-m_text_length(game_font, _t("No"))/2-size;
 				}
@@ -1047,7 +1047,6 @@ void doDialogue(std::string text, bool top, int rows, int offset, bool bottom)
 			y = BH-offset-54;
 		}
 		else {
-//#ifdef IPHONE
 			int oy = area->getFocusY() - area->getOriginY();
 			if (!area->center_view && oy < BH/2+5) {
 				y = BH-offset-54;
@@ -1210,13 +1209,11 @@ int MSpeechDialog::update(int millis)
 		ie = get_next_input_event();
 	}
 	
-	//printf("b1down=%d clicked=%d\n", ie.button1 == DOWN, clicked);
-
-	#ifndef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if ((this == tguiActiveWidget) && (ie.button1 == DOWN || clicked)) {
-	#else
+#else
 	if ((!use_dpad || this == tguiActiveWidget) && (ie.button1 == DOWN || clicked)) {
-	#endif
+#endif
 		use_input_event();
 		
 		Input *i = getInput();
@@ -2206,16 +2203,16 @@ void MMap::draw()
 			const char *s1;
 			const char *s2;
 	
-			#if defined IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 			bool jp_conn = joypad_connected();
-			#else
+#else
 			bool jp_conn = false;
-			#endif
+#endif
 			if (jp_conn) {
 				s1 = "{034} Select";
 				s2 = "{035} Menu";
 			}
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 			else if (airplay_connected) {
 				s1 = "{036} Select";
 				s2 = "{037} Menu";
@@ -2274,7 +2271,7 @@ void MMap::draw()
 void MMap::auto_save(int millis, bool force)
 {
 	if (!shouldFlash) {
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		if (!force)
 			mem_save_counter += millis;
 		if (mem_save_counter >= 1000 || force) {
@@ -2879,7 +2876,7 @@ void MSpellSelector::setFocus(bool f)
 		started = false;
 		*/
 	if (!f) {
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		if (dragging) {
 			dragging = false;
 			m_destroy_bitmap(dragBmp);
@@ -3139,7 +3136,7 @@ void MSpellSelector::draw()
 		else {
 			dx = BW/3+5;
 		}
-		#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		if (use_dpad) {
 			if (pressed == i && this == tguiActiveWidget) {
 				color = m_map_rgb(255, 255, 0);
@@ -3464,12 +3461,9 @@ int MSpellSelector::update(int millis)
 				tmp = info->spells[pressed];
 				info->spells[pressed] = info->spells[selected];
 				info->spells[selected] = tmp;
-				//selected = pressed;
 				pressed = -1;
 			}
-		//#ifndef IPHONE
 		}
-		//#endif
 	}
 	else if (this == tguiActiveWidget && (ie.button2 == DOWN || (!dragging && iphone_shaken(0.1)))) {
 		use_input_event();
@@ -4004,11 +3998,11 @@ MToggleList::~MToggleList(void)
 
 void MScrollingList::setFocus(bool f)
 {
-	#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	was_down = getInput()->getDescriptor().button1;
-	#else
+#else
 	was_down = false;
-	#endif
+#endif
 
 	if (!f) {
 		if (dragging) {
@@ -4346,27 +4340,27 @@ int MScrollingList::update(int millis)
 	if (use_dpad && this == tguiActiveWidget) {
 		INPUT_EVENT ie = get_next_input_event();
 		InputDescriptor id = getInput()->getDescriptor();
-		#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		if (!id.button1 && holdTime != -1) {
-		#else
+#else
 		(void)id;
 		if (!ie.button1 == DOWN && holdTime != -1) {
-		#endif
+#endif
 			use_input_event();
 			if ((unsigned long)holdTime+250 > tguiCurrentTimeMillis()) {
 				clicked = true;
 			}
 			holdTime = -1;
 		}
-		#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		else if (id.button1 && holdTime == -1) {
-		#else
+#else
 		else if (ie.button1 == DOWN && holdTime == -1) {
-		#endif
+#endif
 			use_input_event();
 			holdTime = tguiCurrentTimeMillis();
 		}
-		#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		else if (id.button1) {
 			int elapsed = tguiCurrentTimeMillis() - holdTime;
 			if (hold_callback && elapsed > 600) {
@@ -4536,11 +4530,11 @@ bool MItemSelector::itemsBelow(void)
 
 void MItemSelector::setFocus(bool f)
 {
-	#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	was_down = getInput()->getDescriptor().button1;
-	#else
+#else
 	was_down = false;
-	#endif
+#endif
 
 	if (!f) {
 		if (dragging) {
@@ -4785,14 +4779,14 @@ void MItemSelector::draw()
 			dx = BW/2+20;
 		}
 		sprintf(s, "%s%s", getItemIcon(inv->index).c_str(), _t(getItemName(inv->index).c_str()));
-		#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		if (pressed == i) {
 			color = m_map_rgb(255, 255, 0);
 		}
 		else {
 			color = grey;
 		}
-		#else
+#else
 		if (use_dpad) {
 			if (pressed == i) {
 				color = m_map_rgb(255, 255, 0);
@@ -4809,7 +4803,7 @@ void MItemSelector::draw()
 				color = grey;
 			}
 		}
-		#endif
+#endif
 		mTextout(game_font, s, dx, dy,
 			color, black,
 			WGT_TEXT_DROP_SHADOW, false);
@@ -4853,10 +4847,10 @@ loop:
 		m_restore_blender();
 	}
 
-	#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (this != tguiActiveWidget)
 		return;
-	#endif
+#endif
 
 
 	// draw arrows
@@ -4927,7 +4921,7 @@ int MItemSelector::update(int millis)
 				WGT_TEXT_DROP_SHADOW, false);
 			m_pop_target_bitmap();
 		}
-		#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		else if (selected >= 0) {
 			if (inventory[selected].index >= 0 && canArrange) {
 				downCount += millis;
@@ -4939,7 +4933,7 @@ int MItemSelector::update(int millis)
 				}
 			}
 		}
-		#endif
+#endif
 	}
 	else if (dragging) {
 		if (this == tguiActiveWidget && iphone_shaken(0.1)) {
@@ -5032,9 +5026,9 @@ int MItemSelector::update(int millis)
 		ie = get_next_input_event();
 		_id = getInput()->getDescriptor();
 	}
-	#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	(void)_id;
-	#endif
+#endif
 	
 	if (ie.left == DOWN) {
 		use_input_event();
@@ -5111,7 +5105,7 @@ int MItemSelector::update(int millis)
 							playPreloadedSample("select.ogg");
 							int index = inventory[selected].index;
 							reset();
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 							while (_id.button1) {
 								al_rest(0.001);
 								_id = getInput()->getDescriptor();
@@ -5119,7 +5113,7 @@ int MItemSelector::update(int millis)
 							clear_input_events();
 #endif
 							showItemInfo(index, true);
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 							while (_id.button1) {
 								al_rest(0.001);
 								_id = getInput()->getDescriptor();
@@ -5202,39 +5196,6 @@ int MItemSelector::update(int millis)
 	
 END:;
 
-
-#if 0
-		use_input_event();
-		
-		#ifdef IPHONE
-		if (_id.button1 || ie.button1 == DOWN) {
-		#else
-		if (ie.button1 == DOWN) {
-		#endif
-			downCount += millis;
-			if (downCount == 0) downCount = 1;
-			if (downCount >= 600) {
-				//if (canArrange) {
-				
-				
-				/*******/
-				
-				
-				proceed1 = false;
-				proceed2 = false;
-				goto END;
-			}
-		}
-		if (((canArrange && pressed < 0 && proceed1) || (!canArrange && proceed1)) || (pressed >= 0 && proceed2) || clicked) {
-			was_clicked = clicked;
-			clicked = false;
-			if (proceed2) proceed2 = false, proceed1 = false;
-			
-			/****/
-END:;
-		}
-	}
-#endif
 
 	if (this == tguiActiveWidget && (ie.button2 == DOWN || (!dragging && iphone_shaken(0.1)))) {
 		use_input_event();
@@ -5504,7 +5465,7 @@ int MManSelector::update(int millis)
 	if (holdTime > 0) {
 		holdTime -= millis;
 		if (holdTime <= 0) {
-			#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			if (use_dpad) {
 				if (pos != 6) {
 					int p = pos;
@@ -5515,7 +5476,7 @@ int MManSelector::update(int millis)
 				}
 			}
 			else 
-			#endif
+#endif
 			{
 				ALLEGRO_MOUSE_STATE s;
 				m_get_mouse_state(&s);
@@ -5572,22 +5533,22 @@ int MManSelector::update(int millis)
 
 	InputDescriptor id = getInput()->getDescriptor();
 
-	#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (!id.button1 && use_dpad && need_release) {
-	#else
+#else
 	(void)id;
 	if (!(ie.button1 == DOWN) && use_dpad && need_release) {
-	#endif
+#endif
 		use_input_event();
 		holdTime = 0;
 		clicked = true;
 		need_release = false;
 	}
-	#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	else if ((id.button1 || clicked) && !need_release) {
-	#else
+#else
 	else if ((ie.button1 == DOWN || clicked) && !need_release) {
-	#endif
+#endif
 		use_input_event();
 		if (use_dpad && !clicked && holdTime == 0) {
 			need_release = true;
@@ -5794,14 +5755,14 @@ void MMultiChooser::draw()
 					alpha = 0;
 				}
 			}
-			#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			if (current.size() > 1 && points[current[0]].west == p->west) {
 				if (((unsigned)tguiCurrentTimeMillis() % 100) < 50) {
 					m_draw_bitmap(arrow, draw_x, draw_y, flags);
 				}
 			}
 			else
-			#endif
+#endif
 			{
 				m_draw_bitmap(arrow, draw_x, draw_y, flags);
 			}
@@ -6142,11 +6103,11 @@ void MPartySelector::draw()
 		}
 	}
 
-	#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (true) {
-	#else
+#else
 	if (!use_dpad || this == tguiActiveWidget) {
-	#endif
+#endif
 		if (((unsigned)tguiCurrentTimeMillis() % 300) < 150) {
 			int w = m_get_bitmap_width(arrow);
 			int h = m_get_bitmap_height(arrow);
@@ -6302,11 +6263,11 @@ int MPartySelector::update(int millis)
 		}
 	}
 
-	#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (true) {
-	#else
+#else
 	if (!use_dpad || this == tguiActiveWidget) {
-	#endif
+#endif
 
 		INPUT_EVENT ie;
 		if (this != tguiActiveWidget)
@@ -6922,32 +6883,32 @@ void MShop::draw(void)
 		if (r >= nItems)
 			break;
 		if (i == 0 && r != 0) {
-			#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 			if (row == r && this == tguiActiveWidget) {
 				if ((unsigned)tguiCurrentTimeMillis() % 600 < 300) {
 					m_draw_bitmap(up, x, yy, 0);
 				}
 			}
 			else {
-			#endif
+#endif
 				m_draw_bitmap(up, x, yy, 0);
-			#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 			}
-			#endif
+#endif
 		}
 		else if (i == 5 && r < (nItems-1)) {
-			#ifndef IPHONE
+#ifndef IPHONE
 			if (row == r && this == tguiActiveWidget) {
 				if ((unsigned)tguiCurrentTimeMillis() % 600 < 300) {
 					m_draw_bitmap(up, x, yy, M_FLIP_VERTICAL);
 				}
 			}
 			else {
-			#endif
+#endif
 				m_draw_bitmap(up, x, yy, M_FLIP_VERTICAL);
-			#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 			}
-			#endif
+#endif
 		}
 		else {
 			MCOLOR color;

@@ -922,7 +922,7 @@ void CombatEnemy::construct(std::string name, int x, int y, bool alpha)
 
 	work = NULL;
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	death_blitted = false;
 #endif
 }

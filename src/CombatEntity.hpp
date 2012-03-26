@@ -207,15 +207,12 @@ protected:
 	Combatant *target;
 	MBITMAP *icecube;
 	MBITMAP *snowflake;
-	//MSAMPLE shatter;
 	float scale;
 	float ysize;
 	int count;
 	bool shattered;
 	int numshards;
-//#ifdef IPHONE
 	ALLEGRO_VERTEX *verts;
-//#endif
 };
 
 
@@ -249,7 +246,7 @@ struct Darkness1Blob {
 
 class Darkness1Effect : public CombatEntity {
 public:
-#if defined WIZ || defined IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	static const int NUM_BLOBS = 10;
 #else
 	static const int NUM_BLOBS = 15;
@@ -352,7 +349,7 @@ struct SlimeBlob {
 
 class SlimeEffect : public CombatEntity {
 public:
-#if defined WIZ || defined IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	static const int NUM_BLOBS = 5;
 #else
 	static const int NUM_BLOBS = 20;
@@ -370,10 +367,10 @@ protected:
 	Combatant *target;
 	int count;
 	SlimeBlob blobs[NUM_BLOBS];
-	#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	ALLEGRO_VERTEX verts[NUM_BLOBS*6];
 	MBITMAP *blob;
-	#endif
+#endif
 };
 
 
@@ -404,7 +401,7 @@ protected:
 	int maxDepth;
 	AnimationSet *animSet;
 	Combatant *target;
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	ALLEGRO_VERTEX *verts;
 #endif
 };

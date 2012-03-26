@@ -5,7 +5,7 @@
 #define ASSERT ALLEGRO_ASSERT
 #include <allegro5/internal/aintern_opengl.h>
 
-#if defined IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 #include "joypad.hpp"
 #endif
 
@@ -58,7 +58,7 @@ static int vert_compare_z(const void *a, const void *b)
 
 
 // stuff allegro doesn't have yet
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 #define glFrustum glFrustumf
 #define glOrtho glOrthof
 #define glClearDepth glClearDepthf
@@ -516,22 +516,14 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 		catch (...) {
 		}
 
-#ifndef IPHONE
+#ifn !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		if (strstr(filename, "bow.raw")) {
 			qsort(&m->verts[0], vcount/3, sizeof(ALLEGRO_VERTEX)*3, vert_compare);
 		}
 #endif
-#ifdef ALLEGRO_WINDOWS
-		/*
-		if (strstr(filename, "staff.raw")) {
-			qsort(&m->verts[0], vcount/3, sizeof(ALLEGRO_VERTEX)*3, vert_compare_z);
-		}
-		*/
-#endif
 
 
 		if (is_volcano) {
-			//qsort(&m->verts[0], vcount/3, sizeof(ALLEGRO_VERTEX)*3, vert_compare);
 			for (int i = 0; i < vcount; i += 6) {
 				float inc = tex_size / 50;
 				float xx = ((i/6) % 50) * inc;
@@ -710,14 +702,14 @@ static bool real_archery(int *accuracy_pts)
 		NUM_GOBLINS = 50;
 	}
 
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	if (use_dpad || joypad_connected() || airplay_connected)
 #else
-	#if defined ALLEGRO_MACOSX
+#if defined ALLEGRO_MACOSX
 	bool jp_conn = joypad_connected();
-	#else
+#else
 	bool jp_conn = false;
-	#endif
+#endif
 	if (use_dpad || jp_conn)
 #endif
 		goblin_speed = 0.015f;
@@ -729,7 +721,7 @@ static bool real_archery(int *accuracy_pts)
 	bool really_done = false;
 	bool played_draw_and_release = false;
 	bool clicked = false;
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	current_mouse_x = BW/2;
 	current_mouse_y = BH/2;
 	al_set_mouse_xy(display, current_mouse_x, current_mouse_y);
@@ -767,7 +759,7 @@ static bool real_archery(int *accuracy_pts)
 
 	const float max_yrot = M_PI/2;
 	const float max_xrot = M_PI/2;
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	const float aim_speed = 0.16f;
 #else
 	const float aim_speed = 0.22f;
@@ -1014,7 +1006,7 @@ static bool real_archery(int *accuracy_pts)
 		                 m_map_rgb(255, 0, 0), M_FILLED);
 		m_draw_bitmap(progress, 2, 2, 0);
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		drawBufferToScreen();
 		al_set_target_backbuffer(display);
 #endif
@@ -1107,7 +1099,7 @@ static bool real_archery(int *accuracy_pts)
 		al_set_projection_transform(display, &proj_push);
 		//m_set_target_bitmap(buffer);
 
-#if !defined(IPHONE)
+#if !defined(IPHONE) && !defined(ALLEGRO_ANDROID)
 		drawBufferToScreen();
 #endif
 

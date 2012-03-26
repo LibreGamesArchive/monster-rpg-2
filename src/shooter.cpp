@@ -1,6 +1,6 @@
 #include "monster2.hpp"
 #define ASSERT ALLEGRO_ASSERT
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 #include <allegro5/allegro_iphone.h>
 #define glFrustum glFrustumf
 #endif
@@ -258,20 +258,6 @@ static MBITMAP *sub_bmp;
 static MBITMAP *bullet;
 static MBITMAP *crab_bmp;
 static MBITMAP *shark_bmp;
-
-#ifdef IPHONEXX
-#define superPlaySample(sample, id, played) \
-	if (played) \
-		al_stop_sample(&id); \
-	else \
-		played = true; \
-	playSample(sample, &id)
-#else
-#define superPlaySample(sample, id, played) \
-	playSample(sample)
-#endif
-	
-
 
 static char *scene;
 static char *solid;
@@ -691,7 +677,7 @@ bool shooter(bool for_points)
 	int shark_value, crab_value;
 
 	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags((flags | ALLEGRO_NO_PRESERVE_TEXTURE) & ~ALLEGRO_PRESERVE_TEXTURE);
+	al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
 	bbot = m_create_bitmap(1024, 1024); // check
 	btop = m_create_bitmap(1024, 1024); // check
 	al_set_new_bitmap_flags(flags);
@@ -742,7 +728,7 @@ bool shooter(bool for_points)
 	const int pause_pos_x = BW-pause_icon_w/2-4;
 	const int pause_pos_y = 3+pause_icon_h/2;
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	std::list<ZONE>::iterator pause_zone = define_zone(
 		pause_pos_x-pause_icon_w/2,
 		pause_pos_y-pause_icon_h/2,
@@ -882,7 +868,7 @@ start:
 				playPreloadedSample("explosion.ogg");
 			}
 			else if (!dead) {
-#if defined IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 				if (use_dpad) {
 					if (ie.left) {
 						x -= LOGIC_MILLIS * 0.2;
@@ -1170,7 +1156,7 @@ start:
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 			m_draw_bitmap(crab_icon, 0, 0, 0);
 			m_draw_bitmap(shark_icon, 0, 16, 0);
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			m_draw_alpha_bitmap(pause_icon, BW-m_get_bitmap_width(pause_icon)-4, 3);
 #endif
 			char buf[100];
@@ -1279,7 +1265,7 @@ done:
 	delete crab;
 	delete shark_anim;
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	delete_zone(pause_zone);
 #endif
 

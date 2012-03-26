@@ -26,7 +26,7 @@ bool is_32_or_later(void)
 
 void init_joypad(void)
 {
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
 	NSString *s = [[UIDevice currentDevice] systemVersion];
 	float v = [s floatValue];

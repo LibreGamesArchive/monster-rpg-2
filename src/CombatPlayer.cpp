@@ -106,7 +106,7 @@ public:
 		shadow = new MShadow();
 		int x = 5;
 		int y;
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		if (!use_dpad)
 			y = BH-45;
 		else
@@ -1528,11 +1528,7 @@ void CombatPlayer::draw(void)
 		float amountF;
 		ALLEGRO_COLOR vcol;
 		if (info.condition == CONDITION_SHADOW) {
-			#ifdef IPHONE
 			amountF = -1.0f;
-			#else
-			amountF = -1.0f;
-			#endif
 			amount = 255*amountF;
 			vcol = black;
 		}

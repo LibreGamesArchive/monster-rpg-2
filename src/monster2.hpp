@@ -8,10 +8,9 @@
 
 #define R2D(a) ((a)*180/M_PI)
 
-#if defined IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 #define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_RGBA_4444
 #elif defined A5_OGL
-//#define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE
 #define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_RGBA_4444
 #else
 #define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_ARGB_8888
@@ -70,8 +69,11 @@
 //#include <objc/objc.h>
 #endif
 
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 #include <allegro5/allegro_iphone.h>
+#endif
+#if defined ALLEGRO_ANDROID
+#include <allegro5/allegro_android.h>
 #endif
 
 #ifndef ALLEGRO_WINDOWS
@@ -140,16 +142,16 @@ const int LOGIC_MILLIS = (1000/LOGIC_RATE);
 
 
 // Lua must be built as C++ code (at least on iPhone!)
-#ifndef IPHONE
-#if defined ALLEGRO_WINDOWS || defined __linux__
+#ifndef ALLEGRO_IPHONE
+#if defined ALLEGRO_WINDOWS || defined __linux__ || defined ALLEGRO_ANDROID
 extern "C" {
 #endif
 #endif
 #include <lua-fixed/lua.h>
 #include <lua-fixed/lauxlib.h>
 #include <lua-fixed/lualib.h>
-#ifndef IPHONE
-#if defined ALLEGRO_WINDOWS || defined __linux__
+#ifndef ALLEGRO_IPHONE
+#if defined ALLEGRO_WINDOWS || defined __linux__ || defined ALLEGRO_ANDROID
 }
 #endif
 #endif
@@ -163,7 +165,7 @@ extern "C" {
 #include <d3dx9.h>
 #endif
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 #define glUseProgramObjectARB glUseProgram
 #define glGetUniformLocationARB glGetUniformLocation
 #define glUniform1fARB glUniform1f
@@ -179,36 +181,14 @@ extern "C" {
 
 #ifdef A5_OGL
 #include <allegro5/allegro_opengl.h>
-#ifdef ALLEGRO_MACOSX
-#include <OpenGL/glu.h>
-#else
-#if !defined(WIZ) && !defined(NO_GLU)
-#include <GL/glu.h>
 #endif
-#endif
-#endif
-
-#ifdef IPHONE
-#include <OpenGLES/ES2/gl.h>
-#include <OpenGLES/ES2/glext.h>
-#endif
-
 
 #ifdef MEMDBG
 #include "debug_new.h"
 #endif
 
 
-
-
-#if defined WIZ && !defined FAKEWIZ
-extern "C" {
-#include <wiz/castor.h>
-}
-#endif
-
-
-#if defined IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 #define POOL_BEGIN NSAutoreleasePool *___p = [[NSAutoreleasePool alloc] init];
 #define POOL_END [___p drain];
 #endif
@@ -274,22 +254,6 @@ class Combatant;
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #endif
 
-#if defined WIZ || defined IPHONE
-/*
-const int SIN_TAB_SIZE = 1024;
-const int COS_TAB_SIZE = 1024;
-const float TWO_PI = (M_PI*2);
-#define fmod(f1, f2) ((float)((((int)((f1)*10000)) % \
-	((int)((f2)*10000)))) / 10000.0f)
-#define SIN(r) (sintab[(int)(fmod(r, TWO_PI)/TWO_PI*SIN_TAB_SIZE)])
-#define COS(r) (costab[(int)(fmod(r, TWO_PI)/TWO_PI*COS_TAB_SIZE)])
-*/
-#ifndef NO_SIN
-//#define sin(r) (al_fixtof(al_fixsin(al_ftofix(fmod((((float)r)*256.0)/(M_PI*2.0), 256.0)))))
-//#define cos(r) (al_fixtof(al_fixcos(al_ftofix(fmod((((float)r)*256.0)/(M_PI*2.0), 256.0)))))
-#endif
-#endif
-
 #include "translate.hpp"
 
 #include "c.h"
@@ -311,7 +275,7 @@ const float TWO_PI = (M_PI*2);
 #include "AnimationSet.hpp"
 #include "Tile.hpp"
 #include "Area.hpp"
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 #include "iphone.h"
 #endif
 #include "init.hpp"

@@ -11,7 +11,7 @@ char **myArgv;
 unsigned long last_shake_check;
 
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE
 /*
  * Return the path to user resources (save states, configuration)
  */
@@ -23,48 +23,6 @@ static char *userResourcePath()
 	sprintf(path, "%s/", al_path_cstr(user_path, '/'));
 	al_destroy_path(user_path);
 	return path;
-
-/*
-	char* env = getenv("HOME");
-
-	if (env) {
-		strcpy(path, env);
-		if (path[strlen(path)-1] != '/') {
-			strncat(path, "/.monster2/", (sizeof(path)/sizeof(*path))-1);
-		}
-		else {
-			strncat(path, ".monster2/", (sizeof(path)/sizeof(*path))-1);
-		}
-	}
-	else {
-		strcpy(path, "save/");
-	}
-
-	return path;
-	*/
-}
-#endif
-#if 0
-//#else
-static char *userResourcePath()
-{
-	static char path[MAX_PATH];
-
-	bool success = SHGetSpecialFolderPath(0, path, CSIDL_APPDATA, false);
-
-	if (success) {
-		if (path[strlen(path)-1] != '/') {
-			strncat(path, "/Monster2/", (sizeof(path)/sizeof(*path))-1);	
-		}
-		else {
-			strncat(path, "Monster2/", (sizeof(path)/sizeof(*path))-1);
-		}
-	}
-	else {
-		strcpy(path, "save/");
-	}
-
-	return path;
 }
 #endif
 
@@ -73,7 +31,7 @@ const char *getUserResource(const char *fmt, ...)
 {
 	va_list ap;
 
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	char file[MAX_PATH];
 	static char result[MAX_PATH];
 	char old[MAX_PATH];
@@ -162,18 +120,6 @@ const char *getResource(const char *fmt, ...)
 	va_list ap;
 	static char name[MAX_PATH];
 
-#ifdef IPHONE
-	// check bonus content first
-	/*
-	strcpy(name, getUserResource("bonus/"));
-	va_start(ap, fmt);
-	vsnprintf(name+strlen(name), (sizeof(name)/sizeof(*name))-1, fmt, ap);
-	va_end(ap);
-	if (al_filename_exists(name))
-		return name;
-	*/
-#endif
-
 	strcpy(name, resourcePath());
 	va_start(ap, fmt);
 	vsnprintf(name+strlen(name), (sizeof(name)/sizeof(*name))-1, fmt, ap);
@@ -237,7 +183,7 @@ int check_arg(int argc, char **argv, const char *s)
 // returns true to continue
 bool native_error(const char *msg)
 {
-#if defined WIZ || defined IPHONE
+#if defined WIZ || defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	return true;
 #endif
 #ifdef EDITOR
@@ -294,7 +240,7 @@ bool iphone_line(IPHONE_LINE_DIR dir, double since)
 
 bool iphone_shaken(double since)
 {
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	if (use_dpad) return false;
 #endif
 

@@ -247,7 +247,7 @@ public:
 
 	unsigned long getHoldStart(void)
 	{
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		return holdStart;
 #else
 		if (b3_pressed) {
@@ -277,29 +277,29 @@ public:
 			INPUT_EVENT ie = get_next_input_event();
 			InputDescriptor id = getInput()->getDescriptor();
 
-#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 			if (ie.button3 == DOWN) {
 				b3_pressed = true;
 			}
 			else 
 #endif
 
-			#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			if (!id.button1 && holdStart != 0) {
-			#else
+#else
 			if (!ie.button1 == DOWN && holdStart != 0) {
-			#endif
+#endif
 				use_input_event();
 				if (holdStart+250 > tguiCurrentTimeMillis()) {
 					clicked = true;
 				}
 				holdStart = 0;
 			}
-			#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			else if (id.button1 && holdStart == 0) {
-			#else
+#else
 			else if (ie.button1 == DOWN && holdStart == 0) {
-			#endif
+#endif
 				use_input_event();
 				holdStart = tguiCurrentTimeMillis();
 			}
@@ -326,11 +326,11 @@ public:
 	{
 		TGUIWidget::setFocus(fcs);
 
-		#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		was_down = use_dpad && getInput()->getDescriptor().button1;
-		#else
+#else
 		was_down = false;
-		#endif
+#endif
 	}
 
 	FakeWidget(int x, int y, int w, int h, bool accFocus = true, bool draw_outline = false) {
@@ -419,7 +419,7 @@ public:
 		this->text = text;
 		clicked = false;
 		int flags = al_get_new_bitmap_flags();
-		al_set_new_bitmap_flags((flags | ALLEGRO_PRESERVE_TEXTURE) & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+		al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 		bmp = m_create_bitmap(width, 14); // check
 		al_set_new_display_flags(flags);
 		m_push_target_bitmap();
@@ -1248,11 +1248,11 @@ public:
 	{
 		TGUIWidget::setFocus(fcs);
 
-		#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		was_down = getInput()->getDescriptor().button1;
-		#else
+#else
 		was_down = false;
-		#endif
+#endif
 	}
 
 	bool acceptsFocus(void);

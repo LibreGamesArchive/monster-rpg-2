@@ -976,7 +976,7 @@ void Battle::addMessage(MessageLocation loc, std::string msg, int lifetime)
 
 void Battle::start(void)
 {
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	vibrate();
 #endif
 	save_memory();

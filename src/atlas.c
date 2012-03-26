@@ -59,7 +59,7 @@ static void insert_sheet(ATLAS *atlas, _AL_LIST *rect_list)
 	}
 
 	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags((flags | ALLEGRO_PRESERVE_TEXTURE)&~ALLEGRO_NO_PRESERVE_TEXTURE);
+	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 	atlas->sheets[sheet] = al_create_bitmap(atlas->width, atlas->height);
 	al_set_new_bitmap_flags(flags);
 

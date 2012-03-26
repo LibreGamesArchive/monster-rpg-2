@@ -285,10 +285,6 @@ bool Object::update(Area *area, int step)
 	
 	InputDescriptor ie = input->getDescriptor();
 
-	// Edit: FIXME: this could have bad consequences
-#ifndef IPHONE
-	//const bool dpad_panning = false;
-#endif
 	if (speechDialog || dpad_panning) {
 		ie.left = ie.right = ie.up = ie.down = false;
 		if (dpad_panning)

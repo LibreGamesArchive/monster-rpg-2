@@ -306,7 +306,7 @@ MBITMAP *get_string_bitmap(const MFONT *font, std::string s, ALLEGRO_COLOR c)
 	if (!ret) {
 		MBITMAP *bmp;
 		int flgs = al_get_new_bitmap_flags();
-		al_set_new_bitmap_flags((flgs | ALLEGRO_PRESERVE_TEXTURE)&~ALLEGRO_NO_PRESERVE_TEXTURE);
+		al_set_new_bitmap_flags(flgs & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 		bmp = m_create_bitmap(m_text_length(font, s.c_str()), m_text_height(font)+2); // check
 		al_set_new_bitmap_flags(flgs);
 		ALLEGRO_STATE state;
@@ -508,7 +508,7 @@ MFONT *m_load_font(const char *name)
 	ALLEGRO_FONT *f;
 
 	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags((flags | ALLEGRO_PRESERVE_TEXTURE)&~ALLEGRO_NO_PRESERVE_TEXTURE);
+	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 
 #ifndef WIZ
 	f = al_load_font(name, 0, 0);
@@ -715,7 +715,7 @@ void m_put_pixel(int x, int y, MCOLOR color)
 
 void m_draw_trans_pixel(int x, int y, MCOLOR color)
 {
-#if defined A5_D3D || defined IPHONE
+#if defined A5_D3D || defined ALLEGRO_IPHONE
 	al_draw_pixel(x, y, color);
 #else
 	// Workaround for some OpenGL drivers
@@ -750,7 +750,7 @@ MBITMAP *create_trapezoid(Direction dir, int topw, int bottomw, int length, MCOL
 	m_push_target_bitmap();
 
 	int flgs = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags((flgs | ALLEGRO_PRESERVE_TEXTURE)&~ALLEGRO_NO_PRESERVE_TEXTURE);
+	al_set_new_bitmap_flags(flgs & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 	
 	if (dir == DIRECTION_NORTH) {
 		b = m_create_bitmap(bottomw, length); // check
@@ -1012,7 +1012,7 @@ void m_unlock_bitmap(MBITMAP *b)
 void _destroy_loaded_bitmaps(void)
 {
 	for (size_t i = 0; i < loaded_bitmaps.size(); i++) {
-		if (loaded_bitmaps[i].flags & ALLEGRO_PRESERVE_TEXTURE) {
+		if (!(loaded_bitmaps[i].flags & ALLEGRO_NO_PRESERVE_TEXTURE)) {
 			continue;
 		}
 		MBITMAP *m = loaded_bitmaps[i].bitmap;
@@ -1026,7 +1026,7 @@ void _reload_loaded_bitmaps(void)
 	int format = al_get_new_bitmap_format();
 
 	for (size_t i = 0; i < loaded_bitmaps.size(); i++) {
-		if (loaded_bitmaps[i].flags & ALLEGRO_PRESERVE_TEXTURE) {
+		if (!(loaded_bitmaps[i].flags & ALLEGRO_NO_PRESERVE_TEXTURE)) {
 			continue;
 		}
 		MBITMAP *m = loaded_bitmaps[i].bitmap;

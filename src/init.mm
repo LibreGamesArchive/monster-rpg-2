@@ -13,7 +13,6 @@
 extern "C" {
 #include <allegro5/internal/aintern_iphone.h>
 }
-#include "playaac.h"
 #endif
 
 #ifdef A5_D3D
@@ -25,7 +24,7 @@ extern "C" {
 #include "joypad.hpp"
 #endif
 
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 extern "C" {
 #include <allegro5/allegro_iphone_objc.h>
 }
@@ -101,8 +100,7 @@ static void d3d_resource_release(void)
 }
 #endif
 
-#ifdef IPHONE
-//bool orienting = false;
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 bool do_pause_game = false;
 #endif
 
@@ -121,7 +119,7 @@ bool superpower = false, healall = false;
 static bool pause_joystick_repeat_events = false;
 bool pause_f_to_toggle_fullscreen = false;
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 bool have_mouse = false;
 #else
 bool have_mouse = true;
@@ -129,7 +127,7 @@ bool have_mouse = true;
 bool use_digital_joystick = false;
 int screen_offset_x, screen_offset_y;
 float screen_ratio_x, screen_ratio_y;
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 static double allegro_iphone_shaken = 0.0;
 #endif
 float initial_screen_scale = 0.0f;
@@ -214,7 +212,7 @@ int startGFXDriver;
 bool egl_workaround = false;
 bool inited = false;
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 bool use_dpad = false;
 #else
 bool use_dpad = true;
@@ -270,8 +268,7 @@ ALLEGRO_MUTEX *switch_mutex;
 ALLEGRO_COND *switch_cond;
 uint32_t my_opengl_version;
 
-#if 0
-// should pause on background/switch out
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 static bool should_pause_game(void)
 {
 	return (area && !battle && !player_scripted && !in_pause && !in_map);
@@ -385,7 +382,7 @@ static void get_inputs(int x, int y, bool *l, bool *r, bool *u, bool *d, bool *b
 {
 	*l = *r = *u = *d = *b1 = *b2 = *b3 = false;
 
-#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	return;
 #else
 
@@ -513,7 +510,7 @@ const int MOUSE_AXES = 3;
 void myTguiIgnore(int type)
 {
 	tguiIgnore(type);
-	#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (!(config.getDpadType() == DPAD_TOTAL_1 || config.getDpadType() == DPAD_TOTAL_2)) {
 		al_lock_mutex(touch_mutex);
 		getInput()->set(false, false, false, false, false, false, false);
@@ -632,11 +629,11 @@ static void *thread_proc(void *arg)
 	
 	ALLEGRO_EVENT event;
 	
-#if defined A5_D3D || defined IPHONE
+#if defined A5_D3D || defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_register_event_source(events, al_get_display_event_source(display));
 #endif
 
-#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	al_register_event_source(events, al_get_keyboard_event_source());
 	al_register_event_source(events, al_get_joystick_event_source());
 #endif
@@ -650,7 +647,7 @@ static void *thread_proc(void *arg)
 	al_register_event_source(events, (ALLEGRO_EVENT_SOURCE *)draw_timer);
 	al_register_event_source(events, (ALLEGRO_EVENT_SOURCE *)logic_timer);
 	
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_register_event_source(events, al_get_touch_input_event_source());
 #else
 	al_register_event_source(events, al_get_mouse_event_source());
@@ -680,12 +677,12 @@ static void *thread_proc(void *arg)
 		
 		if (al_wait_for_event_timed(events, &event, 1.0f/LOGIC_RATE)) {
 		
-			#ifndef ALLEGRO_IPHONE
+#if !defined ALLEGRO_IPHONE && #defined ALLEGRO_ANDROID
 			al_lock_mutex(input_mutex);
 			if (getInput())
 				getInput()->handle_event(&event);
 			al_unlock_mutex(input_mutex);
-			#endif
+#endif
 
 			if (event.type == ALLEGRO_EVENT_TIMER) {
 				if (event.timer.source == draw_timer) {
@@ -716,7 +713,7 @@ static void *thread_proc(void *arg)
 				}
 				al_signal_cond(wait_cond);
 			}
-#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && #defined ALLEGRO_ANDROID
 			else if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
 				if (event.keyboard.keycode == ALLEGRO_KEY_F) {
 					if (!pause_f_to_toggle_fullscreen) {
@@ -928,7 +925,7 @@ static void *thread_proc(void *arg)
 			}
 #endif
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 #define BEGIN ALLEGRO_EVENT_TOUCH_BEGIN
 #define END ALLEGRO_EVENT_TOUCH_END
 #define MOVE ALLEGRO_EVENT_TOUCH_MOVE
@@ -939,11 +936,11 @@ static void *thread_proc(void *arg)
 #endif
 
 			Input *i = getInput();
-			#if defined IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 			bool jp_conn = joypad_connected();
-			#else
+#else
 			bool jp_conn = false;
-			#endif
+#endif
 			if (!jp_conn && i && i->isPlayerControlled() && 
 			(event.type == BEGIN ||
 			event.type == END ||
@@ -951,11 +948,11 @@ static void *thread_proc(void *arg)
 
 				al_lock_mutex(input_mutex);
 
-				#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 				int this_x = event.touch.x;
 				int this_y = event.touch.y;
 				int touch_id = event.touch.id;
-				#else
+#else
 				int this_x = event.mouse.x;
 				int this_y = event.mouse.y;
 				int touch_id = 1;
@@ -1150,7 +1147,7 @@ static void *thread_proc(void *arg)
 	
 	al_unregister_event_source(events, (ALLEGRO_EVENT_SOURCE *)draw_timer);
 	al_unregister_event_source(events, (ALLEGRO_EVENT_SOURCE *)logic_timer);
-#if defined A5_D3D || defined IPHONE
+#if defined A5_D3D || defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_unregister_event_source(events, (ALLEGRO_EVENT_SOURCE *)display);
 #endif
 	
@@ -1164,14 +1161,14 @@ static void *thread_proc(void *arg)
 	return NULL;
 }
 
-#ifdef IPHONE
+#if defined ALLEGOR_IPHONE || defined ALLEGRO_ANDROID
 static float backup_music_volume = 1.0f;
 static float backup_ambience_volume = 1.0f;
 #endif
 
 static void *thread_proc_minor(void *arg)
 {
-#if defined IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	POOL_BEGIN
 #endif
 
@@ -1188,14 +1185,14 @@ static void *thread_proc_minor(void *arg)
 
 	ALLEGRO_EVENT event;
 
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	double next_shake = al_current_time();
 #endif
 
 	al_register_event_source(events_minor, (ALLEGRO_EVENT_SOURCE *)display);
 
 	while  (exit_minor_event_thread != 1) {
-#if defined IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 		POOL_BEGIN
 #endif
 		if (al_wait_for_event_timed(events_minor, &event, 1.0f/LOGIC_RATE)) {
@@ -1209,23 +1206,25 @@ static void *thread_proc_minor(void *arg)
 #endif
 
 			if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 				if (!sound_was_playing_at_program_start)
 					iPodStop();
 #endif
 				close_pressed = true;
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 				break;
 #endif
 			}
 			if (event.type == ALLEGRO_EVENT_DISPLAY_HALT_DRAWING) {
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE
 				if (!isMultitaskingSupported()) {
 					if (!sound_was_playing_at_program_start)
 						iPodStop();
 					close_pressed = true;
 					break;
 				}
+#endif
 				do_pause_game = should_pause_game();
 				do_close(false);
 				switched_out = true;
@@ -1233,13 +1232,13 @@ static void *thread_proc_minor(void *arg)
 #endif
 			}
 			if (event.type == ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING) {
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 				switched_out = false;
 				close_pressed = false;
 				al_signal_cond(switch_cond);
 #endif
 			}
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT)
 			{
 				do_pause_game = should_pause_game();
@@ -1267,7 +1266,7 @@ static void *thread_proc_minor(void *arg)
 				reload_loaded_bitmaps = true;
 			}
 		}
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 		double shake = al_iphone_get_last_shake_time();
 		if (shake > allegro_iphone_shaken) {
 			allegro_iphone_shaken = shake;
@@ -1280,7 +1279,7 @@ static void *thread_proc_minor(void *arg)
 			}
 		}
 #endif
-#if defined IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 		POOL_END
 #endif
 	}
@@ -1291,7 +1290,7 @@ static void *thread_proc_minor(void *arg)
 	
 	exit_minor_event_thread = 2;
 
-#if defined IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	POOL_END
 #endif
 
@@ -1300,16 +1299,16 @@ static void *thread_proc_minor(void *arg)
 
 static void *loader_proc(void *arg)
 {
-#if defined IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	POOL_BEGIN
 #endif
 
 #ifdef A5_OGL
-	#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGBA_4444);
-	#else
+#else
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
-	#endif
+#endif
 #else
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 #endif
@@ -1379,11 +1378,11 @@ static void *loader_proc(void *arg)
 	}
 
 	// Set an icon
-	#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_MACOSX
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_MACOSX && !defined ALLEGRO_ANDROID
 	MBITMAP *tmp_bmp = m_load_alpha_bitmap(getResource("staff.png"));
 	al_set_display_icon(display, tmp_bmp->bitmap);
 	m_destroy_bitmap(tmp_bmp);
-	#endif
+#endif
 
 	show_progress(24);
 
@@ -1392,14 +1391,14 @@ static void *loader_proc(void *arg)
 
 	initSound();
 
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	if (iPodIsPlaying()) {
 		config.setMusicVolume(0);
 		setMusicVolume(1);
 	}
 #endif
 
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	sound_was_playing_at_program_start = iPodIsPlaying();
 #endif
 
@@ -1492,7 +1491,7 @@ static void *loader_proc(void *arg)
 		notify("Desired mode could not be", "set. Using default", "(safe) mode...");
 	}
 	
-#if defined IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	POOL_END
 #endif
 
@@ -1564,7 +1563,7 @@ void init_controller_shader(void)
 	"}\n";
 
 	static const char *main_pixel_source =
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	"precision mediump float;\n"
 #endif
 	"uniform bool use_tex;\n"
@@ -1617,7 +1616,7 @@ void destroy_controller_shader(void)
 #ifndef A5_D3D
 void init_shaders(void)
 {
-#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 #define LOWP ""
 #else
 #define LOWP "lowp"
@@ -1675,7 +1674,7 @@ void init_shaders(void)
 		"   gl_Position = projview_matrix * pos;\n"
 		"}\n";
 		
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 		static const char *scale2x_vertex_source =
 		"attribute vec4 pos;\n"
 		"attribute vec2 texcoord;\n"
@@ -1734,7 +1733,7 @@ void init_shaders(void)
 #endif
 		
 		static const char *main_pixel_source =
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		"precision mediump float;\n"
 #endif
 		"uniform bool use_tex;\n"
@@ -1760,7 +1759,7 @@ void init_shaders(void)
 		"}\n";
 		
 		static const char *cheap_pixel_source =
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		"precision mediump float;\n"
 #endif
 		"uniform sampler2D tex;\n"
@@ -1772,7 +1771,7 @@ void init_shaders(void)
 		"}\n";
 		
 		const char *tinter_pixel_source =
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		"precision mediump float;\n"
 #endif
 		"uniform bool use_tex;\n"
@@ -1803,31 +1802,8 @@ void init_shaders(void)
 		"   gl_FragColor = color;\n"
 		"}";
 		
-		// spiral transition
-#if 0
-		const char *warp_pixel_source =
-#ifdef IPHONE
-		"precision mediump float;\n"
-#endif
-		"uniform sampler2D tex;\n"
-		"varying vec2 varying_texcoord;\n"
-		"uniform vec3 params;\n"
-		"void main() {\n"
-		"   vec4 v;\n"
-		"   v.x = varying_texcoord.x - params.y;\n"
-		"   v.y = varying_texcoord.y - params.z;\n"
-		"   v.z = sqrt(v.x*v.x + v.y*v.y);\n"
-		"   v.w = atan(v.y, v.x);\n"
-		"   float wave = v.z/0.707*params.x*4.0;\n"
-		"   vec2 v2;\n"
-		"   v2.x = cos(v.w + wave) * v.z + params.y;\n"
-		"   v2.y = sin(v.w + (wave * wave)) * v.z + params.z;\n"
-		"   gl_FragColor = texture2D(tex, v2);\n"
-		"}\n";
-#endif
-		
 		const char *warp2_pixel_source =
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		"precision mediump float;\n"
 #endif
 		"uniform sampler2D tex;\n"
@@ -1848,7 +1824,7 @@ void init_shaders(void)
 		"}\n";
 		
 		const char *shadow_pixel_source =
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		"precision mediump float;\n"
 #endif
 		"varying vec4 varying_color;\n"
@@ -1874,7 +1850,7 @@ void init_shaders(void)
 		"}\n";
 		
 		const char *brighten_pixel_source =
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		"precision mediump float;\n"
 #endif
 		"uniform sampler2D tex;\n"
@@ -1908,11 +1884,9 @@ void init_shaders(void)
 		"   }\n"
 		"}";
 		
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 		const char *scale2x_pixel_source =
-#ifdef IPHONE
 		"precision mediump float;\n"
-#endif
 		"uniform sampler2D tex;\n"
 		"varying vec2 varying_texcoord;\n"
 		"uniform " LOWP " float offset_x;\n"
@@ -1965,9 +1939,7 @@ void init_shaders(void)
 		"}\n";
 		
 		const char *scale2x_flipped_pixel_source =
-#ifdef IPHONE
 		"precision mediump float;\n"
-#endif
 		"uniform sampler2D tex;\n"
 		"varying vec2 varying_texcoord;\n"
 		"uniform " LOWP " float offset_x;\n"
@@ -2004,9 +1976,7 @@ void init_shaders(void)
 		"}\n";
 		
 		const char *scale3x_pixel_source =
-#ifdef IPHONE
 		"precision mediump float;\n"
-#endif
 		"uniform sampler2D tex;\n"
 		"uniform float offset_x;\n"
 		"uniform float offset_y;\n"
@@ -2072,9 +2042,7 @@ void init_shaders(void)
 		"}\n";
 		
 		const char *scale3x_flipped_pixel_source =
-#ifdef IPHONE
 		"precision mediump float;\n"
-#endif
 		"uniform sampler2D tex;\n"
 		"uniform float offset_x;\n"
 		"uniform float offset_y;\n"
@@ -2140,9 +2108,7 @@ void init_shaders(void)
 		"}\n";
 		
 		const char *scale2x_linear_pixel_source =
-#ifdef IPHONE
 		"precision mediump float;\n"
-#endif
 		"uniform sampler2D tex;\n"
 		"varying vec2 varying_texcoord;\n"
 		"uniform float offset_x;\n"
@@ -2179,9 +2145,7 @@ void init_shaders(void)
 		"}\n";
 		
 		const char *scale2x_linear_flipped_pixel_source =
-#ifdef IPHONE
 		"precision mediump float;\n"
-#endif
 		"uniform sampler2D tex;\n"
 		"varying vec2 varying_texcoord;\n"
 		"uniform float offset_x;\n"
@@ -2218,9 +2182,7 @@ void init_shaders(void)
 		"}\n";
 		
 		const char *scale3x_linear_pixel_source =
-#ifdef IPHONE
 		"precision mediump float;\n"
-#endif
 		"uniform sampler2D tex;\n"
 		"uniform float offset_x;\n"
 		"uniform float offset_y;\n"
@@ -2286,9 +2248,7 @@ void init_shaders(void)
 		"}\n";
 		
 		const char *scale3x_linear_flipped_pixel_source =
-#ifdef IPHONE
 		"precision mediump float;\n"
-#endif
 		"uniform sampler2D tex;\n"
 		"uniform float offset_x;\n"
 		"uniform float offset_y;\n"
@@ -2618,7 +2578,7 @@ void init_shaders(void)
 		warp = al_create_shader(ALLEGRO_SHADER_GLSL);
 		shadow_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
 		brighten = al_create_shader(ALLEGRO_SHADER_GLSL);
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 		scale2x = al_create_shader(ALLEGRO_SHADER_GLSL);
 		scale2x_flipped = al_create_shader(ALLEGRO_SHADER_GLSL);
 		scale3x = al_create_shader(ALLEGRO_SHADER_GLSL);
@@ -2666,7 +2626,7 @@ void init_shaders(void)
 					default_vertex_source
 					);
 		
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 		al_attach_shader_source(
 					scale2x,
 					ALLEGRO_VERTEX_SHADER,
@@ -2752,7 +2712,7 @@ void init_shaders(void)
 					brighten_pixel_source
 					);
 		
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 		al_attach_shader_source(
 					scale2x,
 					ALLEGRO_PIXEL_SHADER,
@@ -2828,7 +2788,7 @@ void init_shaders(void)
 		if ((shader_log = al_get_shader_log(brighten))[0] != 0) {
 			printf("6. %s\n", shader_log);
 		}
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 		al_link_shader(scale2x);
 		if ((shader_log = al_get_shader_log(scale2x))[0] != 0) {
 			printf("7. %s\n", shader_log);
@@ -2871,7 +2831,7 @@ void init2_shaders(void)
 	if (use_programmable_pipeline) {
 		int buffer_true_w, buffer_true_h;
 		get_buffer_true_size(&buffer_true_w, &buffer_true_h);
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 		al_set_shader_float(scale2x, "hstep", 1.0/buffer_true_w);
 		al_set_shader_float(scale2x, "vstep", 1.0/buffer_true_h);
 		al_set_shader_float(scale2x, "offset_x", 1);
@@ -2904,10 +2864,12 @@ void init2_shaders(void)
 		al_set_shader_float(scale3x_linear_flipped, "vstep", 1.0/buffer_true_h);
 		al_set_shader_float(scale3x_linear_flipped, "offset_x", 0);
 		al_set_shader_float(scale3x_linear_flipped, "offset_y", 0);
-		al_set_shader_sampler(scale2x, "tex", scaleXX_buffer->bitmap, 0);
-		al_set_shader_sampler(scale2x_flipped, "tex", scaleXX_buffer->bitmap, 0);
-		al_set_shader_sampler(scale3x, "tex", scaleXX_buffer->bitmap, 0);
-		al_set_shader_sampler(scale3x_flipped, "tex", scaleXX_buffer->bitmap, 0);
+		if (scaleXX_buffer) {
+			al_set_shader_sampler(scale2x, "tex", scaleXX_buffer->bitmap, 0);
+			al_set_shader_sampler(scale2x_flipped, "tex", scaleXX_buffer->bitmap, 0);
+			al_set_shader_sampler(scale3x, "tex", scaleXX_buffer->bitmap, 0);
+			al_set_shader_sampler(scale3x_flipped, "tex", scaleXX_buffer->bitmap, 0);
+		}
 #endif
 		
 		
@@ -2931,7 +2893,7 @@ void destroy_shaders(void)
 		al_destroy_shader(brighten);
 		al_destroy_shader(warp);
 		al_destroy_shader(shadow_shader);
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 		al_destroy_shader(scale2x);
 		al_destroy_shader(scale2x_flipped);
 		al_destroy_shader(scale3x);
@@ -2978,14 +2940,14 @@ bool init(int *argc, char **argv[])
 
 	input_event_mutex = al_create_mutex();
 
-	#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE
 	al_set_org_name("Nooskewl");
-	#ifdef LITE
+#ifdef LITE
 	al_set_app_name("Monster RPG 2 Lite");
-	#else
+#else
 	al_set_app_name("Monster RPG 2");
-	#endif
-	#endif
+#endif
+#endif
 
 	try {
 		config.read();
@@ -2993,14 +2955,14 @@ bool init(int *argc, char **argv[])
 	catch (ReadError e) {
 	}
 
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	config.setAutoRotation(config.getAutoRotation());
 #endif
 
 	load_translation_tags();
 	load_translation(get_language_name(config.getLanguage()).c_str());
 	
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	dpad_type = config.getDpadType();
 	use_dpad = false;
 #else
@@ -3018,7 +2980,7 @@ bool init(int *argc, char **argv[])
 
 
 	al_install_mouse();
-#if !defined IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	al_install_keyboard();
 #else
 	al_install_touch_input();
@@ -3052,11 +3014,9 @@ bool init(int *argc, char **argv[])
 
 	al_set_new_display_flags(flags);
 
-#if !defined(IPHONE)
+#if !defined(IPHONE) && !defined(ALLEGRO_ANDROID)
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 16, ALLEGRO_REQUIRE);
-	//al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_REQUIRE);
-	//al_set_new_display_option(ALLEGRO_COLOR_SIZE, 32, ALLEGRO_SUGGEST);
 	al_set_new_display_adapter(config.getAdapter());
 	
 	// set screenScale *for loading screen only*
@@ -3089,7 +3049,7 @@ bool init(int *argc, char **argv[])
 		al_set_new_display_option(ALLEGRO_VSYNC, 1, ALLEGRO_SUGGEST);
 
 
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	initial_screen_scale = al_iphone_get_screen_scale();
 
 	if (initial_screen_scale == 2.0f) {
@@ -3176,21 +3136,9 @@ bool init(int *argc, char **argv[])
 		al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_USE_PROGRAMMABLE_PIPELINE);
 	}
 	
-#ifdef IPHONE
-	//al_set_new_display_option(ALLEGRO_AUTO_CONVERT_BITMAPS, 1, ALLEGRO_REQUIRE);
-#endif
-
-	#ifdef IPHONE
-	/*
-	if ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationLandscapeLeft)
-		al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_270_DEGREES, ALLEGRO_REQUIRE);
-	else
-		al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_90_DEGREES, ALLEGRO_REQUIRE);
-	*/
-	
+#if defined ALLEGRO_IPHONE
 	al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE, ALLEGRO_REQUIRE);
-	//al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_FULLSCREEN_WINDOW);
-	#endif	
+#endif	
 
 #ifdef EDITOR
 	display = al_create_display(800, 500);
@@ -3215,7 +3163,7 @@ bool init(int *argc, char **argv[])
 			return false;
 	}
 
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
    NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
 
    NSString *reqSysVer = @"3.2";
@@ -3231,26 +3179,14 @@ bool init(int *argc, char **argv[])
 
 	al_set_new_bitmap_flags(PRESERVE_TEXTURE);
 
-	/*
-	UIDeviceOrientation uido = [[UIDevice currentDevice] orientation];	
-	if (uido == UIDeviceOrientationLandscapeRight) {
-		printf("GOT HERE FUCK\n");
-		CGAffineTransform xform = CGAffineTransformMakeRotation(M_PI/4);
-		self.view.transform = xform;
-	}
-	*/
-
-	#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	init_joypad();
 #endif
 
-#if defined IPHONE && !defined LITE
+#if defined ALLEGRO_IPHONE && !defined LITE
 	authenticatePlayer();
-//	al_rest(10);
-//	resetAchievements();
 #endif
 
-//#if !defined(IPHONE) && defined(A5_OGL)
 #ifdef ALLEGRO_MACOSX
 	if (sd->fullscreen) {
 		sd->fullscreen = false; // hack
@@ -3321,39 +3257,37 @@ bool init(int *argc, char **argv[])
 
 
 
-#if !defined WIZ && !defined IPHONE
-	#ifdef A5_D3D
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#ifdef A5_D3D
 	d3d_resource_mutex = al_create_mutex();
 	init_big_depth_surface();
 	al_d3d_set_restore_callback(d3d_resource_restore);
 	al_d3d_set_release_callback(d3d_resource_release);
-	#endif
-
+#endif
 
 	m_clear(black);
 	m_flip_display();
 #endif
 	
-	#ifdef LITE
+#ifdef LITE
 	al_set_window_title(display, "Monster RPG 2 Lite");
-	#else
+#else
 	al_set_window_title(display, "Monster RPG 2");
-	#endif
+#endif
 
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
 #ifdef A5_OGL
-	#ifdef IPHONE
+#if defined ALLEGOR_IPHONE || defined ALLEGRO_ANDROID
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGBA_4444);
-	#else
+#else
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
-	#endif
+#endif
 #else
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 #endif
 
 	flags = al_get_new_bitmap_flags();
-	//al_set_new_bitmap_flags(ALLEGRO_NO_PRESERVE_TEXTURE|ALLEGRO_CONVERT_BITMAP);
 	buffer = m_create_bitmap(BW, BH); // check
 	overlay = m_create_bitmap(BW, BH); // check
 
@@ -3371,7 +3305,7 @@ bool init(int *argc, char **argv[])
 
 	al_set_new_bitmap_flags(flags);
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE
 	screen_offset_x = 0;
 	screen_offset_y = 0;
 	screen_ratio_x = 1.0;
@@ -3379,8 +3313,6 @@ bool init(int *argc, char **argv[])
 	if (is_ipad()) {
 		ALLEGRO_MONITOR_INFO mi;
 		al_get_monitor_info(0, &mi);
-		//int scr_w = mi.x2-mi.x1;
-		//int scr_h = mi.y2-mi.y1;
 		int scr_w = mi.y2-mi.y1;
 		int scr_h = mi.x2-mi.x1;
 		float mul;
@@ -3397,33 +3329,18 @@ bool init(int *argc, char **argv[])
 		else {
 			mul = 1;
 		}
-		/*
-		screen_offset_x = (scr_w - (BH*screenScale*mul)) / (2*mul);
-		screen_offset_y = (scr_h - (BW*screenScale*mul)) / (2*mul);
-		screen_ratio_x = (float)scr_w / (BH*screenScale*mul);
-		screen_ratio_y = (float)scr_h / (BW*screenScale*mul);
-		*/
 		screen_offset_x = (scr_w - (BW*screenScale*mul)) / (2*mul);
 		screen_offset_y = (scr_h - (BH*screenScale*mul)) / (2*mul);
 		screen_ratio_x = (float)scr_w / (BW*screenScale*mul);
 		screen_ratio_y = (float)scr_h / (BH*screenScale*mul);
-		/*
-		if (config.getFilterType() == FILTER_SCALE2X) {
-			screen_offset_x /= 2;
-			screen_offset_y /= 2;
-			screenScale /= 2;
-		}
-		*/
 	}
-#else
-	//set_screen_params();
 #endif
 
-	#ifndef A5_D3D
+#ifndef A5_D3D
 	init2_shaders();
-	#endif
+#endif
 
-#if defined IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGBA_4444);
 #elif defined A5_OGL
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
@@ -3469,12 +3386,9 @@ bool init(int *argc, char **argv[])
 	
 	tguiSetRotation(0);
 
-#if defined IPHONE
-	//if (is_ipad()) {
-		tguiSetScreenSize(BH*screenScale, BW*screenScale);
-		config.setMaintainAspectRatio(config.getMaintainAspectRatio());
-	//}
-	//config.setFlipScreen(config.getFlipScreen());
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+	tguiSetScreenSize(BH*screenScale, BW*screenScale);
+	config.setMaintainAspectRatio(config.getMaintainAspectRatio());
 #elif !defined EDITOR
 	tguiSetScreenSize(BW*screenScale, BH*screenScale);
 	config.setMaintainAspectRatio(config.getMaintainAspectRatio());
@@ -3518,7 +3432,7 @@ bool init(int *argc, char **argv[])
 			dot_loader->draw(118, 24, 0);
 			al_set_target_backbuffer(display);
 			m_clear(black);
-#ifndef IPHONE
+#if !defined IPHONE && !defined ALLEGRO_ANDROID
 			float scale = screenScale / 2.0f;
 			if (config.getMaintainAspectRatio()) {
 				m_draw_scaled_bitmap(tmp, 0, 0, BH, BW, screen_offset_x, screen_offset_y, BH*scale, BW*scale, 0);
@@ -3575,7 +3489,7 @@ bool init(int *argc, char **argv[])
 		ttf_flags = ALLEGRO_TTF_MONOCHROME;
 	}
 
-	al_set_new_bitmap_flags((bflags | ALLEGRO_PRESERVE_TEXTURE) & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+	al_set_new_bitmap_flags(bflags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 
 	game_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 9, ttf_flags);
 	if (!game_font) {
@@ -3595,19 +3509,14 @@ bool init(int *argc, char **argv[])
 			return false;
 	}
 
-	al_set_new_bitmap_flags(bflags);
-
 	/* RELOAD EVERYTHING AS DISPLAY BITMAPS */
 	guiAnims->displayConvert();
 
 	cursor = m_make_display_bitmap(cursor);
-
+	
 	m_push_target_bitmap();
 	m_save_blender();
-	int flgs = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags((flgs | ALLEGRO_PRESERVE_TEXTURE)&~ALLEGRO_NO_PRESERVE_TEXTURE);
 	orb_bmp = m_create_alpha_bitmap(80, 80);
-	al_set_new_bitmap_flags(flgs);
 	m_set_target_bitmap(orb_bmp);
 	m_set_blender(M_ONE, M_ZERO, white);
 	for (int yy = 0; yy < 80; yy++) {
@@ -3640,8 +3549,6 @@ bool init(int *argc, char **argv[])
 
 	ALLEGRO_BITMAP *__old_target__ = al_get_target_bitmap();
 	m_save_blender();
-	flgs = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags((flgs|ALLEGRO_PRESERVE_TEXTURE)&~ALLEGRO_NO_PRESERVE_TEXTURE);
 	shadow_sides[0] = m_create_alpha_bitmap(16, SHADOW_CORNER_SIZE); // check
 	shadow_sides[1] = m_create_alpha_bitmap(SHADOW_CORNER_SIZE, 16); // check
 	shadow_sides[2] = m_create_alpha_bitmap(16, SHADOW_CORNER_SIZE); // check
@@ -3653,7 +3560,6 @@ bool init(int *argc, char **argv[])
 		m_set_target_bitmap(shadow_sides[i]);
 		m_clear(m_map_rgba(0, 0, 0, 0));
 	}
-	al_set_new_bitmap_flags(flgs);
 	for (int yy = 0; yy < SHADOW_CORNER_SIZE; yy++) {
 		for (int xx = 0; xx < SHADOW_CORNER_SIZE; xx++) {
 			int dx = xx;
@@ -3710,6 +3616,8 @@ bool init(int *argc, char **argv[])
 	
 	mushroom = m_make_display_bitmap(mushroom);
 	webbed = m_make_display_bitmap(webbed);
+
+	al_set_new_display_flags(bflags);
 	
 	dpad_buttons = m_load_bitmap(getResource("media/buttons.png"));
 	batteryIcon = m_load_bitmap(getResource("media/battery_icon.png"));
@@ -3850,14 +3758,15 @@ void destroy(void)
 	debug_message("Destroy 19\n");
 
 	cleanup_astar();
-	#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_destroy_mutex(click_mutex);
 	al_destroy_mutex(input_mutex);
 	al_destroy_mutex(dpad_mutex);
 	al_destroy_mutex(touch_mutex);
-	//al_destroy_mutex(orient_mutex);
+#ifdef ALLEGRO_IPHONE
 	shutdownIpod();
-	#endif
+#endif
+#endif
 
 	al_destroy_mutex(input_event_mutex);
 
@@ -3876,13 +3785,13 @@ void destroy(void)
 	inited = false;
 }
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 static int dpad_count = 1;
 #endif
 
 void dpad_off(bool count)
 {
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (count)
 		dpad_count++;
 	if (dpad_count > 0 || !count) {
@@ -3918,7 +3827,7 @@ void dpad_off(bool count)
 
 void dpad_on(bool count)
 {
-#ifdef IPHONE
+#if defned ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (count)
 		dpad_count--;
 	if (dpad_count <= 0 || !count) {
@@ -3939,12 +3848,11 @@ void set_screen_params(void)
 {
 	ScreenDescriptor *sd = config.getWantedGraphicsMode();
 	if (sd->fullscreen) {
-		//#ifdef A5_D3D
-		#if !defined(IPHONE) && !defined(ALLEGRO_MACOSX)
+#if !defined(IPHONE) && !defined(ALLEGRO_MACOSX)
 		al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_FULLSCREEN_WINDOW);
-		#endif
+#endif
 		static ALLEGRO_MONITOR_INFO mi;
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		static bool gotten = false;
 		if (!gotten) {
 			al_get_monitor_info(config.getAdapter(), &mi);

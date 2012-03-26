@@ -96,41 +96,21 @@ public:
 	void setXbox360(bool x);
 	int getAdapter(void);
 	void setAdapter(int a);
-#ifdef WIZ
-	int getGFXDriver(void);
-	void setGFXDriver(int gd);
-#endif
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	int getDpadType(void) { return cfg_dpad_type; }
 	void setDpadType(int b) { cfg_dpad_type = b; }
 	bool getTellUserToUseDpad(void) { return cfg_tellusertousedpad; }
 	void setTellUserToUseDpad(bool b) { cfg_tellusertousedpad = b; }
+	bool getSwapButtons(void) { return cfg_swap_buttons; }
+	void setSwapButtons(bool b) { cfg_swap_buttons = b; }
 #endif
 	int getDifficulty(void) { return cfg_difficulty; }
 	void setDifficulty(int d) { cfg_difficulty = d; }
 	int getTuning(void) { return cfg_tuning; }
 	void setTuning(int t) { cfg_tuning = t; }
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	int getShakeAction(void) { return cfg_shake_action; }
 	void setShakeAction(int t) { cfg_shake_action = t; }
-	bool getSwapButtons(void) { return cfg_swap_buttons; }
-	void setSwapButtons(bool b) { cfg_swap_buttons = b; }
-	/*
-	bool getFlipScreen(void) { return cfg_flip_screen; }
-	void setFlipScreen(bool b) {
-		cfg_flip_screen = b;
-		if (b == true) {
-			al_iphone_set_statusbar_orientation(ALLEGRO_IPHONE_STATUSBAR_ORIENTATION_LANDSCAPE_RIGHT);
-			al_change_display_option(display, ALLEGRO_SUPPORTED_ORIENTATIONS, 
-		}
-		else {
-			al_iphone_set_statusbar_orientation(ALLEGRO_IPHONE_STATUSBAR_ORIENTATION_LANDSCAPE_LEFT);
-		}
-	}
-#else
-	bool getFlipScreen(void) { return false; }
-	void setFlipScreen(bool b) { (void)b; }
-	 */
 #endif
 	int getFilterType(void) {
 		return cfg_filter_type;
@@ -144,13 +124,12 @@ public:
 			set_linear_mag_filter(scaleXX_buffer, t == FILTER_SCALE2X_LINEAR || t == FILTER_SCALE3X_LINEAR);
 		}
 	}
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	int getAutoRotation(void) {
 		return cfg_auto_rotation;
 	}
 	void setAutoRotation(int auto_rot) {
 		cfg_auto_rotation = auto_rot;
-//		printf("config set to %d\n", cfg_auto_rotation);
 		if (display) {
 			if (auto_rot == 0)
 			{
@@ -160,12 +139,6 @@ public:
 			{
 				al_change_display_option(display, ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_90_DEGREES);
 			}
-			/*
-			if (auto_rot == 0 || auto_rot == 1)
-			{
-				al_change_display_option(display, ALLEGRO_SUPPORTED_ORIENTATIONS, 0);
-			}
-			*/
 			else
 			{
 				al_change_display_option(display, ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE);
@@ -193,8 +166,10 @@ public:
 	}
 	void setMaintainAspectRatio(bool m) {
 		cfg_maintain_aspect_ratio = m;
-#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		set_screen_params();
+#elif defined ALLEGRO_ANDROID
+		if (tguiIsInitialized()) {
 #else
 		if (tguiIsInitialized() && is_ipad()) {
 #endif
@@ -204,7 +179,7 @@ public:
 			else {
 				tguiSetScreenParameters(0, 0, screen_ratio_x, screen_ratio_y);
 			}
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		}
 #endif
 	}
@@ -239,29 +214,22 @@ private:
 	int adapter;
 	int axis;
 	bool xbox360;
-#ifdef WIZ
-	int gfxDriver;
-#endif
-#ifdef IPHONE
-	int cfg_dpad_type;
-	bool cfg_tellusertousedpad;
-#endif
 	int cfg_tuning;
-#ifdef IPHONE
-	int cfg_shake_action;
-	int cfg_swap_buttons;
-	//bool cfg_flip_screen;
-#endif
-#ifdef IPHONE
-	int cfg_auto_rotation;
-#endif
 	int cfg_difficulty;
 	int cfg_filter_type;
 	bool cfg_maintain_aspect_ratio;
 	int language;
 	bool fixed_language;
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+	int cfg_dpad_type;
+	bool cfg_tellusertousedpad;
+	int cfg_swap_buttons;
+#endif
+#ifdef ALLEGRO_IPHONE
+	int cfg_shake_action;
+	int cfg_auto_rotation;
+#endif
 };
-
 
 extern Configuration config;
 

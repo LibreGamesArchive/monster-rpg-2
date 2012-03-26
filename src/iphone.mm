@@ -406,11 +406,11 @@ void showIpod(void)
 		if (draw_counter > 0) {
 			draw_counter = 0;
 
-			al_set_target_bitmap(buffer);
+			m_set_target_bitmap(buffer);
 
 //			m_clear(m_map_rgb(0, 0, 0));
 			
-			al_draw_tinted_bitmap(bg, al_map_rgba(64, 64, 64, 255), 0, 0, 0);
+			al_draw_tinted_bitmap(bg->bitmap, al_map_rgba(64, 64, 64, 255), 0, 0, 0);
 
 			if (section >= 1) {
 				mTextout_simple(curr_artist.c_str(),

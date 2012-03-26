@@ -436,7 +436,7 @@ TripleInput::TripleInput() :
 	Input()
 {
 	playerControlled = true;
-#if (!defined WIZ && !defined IPHONE) || defined FAKEWIZ
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	kb = new KeyboardInput();
 	js = new GamepadInput();
 #else
@@ -449,7 +449,7 @@ void TripleInput::update()
 {
 	al_lock_mutex(mutex);
 	
-#if !defined IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	kb->update();
 	js->update();
 	

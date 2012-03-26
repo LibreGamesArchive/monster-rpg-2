@@ -22,12 +22,13 @@ enum BOOLEAN {
  * then a system-wide resource directory then the directory
  * "data" from the current directory.
  */
+#ifndef ALLEGRO_ANDROID
 #ifndef ALLEGRO_WINDOWS
 static char* resourcePath()
 {
 	static char path[MAX_PATH];
 
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	strcpy(path, "data/");
 	return path;
 #endif
@@ -41,9 +42,6 @@ static char* resourcePath()
 		}
 	}
 	else {
-#ifdef ALLEGRO4
-		replace_filename(path, myArgv[0], "/data/", MAX_PATH);
-#else
 		char tmp[1000];
 		strcpy(tmp, myArgv[0]);
 		int i = strlen(tmp)-1;
@@ -61,7 +59,6 @@ static char* resourcePath()
 		else {
 			strcpy(path, "data/");
 		}
-#endif
 	}
 
 	return path;
@@ -98,4 +95,31 @@ const char *getResource(const char *fmt, ...)
 	vsnprintf(name+strlen(name), (sizeof(name)/sizeof(*name))-1, fmt, ap);
 	return name;
 }
+#endif
+
+#ifdef ALLEGRO_ANDROID
+const char* getResource(const char* fmt, ...)
+{
+   va_list ap;
+   static char res[512];
+   static ALLEGRO_PATH *dir;
+   static ALLEGRO_PATH *path;
+
+   va_start(ap, fmt);
+   memset(res, 0, 512);
+   snprintf(res, 511, fmt, ap);
+
+   if (!dir) {
+      dir = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+      al_append_path_component(dir, "unpack");
+   }
+
+   if (path)
+      al_destroy_path(path);
+
+   path = al_create_path(res);
+   al_rebase_path(dir, path);
+   return al_path_cstr(path, '/');
+}
+#endif
 

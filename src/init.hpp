@@ -182,14 +182,16 @@ extern MBITMAP *achievement_bmp;
 void init_shaders(void);
 void destroy_shaders(void);
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 extern bool do_pause_game;
+void init_shaders();
+void destroy_shaders();
+#endif
+#ifdef ALLEGRO_IPHONE
 void check_orientation(void);
 extern bool create_airplay_mirror;
 extern bool delete_airplay_mirror;
 extern bool airplay_connected;
-void init_shaders();
-void destroy_shaders();
 #endif
 void init2_shaders();
 

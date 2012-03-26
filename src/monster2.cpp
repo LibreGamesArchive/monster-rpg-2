@@ -35,7 +35,7 @@ bool was_in_map = false;
 static bool fps_on = false;
 static int fps;
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 static int bright_dir = 1;
 #endif
 float bright_ticker = 0;
@@ -56,7 +56,7 @@ int old_control_mode = -1;
 
 void connect_airplay_controls(void)
 {
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	old_control_mode = config.getDpadType();
 	al_lock_mutex(dpad_mutex);
 	getInput()->reset();
@@ -74,7 +74,7 @@ void connect_airplay_controls(void)
 
 void disconnect_airplay_controls(void)
 {
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	al_lock_mutex(dpad_mutex);
 	getInput()->reset();
 	config.setDpadType(old_control_mode);
@@ -97,7 +97,7 @@ void disconnect_airplay_controls(void)
 
 void connect_second_display(void)
 {
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 		
 	int mvol = config.getMusicVolume();
 	int svol = config.getSFXVolume();
@@ -137,7 +137,7 @@ void connect_second_display(void)
 	black_button = m_load_bitmap(getResource("media/blackbutton.png"));
 	airplay_logo = m_load_bitmap(getResource("media/m2_controller_logo.png"));
 	
-	al_set_target_bitmap(buffer);
+	m_set_target_bitmap(buffer);
 
 	config.setMusicVolume(mvol);
 	config.setSFXVolume(svol);
@@ -168,7 +168,7 @@ bool is_close_pressed(void)
 		playPreloadedSample("blip.ogg");
 	}
 
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	if (create_airplay_mirror)
 	{
 		create_airplay_mirror = false;
@@ -206,7 +206,7 @@ bool is_close_pressed(void)
 			init_shaders();
 			init2_shaders();
 			
-			al_set_target_bitmap(buffer);
+			m_set_target_bitmap(buffer);
 			
 			config.setMusicVolume(mvol);
 			config.setSFXVolume(svol);
@@ -224,9 +224,8 @@ bool is_close_pressed(void)
 
 void do_close(bool quit)
 {
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (switched_out) {
-		//destroySound();
 		al_stop_timer(logic_timer);
 		al_stop_timer(draw_timer);
 		al_acknowledge_drawing_halt(display);
@@ -242,8 +241,6 @@ void do_close(bool quit)
 	else if (area && !shouldDoMap) {
 		area->auto_save_game(0, true);
 	}
-	//FIXME?
-	//save_memory(false);
 	save_memory(true);
 	config.write();
 	if (quit)
@@ -346,7 +343,7 @@ void run(void)
 				close_pressed = false;
 			}
 
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			if (do_pause_game)
 			{
 				do_pause_game = false;
@@ -744,7 +741,7 @@ void run(void)
       }
 #else
 
-#if (!defined WIZ && !defined IPHONE) || defined FAKEWIZ
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		ALLEGRO_KEYBOARD_STATE state;
 		al_get_keyboard_state(&state);
 		/*
@@ -964,10 +961,10 @@ int main(int argc, char *argv[])
 		drawBufferToScreen();
 		m_flip_display();
 		
-	#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			if (is_close_pressed())
 				throw QuitError();
-	#endif
+#endif
 			
 		//loadPlayDestroy("nooskewl.ogg");
 		m_rest(1.5);
@@ -1010,12 +1007,12 @@ int main(int argc, char *argv[])
 
 	
    
-	#ifdef IPHONE
+#if defined ALLEGRO_IPHONE
 	if (al_get_num_video_adapters() > 1) {
 		create_airplay_mirror = true;
 		is_close_pressed();
 	}
-	#endif
+#endif
 
 
 
@@ -1039,7 +1036,7 @@ int main(int argc, char *argv[])
 
 		int choice = 0;
 		
-#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		if (al_filename_exists(getUserResource("start_in_config"))) {
 			remove(getUserResource("start_in_config"));
 			bool result = config_menu(true);
@@ -1055,11 +1052,11 @@ int main(int argc, char *argv[])
 		m_clear(m_map_rgb(0, 0, 0));
 		m_pop_target_bitmap();
 
-		#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		int remap[4] = { 0, 1, 3, 4 };
-		#else
+#else
 		int remap[4] = { 1, 3, 5, 0 };
-		#endif
+#endif
 		if (choice != 0xDEAD && choice != 0xBEEF) {
 			choice = remap[choice];
 		}
@@ -1191,7 +1188,7 @@ int main(int argc, char *argv[])
 			tutorial_started = true;
 			startNewGame("tutorial");
 		}
-		#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		else if (choice == 4) {
 			save_memory();
 			config.write();
@@ -1207,7 +1204,7 @@ int main(int argc, char *argv[])
 			throw QuitError();
 		}
 		else if (choice == 0xDEAD) {
-#if defined IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			do_close(true);
 #elif defined ALLEGRO_MACOSX
 			destroy();
@@ -1287,7 +1284,7 @@ int main(int argc, char *argv[])
 		m_flip_display();
 	}
 
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 done:
 #endif
 
@@ -1295,9 +1292,9 @@ done:
 	al_unlock_mutex(wait_mutex);
 #endif
 
-	#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE
 	destroy();
-	#endif
+#endif
 
 #if defined ALLEGRO_WINDOWS && defined A5_OGL
 	for (int i = 0; i < argc; i++) {

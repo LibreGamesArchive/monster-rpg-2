@@ -1,5 +1,5 @@
 #include "monster2.hpp"
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 #import <Foundation/Foundation.h>
 #endif
 
@@ -22,7 +22,7 @@ bool dpad_panning = false;
 
 const float ORB_RADIUS = 40.0f;
 
-#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE
 const char *file_date(const char *filename)
 {
 	static char buf[1000];
@@ -42,7 +42,7 @@ const char *file_date(const char *filename)
 }
 #endif
 
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 const char *file_date(const char *filename)
 {
 	static char buf[1000];
@@ -116,7 +116,7 @@ static void shift_auto_saves()
 
 void save_memory(bool save_screenshot)
 {
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	bool all_dead = true;
 	for (int i = 0; i < MAX_PARTY; i++) {
 		if (party[i] &&
@@ -141,7 +141,7 @@ void save_memory(bool save_screenshot)
 		gzclose(f);
 	}
 	if (screenshot && save_screenshot) {
-		al_save_bitmap(getUserResource("auto0.bmp"), screenshot);
+		al_save_bitmap(getUserResource("auto0.bmp"), screenshot->bitmap);
 	}
 #endif
 }
@@ -1171,7 +1171,8 @@ void Area::drawLayer(int i, int bw, int bh)
 				int mapped = tileAnimationNums[n];
 #else
 			//if (n >= 0 && n < (int)tileAnimations.size() && mapping[tileAnimationNums[n]]) {
-			if (n >= 0 && n < (int)tileAnimations.size() && newmap[tileAnimationNums[n]]) {
+			//if (n >= 0 && n < (int)tileAnimationNums.size() && newmap[tileAnimationNums[n]]) {
+			if (n >= 0 && n < (int)tileAnimationNums.size()) {
 				//int mapped = mapping[tileAnimationNums[n]];
 				int mapped = newmap[tileAnimationNums[n]];
 #endif
@@ -1504,7 +1505,7 @@ void Area::copyTile(int x, int y, Tile *t)
 }
 
 static int ss_save_counter = 1000;
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 static int mem_save_counter = 1000;
 
 void real_auto_save_game(void)
@@ -1654,7 +1655,7 @@ void Area::update(int step)
 	}
 
 	if (this == area) {
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		auto_save_game(step);
 #endif
 		auto_save_screenshot(step);
@@ -2369,7 +2370,7 @@ void Area::load(std::string filename)
 	tm_h = len;
 
 	int flgs = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags((flgs|ALLEGRO_PRESERVE_TEXTURE)&~ALLEGRO_NO_PRESERVE_TEXTURE);
+	al_set_new_bitmap_flags(flgs & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 	partial_tm = m_create_alpha_bitmap(tm_w*TILE_SIZE, tm_h*TILE_SIZE); // check
 	al_set_new_bitmap_flags(flgs);
 	printf("partial flags=%d\n", al_get_bitmap_flags(partial_tm->bitmap));
@@ -2531,10 +2532,10 @@ Area::Area(void)
 	follow = true;
 	last_player_x = -1;
 	last_player_y = -1;
-	#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	mem_save_counter = 1000;
 	ss_save_counter = 1000;
-	#endif
+#endif
 	down = false;
 	//initial = false;
 	panned = false;

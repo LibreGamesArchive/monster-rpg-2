@@ -1,6 +1,6 @@
 #include "monster2.hpp"
 
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 #include "iphone.h"
 #endif
 
@@ -529,7 +529,7 @@ int CSetMilestone(lua_State *stack)
 	bool value = (bool)lua_toboolean(stack, 2);
 
 	if (num >= 0 && num < MAX_MILESTONES) {
-#if defined(IPHONE) && !defined(LITE)
+#if defined(ALLEGRO_IPHONE) && !defined(LITE)
 		if (value == true && gameInfo.milestones[num] == false)
 			do_milestone(num);
 #endif
@@ -851,7 +851,7 @@ bool anotherDoDialogue(const char *text, bool clearbuf, bool top)
 	doDialogue(textS, top, 4, 10, false);
 
 	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags((flags | ALLEGRO_PRESERVE_TEXTURE) & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 	MBITMAP *tmp = m_create_bitmap(BW, BH); // check
 	al_set_new_bitmap_flags(flags);
 	m_set_target_bitmap(tmp);
@@ -1222,30 +1222,11 @@ int CStartBattle(lua_State *stack)
 	
 	debug_message("can_run=%d must_win=%d\n", can_run, battle_must_win);
 
-#ifdef IPHONE
-	/*
-	Input *i = obj->getInput();
-	if (i) {
-		i->set(false, false, false, false, false, false);
-	}
-	 */
-#endif
-	
-	//astar_stop();
 	battle = new Battle(name, can_run);
 	debug_message("created battle object\n");
 	battle->start();
 	astar_stop();
 	
-	// FIXME: Why clearing it here!??!??!?!?!?! */
-	// Clear the buffer
-	/*
-	MBITMAP *old_target = m_get_target_bitmap();
-	m_set_target_bitmap(buffer);
-	m_clear(m_map_rgb(0, 0, 0));
-	m_set_target_bitmap(old_target);
-	*/
-
 	debug_message("battle->start called\n");
 
 	battleTransition();
@@ -2768,13 +2749,15 @@ int Ccredits(lua_State *stack)
 
 int CGetPlatform(lua_State *stack)
 {
-	#if defined IPHONE
+#if defined ALLEGRO_IPHONE
 	lua_pushstring(stack, "iphone");
-	#elif defined ALLEGRO_MACOSX
+#elif defined ALLEGRO_ANDROID
+	lua_pushstring(stack, "android");
+#elif defined ALLEGRO_MACOSX
 	lua_pushstring(stack, "mac");
-	#else
+#else
 	lua_pushstring(stack, "pc");
-	#endif
+#endif
 
 	return 1;
 }
@@ -2958,11 +2941,11 @@ int CDoItemTutorial(lua_State *stack)
 							player->getInfo().equipment.rhand = -1;
 							player->getInfo().equipment.rquantity = 0;
 							stage++;
-							#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 							if (DLG("Great!\nNow I will show you how to use some other basic items...\nYou use an item just like you use a weapon...\nDrag the Cure to your player at the top to use it.\nYou can also press and hold an item name to get a description.\n", false)) { if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }}
-							#else
+#else
 							if (DLG("Great!\nNow I will show you how to use some other basic items...\nYou use an item just like you use a weapon...\nDrag the Cure to your player at the top to use it.\nYou can also press button 3 (default \"V\") to get a description.\n", false)) { if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }}
-							#endif
+#endif
 													inventory[0].index = CURE_INDEX;
 							inventory[0].quantity = 1;
 						}
@@ -2977,11 +2960,11 @@ int CDoItemTutorial(lua_State *stack)
 								stage++;
 								player->getInfo().equipment.rhand = -1;
 								player->getInfo().equipment.rquantity = 0;
-								#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 								if (DLG("Great!\nNow I will show you how to use some other basic items...\nYou use an item just like you use a weapon...\nPress twice on the Cure to use it.\nYou can also press and hold an item name to get a description.\n", false)) { if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }}
-								#else
+#else
 								if (DLG("Great!\nNow I will show you how to use some other basic items...\nYou use an item just like you use a weapon...\nPress twice on the Cure to use it.\nYou can also press button 3 (default \"V\") to get a description.\n", false)) { if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }}
-								#endif
+#endif
 								inventory[0].index = CURE_INDEX;
 								inventory[0].quantity = 1;
 								tguiDeleteWidget(equipChooser);
@@ -3586,7 +3569,7 @@ int CSetRedOffPressOn(lua_State *stack)
 
 int CGetDpadType(lua_State *stack)
 {
-#ifdef IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	lua_pushnumber(stack, config.getDpadType());
 #else
 	lua_pushnumber(stack, DPAD_TOTAL_1);
