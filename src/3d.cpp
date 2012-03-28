@@ -516,7 +516,7 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 		catch (...) {
 		}
 
-#ifn !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		if (strstr(filename, "bow.raw")) {
 			qsort(&m->verts[0], vcount/3, sizeof(ALLEGRO_VERTEX)*3, vert_compare);
 		}

@@ -201,13 +201,16 @@ MBITMAP *m_create_alpha_bitmap(int w, int h, void (*func)(MBITMAP *bitmap, Recre
 	al_set_new_bitmap_format(ALPHA_FMT);
 	ALLEGRO_BITMAP *b;
 	int flags = al_get_new_bitmap_flags();
+
+	ALLEGRO_DEBUG("in m_create_alpha_bitmap flags=%d", flags);
 	
 	if (config.getUseOnlyMemoryBitmaps()) {
+		ALLEGRO_DEBUG("USE ONLY MEM BITMAPS");
 		al_set_new_bitmap_flags(flags|ALLEGRO_MEMORY_BITMAP);
 		b = al_create_bitmap(w, h);
 	}
 	else {
-		//al_set_new_bitmap_flags(flags);
+		ALLEGRO_DEBUG("NO don't use only mem bitmaps");
 		b = al_create_bitmap(w, h);
 	}
 	
@@ -287,7 +290,7 @@ static void destroy_string_bitmaps(uint64_t keep)
 
 void destroy_string_bitmaps(void)
 {
-	destroy_string_bitmaps((uint64_t)pow(2, 64));
+	destroy_string_bitmaps((uint64_t)powf(2, 64));
 }
 
 MBITMAP *get_string_bitmap(const MFONT *font, std::string s, ALLEGRO_COLOR c)
@@ -425,7 +428,6 @@ MBITMAP *new_mbitmap(ALLEGRO_BITMAP *bitmap)
 	return m;
 }
 
-
 // HERE FIXME
 MBITMAP *m_load_bitmap(const char *name, bool force_memory)
 {
@@ -433,18 +435,19 @@ MBITMAP *m_load_bitmap(const char *name, bool force_memory)
 	int flags = al_get_new_bitmap_flags();
 
 	if (!force_memory && !config.getUseOnlyMemoryBitmaps()) {
-		//al_set_new_bitmap_flags((flags & ~ALLEGRO_MEMORY_BITMAP) | ALLEGRO_CONVERT_BITMAP | PRESERVE_TEXTURE);
 		al_set_new_bitmap_flags((flags & ~ALLEGRO_MEMORY_BITMAP));
-		bitmap = al_load_bitmap(name);
+		bitmap = my_load_bitmap(name);
 	}
 
 	if (!bitmap) {
 		ALLEGRO_STATE s;
 		al_store_state(&s, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
 		al_set_new_bitmap_flags(flags|ALLEGRO_MEMORY_BITMAP);
-		bitmap = al_load_bitmap(name);
+		bitmap = my_load_bitmap(name);
 		al_restore_state(&s);
 	}
+
+	al_set_new_bitmap_flags(flags);
 
 	if (!bitmap) {
 		debug_message("Error loading bitmap %s\n", name);
@@ -473,13 +476,13 @@ MBITMAP *m_load_alpha_bitmap(const char *name, bool force_memory)
 	al_set_new_bitmap_format(ALPHA_FMT);
 
 	if (!force_memory)
-		bitmap = al_load_bitmap(name);
+		bitmap = my_load_bitmap(name);
 
 	if (!bitmap) {
 		ALLEGRO_STATE s;
 		al_store_state(&s, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
 		al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
-		bitmap = al_load_bitmap(name);
+		bitmap = my_load_bitmap(name);
 		al_restore_state(&s);
 	}
 
@@ -510,13 +513,13 @@ MFONT *m_load_font(const char *name)
 	int flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 
-#ifndef WIZ
 	f = al_load_font(name, 0, 0);
 	if (f) {
 		al_set_new_bitmap_flags(flags);
 		return f;
 	}
-#endif
+
+	ALLEGRO_DEBUG("couldn't load font: using mem bitmaps");
 
 	al_set_new_bitmap_flags(flags|ALLEGRO_MEMORY_BITMAP);
 	f = al_load_font(name, 0, 0);
@@ -538,22 +541,17 @@ MBITMAP *m_create_bitmap(int w, int h, void (*func)(MBITMAP *bitmap, RecreateDat
 {
 	ALLEGRO_BITMAP *bitmap = NULL;
 
-	int flags = al_get_new_bitmap_flags();
-
-	if (!config.getUseOnlyMemoryBitmaps() && !(flags & ALLEGRO_MEMORY_BITMAP)) {
+	if (!config.getUseOnlyMemoryBitmaps()) {
 		bitmap = al_create_bitmap(w, h);
 	}
 
 	if (!bitmap) {
-		ALLEGRO_STATE s;
-		al_store_state(&s, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
+		int flags = al_get_new_bitmap_flags();
 		al_set_new_bitmap_flags(flags|ALLEGRO_MEMORY_BITMAP);
 		bitmap = al_create_bitmap(w, h);
-		al_restore_state(&s);
+		al_set_new_bitmap_flags(flags);
 	}
 		
-	al_set_new_bitmap_flags(flags);
-
 	if (!bitmap) {
 		printf("error creating bitmap\n");
 		return NULL;
@@ -1011,6 +1009,12 @@ void m_unlock_bitmap(MBITMAP *b)
 
 void _destroy_loaded_bitmaps(void)
 {
+	if (cached_bitmap) {
+		al_destroy_bitmap(cached_bitmap);
+		cached_bitmap = NULL;
+		cached_bitmap_filename = "";
+	}
+
 	for (size_t i = 0; i < loaded_bitmaps.size(); i++) {
 		if (!(loaded_bitmaps[i].flags & ALLEGRO_NO_PRESERVE_TEXTURE)) {
 			continue;
@@ -1033,7 +1037,7 @@ void _reload_loaded_bitmaps(void)
 		al_set_new_bitmap_flags(loaded_bitmaps[i].flags);
 		al_set_new_bitmap_format(loaded_bitmaps[i].format);
 		if (loaded_bitmaps[i].load_type == LOAD_LOAD) {
-			m->bitmap = al_load_bitmap(loaded_bitmaps[i].load.filename.c_str());
+			m->bitmap = my_load_bitmap(loaded_bitmaps[i].load.filename.c_str());
 		}
 		else { // create
 			Recreate *d = &loaded_bitmaps[i].recreate;

@@ -152,6 +152,12 @@ bool is_close_pressed(void)
 {
 	// random tasks
 
+	if (do_acknowledge_resize) {
+		ALLEGRO_DEBUG("acknowledging resize");
+		al_acknowledge_resize(display);
+		do_acknowledge_resize = false;
+	}
+
 	if (destroy_loaded_bitmaps) {
 		_destroy_loaded_bitmaps();
 		destroy_loaded_bitmaps = false;
@@ -224,7 +230,7 @@ bool is_close_pressed(void)
 
 void do_close(bool quit)
 {
-#ifdef ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (switched_out) {
 		al_stop_timer(logic_timer);
 		al_stop_timer(draw_timer);
@@ -343,7 +349,7 @@ void run(void)
 				close_pressed = false;
 			}
 
-#ifdef ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			if (do_pause_game)
 			{
 				do_pause_game = false;
@@ -847,7 +853,11 @@ void run(void)
 
 
 #ifndef EDITOR
+#ifdef ALLEGRO_ANDROID
+int main(void)
+#else
 int main(int argc, char *argv[])
+#endif
 {
 
 #if defined ALLEGRO_WINDOWS && defined A5_OGL
@@ -881,17 +891,16 @@ int main(int argc, char *argv[])
 
 	try { // QuitError try
 
-	//if (check_arg(argc, argv, "-help") > 0 || check_arg(argc, argv, "-h") > 0 || check_arg(argc, argv, "--help") > 0 || check_arg(argc, argv, "/?") > 0) {
-	//	exit(0);
-	//}
-
 	int n;
-	//if ((n = check_arg(argc, argv, "-debug")) != -1) {
-	//	config.setShowDebugMessages(true);
-	//}
+
+#ifndef ALLEGRO_ANDROID
 	if ((n = check_arg(argc, argv, "-adapter")) != -1) {
 		config.setAdapter(atoi(argv[n+1]));
 	}
+#else
+	int argc = 0;
+	char **argv = NULL;
+#endif
 
 	if (!init(&argc, &argv)) {
 		printf("An error occurred during initialization.\n");
@@ -899,6 +908,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+#ifndef ALLEGRO_ANDROID
 	int c = argc;
 	char **p = argv;
 	while ((n = check_arg(c, p, "-ms")) != -1) {
@@ -912,10 +922,11 @@ int main(int argc, char *argv[])
 		p = &p[n+2];
 		printf("ms %d %d\n", num, value);
 	}
+#endif
 
 	// FIXME!
 	// Easiest way to restore a save state after deleting the app
-#ifdef DEBUG
+#ifdef DEBUG_XXX
 	#include "savestate.h"
 	//#ifdef OVERWRITE_SAVE
 	FILE *f = fopen(getUserResource("auto9.save"), "wb");
@@ -924,9 +935,11 @@ int main(int argc, char *argv[])
 	//#endif
 #endif
 
-	MBITMAP *nooskewl = m_load_bitmap(getResource("media/nooskewl.png"));
-	
+	ALLEGRO_DEBUG("trixie: %d", al_get_bitmap_flags(shadow_corners[0]->bitmap));
 
+	MBITMAP *nooskewl = m_load_bitmap(getResource("media/nooskewl.png"));
+
+#ifndef ALLEGRO_ANDROID
 	if ((n = check_arg(argc, argv, "-stick")) != -1) {
 		int stick = atoi(argv[n+1]);
 		config.setStick(stick);
@@ -938,6 +951,7 @@ int main(int argc, char *argv[])
 	if ((n = check_arg(argc, argv, "-360")) != -1) {
 		config.setXbox360(true);
 	}
+#endif
 	
 	al_set_target_backbuffer(display);
 	al_clear_to_color(al_map_rgb(0, 0, 0));
@@ -977,9 +991,7 @@ int main(int argc, char *argv[])
 
 	debug_message("After logo\n");
 
-
-
-	#ifdef DEBUG
+	#ifdef DEBUG_XXX
 	DEBUG_DATA d;
 	char *xS;
 	char *yS;
@@ -1195,7 +1207,11 @@ int main(int argc, char *argv[])
 #ifdef LITEXX
 			openFeedbackSite();
 #else
+#ifdef ALLEGRO_ANDROID
+			// FIXME
+#else
 			openRatingSite();
+#endif
 #endif
 		}
 		#endif

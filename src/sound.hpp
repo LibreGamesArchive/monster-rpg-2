@@ -15,7 +15,7 @@ extern bool sound_inited;
 
 void unmuteMusic(void);
 void unmuteAmbience(void);
-void playMusic(std::string name, bool setLoopStart = false, unsigned int loopStart = 0, bool force = false);
+void playMusic(std::string name, float vol = 1.0f, bool force = false);
 void setMusicVolume(float volume);
 void setAmbienceVolume(float volume);
 void playPreloadedSample(std::string name);

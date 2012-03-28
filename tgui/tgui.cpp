@@ -46,7 +46,7 @@ static float screen_ratio_y = 1.0;
 #if defined ALLEGRO4
 static int saved_mx, saved_my, saved_mb;
 #else
-#if !defined WIZ && !defined IPHONE
+#if !defined WIZ && !defined IPHONE && !defined ALLEGRO_ANDROID
 static ALLEGRO_EVENT_QUEUE *key_events;
 #endif
 #if !defined WIZ
@@ -84,6 +84,12 @@ static int mouse_downs = 0;
 static int rotation = 0;
 
 static std::vector<TGUIWidget *> disabledWidgets;
+
+#if defined ALLEGRO_ANDROID || defined ALLEGRO_IPHONE
+#define ALLEGRO_EVENT_MOUSE_BUTTON_DOWN ALLEGRO_EVENT_TOUCH_BEGIN
+#define ALLEGRO_EVENT_MOUSE_BUTTON_UP ALLEGRO_EVENT_TOUCH_END
+#define ALLEGRO_EVENT_MOUSE_AXES ALLEGRO_EVENT_TOUCH_MOVE
+#endif
 
 #ifdef ALLEGRO4
 /* FIXME: add mouse move events here! */
@@ -139,7 +145,7 @@ void *queue_emptier(void *crap)
 
 	while (event_queues_created) {
 		ALLEGRO_EVENT event;
-#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		if (al_peek_next_event(key_events, &event)) {
 			if (event.any.timestamp+KEEP_TIME < al_current_time()) {
 				al_drop_next_event(key_events);
@@ -192,7 +198,7 @@ static bool tguiShiftsPressed(int shifts)
  */
 static bool tguiShiftsPressed(ALLEGRO_KEYBOARD_STATE *kbdstate, int shifts)
 {
-#if !defined WIZ && !defined IPHONE
+#if !defined WIZ && !defined IPHONE && !defined ALLEGRO_ANDROID
 	if (shifts & TGUI_KEYFLAG_SHIFT) {
 		if (!al_key_down(kbdstate, ALLEGRO_KEY_LSHIFT) &&
 				!al_key_down(kbdstate, ALLEGRO_KEY_RSHIFT))
@@ -251,7 +257,7 @@ static bool tguiShiftsPressed(ALLEGRO_KEYBOARD_STATE *kbdstate, int shifts)
  */
 static bool tguiHotkeyPressed(int hotkey)
 {
-#if !defined WIZ && !defined IPHONE
+#if !defined WIZ && !defined IPHONE && !defined ALLEGRO_ANDROID
 	int shifts = tguiGetHotkeyFlags(hotkey);
 	int k = tguiGetHotkeyKey(hotkey);
 
@@ -345,11 +351,6 @@ void tguiInit(void)
 
 	tguiLastUpdate = tguiCurrentTimeMillis();
 
-#ifdef ALLEGRO4
-	tguiScreenWidth = SCREEN_W;
-	tguiScreenHeight = SCREEN_H;
-	mouse_callback = mouse_cb;
-#else
 	if (al_get_current_display()) {
 		ALLEGRO_BITMAP *bb = al_get_backbuffer(al_get_current_display());
 
@@ -357,33 +358,27 @@ void tguiInit(void)
 		tguiScreenHeight = al_get_bitmap_height(bb);
 	}
 	else {
-		#ifdef WIZ
-		tguiScreenWidth = 320;
-		tguiScreenHeight = 240;
-		#else
 		tguiScreenWidth = 480;
 		tguiScreenHeight = 320;
-		#endif
 	}
 
 	if (!event_queues_created) {
 
 		mouse_events = al_create_event_queue();
 		
-#if !defined IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		key_events = al_create_event_queue();
 		al_register_event_source(key_events, al_get_keyboard_event_source());
 		al_register_event_source(mouse_events, al_get_mouse_event_source());
 		//al_register_event_source(events, al_get_touch_input_mouse_emulation_event_source());
 #else
-		al_register_event_source(mouse_events, al_get_touch_input_mouse_emulation_event_source());
+		al_register_event_source(mouse_events, al_get_touch_input_event_source());
 #endif
 
 		event_queues_created = true;
 
 		al_run_detached_thread(queue_emptier, NULL);
 	}
-#endif
 }
 
 /*
@@ -396,7 +391,7 @@ void tguiShutdown()
 		delete activeGUI;
 	}
 	tguiStack.clear();
-#if !defined ALLEGRO4 && !defined WIZ && !defined IPHONE
+#if !defined ALLEGRO4 && !defined WIZ && !defined IPHONE && !defined ALLEGRO_ANDROID
 	al_unregister_event_source(key_events, al_get_keyboard_event_source());
 	al_destroy_event_queue(key_events);
 #endif
@@ -686,6 +681,14 @@ TGUIWidget* tguiUpdate()
 
 #else
 
+#if defined ALLEGRO_ANDROID || defined ALLEGRO_IPHONE
+#define EV event.touch
+#define BUTTON id
+#else
+#define EV event.mouse
+#define BUTTON button
+#endif
+
 #if !defined WIZ
 	while (!al_event_queue_is_empty(mouse_events)) {
 		ALLEGRO_EVENT event;
@@ -693,11 +696,11 @@ TGUIWidget* tguiUpdate()
 		if (!(ignore & TGUI_MOUSE)) {
 			if (mouse_downs > 0) {
 				if (event.type == ALLEGRO_EVENT_MOUSE_AXES) {
-					tguiMouseState.x = event.mouse.x;
-					tguiMouseState.y = event.mouse.y;
+					tguiMouseState.x = EV.x;
+					tguiMouseState.y = EV.y;
 					MouseEvent *e = new MouseEvent;
-					e->x = event.mouse.x;
-					e->y = event.mouse.y;
+					e->x = EV.x;
+					e->y = EV.y;
 					tguiConvertMousePosition(&e->x, &e->y, screen_offset_x, screen_offset_y, screen_ratio_x, screen_ratio_y);
 					e->b = 0;
 					mouseMoveEvents.push_back(e);
@@ -705,29 +708,33 @@ TGUIWidget* tguiUpdate()
 				else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
 					mouse_downs--;
 					MouseEvent *e = new MouseEvent;
-					e->x = event.mouse.x;
-					e->y = event.mouse.y;
+					e->x = EV.x;
+					e->y = EV.y;
 					tguiConvertMousePosition(&e->x, &e->y, screen_offset_x, screen_offset_y, screen_ratio_x, screen_ratio_y);
-					e->b = event.mouse.button;
+					e->b = EV.BUTTON;
 					mouseUpEvents.push_back(e);
-					tguiMouseState.buttons &= (~event.mouse.button);
+					tguiMouseState.buttons &= (~EV.BUTTON);
 				}
 			}
 			if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
 				mouse_downs++;
-				tguiConvertMousePosition(&event.mouse.x, &event.mouse.y, screen_offset_x, screen_offset_y, screen_ratio_x, screen_ratio_y);
+				int ex = EV.x;
+				int ey = EV.y;
+				tguiConvertMousePosition(&ex, &ey, screen_offset_x, screen_offset_y, screen_ratio_x, screen_ratio_y);
+				EV.x = ex;
+				EV.y = ey;
 				/* This check is Monster 2 specific! */
 				#ifdef MONSTER2
-				if (ignore_hot_zone || !(event.mouse.x < 16 && event.mouse.y < 16)) {
+				if (ignore_hot_zone || !(EV.x < 16 && EV.y < 16)) {
 				#endif
-						//&& event.mouse.y < (32-event.mouse.x)))
+						//&& EV.y < (32-EV.x)))
 				//{
 					MouseEvent *e = new MouseEvent;
-					e->x = event.mouse.x;
-					e->y = event.mouse.y;
-					e->b = event.mouse.button;
+					e->x = EV.x;
+					e->y = EV.y;
+					e->b = EV.BUTTON;
 					mouseDownEvents.push_back(e);
-					tguiMouseState.buttons |= event.mouse.button;
+					tguiMouseState.buttons |= EV.BUTTON;
 				#ifdef MONSTER2
 				}
 				#endif
@@ -735,7 +742,7 @@ TGUIWidget* tguiUpdate()
 		}
 	}
 
-#if !defined IPHONE
+#if !defined IPHONE && !defined ALLEGRO_ANDROID
 	if (tguiActiveWidget) {
 		ALLEGRO_EVENT event;
 		while (!al_event_queue_is_empty(key_events)) {

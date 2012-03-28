@@ -175,6 +175,7 @@ int atlas_finish(ATLAS *atlas)
 					rect->y+atlas->border,
 					0
 				);
+				printf("\t%d, %d, %d, %d,\n", rect->x+atlas->border, rect->y+atlas->border, bmp_w, bmp_h);
 				atlas_item->sub = al_create_sub_bitmap(
 					atlas->sheets[rect->sheet],
 					rect->x+atlas->border,

@@ -1,21 +1,17 @@
 #include "monster2.hpp"
 #include <allegro5/allegro_acodec.h>
 
-std::string shutdownMusicName = "";
-std::string shutdownAmbienceName = "";
+#include "java.h"
 
 bool sound_inited = false;
 
+std::string shutdownMusicName = "";
+std::string shutdownAmbienceName = "";
+static std::string sample_name = "";
+
 std::map<std::string, MSAMPLE> preloaded_samples;
 
-static std::string sample_name = "";
 static MSAMPLE sample;
-
-#ifdef ALLEGRO_IPHONE
-static HPLUGIN BASSFLACplugin;
-#else
-extern HPLUGIN BASSFLACplugin;
-#endif
 
 static DWORD music = 0;
 static DWORD ambience = 0;
@@ -25,7 +21,6 @@ static QWORD music_loop_start = 0;
 static QWORD ambience_loop_start = 0;
 static float musicVolume = 1.0f;
 static float ambienceVolume = 1.0f;
-
 
 static std::string preloaded_names[] =
 {
@@ -292,52 +287,23 @@ static std::string preloaded_names[] =
 static void destroyMusic(void)
 {
 	if (music) {
-		BASS_StreamFree(music);
+		bass_destroyMusic(music);
 		music = 0;
 	}
 	if (ambience) {
-		BASS_StreamFree(ambience);
+		bass_destroyMusic(ambience);
 		ambience = 0;
 	}
 	
 	musicName = "";
 	sample_name = "";
-	
-	BASS_PluginFree((HPLUGIN)BASSFLACplugin);
 }
 
 void initSound(void)
 {
 	sound_inited = true;
 
-#ifdef __linux__XXX
-	if (!BASS_Init(-1, 44100, BASS_DEVICE_DMIX, NULL, NULL)) {
-#else
-	if (!BASS_Init(-1, 44100, 0, NULL, NULL)) {
-#endif
-		sound_inited = false;
-		return;
-	}
-
-#if defined ALLEGRO_WINDOWS
-	BASSFLACplugin = BASS_PluginLoad("bassflac.dll", 0);
-#elif defined LINUX_GENERIC
-	char buf1[MAX_PATH];
-	char buf2[MAX_PATH];
-	getcwd(buf1, MAX_PATH);
-	sprintf(buf2, "%s/libbassflac.so", buf1);
-	BASSFLACplugin = BASS_PluginLoad(buf2, 0);
-#elif defined ALLEGRO_IPHONE
-	BASS_PluginLoad((const char *)&BASSFLACplugin, 0);
-#elif defined ALLEGRO_MACOSX
-	BASSFLACplugin = BASS_PluginLoad("libbassflac.dylib", 0);
-#else
-	BASSFLACplugin = BASS_PluginLoad("libbassflac.so", 0);
-#endif
-
-	if (!BASSFLACplugin) {
-		printf("Error loading FLAC plugin (%d)\n", BASS_ErrorGetCode());
-	}
+	bass_initSound();
 
 	for (int i = 0; preloaded_names[i] != ""; i++) {
 		preloaded_samples[preloaded_names[i]] =
@@ -354,21 +320,22 @@ void destroySound(void)
 
 	for (it = preloaded_samples.begin(); it != preloaded_samples.end(); it++) {
 		HSAMPLE s = (HSAMPLE)it->second;
-		BASS_SampleFree(s);
+		bass_destroySample(s);
 	}
 
 	preloaded_samples.clear();
 
-	if (sample)
-		BASS_SampleFree(sample);
+	if (sample) {
+		bass_destroySample(sample);
 		sample = 0;
+	}
 
 	destroyMusic();
 
 	shutdownMusicName = musicName;
 	shutdownAmbienceName = ambienceName;
-
-	BASS_Free();
+	
+	bass_shutdownBASS();
 }
 
 
@@ -394,10 +361,7 @@ MSAMPLE loadSample(std::string name)
 	name.replace(name.length()-3, 3, "wav");
 #endif
 
-	s = BASS_SampleLoad(false,
-		getResource("sfx/%s", name.c_str()),
-		0, 0, 8,
-		BASS_SAMPLE_OVER_POS);
+	s = bass_loadSample(getResource("sfx/%s", name.c_str()));
 
 	return s;
 }
@@ -407,7 +371,7 @@ void destroySample(MSAMPLE sample)
 {
 	if (!sound_inited) return;
 
-	BASS_SampleFree(sample);
+	bass_destroySample(sample);
 }
 
 
@@ -416,10 +380,7 @@ void playSample(MSAMPLE sample, MSAMPLE_ID *unused)
 	(void)unused;
 	if (!sound_inited) return;
 
-	HCHANNEL chan = BASS_SampleGetChannel(sample, false);
-	float vol = (float)config.getSFXVolume()/255.0;
-	BASS_ChannelSetAttribute(chan, BASS_ATTRIB_VOL, vol);
-	BASS_ChannelPlay(chan, false);
+	bass_playSample(sample);
 }
 
 
@@ -433,7 +394,7 @@ void loadPlayDestroy(std::string name)
 
 	if (sample != 0 && sample_name != name) {
 		sample_name = name;
-		BASS_SampleFree(sample);
+		bass_destroySample(sample);
 		sample = loadSample(name);
 	}
 	else if (sample == 0) {
@@ -448,13 +409,7 @@ void stopAllSamples(void)
 {
 }
 
-static void CALLBACK MusicSyncProc(HSYNC handle, DWORD channel, DWORD data, void *user)
-{
-	if (!BASS_ChannelSetPosition(channel, music_loop_start, BASS_POS_BYTE))
-		BASS_ChannelSetPosition(channel, 0, BASS_POS_BYTE);
-}
-
-void playMusic(std::string name, bool setLoopStart, unsigned int loopStart, bool force)
+void playMusic(std::string name, float volume, bool force)
 {
 	if (!sound_inited) return;
 
@@ -465,7 +420,7 @@ void playMusic(std::string name, bool setLoopStart, unsigned int loopStart, bool
 		musicName = name;
 
 	if (music) {
-		BASS_StreamFree(music);
+		bass_destroyMusic(music);
 	}
 
 	if (name == "" || config.getMusicVolume() == 0) {
@@ -481,63 +436,13 @@ void playMusic(std::string name, bool setLoopStart, unsigned int loopStart, bool
 	if (ext_pos != std::string::npos) {
 		name = name.substr(0, ext_pos) + ".flac";
 	}
-	music = BASS_StreamCreateFile(false,
-		getResource("music/%s", name.c_str()),
-		0, 0, 0);
+
+	music = bass_loadMusic(getResource("music/%s", name.c_str()));
 	
-	if (setLoopStart) {
-		music_loop_start = BASS_ChannelSeconds2Bytes(music, loopStart/1000.0);
-	}
-	else {
-		music_loop_start = 0;
-	}
+	setMusicVolume(volume);
 
-	BASS_ChannelSetSync(music, BASS_SYNC_END | BASS_SYNC_MIXTIME,
-		0, MusicSyncProc, 0);
-
-	setMusicVolume(1);
-	BASS_ChannelPlay(music, FALSE);
+	bass_playMusic(music);
 }
-
-
-void playMusicVolumeOff(std::string name)
-{
-	if (!sound_inited) return;
-
-	if (musicName == name)
-		return;
-
-	if (name != "")
-		musicName = name;
-
-	if (music) {
-		BASS_StreamFree(music);
-	}
-
-	if (name == "" || config.getMusicVolume() == 0) {
-		music = 0;
-		return;
-	}
-
-	size_t ext_pos = name.find(".caf", 0);
-	if (ext_pos != std::string::npos) {
-		name = name.substr(0, ext_pos) + ".flac";
-	}
-	ext_pos = name.find(".ogg", 0);
-	if (ext_pos != std::string::npos) {
-		name = name.substr(0, ext_pos) + ".flac";
-	}
-	music = BASS_StreamCreateFile(false,
-		getResource("music/%s", name.c_str()),
-		0, 0, 0);
-	
-	BASS_ChannelSetSync(music, BASS_SYNC_END | BASS_SYNC_MIXTIME,
-		0, MusicSyncProc, 0);
-
-	setMusicVolume(0);
-	BASS_ChannelPlay(music, FALSE);
-}
-
 
 void setMusicVolume(float volume)
 {
@@ -547,16 +452,11 @@ void setMusicVolume(float volume)
 
 	volume *= config.getMusicVolume()/255.0f;
 
-	if (music)
-		BASS_ChannelSetAttribute(music, BASS_ATTRIB_VOL, volume);
+	if (music) {
+		// FIXME!
+		//BASS_ChannelSetAttribute(music, BASS_ATTRIB_VOL, volume);
+	}
 }
-
-static void CALLBACK AmbienceSyncProc(HSYNC handle, DWORD channel, DWORD data, void *user)
-{
-	if (!BASS_ChannelSetPosition(channel, ambience_loop_start, BASS_POS_BYTE))
-		BASS_ChannelSetPosition(channel, 0, BASS_POS_BYTE);
-}
-
 
 void playAmbience(std::string name)
 {
@@ -565,7 +465,7 @@ void playAmbience(std::string name)
 	ambienceName = name;
 
 	if (ambience) {
-		BASS_StreamFree(ambience);
+		bass_destroyMusic(ambience);
 	}
 
 	if (name == "" || config.getMusicVolume() == 0) {
@@ -581,27 +481,23 @@ void playAmbience(std::string name)
 	if (ext_pos != std::string::npos) {
 		name = name.substr(0, ext_pos) + ".flac";
 	}
-	ambience = BASS_StreamCreateFile(false,
-		getResource("music/%s", name.c_str()),
-		0, 0, 0);
-	
-	ambience_loop_start = 0;
-	BASS_ChannelSetSync(ambience, BASS_SYNC_END | BASS_SYNC_MIXTIME,
-		0, AmbienceSyncProc, 0);
 
+	ambience = bass_loadMusic(getResource("music/%s", name.c_str()));
+	
 	setMusicVolume(1);
-	BASS_ChannelPlay(ambience, FALSE);
+	bass_playMusic(ambience);
 }
 
 void setAmbienceVolume(float volume)
 {
 	if (!sound_inited) return;
 
-   ambienceVolume = volume;
+	ambienceVolume = volume;
 
-   volume *= config.getMusicVolume()/255.0f;
+	volume *= config.getMusicVolume()/255.0f;
 
-	BASS_ChannelSetAttribute(ambience, BASS_ATTRIB_VOL, volume);
+	// FIXME!
+	//BASS_ChannelSetAttribute(ambience, BASS_ATTRIB_VOL, volume);
 }
 
 
@@ -617,7 +513,7 @@ float getAmbienceVolume(void)
 
 void unmuteMusic(void)
 {
-    playMusic(musicName, false, 0, true);
+    playMusic(musicName, 1.0f, true);
 }
 
 void unmuteAmbience(void)
@@ -627,7 +523,7 @@ void unmuteAmbience(void)
 
 void restartMusic(void)
 {
-	playMusic(shutdownMusicName, false, 0, true);
+	playMusic(shutdownMusicName, 1.0f, true);
 }
 
 

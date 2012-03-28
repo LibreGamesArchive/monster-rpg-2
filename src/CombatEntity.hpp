@@ -401,7 +401,7 @@ protected:
 	int maxDepth;
 	AnimationSet *animSet;
 	Combatant *target;
-#ifdef ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	ALLEGRO_VERTEX *verts;
 #endif
 };

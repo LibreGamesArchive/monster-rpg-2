@@ -71,7 +71,11 @@ void draw_the_controls(bool draw_controls)
 			if (joypad_connected()) {
 				mTextout(game_font_second_display, "Joypad connected...", 2, 2, white, black, WGT_TEXT_NORMAL, false);
 			}
-			else {
+#else
+	if (((config.getDpadType() == DPAD_TOTAL_1 || config.getDpadType() == DPAD_TOTAL_2)) || (use_dpad && dpad_buttons && draw_controls && global_draw_controls)) {
+		if (false) {
+			if (false) {
+#endif
 				ALLEGRO_STATE state;
 				al_store_state(&state, ALLEGRO_STATE_BLENDER);
 				al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ONE);
@@ -153,10 +157,11 @@ void draw_the_controls(bool draw_controls)
 			}
 		}
 		else
-#else
-		bool joypad_connected = false;
-#endif
+#ifdef ALLEGRO_IPHONE
 		if (!joypad_connected() && (dpad_type == DPAD_TOTAL_2 || dpad_type == DPAD_HYBRID_2)) {
+#else
+		if ((dpad_type == DPAD_TOTAL_2 || dpad_type == DPAD_HYBRID_2)) {
+#endif
 			ALLEGRO_COLOR light = al_map_rgb(100, 200, 100);
 			ALLEGRO_COLOR dark = al_map_rgb(150, 250, 150);
 			int x = BUTTON_SIZE+10;
@@ -216,7 +221,11 @@ void draw_the_controls(bool draw_controls)
 				x+BUTTON_SIZE/2, y+BUTTON_SIZE-4,
 				x+BUTTON_SIZE-4, y+4, dark, 1);
 		}
+#ifdef ALLEGRO_IPHONE
 		else if (!joypad_connected()) {
+#else
+		else if (true) {
+#endif
 			ALLEGRO_VERTEX verts[36];
 
 			InputDescriptor ie = getInput()->getDescriptor();
@@ -459,7 +468,7 @@ void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 
 	draw_the_controls(draw_controls);
 
-	m_set_target_bitmap(buf);
+	m_set_target_bitmap(buffer);
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	bool on = ((unsigned)tguiCurrentTimeMillis() % 1000) < 500;
@@ -579,7 +588,7 @@ void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 		}
 	}
 
-	float bufscale;
+	float bufscaleX, bufscaleY;
 	MBITMAP *buf_save = buf;
 
 	if (scaleXX_buffer) {
@@ -596,10 +605,10 @@ void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 		);
 		al_restore_state(&s);
 		if (config.getFilterType() == FILTER_SCALE2X_LINEAR) {
-			bufscale = 2;
+			bufscaleX = bufscaleY = 2;
 		}
 		else { // scale3x
-			bufscale = 1.0/0.75;
+			bufscaleX = bufscaleY = 1.0/0.75;
 		}
 		buf = scaleXX_buffer;
 		al_use_shader(scale2x_shader, false);
@@ -608,7 +617,8 @@ void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 		al_use_shader(cheap_shader, true);
 	}
 	else {
-		bufscale = screenScale;
+		bufscaleX = screenScaleX;
+		bufscaleY = screenScaleY;
 	}
 	
 #if defined ALLEGRO_IPHONE
@@ -625,8 +635,8 @@ void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 			dh = al_get_display_height(display);
 		}
 		else {
-			dw = screenScale*BW;
-			dh = screenScale*BH;
+			dw = screenScaleX*BW;
+			dh = screenScaleY*BH;
 			dx = screen_offset_x;
 			dy = screen_offset_y;
 		}
@@ -651,18 +661,23 @@ void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 	}
 #else
 	ScreenDescriptor *sd = config.getWantedGraphicsMode();
-
 	if (config.getMaintainAspectRatio()) {
 		m_draw_scaled_bitmap(buf, 0, 0, BW, BH, screen_offset_x, screen_offset_y,
-			screenScale*BW, screenScale*BH,
+			screenScaleX*BW, screenScaleY*BH,
 			0
 		);
 	}
 	else {
+#ifdef ALLEGRO_ANDROID
+		m_draw_scaled_bitmap(
+			buf, 0, 0, BW, BH, 0, 0, sd->width, sd->height, 0);
+#else
+
 		m_draw_scaled_bitmap(buf, 0, 0, BW, BH, 0, 0,
 			sd->real_width, sd->real_height,
 			0
 		);
+#endif
 	}
 #endif
 
@@ -687,8 +702,8 @@ void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 			dh = al_get_display_height(display);
 		}
 		else {
-			dw = screenScale*BW;
-			dh = screenScale*BH;
+			dw = screenScaleX*BW;
+			dh = screenScaleY*BH;
 			dx = screen_offset_x;
 			dy = screen_offset_y;
 		}
@@ -713,15 +728,21 @@ void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 #else
 	if (config.getMaintainAspectRatio()) {
 		m_draw_tinted_scaled_bitmap(overlay, al_map_rgba_f(0.4, 0.4, 0.4, 0.4), 0, 0, BW, BH, screen_offset_x, screen_offset_y,
-			screenScale*BW, screenScale*BH,
+			screenScaleX*BW, screenScaleY*BH,
 			0
 		);
 	}
 	else {
+#ifdef ALLEGRO_ANDROID
+		m_draw_tinted_scaled_bitmap(
+			overlay, al_map_rgba_f(0.4, 0.4, 0.4, 0.4),
+			0, 0, BW, BH, 0, 0, sd->width, sd->height, 0);
+#else
 		m_draw_tinted_scaled_bitmap(overlay, al_map_rgba_f(0.4, 0.4, 0.4, 0.4), 0, 0, BW, BH, 0, 0,
 			sd->real_width, sd->real_height,
 			0
 		);
+#endif
 	}
 #endif
 
@@ -906,7 +927,7 @@ static void fade(int startAlpha, int endAlpha, int length, MCOLOR color)
 	long total = 0;
 
 	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
+	al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
 	MBITMAP *tmpbuf = m_create_bitmap(BW, BH); // check
 	al_set_new_bitmap_flags(flags);
 

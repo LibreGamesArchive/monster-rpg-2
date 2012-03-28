@@ -47,5 +47,8 @@ protected:
 	bool alpha;
 };
 
+extern ALLEGRO_BITMAP *cached_bitmap;
+extern std::string cached_bitmap_filename;
+
 #endif
 

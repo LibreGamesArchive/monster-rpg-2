@@ -34,13 +34,8 @@ int Animation::getLength(void)
  */
 bool Animation::addFrame(Frame *frame)
 {
-	try {
-		frames.push_back(frame);
-		nFrames++;
-	}
-	catch (std::bad_alloc a) {
-		return false;
-	}
+	frames.push_back(frame);
+	nFrames++;
 	return true;
 }
 

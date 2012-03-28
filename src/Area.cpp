@@ -114,6 +114,30 @@ static void shift_auto_saves()
 }
 #endif
 
+#ifdef ALLEGRO_ANDROID
+static void shift_auto_saves()
+{
+	char src_c[1000];
+	char dst_c[1000];
+	for (int i = 8; i >= 0; i--) {
+		strcpy(src_c, getUserResource("auto%d.save", i));
+		strcpy(dst_c, getUserResource("auto%d.save", i+1));
+		remove(dst_c);
+		rename(src_c, dst_c);
+
+		strcpy(src_c, getUserResource("auto%d.png", i));
+		strcpy(dst_c, getUserResource("auto%d.png", i+1));
+		remove(dst_c);
+		rename(src_c, dst_c);
+
+		strcpy(src_c, getUserResource("auto%d.bmp", i));
+		strcpy(dst_c, getUserResource("auto%d.bmp", i+1));
+		remove(dst_c);
+		rename(src_c, dst_c);
+	}
+}
+#endif
+
 void save_memory(bool save_screenshot)
 {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -1622,7 +1646,7 @@ void Area::update(int step)
 
 	oldArea = area;
 	callLua(luaState, "update", "i>", step);
-	
+
 	for (unsigned int i = 0; i < objects.size(); i++) {
 		if (!objects[i]->update(this, step)) {
 			toDelete.push_back(i);
@@ -2363,7 +2387,7 @@ void Area::load(std::string filename)
 		}
 	}
 
-	int len = sqrt(ntiles);
+	int len = sqrtf(ntiles);
 	len++;
 
 	tm_w = len;

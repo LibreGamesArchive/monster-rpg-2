@@ -483,7 +483,7 @@ void TripleInput::update()
 		sets.button3 || id1.button3 || id2.button3 || id3.button3,
 		false
 	);
-#else
+#elif defined ALLEGRO_IPHONE
 	if (joypad_connected()) {
 		lock_joypad_mutex();
 

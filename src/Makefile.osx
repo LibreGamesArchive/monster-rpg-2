@@ -47,8 +47,6 @@ CXX_SRCS=\
      xml.cpp
 
 
-C_SRCS=atlas.c atlas_accessor.c
-
 OBJCXX_SRCS=\
      init.mm\
      joypad.mm\
@@ -58,7 +56,6 @@ OBJC_SRCS=\
 
 
 CXX_LIBOBJS=$(CXX_SRCS:.cpp=.o)
-C_LIBOBJS=$(C_SRCS:.c=.o)
 OBJCXX_LIBOBJS=$(OBJCXX_SRCS:.mm=.o)
 OBJC_LIBOBJS=$(OBJC_SRCS:.m=.o)
 
@@ -70,8 +67,8 @@ LIBS=-llua-fixed -ltgui $(ALLEGROLIBS) -lz -framework OpenGL -framework Foundati
 default: monster2
 
 
-monster2: $(C_LIBOBJS) $(CXX_LIBOBJS) $(OBJCXX_LIBOBJS) $(OBJC_LIBOBJS)
-	g++ $(LINKFLAGS) -o monster2 $(C_LIBOBJS) $(CXX_LIBOBJS) $(OBJCXX_LIBOBJS) $(OBJC_LIBOBJS) $(LIBS)
+monster2: $(CXX_LIBOBJS) $(OBJCXX_LIBOBJS) $(OBJC_LIBOBJS)
+	g++ $(LINKFLAGS) -o monster2 $(CXX_LIBOBJS) $(OBJCXX_LIBOBJS) $(OBJC_LIBOBJS) $(LIBS)
 
 
 .cpp.o:

@@ -1,5 +1,7 @@
 #include "monster2.hpp"
 
+ALLEGRO_BITMAP *cached_bitmap = NULL;
+std::string cached_bitmap_filename = "";
 
 int Image::getWidth(void)
 {
@@ -60,7 +62,21 @@ void load_image_callback(MBITMAP *bitmap, RecreateData *data)
 	al_set_new_bitmap_flags(al_get_bitmap_flags(bitmap->bitmap));
 	al_set_new_bitmap_format(al_get_bitmap_format(bitmap->bitmap));
 
-	ALLEGRO_BITMAP *b = al_load_bitmap(d->filename.c_str());
+	ALLEGRO_BITMAP *b;
+
+	if (cached_bitmap && d->filename == cached_bitmap_filename) {
+		ALLEGRO_DEBUG("A CHOSEN");
+		b = cached_bitmap;
+	}
+	else {
+		ALLEGRO_DEBUG("BBB CHOSEN");
+		if (cached_bitmap) {
+			al_destroy_bitmap(cached_bitmap);
+		}
+		cached_bitmap = my_load_bitmap(d->filename.c_str());
+		cached_bitmap_filename = d->filename;
+		b = cached_bitmap;
+	}
 
 	ALLEGRO_BITMAP *tmp = al_get_target_bitmap();
 	m_save_blender();
@@ -73,8 +89,6 @@ void load_image_callback(MBITMAP *bitmap, RecreateData *data)
 
 	al_set_target_bitmap(tmp);
 	m_restore_blender();
-	
-	al_destroy_bitmap(b);
 
 	al_set_new_bitmap_flags(flags);
 	al_set_new_bitmap_format(format);
@@ -93,7 +107,7 @@ bool Image::load(std::string copy_from, int x1, int y1, int x2, int y2)
 	d->y1 = y1;
 	d->w = w;
 	d->h = h;
-
+	
 	if (alpha)
 		bitmap = m_create_alpha_bitmap(w, h, load_image_callback, d); // check
 	else

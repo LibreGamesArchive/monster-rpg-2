@@ -652,13 +652,12 @@ Configuration::Configuration() :
 	adapter(0),
 	axis(0),
 	xbox360(false)
-	,cfg_tuning(CFG_TUNING_PERFORMANCE)
+	,cfg_tuning(CFG_TUNING_BALANCED)
 	,cfg_difficulty(CFG_DIFFICULTY_NORMAL)
 	,cfg_filter_type(FILTER_NONE)
 	,cfg_maintain_aspect_ratio(false)
 	,language(0)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	,cfg_tuning(CFG_TUNING_BALANCED)
 	,cfg_dpad_type(0)
 	,cfg_tellusertousedpad(true)
 	,cfg_swap_buttons(false)

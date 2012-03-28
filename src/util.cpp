@@ -120,7 +120,11 @@ const char *getResource(const char *fmt, ...)
 	va_list ap;
 	static char name[MAX_PATH];
 
+#ifndef ALLEGRO_ANDROID // FIXME
 	strcpy(name, resourcePath());
+#else
+	strcpy(name, "/sdcard/sd/stuff/data/");
+#endif
 	va_start(ap, fmt);
 	vsnprintf(name+strlen(name), (sizeof(name)/sizeof(*name))-1, fmt, ap);
 	va_end(ap);
@@ -245,7 +249,7 @@ bool iphone_shaken(double since)
 #endif
 
 	last_shake_check = tguiCurrentTimeMillis();
-	
+
 	if (al_current_time()-iphone_shake_time < since) {
 		return true;
 	}

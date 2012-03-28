@@ -323,9 +323,18 @@ void showSaveStateInfo(const char *basename)
 	int x = (BW-w)/2;
 	int y = (BH-h)/2;
 
+	ALLEGRO_DEBUG("loading screenshot");
+#ifdef ALLEGRO_ANDROID_XXX
+	MBITMAP *ss = m_load_bitmap(getUserResource("%s.png", basename));
+#else
 	MBITMAP *ss = m_load_bitmap(getUserResource("%s.bmp", basename));
+#endif
+	ALLEGRO_DEBUG("ss=%p\n", ss);
+
+	ALLEGRO_DEBUG("getting file date");
 	char d[100];
 	strcpy(d, file_date(getUserResource("%s.save", basename)));
+	ALLEGRO_DEBUG("got file date");
 
 	tguiPush();
 
@@ -680,7 +689,11 @@ static bool choose_save_slot(int num, bool exists, void *data)
 			if (prompt("Overwrite?", "", 0, 0)) {
 				saveGame(getUserResource("%d.save", num), map_name);
 				if (screenshot) {
+#ifdef ALLEGRO_ANDROID_XXX
+					al_save_bitmap(getUserResource("%d.png", num), screenshot->bitmap);
+#else
 					al_save_bitmap(getUserResource("%d.bmp", num), screenshot->bitmap);
+#endif
 				}
 				else {
 					delete_file(getUserResource("%d.bmp", num));
@@ -693,7 +706,11 @@ static bool choose_save_slot(int num, bool exists, void *data)
 		else {
 			saveGame(getUserResource("%d.save", num), map_name);
 			if (screenshot) {
+#ifdef ALLEGRO_ANDROID_XXX
+				al_save_bitmap(getUserResource("%d.png", num), screenshot->bitmap);
+#else
 				al_save_bitmap(getUserResource("%d.bmp", num), screenshot->bitmap);
+#endif
 			}
 			else {
 				delete_file(getUserResource("%d.png", num));
@@ -843,7 +860,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 
 	int yyy = 6;
 
-#if (defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID) && !defined LITE
+#if defined ALLEGRO_IPHONE && !defined LITE
 	MIcon *game_center = NULL;
 	if (isGameCenterAPIAvailable()) {
 		game_center = new MIcon(128, yyy, getResource("game_center.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
@@ -2805,7 +2822,7 @@ struct CHOOSE_SAVESTATE_INFO {
 	bool isAuto;
 };
 
-#if defined ALLEGRO_IPHONE || defined ALLEGR_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 static bool choose_copy_state(int n, bool exists, void *data)
 {
 	(void)data;
@@ -2824,7 +2841,11 @@ static bool choose_copy_state(int n, bool exists, void *data)
 			fclose(f);
 
 			char *encoded = create_url(buf, bytes);
+#ifdef ALLEGRO_ANDROID
+			// FIXME!
+#else
 			set_clipboard(encoded);
+#endif
 			notify("", "Save state copied.", "");
 		}
 		else {
@@ -2850,7 +2871,12 @@ static bool choose_paste_state(int n, bool exists, void *data)
 		}
 		if (saveit) {
 			char buf[5000*3];
+#ifdef ALLEGRO_ANDROID
+			// FIXME
+			if (false) {
+#else
 			if (get_clipboard(buf, 5000*3)) {
+#endif
 				save_url(getUserResource("%d.save", n), buf);
 				if (prompt("Run this game now?", "", 0, 1)) {
 					i->num = n;
@@ -3184,7 +3210,7 @@ bool config_menu(bool start_on_fullscreen)
 	
 	y += 13;
 
-#if defind ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	std::vector<std::string> input_choices;
 	input_choices.push_back("{027} Tap-and-go");
 	input_choices.push_back("{027} Hybrid input 1");
@@ -3192,15 +3218,19 @@ bool config_menu(bool start_on_fullscreen)
 	input_choices.push_back("{027} Total D-Pad 1");
 	input_choices.push_back("{027} Total D-Pad 2");
 	MSingleToggle *input_toggle;
-	
+
+#ifdef ALLEGRO_IPHONE
 	if (airplay_connected || joypad_connected()) {
 		input_toggle = NULL;
 	}
 	else {
+#endif
 		input_toggle = new MSingleToggle(xx, y, input_choices);
 		input_toggle->setSelected(config.getDpadType());
 		y += 13;
+#ifdef ALLEGRO_IPHONE
 	}
+#endif
 #endif
 
 	std::vector<std::string> difficulty_choices;
@@ -3305,7 +3335,7 @@ bool config_menu(bool start_on_fullscreen)
 #if defined ALLEGRO_IPHONE
 	if (is_ipad()) {
 #elif defined ALLEGRO_ANDROID
-	if (false) {
+	if (true) {
 #endif
 	y += 13;
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -3378,7 +3408,7 @@ bool config_menu(bool start_on_fullscreen)
 	}
 #endif
 
-#if !defned ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	tguiAddWidget(fullscreen_toggle);
 #endif
 	
@@ -3485,11 +3515,13 @@ bool config_menu(bool start_on_fullscreen)
 		if (input_toggle) {
 			sel = input_toggle->getSelected();
 			if (config.getDpadType() != sel) {
+#ifdef ALLEGRO_IPHONE
 				if (joypad_connected() || airplay_connected) {
 					playPreloadedSample("error.ogg");
 					input_toggle->setSelected((int)config.getDpadType());
 				}
 				else {
+#endif
 					al_lock_mutex(dpad_mutex);
 					getInput()->reset();
 					config.setDpadType(sel);
@@ -3513,7 +3545,9 @@ bool config_menu(bool start_on_fullscreen)
 							config.setTellUserToUseDpad(false);
 						}
 					}
+#ifdef ALLEGRO_IPHONE
 				}
+#endif
 			}
 		}
 #endif
@@ -3594,11 +3628,13 @@ bool config_menu(bool start_on_fullscreen)
 #else
 		if (config.getMaintainAspectRatio() != !sel1)
 			config.setMaintainAspectRatio(!sel1);
+#ifndef ALLEGRO_ANDROID
 		bool fs = fullscreen_toggle->getSelected();
 		if (fs != start_fullscreen) {
 			toggle_fullscreen();
 			start_fullscreen = fs;
 		}
+#endif
 #endif
 
 		if (draw_counter > 0) {

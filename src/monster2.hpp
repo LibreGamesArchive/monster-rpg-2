@@ -63,6 +63,8 @@
 #include <allegro5/allegro_physfs.h>
 #endif
 
+ALLEGRO_DEBUG_CHANNEL("morpg2");
+
 #include <physfs.h>
 
 #ifdef ALLEGRO_MACOSX
@@ -98,13 +100,15 @@
 #include <allegro5/allegro_acodec.h>
 #endif
 
-#include "atlas.h"
-
 #include <zlib.h>
 
 #if !defined KCM_AUDIO
 #include <bass.h>
 #endif
+
+// FIXME!
+#include "my_load_bitmap.h"
+
 
 const int LETTER_INDEX = 3;
 
@@ -137,9 +141,11 @@ const int LOGIC_RATE = 60;
 const int LOGIC_MILLIS = (1000/LOGIC_RATE);
 
 
-
+#ifdef ALLEGRO_ANDROID
+#include "../../tgui/tgui.hpp"
+#else
 #include "../tgui/tgui.hpp"
-
+#endif
 
 // Lua must be built as C++ code (at least on iPhone!)
 #ifndef ALLEGRO_IPHONE
@@ -182,11 +188,6 @@ extern "C" {
 #ifdef A5_OGL
 #include <allegro5/allegro_opengl.h>
 #endif
-
-#ifdef MEMDBG
-#include "debug_new.h"
-#endif
-
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 #define POOL_BEGIN NSAutoreleasePool *___p = [[NSAutoreleasePool alloc] init];

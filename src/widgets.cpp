@@ -13,64 +13,62 @@ MSpeechDialog *speechDialog = NULL;
 
 std::vector<MBITMAP *> icons;
 MManSelector *manChooser = NULL;
-static ATLAS *icon_atlas;
+static MBITMAP *icon_bmp;
 
 
 void loadIcons(void)
 {
-	icon_atlas = atlas_create(256, 256, 0, true);
-	
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/sword.png")), 0);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/helmet.png")), 1);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/potion.png")), 2);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/letter.png")), 3);
-	#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/iphone_button1.png")), 4);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/iphone_button2.png")), 5);
-	#else
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/button1.png")), 4);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/button2.png")), 5);
-	#endif
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/mail.png")), 6);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/staff.png")), 7);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/ball.png")), 8);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/badge.png")), 9);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/robe.png")), 10);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/boots.png")), 11);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/fruit.png")), 12);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/juice.png")), 13);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/gun.png")), 14);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/rounds.png")), 15);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/vest.png")), 16);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/cap.png")), 17);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/ring.png")), 18);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/key.png")), 19);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/medallion.png")), 20);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/tophat.png")), 21);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/blank.png")), 22);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/scope.png")), 23);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/crystal.png")), 24);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/meatballs.png")), 25);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/orb.png")), 26);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/arrows.png")), 27);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/unchecked.png")), 28);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/checked.png")), 29);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/x.png")), 30);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/iphone_button2-1.png")), 31);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/iphone_button2-2.png")), 32);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/flint.png")), 33);
+	int pos[] = {
+		0, 9, 9, 9,
+		0, 18, 9, 9,
+		0, 27, 9, 9,
+		0, 36, 9, 9,
+		0, 45, 9, 9,
+		0, 54, 9, 9,
+		0, 63, 9, 9,
+		0, 72, 9, 9,
+		0, 81, 9, 9,
+		0, 90, 9, 9,
+		0, 99, 9, 9,
+		0, 108, 9, 9,
+		0, 117, 9, 9,
+		0, 126, 9, 9,
+		0, 135, 9, 9,
+		0, 144, 9, 9,
+		0, 153, 9, 9,
+		0, 162, 9, 9,
+		0, 171, 9, 9,
+		0, 180, 9, 9,
+		0, 189, 9, 9,
+		0, 198, 9, 9,
+		0, 207, 9, 9,
+		0, 216, 9, 9,
+		0, 225, 9, 9,
+		0, 234, 9, 9,
+		0, 243, 9, 9,
+		0, 0, 11, 9,
+		11, 0, 9, 9,
+		11, 9, 9, 9,
+		11, 18, 9, 9,
+		11, 27, 9, 9,
+		11, 36, 9, 9,
+		11, 45, 9, 9,
+		11, 54, 9, 9,
+		11, 63, 9, 9,
+		11, 72, 9, 9,
+		11, 81, 9, 9
+	};
 
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/joypad_button_a.png")), 34);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/joypad_button_b.png")), 35);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/airplay_action.png")), 36);
-	atlas_add(icon_atlas, al_load_bitmap(getResource("icons/airplay_cancel.png")), 37);
-
-	
-	atlas_finish(icon_atlas);
+	icon_bmp = m_load_bitmap(getResource("media/icons.png"));
 	
 	for (int i = 0; i < 38; i++) {
-		ATLAS_ITEM *item = atlas_get_item_by_id(icon_atlas, i);
-		icons.push_back(new_mbitmap(atlas_get_item_sub_bitmap(item)));
+		icons.push_back(
+			m_create_sub_bitmap(
+				icon_bmp,
+				pos[i*4+0], pos[i*4+1],
+				pos[i*4+2], pos[i*4+3]
+			)
+		);
 	}
 }
 //else {
@@ -83,8 +81,11 @@ void destroyIcons(void)
 		m_destroy_bitmap(b);
 	}
 	 */
-	
-	atlas_destroy(icon_atlas);
+
+	for (size_t i = 0; i < icons.size(); i++) {
+		m_destroy_bitmap(icons[i]);
+	}
+	m_destroy_bitmap(icon_bmp);
 
 	icons.clear();
 }
@@ -6897,7 +6898,7 @@ void MShop::draw(void)
 #endif
 		}
 		else if (i == 5 && r < (nItems-1)) {
-#ifndef IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 			if (row == r && this == tguiActiveWidget) {
 				if ((unsigned)tguiCurrentTimeMillis() % 600 < 300) {
 					m_draw_bitmap(up, x, yy, M_FLIP_VERTICAL);

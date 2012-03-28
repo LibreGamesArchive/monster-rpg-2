@@ -2,11 +2,14 @@
 #define ASSERT ALLEGRO_ASSERT
 #ifdef ALLEGRO_IPHONE
 #include <allegro5/allegro_iphone.h>
-#define glFrustum glFrustumf
 #endif
 #include <allegro5/internal/aintern_opengl.h>
 #ifdef A5_D3D
 #include <allegro5/internal/aintern_direct3d.h>
+#endif
+
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#define glFrustum glFrustumf
 #endif
 
 void vecXmat(double x, double y, double z, ALLEGRO_TRANSFORM *mat, double *ox, double *oy, double *oz, double *ow)

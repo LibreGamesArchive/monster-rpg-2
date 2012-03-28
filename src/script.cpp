@@ -32,6 +32,7 @@ int getNumberFromScript(lua_State *state, std::string name)
  */
 void startNewGame(const char *name)
 {
+
 	/* Reset game info */
 	for (int i = 0; i < MAX_MILESTONES; i++) {
 		gameInfo.milestones[i] = false;
@@ -193,39 +194,39 @@ void dumpLuaStack(lua_State *l)
         int i;
         int top = lua_gettop(l);
 
-        printf ("--- stack ---\n");
-        printf ("top=%u   ...   ", top);
+        ALLEGRO_DEBUG ("--- stack ---\n");
+        ALLEGRO_DEBUG ("top=%u   ...   ", top);
 
         for (i = 1; i <= top; i++) {  /* repeat for each level */
                 int t = lua_type(l, i);
                 switch (t) {
 
                 case LUA_TSTRING:  /* strings */
-                        printf("`%s'", lua_tostring(l, i));
+                        ALLEGRO_DEBUG("`%s'", lua_tostring(l, i));
                         break;
 
                 case LUA_TBOOLEAN:  /* booleans */
-                        printf(lua_toboolean(l, i) ? "true" : "false");
+                        ALLEGRO_DEBUG(lua_toboolean(l, i) ? "true" : "false");
                         break;
 
                 case LUA_TNUMBER:  /* numbers */
-                        printf("%d", lua_tonumber(l, i));
+                        ALLEGRO_DEBUG("%d", lua_tonumber(l, i));
                         break;
 
                 case LUA_TTABLE:   /* table */
-                        printf("table");
+                        ALLEGRO_DEBUG("table");
                         break;
 
                 default:  /* other values */
-                        printf("%s", lua_typename(l, t));
+                        ALLEGRO_DEBUG("%s", lua_typename(l, t));
                         break;
 
                 }
-                printf("  ");  /* put a separator */
+                ALLEGRO_DEBUG("  ");  /* put a separator */
         }
-        printf("\n");  /* end the listing */
+        ALLEGRO_DEBUG("\n");  /* end the listing */
 
-        printf ("-------------\n");
+        ALLEGRO_DEBUG ("-------------\n");
 }
 
 std::string getScriptExtension()
@@ -3603,6 +3604,15 @@ int C_extra_battle_chances(lua_State *stack)
 	return 1;
 }
 
+int C_dbg(lua_State *stack)
+{
+	const char *t = lua_tostring(stack, 1);
+
+	ALLEGRO_DEBUG(t);
+
+	return 0;
+}
+
 /*
  * This registers all the required C/C++ functions
  * with the Lua interpreter, so they can be called
@@ -4170,5 +4180,8 @@ void registerCFunctions(lua_State* luaState)
 
 	lua_pushcfunction(luaState, C_extra_battle_chances);
 	lua_setglobal(luaState, "extra_battle_chances");
+
+	lua_pushcfunction(luaState, C_dbg);
+	lua_setglobal(luaState, "dbg");
 }
 

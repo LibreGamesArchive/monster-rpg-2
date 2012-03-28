@@ -993,7 +993,7 @@ void Battle::start(void)
 	}
 
 	if (!(name == "1Golem") && !manChooser) {
-		playMusicVolumeOff(musicname);
+		playMusic(musicname, 0.0f);
 		musicFadeCount = 0;
 	}
 	// Add players and adjust enemy positions

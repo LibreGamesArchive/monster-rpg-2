@@ -104,6 +104,8 @@ static void d3d_resource_release(void)
 bool do_pause_game = false;
 #endif
 
+bool do_acknowledge_resize = false;
+
 bool achievement_show = false;
 double achievement_time = 0;
 MBITMAP *achievement_bmp;
@@ -170,7 +172,8 @@ XMLData *trans_data = NULL;
 AnimationSet *guiAnims = NULL;
 XMLData *terrain;
 std::vector<WaterData> waterData;
-float screenScale = 2;
+float screenScaleX = 2;
+float screenScaleY = 2;
 bool use_programmable_pipeline = true;
 
 #ifdef ALLEGRO_IPHONE
@@ -307,6 +310,8 @@ bool is_ipad(void)
 			value = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad);
 		else
 			value = false;
+#elif defined ALLEGRO_ANDROID
+		value = true;
 #else
 		value = false;
 #endif
@@ -625,6 +630,8 @@ static void *thread_proc(void *arg)
 	bool f5_cheated = false, f6_cheated = false;
 	double f5_time = -1, f6_time = -1;
 
+	ALLEGRO_DEBUG("in thread_proc");
+
 	events = al_create_event_queue();
 	
 	ALLEGRO_EVENT event;
@@ -676,8 +683,8 @@ static void *thread_proc(void *arg)
 		}
 		
 		if (al_wait_for_event_timed(events, &event, 1.0f/LOGIC_RATE)) {
-		
-#if !defined ALLEGRO_IPHONE && #defined ALLEGRO_ANDROID
+
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 			al_lock_mutex(input_mutex);
 			if (getInput())
 				getInput()->handle_event(&event);
@@ -713,7 +720,7 @@ static void *thread_proc(void *arg)
 				}
 				al_signal_cond(wait_cond);
 			}
-#if !defined ALLEGRO_IPHONE && #defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 			else if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
 				if (event.keyboard.keycode == ALLEGRO_KEY_F) {
 					if (!pause_f_to_toggle_fullscreen) {
@@ -956,7 +963,7 @@ static void *thread_proc(void *arg)
 				int this_x = event.mouse.x;
 				int this_y = event.mouse.y;
 				int touch_id = 1;
-				#endif
+#endif
 				
 				event_mouse_x = this_x;
 				event_mouse_y = this_y;
@@ -1195,6 +1202,7 @@ static void *thread_proc_minor(void *arg)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 		POOL_BEGIN
 #endif
+
 		if (al_wait_for_event_timed(events_minor, &event, 1.0f/LOGIC_RATE)) {
 #ifdef ALLEGRO_IPHONE
 			if (event.type == ALLEGRO_EVENT_DISPLAY_CONNECTED) {
@@ -1215,8 +1223,19 @@ static void *thread_proc_minor(void *arg)
 				break;
 #endif
 			}
-			if (event.type == ALLEGRO_EVENT_DISPLAY_HALT_DRAWING) {
+#if defined ALLEGRO_ANDROID
+			if (event.type == ALLEGRO_EVENT_DISPLAY_RESIZE) {
+				ALLEGRO_DEBUG("got DISPLAY_RESIZE event");
+				//al_acknowledge_resize(display);
+				do_acknowledge_resize = true;
+			}
+#endif
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE
+			if (event.type == ALLEGRO_EVENT_DISPLAY_HALT_DRAWING) {
+#elif defined ALLEGRO_ANDROID
+			if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT) {
+#endif
 #if defined ALLEGRO_IPHONE
 				if (!isMultitaskingSupported()) {
 					if (!sound_was_playing_at_program_start)
@@ -1229,16 +1248,21 @@ static void *thread_proc_minor(void *arg)
 				do_close(false);
 				switched_out = true;
 				close_pressed = true;
-#endif
 			}
-			if (event.type == ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING) {
+#endif
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#ifdef ALLEGRO_IPHONE
+			if (event.type == ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING) {
+#elif defined ALLEGRO_ANDROID
+			if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN) {
+#endif
 				switched_out = false;
 				close_pressed = false;
 				al_signal_cond(switch_cond);
-#endif
 			}
+#endif
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE // FIXME
 			if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT)
 			{
 				do_pause_game = should_pause_game();
@@ -1258,6 +1282,7 @@ static void *thread_proc_minor(void *arg)
 				setMusicVolume(backup_music_volume);
 				setAmbienceVolume(backup_ambience_volume);
 			}
+#endif
 #endif
 			if (event.type == ALLEGRO_EVENT_DISPLAY_LOST) {
 				destroy_loaded_bitmaps = true;
@@ -1312,18 +1337,17 @@ static void *loader_proc(void *arg)
 #else
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 #endif
+	
+	config.setUseOnlyMemoryBitmaps(true);
 
 	//(void)arg;
 	//m_set_target_bitmap(al_get_backbuffer(display));
 	show_progress(8);
 
 	MBITMAP *deter_display_access_bmp;
-	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags | ALLEGRO_MEMORY_BITMAP);
 	deter_display_access_bmp = m_create_bitmap(16, 16); // check
-	al_set_new_display_flags(flags);
 	m_set_target_bitmap(deter_display_access_bmp);
-
+	
 	guiAnims = new AnimationSet(getResource("gui.png"));
 	if (!guiAnims) {
 		if (!native_error("Failed to load gui"))
@@ -1446,11 +1470,6 @@ static void *loader_proc(void *arg)
 	}
 	*/
 
-	debug_message("Loading icons\n");
-
-	// FIXME: return value
-	loadIcons();
-
 	show_progress(56);
 
 	debug_message("Loading weapon animations\n");
@@ -1494,6 +1513,8 @@ static void *loader_proc(void *arg)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	POOL_END
 #endif
+
+	config.setUseOnlyMemoryBitmaps(false);
 
 	loading_done = true;
 	return NULL;
@@ -2921,22 +2942,31 @@ bool init(int *argc, char **argv[])
 #endif
 
 	srand((int)time(NULL));
+	
+	bool use_fixed_pipeline = false;
 
+#ifndef ALLEGRO_ANDROID
 	if (check_arg(*argc, *argv, "-tiny") > 0)
 		scr_tiny = true;
 	else if (check_arg(*argc, *argv, "-small") > 0)
 		scr_small = true;
 
-	bool use_fixed_pipeline = false;
 	if (check_arg(*argc, *argv, "-fixed-pipeline") > 0)
 		use_fixed_pipeline = true;
+#endif
+
+	ALLEGRO_DEBUG("initing");
 
 	al_init();
+
+	ALLEGRO_DEBUG("inited");
 
 #if !defined ALLEGRO_WINDOWS
 	ALLEGRO_CONFIG *syscfg = al_get_system_config();
 	al_set_config_value(syscfg, "graphics", "config_selection", "old");
 #endif
+
+	ALLEGRO_DEBUG("post init crap 1");
 
 	input_event_mutex = al_create_mutex();
 
@@ -2949,6 +2979,8 @@ bool init(int *argc, char **argv[])
 #endif
 #endif
 
+	ALLEGRO_DEBUG("reading config");
+
 	try {
 		config.read();
 	}
@@ -2958,6 +2990,8 @@ bool init(int *argc, char **argv[])
 #ifdef ALLEGRO_IPHONE
 	config.setAutoRotation(config.getAutoRotation());
 #endif
+
+	ALLEGRO_DEBUG("reading translations");
 
 	load_translation_tags();
 	load_translation(get_language_name(config.getLanguage()).c_str());
@@ -2979,6 +3013,8 @@ bool init(int *argc, char **argv[])
 	debug_message("al_init success\n");
 
 
+	ALLEGRO_DEBUG("installing kb/mouse");
+
 	al_install_mouse();
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	al_install_keyboard();
@@ -2986,6 +3022,8 @@ bool init(int *argc, char **argv[])
 	al_install_touch_input();
 	al_set_mouse_emulation_mode(ALLEGRO_MOUSE_EMULATION_5_0_x);
 #endif
+
+	ALLEGRO_DEBUG("loading Version");
 
 	gzFile f = gzopen(getResource("Version"), "rb");
 	if (f) {
@@ -2998,15 +3036,25 @@ bool init(int *argc, char **argv[])
 		strcpy(versionString, "-1");
 	}
 
+	ALLEGRO_DEBUG("initing addons");
+
 	al_init_font_addon();
 	al_init_ttf_addon();
 	al_init_image_addon();
 	al_init_primitives_addon();
 	
+	ALLEGRO_DEBUG("initing physfs");
+
+#ifdef ALLEGRO_ANDROID
+   	PHYSFS_init("morpg2");
+#else
    	PHYSFS_init(myArgv[0]);
+#endif
 	PHYSFS_addToSearchPath(getResource("tiles.zip"), 1);
 
 	int flags = 0;
+
+	ALLEGRO_DEBUG("setting display options");
 
 #if defined A5_OGL
 	flags |= ALLEGRO_OPENGL;
@@ -3014,7 +3062,7 @@ bool init(int *argc, char **argv[])
 
 	al_set_new_display_flags(flags);
 
-#if !defined(IPHONE) && !defined(ALLEGRO_ANDROID)
+#if !defined(ALLEGRO_IPHONE) && !defined(ALLEGRO_ANDROID)
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 16, ALLEGRO_REQUIRE);
 	al_set_new_display_adapter(config.getAdapter());
@@ -3042,7 +3090,10 @@ bool init(int *argc, char **argv[])
 #else
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 16, ALLEGRO_REQUIRE);
+	#ifndef ALLEGRO_ANDROID
+	// FIXME: do this for android when supporting multihead
 	al_set_new_display_adapter(0);
+	#endif
 #endif
 
 	if (config.getWaitForVsync())
@@ -3071,66 +3122,79 @@ bool init(int *argc, char **argv[])
 		else if (config.getFilterType() == FILTER_SCALEDOWN) {
 			al_iphone_override_screen_scale(0.5);
 		}
-		screenScale *= al_iphone_get_screen_scale();
+		screenScaleX *= al_iphone_get_screen_scale();
+		screenScaleY *= al_iphone_get_screen_scale();
 	}
 	
 	if (is_ipad()) {
 		if (config.getFilterType() == FILTER_SCALE2X) {
 			al_iphone_override_screen_scale(0.5);
-			screenScale = 2;
+			screenScaleX = screenScaleY = 2;
 			sd->width = 768 / 2;
 			sd->height = 1024 / 2;
 		}
 		else if (config.getFilterType() == FILTER_SCALE2X_LINEAR) {
-			screenScale = 4;
+			screenScaleX = screenScaleY = 4;
 			sd->width = 768;
 			sd->height = 1024;
 		}
 		else if (config.getFilterType() == FILTER_SCALE3X_LINEAR) {
-			screenScale = 4;
+			screenScaleX = screenScaleY = 4;
 			sd->width = 768;
 			sd->height = 1024;
 		}
 		else if (config.getFilterType() == FILTER_SCALE3X) {
 			al_iphone_override_screen_scale(0.75);
-			screenScale = 3;
+			screenScaleX = screenScaleY = 3;
 			sd->width = 768 * 0.75;
 			sd->height = 1024 * 0.75;
 		}
 		else if (config.getFilterType() == FILTER_HALFSCALE) {
 			al_iphone_override_screen_scale(0.5);
-			screenScale = 2;
+			screenScaleX = screenScaleY = 2;
 			sd->width = 768 / 2;
 			sd->height = 1024 / 2;			
 		}
 		else if (config.getFilterType() == FILTER_SCALEDOWN) {
 			al_iphone_override_screen_scale(0.25);
-			screenScale = 1;
+			screenScaleX = screenScaleY = 1;
 			sd->width = 768 / 4;
 			sd->height = 1024 / 4;
 		}
 		else {
-			screenScale = 4;
+			screenScaleX = screenScaleY  = 4;
 			sd->width = 768;
 			sd->height = 1024;
 		}
 	}
 	else {
-		sd->width = 160 * screenScale;
-		sd->height = 240 * screenScale;
+		sd->width = 160 * screenScaleX;
+		sd->height = 240 * screenScaleY;
 	}
 #endif
+
+	ALLEGRO_DEBUG("creating some mutexes");
+
 	click_mutex = al_create_mutex();
 	input_mutex = al_create_mutex();
 	dpad_mutex = al_create_mutex();
 	touch_mutex = al_create_mutex();
 	//orient_mutex = al_create_mutex();
 
+	ALLEGRO_DEBUG("calling tguiInit");
+
 	tguiInit();
+
+	ALLEGRO_DEBUG("tguiInit returned");
 
 #ifdef A5_D3D
 	use_fixed_pipeline = true;
 #endif
+
+	// FIXME:
+	#ifdef ALLEGRO_ANDROID
+	use_fixed_pipeline = true;
+	#endif
 
 	if (!use_fixed_pipeline) {
 		al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_USE_PROGRAMMABLE_PIPELINE);
@@ -3138,7 +3202,11 @@ bool init(int *argc, char **argv[])
 	
 #if defined ALLEGRO_IPHONE
 	al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE, ALLEGRO_REQUIRE);
-#endif	
+#elif defined ALLEGRO_ANDROID
+	al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_270_DEGREES, ALLEGRO_REQUIRE);
+#endif
+
+	ALLEGRO_DEBUG("creating display");
 
 #ifdef EDITOR
 	display = al_create_display(800, 500);
@@ -3159,9 +3227,26 @@ bool init(int *argc, char **argv[])
 	
 #endif
 	if (!display) {
+		ALLEGRO_DEBUG("display == NULL");
 		if (!native_error("Failed to set gfx mode"))
 			return false;
 	}
+
+	ALLEGRO_DEBUG("display created");
+
+#ifdef ALLEGRO_ANDROID
+	sd->width = al_get_display_width(display);
+	sd->height = al_get_display_height(display);
+	float ratio = (float)sd->width / BW;
+	if (ratio > ((float)sd->height / BH))
+		ratio = (float)sd->height / BH;
+	screenScaleX = ratio;
+	screenScaleY = ratio;
+	screen_offset_x = (sd->width - (screenScaleX*BW)) / 2;
+	screen_offset_y = (sd->height - (screenScaleY*BH)) / 2;
+	screen_ratio_x = sd->width / (screenScaleX*BW);
+	screen_ratio_y = sd->height / (screenScaleY*BH);
+#endif
 
 #ifdef ALLEGRO_IPHONE
    NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
@@ -3231,6 +3316,8 @@ bool init(int *argc, char **argv[])
 	init_shaders();
 	#endif
 
+	ALLEGRO_DEBUG("initing joysticks");
+
 	if (al_install_joystick()) {
 		if (al_get_num_joysticks() > 0)
 			config.setGamepadAvailable(true);
@@ -3244,6 +3331,8 @@ bool init(int *argc, char **argv[])
 	if (config.getGamepadAvailable()) {
 //		al_get_joystick(0); // needed?
 	}
+
+	ALLEGRO_DEBUG("spawning thread proc minor");
 
 	al_run_detached_thread(thread_proc_minor, NULL);
 
@@ -3287,9 +3376,14 @@ bool init(int *argc, char **argv[])
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 #endif
 
+	ALLEGRO_DEBUG("creating buffers");
+
 	flags = al_get_new_bitmap_flags();
+
+	al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
 	buffer = m_create_bitmap(BW, BH); // check
 	overlay = m_create_bitmap(BW, BH); // check
+	al_set_new_display_flags(flags);
 
 	if (config.getFilterType() == FILTER_SCALE2X_LINEAR) {
 		scaleXX_buffer = m_create_bitmap(BW*2, BH*2); // check
@@ -3329,10 +3423,10 @@ bool init(int *argc, char **argv[])
 		else {
 			mul = 1;
 		}
-		screen_offset_x = (scr_w - (BW*screenScale*mul)) / (2*mul);
-		screen_offset_y = (scr_h - (BH*screenScale*mul)) / (2*mul);
-		screen_ratio_x = (float)scr_w / (BW*screenScale*mul);
-		screen_ratio_y = (float)scr_h / (BH*screenScale*mul);
+		screen_offset_x = (scr_w - (BW*screenScaleX*mul)) / (2*mul);
+		screen_offset_y = (scr_h - (BH*screenScaleY*mul)) / (2*mul);
+		screen_ratio_x = (float)scr_w / (BW*screenScaleX*mul);
+		screen_ratio_y = (float)scr_h / (BH*screenScaleY*mul);
 	}
 #endif
 
@@ -3361,17 +3455,8 @@ bool init(int *argc, char **argv[])
 			return false;
 	}
 
+	ALLEGRO_DEBUG("loading loader graphics");
 	
-#ifdef WIZ
-	if (startGFXDriver == 0) {
-		buffer->memory += (buffer->h-1)*buffer->pitch;
-		buffer->pitch = -buffer->pitch;
-	}
-	harpy = new AnimationSet(getResource("combat_media/Harpy.png"));
-#endif
-
-
-
 	eny_loader = new AnimationSet(getResource("media/eny-loader.png"));
 	dot_loader = new AnimationSet(getResource("media/dot-loader.png"));
 	bg_loader = m_load_bitmap(getResource("media/bg-loader.png"));
@@ -3387,20 +3472,27 @@ bool init(int *argc, char **argv[])
 	tguiSetRotation(0);
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	tguiSetScreenSize(BH*screenScale, BW*screenScale);
+	tguiSetScreenSize(BH*screenScaleY, BW*screenScaleX);
 	config.setMaintainAspectRatio(config.getMaintainAspectRatio());
 #elif !defined EDITOR
-	tguiSetScreenSize(BW*screenScale, BH*screenScale);
+	tguiSetScreenSize(BW*screenScaleX, BH*screenScaleY);
 	config.setMaintainAspectRatio(config.getMaintainAspectRatio());
 #endif
 
 #ifndef EDITOR
-	tguiSetScale(screenScale, screenScale);
+	tguiSetScale(screenScaleX, screenScaleY);
 
 	tguiSetTolerance(3);
 #endif
 
-	config.setUseOnlyMemoryBitmaps(true);
+	ALLEGRO_DEBUG("doing load screen");
+
+	if (cached_bitmap) {
+		al_destroy_bitmap(cached_bitmap);
+		cached_bitmap = NULL;
+		cached_bitmap_filename = "";
+	}
+
 	al_run_detached_thread(loader_proc, NULL);
 
 	long start = -1;
@@ -3413,6 +3505,8 @@ bool init(int *argc, char **argv[])
 		eny_loader->update(elapsed);
 		dot_loader->update(elapsed);
 		draw -= elapsed;
+		
+		is_close_pressed();
 
  		int percent = progress_percent;
  		if (draw < 0 || percent == 100) {
@@ -3433,9 +3527,10 @@ bool init(int *argc, char **argv[])
 			al_set_target_backbuffer(display);
 			m_clear(black);
 #if !defined IPHONE && !defined ALLEGRO_ANDROID
-			float scale = screenScale / 2.0f;
+			float scaleX = screenScaleX / 2.0f;
+			float scaleY = screenScaleY / 2.0f;
 			if (config.getMaintainAspectRatio()) {
-				m_draw_scaled_bitmap(tmp, 0, 0, BH, BW, screen_offset_x, screen_offset_y, BH*scale, BW*scale, 0);
+				m_draw_scaled_bitmap(tmp, 0, 0, BH, BW, screen_offset_x, screen_offset_y, BH*scaleX, BW*scaleY, 0);
 			}
 			else {
 				float rx, ry;
@@ -3446,14 +3541,18 @@ bool init(int *argc, char **argv[])
 				else {
 					rx = ry = 1;
 				}
-				m_draw_scaled_bitmap(tmp, 0, 0, BH, BW, 0, 0, BH*scale*rx, BW*scale*ry, 0);
+				m_draw_scaled_bitmap(tmp, 0, 0, BH, BW, 0, 0, BH*scaleX*rx, BW*scaleY*ry, 0);
 			}
 #else
+#ifdef ALLEGRO_ANDROID
+			if (false) {
+#else
 			if (is_ipad()) {
+#endif
 				m_draw_scaled_bitmap(tmp, 0, 0, BH, BW, 0, 0, sd->width*BH/BW, sd->width, 0);
 			}
 			else {
-				m_draw_scaled_bitmap(tmp, 0, 0, BH, BW, screen_offset_x, screen_offset_y, BH*screenScale*BH/BW, BW*screenScale*BH/BW, 0);
+				m_draw_scaled_bitmap(tmp, 0, 0, BH, BW, screen_offset_x, screen_offset_y, BH*screenScaleX*BH/BW, BW*screenScaleY*BH/BW, 0);
 			}
 #endif
  			m_flip_display();
@@ -3465,12 +3564,20 @@ bool init(int *argc, char **argv[])
 	}
 
 	m_destroy_bitmap(tmp);
-   
+
 	while (!loading_done) {
 		m_rest(0.001);
 	}
+	
+	if (cached_bitmap) {
+		al_destroy_bitmap(cached_bitmap);
+		cached_bitmap = NULL;
+		cached_bitmap_filename = "";
+	}
+	
+	ALLEGRO_DEBUG("done loading screen");
 
-	config.setUseOnlyMemoryBitmaps(false);
+	ALLEGRO_DEBUG("loading fonts and making display bitmaps");
 
 	stomach_circle = m_load_bitmap(getResource("combat_media/stomach_circle.png"));
 	
@@ -3479,6 +3586,7 @@ bool init(int *argc, char **argv[])
 	}
 
 	int bflags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags((bflags & ~ALLEGRO_NO_PRESERVE_TEXTURE) & ~ALLEGRO_MEMORY_BITMAP);
 
 	int ttf_flags;
 	
@@ -3488,8 +3596,6 @@ bool init(int *argc, char **argv[])
 	else {
 		ttf_flags = ALLEGRO_TTF_MONOCHROME;
 	}
-
-	al_set_new_bitmap_flags(bflags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 
 	game_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 9, ttf_flags);
 	if (!game_font) {
@@ -3509,10 +3615,14 @@ bool init(int *argc, char **argv[])
 			return false;
 	}
 
+	ALLEGRO_DEBUG("Loaded fonts");
+
 	/* RELOAD EVERYTHING AS DISPLAY BITMAPS */
 	guiAnims->displayConvert();
 
 	cursor = m_make_display_bitmap(cursor);
+
+	ALLEGRO_DEBUG("converted guiAnims and cursor");
 	
 	m_push_target_bitmap();
 	m_save_blender();
@@ -3542,10 +3652,13 @@ bool init(int *argc, char **argv[])
 	m_restore_blender();
 	m_pop_target_bitmap();
 
+	ALLEGRO_DEBUG("created orb");
+
 	poison_bmp = m_make_alpha_display_bitmap(poison_bmp);
 	poison_bmp_tmp = m_make_alpha_display_bitmap(poison_bmp_tmp);
 	poison_bmp_tmp2 = m_make_alpha_display_bitmap(poison_bmp_tmp2);
 
+	ALLEGRO_DEBUG("created poison");
 
 	ALLEGRO_BITMAP *__old_target__ = al_get_target_bitmap();
 	m_save_blender();
@@ -3553,13 +3666,21 @@ bool init(int *argc, char **argv[])
 	shadow_sides[1] = m_create_alpha_bitmap(SHADOW_CORNER_SIZE, 16); // check
 	shadow_sides[2] = m_create_alpha_bitmap(16, SHADOW_CORNER_SIZE); // check
 	shadow_sides[3] = m_create_alpha_bitmap(SHADOW_CORNER_SIZE, 16); // check
+
+	ALLEGRO_DEBUG("created shadow sides");
+
 	for (int i = 0; i < 4; i++) {
+		ALLEGRO_DEBUG("curr flags: %d", al_get_new_bitmap_flags());
 		shadow_corners[i] = m_create_alpha_bitmap(SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE); // check
+		ALLEGRO_DEBUG("bmp flags=%d", al_get_bitmap_flags(shadow_corners[i]->bitmap));
 		m_set_target_bitmap(shadow_corners[i]);
 		m_clear(m_map_rgba(0, 0, 0, 0));
 		m_set_target_bitmap(shadow_sides[i]);
 		m_clear(m_map_rgba(0, 0, 0, 0));
 	}
+	ALLEGRO_DEBUG("1 shadow 0 flags=%d", al_get_bitmap_flags(shadow_corners[0]->bitmap));
+	m_set_target_bitmap(shadow_corners[2]);
+	m_lock_bitmap(shadow_corners[2], ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
 	for (int yy = 0; yy < SHADOW_CORNER_SIZE; yy++) {
 		for (int xx = 0; xx < SHADOW_CORNER_SIZE; xx++) {
 			int dx = xx;
@@ -3567,11 +3688,12 @@ bool init(int *argc, char **argv[])
  			float dist = (float)sqrt((float)dx*dx + dy*dy) + 1;
 			if (dist > SHADOW_CORNER_SIZE) dist = SHADOW_CORNER_SIZE;
 			float a = (1.0f-(dist/SHADOW_CORNER_SIZE))*255; //(1.0-sin(((float)dist/(SHADOW_CORNER_SIZE-1))*(M_PI/2))) * 255;
-			m_set_target_bitmap(shadow_corners[2]);
 			m_put_pixel(xx, yy, m_map_rgba(0, 0, 0, a));
 		}
 	}
+	m_unlock_bitmap(shadow_corners[2]);
 	_blend_color = white;
+	ALLEGRO_DEBUG("2 shadow 0 flags=%d", al_get_bitmap_flags(shadow_corners[0]->bitmap));
 
 	if (use_programmable_pipeline) {
 		al_set_separate_blender(
@@ -3586,6 +3708,9 @@ bool init(int *argc, char **argv[])
 	else {
 		al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
 	}
+
+	ALLEGRO_DEBUG("created 1 corner");
+	ALLEGRO_DEBUG("3 shadow 0 flags=%d", al_get_bitmap_flags(shadow_corners[0]->bitmap));
 
 	m_set_target_bitmap(shadow_corners[0]);
 	m_draw_bitmap(shadow_corners[2], 0, 0, M_FLIP_HORIZONTAL|M_FLIP_VERTICAL);
@@ -3603,32 +3728,49 @@ bool init(int *argc, char **argv[])
 	m_draw_bitmap(shadow_sides[3], 0, 0, M_FLIP_HORIZONTAL);
 	al_set_target_bitmap(__old_target__);
 	m_restore_blender();
+	ALLEGRO_DEBUG("4 shadow 0 flags=%d", al_get_bitmap_flags(shadow_corners[0]->bitmap));
+
+	ALLEGRO_DEBUG("created all shadow sides");
 
 	tile = m_make_display_bitmap(tile);
+	ALLEGRO_DEBUG("5 shadow 0 flags=%d", al_get_bitmap_flags(shadow_corners[0]->bitmap));
 
 	//profileBg = m_make_display_bitmap(profileBg);
 	
-	for (int i = 0; i < (int)icons.size(); i++) {
-		icons[i] = m_make_display_bitmap(icons[i]);
-	}
+	debug_message("Loading icons\n");
+
+	// FIXME: return value
+	loadIcons();
+
+
+	ALLEGRO_DEBUG("converted icons");
 
 	stoneTexture = m_make_display_bitmap(stoneTexture);
 	
 	mushroom = m_make_display_bitmap(mushroom);
 	webbed = m_make_display_bitmap(webbed);
 
-	al_set_new_display_flags(bflags);
+	ALLEGRO_DEBUG("converted misc stuff");
+	ALLEGRO_DEBUG("6 shadow 0 flags=%d", al_get_bitmap_flags(shadow_corners[0]->bitmap));
+
+	al_set_new_display_flags(bflags & ~ALLEGRO_MEMORY_BITMAP);
 	
 	dpad_buttons = m_load_bitmap(getResource("media/buttons.png"));
 	batteryIcon = m_load_bitmap(getResource("media/battery_icon.png"));
 	achievement_bmp = m_load_bitmap(getResource("media/trophy.png"));
+	ALLEGRO_DEBUG("7 shadow 0 flags=%d", al_get_bitmap_flags(shadow_corners[0]->bitmap));
+
+	ALLEGRO_DEBUG("loaded some bitmaps");
 
 	m_set_target_bitmap(buffer);
+	ALLEGRO_DEBUG("8 shadow 0 flags=%d", al_get_bitmap_flags(shadow_corners[0]->bitmap));
 	
-
 	inited = true;
 
 	m_clear(black);
+
+	ALLEGRO_DEBUG("init() sucess!");
+	ALLEGRO_DEBUG("9 shadow 0 flags=%d", al_get_bitmap_flags(shadow_corners[0]->bitmap));
 
 	return true;
 }
@@ -3669,6 +3811,12 @@ void destroy(void)
 	debug_message("Destroy 1\n");
 	destroyTilemap();
 	debug_message("Destroy 2\n");
+	
+	if (cached_bitmap) {
+		al_destroy_bitmap(cached_bitmap);
+		cached_bitmap = NULL;
+		cached_bitmap_filename = "";
+	}
 
 	m_destroy_bitmap(buffer);
 	m_destroy_bitmap(overlay);
@@ -3797,7 +3945,11 @@ void dpad_off(bool count)
 	if (dpad_count > 0 || !count) {
 		al_lock_mutex(dpad_mutex);
 		use_dpad = (dpad_type == DPAD_TOTAL_1 || dpad_type == DPAD_TOTAL_2);
+#ifdef ALLEGRO_IPHONE
 		if (!joypad_connected()) {
+#else
+		if (true) {
+#endif
 			if (use_dpad)
 				myTguiIgnore(TGUI_MOUSE);
 			else {
@@ -3827,13 +3979,17 @@ void dpad_off(bool count)
 
 void dpad_on(bool count)
 {
-#if defned ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (count)
 		dpad_count--;
 	if (dpad_count <= 0 || !count) {
 		al_lock_mutex(dpad_mutex);
 		use_dpad = dpad_type != DPAD_NONE;
+#ifdef ALLEGRO_IPHONE
 		if (!joypad_connected()) {
+#else
+		if (true) {
+#endif
 			if (use_dpad)
 				myTguiIgnore(TGUI_MOUSE);
 			else
@@ -3865,18 +4021,18 @@ void set_screen_params(void)
 		//printf("w=%d h=%d ssp\n", w, h);
 		sd->real_width = w;
 		sd->real_height = h;
-		screenScale = (int)w / (int)BW;
-		if (screenScale > ((int)h / (int)BH))
-			screenScale = (int)h /(int)BH;
+		screenScaleX = screenScaleY = (int)w / (int)BW;
+		if (screenScaleX > ((int)h / (int)BH))
+			screenScaleX = screenScaleY = (int)h /(int)BH;
 		if (config.getMaintainAspectRatio()) {
 			screen_ratio_x = screen_ratio_y = 0;
-			screen_offset_x = (w - screenScale*BW)/2;
-			screen_offset_y = (h - screenScale*BH)/2;
+			screen_offset_x = (w - screenScaleX*BW)/2;
+			screen_offset_y = (h - screenScaleY*BH)/2;
 		}
 		else {
 			screen_offset_x = screen_offset_y = 0;
-			screen_ratio_x = w / (BW*screenScale);
-			screen_ratio_y = h / (BH*screenScale);
+			screen_ratio_x = w / (BW*screenScaleX);
+			screen_ratio_y = h / (BH*screenScaleY);
 		}
 	}
 	else {
@@ -3885,22 +4041,22 @@ void set_screen_params(void)
 		if (scr_sz == ScreenSize_Tiny) {
 			sd->real_width = 240;
 			sd->real_height = 160;
-			screenScale = 1;
+			screenScaleX = screenScaleY = 1;
 		}
 		else if (scr_sz == ScreenSize_Smaller) {
 			sd->real_width = 480;
 			sd->real_height = 320;
-			screenScale = 2;
+			screenScaleX = screenScaleY = 2;
 		}
 		else if (scr_sz == ScreenSize_Small) {
 			sd->real_width = 720;
 			sd->real_height = 480;
-			screenScale = 3;
+			screenScaleX = screenScaleY = 3;
 		}
 		else {
 			sd->real_width = 960;
 			sd->real_height = 640;
-			screenScale = 4;
+			screenScaleX = screenScaleY = 4;
 		}
 
 		screen_ratio_x = screen_ratio_y = 1.0f;
@@ -3915,11 +4071,11 @@ void toggle_fullscreen(void)
 	sd->fullscreen = !sd->fullscreen;
 	al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, config.getWantedGraphicsMode()->fullscreen);
 	set_screen_params();
-	tguiSetScreenSize(BW*screenScale, BH*screenScale);
+	tguiSetScreenSize(BW*screenScaleX, BH*screenScaleY);
 	//if (config.getWantedGraphicsMode()->fullscreen) {
 		config.setMaintainAspectRatio(config.getMaintainAspectRatio());
 	//}
-	tguiSetScale(screenScale, screenScale);
+	tguiSetScale(screenScaleX, screenScaleY);
 	pause_joystick_repeat_events = false;
 }
 

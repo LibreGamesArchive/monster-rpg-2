@@ -139,7 +139,8 @@ extern bool global_draw_red;
 extern bool red_off_press_on;
 extern volatile bool loading_done;
 extern MBITMAP *stomach_circle;
-extern float screenScale;
+extern float screenScaleX;
+extern float screenScaleY;
 
 extern bool switched_out;
 extern ALLEGRO_COND *switch_cond;
@@ -203,6 +204,8 @@ extern volatile int curr_touches;
 
 extern int versionMajor;
 extern int versionMinor;
+
+extern bool do_acknowledge_resize;
 
 #endif
 
