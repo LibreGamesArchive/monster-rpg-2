@@ -80,6 +80,28 @@
          in order to avoid having your file be overridden by tools such as "android update project"
     -->
     <!-- version-tag: 1 -->
+
+	<!-- tmg -->
+<target name="-package-resources">
+    <echo>Packaging resources</echo>
+    <aapt executable="${aapt}"
+        command="package"
+        versioncode="${version.code}"
+        debug="${build.packaging.debug}"
+        manifest="AndroidManifest.xml"
+        assets="${asset.absolute.dir}"
+        androidjar="${android.jar}"
+        apkfolder="${out.absolute.dir}"
+        resourcefilename="${resource.package.file.name}"
+	projectLibrariesResName="project.libraries.res"
+	projectLibrariesPackageName="project.libraries.package" 
+        resourcefilter="${aapt.resource.filter}">
+    <res path="${resource.absolute.dir}" />
+    <nocompress />
+    <!-- <nocompress extension="xml" /> forces no compression on specific file   extensions in assets and res/raw -->
+    </aapt>
+</target>
+
     <import file="${sdk.dir}/tools/ant/build.xml" />
 
 </project>

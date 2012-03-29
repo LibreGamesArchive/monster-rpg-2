@@ -1,0 +1,15 @@
+<stand>
+	<x>0</x>
+	<y>0</y>
+	<width>60</width>
+	<height>90</height>
+	<frames>1</frames>
+</stand>
+
+<hurt>
+	<x>60</x>
+	<y>0</y>
+	<width>60</width>
+	<height>90</height>
+	<frames>1</frames>
+</hurt>

@@ -2,7 +2,6 @@ package org.liballeg.app;
 
 import com.un4seen.bass.BASS;
 import com.un4seen.bass.BASSmix;
-import com.un4seen.bass.BASSFLAC;
 import android.media.AudioTrack;
 import android.media.AudioManager;
 import android.media.AudioFormat;
@@ -18,15 +17,19 @@ public class BassPump
 	private static int mainChannel;
 	private static AudioTrack track;
 	private static ByteBuffer buffer;
+	private static ByteBuffer silence;
 	private static ArrayList<Sample> sample_data = new ArrayList<Sample>();
 	private static ArrayList<PoolItem> sample_pool = new ArrayList<PoolItem>();
+	private static AllegroActivity activity;
 
-	public static void initSound()
+	public static void initSound(AllegroActivity activity)
 	{
-		BASS.BASS_Init(0, 11025, 0);
+		BassPump.activity = activity;
+
+		BASS.BASS_Init(0, 44100, 0);
 
 		mainChannel = BASSmix.BASS_Mixer_StreamCreate(
-			11025,
+			44100,
 			2,
 			BASS.BASS_STREAM_DECODE
 		);
@@ -35,26 +38,38 @@ public class BassPump
 
 		track = new AudioTrack(
 			AudioManager.STREAM_MUSIC,
-			11025,
+			44100,
 			AudioFormat.CHANNEL_CONFIGURATION_STEREO,
 			AudioFormat.ENCODING_PCM_16BIT,
-			AudioTrack.getMinBufferSize(11025, AudioFormat.CHANNEL_CONFIGURATION_STEREO, AudioFormat.ENCODING_PCM_16BIT),
+			AudioTrack.getMinBufferSize(44100, AudioFormat.CHANNEL_CONFIGURATION_STEREO, AudioFormat.ENCODING_PCM_16BIT),
 			AudioTrack.MODE_STREAM);
+		
+		track.play();
 
 		buffer = ByteBuffer.allocate(4096);
+
+		silence = ByteBuffer.allocate(4096);
+		byte[] silence_bytes = new byte[4096];
+		for (int i = 0; i < silence.capacity(); i++) {
+			silence_bytes[i] = 0;
+		}
+		silence.put(silence_bytes);
 	}
 
 	public static void update()
 	{
 		int res = BASS.BASS_ChannelGetData(mainChannel, buffer, buffer.capacity());
+		ByteBuffer buf;
 
-		if (track.getPlayState() != AudioTrack.PLAYSTATE_PLAYING) {
-			track.play();
+		if (res <= 0) {
+			buf = silence;
+			res = silence.capacity();
+		}
+		else {
+			buf = buffer;
 		}
 
-		if (res > 0) {
-			track.write(buffer.array(), 0, res);
-		}
+		track.write(buf.array(), 0, res);
 	}
 
 	private static int loadSampleWorker(String name, boolean loop)
@@ -64,19 +79,21 @@ public class BassPump
 		Sample s = new Sample();
 		s.loop = loop;
 
-		File file = new File(name);
 		try {
-			FileInputStream fin = new FileInputStream(file);
-			s.data = ByteBuffer.allocate((int)file.length());
+			AllegroAPKStream in = new AllegroAPKStream(activity, name);
+			in.open();
+			int size = (int)in.size();
+			s.data = ByteBuffer.allocate(size);
 			s.data.mark();
-			byte[] bytes = new byte[(int)file.length()];
+			byte[] bytes = new byte[size];
 			int read = 0;
-			while (read < (int)file.length()) {
-				int r = fin.read(bytes);
+			while (read < size) {
+				int r = in.read(bytes);
 				if (r < 0) break;
 				read += r;
 			}
 			s.data.put(bytes);
+			in.close();
 		}
 		catch (Exception e) {
 			Log.e("BassPump", "loadSampleWorker failed for '" + name + "'");
@@ -164,11 +181,13 @@ public class BassPump
 
 	public static int loadMusic(String name)
 	{
-		int m = BASSFLAC.BASS_FLAC_StreamCreateFile(
-			name,
-			0,
-			0,
-			BASS.BASS_STREAM_DECODE
+		AllegroAPKStream apk_stream = new AllegroAPKStream(activity, name);
+		apk_stream.open();
+		int m = BASS.BASS_StreamCreateFileUser(
+			BASS.STREAMFILE_NOBUFFER,
+			BASS.BASS_STREAM_DECODE,
+			new UserFileProcs(),
+			apk_stream
 		);
 		BASS.BASS_ChannelSetSync(m, BASS.BASS_SYNC_END, 0, new Sync(), new Object());
 		return m;
@@ -230,4 +249,34 @@ class PoolItem
 	int idx;
 	public int handle;
 	boolean done;
+}
+
+class UserFileProcs implements BASS.BASS_FILEPROCS
+{
+	public void FILECLOSEPROC(Object user)
+	{
+		AllegroAPKStream a = (AllegroAPKStream)user;
+		a.close();
+	}
+
+	public long FILELENPROC(Object user)
+	{
+		AllegroAPKStream a = (AllegroAPKStream)user;
+		return a.size();
+	}
+
+	public int FILEREADPROC(ByteBuffer buffer, int length, Object user)
+	{
+		AllegroAPKStream a = (AllegroAPKStream)user;
+		byte[] b = new byte[length];
+		long res = a.read(b);
+		buffer.put(b);
+		return (int)res;
+	}
+
+	public boolean FILESEEKPROC(long offset, Object user)
+	{
+		AllegroAPKStream a = (AllegroAPKStream)user;
+		return a.seek(offset);
+	}
 }

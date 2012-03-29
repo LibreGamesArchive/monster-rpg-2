@@ -1,0 +1,285 @@
+<19>
+	<comment>Water</comment>
+	<delay>333</delay>
+	<2>20</2>
+	<3>21</3>
+	<4>22</4>
+</19>
+
+<203>
+	<comment>Dark water</comment>
+	<delay>333</delay>
+	<2>204</2>
+	<3>205</3>
+	<4>206</4>
+</203>
+
+<235>
+	<comment>Dark water (Slow)</comment>
+	<delay>667</delay>
+	<2>236</2>
+	<3>237</3>
+	<4>238</4>
+</235>
+
+<160>
+	<comment>Fountain of life</comment>
+	<delay>25</delay>
+	<2>161</2>
+</160>
+
+<800>
+	<comment>Ocean water 1</comment>
+	<delay>450</delay>
+	<2>801</2>
+	<3>802</3>
+	<4>803</4>
+	<5>804</5>
+	<6>805</6>
+	<7>806</7>
+	<8>807</8>
+</800>
+
+<832>
+	<comment>Ocean water 2</comment>
+	<delay>450</delay>
+	<2>833</2>
+	<3>834</3>
+	<4>835</4>
+	<5>836</5>
+	<6>837</6>
+	<7>838</7>
+	<8>839</8>
+</832>
+
+<864>
+	<comment>Ocean water 3</comment>
+	<delay>450</delay>
+	<2>865</2>
+	<3>866</3>
+	<4>867</4>
+	<5>868</5>
+	<6>869</6>
+	<7>870</7>
+	<8>871</8>
+</864>
+
+<896>
+	<comment>Ocean water 4</comment>
+	<delay>450</delay>
+	<2>897</2>
+	<3>898</3>
+	<4>899</4>
+	<5>900</5>
+	<6>901</6>
+	<7>902</7>
+	<8>903</8>
+</896>
+
+
+<1344>
+	<comment>crap, did it the hard way</comment>
+	<delay>250</delay>
+	<2>1345</2>
+	<3>1346</3>
+	<4>1347</4>
+	<5>1348</5>
+	<6>1349</6>
+</1344>
+
+
+<1376>
+	<comment>crap, did it the hard way</comment>
+	<delay>250</delay>
+	<2>1377</2>
+	<3>1378</3>
+	<4>1379</4>
+	<5>1380</5>
+	<6>1381</6>
+</1376>
+
+
+<1408>
+	<comment>crap, did it the hard way</comment>
+	<delay>250</delay>
+	<2>1409</2>
+	<3>1410</3>
+	<4>1411</4>
+	<5>1412</5>
+	<6>1413</6>
+</1408>
+
+
+<1440>
+	<comment>crap, did it the hard way</comment>
+	<delay>250</delay>
+	<2>1441</2>
+	<3>1442</3>
+	<4>1443</4>
+	<5>1444</5>
+	<6>1445</6>
+</1440>
+
+<962>
+	<comment>Beach water</comment>
+	<delay>700</delay>
+	<2>963</2>
+</962>
+
+<964>
+	<comment>Beach water</comment>
+	<delay>700</delay>
+	<2>965</2>
+</964>
+
+<1450>
+	<comment>fort water</comment>
+	<delay>700</delay>
+	<2>1451</2>
+</1450>
+
+<1452>
+	<comment>fort water part</comment>
+	<delay>700</delay>
+	<2>1453</2>
+</1452>
+
+<1455>
+	<comment>fort water dark</comment>
+	<delay>700</delay>
+	<2>1456</2>
+</1455>
+
+<1457>
+	<comment>fort water tile</comment>
+	<delay>700</delay>
+	<2>1458</2>
+</1457>
+
+<1459>
+	<comment>fort water wall</comment>
+	<delay>700</delay>
+	<2>1460</2>
+</1459>
+
+<2153>
+	<comment>jungle stream</comment>
+	<delay>333</delay>
+	<2>2217</2>
+</2153>
+
+
+<2154>
+	<comment>jungle stream</comment>
+	<delay>333</delay>
+	<2>2218</2>
+</2154>
+
+
+<2155>
+	<comment>jungle stream</comment>
+	<delay>333</delay>
+	<2>2219</2>
+</2155>
+
+
+<2156>
+	<comment>jungle stream</comment>
+	<delay>333</delay>
+	<2>2220</2>
+</2156>
+
+
+<2157>
+	<comment>jungle stream</comment>
+	<delay>333</delay>
+	<2>2221</2>
+</2157>
+
+
+<2158>
+	<comment>jungle stream</comment>
+	<delay>333</delay>
+	<2>2222</2>
+</2158>
+
+
+<2159>
+	<comment>jungle stream</comment>
+	<delay>333</delay>
+	<2>2223</2>
+</2159>
+
+
+<2160>
+	<comment>jungle stream</comment>
+	<delay>333</delay>
+	<2>2224</2>
+</2160>
+
+<2185>
+	<comment>jungle stream</comment>
+	<delay>333</delay>
+	<2>2249</2>
+</2185>
+
+<2186>
+	<comment>jungle stream</comment>
+	<delay>333</delay>
+	<2>2250</2>
+</2186>
+
+<2187>
+	<comment>jungle stream</comment>
+	<delay>333</delay>
+	<2>2251</2>
+</2187>
+
+<2188>
+	<comment>jungle stream</comment>
+	<delay>333</delay>
+	<2>2252</2>
+</2188>
+
+<2189>
+	<comment>jungle stream</comment>
+	<delay>333</delay>
+	<2>2253</2>
+</2189>
+
+<2190>
+	<comment>jungle stream</comment>
+	<delay>333</delay>
+	<2>2254</2>
+</2190>
+
+<2191>
+	<comment>jungle stream</comment>
+	<delay>333</delay>
+	<2>2255</2>
+</2191>
+
+<2192>
+	<comment>jungle stream</comment>
+	<delay>333</delay>
+	<2>2256</2>
+</2192>
+
+<2161>
+	<comment>jungle stream</comment>
+	<delay>333</delay>
+	<2>2193</2>
+</2161>
+
+
+<2162>
+	<comment>jungle stream</comment>
+	<delay>333</delay>
+	<2>2194</2>
+</2162>
+
+<2225>
+	<comment>jungle stream</comment>
+	<delay>333</delay>
+	<2>2257</2>
+/2225>

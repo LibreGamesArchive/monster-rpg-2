@@ -1,0 +1,43 @@
+<stand>
+	<x>0</x>
+	<y>0</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>4</frames>
+	<delays>
+		<0>2100</0>
+		<1>120</1>
+		<2>120</2>
+		<3>120</3>
+	</delays>
+</stand>
+
+<cast>
+	<tag>DoNotWaitForAnimationToFinish</tag>
+	<looping>false</looping>
+	<x>0</x>
+	<y>40</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>4</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+		<3>120</3>
+	</delays>
+</cast>
+
+<broken>
+	<x>0</x>
+	<y>80</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>4</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+		<3>120</3>
+	</delays>
+</broken>

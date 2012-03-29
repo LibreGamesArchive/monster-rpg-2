@@ -1,0 +1,29 @@
+<stand>
+	<x>0</x>
+	<y>0</y>
+	<width>33</width>
+	<height>50</height>
+	<frames>3</frames>
+	<delays>
+		<0>100</0>
+		<1>100</1>
+		<2>100</2>
+	</delays>
+</stand>
+
+<forward>
+	<x>0</x>
+	<y>50</y>
+	<width>33</width>
+	<height>55</height>
+	<frames>1</frames>
+</forward>
+
+<backward>
+	<x>0</x>
+	<y>105</y>
+	<width>33</width>
+	<height>50</height>
+	<frames>1</frames>
+</backward>
+

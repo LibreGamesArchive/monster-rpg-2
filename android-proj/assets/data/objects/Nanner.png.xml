@@ -1,0 +1,12 @@
+<normal>
+	<x>0</x>
+	<y>0</y>
+	<width>16</width>
+	<height>26</height>
+	<frames>2</frames>
+	<delays>
+		<0>500</0>
+		<1>500</1>
+	</delays>
+</normal>
+

@@ -1,0 +1,109 @@
+<stand>
+	<x>0</x>
+	<y>0</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>3</frames>
+	<delays>
+		<0>1000</0>
+		<1>120</1>
+		<2>120</2>
+	</delays>
+</stand>
+
+<hit>
+	<x>180</x>
+	<y>0</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>1</frames>
+</hit>
+
+<hurt>
+	<x>0</x>
+	<y>40</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>3</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+	</delays>
+</hurt>
+
+<dead>
+	<x>180</x>
+	<y>40</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>1</frames>
+</dead>
+
+<walk>
+	<x>0</x>
+	<y>80</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>3</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+	</delays>
+</walk>
+
+<attack>
+	<looping>false</looping>
+	<x>0</x>
+	<y>120</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>3</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+	</delays>
+</attack>
+
+<use>
+	<looping>false</looping>
+	<x>0</x>
+	<y>160</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>3</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+	</delays>
+</use>
+
+<poisoned>
+	<x>0</x>
+	<y>200</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>3</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+	</delays>
+</poisoned>
+
+<paralyzed>
+	<x>0</x>
+	<y>240</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>4</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+		<3>120</3>
+	</delays>
+</paralyzed>

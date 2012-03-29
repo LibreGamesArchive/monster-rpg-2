@@ -1,0 +1,20 @@
+<stand>
+	<x>0</x>
+	<y>0</y>
+	<width>43</width>
+	<height>99</height>
+	<frames>1</frames>
+</stand>
+<cast>
+	<tag>DoNotWaitForAnimationToFinish</tag>
+	<looping>false</looping>
+	<x>43</x>
+	<y>0</y>
+	<width>43</width>
+	<height>99</height>
+	<frames>2</frames>
+	<delays>
+		<0>150</0>
+		<1>150</1>
+	</delays>
+</cast>

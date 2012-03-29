@@ -15,6 +15,9 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.OrientationEventListener;
 import android.view.WindowManager;
+import android.net.Uri;
+import android.content.Intent;
+import android.text.ClipboardManager;
 
 import android.hardware.*;
 import android.content.res.Configuration;
@@ -123,6 +126,35 @@ public class AllegroActivity extends Activity implements SensorEventListener
 
    
    public static AllegroActivity Self;
+	
+   public void openURL(String url)
+   {
+      Intent browserIntent =
+         new Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("http://www.monster-rpg.com")
+         );
+      startActivity(browserIntent);
+   }
+
+   public void setClipData(String saveState)
+   {
+      ClipboardManager m = 
+         (ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
+
+      m.setText(saveState);
+   }
+
+   public String getClipData()
+   {
+      ClipboardManager m = 
+         (ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
+
+      String s = m.getText().toString();
+
+      return s;
+   }
+
 
    /* methods native code calls */
    

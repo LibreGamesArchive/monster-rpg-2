@@ -1,0 +1,176 @@
+<stand>
+	<x>0</x>
+	<y>0</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>4</frames>
+	<delays>
+		<0>5000</0>
+		<1>150</1>
+		<2>150</2>
+		<3>150</3>
+	</delays>
+</stand>
+
+<talon>
+	<looping>false</looping>
+	<x>0</x>
+	<y>109</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>4</frames>
+	<delays>
+		<0>125</0>
+		<1>125</1>
+		<2>125</2>
+		<3>125</3>
+	</delays>
+</talon>
+
+<bof>
+	<looping>false</looping>
+	<x>0</x>
+	<y>218</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>3</frames>
+	<delays>
+		<0>125</0>
+		<1>125</1>
+		<2>125</2>
+	</delays>
+</bof>
+
+<transform0>
+	<x>0</x>
+	<y>331</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>1</frames>
+</transform0>
+<transform1>
+	<x>116</x>
+	<y>331</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>1</frames>
+</transform1>
+<transform2>
+	<x>232</x>
+	<y>331</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>1</frames>
+</transform2>
+<transform3>
+	<x>348</x>
+	<y>331</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>1</frames>
+</transform3>
+<transform4>
+	<x>0</x>
+	<y>449</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>1</frames>
+</transform4>
+<transform5>
+	<x>116</x>
+	<y>449</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>1</frames>
+</transform5>
+<transform6>
+	<x>232</x>
+	<y>449</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>1</frames>
+</transform6>
+<transform7>
+	<x>348</x>
+	<y>449</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>1</frames>
+</transform7>
+<transform8>
+	<x>0</x>
+	<y>568</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>1</frames>
+</transform8>
+<transform9>
+	<x>116</x>
+	<y>568</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>1</frames>
+</transform9>
+<transform10>
+	<x>232</x>
+	<y>568</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>1</frames>
+</transform10>
+<transform11>
+	<x>348</x>
+	<y>568</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>1</frames>
+</transform11>
+<transform12>
+	<x>0</x>
+	<y>687</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>1</frames>
+</transform12>
+<transform13>
+	<x>116</x>
+	<y>687</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>1</frames>
+</transform13>
+<transform14>
+	<x>232</x>
+	<y>687</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>1</frames>
+</transform14>
+<transform15>
+	<x>348</x>
+	<y>687</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>1</frames>
+</transform15>
+<transform16>
+	<x>0</x>
+	<y>804</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>1</frames>
+</transform16>
+<transform17>
+	<x>116</x>
+	<y>804</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>1</frames>
+</transform17>
+<transform18>
+	<x>232</x>
+	<y>804</y>
+	<width>116</width>
+	<height>109</height>
+	<frames>1</frames>
+</transform18>

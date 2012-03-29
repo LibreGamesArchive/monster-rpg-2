@@ -1,0 +1,15 @@
+<stand>
+	<loop_mode>pingpong</loop_mode>
+	<x>0</x>
+	<y>0</y>
+	<width>60</width>
+	<height>50</height>
+	<frames>4</frames>
+	<delays>
+		<0>250</0>
+		<1>150</1>
+		<2>150</2>
+		<3>150</3>
+	</delays>
+</stand>
+
