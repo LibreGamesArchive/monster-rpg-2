@@ -84,7 +84,7 @@ LOCAL_SRC_FILES := \
 	redundant.cpp\
 	script.cpp\
 	shooter.cpp\
-	sound.cpp\
+	sound-android.cpp\
 	Spells.cpp\
 	Tile.cpp\
 	translate.cpp\
