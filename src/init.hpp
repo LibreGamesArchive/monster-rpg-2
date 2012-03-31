@@ -206,6 +206,11 @@ extern int versionMajor;
 extern int versionMinor;
 
 extern bool do_acknowledge_resize;
+	
+extern ALLEGRO_EVENT_QUEUE *events_minor;
+#ifdef ALLEGRO_IPHONE
+extern double next_shake;
+#endif
 
 #endif
 

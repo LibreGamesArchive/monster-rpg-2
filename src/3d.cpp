@@ -351,7 +351,7 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 		uint32_t in;
 	};
 
-	gzFile f = gzopen(filename, "rb");
+	ALLEGRO_FILE *f = al_fopen(filename, "rb");
 	if (!f)
 		return NULL;
 
@@ -361,14 +361,14 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 	/* count everything */
 	try {
 		while (1) {
-			int nv = my_pack_getc(f);
+			int nv = al_fgetc(f);
 			for (int n = 0 ; n < nv; n++) {
-				my_pack_getc(f); // skip
-				my_pack_getc(f); // skip
-				my_pack_getc(f); // skip
-				igetl(f); // skip
-				igetl(f); // skip
-				igetl(f); // skip
+				al_fgetc(f); // skip
+				al_fgetc(f); // skip
+				al_fgetc(f); // skip
+				al_fread32le(f); // skip
+				al_fread32le(f); // skip
+				al_fread32le(f); // skip
 			}
 			if (nv == 3)
 				vcount += 3;
@@ -382,7 +382,7 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 	m->num_verts = vcount;
 	m->verts = new ALLEGRO_VERTEX[vcount];
 
-	gzclose(f);
+	al_fclose(f);
 
 	bool load_txt = false;
 
@@ -395,7 +395,7 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 		strcpy(real_filename, filename);
 		strcpy(real_filename+strlen(real_filename)-3, "txt");
 		
-		FILE *f = fopen(real_filename, "r");
+		ALLEGRO_FILE *f = al_fopen(real_filename, "r");
 		if (!f)
 			return NULL;
 
@@ -406,7 +406,7 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 			double xyz[4][3];
 
 			char line[2000];
-			char *silence_warning = fgets(line, 2000, f);
+			char *silence_warning = al_fgets(f, line, 2000);
 			(void)silence_warning;
 
 			int n = sscanf(line,
@@ -452,10 +452,10 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 				break;
 		}
 
-		fclose(f);
+		al_fclose(f);
 	}
 	else {
-		f = gzopen(filename, "rb");
+		f = al_fopen(filename, "rb");
 		if (!f)
 			return NULL;
 
@@ -467,16 +467,16 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 				float x, y, z;
 				std::vector<float> vv;
 				std::vector<int> cv;
-				int nv = my_pack_getc(f);
+				int nv = al_fgetc(f);
 				for (int n = 0; n < nv; n++) {
-					r = my_pack_getc(f);
-					g = my_pack_getc(f);
-					b = my_pack_getc(f);
-					in = (int)igetl(f);
+					r = al_fgetc(f);
+					g = al_fgetc(f);
+					b = al_fgetc(f);
+					in = (int)al_fread32le(f);
 					x = fl;
-					in = (int)igetl(f);
+					in = (int)al_fread32le(f);
 					y = fl;
-					in = (int)igetl(f);
+					in = (int)al_fread32le(f);
 					z = fl;
 					vv.push_back(x);
 					vv.push_back(y);
@@ -545,7 +545,7 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 			}
 		}
 
-		gzclose(f);
+		al_fclose(f);
 	}
 
 	return m;

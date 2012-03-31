@@ -901,11 +901,20 @@ void Area::initLua()
 	runGlobalScript(luaState);
 	debug_message("...\n");
 
+	unsigned char *bytes;
+	int file_size;
+
+	ALLEGRO_DEBUG("going to load global area script");
+
 	debug_message("Loading global area script...\n");
-	if (luaL_loadfile(luaState, getResource("area_scripts/global.%s", getScriptExtension().c_str()))) {
+	bytes = slurp_text_file(getResource("area_scripts/global.%s", getScriptExtension().c_str()), &file_size);
+	ALLEGRO_DEBUG("slurped %d bytes", file_size);
+	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
 	}
+	delete[] bytes;
+	ALLEGRO_DEBUG("loaded it");
 
 	debug_message("Running global area script...\n");
 	if (lua_pcall(luaState, 0, 0, 0)) {
@@ -914,12 +923,18 @@ void Area::initLua()
 		throw ScriptError();
 	}
 
+	ALLEGRO_DEBUG("gonna load the other one");
+
 	debug_message("Loading area script (%s)...\n", name.c_str());
-	if (luaL_loadfile(luaState, getResource("area_scripts/%s.%s", name.c_str(), getScriptExtension().c_str()))) {
+	bytes = slurp_text_file(getResource("area_scripts/%s.%s", name.c_str(), getScriptExtension().c_str()), &file_size);
+	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		lua_close(luaState);
 		throw ReadError();
 	}
+	delete[] bytes;
+
+	ALLEGRO_DEBUG("loaded the other one!");
 
 	debug_message("Running area script...\n");
 	if (lua_pcall(luaState, 0, 0, 0)) {
@@ -935,6 +950,9 @@ void Area::initLua()
 	startMusic();
 
 	adjustPan();
+
+
+	ALLEGRO_DEBUG("initLua done!");
 }
 
 void Area::startMusic(void)
@@ -2005,7 +2023,7 @@ void Area::writeTile(int tile, gzFile f)
 	my_pack_putc((char)tiles[tile]->isSolid(), f);
 }
 
-Tile* Area::loadTile(gzFile f)
+Tile* Area::loadTile(ALLEGRO_FILE *f)
 {
 	Tile* tile = 0;
 
@@ -2014,7 +2032,7 @@ Tile* Area::loadTile(gzFile f)
 		short tu[TILE_LAYERS];
 		short tv[TILE_LAYERS];
 		for (int i = 0; i < TILE_LAYERS; i++) {
-			anims[i] = (int)igetl(f);
+			anims[i] = al_fread32le(f);
 			if (anims[i] >= 0) {
 #if 0
 #ifdef EDITOR
@@ -2031,7 +2049,7 @@ Tile* Area::loadTile(gzFile f)
 				tv[i] = (n / tm_w) * TILE_SIZE;
 			}
 		}
-		bool solid = my_pack_getc(f);
+		bool solid = al_fgetc(f);
 		tile = new Tile(anims, solid, tu, tv);
 	}
 	catch (...) {
@@ -2197,11 +2215,17 @@ void Area::loadAnimation(int index, bool addIndex)
 
 	ALLEGRO_STATE st;
 	al_store_state(&st, ALLEGRO_STATE_BLENDER | ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
-	al_set_physfs_file_interface();
 	char nm[100];
+#ifndef ALLEGRO_ANDROID
+	al_set_physfs_file_interface();
 	sprintf(nm, "%d-%d.png", subx, suby);
+#else
+	sprintf(nm, "data/tiles/%d-%d.png", subx, suby);
+#endif
 	MBITMAP *tmp = m_load_bitmap(nm);
+#ifndef ALLEGRO_ANDROID
 	al_set_standard_file_interface();
+#endif
 	int xx = tm_used % tm_w;
 	int yy = tm_used / tm_w;
 	tm_used++;
@@ -2280,10 +2304,16 @@ void Area::loadAnimation(int index, bool addIndex)
 
 		ALLEGRO_STATE st;
 		al_store_state(&st, ALLEGRO_STATE_BLENDER | ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
+#ifndef ALLEGRO_ANDROID
 		al_set_physfs_file_interface();
 		sprintf(nm, "%d-%d.png", subx, suby);
+#else
+		sprintf(nm, "data/tiles/%d-%d.png", subx, suby);
+#endif
 		MBITMAP *tmp = m_load_bitmap(nm);
+#ifndef ALLEGRO_ANDROID
 		al_set_standard_file_interface();
+#endif
 		int xx = tm_used % tm_w;
 		int yy = tm_used / tm_w;
 		tm_used++;
@@ -2348,12 +2378,12 @@ void Area::reloadAnimations(void)
 
 void Area::load(std::string filename)
 {
-	gzFile f = gzopen(filename.c_str(), "rb");
+	ALLEGRO_FILE *f = al_fopen(filename.c_str(), "rb");
 	if (!f)
 		throw ReadError();
 	
-	sizex = (int)igetl(f);
-	sizey = (int)igetl(f);
+	sizex = al_fread32le(f);
+	sizey = al_fread32le(f);
 		
 	int ntiles = 0;
 	tm_w = 0;
@@ -2361,9 +2391,9 @@ void Area::load(std::string filename)
 	tm_used = 0;
 	
 	// Count number of tiles used
-	int n = (int)igetl(f);
+	int n = al_fread32le(f);
 	for (int i = 0; i < n; i++) {
-		int tileIndex = (int)igetl(f);
+		int tileIndex = al_fread32le(f);
 
 		char num[100];
 		sprintf(num, "%d", tileIndex);
@@ -2409,21 +2439,21 @@ void Area::load(std::string filename)
 
 	// Can be null, it's ok
 	const char *_tmp = getResource("media/%s_bg.png", name.c_str());
-	FILE *_f = fopen(_tmp, "rb");
+	ALLEGRO_FILE *_f = al_fopen(_tmp, "rb");
 	if (_f) {
-		fclose(_f);
+		al_fclose(_f);
 		bg = m_load_bitmap(_tmp);
 	}
 
 	luaState = 0;
 
-	gzseek(f, 8, SEEK_SET);
+	al_fseek(f, 8, SEEK_SET);
 
 	try {
 		// Read animation indexes
-		int n = (int)igetl(f);
+		int n = (int)al_fread32le(f);
 		for (int i = 0; i < n; i++) {
-			int tileIndex = (int)igetl(f);
+			int tileIndex = (int)al_fread32le(f);
 			loadAnimation(tileIndex, true);
 		}
 		
@@ -2440,10 +2470,10 @@ void Area::load(std::string filename)
 			}
 			tiles.clear();
 		}
-		gzclose(f);
+		al_fclose(f);
 	}
 
-	gzclose(f);
+	al_fclose(f);
 }
 
 void Area::followPlayer(bool f)

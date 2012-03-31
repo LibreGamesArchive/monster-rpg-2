@@ -18,6 +18,38 @@ Direction battleStartDirection;
 // Note: lua starts counting at 1, in C++ we start at 0, that's why you
 // see -1 and +1  here and there
 
+unsigned char *slurp_text_file(std::string filename, int *ret_size)
+{
+	ALLEGRO_FILE *f = al_fopen(filename.c_str(), "rb");
+	long size = al_fsize(f);
+	unsigned char *bytes;
+
+	if (size < 0) {
+		std::vector<char> v;
+		int c;
+		while ((c = al_fgetc(f)) != EOF) {
+			v.push_back(c);
+		}
+		size = v.size();
+		bytes = new unsigned char[size+1];
+		for (unsigned int i = 0; i < size; i++) {
+			bytes[i] = v[i];
+		}
+	}
+	else {
+		bytes = new unsigned char[size+1];
+		al_fread(f, bytes, size);
+	}
+	al_fclose(f);
+
+	bytes[size] = 0;
+
+	if (ret_size)
+		*ret_size = size;
+
+	return bytes;
+}
+
 
 int getNumberFromScript(lua_State *state, std::string name)
 {
@@ -59,11 +91,16 @@ void startNewGame(const char *name)
 
 	runGlobalScript(luaState);
 
+	unsigned char *bytes;
+	int file_size;
+
 	debug_message("Loading global area script...\n");
-	if (luaL_loadfile(luaState, getResource("area_scripts/global.%s", getScriptExtension().c_str()))) {
+	bytes = slurp_text_file(getResource("area_scripts/global.%s", getScriptExtension().c_str()), &file_size);
+	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
 	}
+	delete[] bytes;
 
 	debug_message("Running global area script...\n");
 	if (lua_pcall(luaState, 0, 0, 0)) {
@@ -73,11 +110,13 @@ void startNewGame(const char *name)
 	}
 
 	debug_message("Loading start script...\n");
-	if (luaL_loadfile(luaState, getResource("scripts/%s.%s", name, getScriptExtension().c_str()))) {
+	bytes = slurp_text_file(getResource("scripts/%s.%s", name, getScriptExtension().c_str()), &file_size);
+	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		lua_close(luaState);
 		throw ReadError();
 	}
+	delete[] bytes;
 
 	debug_message("Running start script...\n");
 	if (lua_pcall(luaState, 0, 0, 0)) {
@@ -94,11 +133,21 @@ void startNewGame(const char *name)
 
 void runGlobalScript(lua_State *luaState)
 {
+	unsigned char *bytes;
+	int file_size;
+
+	ALLEGRO_DEBUG("Running global script");
+
 	debug_message("Loading global script...\n");
-	if (luaL_loadfile(luaState, getResource("scripts/global.%s", getScriptExtension().c_str()))) {
+	bytes = slurp_text_file(getResource("scripts/global.%s", getScriptExtension().c_str()), &file_size);
+	ALLEGRO_DEBUG("slurped %d bytes", file_size);
+	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
 	}
+	ALLEGRO_DEBUG("loaded buffer");
+	delete[] bytes;
+	ALLEGRO_DEBUG("deleted bytes");
 
 	debug_message("Running global script...\n");
 	if (lua_pcall(luaState, 0, 0, 0)) {
@@ -3119,6 +3168,7 @@ int CDoMapTutorial(lua_State *stack)
 
 			TGUIWidget *widget = tguiUpdate();
 			if (widget == mapWidget) {
+				ALLEGRO_DEBUG("tguiUpdate returned");
 				if (mapWidget->getSelected() == "seaside") {
 					goto done;
 				}

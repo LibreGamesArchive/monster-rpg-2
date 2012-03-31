@@ -57,7 +57,7 @@ public:
 	void setTile(int x, int y, Tile *t);
 	void copyTile(int x, int y, Tile *t);
 	
-	Tile* loadTile(gzFile f);
+	Tile* loadTile(ALLEGRO_FILE *f);
 	
 	void save(std::string filename);
 	

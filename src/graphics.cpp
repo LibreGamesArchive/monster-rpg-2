@@ -71,6 +71,7 @@ void draw_the_controls(bool draw_controls)
 			if (joypad_connected()) {
 				mTextout(game_font_second_display, "Joypad connected...", 2, 2, white, black, WGT_TEXT_NORMAL, false);
 			}
+			else {	
 #else
 	if (((config.getDpadType() == DPAD_TOTAL_1 || config.getDpadType() == DPAD_TOTAL_2)) || (use_dpad && dpad_buttons && draw_controls && global_draw_controls)) {
 		if (false) {

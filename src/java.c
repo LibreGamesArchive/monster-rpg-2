@@ -3,9 +3,49 @@
 
 #include <jni.h>
 
+static bool ok = false;
+
+#define _jni_checkException(env) __jni_checkException(env, __FILE__, __FUNCTION__, __LINE__)
+void __jni_checkException(JNIEnv *env, const char *file, const char *fname, int line);
+
+#define _jni_call(env, rett, method, args...) ({ \
+   rett ret = (*env)->method(env, ##args); \
+   _jni_checkException(env); \
+   ret; \
+})
+
+#define _jni_callv(env, method, args...) ({ \
+   (*env)->method(env, ##args); \
+   _jni_checkException(env); \
+})
+
+#define _jni_callVoidMethodV(env, obj, name, sig, args...) ({ \
+   jclass class_id = _jni_call(env, jclass, GetObjectClass, obj); \
+   \
+   jmethodID method_id = _jni_call(env, jmethodID, GetMethodID, class_id, name, sig); \
+   if(method_id == NULL) { \
+   } else { \
+      _jni_callv(env, CallVoidMethod, obj, method_id, ##args); \
+   } \
+   \
+   _jni_callv(env, DeleteLocalRef, class_id); \
+})
+
+static jobject _jni_callObjectMethod(JNIEnv *env, jobject object, char *name, char *sig)
+{
+   jclass class_id = _jni_call(env, jclass, GetObjectClass, object);
+   jmethodID method_id = _jni_call(env, jmethodID, GetMethodID, class_id, name, sig);
+   jobject ret = _jni_call(env, jobject, CallObjectMethod, object, method_id);
+   
+   return ret;
+}
+
+jobject _al_android_activity_object();
+
 ALLEGRO_DEBUG_CHANNEL("tmgCrap");
 
 static JavaVM *javavm;
+static JNIEnv *java_env;
 static JNIEnv *thread_env;
 static jclass bpc;
 
@@ -18,7 +58,7 @@ typedef struct FuncCall
 	float vol, pan;
 } FuncCall;
 
-#define FUNCBUF_SIZE 100
+#define FUNCBUF_SIZE 250
 static FuncCall funcs[FUNCBUF_SIZE];
 static int insertPos = 0;
 static int processPos = 0;
@@ -59,7 +99,7 @@ static void *thread_proc(void *arg)
    	JavaVMAttachArgs attach_args = { JNI_VERSION_1_4, "java_audio_thread", NULL };
       	(*javavm)->AttachCurrentThread(javavm, &thread_env, &attach_args);
 	
-	jmethodID meth_initSound = (*thread_env)->GetStaticMethodID(thread_env, bpc, "initSound", "()V");
+	jmethodID meth_initSound = (*thread_env)->GetStaticMethodID(thread_env, bpc, "initSound", "(Lorg/liballeg/app/AllegroActivity;)V");
 	jmethodID meth_update = (*thread_env)->GetStaticMethodID(thread_env, bpc, "update", "()V");
 	jmethodID meth_loadSample = (*thread_env)->GetStaticMethodID(thread_env, bpc, "loadSample", "(Ljava/lang/String;)I");
 	jmethodID meth_loadSampleLoop = (*thread_env)->GetStaticMethodID(thread_env, bpc, "loadSampleLoop", "(Ljava/lang/String;)I");
@@ -74,6 +114,8 @@ static void *thread_proc(void *arg)
 	jmethodID meth_shutdownBASS = (*thread_env)->GetStaticMethodID(thread_env, bpc, "shutdownBASS", "()V");
 	jmethodID meth_destroySample = (*thread_env)->GetStaticMethodID(thread_env, bpc, "destroySample", "(I)V");
 
+	ok = true;
+
 	while (1) {
 		al_lock_mutex(mutex);
 		bool processed = funcs[processPos].processed;
@@ -83,25 +125,32 @@ static void *thread_proc(void *arg)
 			}
 			al_unlock_mutex(mutex);
 			if (inited) {
-				al_rest(0.01);
+				al_rest(0.001);
 			}
 			continue;
 		}
 		const char *func = funcs[processPos].funcname;
 		if (!strcmp(func, "initSound")) {
-			(*thread_env)->CallStaticVoidMethod(thread_env, bpc, meth_initSound);
+			(*thread_env)->CallStaticVoidMethod(thread_env, bpc, meth_initSound, _al_android_activity_object());
+			ok = true;
 		}
 		else if (!strcmp(func, "shutdownBASS")) {
 			(*thread_env)->CallStaticVoidMethod(thread_env, bpc, meth_shutdownBASS);
 		}
 		else if (!strcmp(func, "loadSample")) {
-			the_return = (*thread_env)->CallStaticIntMethod(thread_env, bpc, meth_loadSample, (*thread_env)->NewStringUTF(thread_env, funcs[processPos].filename));
+			jstring str = (*thread_env)->NewStringUTF(thread_env, funcs[processPos].filename);
+			the_return = (*thread_env)->CallStaticIntMethod(thread_env, bpc, meth_loadSample, str);
+			(*thread_env)->DeleteLocalRef(thread_env, str);
 		}
 		else if (!strcmp(func, "loadSampleLoop")) {
-			the_return = (*thread_env)->CallStaticIntMethod(thread_env, bpc, meth_loadSampleLoop, (*thread_env)->NewStringUTF(thread_env, funcs[processPos].filename));
+			jstring str = (*thread_env)->NewStringUTF(thread_env, funcs[processPos].filename);
+			the_return = (*thread_env)->CallStaticIntMethod(thread_env, bpc, meth_loadSampleLoop, str);
+			(*thread_env)->DeleteLocalRef(thread_env, str);
 		}
 		else if (!strcmp(func, "loadMusic")) {
-			the_return = (*thread_env)->CallStaticIntMethod(thread_env, bpc, meth_loadMusic, (*thread_env)->NewStringUTF(thread_env, funcs[processPos].filename));
+			jstring str = (*thread_env)->NewStringUTF(thread_env, funcs[processPos].filename);
+			the_return = (*thread_env)->CallStaticIntMethod(thread_env, bpc, meth_loadMusic, str);
+			(*thread_env)->DeleteLocalRef(thread_env, str);
 		}
 		else if (!strcmp(func, "playSampleVolumePan")) {
 			(*thread_env)->CallStaticIntMethod(thread_env, bpc, meth_playSampleVolumePan, funcs[processPos].handle, funcs[processPos].vol, funcs[processPos].pan);
@@ -142,7 +191,6 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 	(void)reserved;
 
 	javavm = vm;
-	JNIEnv *java_env;
 	(*javavm)->GetEnv(javavm, (void **)&java_env, JNI_VERSION_1_4);
 
 	jclass cls = (*java_env)->FindClass(java_env, "org/liballeg/app/BassPump");
@@ -163,6 +211,11 @@ void bass_initSound(void)
 	al_run_detached_thread(thread_proc, NULL);
 
 	push("initSound", NULL, 0, 0, 0);
+
+	while (!ok) {
+		al_rest(0.001);
+	}
+
 	inited = true;
 }
 
@@ -226,3 +279,55 @@ void bass_destroySample(HSAMPLE s)
 	push("destroySample", NULL, s, 0, 0);
 }
 
+void openURL(const char *url)
+{
+	jstring urlS = (*java_env)->NewStringUTF(java_env, url);
+
+	_jni_callVoidMethodV(
+		java_env,
+		_al_android_activity_object(),
+		"openURL",
+		"(Ljava/lang/String;)V",
+		urlS
+	);
+	
+	(*java_env)->DeleteLocalRef(java_env, urlS);
+}
+
+// return true on success
+bool get_clipboard(char *buf, int len)
+{
+	jstring s =
+		(jstring)_jni_callObjectMethod(
+			java_env,
+			_al_android_activity_object(),
+			"getClipData",
+			"()Ljava/lang/String;"
+		);
+	
+	if (s == NULL)
+		return false;
+	
+	const char *native = (*java_env)->GetStringUTFChars(java_env, s, 0);
+
+	strncpy(buf, native, len);
+
+	(*java_env)->ReleaseStringUTFChars(java_env, s, native);
+
+	return true;
+}
+
+void set_clipboard(char *buf)
+{
+	jstring saveS = (*java_env)->NewStringUTF(java_env, buf);
+
+	_jni_callVoidMethodV(
+		java_env,
+		_al_android_activity_object(),
+		"setClipData",
+		"(Ljava/lang/String;)V",
+		saveS
+	);
+
+	(*java_env)->DeleteLocalRef(java_env, saveS);
+}

@@ -789,11 +789,16 @@ void CombatEnemy::initLua(void)
 
 	runGlobalScript(luaState);
 
+	unsigned char *bytes;
+	int file_size;
+
 	debug_message("Loading global enemy script...\n");
-	if (luaL_loadfile(luaState, getResource("combat_enemies/global.%s", getScriptExtension().c_str()))) {
+	bytes = slurp_text_file(getResource("combat_enemies/global.%s", getScriptExtension().c_str()), &file_size);
+	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
 	}
+	delete[] bytes;
 
 	debug_message("Running global enemy script...\n");
 	if (lua_pcall(luaState, 0, 0, 0)) {
@@ -808,10 +813,12 @@ void CombatEnemy::initLua(void)
 	if (name == "UFO") name = "ufo";
 #endif
 	debug_message("Loading enemy script...\n");
-	if (luaL_loadfile(luaState, getResource("combat_enemies/%s.%s", name.c_str(), getScriptExtension().c_str()))) {
+	bytes = slurp_text_file(getResource("combat_enemies/%s.%s", name.c_str(), getScriptExtension().c_str()), &file_size);
+	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
 	}
+	delete[] bytes;
 #ifdef WIZ
 	if (name == "ufo") name = "UFO";
 #endif

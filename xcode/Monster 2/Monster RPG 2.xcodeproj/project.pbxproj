@@ -107,6 +107,7 @@
 		9659CDA1143A426C0007757E /* joypad.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA0143A426C0007757E /* joypad.mm */; };
 		9659CDA4143A42C50007757E /* joypad_handler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA3143A42C50007757E /* joypad_handler.m */; };
 		9659CDB1143A4E570007757E /* libJoypadCocoaTouch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9659CDB0143A4E560007757E /* libJoypadCocoaTouch.a */; };
+		965C7FA71526804800AD9919 /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 965C7FA61526804800AD9919 /* data */; };
 		966E2381148D80030056951D /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 966E2380148D80030056951D /* data */; };
 		967976AC13BE8690006BCE29 /* init.mm in Sources */ = {isa = PBXBuildFile; fileRef = 967976AB13BE8690006BCE29 /* init.mm */; };
 		968BA9351481E98000F768C5 /* init.mm in Sources */ = {isa = PBXBuildFile; fileRef = 967976AB13BE8690006BCE29 /* init.mm */; };
@@ -285,7 +286,6 @@
 		96BF59F0146EFA170059C813 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 96B4B14C143BC21E00ACA64C /* icon.icns */; };
 		96D175A813351F06008462BB /* translate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D175A713351F06008462BB /* translate.cpp */; };
 		96DB70E213DA6985006F8FCF /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 96DB70C513DA65D7006F8FCF /* Default.png */; };
-		96F822DD151D1FA9004B1B54 /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 96F822DC151D1FA9004B1B54 /* data */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -305,7 +305,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
-				96F822DD151D1FA9004B1B54 /* data in CopyFiles */,
+				965C7FA71526804800AD9919 /* data in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -423,6 +423,7 @@
 		9659CDAE143A4E560007757E /* JoypadManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JoypadManager.h; path = ../../../../Downloads/JoypadSDKs/iOS/JoypadCocoaTouchSDK/JoypadManager.h; sourceTree = "<group>"; };
 		9659CDAF143A4E560007757E /* JoypadSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JoypadSDK.h; path = ../../../../Downloads/JoypadSDKs/iOS/JoypadCocoaTouchSDK/JoypadSDK.h; sourceTree = "<group>"; };
 		9659CDB0143A4E560007757E /* libJoypadCocoaTouch.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libJoypadCocoaTouch.a; path = ../../../../Downloads/JoypadSDKs/iOS/JoypadCocoaTouchSDK/libJoypadCocoaTouch.a; sourceTree = "<group>"; };
+		965C7FA61526804800AD9919 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = "../../iphone-data/data"; sourceTree = "<group>"; };
 		966E2380148D80030056951D /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = ../../fulldatapc/data; sourceTree = "<group>"; };
 		96789CB814831C8D003F393D /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = ../../fulldataios/data; sourceTree = "<group>"; };
 		967976AB13BE8690006BCE29 /* init.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = init.mm; path = ../../src/init.mm; sourceTree = "<group>"; };
@@ -666,6 +667,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				965C7FA61526804800AD9919 /* data */,
 				9631BB8F151E220A00CE43D0 /* libphysfs_xcode.a */,
 				96A460A6151D836A001BC99C /* libAllegro.a */,
 				96F822DC151D1FA9004B1B54 /* data */,

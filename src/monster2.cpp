@@ -1,5 +1,11 @@
 #include "monster2.hpp"
 
+#ifdef ALLEGRO_ANDROID
+extern "C" {
+void openURL(const char *url);
+}
+#endif
+
 int pvr = false;
 int pvr_true_w = -1;
 int pvr_true_h = -1;
@@ -102,12 +108,12 @@ void connect_second_display(void)
 	int mvol = config.getMusicVolume();
 	int svol = config.getSFXVolume();
 
+	_delete_loaded_bitmaps();
+
 	connect_airplay_controls();
 	
 	destroy_shaders();
 	al_destroy_display(display);
-	
-	//al_iphone_override_screen_scale(initial_screen_scale);
 	
 	al_set_new_display_adapter(1);
 	int flags = al_get_new_display_flags();
@@ -117,6 +123,8 @@ void connect_second_display(void)
 	al_set_new_display_flags(flags);
 	init_shaders();
 	init2_shaders();
+
+	_reload_loaded_bitmaps();
 	
 
 	al_set_new_display_adapter(0);
@@ -147,25 +155,144 @@ void connect_second_display(void)
 #endif
 }
 
+static void *wait_for_drawing_resume(void *arg)
+{
+	ALLEGRO_EVENT_QUEUE *queue = (ALLEGRO_EVENT_QUEUE *)arg;
+
+	while (1) {
+		ALLEGRO_EVENT event;
+		al_wait_for_event(queue, &event);
+		if (event.type == ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING) {
+			break;
+		}
+	}
+
+	al_broadcast_cond(switch_cond);
+
+	return NULL;
+}
+
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+static bool should_pause_game(void)
+{
+	return (area && !battle && !player_scripted && !in_pause && !in_map);
+}
+
+static float backup_music_volume = 1.0f;
+static float backup_ambience_volume = 1.0f;
+#endif
+
 // called from everywhere
 bool is_close_pressed(void)
 {
 	// random tasks
+	while (!al_event_queue_is_empty(events_minor)) {
+		ALLEGRO_EVENT event;
+		al_get_next_event(events_minor, &event);
+#ifdef ALLEGRO_IPHONE
+		if (event.type == ALLEGRO_EVENT_DISPLAY_CONNECTED) {
+			create_airplay_mirror = true;
+		}
+		else if (event.type == ALLEGRO_EVENT_DISPLAY_DISCONNECTED) {
+			delete_airplay_mirror = true;
+		}
+#endif
+
+		if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+#ifdef ALLEGRO_IPHONE
+			if (!sound_was_playing_at_program_start)
+				iPodStop();
+#endif
+			close_pressed = true;
+#ifdef ALLEGRO_IPHONE
+			break;
+#endif
+		}
+#if defined ALLEGRO_ANDROID
+		if (event.type == ALLEGRO_EVENT_DISPLAY_RESIZE) {
+			do_acknowledge_resize = true;
+		}
+#endif
+#ifdef ALLEGRO_ANDROID
+		if (event.type == ALLEGRO_EVENT_DISPLAY_LOST) {
+			_destroy_loaded_bitmaps();
+		}
+		else if (event.type == ALLEGRO_EVENT_DISPLAY_FOUND) {
+			_reload_loaded_bitmaps();
+		}
+#endif
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+		if (event.type == ALLEGRO_EVENT_DISPLAY_HALT_DRAWING) {
+#if defined ALLEGRO_IPHONE
+			if (!isMultitaskingSupported()) {
+				if (!sound_was_playing_at_program_start)
+					iPodStop();
+				exit(0);
+			}
+#elif defined ALLEGRO_ANDROID
+			std::string old_music_name = musicName;
+			float old_music_volume = getMusicVolume();
+			playMusic("");
+#endif
+			al_stop_timer(logic_timer);
+			al_stop_timer(draw_timer);
+			// halt
+			al_acknowledge_drawing_halt(display);
+			al_run_detached_thread(
+				wait_for_drawing_resume,
+				events_minor
+			);
+			al_lock_mutex(switch_mutex);
+			al_wait_cond(switch_cond, switch_mutex);
+			al_unlock_mutex(switch_mutex);
+			// resume
+			al_acknowledge_drawing_resume(display);
+			al_start_timer(logic_timer);
+			al_start_timer(draw_timer);
+#ifdef ALLEGRO_ANDROID
+			playMusic(old_music_name, old_music_volume, true);
+#endif
+		}
+#endif
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+		if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT)
+		{
+			do_pause_game = should_pause_game();
+			if (do_pause_game || in_pause) {
+				backup_music_volume = 0.5;
+				backup_ambience_volume = 0.5;
+			}
+			else {
+				backup_music_volume = getMusicVolume();
+				backup_ambience_volume = getAmbienceVolume();
+			}
+			setMusicVolume(0.0);
+			setAmbienceVolume(0.0);
+		}
+		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN)
+		{
+			setMusicVolume(backup_music_volume);
+			setAmbienceVolume(backup_ambience_volume);
+		}
+#endif
+	}
+#ifdef ALLEGRO_IPHONE
+	double shake = al_iphone_get_last_shake_time();
+	if (shake > allegro_iphone_shaken) {
+		allegro_iphone_shaken = shake;
+		if (config.getShakeAction() == CFG_SHAKE_CHANGE_SONG) {
+			iPodNext();
+		}
+		else if (al_current_time() > next_shake) {
+			iphone_shake_time = al_current_time();
+			next_shake = al_current_time()+0.5;
+		}
+	}
+#endif
 
 	if (do_acknowledge_resize) {
-		ALLEGRO_DEBUG("acknowledging resize");
 		al_acknowledge_resize(display);
 		do_acknowledge_resize = false;
-	}
-
-	if (destroy_loaded_bitmaps) {
-		_destroy_loaded_bitmaps();
-		destroy_loaded_bitmaps = false;
-		while (!reload_loaded_bitmaps) {
-			al_rest(0.01);
-		}
-		_reload_loaded_bitmaps();
-		reload_loaded_bitmaps = false;
 	}
 
 	if (reload_translation) {
@@ -227,20 +354,9 @@ bool is_close_pressed(void)
 }
 
 
-
 void do_close(bool quit)
 {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	if (switched_out) {
-		al_stop_timer(logic_timer);
-		al_stop_timer(draw_timer);
-		al_acknowledge_drawing_halt(display);
-		// halt
-		al_wait_cond(switch_cond, switch_mutex);
-		al_start_timer(logic_timer);
-		al_start_timer(draw_timer);
-		return;
-	}
 	if (mapWidget) {
 		mapWidget->auto_save(0, true);
 	}
@@ -908,6 +1024,8 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+	ALLEGRO_DEBUG("returned from init");
+
 #ifndef ALLEGRO_ANDROID
 	int c = argc;
 	char **p = argv;
@@ -934,8 +1052,6 @@ int main(int argc, char *argv[])
 	fclose(f);
 	//#endif
 #endif
-
-	ALLEGRO_DEBUG("trixie: %d", al_get_bitmap_flags(shadow_corners[0]->bitmap));
 
 	MBITMAP *nooskewl = m_load_bitmap(getResource("media/nooskewl.png"));
 
@@ -1208,7 +1324,8 @@ int main(int argc, char *argv[])
 			openFeedbackSite();
 #else
 #ifdef ALLEGRO_ANDROID
-			// FIXME
+			openURL("http://www.monster-rpg.com");
+			exit(0);
 #else
 			openRatingSite();
 #endif

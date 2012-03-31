@@ -13,7 +13,7 @@ std::list<XMLData*> &XMLData::getNodes(void)
 }
 
 
-XMLData::XMLData(std::string name, FILE* f) :
+XMLData::XMLData(std::string name, ALLEGRO_FILE* f) :
 	file(f),
 	debug(false),
 	ungot(-1),
@@ -31,14 +31,14 @@ XMLData::XMLData(std::string filename) :
 {
 	name = std::string("main");
 
-	file = fopen(filename.c_str(), "r");
+	file = al_fopen(filename.c_str(), "r");
 	if (!file) {
 		throw ReadError();
 	}
 
 	read();
 
-	fclose(file);
+	al_fclose(file);
 }
 
 
@@ -93,7 +93,7 @@ XMLData::~XMLData()
 
 std::string XMLData::readToken()
 {
-	if (feof(file)) {
+	if (al_feof(file)) {
 		return "(null)";
 	}
 
@@ -164,7 +164,7 @@ int XMLData::get()
 		ungotReady = false;
 	}
 	else {
-		c = fgetc(file);
+		c = al_fgetc(file);
 	}
 
 	return c;

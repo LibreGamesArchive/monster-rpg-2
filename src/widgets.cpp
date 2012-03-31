@@ -2100,6 +2100,8 @@ void MMap::mouseDown(int xx, int yy, int b)
 	m_get_mouse_state(&s);
 	downX = s.x;
 	downY = s.y;
+
+	ALLEGRO_DEBUG("mouseDown done");
 }
 
 
@@ -2115,6 +2117,7 @@ void MMap::mouseUp(int x, int y, int b)
 		int dy = y - py;
 		if (sqrtf(dx*dx + dy*dy) < 10) {
 			clicked = true;
+			ALLEGRO_DEBUG("MOUSE UP! RETURNING");
 			return;
 		}
 		// test surrounding points
@@ -2392,6 +2395,7 @@ int MMap::update(int millis)
 		}
 	}
 
+	ALLEGRO_DEBUG("in update, flash=%d", shouldFlash);
 	if (shouldFlash) {
 		if (ie.button1 == DOWN || clicked) {
 			use_input_event();
@@ -2594,11 +2598,16 @@ void MMap::load_map_data(void)
 
 	runGlobalScript(luaState);
 
+	unsigned char *bytes;
+	int file_size;
+
 	debug_message("Loading global script...\n");
-	if (luaL_loadfile(luaState, getResource("scripts/global.%s", getScriptExtension().c_str()))) {
+	bytes = slurp_text_file(getResource("scripts/global.%s", getScriptExtension().c_str()), &file_size);
+	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
 	}
+	delete[] bytes;
 
 	debug_message("Running global script...\n");
 	if (lua_pcall(luaState, 0, 0, 0)) {
@@ -2612,10 +2621,12 @@ void MMap::load_map_data(void)
 	lua_setglobal(luaState, "prev");
 
 	debug_message("Loading map script...\n");
-		if (luaL_loadfile(luaState, getResource("%s.%s", prefix.c_str(), getScriptExtension().c_str()))) {
+	bytes = slurp_text_file(getResource("%s.%s", prefix.c_str(), getScriptExtension().c_str()), &file_size);
+	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
 	}
+	delete[] bytes;
 
 	debug_message("Running map script...\n");
 	if (lua_pcall(luaState, 0, 0, 0)) {

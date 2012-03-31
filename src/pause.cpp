@@ -4,6 +4,15 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <CFNetwork/CFNetwork.h>
 #endif
+			
+			
+			// FIXME
+			extern "C" {
+			#define ASSERT ALLEGRO_ASSERT
+			#include <allegro5/allegro_android.h>
+			#include <allegro5/internal/aintern_android.h>
+			void _al_android_make_current(JNIEnv *env, ALLEGRO_DISPLAY_ANDROID *d);
+			}
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 #include "joypad.hpp"
@@ -11,6 +20,10 @@
 
 #if defined ALLEGRO_IPHONE
 #include "iphone.h"
+#endif
+
+#ifdef ALLEGRO_ANDROID
+#include "java.h"
 #endif
 
 bool fairy_used = false;
@@ -2841,11 +2854,7 @@ static bool choose_copy_state(int n, bool exists, void *data)
 			fclose(f);
 
 			char *encoded = create_url(buf, bytes);
-#ifdef ALLEGRO_ANDROID
-			// FIXME!
-#else
 			set_clipboard(encoded);
-#endif
 			notify("", "Save state copied.", "");
 		}
 		else {
@@ -2871,12 +2880,7 @@ static bool choose_paste_state(int n, bool exists, void *data)
 		}
 		if (saveit) {
 			char buf[5000*3];
-#ifdef ALLEGRO_ANDROID
-			// FIXME
-			if (false) {
-#else
 			if (get_clipboard(buf, 5000*3)) {
-#endif
 				save_url(getUserResource("%d.save", n), buf);
 				if (prompt("Run this game now?", "", 0, 1)) {
 					i->num = n;
@@ -3972,6 +3976,8 @@ int title_menu(void)
 		}
 
 		if (draw_counter > 0) {
+			// FIXME
+			//ALLEGRO_DEBUG("drawing loop");
 			draw_counter = 0;
 			m_set_target_bitmap(buffer);
 		
@@ -3984,7 +3990,7 @@ int title_menu(void)
 			mTextout(game_font, versionString,
 				BW-(m_text_length(game_font, versionString)+1),
 				1, white, black, WGT_TEXT_SQUARE_BORDER, false);
-		
+	
 			if (first_frame) {
 				fadeIn(black);
 				first_frame = false;

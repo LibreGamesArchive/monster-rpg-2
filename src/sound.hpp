@@ -34,6 +34,8 @@ void stopAllSamples(void);
 void restartMusic(void);
 void restartAmbience(void);
 void playMusicVolumeOff(std::string name);
-	
+
+bool loadSamples(void (*cb)(int, int));
+
 #endif
 

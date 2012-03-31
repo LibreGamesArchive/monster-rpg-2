@@ -167,9 +167,6 @@ struct LoadedBitmap {
 	int flags, format;
 };
 
-extern std::vector<LoadedBitmap> loaded_bitmaps;
-extern bool destroy_loaded_bitmaps;
-extern bool reload_loaded_bitmaps;
 void _destroy_loaded_bitmaps(void);
 void _reload_loaded_bitmaps(void);
 

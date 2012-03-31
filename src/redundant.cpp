@@ -11,9 +11,7 @@
 #include "allegro5/internal/aintern_opengl.h"
 #endif
 
-std::vector<LoadedBitmap> loaded_bitmaps;
-bool destroy_loaded_bitmaps = false;
-bool reload_loaded_bitmaps = false;
+static std::vector<LoadedBitmap> loaded_bitmaps;
 
 static float get_trap_peak(int topw, int bottomw, int length)
 {

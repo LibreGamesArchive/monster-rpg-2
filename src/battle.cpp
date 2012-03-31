@@ -1117,12 +1117,17 @@ void Battle::initLua(void)
 	registerCFunctions(luaState);
 
 	runGlobalScript(luaState);
+	
+	unsigned char *bytes;
+	int file_size;
 
 	debug_message("Loading global combat script...\n");
-	if (luaL_loadfile(luaState, getResource("combat_scripts/global.%s", getScriptExtension().c_str()))) {
+	bytes = slurp_text_file(getResource("combat_scripts/global.%s", getScriptExtension().c_str()), &file_size);
+	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
 	}
+	delete[] bytes;
 
 	debug_message("Running global combat script...\n");
 	if (lua_pcall(luaState, 0, 0, 0)) {
@@ -1130,12 +1135,14 @@ void Battle::initLua(void)
 		lua_close(luaState);
 		throw ScriptError();
 	}
-
+	
 	debug_message("Loading combat script...\n");
-	if (luaL_loadfile(luaState, getResource("combat_scripts/%s.%s", name.c_str(), getScriptExtension().c_str()))) {
+	bytes = slurp_text_file(getResource("combat_scripts/%s.%s", name.c_str(), getScriptExtension().c_str()), &file_size);
+	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
 	}
+	delete[] bytes;
 
 	debug_message("Running combat script...\n");
 	if (lua_pcall(luaState, 0, 0, 0)) {

@@ -19,6 +19,11 @@ void bass_destroyMusic(HMUSIC music);
 void bass_shutdownBASS(void);
 void bass_destroySample(HSAMPLE s);
 
+void openURL(const char *url);
+
+bool get_clipboard(char *buf, int len);
+void set_clipboard(char *buf);
+
 #ifdef __cplusplus
 }
 #endif

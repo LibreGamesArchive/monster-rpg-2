@@ -18,14 +18,14 @@ public:
 	XMLData(std::string filename);
 	~XMLData(void);
 private:
-	XMLData(std::string name, FILE* f);
+	XMLData(std::string name, ALLEGRO_FILE* f);
 	std::string readToken(void);
 	int get(void);
 	void unget(int c);
 	void seek(long pos);
 	void read();
 	std::string getName(std::string token);
-	FILE* file;
+	ALLEGRO_FILE* file;
 	std::string name;
 	std::string value;
 	std::list<XMLData*> nodes;

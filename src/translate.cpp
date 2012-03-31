@@ -33,11 +33,11 @@ std::string get_language_friendly_name(int index)
 
 void load_translation_tags(void)
 {
-	FILE *f = fopen(getResource("English.utf8"), "r");
+	ALLEGRO_FILE *f = al_fopen(getResource("English.utf8"), "r");
 
 	char buf[5000];
 
-	while (fgets(buf, 5000, f) != NULL) {
+	while (al_fgets(f, buf, 5000) != NULL) {
 		if (buf[strlen(buf)-1] == 0xa)
 			buf[strlen(buf)-1] = 0;
 		if (buf[strlen(buf)-1] == 0xd)
@@ -48,7 +48,7 @@ void load_translation_tags(void)
 		pre_translated_strings.push_back(std::string(buf));
 	}
 
-	fclose(f);
+	al_fclose(f);
 }
 
 static void ustr_replace_all(ALLEGRO_USTR *ustr, int32_t c1, int32_t c2)

@@ -123,7 +123,7 @@ const char *getResource(const char *fmt, ...)
 #ifndef ALLEGRO_ANDROID // FIXME
 	strcpy(name, resourcePath());
 #else
-	strcpy(name, "/sdcard/sd/stuff/data/");
+	strcpy(name, "data/");
 #endif
 	va_start(ap, fmt);
 	vsnprintf(name+strlen(name), (sizeof(name)/sizeof(*name))-1, fmt, ap);

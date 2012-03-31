@@ -113,18 +113,10 @@ public class AllegroActivity extends Activity implements SensorEventListener
       System.loadLibrary("allegro_font-debug");
       System.loadLibrary("allegro_ttf-debug");
       System.loadLibrary("allegro_shader-debug");
+      System.loadLibrary("allegro-example");
    }
 	
         
-   // For BassPump
-   static {
-      System.loadLibrary("bass");
-      System.loadLibrary("bassmix");
-      System.loadLibrary("bassflac");
-      System.loadLibrary("allegro-example");
-   }
-
-   
    public static AllegroActivity Self;
 	
    public void openURL(String url)
@@ -1325,15 +1317,17 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
    public void surfaceDestroyed(SurfaceHolder holder)
    {
       Log.d("AllegroSurface", "surfaceDestroyed");
-      
+
+      nativeOnDestroy();
+
+      egl_makeCurrent();
+
       egl_destroySurface();
       egl_destroyContext();
       
       EGL10 egl = (EGL10)EGLContext.getEGL();
       egl.eglTerminate(egl_Display);
       egl_Display = null;
-      
-      nativeOnDestroy();
       
       Log.d("AllegroSurface", "surfaceDestroyed end");
    }

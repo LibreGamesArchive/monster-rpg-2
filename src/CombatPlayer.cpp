@@ -231,12 +231,17 @@ public:
 		std::string realName = party[player->getNumber()]->getName();
 
 		debug_message("Real name = %s\n", realName.c_str());
+	
+		unsigned char *bytes;
+		int file_size;
 
 		debug_message("Loading player script...\n");
-		if (luaL_loadfile(luaState, getResource("combat_players/%s.%s", realName.c_str(), getScriptExtension().c_str()))) {
+		bytes = slurp_text_file(getResource("combat_players/%s.%s", realName.c_str(), getScriptExtension().c_str()), &file_size);
+	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 			dumpLuaStack(luaState);
 			throw ReadError();
 		}
+		delete[] bytes;
 
 		debug_message("Running player script...\n");
 		if (lua_pcall(luaState, 0, 0, 0)) {
