@@ -5,7 +5,7 @@
 
 class Object;
 
-unsigned char *slurp_text_file(std::string filename, int *ret_size);
+unsigned char *slurp_file(std::string filename, int *ret_size);
 
 void openLuaLibs(lua_State* state);
 void callLua(lua_State* luaState, const char *func, const char *sig, ...);

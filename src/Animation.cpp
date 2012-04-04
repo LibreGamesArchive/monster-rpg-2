@@ -122,6 +122,10 @@ int Animation::getAlpha(void)
 }
 
 
+Animation::Animation(void)
+{
+}
+
 Animation::Animation(const char *name, int alpha) :
 	nFrames(0)
 {
@@ -188,3 +192,23 @@ void Animation::wrap(void)
 	}
 }
 
+Animation *Animation::clone(void)
+{
+	Animation *a = new Animation();
+
+	for (int i = 0; i < frames.size(); i++) {
+		a->frames.push_back(frames[i]->clone());
+	}
+
+	a->nFrames = nFrames;
+	a->currentFrame = currentFrame;
+	a->count = count;
+	a->name = name;
+	a->alpha = alpha;
+	a->looping = looping;
+	a->loopMode = loopMode;
+	a->increment = increment;
+	a->tags = tags;
+
+	return a;
+}

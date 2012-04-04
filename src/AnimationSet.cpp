@@ -263,6 +263,10 @@ AnimationSet::AnimationSet(const char *filename, bool alpha) :
 	debug_message("Animation set %s loaded\n", filenameS.c_str());
 }
 
+AnimationSet::AnimationSet()
+{
+}
+
 AnimationSet::~AnimationSet()
 {
 	for (uint i = 0; i < anims.size(); i++)
@@ -270,3 +274,28 @@ AnimationSet::~AnimationSet()
 	anims.clear();
 }
 
+AnimationSet *AnimationSet::clone(int type)
+{
+	AnimationSet *a = new AnimationSet();
+
+	a->name = name;
+	for (int i = 0; i < anims.size(); i++) {
+		bool do_clone = false;
+		if (type == CLONE_ENEMY) {
+			do_clone = true;
+		}
+		else {
+			if (anims[i]->getName() == "stand" || anims[i]->getName() == "stand2" || anims[i]->getName() == "walk" || anims[i]->getName() == "noweapon_stand" || anims[i]->getName() == "noweapon_walk") {
+				do_clone = true;
+			}
+		}
+		if (!do_clone)
+			continue;
+		a->anims.push_back(anims[i]->clone());
+	}
+	a->currAnim = currAnim;
+	a->prefix = prefix;
+	a->destroy = destroy;
+
+	return a;
+}

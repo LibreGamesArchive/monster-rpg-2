@@ -100,6 +100,7 @@ static void d3d_resource_release(void)
 }
 #endif
 
+
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 bool do_pause_game = false;
 #endif
@@ -134,7 +135,7 @@ bool use_digital_joystick = false;
 int screen_offset_x, screen_offset_y;
 float screen_ratio_x, screen_ratio_y;
 #ifdef ALLEGRO_IPHONE
-static double allegro_iphone_shaken = 0.0;
+double allegro_iphone_shaken = 0.0;
 #endif
 float initial_screen_scale = 0.0f;
 bool sound_was_playing_at_program_start;
@@ -145,7 +146,7 @@ ALLEGRO_COND *wait_cond;
 ALLEGRO_MUTEX *wait_mutex;
 ALLEGRO_MUTEX *joypad_mutex;
 int exit_event_thread = 0;
-ALLEGRO_SHADER *controller_shader;
+//ALLEGRO_SHADER *controller_shader;
 ALLEGRO_SHADER *default_shader;
 ALLEGRO_SHADER *cheap_shader;
 ALLEGRO_SHADER *tinter;
@@ -153,13 +154,6 @@ ALLEGRO_SHADER *warp;
 ALLEGRO_SHADER *shadow_shader;
 ALLEGRO_SHADER *brighten;
 ALLEGRO_SHADER *scale2x;
-ALLEGRO_SHADER *scale2x_flipped;
-ALLEGRO_SHADER *scale3x;
-ALLEGRO_SHADER *scale3x_flipped;
-ALLEGRO_SHADER *scale2x_linear;
-ALLEGRO_SHADER *scale2x_linear_flipped;
-ALLEGRO_SHADER *scale3x_linear;
-ALLEGRO_SHADER *scale3x_linear_flipped;
 #endif
 MBITMAP *buffer = 0;
 MBITMAP *overlay = 0;
@@ -173,7 +167,7 @@ MBITMAP *tile;
 char start_cwd[1000];
 XMLData *tilemap_data = NULL;
 XMLData *trans_data = NULL;
-AnimationSet *guiAnims = NULL;
+GuiAnims guiAnims;
 XMLData *terrain;
 std::vector<WaterData> waterData;
 float screenScaleX = 2;
@@ -246,8 +240,7 @@ static AnimationSet *dot_loader;
 static MBITMAP *bg_loader, *loading_loader, *bar_loader;
 MBITMAP *corner_bmp;
 bool had_battle = false;
-MBITMAP *shadow_corners[4]; // top left then clockwise
-MBITMAP *shadow_sides[4]; // top then clockwise
+MBITMAP *shadow_sheet;
 ALLEGRO_VERTEX triangle_lines[32];
 MBITMAP *dpad_buttons;
 bool onscreen_swipe_to_attack;
@@ -274,6 +267,92 @@ bool switched_out = false;
 ALLEGRO_MUTEX *switch_mutex;
 ALLEGRO_COND *switch_cond;
 uint32_t my_opengl_version;
+
+static void create_shadows(MBITMAP *bmp, RecreateData *data)
+{
+	(void)data;
+	MBITMAP *shadow_corners[4]; // top left then clockwise
+	MBITMAP *shadow_sides[4]; // top then clockwise
+
+	ALLEGRO_BITMAP *__old_target__ = al_get_target_bitmap();
+	m_save_blender();
+
+	m_set_target_bitmap(bmp);
+	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
+
+	shadow_sides[0] = m_create_sub_bitmap(bmp, 16*0, 0, 16, SHADOW_CORNER_SIZE);
+	shadow_sides[1] = m_create_sub_bitmap(bmp, 16*1, 0, SHADOW_CORNER_SIZE, 16);
+	shadow_sides[2] = m_create_sub_bitmap(bmp, 16*2, 0, 16, SHADOW_CORNER_SIZE);
+	shadow_sides[3] = m_create_sub_bitmap(bmp, 16*3, 0, SHADOW_CORNER_SIZE, 16);
+	
+	for (int i = 0; i < 4; i++) {
+		//shadow_corners[i] = m_create_alpha_bitmap(SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE); // check
+		shadow_corners[i] = m_create_sub_bitmap(bmp, i*SHADOW_CORNER_SIZE, 16, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE);
+		m_set_target_bitmap(shadow_corners[i]);
+		m_clear(m_map_rgba(0, 0, 0, 0));
+		m_set_target_bitmap(shadow_sides[i]);
+		m_clear(m_map_rgba(0, 0, 0, 0));
+	}
+	
+	m_set_target_bitmap(shadow_corners[2]);
+	m_lock_bitmap(shadow_corners[2], ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
+	for (int yy = 0; yy < SHADOW_CORNER_SIZE; yy++) {
+		for (int xx = 0; xx < SHADOW_CORNER_SIZE; xx++) {
+			int dx = xx;
+			int dy = yy;
+ 			float dist = (float)sqrt((float)dx*dx + dy*dy) + 1;
+			if (dist > SHADOW_CORNER_SIZE) dist = SHADOW_CORNER_SIZE;
+			float a = (1.0f-(dist/SHADOW_CORNER_SIZE))*255; //(1.0-sin(((float)dist/(SHADOW_CORNER_SIZE-1))*(M_PI/2))) * 255;
+			m_put_pixel(xx, yy, m_map_rgba(0, 0, 0, a));
+		}
+	}
+	m_unlock_bitmap(shadow_corners[2]);
+	_blend_color = white;
+	
+	if (use_programmable_pipeline) {
+		al_set_separate_blender(
+			ALLEGRO_ADD,
+			ALLEGRO_ONE,
+			ALLEGRO_ZERO,
+			ALLEGRO_ADD,
+			ALLEGRO_ONE,
+			ALLEGRO_ONE
+		);
+	}
+	else {
+		al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+	}
+
+	// Can't draw bitmaps to themselves except MEMORY or locked ones, so lock it
+
+	m_set_target_bitmap(shadow_corners[0]);
+	m_draw_bitmap_to_self(shadow_corners[2], 0, 0, M_FLIP_HORIZONTAL|M_FLIP_VERTICAL);
+	
+	m_set_target_bitmap(shadow_corners[1]);
+	m_draw_bitmap_to_self(shadow_corners[2], 0, 0, M_FLIP_VERTICAL);
+	m_set_target_bitmap(shadow_corners[3]);
+	m_draw_bitmap_to_self(shadow_corners[2], 0, 0, M_FLIP_HORIZONTAL);
+	m_set_target_bitmap(shadow_sides[0]);
+	m_draw_bitmap_region_to_self(shadow_corners[0], SHADOW_CORNER_SIZE-1, 0, 1, SHADOW_CORNER_SIZE, 0, 0, 0);
+	m_set_target_bitmap(shadow_sides[3]);
+	m_draw_bitmap_region_to_self(shadow_corners[0], 0, SHADOW_CORNER_SIZE-1, SHADOW_CORNER_SIZE, 1, 0, 0, 0);
+	m_set_target_bitmap(shadow_sides[2]);
+	m_draw_bitmap_to_self(shadow_sides[0], 0, 0, M_FLIP_VERTICAL);
+	m_set_target_bitmap(shadow_sides[1]);
+	m_draw_bitmap_to_self(shadow_sides[3], 0, 0, M_FLIP_HORIZONTAL);
+	al_set_target_bitmap(__old_target__);
+	m_restore_blender();
+
+	for (int i = 0; i < 4; i++) {
+		m_destroy_bitmap(shadow_corners[i]);
+		m_destroy_bitmap(shadow_sides[i]);
+	}
+}
+
+static void destroy_shadows(MBITMAP *bmp)
+{
+	al_destroy_bitmap(bmp->bitmap);
+}
 
 ScreenSize small_screen(void)
 {
@@ -633,9 +712,10 @@ static void *thread_proc(void *arg)
 #if defined A5_D3D || defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_register_event_source(events, al_get_display_event_source(display));
 #endif
-
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE
 	al_register_event_source(events, al_get_keyboard_event_source());
+#endif
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	al_register_event_source(events, al_get_joystick_event_source());
 #endif
 	
@@ -962,7 +1042,7 @@ static void *thread_proc(void *arg)
 				event_mouse_x = this_x;
 				event_mouse_y = this_y;
 				
-				if (is_ipad() && !config.getMaintainAspectRatio())
+				if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN)
 					tguiConvertMousePosition(&this_x, &this_y, 0, 0, screen_ratio_x, screen_ratio_y);
 				else
 					tguiConvertMousePosition(&this_x, &this_y, screen_offset_x, screen_offset_y, 1, 1);
@@ -1191,19 +1271,13 @@ static void *loader_proc(void *arg)
 
 	//(void)arg;
 	//m_set_target_bitmap(al_get_backbuffer(display));
-	show_progress(54);
+	show_progress(55);
 
 	MBITMAP *deter_display_access_bmp;
 	deter_display_access_bmp = m_create_bitmap(16, 16); // check
 	m_set_target_bitmap(deter_display_access_bmp);
-	
-	guiAnims = new AnimationSet(getResource("gui.png"));
-	if (!guiAnims) {
-		if (!native_error("Failed to load gui"))
-			return NULL;
-	}
-	debug_message("GUI graphics loaded.\n");
-	
+
+	guiAnims.bitmap = m_load_bitmap(getResource("gui.png"));
 
 	cursor = m_load_bitmap(getResource("media/cursor.png"));
 	if (!cursor) {
@@ -1235,7 +1309,7 @@ static void *loader_proc(void *arg)
 	debug_message("Input initialized.\n");
 	initInput();
 
-	show_progress(58);
+	show_progress(60);
 
 	gfx_mode_set = true;
 
@@ -1257,7 +1331,7 @@ static void *loader_proc(void *arg)
 	m_destroy_bitmap(tmp_bmp);
 #endif
 
-	show_progress(62);
+	show_progress(65);
 
 	debug_message("TGUI initialized.\n");
 
@@ -1275,7 +1349,7 @@ static void *loader_proc(void *arg)
 	debug_message("Sound initialized\n");
 
 
-	show_progress(66);
+	show_progress(70);
 
 	// load terrain file
 
@@ -1299,7 +1373,7 @@ static void *loader_proc(void *arg)
 	}
 	delete water_data;
 
-	show_progress(70);
+	show_progress(75);
 	debug_message("water data loaded\n");
 
 	for (int i = 0; i < MAX_INVENTORY; i++) {
@@ -1316,7 +1390,7 @@ static void *loader_proc(void *arg)
 	}
 	*/
 
-	show_progress(75);
+	show_progress(80);
 
 	debug_message("Loading weapon animations\n");
 
@@ -1324,7 +1398,7 @@ static void *loader_proc(void *arg)
 	//initWeaponAnimations();
 
 
-	show_progress(79);
+	show_progress(85);
 
 	debug_message("Loading miscellaneous graphics\n");
 
@@ -1334,7 +1408,7 @@ static void *loader_proc(void *arg)
 	webbed = m_load_bitmap(getResource("combat_media/webbed.png"));
 
 
-	show_progress(83);
+	show_progress(90);
 
 	wait_cond = al_create_cond();
 	wait_mutex = al_create_mutex();
@@ -1373,76 +1447,7 @@ static void *loader_proc(void *arg)
 	m_restore_blender();
 	m_pop_target_bitmap();
 
-	ALLEGRO_BITMAP *__old_target__ = al_get_target_bitmap();
-	m_save_blender();
-	shadow_sides[0] = m_create_alpha_bitmap(16, SHADOW_CORNER_SIZE); // check
-	shadow_sides[1] = m_create_alpha_bitmap(SHADOW_CORNER_SIZE, 16); // check
-	shadow_sides[2] = m_create_alpha_bitmap(16, SHADOW_CORNER_SIZE); // check
-	shadow_sides[3] = m_create_alpha_bitmap(SHADOW_CORNER_SIZE, 16); // check
-
-	for (int i = 0; i < 4; i++) {
-		shadow_corners[i] = m_create_alpha_bitmap(SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE); // check
-		m_set_target_bitmap(shadow_corners[i]);
-		m_clear(m_map_rgba(0, 0, 0, 0));
-		m_set_target_bitmap(shadow_sides[i]);
-		m_clear(m_map_rgba(0, 0, 0, 0));
-	}
-
-	show_progress(87);
-
-	m_set_target_bitmap(shadow_corners[2]);
-	m_lock_bitmap(shadow_corners[2], ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
-	for (int yy = 0; yy < SHADOW_CORNER_SIZE; yy++) {
-		for (int xx = 0; xx < SHADOW_CORNER_SIZE; xx++) {
-			int dx = xx;
-			int dy = yy;
- 			float dist = (float)sqrt((float)dx*dx + dy*dy) + 1;
-			if (dist > SHADOW_CORNER_SIZE) dist = SHADOW_CORNER_SIZE;
-			float a = (1.0f-(dist/SHADOW_CORNER_SIZE))*255; //(1.0-sin(((float)dist/(SHADOW_CORNER_SIZE-1))*(M_PI/2))) * 255;
-			m_put_pixel(xx, yy, m_map_rgba(0, 0, 0, a));
-		}
-	}
-	m_unlock_bitmap(shadow_corners[2]);
-	_blend_color = white;
-	
-	show_progress(91);
-
-	if (use_programmable_pipeline) {
-		al_set_separate_blender(
-			ALLEGRO_ADD,
-			ALLEGRO_ONE,
-			ALLEGRO_ZERO,
-			ALLEGRO_ADD,
-			ALLEGRO_ONE,
-			ALLEGRO_ONE
-		);
-	}
-	else {
-		al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
-	}
-
-	m_set_target_bitmap(shadow_corners[0]);
-	m_draw_bitmap(shadow_corners[2], 0, 0, M_FLIP_HORIZONTAL|M_FLIP_VERTICAL);
-
 	show_progress(95);
-
-	m_set_target_bitmap(shadow_corners[1]);
-	m_draw_bitmap(shadow_corners[2], 0, 0, M_FLIP_VERTICAL);
-	m_set_target_bitmap(shadow_corners[3]);
-	m_draw_bitmap(shadow_corners[2], 0, 0, M_FLIP_HORIZONTAL);
-	m_set_target_bitmap(shadow_sides[0]);
-	m_draw_bitmap_region(shadow_corners[0], SHADOW_CORNER_SIZE-1, 0, 1, SHADOW_CORNER_SIZE, 0, 0, 0);
-	m_set_target_bitmap(shadow_sides[3]);
-	m_draw_bitmap_region(shadow_corners[0], 0, SHADOW_CORNER_SIZE-1, SHADOW_CORNER_SIZE, 1, 0, 0, 0);
-	m_set_target_bitmap(shadow_sides[2]);
-	m_draw_bitmap(shadow_sides[0], 0, 0, M_FLIP_VERTICAL);
-	m_set_target_bitmap(shadow_sides[1]);
-	m_draw_bitmap(shadow_sides[3], 0, 0, M_FLIP_HORIZONTAL);
-	al_set_target_bitmap(__old_target__);
-	m_restore_blender();
-
-	show_progress(100);
-
 
 	al_run_detached_thread(thread_proc, NULL);
 	m_rest(0.5);
@@ -1505,7 +1510,13 @@ bool loadTilemap(void)
 	return true;
 }
 
-void init_controller_shader(void)
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#define LOWP ""
+#else
+#define LOWP "lowp"
+#endif	
+
+/*void init_controller_shader(void)
 {
 	static const char *main_vertex_source =
 	"attribute vec4 pos;\n"
@@ -1532,19 +1543,19 @@ void init_controller_shader(void)
 	"uniform sampler2D tex;\n"
 	"uniform bool use_tex_matrix;\n"
 	"uniform mat4 tex_matrix;\n"
-	"varying lowp vec4 varying_color;\n"
+	"varying " LOWP " vec4 varying_color;\n"
 	"varying vec2 varying_texcoord;\n"
 	"void main()\n"
 	"{\n"
-	"  lowp vec4 tmp = varying_color;\n"
+	"  " LOWP " vec4 tmp = varying_color;\n"
 	"  vec4 coord = vec4(varying_texcoord, 0.0, 1.0);\n"
 	"  if (use_tex_matrix) {\n"
 	"     coord = coord * tex_matrix;\n"
-	"     lowp vec4 sample = texture2D(tex, coord.st);\n"
+	"     " LOWP " vec4 sample = texture2D(tex, coord.st);\n"
 	"     tmp *= sample;\n"
 	"  }\n"
 	"  else if (use_tex) {\n"
-	"     lowp vec4 sample = texture2D(tex, coord.st);\n"
+	"     " LOWP " vec4 sample = texture2D(tex, coord.st);\n"
 	"     tmp *= sample;\n"
 	"  }\n"
 	"  gl_FragColor = tmp;\n"
@@ -1565,6 +1576,7 @@ void init_controller_shader(void)
 				);
 
 	al_link_shader(controller_shader);
+printf("-- %s --\n", al_get_shader_log(controller_shader));
 	
 	al_set_opengl_program_object(controller_display, al_get_opengl_program_object(controller_shader));
 
@@ -1574,16 +1586,11 @@ void destroy_controller_shader(void)
 {
 	al_destroy_shader(controller_shader);
 }
+*/
 
 #ifndef A5_D3D
 void init_shaders(void)
 {
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-#define LOWP ""
-#else
-#define LOWP "lowp"
-#endif	
-	
 #if !defined NO_SHADERS
 	if (use_programmable_pipeline) {
 		
@@ -1636,7 +1643,6 @@ void init_shaders(void)
 		"   gl_Position = projview_matrix * pos;\n"
 		"}\n";
 		
-#ifdef ALLEGRO_IPHONE
 		static const char *scale2x_vertex_source =
 		"attribute vec4 pos;\n"
 		"attribute vec2 texcoord;\n"
@@ -1660,39 +1666,6 @@ void init_shaders(void)
 #endif
 		"   gl_Position = projview_matrix * pos;\n"
 		"}\n";
-		
-		static const char *scale3x_vertex_source =
-		"attribute vec4 pos;\n"
-		"attribute vec2 texcoord;\n"
-		"uniform mat4 projview_matrix;\n"
-		"uniform float hstep;\n"
-		"uniform float vstep;\n"
-		"varying vec2 varying_texcoord;\n"
-		"varying vec2 tA;\n"
-		"varying vec2 tB;\n"
-		"varying vec2 tC;\n"
-		"varying vec2 tD;\n"
-		"varying vec2 tF;\n"
-		"varying vec2 tG;\n"
-		"varying vec2 tH;\n"
-		"varying vec2 tI;\n"
-		"void main()\n"
-		"{\n"
-		"	tA = vec2(texcoord.s-hstep, texcoord.t+vstep);\n"
-		"   tB = vec2(texcoord.s,       texcoord.t+vstep);\n"
-		"	tC = vec2(texcoord.s+hstep, texcoord.t+vstep);\n"
-		"   tD = vec2(texcoord.s-hstep, texcoord.t      );\n"
-		"   tF = vec2(texcoord.s+hstep, texcoord.t      );\n"
-		"	tG = vec2(texcoord.s-hstep, texcoord.t-vstep);\n"
-		"   tH = vec2(texcoord.s,       texcoord.t-vstep);\n"
-		"	tI = vec2(texcoord.s+hstep, texcoord.t-vstep);\n"
-		"   varying_texcoord = texcoord;\n"
-#ifndef __linux__
-		"   gl_PointSize = 1.0;\n"
-#endif
-		"   gl_Position = projview_matrix * pos;\n"
-		"}\n";
-#endif
 		
 		static const char *main_pixel_source =
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -1846,7 +1819,6 @@ void init_shaders(void)
 		"   }\n"
 		"}";
 		
-#ifdef ALLEGRO_IPHONE
 		const char *scale2x_pixel_source =
 		"precision mediump float;\n"
 		"uniform sampler2D tex;\n"
@@ -1878,403 +1850,12 @@ void init_shaders(void)
 		"		else{\n"
 		"			gl_FragColor = H == F ? F : E;\n"
 		"		}\n"
-		/*
-		 "		" LOWP " float x = mod(gl_FragCoord.t-offset_y, 2.0);\n"
-		 "		" LOWP " float y = mod(gl_FragCoord.s-offset_x, 2.0);\n"
-		 "		if (x < 1.0 && y < 1.0) {\n"
-		 "			gl_FragColor = B == F ? F : E;\n"
-		 "		}\n"
-		 "		else if (x < 1.0 && y >= 1.0) {\n"
-		 "			gl_FragColor = H == F ? F : E;\n"
-		 "		}\n"
-		 "		else if (x >= 1.0 && y < 1.0) {\n"
-		 "			gl_FragColor = D == B ? D : E;\n"
-		 "		}\n"
-		 "		else{\n"
-		 "			gl_FragColor = D == H ? D : E;\n"
-		 "		}\n"
-		 */
 		"	}\n"
 		"	else {\n"
 		"		gl_FragColor = E;\n"
 		"	}\n"
 		"}\n";
 		
-		const char *scale2x_flipped_pixel_source =
-		"precision mediump float;\n"
-		"uniform sampler2D tex;\n"
-		"varying vec2 varying_texcoord;\n"
-		"uniform " LOWP " float offset_x;\n"
-		"uniform " LOWP " float offset_y;\n"
-		"varying vec2 tB;\n"
-		"varying vec2 tD;\n"
-		"varying vec2 tF;\n"
-		"varying vec2 tH;\n"
-		"void main() {\n"
-		"	" LOWP " vec4 H = texture2D(tex, tB);\n"
-		"	" LOWP " vec4 E = texture2D(tex, varying_texcoord);\n"
-		"	" LOWP " vec4 B = texture2D(tex, tH);\n"
-		"	" LOWP " vec4 F = texture2D(tex, tD);\n"
-		"	" LOWP " vec4 D = texture2D(tex, tF);\n"
-		"	if (B != H && D != F) {\n"
-		"		" LOWP " float x = mod(gl_FragCoord.t-offset_y, 2.0);\n"
-		"		" LOWP " float y = mod(gl_FragCoord.s-offset_x, 2.0);\n"
-		"		if (x < 1.0 && y < 1.0) {\n"
-		"			gl_FragColor = B == F ? F : E;\n"
-		"		}\n"
-		"		else if (x < 1.0 && y >= 1.0) {\n"
-		"			gl_FragColor = H == F ? F : E;\n"
-		"		}\n"
-		"		else if (x >= 1.0 && y < 1.0) {\n"
-		"			gl_FragColor = D == B ? D : E;\n"
-		"		}\n"
-		"		else{\n"
-		"			gl_FragColor = D == H ? D : E;\n"
-		"		}\n"
-		"	}\n"
-		"	else {\n"
-		"		gl_FragColor = E;\n"
-		"	}\n"
-		"}\n";
-		
-		const char *scale3x_pixel_source =
-		"precision mediump float;\n"
-		"uniform sampler2D tex;\n"
-		"uniform float offset_x;\n"
-		"uniform float offset_y;\n"
-		"varying vec2 varying_texcoord;\n"
-		"varying vec2 tA;\n"
-		"varying vec2 tB;\n"
-		"varying vec2 tC;\n"
-		"varying vec2 tD;\n"
-		"varying vec2 tF;\n"
-		"varying vec2 tG;\n"
-		"varying vec2 tH;\n"
-		"varying vec2 tI;\n"
-		"void main() {\n"
-		"	vec4 A = texture2D(tex, tA);\n"
-		"	vec4 B = texture2D(tex, tB);\n"
-		"	vec4 C = texture2D(tex, tC);\n"
-		"	vec4 D = texture2D(tex, tD);\n"
-		"	vec4 E = texture2D(tex, varying_texcoord);\n"
-		"	vec4 F = texture2D(tex, tF);\n"
-		"	vec4 G = texture2D(tex, tG);\n"
-		"	vec4 H = texture2D(tex, tH);\n"
-		"	vec4 I = texture2D(tex, tI);\n"
-		"	if (B != H && D != F) {\n"
-		"		float x = mod(gl_FragCoord.t-offset_y, 3.0);\n"
-		"		float y = mod(gl_FragCoord.s-offset_x, 3.0);\n"
-		"		if (y < 1.0) {\n"
-		"			if (x < 1.0) {\n"
-		"				gl_FragColor = H == F ? F : E;\n"
-		"			}\n"
-		"			else if (x < 2.0) {\n"
-		"				gl_FragColor = (D == H && E != I) || (H == F && E != G) ? H : E;\n"
-		"			}\n"
-		"			else {\n"
-		"				gl_FragColor = D == H ? D : E;\n"
-		"			}\n"
-		"		}\n"
-		"		else if (y < 2.0) {\n"
-		"			if (x < 1.0) {\n"
-		"				gl_FragColor = (B == F && E != I) || (H == F && E != C) ? F : E;\n"
-		"			}\n"
-		"			else if (x < 2.0) {\n"
-		"				gl_FragColor = E;\n"
-		"			}\n"
-		"			else {\n"
-		"				gl_FragColor = (D == B && E != G) || (D == H && E != A) ? D : E;\n"
-		"			}\n"
-		"		}\n"
-		"		else {\n"
-		"			if (x < 1.0) {\n"
-		"				gl_FragColor = B == F ? F : E;\n"
-		"			}\n"
-		"			else if (x < 2.0) {\n"
-		"				gl_FragColor = (D == B && E != C) || (B == F && E != A) ? B : E;\n"
-		"			}\n"
-		"			else {\n"
-		"				gl_FragColor = D == B ? D : E;\n"
-		"			}\n"
-		"		}\n"
-		"	}\n"
-		"	else {\n"
-		"		gl_FragColor = E;\n"
-		"	}\n"
-		"}\n";
-		
-		const char *scale3x_flipped_pixel_source =
-		"precision mediump float;\n"
-		"uniform sampler2D tex;\n"
-		"uniform float offset_x;\n"
-		"uniform float offset_y;\n"
-		"varying vec2 varying_texcoord;\n"
-		"varying vec2 tA;\n"
-		"varying vec2 tB;\n"
-		"varying vec2 tC;\n"
-		"varying vec2 tD;\n"
-		"varying vec2 tF;\n"
-		"varying vec2 tG;\n"
-		"varying vec2 tH;\n"
-		"varying vec2 tI;\n"
-		"void main() {\n"
-		"	vec4 A = texture2D(tex, tI);\n"
-		"	vec4 B = texture2D(tex, tH);\n"
-		"	vec4 C = texture2D(tex, tG);\n"
-		"	vec4 D = texture2D(tex, tF);\n"
-		"	vec4 E = texture2D(tex, varying_texcoord);\n"
-		"	vec4 F = texture2D(tex, tD);\n"
-		"	vec4 G = texture2D(tex, tC);\n"
-		"	vec4 H = texture2D(tex, tB);\n"
-		"	vec4 I = texture2D(tex, tA);\n"
-		"	if (B != H && D != F) {\n"
-		"		float x = mod(gl_FragCoord.t-offset_y, 3.0);\n"
-		"		float y = mod(gl_FragCoord.s-offset_x, 3.0);\n"
-		"		if (y < 1.0) {\n"
-		"			if (x < 1.0) {\n"
-		"				gl_FragColor = H == F ? F : E;\n"
-		"			}\n"
-		"			else if (x < 2.0) {\n"
-		"				gl_FragColor = (D == H && E != I) || (H == F && E != G) ? H : E;\n"
-		"			}\n"
-		"			else {\n"
-		"				gl_FragColor = D == H ? D : E;\n"
-		"			}\n"
-		"		}\n"
-		"		else if (y < 2.0) {\n"
-		"			if (x < 1.0) {\n"
-		"				gl_FragColor = (B == F && E != I) || (H == F && E != C) ? F : E;\n"
-		"			}\n"
-		"			else if (x < 2.0) {\n"
-		"				gl_FragColor = E;\n"
-		"			}\n"
-		"			else {\n"
-		"				gl_FragColor = (D == B && E != G) || (D == H && E != A) ? D : E;\n"
-		"			}\n"
-		"		}\n"
-		"		else {\n"
-		"			if (x < 1.0) {\n"
-		"				gl_FragColor = B == F ? F : E;\n"
-		"			}\n"
-		"			else if (x < 2.0) {\n"
-		"				gl_FragColor = (D == B && E != C) || (B == F && E != A) ? B : E;\n"
-		"			}\n"
-		"			else {\n"
-		"				gl_FragColor = D == B ? D : E;\n"
-		"			}\n"
-		"		}\n"
-		"	}\n"
-		"	else {\n"
-		"		gl_FragColor = E;\n"
-		"	}\n"
-		"}\n";
-		
-		const char *scale2x_linear_pixel_source =
-		"precision mediump float;\n"
-		"uniform sampler2D tex;\n"
-		"varying vec2 varying_texcoord;\n"
-		"uniform float offset_x;\n"
-		"uniform float offset_y;\n"
-		"varying vec2 tB;\n"
-		"varying vec2 tD;\n"
-		"varying vec2 tF;\n"
-		"varying vec2 tH;\n"
-		"void main() {\n"
-		"	vec4 B = texture2D(tex, tB);\n"
-		"	vec4 E = texture2D(tex, varying_texcoord);\n"
-		"	vec4 H = texture2D(tex, tH);\n"
-		"	vec4 D = texture2D(tex, tD);\n"
-		"	vec4 F = texture2D(tex, tF);\n"
-		"	if (B != H && D != F) {\n"
-		"		float x = mod(gl_FragCoord.s-offset_y, 2.0);\n"
-		"		float y = mod(gl_FragCoord.t-offset_x, 2.0);\n"
-		"		if (x >= 1.0 && y < 1.0) {\n"
-		"			gl_FragColor = D == H ? D : E;\n"
-		"		}\n"
-		"		else if (x < 1.0 && y < 1.0) {\n"
-		"			gl_FragColor = H == F ? F : E;\n"
-		"		}\n"
-		"		else if (x >= 1.0 && y >= 1.0) {\n"
-		"			gl_FragColor = D == B ? D : E;\n"
-		"		}\n"
-		"		else{\n"
-		"			gl_FragColor = B == F ? F : E;\n"
-		"		}\n"
-		"	}\n"
-		"	else {\n"
-		"		gl_FragColor = E;\n"
-		"	}\n"
-		"}\n";
-		
-		const char *scale2x_linear_flipped_pixel_source =
-		"precision mediump float;\n"
-		"uniform sampler2D tex;\n"
-		"varying vec2 varying_texcoord;\n"
-		"uniform float offset_x;\n"
-		"uniform float offset_y;\n"
-		"varying vec2 tB;\n"
-		"varying vec2 tD;\n"
-		"varying vec2 tF;\n"
-		"varying vec2 tH;\n"
-		"void main() {\n"
-		"	vec4 H = texture2D(tex, tB);\n"
-		"	vec4 E = texture2D(tex, varying_texcoord);\n"
-		"	vec4 B = texture2D(tex, tH);\n"
-		"	vec4 F = texture2D(tex, tF);\n"
-		"	vec4 D = texture2D(tex, tD);\n"
-		"	if (B != H && D != F) {\n"
-		"		float x = mod(gl_FragCoord.s-offset_y, 2.0);\n"
-		"		float y = mod(gl_FragCoord.t-offset_x, 2.0);\n"
-		"		if (x >= 1.0 && y < 1.0) {\n"
-		"			gl_FragColor = D == B ? D : E;\n"
-		"		}\n"
-		"		else if (x < 1.0 && y < 1.0) {\n"
-		"			gl_FragColor = B == F ? F : E;\n"
-		"		}\n"
-		"		else if (x >= 1.0 && y >= 1.0) {\n"
-		"			gl_FragColor = D == H ? D : E;\n"
-		"		}\n"
-		"		else{\n"
-		"			gl_FragColor = H == F ? F : E;\n"
-		"		}\n"
-		"	}\n"
-		"	else {\n"
-		"		gl_FragColor = E;\n"
-		"	}\n"
-		"}\n";
-		
-		const char *scale3x_linear_pixel_source =
-		"precision mediump float;\n"
-		"uniform sampler2D tex;\n"
-		"uniform float offset_x;\n"
-		"uniform float offset_y;\n"
-		"varying vec2 varying_texcoord;\n"
-		"varying vec2 tA;\n"
-		"varying vec2 tB;\n"
-		"varying vec2 tC;\n"
-		"varying vec2 tD;\n"
-		"varying vec2 tF;\n"
-		"varying vec2 tG;\n"
-		"varying vec2 tH;\n"
-		"varying vec2 tI;\n"
-		"void main() {\n"
-		"	vec4 A = texture2D(tex, tA);\n"
-		"	vec4 B = texture2D(tex, tB);\n"
-		"	vec4 C = texture2D(tex, tC);\n"
-		"	vec4 D = texture2D(tex, tD);\n"
-		"	vec4 E = texture2D(tex, varying_texcoord);\n"
-		"	vec4 F = texture2D(tex, tF);\n"
-		"	vec4 G = texture2D(tex, tG);\n"
-		"	vec4 H = texture2D(tex, tH);\n"
-		"	vec4 I = texture2D(tex, tI);\n"
-		"	if (B != H && D != F) {\n"
-		"		float x = mod(gl_FragCoord.s-offset_y, 3.0);\n"
-		"		float y = mod(gl_FragCoord.t-offset_x, 3.0);\n"
-		"		if (y < 1.0) {\n"
-		"			if (x < 1.0) {\n"
-		"				gl_FragColor = D == H ? D : E;\n"
-		"			}\n"
-		"			else if (x < 2.0) {\n"
-		"				gl_FragColor = (D == H && E != I) || (H == F && E != G) ? H : E;\n"
-		"			}\n"
-		"			else {\n"
-		"				gl_FragColor = H == F ? F : E;\n"
-		"			}\n"
-		"		}\n"
-		"		else if (y < 2.0) {\n"
-		"			if (x < 1.0) {\n"
-		"				gl_FragColor = (D == B && E != G) || (D == H && E != A) ? D : E;\n"
-		"			}\n"
-		"			else if (x < 2.0) {\n"
-		"				gl_FragColor = E;\n"
-		"			}\n"
-		"			else {\n"
-		"				gl_FragColor = (B == F && E != I) || (H == F && E != C) ? F : E;\n"
-		"			}\n"
-		"		}\n"
-		"		else {\n"
-		"			if (x < 1.0) {\n"
-		"				gl_FragColor = D == B ? D : E;\n"
-		"			}\n"
-		"			else if (x < 2.0) {\n"
-		"				gl_FragColor = (D == B && E != C) || (B == F && E != A) ? B : E;\n"
-		"			}\n"
-		"			else {\n"
-		"				gl_FragColor = B == F ? F : E;\n"
-		"			}\n"
-		"		}\n"
-		"	}\n"
-		"	else {\n"
-		"		gl_FragColor = E;\n"
-		"	}\n"
-		"}\n";
-		
-		const char *scale3x_linear_flipped_pixel_source =
-		"precision mediump float;\n"
-		"uniform sampler2D tex;\n"
-		"uniform float offset_x;\n"
-		"uniform float offset_y;\n"
-		"varying vec2 varying_texcoord;\n"
-		"varying vec2 tA;\n"
-		"varying vec2 tB;\n"
-		"varying vec2 tC;\n"
-		"varying vec2 tD;\n"
-		"varying vec2 tF;\n"
-		"varying vec2 tG;\n"
-		"varying vec2 tH;\n"
-		"varying vec2 tI;\n"
-		"void main() {\n"
-		"	vec4 A = texture2D(tex, tI);\n"
-		"	vec4 B = texture2D(tex, tH);\n"
-		"	vec4 C = texture2D(tex, tG);\n"
-		"	vec4 D = texture2D(tex, tF);\n"
-		"	vec4 E = texture2D(tex, varying_texcoord);\n"
-		"	vec4 F = texture2D(tex, tD);\n"
-		"	vec4 G = texture2D(tex, tC);\n"
-		"	vec4 H = texture2D(tex, tB);\n"
-		"	vec4 I = texture2D(tex, tA);\n"
-		"	if (B != H && D != F) {\n"
-		"		float x = mod(gl_FragCoord.s-offset_y, 3.0);\n"
-		"		float y = mod(gl_FragCoord.t-offset_x, 3.0);\n"
-		"		if (y < 1.0) {\n"
-		"			if (x < 1.0) {\n"
-		"				gl_FragColor = D == H ? D : E;\n"
-		"			}\n"
-		"			else if (x < 2.0) {\n"
-		"				gl_FragColor = (D == H && E != I) || (H == F && E != G) ? H : E;\n"
-		"			}\n"
-		"			else {\n"
-		"				gl_FragColor = H == F ? F : E;\n"
-		"			}\n"
-		"		}\n"
-		"		else if (y < 2.0) {\n"
-		"			if (x < 1.0) {\n"
-		"				gl_FragColor = (D == B && E != G) || (D == H && E != A) ? D : E;\n"
-		"			}\n"
-		"			else if (x < 2.0) {\n"
-		"				gl_FragColor = E;\n"
-		"			}\n"
-		"			else {\n"
-		"				gl_FragColor = (B == F && E != I) || (H == F && E != C) ? F : E;\n"
-		"			}\n"
-		"		}\n"
-		"		else {\n"
-		"			if (x < 1.0) {\n"
-		"				gl_FragColor = D == B ? D : E;\n"
-		"			}\n"
-		"			else if (x < 2.0) {\n"
-		"				gl_FragColor = (D == B && E != C) || (B == F && E != A) ? B : E;\n"
-		"			}\n"
-		"			else {\n"
-		"				gl_FragColor = B == F ? F : E;\n"
-		"			}\n"
-		"		}\n"
-		"	}\n"
-		"	else {\n"
-		"		gl_FragColor = E;\n"
-		"	}\n"
-		"}\n";
-#endif
 #else
 		static const char *main_vertex_source =
 		"struct VS_INPUT\n"
@@ -2540,16 +2121,7 @@ void init_shaders(void)
 		warp = al_create_shader(ALLEGRO_SHADER_GLSL);
 		shadow_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
 		brighten = al_create_shader(ALLEGRO_SHADER_GLSL);
-#ifdef ALLEGRO_IPHONE
 		scale2x = al_create_shader(ALLEGRO_SHADER_GLSL);
-		scale2x_flipped = al_create_shader(ALLEGRO_SHADER_GLSL);
-		scale3x = al_create_shader(ALLEGRO_SHADER_GLSL);
-		scale3x_flipped = al_create_shader(ALLEGRO_SHADER_GLSL);
-		scale2x_linear = al_create_shader(ALLEGRO_SHADER_GLSL);
-		scale2x_linear_flipped = al_create_shader(ALLEGRO_SHADER_GLSL);
-		scale3x_linear = al_create_shader(ALLEGRO_SHADER_GLSL);
-		scale3x_linear_flipped = al_create_shader(ALLEGRO_SHADER_GLSL);
-#endif
 #endif
 		
 		al_attach_shader_source(
@@ -2588,55 +2160,11 @@ void init_shaders(void)
 					default_vertex_source
 					);
 		
-#ifdef ALLEGRO_IPHONE
 		al_attach_shader_source(
 					scale2x,
 					ALLEGRO_VERTEX_SHADER,
 					scale2x_vertex_source
 					);
-		
-		al_attach_shader_source(
-					scale2x_flipped,
-					ALLEGRO_VERTEX_SHADER,
-					scale2x_vertex_source
-					);
-		
-		al_attach_shader_source(
-					scale3x,
-					ALLEGRO_VERTEX_SHADER,
-					scale3x_vertex_source
-					);
-		
-		al_attach_shader_source(
-					scale3x_flipped,
-					ALLEGRO_VERTEX_SHADER,
-					scale3x_vertex_source
-					);
-		
-		al_attach_shader_source(
-					scale2x_linear,
-					ALLEGRO_VERTEX_SHADER,
-					scale2x_vertex_source
-					);
-		
-		al_attach_shader_source(
-					scale2x_linear_flipped,
-					ALLEGRO_VERTEX_SHADER,
-					scale2x_vertex_source
-					);
-		
-		al_attach_shader_source(
-					scale3x_linear,
-					ALLEGRO_VERTEX_SHADER,
-					scale3x_vertex_source
-					);
-		
-		al_attach_shader_source(
-					scale3x_linear_flipped,
-					ALLEGRO_VERTEX_SHADER,
-					scale3x_vertex_source
-					);
-#endif
 		
 		al_attach_shader_source(
 					default_shader,
@@ -2674,55 +2202,11 @@ void init_shaders(void)
 					brighten_pixel_source
 					);
 		
-#ifdef ALLEGRO_IPHONE
 		al_attach_shader_source(
 					scale2x,
 					ALLEGRO_PIXEL_SHADER,
 					scale2x_pixel_source
 					);
-		
-		al_attach_shader_source(
-					scale2x_flipped,
-					ALLEGRO_PIXEL_SHADER,
-					scale2x_flipped_pixel_source
-					);
-		
-		al_attach_shader_source(
-					scale3x,
-					ALLEGRO_PIXEL_SHADER,
-					scale3x_pixel_source
-					);
-		
-		al_attach_shader_source(
-					scale3x_flipped,
-					ALLEGRO_PIXEL_SHADER,
-					scale3x_flipped_pixel_source
-					);
-		
-		al_attach_shader_source(
-					scale2x_linear,
-					ALLEGRO_PIXEL_SHADER,
-					scale2x_linear_pixel_source
-					);
-		
-		al_attach_shader_source(
-					scale2x_linear_flipped,
-					ALLEGRO_PIXEL_SHADER,
-					scale2x_linear_flipped_pixel_source
-					);
-		
-		al_attach_shader_source(
-					scale3x_linear,
-					ALLEGRO_PIXEL_SHADER,
-					scale3x_linear_pixel_source
-					);
-		
-		al_attach_shader_source(
-					scale3x_linear_flipped,
-					ALLEGRO_PIXEL_SHADER,
-					scale3x_linear_flipped_pixel_source
-					);
-#endif
 		
 		const char *shader_log;
 		
@@ -2750,22 +2234,10 @@ void init_shaders(void)
 		if ((shader_log = al_get_shader_log(brighten))[0] != 0) {
 			printf("6. %s\n", shader_log);
 		}
-#ifdef ALLEGRO_IPHONE
 		al_link_shader(scale2x);
 		if ((shader_log = al_get_shader_log(scale2x))[0] != 0) {
 			printf("7. %s\n", shader_log);
 		}
-		al_link_shader(scale2x_flipped);
-		if ((shader_log = al_get_shader_log(scale2x_flipped))[0] != 0) {
-			printf("8. %s\n", shader_log);
-		}
-		al_link_shader(scale3x);
-		al_link_shader(scale3x_flipped);
-		al_link_shader(scale2x_linear);
-		al_link_shader(scale2x_linear_flipped);
-		al_link_shader(scale3x_linear);
-		al_link_shader(scale3x_linear_flipped);
-#endif
 		
 #ifdef A5_OGL
 		al_set_opengl_program_object(display, al_get_opengl_program_object(default_shader));
@@ -2776,12 +2248,14 @@ void init_shaders(void)
 	}
 #endif
 
-#if defined A5_OGL && !defined ALLEGRO_ANDROID
+#if defined A5_OGL
       glDisable(GL_DITHER);
+      /*
    if (!use_programmable_pipeline) {
       glShadeModel(GL_FLAT);
       glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
    }
+   */
 #endif
 
 
@@ -2793,47 +2267,12 @@ void init2_shaders(void)
 	if (use_programmable_pipeline) {
 		int buffer_true_w, buffer_true_h;
 		get_buffer_true_size(&buffer_true_w, &buffer_true_h);
-#ifdef ALLEGRO_IPHONE
+
 		al_set_shader_float(scale2x, "hstep", 1.0/buffer_true_w);
 		al_set_shader_float(scale2x, "vstep", 1.0/buffer_true_h);
 		al_set_shader_float(scale2x, "offset_x", 1);
 		al_set_shader_float(scale2x, "offset_y", 0);
-		al_set_shader_float(scale2x_flipped, "hstep", 1.0/buffer_true_w);
-		al_set_shader_float(scale2x_flipped, "vstep", 1.0/buffer_true_h);
-		al_set_shader_float(scale2x_flipped, "offset_x", 1);
-		al_set_shader_float(scale2x_flipped, "offset_y", 0);
-		al_set_shader_float(scale3x, "hstep", 1.0/buffer_true_w);
-		al_set_shader_float(scale3x, "vstep", 1.0/buffer_true_h);
-		al_set_shader_float(scale3x, "offset_x", 0);
-		al_set_shader_float(scale3x, "offset_y", 0);
-		al_set_shader_float(scale3x_flipped, "hstep", 1.0/buffer_true_w);
-		al_set_shader_float(scale3x_flipped, "vstep", 1.0/buffer_true_h);
-		al_set_shader_float(scale3x_flipped, "offset_x", 0);
-		al_set_shader_float(scale3x_flipped, "offset_y", 0);
-		al_set_shader_float(scale2x_linear, "hstep", 1.0/buffer_true_w);
-		al_set_shader_float(scale2x_linear, "vstep", 1.0/buffer_true_h);
-		al_set_shader_float(scale2x_linear, "offset_x", 0);
-		al_set_shader_float(scale2x_linear, "offset_y", 1);
-		al_set_shader_float(scale2x_linear_flipped, "hstep", 1.0/buffer_true_w);
-		al_set_shader_float(scale2x_linear_flipped, "vstep", 1.0/buffer_true_h);
-		al_set_shader_float(scale2x_linear_flipped, "offset_x", 0);
-		al_set_shader_float(scale2x_linear_flipped, "offset_y", 1);
-		al_set_shader_float(scale3x_linear, "hstep", 1.0/buffer_true_w);
-		al_set_shader_float(scale3x_linear, "vstep", 1.0/buffer_true_h);
-		al_set_shader_float(scale3x_linear, "offset_x", 0);
-		al_set_shader_float(scale3x_linear, "offset_y", 0);
-		al_set_shader_float(scale3x_linear_flipped, "hstep", 1.0/buffer_true_w);
-		al_set_shader_float(scale3x_linear_flipped, "vstep", 1.0/buffer_true_h);
-		al_set_shader_float(scale3x_linear_flipped, "offset_x", 0);
-		al_set_shader_float(scale3x_linear_flipped, "offset_y", 0);
-		if (scaleXX_buffer) {
-			al_set_shader_sampler(scale2x, "tex", scaleXX_buffer->bitmap, 0);
-			al_set_shader_sampler(scale2x_flipped, "tex", scaleXX_buffer->bitmap, 0);
-			al_set_shader_sampler(scale3x, "tex", scaleXX_buffer->bitmap, 0);
-			al_set_shader_sampler(scale3x_flipped, "tex", scaleXX_buffer->bitmap, 0);
-		}
-#endif
-		
+		al_set_shader_sampler(scale2x, "tex", scaleXX_buffer->bitmap, 0);
 		
 		al_set_shader_bool(default_shader, "use_tex_matrix", false);
 		al_set_shader_bool(tinter, "use_tex_matrix", false);
@@ -2855,19 +2294,46 @@ void destroy_shaders(void)
 		al_destroy_shader(brighten);
 		al_destroy_shader(warp);
 		al_destroy_shader(shadow_shader);
-#ifdef ALLEGRO_IPHONE
 		al_destroy_shader(scale2x);
-		al_destroy_shader(scale2x_flipped);
-		al_destroy_shader(scale3x);
-		al_destroy_shader(scale3x_flipped);
-		al_destroy_shader(scale2x_linear);
-		al_destroy_shader(scale2x_linear_flipped);
-		al_destroy_shader(scale3x_linear);
-		al_destroy_shader(scale3x_linear_flipped);
-#endif
 	}	
 }
 #endif
+
+void draw_loading_screen(MBITMAP *tmp, int percent, ScreenDescriptor *sd)
+{
+	m_set_target_bitmap(tmp);
+	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
+	m_draw_bitmap(bg_loader, 0, 0, 0);
+	m_draw_bitmap(loading_loader, 33, 10, 0);
+	int bx = 38;
+	int by = 34;
+	int bw = m_get_bitmap_width(bar_loader);
+	int bh = m_get_bitmap_height(bar_loader);
+	al_draw_filled_rectangle(bx-1, by-1, bx+bw+1, by+bh+1, white);
+	al_draw_filled_rectangle(bx, by, bx+bw, by+bh, black);
+	m_draw_bitmap_region(bar_loader, 0, 0, bw*(percent/100.0f), bh, bx, by, 0);
+	eny_loader->draw(BH/2-eny_loader->getWidth()/2-25, BW-eny_loader->getHeight()-35, 0);
+	dot_loader->draw(118, 24, 0);
+	al_set_target_backbuffer(display);
+	m_clear(black);
+	m_draw_scaled_bitmap(tmp, 0, 0, BH, BW, 0, 0, (float)sd->height/BW*BH, sd->height, 0);
+	m_flip_display();
+}
+
+void create_buffers(void)
+{
+	if (buffer)
+		m_destroy_bitmap(buffer);
+	if (overlay)
+		m_destroy_bitmap(overlay);
+	int flags = al_get_new_bitmap_flags();
+	if (config.getFilterType() == FILTER_LINEAR) {
+		al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
+	}
+	buffer = m_create_bitmap(BW, BH); // check
+	overlay = m_create_bitmap(BW, BH); // check
+	al_set_new_bitmap_flags(flags);
+}
 
 bool init(int *argc, char **argv[])
 {
@@ -2950,19 +2416,20 @@ bool init(int *argc, char **argv[])
 
 
 	al_install_mouse();
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE
 	al_install_keyboard();
-#else
+#endif
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_install_touch_input();
 	al_set_mouse_emulation_mode(ALLEGRO_MOUSE_EMULATION_5_0_x);
 #endif
 
-	gzFile f = gzopen(getResource("Version"), "rb");
+	ALLEGRO_FILE *f = al_fopen(getResource("Version"), "rb");
 	if (f) {
-		versionMajor = (int)igetl(f);
-		versionMinor = (int)igetl(f);
+		versionMajor = al_fread32le(f);
+		versionMinor = al_fread32le(f);
 		sprintf(versionString, "%d.%d", versionMajor, versionMinor);
-		gzclose(f);
+		al_fclose(f);
 	}
 	else {
 		strcpy(versionString, "-1");
@@ -2976,6 +2443,7 @@ bool init(int *argc, char **argv[])
 #ifndef ALLEGRO_ANDROID
    	PHYSFS_init(myArgv[0]);
 	PHYSFS_addToSearchPath(getResource("tiles.zip"), 1);
+	PHYSFS_addToSearchPath(getResource("areas.zip"), 1);
 #endif
 
 	int flags = 0;
@@ -2986,9 +2454,10 @@ bool init(int *argc, char **argv[])
 
 	al_set_new_display_flags(flags);
 
-#if !defined(ALLEGRO_IPHONE) && !defined(ALLEGRO_ANDROID)
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 16, ALLEGRO_REQUIRE);
+
+#if !defined(ALLEGRO_IPHONE) && !defined(ALLEGRO_ANDROID)
 	al_set_new_display_adapter(config.getAdapter());
 	
 	// set screenScale *for loading screen only*
@@ -3009,8 +2478,6 @@ bool init(int *argc, char **argv[])
 		sd->width = 960;
 		sd->height = 640;
 	}
-
-	set_screen_params();
 #else
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 16, ALLEGRO_REQUIRE);
@@ -3018,101 +2485,31 @@ bool init(int *argc, char **argv[])
 	// FIXME: do this for android when supporting multihead
 	al_set_new_display_adapter(0);
 	#endif
+
+	sd->width = 1;
+	sd->height = 1;
 #endif
 
 	if (config.getWaitForVsync())
 		al_set_new_display_option(ALLEGRO_VSYNC, 1, ALLEGRO_SUGGEST);
 
 
-#ifdef ALLEGRO_IPHONE
-	initial_screen_scale = al_iphone_get_screen_scale();
-
-	if (initial_screen_scale == 2.0f) {
-		if (config.getFilterType() == FILTER_NONE) {
-			al_iphone_override_screen_scale(2.0);
-		}
-		else if (config.getFilterType() == FILTER_LINEAR) {
-			al_iphone_override_screen_scale(2.0);
-		}
-		else if (config.getFilterType() == FILTER_SCALE2X || config.getFilterType() == FILTER_SCALE2X_LINEAR) {
-			al_iphone_override_screen_scale(1.0f);
-		}
-		else if (config.getFilterType() == FILTER_SCALE3X || config.getFilterType() == FILTER_SCALE3X_LINEAR) {
-			al_iphone_override_screen_scale(1.5f);
-		}
-		else if (config.getFilterType() == FILTER_HALFSCALE) {
-			al_iphone_override_screen_scale(1.0f);
-		}
-		else if (config.getFilterType() == FILTER_SCALEDOWN) {
-			al_iphone_override_screen_scale(0.5);
-		}
-		screenScaleX *= al_iphone_get_screen_scale();
-		screenScaleY *= al_iphone_get_screen_scale();
-	}
-	
-	if (is_ipad()) {
-		if (config.getFilterType() == FILTER_SCALE2X) {
-			al_iphone_override_screen_scale(0.5);
-			screenScaleX = screenScaleY = 2;
-			sd->width = 768 / 2;
-			sd->height = 1024 / 2;
-		}
-		else if (config.getFilterType() == FILTER_SCALE2X_LINEAR) {
-			screenScaleX = screenScaleY = 4;
-			sd->width = 768;
-			sd->height = 1024;
-		}
-		else if (config.getFilterType() == FILTER_SCALE3X_LINEAR) {
-			screenScaleX = screenScaleY = 4;
-			sd->width = 768;
-			sd->height = 1024;
-		}
-		else if (config.getFilterType() == FILTER_SCALE3X) {
-			al_iphone_override_screen_scale(0.75);
-			screenScaleX = screenScaleY = 3;
-			sd->width = 768 * 0.75;
-			sd->height = 1024 * 0.75;
-		}
-		else if (config.getFilterType() == FILTER_HALFSCALE) {
-			al_iphone_override_screen_scale(0.5);
-			screenScaleX = screenScaleY = 2;
-			sd->width = 768 / 2;
-			sd->height = 1024 / 2;			
-		}
-		else if (config.getFilterType() == FILTER_SCALEDOWN) {
-			al_iphone_override_screen_scale(0.25);
-			screenScaleX = screenScaleY = 1;
-			sd->width = 768 / 4;
-			sd->height = 1024 / 4;
-		}
-		else {
-			screenScaleX = screenScaleY  = 4;
-			sd->width = 768;
-			sd->height = 1024;
-		}
-	}
-	else {
-		sd->width = 160 * screenScaleX;
-		sd->height = 240 * screenScaleY;
-	}
-#endif
-
 	click_mutex = al_create_mutex();
 	input_mutex = al_create_mutex();
 	dpad_mutex = al_create_mutex();
 	touch_mutex = al_create_mutex();
-	//orient_mutex = al_create_mutex();
 
 	tguiInit();
+	tguiSetRotation(0);
 	
 #ifdef A5_D3D
 	use_fixed_pipeline = true;
 #endif
 
 	// FIXME:
-	#ifdef ALLEGRO_ANDROID
+#ifdef ALLEGRO_ANDROID
 	use_fixed_pipeline = true;
-	#endif
+#endif
 
 	if (!use_fixed_pipeline) {
 		al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_USE_PROGRAMMABLE_PIPELINE);
@@ -3122,6 +2519,10 @@ bool init(int *argc, char **argv[])
 	al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE, ALLEGRO_REQUIRE);
 #elif defined ALLEGRO_ANDROID
 	al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_270_DEGREES, ALLEGRO_REQUIRE);
+#endif
+
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+	al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_FULLSCREEN_WINDOW);
 #endif
 
 #ifdef EDITOR
@@ -3139,45 +2540,31 @@ bool init(int *argc, char **argv[])
 		}
 	}
 	
-	//al_rest(3);
-	
 #endif
 	if (!display) {
 		if (!native_error("Failed to set gfx mode"))
 			return false;
 	}
 
+	set_screen_params();
+
 	initSound();
 
-#ifdef ALLEGRO_ANDROID
-	sd->width = al_get_display_width(display);
-	sd->height = al_get_display_height(display);
-	float ratio = (float)sd->width / BW;
-	if (ratio > ((float)sd->height / BH))
-		ratio = (float)sd->height / BH;
-	screenScaleX = ratio;
-	screenScaleY = ratio;
-	screen_offset_x = (sd->width - (screenScaleX*BW)) / 2;
-	screen_offset_y = (sd->height - (screenScaleY*BH)) / 2;
-	screen_ratio_x = sd->width / (screenScaleX*BW);
-	screen_ratio_y = sd->height / (screenScaleY*BH);
+#ifdef ALLEGRO_IPHONE_XXX
+	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
+
+	NSString *reqSysVer = @"3.2";
+	NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
+	BOOL osVersionSupported = ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending);
+	if (osVersionSupported) {
+		// FIXME!
+		//PRESERVE_TEXTURE = ALLEGRO_PRESERVE_TEXTURE;
+	}
+
+	[p drain];
 #endif
 
-#ifdef ALLEGRO_IPHONE
-   NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
-
-   NSString *reqSysVer = @"3.2";
-   NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
-   BOOL osVersionSupported = ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending);
-   if (osVersionSupported) {
-   	// FIXME!
-   	//PRESERVE_TEXTURE = ALLEGRO_PRESERVE_TEXTURE;
-   }
-
-   [p drain];
-#endif
-
-	al_set_new_bitmap_flags(PRESERVE_TEXTURE);
+	al_set_new_bitmap_flags(PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	init_joypad();
@@ -3289,57 +2676,14 @@ bool init(int *argc, char **argv[])
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 #endif
 
+	create_buffers();
+
 	flags = al_get_new_bitmap_flags();
-
 	al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
-	buffer = m_create_bitmap(BW, BH); // check
-	overlay = m_create_bitmap(BW, BH); // check
-	al_set_new_display_flags(flags);
-
-	if (config.getFilterType() == FILTER_SCALE2X_LINEAR) {
-		scaleXX_buffer = m_create_bitmap(BW*2, BH*2); // check
-	}
-	else if (config.getFilterType() == FILTER_SCALE3X_LINEAR) {
-		scaleXX_buffer = m_create_bitmap(BW*3, BH*3); // check
-	}
-	else {
-		scaleXX_buffer = NULL;
-	}
-	
 	screenshot = m_create_bitmap(BW/2, BH/2); // check
-
 	al_set_new_bitmap_flags(flags);
 
-#if defined ALLEGRO_IPHONE
-	screen_offset_x = 0;
-	screen_offset_y = 0;
-	screen_ratio_x = 1.0;
-	screen_ratio_y = 1.0;
-	if (is_ipad()) {
-		ALLEGRO_MONITOR_INFO mi;
-		al_get_monitor_info(0, &mi);
-		int scr_w = mi.y2-mi.y1;
-		int scr_h = mi.x2-mi.x1;
-		float mul;
-		if (config.getFilterType() == FILTER_SCALE2X || config.getFilterType() == FILTER_HALFSCALE
-		) {
-			mul = 2;
-		}
-		else if (config.getFilterType() == FILTER_SCALE3X) {
-			mul = 1.0/0.75;
-		}
-		else if (config.getFilterType() == FILTER_SCALEDOWN) {
-			mul = 4;
-		}
-		else {
-			mul = 1;
-		}
-		screen_offset_x = (scr_w - (BW*screenScaleX*mul)) / (2*mul);
-		screen_offset_y = (scr_h - (BH*screenScaleY*mul)) / (2*mul);
-		screen_ratio_x = (float)scr_w / (BW*screenScaleX*mul);
-		screen_ratio_y = (float)scr_h / (BH*screenScaleY*mul);
-	}
-#endif
+	scaleXX_buffer = m_create_bitmap(BW*2, BH*2); // check
 
 #ifndef A5_D3D
 	init2_shaders();
@@ -3365,35 +2709,27 @@ bool init(int *argc, char **argv[])
 		if (!native_error("Failed to create screenshot"))
 			return false;
 	}
+	
+	corner_bmp = m_load_bitmap(getResource("media/corner.png"));
+	stomach_circle = m_load_bitmap(getResource("combat_media/stomach_circle.png"));
+	if (!loadTilemap()) {
+		return false;
+	}
+
 
 	eny_loader = new AnimationSet(getResource("media/eny-loader.png"));
 	dot_loader = new AnimationSet(getResource("media/dot-loader.png"));
 	bg_loader = m_load_bitmap(getResource("media/bg-loader.png"));
 	bar_loader = m_load_bitmap(getResource("media/bar-loader.png"));
 	loading_loader = m_load_bitmap(getResource("media/loading-loader.png"));
+
 	MBITMAP *tmp = m_create_bitmap(BH, BW); // check
-	corner_bmp = m_load_bitmap(getResource("media/corner.png"));
+
 
 	/* ON IPHONE WE LOAD EVERYTHING AS MEMORY BITMAP FIRST THEN
 	 * CONVERT THEM TO DISPLAY BITMAPS SO WE CAN SHOW A SMOOTH
 	 * PROGRESS BAR */
 	
-	tguiSetRotation(0);
-
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	tguiSetScreenSize(BH*screenScaleY, BW*screenScaleX);
-	config.setMaintainAspectRatio(config.getMaintainAspectRatio());
-#elif !defined EDITOR
-	tguiSetScreenSize(BW*screenScaleX, BH*screenScaleY);
-	config.setMaintainAspectRatio(config.getMaintainAspectRatio());
-#endif
-
-#ifndef EDITOR
-	tguiSetScale(screenScaleX, screenScaleY);
-
-	tguiSetTolerance(3);
-#endif
-
 	if (cached_bitmap) {
 		al_destroy_bitmap(cached_bitmap);
 		cached_bitmap = NULL;
@@ -3424,87 +2760,42 @@ bool init(int *argc, char **argv[])
  		int percent = progress_percent;
  		if (draw < 0 || percent == 100) {
  			draw = 1000/30;
-			m_set_target_bitmap(tmp);
- 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
- 			m_draw_bitmap(bg_loader, 0, 0, 0);
-			m_draw_bitmap(loading_loader, 33, 10, 0);
- 			int bx = 38;
- 			int by = 34;
- 			int bw = m_get_bitmap_width(bar_loader);
- 			int bh = m_get_bitmap_height(bar_loader);
-			al_draw_filled_rectangle(bx-1, by-1, bx+bw+1, by+bh+1, white);
-			al_draw_filled_rectangle(bx, by, bx+bw, by+bh, black);
-			m_draw_bitmap_region(bar_loader, 0, 0, bw*(percent/100.0f), bh, bx, by, 0);
-			eny_loader->draw(BH/2-eny_loader->getWidth()/2-25, BW-eny_loader->getHeight()-35, 0);
-			dot_loader->draw(118, 24, 0);
-			al_set_target_backbuffer(display);
-			m_clear(black);
-#if !defined IPHONE && !defined ALLEGRO_ANDROID
-			float scaleX = screenScaleX / 2.0f;
-			float scaleY = screenScaleY / 2.0f;
-			if (config.getMaintainAspectRatio()) {
-				m_draw_scaled_bitmap(tmp, 0, 0, BH, BW, screen_offset_x, screen_offset_y, BH*scaleX, BW*scaleY, 0);
-			}
-			else {
-				float rx, ry;
-				if (sd->fullscreen) {
-					rx = screen_ratio_x;
-					ry = screen_ratio_y;
-				}
-				else {
-					rx = ry = 1;
-				}
-				m_draw_scaled_bitmap(tmp, 0, 0, BH, BW, 0, 0, BH*scaleX*rx, BW*scaleY*ry, 0);
-			}
-#else
-#ifdef ALLEGRO_ANDROID
-			if (false) {
-#else
-			if (is_ipad()) {
-#endif
-				m_draw_scaled_bitmap(tmp, 0, 0, BH, BW, 0, 0, sd->width*BH/BW, sd->width, 0);
-			}
-			else {
-				m_draw_scaled_bitmap(tmp, 0, 0, BH, BW, screen_offset_x, screen_offset_y, BH*screenScaleX*BH/BW, BW*screenScaleY*BH/BW, 0);
-			}
-#endif
- 			m_flip_display();
+			draw_loading_screen(tmp, percent, sd);
  		}
- 		if (percent == 100) {
-			m_rest(1);
+		if (percent == 95) {
  			break;
  		}
 	}
-
-	m_destroy_bitmap(tmp);
 
 	while (!loading_done) {
 		m_rest(0.001);
 	}
 	
+	shadow_sheet = m_create_alpha_bitmap(4*16, 2*16, create_shadows, NULL, destroy_shadows);
+	draw_loading_screen(tmp, 100, sd);
+	m_destroy_bitmap(tmp);
+	
+	int bflags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags((bflags & ~ALLEGRO_NO_PRESERVE_TEXTURE) & ~ALLEGRO_MEMORY_BITMAP);
+
 	if (cached_bitmap) {
 		al_destroy_bitmap(cached_bitmap);
 		cached_bitmap = NULL;
 		cached_bitmap_filename = "";
 	}
 	
-	stomach_circle = m_load_bitmap(getResource("combat_media/stomach_circle.png"));
-	
-	if (!loadTilemap()) {
-		return false;
-	}
-
-	int bflags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags((bflags & ~ALLEGRO_NO_PRESERVE_TEXTURE) & ~ALLEGRO_MEMORY_BITMAP);
-
 	int ttf_flags;
-	
+
+#ifdef ALLEGRO_IPHONE
 	if (config.getFilterType() == FILTER_SCALE2X) {
 		ttf_flags = 0;
 	}
 	else {
+#endif
 		ttf_flags = ALLEGRO_TTF_MONOCHROME;
+#ifdef ALLEGRO_IPHONE
 	}
+#endif
 
 	ALLEGRO_DEBUG("loading fonts");
 
@@ -3529,7 +2820,10 @@ bool init(int *argc, char **argv[])
 	ALLEGRO_DEBUG("done loading fonts");
 
 	/* RELOAD EVERYTHING AS DISPLAY BITMAPS */
-	guiAnims->displayConvert();
+	guiAnims.bitmap = m_make_display_bitmap(guiAnims.bitmap);
+	guiAnims.corner_sub = m_create_sub_bitmap(guiAnims.bitmap, 0, 0, 3, 3);
+	guiAnims.wide_sub = m_create_sub_bitmap(guiAnims.bitmap, 0, 3, 32, 3);
+	guiAnims.tall_sub = m_create_sub_bitmap(guiAnims.bitmap, 0, 6, 3, 32);
 
 	cursor = m_make_display_bitmap(cursor);
 
@@ -3538,15 +2832,9 @@ bool init(int *argc, char **argv[])
 	poison_bmp_tmp2 = m_make_alpha_display_bitmap(poison_bmp_tmp2);
 
 	orb_bmp = m_make_alpha_display_bitmap(orb_bmp);
-	for (int i = 0; i < 4; i++) {
-		shadow_sides[i] = m_make_alpha_display_bitmap(shadow_sides[i]);
-		shadow_corners[i] = m_make_alpha_display_bitmap(shadow_corners[i]);
-	}
 
 	tile = m_make_display_bitmap(tile);
 
-	//profileBg = m_make_display_bitmap(profileBg);
-	
 	debug_message("Loading icons\n");
 
 	// FIXME: return value
@@ -3644,7 +2932,10 @@ void destroy(void)
 	debug_message("Destroy 13\n");
 	m_destroy_bitmap(cursor);
 	debug_message("Destroy 14\n");
-	delete guiAnims;
+	m_destroy_bitmap(guiAnims.corner_sub);
+	m_destroy_bitmap(guiAnims.wide_sub);
+	m_destroy_bitmap(guiAnims.tall_sub);
+	m_destroy_bitmap(guiAnims.bitmap);
 	debug_message("Destroy 15\n");
 	m_destroy_bitmap(orb_bmp);
 	m_destroy_bitmap(poison_bmp);
@@ -3662,10 +2953,7 @@ void destroy(void)
 	m_destroy_bitmap(loading_loader);
 	m_destroy_bitmap(corner_bmp);
 
-	for (int i = 0; i < 4; i++) {
-		m_destroy_bitmap(shadow_corners[i]);
-		m_destroy_bitmap(shadow_sides[i]);
-	}
+	m_destroy_bitmap(shadow_sheet);
 
 	m_destroy_font(game_font);
 	m_destroy_font(huge_font);
@@ -3800,64 +3088,47 @@ void dpad_on(bool count)
 void set_screen_params(void)
 {
 	ScreenDescriptor *sd = config.getWantedGraphicsMode();
-	if (sd->fullscreen) {
-#if !defined(IPHONE) && !defined(ALLEGRO_MACOSX)
-		al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_FULLSCREEN_WINDOW);
-#endif
-		static ALLEGRO_MONITOR_INFO mi;
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-		static bool gotten = false;
-		if (!gotten) {
-			al_get_monitor_info(config.getAdapter(), &mi);
-		}
-#else
-		al_get_monitor_info(config.getAdapter(), &mi);
-#endif
-		int w = mi.x2 - mi.x1;
-		int h = mi.y2 - mi.y1;
-		//printf("w=%d h=%d ssp\n", w, h);
-		sd->real_width = w;
-		sd->real_height = h;
-		screenScaleX = screenScaleY = (int)w / (int)BW;
-		if (screenScaleX > ((int)h / (int)BH))
-			screenScaleX = screenScaleY = (int)h /(int)BH;
-		if (config.getMaintainAspectRatio()) {
-			screen_ratio_x = screen_ratio_y = 0;
-			screen_offset_x = (w - screenScaleX*BW)/2;
-			screen_offset_y = (h - screenScaleY*BH)/2;
-		}
-		else {
-			screen_offset_x = screen_offset_y = 0;
-			screen_ratio_x = w / (BW*screenScaleX);
-			screen_ratio_y = h / (BH*screenScaleY);
-		}
+	sd->width = al_get_display_width(display);
+	sd->height = al_get_display_height(display);
+	if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN) {
+		screenScaleX = (float)sd->width / BW;
+		screenScaleY = (float)sd->height / BH;
 	}
 	else {
-		ScreenSize scr_sz = small_screen();
+		float ratio;
+		if (config.getMaintainAspectRatio() == ASPECT_INTEGER) {
+			ratio = sd->width / BW;
+			if (ratio > (sd->height / BH)) {
+				ratio = sd->height / BH;
+			}
+		}
+		else if (config.getMaintainAspectRatio() == ASPECT_MAINTAIN_RATIO) {
+			ratio = (float)sd->width / BW;
+			if (ratio > ((float)sd->height / BH)) {
+				ratio = (float)sd->height / BH;
+			}
+		}
+		screenScaleX = ratio;
+		screenScaleY = ratio;
+	}
+	screen_offset_x = (sd->width - (screenScaleX*BW)) / 2;
+	screen_offset_y = (sd->height - (screenScaleY*BH)) / 2;
+	screen_ratio_x = sd->width / (screenScaleX*BW);
+	screen_ratio_y = sd->height / (screenScaleY*BH);
 
-		if (scr_sz == ScreenSize_Tiny) {
-			sd->real_width = 240;
-			sd->real_height = 160;
-			screenScaleX = screenScaleY = 1;
-		}
-		else if (scr_sz == ScreenSize_Smaller) {
-			sd->real_width = 480;
-			sd->real_height = 320;
-			screenScaleX = screenScaleY = 2;
-		}
-		else if (scr_sz == ScreenSize_Small) {
-			sd->real_width = 720;
-			sd->real_height = 480;
-			screenScaleX = screenScaleY = 3;
+	if (tguiIsInitialized()) {
+		tguiSetScreenSize(screenScaleX*BW, screenScaleY*BH);
+
+		if (config.getMaintainAspectRatio() != ASPECT_FILL_SCREEN) {
+			tguiSetScreenParameters(screen_offset_x, screen_offset_y, 1.0f, 1.0f);
 		}
 		else {
-			sd->real_width = 960;
-			sd->real_height = 640;
-			screenScaleX = screenScaleY = 4;
+			tguiSetScreenParameters(0, 0, screen_ratio_x, screen_ratio_y);
 		}
-
-		screen_ratio_x = screen_ratio_y = 1.0f;
-		screen_offset_x = screen_offset_y = 0;
+#ifndef EDITOR
+		tguiSetScale(screenScaleX, screenScaleY);
+		tguiSetTolerance(3);
+#endif
 	}
 }
 
@@ -3868,14 +3139,18 @@ void toggle_fullscreen(void)
 	sd->fullscreen = !sd->fullscreen;
 	al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, config.getWantedGraphicsMode()->fullscreen);
 	set_screen_params();
-	tguiSetScreenSize(BW*screenScaleX, BH*screenScaleY);
-	//if (config.getWantedGraphicsMode()->fullscreen) {
-		config.setMaintainAspectRatio(config.getMaintainAspectRatio());
-	//}
-	tguiSetScale(screenScaleX, screenScaleY);
 	pause_joystick_repeat_events = false;
 }
 
+bool imperfect_aspect(void)
+{
+	if (
+		((al_get_display_width(display)/BW) != ((float)al_get_display_width(display)/BW)) ||
+		((al_get_display_height(display)/BH) != ((float)al_get_display_height(display)/BH))) {
+		return true;
+	}
+	return false;
+}
 
 extern "C" {
 void connect_joypad(void);
@@ -3901,4 +3176,5 @@ void unlock_joypad_mutex(void)
 {
 	al_unlock_mutex(joypad_mutex);
 }
+
 }

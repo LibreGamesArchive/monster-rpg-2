@@ -131,6 +131,32 @@ void Image::draw_trans(int x, int y, int alpha)
 	m_draw_trans_bitmap(bitmap, x, y, alpha);
 }
 
+Image *Image::clone(void)
+{
+	Image *img = new Image();
+	img->transparent = transparent;
+	img->alpha = alpha;
+
+	/* This can be a generic clone by just using
+	 * al_clone_bitmap, but right now we only need
+	 * the white highlight
+	 */
+
+	img->bitmap = m_create_bitmap(
+		m_get_bitmap_width(bitmap),
+		m_get_bitmap_height(bitmap)
+	);
+
+	ALLEGRO_BITMAP *target = al_get_target_bitmap();
+	m_set_target_bitmap(img->bitmap);
+	al_clear_to_color(al_map_rgba_f(0, 0, 0 ,0));
+	m_draw_bitmap(bitmap, 0, 0, 0);
+	add_blit(bitmap, 0, 0, white, 0.7, 0);
+	al_set_target_bitmap(target);
+
+	return img;
+}
+
 Image::Image(void)
 {
 	transparent = true;

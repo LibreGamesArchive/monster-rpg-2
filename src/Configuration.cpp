@@ -493,7 +493,8 @@ void Configuration::read()
 	if (!vsync) { delete xml; throw ReadError(); }
 	XMLData *xml_filter_type = gfx->find("filter_type");
 	if (xml_filter_type) {
-		setFilterType(atoi(xml_filter_type->getValue().c_str()));
+		int ft = atoi(xml_filter_type->getValue().c_str());
+		setFilterType(ft >= NUM_FILTER_TYPES ? 0 : ft);
 	}
 	XMLData *xml_aspect = gfx->find("maintain_aspect_ratio");
 	if (xml_aspect) {
@@ -654,8 +655,12 @@ Configuration::Configuration() :
 	xbox360(false)
 	,cfg_tuning(CFG_TUNING_BALANCED)
 	,cfg_difficulty(CFG_DIFFICULTY_NORMAL)
+#ifdef ALLEGRO_ANDROID
+	,cfg_filter_type(FILTER_LINEAR)
+#else
 	,cfg_filter_type(FILTER_NONE)
-	,cfg_maintain_aspect_ratio(false)
+#endif
+	,cfg_maintain_aspect_ratio(0)
 	,language(0)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	,cfg_dpad_type(0)

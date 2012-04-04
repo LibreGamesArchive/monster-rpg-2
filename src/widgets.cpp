@@ -23,8 +23,13 @@ void loadIcons(void)
 		0, 18, 9, 9,
 		0, 27, 9, 9,
 		0, 36, 9, 9,
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+		11, 90, 9, 9,
+		11, 99, 9, 9,
+#else
 		0, 45, 9, 9,
 		0, 54, 9, 9,
+#endif		
 		0, 63, 9, 9,
 		0, 72, 9, 9,
 		0, 81, 9, 9,
@@ -97,9 +102,11 @@ static void mTextout_real(MFONT *font, const char *text, int x, int y,
 {
 	float inc = 1.0f;
 
+#ifdef ALLEGRO_IPHONE
 	if (config.getFilterType() == FILTER_SCALE2X && shadowType == WGT_TEXT_DROP_SHADOW) {
 		shadowType = WGT_TEXT_SQUARE_BORDER;
 	}
+#endif
 
 	const char *ctext;
 	char buf[100];
@@ -127,13 +134,19 @@ static void mTextout_real(MFONT *font, const char *text, int x, int y,
 	
 	to = m_textout;
 
+	bool held = al_is_bitmap_drawing_held();
+	al_hold_bitmap_drawing(true);
+
 	switch (shadowType) {
 		case WGT_TEXT_NORMAL:
 			break;
 		case WGT_TEXT_DROP_SHADOW:
+			to(font, ctext, x+inc, y+inc, shadow_color);
+			/*
 			to(font, ctext, x+inc, y, shadow_color);
 			to(font, ctext, x, y+inc, shadow_color);
 			to(font, ctext, x+inc, y+inc, shadow_color);
+			*/
 			break;
 		case WGT_TEXT_BORDER:
 			to(font, ctext, x-inc, y, shadow_color);
@@ -142,6 +155,10 @@ static void mTextout_real(MFONT *font, const char *text, int x, int y,
 			to(font, ctext, x, y+inc, shadow_color);
 			break;
 		case WGT_TEXT_SQUARE_BORDER:
+			to(font, ctext, x+inc, y, shadow_color);
+			to(font, ctext, x, y+inc, shadow_color);
+			to(font, ctext, x+inc, y+inc, shadow_color);
+			/*
 			to(font, ctext, x-inc, y, shadow_color);
 			to(font, ctext, x-inc, y-inc, shadow_color);
 			to(font, ctext, x, y-inc, shadow_color);
@@ -150,10 +167,13 @@ static void mTextout_real(MFONT *font, const char *text, int x, int y,
 			to(font, ctext, x+inc, y+inc, shadow_color);
 			to(font, ctext, x, y+inc, shadow_color);
 			to(font, ctext, x-inc, y+inc, shadow_color);
+			*/
 			break;
 	}
 	
 	to(font, ctext, x, y, text_color);
+
+	al_hold_bitmap_drawing(held);
 }
 
 
@@ -226,67 +246,37 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 		al_set_shader(display, default_shader);
 	}
 
-	guiAnims->setSubAnimation("frame_horizontal");
-
-	int sprite_w = guiAnims->getWidth();
-	int sprite_h = guiAnims->getHeight();
-
-	int horiz_tiles = (int)ceil((float)w/sprite_w);
 
 	m_set_blender(M_ONE, M_ZERO, white);
 
-	for (int i = 0; i < horiz_tiles; i++) {
-		float xx;
-		if (i == (horiz_tiles-1)) {
-			xx = x+w-sprite_w;
-		}
-		else {
-			xx = x + i*sprite_w;
-		}
-		guiAnims->draw(xx, y-sprite_h);
-		guiAnims->draw(xx, y+h, M_FLIP_VERTICAL);
-	}
+	al_hold_bitmap_drawing(true);
 
-	guiAnims->setSubAnimation("frame_vertical");
+	MBITMAP *b = guiAnims.wide_sub;
+	int sprite_w = m_get_bitmap_width(b);
+	int sprite_h = m_get_bitmap_height(b);
+	al_draw_scaled_bitmap(b->bitmap, 0, 0, sprite_w, sprite_h, x, y-sprite_h, w, sprite_h, 0);
+	al_draw_scaled_bitmap(b->bitmap, 0, 0, sprite_w, sprite_h, x, y+h, w, sprite_h, ALLEGRO_FLIP_VERTICAL);
 
-	sprite_w = guiAnims->getWidth();
-	sprite_h = guiAnims->getHeight();
+	b = guiAnims.tall_sub;
+	sprite_w = m_get_bitmap_width(b);
+	sprite_h = m_get_bitmap_height(b);
+	al_draw_scaled_bitmap(b->bitmap, 0, 0, sprite_w, sprite_h, x-sprite_w, y, sprite_w, h, 0);
+	al_draw_scaled_bitmap(b->bitmap, 0, 0, sprite_w, sprite_h, x+w, y, sprite_w, h, ALLEGRO_FLIP_HORIZONTAL);
 
-	if (sprite_h > h) {
-		MBITMAP *bmp = guiAnims->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
-		m_draw_bitmap_region(bmp, 0, 0, sprite_w, h, x-sprite_w, y, 0);
-		m_draw_bitmap_region(bmp, 0, 0, sprite_w, h, x+w, y, M_FLIP_HORIZONTAL);
-	}
-	else {
-		int vert_tiles = (int)ceil((float)h/sprite_h);
+	b = guiAnims.corner_sub;
+	sprite_w = m_get_bitmap_width(b);
+	sprite_h = m_get_bitmap_height(b);
+	m_draw_bitmap(b, x-sprite_w, y-sprite_h, 0);
+	m_draw_bitmap(b, x+w, y-sprite_h, M_FLIP_HORIZONTAL);
+	m_draw_bitmap(b, x+w, y+h, M_FLIP_HORIZONTAL | M_FLIP_VERTICAL);
+	m_draw_bitmap(b, x-sprite_w, y+h, M_FLIP_VERTICAL);
 
-		for (int i = 0; i < vert_tiles; i++) {
-			float yy;
-			if (i == (vert_tiles-1)) {
-				yy = y+h-sprite_h;
-			}
-			else {
-				yy = y + i*sprite_h;
-			}
+	al_hold_bitmap_drawing(false);
 
-			guiAnims->draw(x-sprite_w, yy);
-			guiAnims->draw(x+w, yy, M_FLIP_HORIZONTAL);
-		}
-	}
-	
-	MCOLOR color;
 
-	color = blue;
+	MCOLOR color = blue;
 
 	m_draw_rectangle(x, y, x+w, y+h, color, M_FILLED);
-
-	guiAnims->setSubAnimation("frame_corner");
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-
-	guiAnims->draw(x-guiAnims->getWidth(), y-guiAnims->getHeight());
-	guiAnims->draw(x+w, y-guiAnims->getHeight(), M_FLIP_HORIZONTAL);
-	guiAnims->draw(x+w, y+h, M_FLIP_VERTICAL|M_FLIP_HORIZONTAL);
-	guiAnims->draw(x-guiAnims->getWidth(), y+h, M_FLIP_VERTICAL);
 
 	m_set_blender(M_ONE, M_INVERSE_ALPHA,
 		m_map_rgb_f(blue.r+0.1, blue.g+0.1, blue.b+0.1));
@@ -301,6 +291,76 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 	al_set_clipping_rectangle(xxx, yyy, www, hhh);
 
 	if (!use_programmable_pipeline && shadow) {
+		ALLEGRO_VERTEX verts[6*8];
+
+		int i = 0;
+
+		#define FILL(xi, yi, ui, vi) \
+		verts[i+1].x = verts[i+0].x + xi; \
+		verts[i+1].y = verts[i+0].y; \
+		verts[i+1].z = 0; \
+		verts[i+1].u = verts[i+0].u + ui; \
+		verts[i+1].v = verts[i+0].v; \
+		verts[i+1].color = white; \
+		verts[i+2].x = verts[i+0].x; \
+		verts[i+2].y = verts[i+0].y + yi; \
+		verts[i+2].z = 0; \
+		verts[i+2].u = verts[i+0].u; \
+		verts[i+2].v = verts[i+0].v + vi; \
+		verts[i+2].color = white; \
+		verts[i+3].x = verts[i+0].x + xi; \
+		verts[i+3].y = verts[i+0].y; \
+		verts[i+3].z = 0; \
+		verts[i+3].u = verts[i+0].u + ui; \
+		verts[i+3].v = verts[i+0].v; \
+		verts[i+3].color = white; \
+		verts[i+4].x = verts[i+0].x; \
+		verts[i+4].y = verts[i+0].y + yi; \
+		verts[i+4].z = 0; \
+		verts[i+4].u = verts[i+0].u; \
+		verts[i+4].v = verts[i+0].v + vi; \
+		verts[i+4].color = white; \
+		verts[i+5].x = verts[i+0].x + xi; \
+		verts[i+5].y = verts[i+0].y + yi; \
+		verts[i+5].z = 0; \
+		verts[i+5].u = verts[i+0].u + ui; \
+		verts[i+5].v = verts[i+0].v + vi; \
+		verts[i+5].color = white; \
+		i += 6;
+
+		verts[i].x = x-2;
+		verts[i].y = y-2-SHADOW_CORNER_SIZE;
+		verts[i].z = 0;
+		verts[i].u = 0;
+		verts[i].v = 0;
+		verts[i].color = white;
+		FILL(w+4, SHADOW_CORNER_SIZE, 1, SHADOW_CORNER_SIZE);
+
+		verts[i].x = x-2;
+		verts[i].y = y+h+2;
+		verts[i].z = 0;
+		verts[i].u = 32;
+		verts[i].v = 0;
+		verts[i].color = white;
+		FILL(w+4, SHADOW_CORNER_SIZE, 1, SHADOW_CORNER_SIZE);
+
+		verts[i].x = x+w+2;
+		verts[i].y = y-2;
+		verts[i].z = 0;
+		verts[i].u = 16;
+		verts[i].v = 0;
+		verts[i].color = white;
+		FILL(SHADOW_CORNER_SIZE, h+4, SHADOW_CORNER_SIZE, 1);
+
+		verts[i].x = x-2-SHADOW_CORNER_SIZE;
+		verts[i].y = y-2;
+		verts[i].z = 0;
+		verts[i].u = 48;
+		verts[i].v = 0;
+		verts[i].color = white;
+		FILL(SHADOW_CORNER_SIZE, h+4, SHADOW_CORNER_SIZE, 1);
+
+		/*
 		m_draw_scaled_bitmap(
 			shadow_sides[0],
 			0, 0,
@@ -333,10 +393,50 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 			SHADOW_CORNER_SIZE, h+4,
 			0
 		);
+		*/
+
+		verts[i+0].x = x-2-SHADOW_CORNER_SIZE;
+		verts[i+0].y = y-2-SHADOW_CORNER_SIZE;
+		verts[i+0].z = 0;
+		verts[i+0].u = 0;
+		verts[i+0].v = 16;
+		verts[i+0].color = white;
+		FILL(SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE);
+		
+		verts[i+0].x = x+w+2;
+		verts[i+0].y = y-2-SHADOW_CORNER_SIZE;
+		verts[i+0].z = 0;
+		verts[i+0].u = SHADOW_CORNER_SIZE;
+		verts[i+0].v = 16;
+		verts[i+0].color = white;
+		FILL(SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE);
+		
+		verts[i+0].x = x+w+2;
+		verts[i+0].y = y+h+2;
+		verts[i+0].z = 0;
+		verts[i+0].u = SHADOW_CORNER_SIZE*2;
+		verts[i+0].v = 16;
+		verts[i+0].color = white;
+		FILL(SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE);
+		
+		verts[i+0].x = x-2-SHADOW_CORNER_SIZE;
+		verts[i+0].y = y+h+2;;
+		verts[i+0].z = 0;
+		verts[i+0].u = SHADOW_CORNER_SIZE*3;
+		verts[i+0].v = 16;
+		verts[i+0].color = white;
+		FILL(SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE);
+		
+		#undef FILL
+
+		m_draw_prim(verts, 0, shadow_sheet, 0, 6*8, ALLEGRO_PRIM_TRIANGLE_LIST);
+		
+		/*
 		m_draw_alpha_bitmap(shadow_corners[0], x-2-SHADOW_CORNER_SIZE, y-2-SHADOW_CORNER_SIZE, 0);
 		m_draw_alpha_bitmap(shadow_corners[1], x+w+2, y-2-SHADOW_CORNER_SIZE, 0);
 		m_draw_alpha_bitmap(shadow_corners[2], x+w+2, y+h+2, 0);
 		m_draw_alpha_bitmap(shadow_corners[3], x-2-SHADOW_CORNER_SIZE, y+h+2, 0);
+		*/
 	}
 
 	m_restore_blender();
@@ -1094,7 +1194,12 @@ void doDialogue(std::string text, bool top, int rows, int offset, bool bottom)
 	}
 }
 
-// Backspace to force new line
+
+void MShadow::draw(void)
+{
+	al_draw_prim(verts, NULL, NULL, 0, 4, ALLEGRO_PRIM_TRIANGLE_STRIP);
+}
+
 
 void MSpeechDialog::mouseUp(int x, int y, int b)
 {
@@ -2160,7 +2265,6 @@ void MMap::draw()
 		m_draw_bitmap_region(map_bmp,
 			top_x+offset_x, top_y+offset_y, BW, BH,
 			0, 0, 0);
-		//-top_x-offset_x, -top_y-offset_y, 0);
 		m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 	}
 	else {
@@ -2602,7 +2706,7 @@ void MMap::load_map_data(void)
 	int file_size;
 
 	debug_message("Loading global script...\n");
-	bytes = slurp_text_file(getResource("scripts/global.%s", getScriptExtension().c_str()), &file_size);
+	bytes = slurp_file(getResource("scripts/global.%s", getScriptExtension().c_str()), &file_size);
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
@@ -2621,7 +2725,7 @@ void MMap::load_map_data(void)
 	lua_setglobal(luaState, "prev");
 
 	debug_message("Loading map script...\n");
-	bytes = slurp_text_file(getResource("%s.%s", prefix.c_str(), getScriptExtension().c_str()), &file_size);
+	bytes = slurp_file(getResource("%s.%s", prefix.c_str(), getScriptExtension().c_str()), &file_size);
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
@@ -4206,6 +4310,9 @@ void MScrollingList::draw()
 	//int yy = y+scroll_offs;
 	int yy = y;
 
+	bool held = al_is_bitmap_drawing_held();
+	al_hold_bitmap_drawing(true);
+
 	for (int i = 0; i < rows; i++) {
 		int r = i + top;
 		if (r >= (int)items.size())
@@ -4233,25 +4340,18 @@ void MScrollingList::draw()
 		buf[count] = 0;
 
 		if (r == selected) {
-			//if (use_dpad) {
-				if (this == tguiActiveWidget)
-					mTextout_simple(buf, x, yy, m_map_rgb(255, 255, 0));
-				else
-					mTextout_simple(buf, x, yy, grey);
-					/*
-			}
-			else {
-				mTextout_simple(buf, x, yy, white);
-			}
-			*/
+			if (this == tguiActiveWidget)
+				mTextout_simple(buf, x, yy, m_map_rgb(255, 255, 0));
+			else
+				mTextout_simple(buf, x, yy, grey);
 		}
 		else
 			mTextout_simple(buf, x, yy, grey);
 		yy += 15;
 	}
-	
-	//m_set_clip(0, 0, m_get_display_width(), m_get_display_height());
 
+	al_hold_bitmap_drawing(held);
+	
 	if (dragging) {
 		ALLEGRO_MOUSE_STATE state;
 		m_get_mouse_state(&state);
@@ -6467,6 +6567,8 @@ MParty::~MParty(void)
 
 void MIcon::pre_draw()
 {
+		// FIXME!
+		/*
 	if (this == tguiActiveWidget && show_focus) {
 		m_save_blender();
 		m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
@@ -6484,6 +6586,7 @@ void MIcon::pre_draw()
 			M_FILLED);
 		m_restore_blender();
 	}
+	*/
 }
 
 void MIcon::draw()
@@ -6491,6 +6594,15 @@ void MIcon::draw()
 	m_save_blender();
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, tint);
 	m_draw_bitmap(bitmap, x, y, 0);
+	if (this == tguiActiveWidget && show_focus) {
+		m_save_blender();
+		al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ONE);
+		double t = fmod(al_get_time(), 1.0);
+		if (t >= 0.5) t = 0.5 - (t-0.5);
+		float a = t / 0.5;
+		al_draw_tinted_bitmap(bitmap->bitmap, al_map_rgba_f(a, a, a, a), x, y, 0);
+		m_restore_blender();
+	}
 	m_restore_blender();
 	if (down && show_name) {
 		m_draw_rectangle(
@@ -6500,10 +6612,10 @@ void MIcon::draw()
 			y-10,
 			black, M_FILLED);
 		m_draw_rectangle(
-			x+m_get_bitmap_width(bitmap)+10,
-			y-25,
-			x+112+10,
-			y-10,
+			x+m_get_bitmap_width(bitmap)+10+0.5,
+			y-25+0.5,
+			x+112+10+0.5,
+			y-10+0.5,
 			white, 0);
 
 		mTextout_simple(_t(name), x+m_get_bitmap_width(bitmap)+6+10, y-7-m_text_height(game_font)/2-9,

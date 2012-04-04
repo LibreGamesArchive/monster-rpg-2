@@ -190,6 +190,9 @@ void Battle::drawStatus(void)
 	if (draw_player_status) {
 		mDrawFrame(separator+9, BH-height-2, BW-(separator+9)-3, height);
 	}
+
+	bool held = al_is_bitmap_drawing_held();
+	al_hold_bitmap_drawing(true);
 	
 	if (draw_enemy_status) {
 		// print enemies 
@@ -247,6 +250,8 @@ void Battle::drawStatus(void)
 			y += m_text_height(game_font);
 		}
 	}
+
+	al_hold_bitmap_drawing(held);
 }
 
 
@@ -1122,7 +1127,7 @@ void Battle::initLua(void)
 	int file_size;
 
 	debug_message("Loading global combat script...\n");
-	bytes = slurp_text_file(getResource("combat_scripts/global.%s", getScriptExtension().c_str()), &file_size);
+	bytes = slurp_file(getResource("combat_scripts/global.%s", getScriptExtension().c_str()), &file_size);
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
@@ -1137,7 +1142,7 @@ void Battle::initLua(void)
 	}
 	
 	debug_message("Loading combat script...\n");
-	bytes = slurp_text_file(getResource("combat_scripts/%s.%s", name.c_str(), getScriptExtension().c_str()), &file_size);
+	bytes = slurp_file(getResource("combat_scripts/%s.%s", name.c_str(), getScriptExtension().c_str()), &file_size);
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();

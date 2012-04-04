@@ -18,9 +18,13 @@ Direction battleStartDirection;
 // Note: lua starts counting at 1, in C++ we start at 0, that's why you
 // see -1 and +1  here and there
 
-unsigned char *slurp_text_file(std::string filename, int *ret_size)
+unsigned char *slurp_file(std::string filename, int *ret_size)
 {
 	ALLEGRO_FILE *f = al_fopen(filename.c_str(), "rb");
+
+	if (!f)
+		return NULL;
+
 	long size = al_fsize(f);
 	unsigned char *bytes;
 
@@ -95,7 +99,7 @@ void startNewGame(const char *name)
 	int file_size;
 
 	debug_message("Loading global area script...\n");
-	bytes = slurp_text_file(getResource("area_scripts/global.%s", getScriptExtension().c_str()), &file_size);
+	bytes = slurp_file(getResource("area_scripts/global.%s", getScriptExtension().c_str()), &file_size);
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
@@ -110,7 +114,7 @@ void startNewGame(const char *name)
 	}
 
 	debug_message("Loading start script...\n");
-	bytes = slurp_text_file(getResource("scripts/%s.%s", name, getScriptExtension().c_str()), &file_size);
+	bytes = slurp_file(getResource("scripts/%s.%s", name, getScriptExtension().c_str()), &file_size);
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		lua_close(luaState);
@@ -139,7 +143,7 @@ void runGlobalScript(lua_State *luaState)
 	ALLEGRO_DEBUG("Running global script");
 
 	debug_message("Loading global script...\n");
-	bytes = slurp_text_file(getResource("scripts/global.%s", getScriptExtension().c_str()), &file_size);
+	bytes = slurp_file(getResource("scripts/global.%s", getScriptExtension().c_str()), &file_size);
 	ALLEGRO_DEBUG("slurped %d bytes", file_size);
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
@@ -1021,6 +1025,7 @@ static int CSetCombatantAnimationSetPrefix(lua_State *stack)
 	if (e) {
 		Combatant *c = (Combatant *)e;
 		c->getAnimationSet()->setPrefix(std::string(prefix));
+		c->getWhiteAnimationSet()->setPrefix(std::string(prefix));
 	}
 	else {
 		debug_message("Combatant %d not found to set animationset prefix\n", id);
@@ -1628,17 +1633,13 @@ int CDoMap(lua_State *stack)
 {	
 	int nargs = lua_gettop(stack);
 
-	//std::string start(lua_tostring(stack, 1));
 	mapStartPlace = std::string(lua_tostring(stack, 1));
 
 	if (nargs > 1) {
-		//std::string prefix(lua_tostring(stack, 2));
 		mapPrefix = std::string(lua_tostring(stack, 2));
-		//doMap(start, prefix);
 	}
 	else {
 		mapPrefix = "<none>";
-		//doMap(start);
 	}
 	
 	shouldDoMap = true;

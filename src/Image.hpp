@@ -30,6 +30,8 @@ public:
 	void draw(int x, int y, int flags = 0);
 	void draw_trans(int x, int y, int alpha);
 
+	Image *clone(void);
+
 	Image(void);
 	Image(bool alpha);
 	/* bitmap is destroyed
@@ -42,8 +44,6 @@ protected:
 
 	MBITMAP *bitmap;
 	bool transparent;
-	int oldSrcBlend, oldDstBlend;
-	MCOLOR oldBlendColor;
 	bool alpha;
 };
 

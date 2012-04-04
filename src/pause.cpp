@@ -6,14 +6,6 @@
 #endif
 			
 			
-			// FIXME
-			extern "C" {
-			#define ASSERT ALLEGRO_ASSERT
-			#include <allegro5/allegro_android.h>
-			#include <allegro5/internal/aintern_android.h>
-			void _al_android_make_current(JNIEnv *env, ALLEGRO_DISPLAY_ANDROID *d);
-			}
-
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 #include "joypad.hpp"
 #endif
@@ -337,12 +329,13 @@ void showSaveStateInfo(const char *basename)
 	int y = (BH-h)/2;
 
 	ALLEGRO_DEBUG("loading screenshot");
-#ifdef ALLEGRO_ANDROID_XXX
-	MBITMAP *ss = m_load_bitmap(getUserResource("%s.png", basename));
-#else
-	MBITMAP *ss = m_load_bitmap(getUserResource("%s.bmp", basename));
+#ifdef ALLEGRO_ANDROID
+	al_set_standard_file_interface();
 #endif
-	ALLEGRO_DEBUG("ss=%p\n", ss);
+	MBITMAP *ss = new_mbitmap(al_load_bitmap(getUserResource("%s.bmp", basename)));
+#ifdef ALLEGRO_ANDROID
+	al_set_apk_file_interface();
+#endif
 
 	ALLEGRO_DEBUG("getting file date");
 	char d[100];
@@ -702,10 +695,12 @@ static bool choose_save_slot(int num, bool exists, void *data)
 			if (prompt("Overwrite?", "", 0, 0)) {
 				saveGame(getUserResource("%d.save", num), map_name);
 				if (screenshot) {
-#ifdef ALLEGRO_ANDROID_XXX
-					al_save_bitmap(getUserResource("%d.png", num), screenshot->bitmap);
-#else
+#ifdef ALLEGRO_ANDROID
+					al_set_standard_file_interface();
+#endif
 					al_save_bitmap(getUserResource("%d.bmp", num), screenshot->bitmap);
+#ifdef ALLEGRO_ANDROID
+					al_set_apk_file_interface();
 #endif
 				}
 				else {
@@ -719,10 +714,12 @@ static bool choose_save_slot(int num, bool exists, void *data)
 		else {
 			saveGame(getUserResource("%d.save", num), map_name);
 			if (screenshot) {
-#ifdef ALLEGRO_ANDROID_XXX
-				al_save_bitmap(getUserResource("%d.png", num), screenshot->bitmap);
-#else
+#ifdef ALLEGRO_ANDROID
+					al_set_standard_file_interface();
+#endif
 				al_save_bitmap(getUserResource("%d.bmp", num), screenshot->bitmap);
+#ifdef ALLEGRO_ANDROID
+					al_set_apk_file_interface();
 #endif
 			}
 			else {
@@ -1786,6 +1783,7 @@ void doMap(std::string startPlace, std::string prefix)
 	
 	fadeOut(black);
 
+	playMusic("");
 	playAmbience("");
 
 	if (prefix == "map2") {
@@ -1795,17 +1793,23 @@ void doMap(std::string startPlace, std::string prefix)
 		playMusic("map.caf");
 	}
 
+	ALLEGRO_DEBUG("doMap 1");
+
 	mapWidget = new MMap(startPlace, prefix);
 
+	ALLEGRO_DEBUG("doMap 2");
 	tguiSetParent(0);
 	tguiAddWidget(mapWidget);
 	tguiSetFocus(mapWidget);
+	ALLEGRO_DEBUG("doMap 3");
 
 	m_set_target_bitmap(buffer);
 	tguiDraw();
 	fadeIn(black);
+	ALLEGRO_DEBUG("doMap 4");
 
 	clear_input_events();
+	ALLEGRO_DEBUG("doMap 5");
 
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
@@ -3287,31 +3291,17 @@ bool config_menu(bool start_on_fullscreen)
 	y += 13;
 #endif
 
-#ifdef ALLEGRO_IPHONE
 	std::vector<std::string> filter_type_choices;
 	std::vector<int> filter_type_values;
 	filter_type_choices.push_back("{027} No filtering");
 	filter_type_values.push_back(FILTER_NONE);
 	filter_type_choices.push_back("{027} Linear filtering");
 	filter_type_values.push_back(FILTER_LINEAR);
-	if (my_opengl_version >= 0x02000000) {
+	if (use_programmable_pipeline) {
 		filter_type_choices.push_back("{027} Scale2x shader");
 		filter_type_values.push_back(FILTER_SCALE2X);
-		if (initial_screen_scale == 2.0f || is_ipad()) {
-			//filter_type_choices.push_back("{027} Scale3x shader");
-			//filter_type_choices.push_back("{027} Scale3x + linear filter");
-			//filter_type_values.push_back(FILTER_SCALE3X);
-			//filter_type_values.push_back(FILTER_SCALE3X_LINEAR);
-//			filter_type_choices.push_back("{027} Scale4x shader");
-//			filter_type_values.push_back(FILTER_SCALE4X);
-			//filter_type_choices.push_back("{027} Scale2x + linear filter");
-			//filter_type_values.push_back(FILTER_SCALE2X_LINEAR);
-			filter_type_choices.push_back("{027} Scale down");
-			filter_type_values.push_back(FILTER_SCALEDOWN);
-			filter_type_choices.push_back("{027} Half scale");
-			filter_type_values.push_back(FILTER_HALFSCALE);
-		}
 	}
+
 	MSingleToggle *filter_type_toggle;
 	int curr_filter_type = 0;
 	int start_filter_type = 0;
@@ -3326,25 +3316,18 @@ bool config_menu(bool start_on_fullscreen)
 	curr_filter_type = start_filter_type;
 	filter_type_toggle->setSelected(curr_filter_type);
 	y += 13;
-#endif
+
+	#define aspect_real_to_option(c) (c == ASPECT_FILL_SCREEN ? 1 : (c == ASPECT_MAINTAIN_RATIO ? 2 : 0))
+	#define aspect_option_to_real(c) (c == 0 ? ASPECT_INTEGER : (c == 1 ? ASPECT_FILL_SCREEN : ASPECT_MAINTAIN_RATIO))
 
 	std::vector<std::string> aspect_choices;
-	aspect_choices.push_back("{027} Maintain aspect ratio");
+	aspect_choices.push_back("{027} Integer scaling");
 	aspect_choices.push_back("{027} Fill the screen");
+	aspect_choices.push_back("{027} Maintain aspect ratio");
 	MSingleToggle *aspect_toggle = new MSingleToggle(xx, y, aspect_choices);
-	int curr_aspect = !config.getMaintainAspectRatio();
-	int start_aspect = curr_aspect;
-	(void)start_aspect;
-	aspect_toggle->setSelected(curr_aspect);
-#if defined ALLEGRO_IPHONE
-	if (is_ipad()) {
-#elif defined ALLEGRO_ANDROID
-	if (true) {
-#endif
+	int curr_aspect = config.getMaintainAspectRatio();
+	aspect_toggle->setSelected(aspect_real_to_option(curr_aspect));
 	y += 13;
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	}
-#endif
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	std::vector<std::string> fullscreen_choices;
@@ -3401,14 +3384,15 @@ bool config_menu(bool start_on_fullscreen)
 
 #if defined ALLEGRO_IPHONE
 	tguiAddWidget(flip_screen_toggle);
-	tguiAddWidget(filter_type_toggle);
 #endif
 
-#if defined ALLEGRO_IPHONE
+	tguiAddWidget(filter_type_toggle);
+
+#ifdef ALLEGRO_IPHONE
 	if (is_ipad()) {
 #endif
-		tguiAddWidget(aspect_toggle);
-#if defined ALLEGRO_IPHONE
+	tguiAddWidget(aspect_toggle);
+#ifdef ALLEGRO_IPHONE
 	}
 #endif
 
@@ -3605,51 +3589,36 @@ bool config_menu(bool start_on_fullscreen)
 			}
 		}
 #endif
-		
-		int sel1 = aspect_toggle->getSelected();
-#if defined ALLEGRO_IPHONE
-		int sel2 = filter_type_toggle->getSelected();
-		int sel_filter = filter_type_values[sel2];
-		
-		if (is_ipad() && (sel1 == 1 && (sel_filter == FILTER_SCALE2X || sel_filter == FILTER_SCALE3X || sel_filter == FILTER_SCALE4X))) {
-			notify("The current filter is", "not compatible with", "fullscreen stretch mode.");
-			//aspect_toggle->setSelected(top_sel1);
-			aspect_toggle->setSelected(0);
-			start_aspect = 0;
-			//filter_type_toggle->setSelected(top_sel2);
-		}
-		else if (sel2 != start_filter_type && sel1 != start_aspect) {
-			notify("Filter type has changed.", "Restart the program", "to change this option.");
-			aspect_toggle->setSelected(start_aspect);
-			filter_type_toggle->setSelected(start_filter_type);
-		}
-		else {
-			config.setMaintainAspectRatio(!sel1);
-			start_aspect = sel1;
-			curr_filter_type = sel2;
+
+		sel = aspect_toggle->getSelected();
+		if (aspect_real_to_option(config.getMaintainAspectRatio()) != sel) {
+			config.setMaintainAspectRatio(aspect_option_to_real(sel));
+			set_screen_params();
 		}
 
-#else
-		if (config.getMaintainAspectRatio() != !sel1)
-			config.setMaintainAspectRatio(!sel1);
-#ifndef ALLEGRO_ANDROID
+		sel = filter_type_toggle->getSelected();
+		if (config.getFilterType() != sel) {
+			config.setFilterType(sel);
+			create_buffers();
+		}
+
+#if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE
 		bool fs = fullscreen_toggle->getSelected();
 		if (fs != start_fullscreen) {
 			toggle_fullscreen();
 			start_fullscreen = fs;
 		}
 #endif
-#endif
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
 
 			m_set_target_bitmap(buffer);
+
+			m_clear_to_color(m_map_rgb(0, 0, 0));
 			
 			al_draw_tinted_bitmap(bg->bitmap, al_map_rgba(64, 64, 64, 255), 0, 0, 0);
 			
-			//m_clear(black);
-		
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
 			tguiDraw();
@@ -3688,10 +3657,10 @@ done:
 	if (input_toggle)
 		delete input_toggle;
 	delete swap_buttons_toggle;
+	delete filter_type_toggle;
 #if defined ALLEGRO_IPHONE
 	delete shake_toggle;
 	delete flip_screen_toggle;
-	delete filter_type_toggle;
 	if (reset_game_center)
 		delete reset_game_center;	
 #endif
@@ -3707,15 +3676,6 @@ done:
 	dpad_on();
 
 	pause_f_to_toggle_fullscreen = false;
-
-#if defined ALLEGRO_IPHONE
-	if (start_filter_type != curr_filter_type) {
-		notify("Filter changed", "You must restart", "Press OK");
-		int sel_filter = filter_type_values[curr_filter_type];
-		config.setFilterType(sel_filter);
-		return true;
-	}
-#endif
 
 	fadeOut(black);
 

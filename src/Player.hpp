@@ -61,5 +61,10 @@ void copyInfo(CombatantInfo &info, CombatantInfo &newinfo);
 void increaseGold(int amount);
 void giveSpell(std::string who, std::string spell);
 
+std::string baseAnimName(std::string name);
+AnimationSet *findBattleAnim(std::string name);
+void referenceBattleAnim(std::string name);
+void unreferenceBattleAnim(std::string name);
+
 #endif
 

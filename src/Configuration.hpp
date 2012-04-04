@@ -3,6 +3,13 @@
 
 #include "monster2.hpp"
 
+enum ASPECT_RATIO
+{
+	ASPECT_FILL_SCREEN,
+	ASPECT_INTEGER,
+	ASPECT_MAINTAIN_RATIO
+};
+
 enum DPAD_TYPE 
 {
 	DPAD_NONE = 0,
@@ -37,13 +44,7 @@ enum CFG_FILTER_TYPE
 	FILTER_NONE = 0,
 	FILTER_LINEAR,
 	FILTER_SCALE2X,
-	FILTER_SCALE3X,
-	FILTER_SCALE4X,
-	FILTER_SCALE2X_LINEAR,
-	FILTER_SCALE3X_LINEAR,
-	FILTER_SCALE4X_LINEAR,
-	FILTER_SCALEDOWN,
-	FILTER_HALFSCALE
+	NUM_FILTER_TYPES
 };
 
 class Configuration {
@@ -119,10 +120,12 @@ public:
 		cfg_filter_type = t;
 		if (!display)
 			return;
-		set_linear_mag_filter(buffer, t == FILTER_LINEAR);
+		//set_linear_mag_filter(buffer, t == FILTER_LINEAR);
+#ifdef ALLEGRO_IPHONE
 		if (scaleXX_buffer) {
 			set_linear_mag_filter(scaleXX_buffer, t == FILTER_SCALE2X_LINEAR || t == FILTER_SCALE3X_LINEAR);
 		}
+#endif
 	}
 #ifdef ALLEGRO_IPHONE
 	int getAutoRotation(void) {
@@ -161,27 +164,11 @@ public:
 		}
 	}
 #endif
-	bool getMaintainAspectRatio(void) {
+	int getMaintainAspectRatio(void) {
 		return cfg_maintain_aspect_ratio;
 	}
-	void setMaintainAspectRatio(bool m) {
+	void setMaintainAspectRatio(int m) {
 		cfg_maintain_aspect_ratio = m;
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-		set_screen_params();
-#elif defined ALLEGRO_ANDROID
-		if (tguiIsInitialized()) {
-#else
-		if (tguiIsInitialized() && is_ipad()) {
-#endif
-			if (m) {
-				tguiSetScreenParameters(screen_offset_x, screen_offset_y, 1.0f, 1.0f);
-			}
-			else {
-				tguiSetScreenParameters(0, 0, screen_ratio_x, screen_ratio_y);
-			}
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-		}
-#endif
 	}
 	void setLanguage(int l);
 	int getLanguage(void);
@@ -217,7 +204,7 @@ private:
 	int cfg_tuning;
 	int cfg_difficulty;
 	int cfg_filter_type;
-	bool cfg_maintain_aspect_ratio;
+	int cfg_maintain_aspect_ratio;
 	int language;
 	bool fixed_language;
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID

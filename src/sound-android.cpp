@@ -404,19 +404,6 @@ void loadPlayDestroy(std::string name)
 #endif
 
 	playPreloadedSample(name);
-	/*
-	if (sample != 0 && sample_name != name) {
-		sample_name = name;
-		bass_destroySample(sample);
-		sample = loadSample(name);
-	}
-	else if (sample == 0) {
-		sample = loadSample(name);
-	}
-
-	if (sample)
-		playSample(sample);
-	*/
 }
 
 void stopAllSamples(void)
@@ -458,10 +445,8 @@ void playMusic(std::string name, float volume, bool force)
 #endif
 
 	music = bass_loadMusic(getResource("music/%s", name.c_str()));
-	
-	setMusicVolume(volume);
-
 	bass_playMusic(music);
+	setMusicVolume(volume);
 }
 
 void setMusicVolume(float volume)
@@ -473,12 +458,11 @@ void setMusicVolume(float volume)
 	volume *= config.getMusicVolume()/255.0f;
 
 	if (music) {
-		// FIXME!
-		//BASS_ChannelSetAttribute(music, BASS_ATTRIB_VOL, volume);
+		bass_setMusicVolume(music, volume);
 	}
 }
 
-void playAmbience(std::string name)
+void playAmbience(std::string name, float vol)
 {
 	if (!sound_inited) return;
 
@@ -509,9 +493,8 @@ void playAmbience(std::string name)
 #endif
 
 	ambience = bass_loadMusic(getResource("music/%s", name.c_str()));
-	
-	setMusicVolume(1);
 	bass_playMusic(ambience);
+	setAmbienceVolume(vol);
 }
 
 void setAmbienceVolume(float volume)
@@ -522,8 +505,8 @@ void setAmbienceVolume(float volume)
 
 	volume *= config.getMusicVolume()/255.0f;
 
-	// FIXME!
-	//BASS_ChannelSetAttribute(ambience, BASS_ATTRIB_VOL, volume);
+	if (ambience)
+		bass_setMusicVolume(ambience, volume);
 }
 
 

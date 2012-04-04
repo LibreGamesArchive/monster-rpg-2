@@ -91,6 +91,8 @@ protected:
 
 	PoisonBlock poisonBlocks[9];
 	bool specialWalkable;
+
+	std::string battleAnimName;
 };
 
 

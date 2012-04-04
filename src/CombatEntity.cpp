@@ -16,6 +16,10 @@ static MBITMAP **bolt2_bmps;
 static int bolt2_bmp_ref_count = 0;
 static int num_bolt2_bmps;
 
+#define SINTABSIZE 100
+static float costable[SINTABSIZE];
+static float sintable[SINTABSIZE];
+
 extern "C" {
 void _al_blend_memory(ALLEGRO_COLOR *, ALLEGRO_BITMAP *, int, int, ALLEGRO_COLOR *);
 }
@@ -561,11 +565,45 @@ void Ice1Effect::draw(void)
 			m_draw_bitmap(bitmap, dx, dy, M_FLIP_HORIZONTAL);
 		}
 	}
-	
+
+#ifdef ALLEGRO_ANDROID
+	ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[particles.size()*6];
+	for (int i = 0; i < (int)particles.size(); i++) {
+		Particle &part = particles[i];
+		verts[i*6+0].x = part.x;
+		verts[i*6+0].y = part.y;
+		verts[i*6+0].z = 0;
+		verts[i*6+0].color = part.color;
+		verts[i*6+1].x = part.x+1;
+		verts[i*6+1].y = part.y;
+		verts[i*6+1].z = 0;
+		verts[i*6+1].color = part.color;
+		verts[i*6+2].x = part.x;
+		verts[i*6+2].y = part.y+1;
+		verts[i*6+2].z = 0;
+		verts[i*6+2].color = part.color;
+		verts[i*6+3].x = part.x+1;
+		verts[i*6+3].y = part.y;
+		verts[i*6+3].z = 0;
+		verts[i*6+3].color = part.color;
+		verts[i*6+4].x = part.x;
+		verts[i*6+4].y = part.y+1;
+		verts[i*6+4].z = 0;
+		verts[i*6+4].color = part.color;
+		verts[i*6+5].x = part.x+1;
+		verts[i*6+5].y = part.y+1;
+		verts[i*6+5].z = 0;
+		verts[i*6+5].color = part.color;
+	}
+	//m_draw_prim(verts, 0, NULL, 0, particles.size()*6, ALLEGRO_PRIM_TRIANGLE_LIST);
+	al_draw_prim(verts, 0, NULL, 0, particles.size()*6, ALLEGRO_PRIM_TRIANGLE_LIST);
+	delete[] verts;
+#else
 	for (int i = 0; i < (int)particles.size(); i++) {
 		Particle &part = particles[i];
 		m_draw_pixel((int)part.x, (int)part.y, part.color);
 	}
+#endif
 }
 
 
@@ -1245,31 +1283,45 @@ int WhirlpoolEffect::getLifetime(void)
 
 void WhirlpoolEffect::draw(void)
 {
-	ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[m_get_bitmap_width(spiral)*m_get_bitmap_height(spiral)];
+#ifdef ALLEGRO_ANDROID_XX
+	int mult = 6;
+#else
+	int mult = 1;
+#endif
+
+	ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[w*h*mult];
 	
 	int i = 0;
-	for (int y = 0; y < m_get_bitmap_height(spiral); y++) {
-		for (int x = 0; x < m_get_bitmap_width(spiral); x++) {
-			int xx = x - m_get_bitmap_width(spiral)/2;
-			int yy = y - m_get_bitmap_height(spiral)/2;
-			float a  = angle + atan2((float)yy, xx);
-			float radius = sqrtf((float)xx*xx + yy*yy);
-			float s = 0.75 + ((float)(y+1)/m_get_bitmap_height(spiral))*0.25;
-			int o = (m_get_bitmap_width(spiral) - (m_get_bitmap_width(spiral)*s))/2.0;
-			xx = m_get_bitmap_width(spiral)/2 + cos(a) * radius;
-			yy = m_get_bitmap_height(spiral)/2 + sin(a) * radius;
-			verts[i].x = ((target->getX()-m_get_bitmap_width(spiral)/2+(x*s)) + o);
-			verts[i].y = (target->getY()-8-m_get_bitmap_height(spiral)/6+y/3);
-			verts[i].z = 0;
-			verts[i].color = m_get_pixel(spiral, xx, yy);
-			i++;
+	for (int y = 0; y < h; y++) {
+		for (int x = 0; x < w; x++) {
+			int xx = x - w/2;
+			int yy = y - h/2;
+			float a  = angle + atans[y*w+x];
+			while (a < 0) a += M_PI*2;
+			while (a >= M_PI*2) a -= M_PI*2;
+			float radius = roots[y*w+x];
+			float s = 0.75 + ((float)(y+1)/h)*0.25;
+			int o = (w - (w*s))/2.0;
+			xx = w/2 + costable[(int)(a/(M_PI*2)*SINTABSIZE)] * radius;
+			yy = h/2 + sintable[(int)(a/(M_PI*2)*SINTABSIZE)] * radius;
+			if (xx >= 0 && yy >= 0 && xx < w && yy < h) {
+				verts[i*mult].x = ((target->getX()-w/2+(x*s)) + o) + 0.5;
+				verts[i*mult].y = (target->getY()-8-(h/6)+(y/3)) + 0.5;
+				verts[i*mult].z = 0;
+				verts[i*mult].color = colors[xx+yy*w];
+				i++;
+			}
 		}
 	}
 
-#ifdef __linux__
-	draw_points_locked(verts, m_get_bitmap_width(spiral)*m_get_bitmap_height(spiral));
+#if defined __linux__ && !defined ALLEGRO_ANDROID
+	draw_points_locked(verts, i);
 #else
-	m_draw_prim(verts, 0, 0, 0, m_get_bitmap_width(spiral)*m_get_bitmap_height(spiral), ALLEGRO_PRIM_POINT_LIST);
+#ifdef ALLEGRO_ANDROID_XX
+	m_draw_prim(verts, 0, 0, 0, i*mult, ALLEGRO_PRIM_TRIANGLE_LIST);
+#else
+	m_draw_prim(verts, 0, 0, 0, i*mult, ALLEGRO_PRIM_POINT_LIST);
+#endif
 #endif
 
 	delete[] verts;
@@ -1303,15 +1355,36 @@ WhirlpoolEffect::WhirlpoolEffect(Combatant *target) :
 
 	this->target = target;
 
-	spiral = m_load_alpha_bitmap(getResource("combat_media/Whirlpool.png"));
+	for (int i = 0; i < SINTABSIZE; i++) {
+		float f = (float)i / SINTABSIZE * M_PI*2;
+		costable[i] = cos(f);
+		sintable[i] = sin(f);
+	}
+
+	MBITMAP *spiral = m_load_alpha_bitmap(getResource("combat_media/Whirlpool.png"));
+	w = m_get_bitmap_width(spiral);
+	h = m_get_bitmap_height(spiral);
+	colors = new ALLEGRO_COLOR[w*h];
+	atans = new float[w*h];
+	roots = new float[w*h];
 	m_lock_bitmap(spiral, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
+	for (int y = 0; y < h; y++) {
+		for (int x = 0; x < w; x++) {
+			colors[x+y*w] = m_get_pixel(spiral, x, y);
+			atans[x+y*w] = atan2((y-h/2), (x-w/2));
+			roots[x+y*w] = sqrtf(((x-w/2)*(x-w/2)) + ((y-h/2)*(y-h/2)));
+		}
+	}
+	m_unlock_bitmap(spiral);
+	m_destroy_bitmap(spiral);
 }
 
 
 WhirlpoolEffect::~WhirlpoolEffect(void)
 {
-	m_unlock_bitmap(spiral);
-	m_destroy_bitmap(spiral);
+	delete[] colors;
+	delete[] atans;
+	delete[] roots;
 }
 
 

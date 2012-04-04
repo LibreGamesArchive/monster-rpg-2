@@ -40,7 +40,7 @@ extern ALLEGRO_DISPLAY *controller_display;
 extern ALLEGRO_COND *wait_cond;
 extern ALLEGRO_MUTEX *wait_mutex;
 extern int exit_event_thread;
-extern ALLEGRO_SHADER *controller_shader;
+//extern ALLEGRO_SHADER *controller_shader;
 extern ALLEGRO_SHADER *default_shader;
 extern ALLEGRO_SHADER *cheap_shader;
 extern ALLEGRO_SHADER *tinter;
@@ -70,9 +70,17 @@ extern MBITMAP *tile;
 extern char start_cwd[1000];
 extern XMLData *tilemap_data;
 extern XMLData *trans_data;
-extern AnimationSet *guiAnims;
 extern XMLData *terrain;
 extern std::vector<WaterData> waterData;
+
+struct GuiAnims
+{
+	MBITMAP *bitmap;
+	MBITMAP *corner_sub;
+	MBITMAP *wide_sub;
+	MBITMAP *tall_sub;
+};
+extern GuiAnims guiAnims;
 
 extern GameInfo gameInfo;
 //extern MBITMAP *profileBg;
@@ -124,8 +132,7 @@ extern float area_panned_x;
 extern float area_panned_y;
 extern MBITMAP *corner_bmp;
 extern bool had_battle;
-extern MBITMAP *shadow_corners[4];
-extern MBITMAP *shadow_sides[4];
+extern MBITMAP *shadow_sheet;
 const int SHADOW_CORNER_SIZE = 10;
 extern MBITMAP *shakeAlternativeBitmap;
 extern ALLEGRO_VERTEX triangle_lines[32];
@@ -197,8 +204,8 @@ extern bool airplay_connected;
 void init2_shaders();
 
 void register_display(ALLEGRO_DISPLAY *display);
-void init_controller_shader(void);
-void destroy_controller_shader(void);
+//void init_controller_shader(void);
+//void destroy_controller_shader(void);
 
 extern volatile int curr_touches;
 
@@ -211,6 +218,15 @@ extern ALLEGRO_EVENT_QUEUE *events_minor;
 #ifdef ALLEGRO_IPHONE
 extern double next_shake;
 #endif
+
+extern bool sound_was_playing_at_program_start;
+#ifdef ALLEGRO_IPHONE
+extern double allegro_iphone_shaken;
+#endif
+
+bool imperfect_aspect(void);
+void create_buffers(void);
+
 
 #endif
 

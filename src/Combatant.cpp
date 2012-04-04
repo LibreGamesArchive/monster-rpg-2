@@ -13,6 +13,12 @@ AnimationSet *Combatant::getAnimationSet(void)
 }
 
 
+AnimationSet *Combatant::getWhiteAnimationSet(void)
+{
+	return whiteAnimSet;
+}
+
+
 CombatLocation Combatant::getLocation(void)
 {
 	return location;
@@ -92,8 +98,9 @@ void Combatant::construct(std::string name, bool alpha)
 
 	s = std::string(getResource("combat_media/")) + s + ".png";
 
-	animSet = new AnimationSet(s.c_str(), alpha);
-	
+	referenceBattleAnim(name);
+	animSet = findBattleAnim(name);
+
 	animSet->setSubAnimation("stand");
 
 	defending = false;
@@ -115,6 +122,6 @@ Combatant::Combatant(std::string name) :
 
 Combatant::~Combatant(void)
 {
-	delete animSet;
+	unreferenceBattleAnim(name);
 }
 

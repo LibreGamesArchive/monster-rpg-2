@@ -98,6 +98,9 @@ public:
 	
 	int getAlpha(void);
 
+	Animation *clone(void);
+
+	Animation(void);
 	Animation(const char *name, int alpha);
 	/* Frames are destroyed
 	 */

@@ -13,13 +13,14 @@ public class BassPump
 	private static AllegroActivity activity;
 	private static SoundPool sp;
 	private static ArrayList<Sample> samples = new ArrayList<Sample>();
-	private static ArrayList<MediaPlayer> mps = new ArrayList<MediaPlayer>();
+	private static ArrayList<Music> mps = new ArrayList<Music>();
+	private static int music_ids = 1;
 
 	public static void initSound(AllegroActivity activity)
 	{
 		BassPump.activity = activity;
 
-		sp = new SoundPool(32, AudioManager.STREAM_MUSIC, 0);
+		sp = new SoundPool(16, AudioManager.STREAM_MUSIC, 0);
 	}
 
 	public static void update()
@@ -94,20 +95,24 @@ public class BassPump
 		try {
 			fd = activity.getResources().getAssets().openFd(name);
 			mp.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
-			//mp.setDataSource(fd.getFileDescriptor());
 		}
 		catch (IOException e) {
 			Log.e("BassPump", "ERROR LOADING MUSIC");
 			return 0;
 		}
 
-		mps.add(mp);
-		return mps.size();
+		Music m = new Music();
+		m.id = music_ids++;
+		m.mp = mp;
+		mps.add(m);
+
+		return m.id;
 	}
 
 	public static void playMusic(int music)
 	{
-		MediaPlayer mp = mps.get(music-1);
+		int idx = findMusic(music);
+		MediaPlayer mp = mps.get(idx).mp;
 		try {
 			mp.prepare();
 		}
@@ -121,20 +126,40 @@ public class BassPump
 
 	public static void stopMusic(int music)
 	{
-		MediaPlayer mp = mps.get(music-1);
-		mp.stop();
+		int idx = findMusic(music);
+		mps.get(idx).mp.stop();
 	}
 
 	public static void destroyMusic(int music)
 	{
-		stopMusic(music);
-		mps.set(music-1, null);
+		int idx = findMusic(music);
+		mps.get(idx).mp.stop();
+		mps.get(idx).mp = null;
+		mps.remove(idx);
+	}
+
+	public static void setMusicVolume(int music, float vol)
+	{
+		int idx = findMusic(music);
+		mps.get(idx).mp.setVolume(vol, vol);
 	}
 
 	public static void shutdownBASS()
 	{
 		sp.release();
 		sp = null;
+	}
+
+	private static int findMusic(int id)
+	{
+		for (int i = 0; i < mps.size(); i++) {
+			if (mps.get(i).id == id) {
+				return i;
+			}
+		}
+
+		Log.d("BassPump", "Couldn't find music " + id);
+		return -1;
 	}
 }
 
@@ -143,4 +168,10 @@ class Sample
 	int id;
 	boolean loop;
 	int streamID;
+}
+
+class Music
+{
+	int id;
+	MediaPlayer mp;
 }

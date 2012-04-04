@@ -108,8 +108,6 @@ void connect_second_display(void)
 	int mvol = config.getMusicVolume();
 	int svol = config.getSFXVolume();
 
-	_delete_loaded_bitmaps();
-
 	connect_airplay_controls();
 	
 	destroy_shaders();
@@ -117,33 +115,38 @@ void connect_second_display(void)
 	
 	al_set_new_display_adapter(1);
 	int flags = al_get_new_display_flags();
-	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | flags);
+	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_USE_PROGRAMMABLE_PIPELINE | flags);
 	al_set_new_display_option(ALLEGRO_AUTO_CONVERT_BITMAPS, 1, ALLEGRO_REQUIRE);
 	display = al_create_display(1, 1);
 	al_set_new_display_flags(flags);
 	init_shaders();
 	init2_shaders();
 
-	_reload_loaded_bitmaps();
-	
-
 	al_set_new_display_adapter(0);
 	ScreenDescriptor *sd = config.getWantedGraphicsMode();
+	int flgs = al_get_new_display_flags();
+	al_set_new_display_flags(flgs & ~ALLEGRO_USE_PROGRAMMABLE_PIPELINE);
 	controller_display = al_create_display(sd->height, sd->width);
+	al_set_new_display_flags(flgs);
 	register_display(controller_display);
-	init_controller_shader();
+	//init_controller_shader();
 	ALLEGRO_TRANSFORM scale;
 	al_identity_transform(&scale);
 	al_scale_transform(&scale, sd->height/960.0, sd->width/640.0);
 	al_use_transform(&scale);
-	game_font_second_display = al_load_ttf_font(getResource("DejaVuSans.ttf"), 10, 0);
-	for (int i = 1; i < 9; i++) {
-		blueblocks[i-1] = m_load_bitmap(getResource("media/blueblocks%d.png", i));
+	int format = al_get_new_bitmap_format();
+	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
+	for (int i = 0; i < 8; i++) {
+		blueblocks[i] = m_load_bitmap(getResource("media/blueblocks%d.png", i+1));
+		printf("loaded blueblocks %d\n", i);
 	}
-	airplay_dpad = m_load_bitmap(getResource("media/airplay_pad.png"));
-	white_button = m_load_bitmap(getResource("media/whitebutton.png"));
-	black_button = m_load_bitmap(getResource("media/blackbutton.png"));
-	airplay_logo = m_load_bitmap(getResource("media/m2_controller_logo.png"));
+	al_set_new_bitmap_format(format);
+	game_font_second_display = al_load_ttf_font(getResource("DejaVuSans.ttf"), 10, 0);
+	
+	airplay_dpad = m_load_alpha_bitmap(getResource("media/airplay_pad.png"));
+	white_button = m_load_alpha_bitmap(getResource("media/whitebutton.png"));
+	black_button = m_load_alpha_bitmap(getResource("media/blackbutton.png"));
+	airplay_logo = m_load_alpha_bitmap(getResource("media/m2_controller_logo.png"));
 	
 	m_set_target_bitmap(buffer);
 
@@ -231,9 +234,13 @@ bool is_close_pressed(void)
 			}
 #elif defined ALLEGRO_ANDROID
 			std::string old_music_name = musicName;
+			std::string old_ambience_name = ambienceName;
 			float old_music_volume = getMusicVolume();
+			float old_ambience_volume = getAmbienceVolume();
 			playMusic("");
+			playAmbience("");
 #endif
+			config.write();
 			al_stop_timer(logic_timer);
 			al_stop_timer(draw_timer);
 			// halt
@@ -247,14 +254,18 @@ bool is_close_pressed(void)
 			al_unlock_mutex(switch_mutex);
 			// resume
 			al_acknowledge_drawing_resume(display);
+#ifdef ALLEGRO_ANDROID
+      			glDisable(GL_DITHER);
+#endif
 			al_start_timer(logic_timer);
 			al_start_timer(draw_timer);
 #ifdef ALLEGRO_ANDROID
 			playMusic(old_music_name, old_music_volume, true);
+			playAmbience(old_ambience_name, old_ambience_volume);
 #endif
 		}
 #endif
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE
 		if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT)
 		{
 			do_pause_game = should_pause_game();
@@ -324,7 +335,7 @@ bool is_close_pressed(void)
 			m_destroy_bitmap(white_button);
 			m_destroy_bitmap(black_button);
 			m_destroy_bitmap(airplay_logo);
-			destroy_controller_shader();
+			//destroy_controller_shader();
 			al_destroy_display(controller_display);
 			controller_display = NULL;
 			
@@ -338,6 +349,8 @@ bool is_close_pressed(void)
 			register_display(display);
 			init_shaders();
 			init2_shaders();
+	
+			_reload_loaded_bitmaps();
 			
 			m_set_target_bitmap(buffer);
 			
@@ -717,28 +730,10 @@ void run(void)
 						}
 						else {
 							iphone_clear_shaken();
-							//debug_message("button 2\n");
 							int posx, posy;
 							party[heroSpot]->getObject()->getPosition(&posx, &posy);
-							//debug_message("1.1\n");
-							//Tile *tile = area->getTile(posx, posy);
-							//debug_message("1.1\n");
 							bool can_save = true;
-							/*
-							bool can_save = false;
-							for (int i = 0; i < TILE_LAYERS; i++) {
-								// FIXME: hardcoded :(
-								int animNum = tile->getAnimationNum(i);
-								if (animNum >= 0 && area->getAnimationNums()[animNum] == 96) {
-									can_save = true;
-									break;
-								}
-							}
-							*/
-							//debug_message("1.1\n");
-							//debug_message("1.1\n");
 							fadeOut(black);
-							//debug_message("1.1\n");
 							bool ret = pause(can_save);
 							if (!ret) {
 								fadeOut(black);
@@ -866,51 +861,6 @@ void run(void)
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		ALLEGRO_KEYBOARD_STATE state;
 		al_get_keyboard_state(&state);
-		/*
-	if (gameInfo.milestones[MS_CELL_SCENE]) {
-		if (al_key_down(&state, ALLEGRO_KEY_S) && !battle) {
-			if (prompt("Really save? This can", "cause problems!!", 0, 0)) {
-				char tmp[1000];
-				strcpy(tmp, saveFilename);
-				saveGame(tmp, "");
-			}
-		}
-	}
-	*/
-	/*
-      if (al_key_down(&state, ALLEGRO_KEY_F1)) {
-         m_rest(0.15);
-         int v = config.getMusicVolume();
-         if (v <= 26) v = 0;
-         else v = v - 26; 
-         config.setMusicVolume(v);
-         setMusicVolume(getMusicVolume());
-         setAmbienceVolume(getAmbienceVolume());
-      }
-      if (al_key_down(&state, ALLEGRO_KEY_F2)) {
-         m_rest(0.15);
-         int v = config.getMusicVolume();
-         if (v >= 230) v = 255;
-         else v = v + 26; 
-         config.setMusicVolume(v);
-         setMusicVolume(getMusicVolume());
-         setAmbienceVolume(getAmbienceVolume());
-      }
-      if (al_key_down(&state, ALLEGRO_KEY_F3)) {
-         m_rest(0.15);
-         int v = config.getSFXVolume();
-         if (v <= 26) v = 0;
-         else v = v - 26; 
-         config.setSFXVolume(v);
-      }
-      if (al_key_down(&state, ALLEGRO_KEY_F4)) {
-         m_rest(0.15);
-         int v = config.getSFXVolume();
-         if (v >= 230) v = 255;
-         else v = v + 26; 
-         config.setSFXVolume(v);
-      }
-	  */
 #elif defined IPHONELKFDJSLKFJDSKFLDS
 	ALLEGRO_JOYSTICK_STATE joystate;
 	al_get_joystick_state(al_get_joystick(0), &joystate);
@@ -1137,12 +1087,9 @@ int main(int argc, char *argv[])
    
 #if defined ALLEGRO_IPHONE
 	if (al_get_num_video_adapters() > 1) {
-		create_airplay_mirror = true;
-		is_close_pressed();
+		connect_second_display();
 	}
 #endif
-
-
 
 
 	// FIXME

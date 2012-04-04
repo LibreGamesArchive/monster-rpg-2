@@ -14,6 +14,8 @@ std::string shutdownAmbienceName = "";
 #if !defined KCM_AUDIO
 
 bool sound_inited = false;
+static int total_samples = 0;
+static int curr_sample = 0;
 
 std::map<std::string, MSAMPLE> preloaded_samples;
 
@@ -255,11 +257,21 @@ void initSound(void)
 	if (!BASSFLACplugin) {
 		printf("Error loading FLAC plugin (%d)\n", BASS_ErrorGetCode());
 	}
-
+	
 	for (int i = 0; preloaded_names[i] != ""; i++) {
-		preloaded_samples[preloaded_names[i]] =
-			loadSample(preloaded_names[i]);
+		total_samples++;
 	}
+}
+
+bool loadSamples(void (*cb)(int, int))
+{
+	preloaded_samples[preloaded_names[curr_sample]] =
+		loadSample(preloaded_names[curr_sample]);
+	(*cb)(curr_sample, total_samples);
+	curr_sample++;
+	if (curr_sample == total_samples)
+		return true;
+	return false;
 }
 
 
@@ -820,7 +832,7 @@ static void CALLBACK MusicSyncProc(HSYNC handle, DWORD channel, DWORD data, void
 		BASS_ChannelSetPosition(channel, 0, BASS_POS_BYTE);
 }
 
-void playMusic(std::string name, bool setLoopStart, unsigned int loopStart, bool force)
+void playMusic(std::string name, float vol, bool force)
 {
 	if (!sound_inited) return;
 
@@ -866,74 +878,12 @@ void playMusic(std::string name, bool setLoopStart, unsigned int loopStart, bool
 			getResource("music/%s", name.c_str()),
 			0, 0, 0);
 		
-		if (setLoopStart) {
-			music_loop_start = BASS_ChannelSeconds2Bytes(music, loopStart/1000.0);
-		}
-		else {
-			music_loop_start = 0;
-		}
+		music_loop_start = 0;
 
 		BASS_ChannelSetSync(music, BASS_SYNC_END | BASS_SYNC_MIXTIME,
 			0, MusicSyncProc, 0);
 
-		setMusicVolume(1);
-		BASS_ChannelPlay(music, FALSE);
-#if defined ALLEGRO_IPHONE_XX || defined ALLEGRO_MACOSX_XX
-	}
-#endif
-}
-
-
-void playMusicVolumeOff(std::string name)
-{
-	if (!sound_inited) return;
-
-	if (musicName == name)
-		return;
-
-	if (name != "")
-		musicName = name;
-
-#if defined ALLEGRO_IPHONE_XX || defined ALLEGRO_MACOSX_XX
-	if (aac_playing) {
-		play_aac(NULL);
-		aac_playing = false;
-		music = NULL;
-	}
-	else
-#endif
-	if (music) {
-		BASS_StreamFree(music);
-	}
-
-	if (name == "" || config.getMusicVolume() == 0) {
-		music = 0;
-		return;
-	}
-
-#if defined ALLEGRO_IPHONE_XX || defined ALLEGRO_MACOSX_XX
-	if (name.find(".caf", 0) != std::string::npos) {
-		play_aac(getResource("music/%s", name.c_str()), true);
-		aac_playing = true;
-	}
-	else {
-#endif
-		size_t ext_pos = name.find(".caf", 0);
-		if (ext_pos != std::string::npos) {
-			name = name.substr(0, ext_pos) + ".flac";
-		}
-		ext_pos = name.find(".ogg", 0);
-		if (ext_pos != std::string::npos) {
-			name = name.substr(0, ext_pos) + ".flac";
-		}
-		music = BASS_StreamCreateFile(false,
-			getResource("music/%s", name.c_str()),
-			0, 0, 0);
-		
-		BASS_ChannelSetSync(music, BASS_SYNC_END | BASS_SYNC_MIXTIME,
-			0, MusicSyncProc, 0);
-
-		setMusicVolume(0);
+		setMusicVolume(vol);
 		BASS_ChannelPlay(music, FALSE);
 #if defined ALLEGRO_IPHONE_XX || defined ALLEGRO_MACOSX_XX
 	}
@@ -1050,7 +1000,7 @@ static void destroyMusic(void)
 
 void unmuteMusic(void)
 {
-    playMusic(musicName, false, 0, true);
+    playMusic(musicName, 1.0, true);
 }
 
 void unmuteAmbience(void)
@@ -1072,7 +1022,7 @@ std::string ambienceName = "";
 static float musicVolume = 1.0f;
 static float ambienceVolume = 1.0f;
 
-void playMusic(std::string name, bool setLoopStart, unsigned int loopStart, bool force)
+void playMusic(std::string name, float vol, bool force)
 {
 	if (!sound_inited) return;
 
@@ -1128,80 +1078,12 @@ void playMusic(std::string name, bool setLoopStart, unsigned int loopStart, bool
 		
 		al_set_audio_stream_playmode(music, ALLEGRO_PLAYMODE_LOOP);
 
-		if (setLoopStart) {
-			al_set_audio_stream_loop_secs(music, loopStart/1000.0,
-				al_get_audio_stream_length_secs(music));
-		}
-
 		al_attach_audio_stream_to_mixer(music, al_get_default_mixer());
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	}
 #endif
 
-	setMusicVolume(1);
-}
-
-
-void playMusicVolumeOff(std::string name)
-{
-	if (!sound_inited) return;
-
-	if (musicName == name)
-		return;
-	
-	musicName = name;
-
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
-	if (aac_playing) {
-		play_aac(NULL);
-		aac_playing = false;
-		music = NULL;
-	}
-	else
-#endif
-	if (music) {
-		//al_detach_stream(music);
-		al_set_audio_stream_playing(music, false);
-		al_destroy_audio_stream(music);
-	}
-
-	if (name == "" || config.getMusicVolume() == 0) {
-		music = 0;
-		return;
-	}
-	//if (name.find("aac", 0) != std::string::npos) {
-
-
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
-	if (name.find(".caf", 0) != std::string::npos) {
-		play_aac(getResource("music/%s", name.c_str()), true);
-		aac_playing = true;
-	}
-	else {
-#else
-		size_t ext_pos = name.find(".caf", 0);
-		if (ext_pos != std::string::npos) {
-			name = name.substr(0, ext_pos) + ".flac";
-		}
-		ext_pos = name.find(".ogg", 0);
-		if (ext_pos != std::string::npos) {
-			name = name.substr(0, ext_pos) + ".flac";
-		}
-#endif
-		music = al_load_audio_stream(getResource("music/%s", name.c_str()), 4, 1024*8);
-		
-		if (!music) {
-			return;
-		}
-
-		al_set_audio_stream_gain(music, 0);
-		
-		al_set_audio_stream_playmode(music, ALLEGRO_PLAYMODE_LOOP);
-
-		al_attach_audio_stream_to_mixer(music, al_get_default_mixer());
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
-	}
-#endif
+	setMusicVolume(vol);
 }
 
 
@@ -1314,7 +1196,7 @@ float getAmbienceVolume(void)
 
 void unmuteMusic(void)
 {
-	playMusic(musicName, false, 0, true);
+	playMusic(musicName, 1.0, true);
 }
 
 void unmuteAmbience(void)
@@ -1325,7 +1207,7 @@ void unmuteAmbience(void)
 
 void restartMusic(void)
 {
-	playMusic(shutdownMusicName, false, 0, true);
+	playMusic(shutdownMusicName, 1.0, true);
 }
 
 

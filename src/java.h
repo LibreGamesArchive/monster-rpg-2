@@ -18,6 +18,7 @@ void bass_stopMusic(HMUSIC music);
 void bass_destroyMusic(HMUSIC music);
 void bass_shutdownBASS(void);
 void bass_destroySample(HSAMPLE s);
+void bass_setMusicVolume(HMUSIC music, float vol);
 
 void openURL(const char *url);
 

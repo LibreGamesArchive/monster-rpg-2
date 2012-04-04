@@ -52,8 +52,10 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.egl.*;
 
 import org.liballeg.app.AllegroInputStream;
+import android.media.AudioManager;
 
 import org.liballeg.app.BassPump;
+
 
 class Utils
 {
@@ -108,6 +110,7 @@ public class AllegroActivity extends Activity implements SensorEventListener
    static {
 		/* FIXME: see if we can't load the allegro library name, or type from the manifest here */
       System.loadLibrary("allegro-debug");
+      System.loadLibrary("allegro_memfile-debug");
       System.loadLibrary("allegro_primitives-debug");
       System.loadLibrary("allegro_image-debug");
       System.loadLibrary("allegro_font-debug");
@@ -861,12 +864,15 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
    static final int ALLEGRO_KEY_COLON2     = 101;
    static final int ALLEGRO_KEY_KANJI      = 102;
 
-   static final int ALLEGRO_KEY_PAD_EQUALS = 103;   /* MacOS X */
-   static final int ALLEGRO_KEY_BACKQUOTE  = 104;   /* MacOS X */
-   static final int ALLEGRO_KEY_SEMICOLON2 = 105;   /* MacOS X -- TODO: ask lillo what this should be */
-   static final int ALLEGRO_KEY_COMMAND    = 106;   /* MacOS X */
-   static final int ALLEGRO_KEY_BACK       = 107;
-   static final int ALLEGRO_KEY_UNKNOWN    = 108;
+   static final int ALLEGRO_KEY_PAD_EQUALS  = 103;   /* MacOS X */
+   static final int ALLEGRO_KEY_BACKQUOTE   = 104;   /* MacOS X */
+   static final int ALLEGRO_KEY_SEMICOLON2  = 105;   /* MacOS X -- TODO: ask lillo what this should be */
+   static final int ALLEGRO_KEY_COMMAND     = 106;   /* MacOS X */
+   static final int ALLEGRO_KEY_BACK        = 107;
+   static final int ALLEGRO_KEY_VOLUME_UP   = 108;
+   static final int ALLEGRO_KEY_VOLUME_DOWN = 109;
+   
+   static final int ALLEGRO_KEY_UNKNOWN    = 110;
 
       /* All codes up to before ALLEGRO_KEY_MODIFIERS can be freely
       * assignedas additional unknown keys, like various multimedia
@@ -891,117 +897,117 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
    static final int ALLEGRO_KEY_MAX = 227;
    
    private static int[] keyMap = {
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_UNKNOWN
-      ALLEGRO_KEY_LEFT,       // KeyEvent.KEYCODE_SOFT_LEFT
-      ALLEGRO_KEY_RIGHT,      // KeyEvent.KEYCODE_SOFT_RIGHT
-      ALLEGRO_KEY_HOME,       // KeyEvent.KEYCODE_HOME
-      ALLEGRO_KEY_BACK,    // KeyEvent.KEYCODE_BACK
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_CALL
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_ENDCALL
-      ALLEGRO_KEY_0,          // KeyEvent.KEYCODE_0
-      ALLEGRO_KEY_1,          // KeyEvent.KEYCODE_1
-      ALLEGRO_KEY_2,          // KeyEvent.KEYCODE_2
-      ALLEGRO_KEY_3,          // KeyEvent.KEYCODE_3
-      ALLEGRO_KEY_4,          // KeyEvent.KEYCODE_4
-      ALLEGRO_KEY_5,          // KeyEvent.KEYCODE_5 
-      ALLEGRO_KEY_6,          // KeyEvent.KEYCODE_6 
-      ALLEGRO_KEY_7,          // KeyEvent.KEYCODE_7 
-      ALLEGRO_KEY_8,          // KeyEvent.KEYCODE_8 
-      ALLEGRO_KEY_9,          // KeyEvent.KEYCODE_9 
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_STAR
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_POUND
-      ALLEGRO_KEY_UP,         // KeyEvent.KEYCODE_DPAD_UP
-      ALLEGRO_KEY_DOWN,       // KeyEvent.KEYCODE_DPAD_DOWN
-      ALLEGRO_KEY_LEFT,       // KeyEvent.KEYCODE_DPAD_LEFT
-      ALLEGRO_KEY_RIGHT,      // KeyEvent.KEYCODE_DPAD_RIGHT
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_DPAD_CENTER
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_VOLUME_UP
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_VOLUME_DOWN
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_POWER
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_CAMERA
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_CLEAR
-      ALLEGRO_KEY_A,          // KeyEvent.KEYCODE_A
-      ALLEGRO_KEY_B,          // KeyEvent.KEYCODE_B
-      ALLEGRO_KEY_C,          // KeyEvent.KEYCODE_B
-      ALLEGRO_KEY_D,          // KeyEvent.KEYCODE_D
-      ALLEGRO_KEY_E,          // KeyEvent.KEYCODE_E
-      ALLEGRO_KEY_F,          // KeyEvent.KEYCODE_F
-      ALLEGRO_KEY_G,          // KeyEvent.KEYCODE_G
-      ALLEGRO_KEY_H,          // KeyEvent.KEYCODE_H
-      ALLEGRO_KEY_I,          // KeyEvent.KEYCODE_I
-      ALLEGRO_KEY_J,          // KeyEvent.KEYCODE_J
-      ALLEGRO_KEY_K,          // KeyEvent.KEYCODE_K 
-      ALLEGRO_KEY_L,          // KeyEvent.KEYCODE_L
-      ALLEGRO_KEY_M,          // KeyEvent.KEYCODE_M
-      ALLEGRO_KEY_N,          // KeyEvent.KEYCODE_N
-      ALLEGRO_KEY_O,          // KeyEvent.KEYCODE_O
-      ALLEGRO_KEY_P,          // KeyEvent.KEYCODE_P
-      ALLEGRO_KEY_Q,          // KeyEvent.KEYCODE_Q
-      ALLEGRO_KEY_R,          // KeyEvent.KEYCODE_R
-      ALLEGRO_KEY_S,          // KeyEvent.KEYCODE_S
-      ALLEGRO_KEY_T,          // KeyEvent.KEYCODE_T
-      ALLEGRO_KEY_U,          // KeyEvent.KEYCODE_U
-      ALLEGRO_KEY_V,          // KeyEvent.KEYCODE_V
-      ALLEGRO_KEY_W,          // KeyEvent.KEYCODE_W
-      ALLEGRO_KEY_X,          // KeyEvent.KEYCODE_X
-      ALLEGRO_KEY_Y,          // KeyEvent.KEYCODE_Y
-      ALLEGRO_KEY_Z,          // KeyEvent.KEYCODE_Z
-      ALLEGRO_KEY_COMMA,      // KeyEvent.KEYCODE_COMMA 
-      ALLEGRO_KEY_FULLSTOP,     // KeyEvent.KEYCODE_PERIOD 
-      ALLEGRO_KEY_ALT,        // KeyEvent.KEYCODE_ALT_LEFT
-      ALLEGRO_KEY_ALTGR,      // KeyEvent.KEYCODE_ALT_RIGHT
-      ALLEGRO_KEY_LSHIFT,     // KeyEvent.KEYCODE_SHIFT_LEFT
-      ALLEGRO_KEY_RSHIFT,     // KeyEvent.KEYCODE_SHIFT_RIGHT
-      ALLEGRO_KEY_TAB,        // KeyEvent.KEYCODE_TAB
-      ALLEGRO_KEY_SPACE,      // KeyEvent.KEYCODE_SPACE
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_SYM
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_EXPLORER
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_ENVELOPE
-      ALLEGRO_KEY_ENTER,      // KeyEvent.KEYCODE_ENTER
-      ALLEGRO_KEY_DELETE,     // KeyEvent.KEYCODE_DEL
-      ALLEGRO_KEY_TILDE,      // KeyEvent.KEYCODE_GRAVE
-      ALLEGRO_KEY_MINUS,      // KeyEvent.KEYCODE_MINUS
-      ALLEGRO_KEY_EQUALS,     // KeyEvent.KEYCODE_EQUALS
-      ALLEGRO_KEY_OPENBRACE,  // KeyEvent.KEYCODE_LEFT_BRACKET
-      ALLEGRO_KEY_CLOSEBRACE, // KeyEvent.KEYCODE_RIGHT_BRACKET
-      ALLEGRO_KEY_BACKSLASH,  // KeyEvent.KEYCODE_BACKSLASH
-      ALLEGRO_KEY_SEMICOLON,  // KeyEvent.KEYCODE_SEMICOLON
-      ALLEGRO_KEY_QUOTE,      // KeyEvent.KEYCODE_APOSTROPHY
-      ALLEGRO_KEY_SLASH,      // KeyEvent.KEYCODE_SLASH
-      ALLEGRO_KEY_AT,         // KeyEvent.KEYCODE_AT
-      ALLEGRO_KEY_NUMLOCK,    // KeyEvent.KEYCODE_NUM
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_HEADSETHOOK
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_FOCUS
-      ALLEGRO_KEY_PAD_PLUS,   // KeyEvent.KEYCODE_PLUS
-      ALLEGRO_KEY_MENU,       // KeyEvent.KEYCODE_MENU
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_NOTIFICATION
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_SEARCH
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_MEDIA_STOP
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_MEDIA_NEXT
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_MEDIA_PREVIOUS
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_MEDIA_REWIND
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_MEDIA_FAST_FORWARD
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_MUTE
-      ALLEGRO_KEY_PGUP,       // KeyEvent.KEYCODE_PAGE_UP
-      ALLEGRO_KEY_PGDN,       // KeyEvent.KEYCODE_PAGE_DOWN
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_PICTSYMBOLS
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_SWITCH_CHARSET
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_BUTTON_A
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_BUTTON_B
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_BUTTON_C
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_BUTTON_X
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_BUTTON_Y
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_BUTTON_Z
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_BUTTON_L1
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_BUTTON_R1
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_BUTTON_L2
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_BUTTON_R2
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_THUMBL
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_THUMBR
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_START
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_SELECT
-      ALLEGRO_KEY_UNKNOWN,    // KeyEvent.KEYCODE_MODE
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_UNKNOWN
+      ALLEGRO_KEY_LEFT,        // KeyEvent.KEYCODE_SOFT_LEFT
+      ALLEGRO_KEY_RIGHT,       // KeyEvent.KEYCODE_SOFT_RIGHT
+      ALLEGRO_KEY_HOME,        // KeyEvent.KEYCODE_HOME
+      ALLEGRO_KEY_BACK,        // KeyEvent.KEYCODE_BACK
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_CALL
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_ENDCALL
+      ALLEGRO_KEY_0,           // KeyEvent.KEYCODE_0
+      ALLEGRO_KEY_1,           // KeyEvent.KEYCODE_1
+      ALLEGRO_KEY_2,           // KeyEvent.KEYCODE_2
+      ALLEGRO_KEY_3,           // KeyEvent.KEYCODE_3
+      ALLEGRO_KEY_4,           // KeyEvent.KEYCODE_4
+      ALLEGRO_KEY_5,           // KeyEvent.KEYCODE_5 
+      ALLEGRO_KEY_6,           // KeyEvent.KEYCODE_6 
+      ALLEGRO_KEY_7,           // KeyEvent.KEYCODE_7 
+      ALLEGRO_KEY_8,           // KeyEvent.KEYCODE_8 
+      ALLEGRO_KEY_9,           // KeyEvent.KEYCODE_9 
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_STAR
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_POUND
+      ALLEGRO_KEY_UP,          // KeyEvent.KEYCODE_DPAD_UP
+      ALLEGRO_KEY_DOWN,        // KeyEvent.KEYCODE_DPAD_DOWN
+      ALLEGRO_KEY_LEFT,        // KeyEvent.KEYCODE_DPAD_LEFT
+      ALLEGRO_KEY_RIGHT,       // KeyEvent.KEYCODE_DPAD_RIGHT
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_DPAD_CENTER
+      ALLEGRO_KEY_VOLUME_UP,   // KeyEvent.KEYCODE_VOLUME_UP
+      ALLEGRO_KEY_VOLUME_DOWN, // KeyEvent.KEYCODE_VOLUME_DOWN
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_POWER
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_CAMERA
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_CLEAR
+      ALLEGRO_KEY_A,           // KeyEvent.KEYCODE_A
+      ALLEGRO_KEY_B,           // KeyEvent.KEYCODE_B
+      ALLEGRO_KEY_C,           // KeyEvent.KEYCODE_B
+      ALLEGRO_KEY_D,           // KeyEvent.KEYCODE_D
+      ALLEGRO_KEY_E,           // KeyEvent.KEYCODE_E
+      ALLEGRO_KEY_F,           // KeyEvent.KEYCODE_F
+      ALLEGRO_KEY_G,           // KeyEvent.KEYCODE_G
+      ALLEGRO_KEY_H,           // KeyEvent.KEYCODE_H
+      ALLEGRO_KEY_I,           // KeyEvent.KEYCODE_I
+      ALLEGRO_KEY_J,           // KeyEvent.KEYCODE_J
+      ALLEGRO_KEY_K,           // KeyEvent.KEYCODE_K 
+      ALLEGRO_KEY_L,           // KeyEvent.KEYCODE_L
+      ALLEGRO_KEY_M,           // KeyEvent.KEYCODE_M
+      ALLEGRO_KEY_N,           // KeyEvent.KEYCODE_N
+      ALLEGRO_KEY_O,           // KeyEvent.KEYCODE_O
+      ALLEGRO_KEY_P,           // KeyEvent.KEYCODE_P
+      ALLEGRO_KEY_Q,           // KeyEvent.KEYCODE_Q
+      ALLEGRO_KEY_R,           // KeyEvent.KEYCODE_R
+      ALLEGRO_KEY_S,           // KeyEvent.KEYCODE_S
+      ALLEGRO_KEY_T,           // KeyEvent.KEYCODE_T
+      ALLEGRO_KEY_U,           // KeyEvent.KEYCODE_U
+      ALLEGRO_KEY_V,           // KeyEvent.KEYCODE_V
+      ALLEGRO_KEY_W,           // KeyEvent.KEYCODE_W
+      ALLEGRO_KEY_X,           // KeyEvent.KEYCODE_X
+      ALLEGRO_KEY_Y,           // KeyEvent.KEYCODE_Y
+      ALLEGRO_KEY_Z,           // KeyEvent.KEYCODE_Z
+      ALLEGRO_KEY_COMMA,       // KeyEvent.KEYCODE_COMMA 
+      ALLEGRO_KEY_FULLSTOP,    // KeyEvent.KEYCODE_PERIOD 
+      ALLEGRO_KEY_ALT,         // KeyEvent.KEYCODE_ALT_LEFT
+      ALLEGRO_KEY_ALTGR,       // KeyEvent.KEYCODE_ALT_RIGHT
+      ALLEGRO_KEY_LSHIFT,      // KeyEvent.KEYCODE_SHIFT_LEFT
+      ALLEGRO_KEY_RSHIFT,      // KeyEvent.KEYCODE_SHIFT_RIGHT
+      ALLEGRO_KEY_TAB,         // KeyEvent.KEYCODE_TAB
+      ALLEGRO_KEY_SPACE,       // KeyEvent.KEYCODE_SPACE
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_SYM
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_EXPLORER
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_ENVELOPE
+      ALLEGRO_KEY_ENTER,       // KeyEvent.KEYCODE_ENTER
+      ALLEGRO_KEY_DELETE,      // KeyEvent.KEYCODE_DEL
+      ALLEGRO_KEY_TILDE,       // KeyEvent.KEYCODE_GRAVE
+      ALLEGRO_KEY_MINUS,       // KeyEvent.KEYCODE_MINUS
+      ALLEGRO_KEY_EQUALS,      // KeyEvent.KEYCODE_EQUALS
+      ALLEGRO_KEY_OPENBRACE,   // KeyEvent.KEYCODE_LEFT_BRACKET
+      ALLEGRO_KEY_CLOSEBRACE,  // KeyEvent.KEYCODE_RIGHT_BRACKET
+      ALLEGRO_KEY_BACKSLASH,   // KeyEvent.KEYCODE_BACKSLASH
+      ALLEGRO_KEY_SEMICOLON,   // KeyEvent.KEYCODE_SEMICOLON
+      ALLEGRO_KEY_QUOTE,       // KeyEvent.KEYCODE_APOSTROPHY
+      ALLEGRO_KEY_SLASH,       // KeyEvent.KEYCODE_SLASH
+      ALLEGRO_KEY_AT,          // KeyEvent.KEYCODE_AT
+      ALLEGRO_KEY_NUMLOCK,     // KeyEvent.KEYCODE_NUM
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_HEADSETHOOK
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_FOCUS
+      ALLEGRO_KEY_PAD_PLUS,    // KeyEvent.KEYCODE_PLUS
+      ALLEGRO_KEY_MENU,        // KeyEvent.KEYCODE_MENU
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_NOTIFICATION
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_SEARCH
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_MEDIA_STOP
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_MEDIA_NEXT
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_MEDIA_PREVIOUS
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_MEDIA_REWIND
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_MEDIA_FAST_FORWARD
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_MUTE
+      ALLEGRO_KEY_PGUP,        // KeyEvent.KEYCODE_PAGE_UP
+      ALLEGRO_KEY_PGDN,        // KeyEvent.KEYCODE_PAGE_DOWN
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_PICTSYMBOLS
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_SWITCH_CHARSET
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_BUTTON_A
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_BUTTON_B
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_BUTTON_C
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_BUTTON_X
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_BUTTON_Y
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_BUTTON_Z
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_BUTTON_L1
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_BUTTON_R1
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_BUTTON_L2
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_BUTTON_R2
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_THUMBL
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_THUMBR
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_START
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_SELECT
+      ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_MODE
    };
    
    final int ALLEGRO_EVENT_TOUCH_BEGIN  = 50;
@@ -1025,6 +1031,9 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
    private EGLDisplay  egl_Display;
    private int         egl_numConfigs = 0;
    private EGLConfig[] egl_Config;
+
+   private Context context;
+   private boolean captureVolume = false;
    
    public boolean egl_Init()
    {      
@@ -1293,6 +1302,8 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
    {
       super(context);
 
+      this.context = context;
+
         
       Log.d("AllegroSurface", "ctor");
       
@@ -1410,10 +1421,43 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
          return null;
       }
    }
-   
-   public boolean onKey(View  v, int keyCode, KeyEvent event)
+
+   public void setCaptureVolumeKeys(boolean onoff)
+   {
+      captureVolume = onoff;
+   }
+
+   private void volumeChange(int inc)
+   {
+         AudioManager mAudioManager = (AudioManager)context.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+
+         // get the current volume level
+         int curr =  
+            mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+
+         curr += inc;
+
+         if (0 <= curr && curr <= mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC))
+         {
+            // set a new volume level manually
+            // with the FLAG_SHOW_UI flag.
+            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, curr, AudioManager.FLAG_SHOW_UI);
+         }
+   }
+
+   public boolean onKey(View v, int keyCode, KeyEvent event)
    {
       if (event.getAction() == KeyEvent.ACTION_DOWN) {
+         if (!captureVolume) {
+            if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+               volumeChange(1);
+               return true;
+            }
+            else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+               volumeChange(-1);
+               return true;
+            }
+         }
          nativeOnKeyDown(keyMap[keyCode]);
          return true;
       }

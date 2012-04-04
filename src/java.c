@@ -113,6 +113,7 @@ static void *thread_proc(void *arg)
 	jmethodID meth_destroyMusic = (*thread_env)->GetStaticMethodID(thread_env, bpc, "destroyMusic", "(I)V");
 	jmethodID meth_shutdownBASS = (*thread_env)->GetStaticMethodID(thread_env, bpc, "shutdownBASS", "()V");
 	jmethodID meth_destroySample = (*thread_env)->GetStaticMethodID(thread_env, bpc, "destroySample", "(I)V");
+	jmethodID meth_setMusicVolume = (*thread_env)->GetStaticMethodID(thread_env, bpc, "setMusicVolume", "(IF)V");
 
 	ok = true;
 
@@ -175,6 +176,9 @@ static void *thread_proc(void *arg)
 		}
 		else if (!strcmp(func, "destroySample")) {
 			(*thread_env)->CallStaticIntMethod(thread_env, bpc, meth_destroySample, funcs[processPos].handle);
+		}
+		else if (!strcmp(func, "setMusicVolume")) {
+			(*thread_env)->CallStaticIntMethod(thread_env, bpc, meth_setMusicVolume, funcs[processPos].handle, funcs[processPos].vol);
 		}
 		funcs[processPos].processed = true;
 		processPos++;
@@ -277,6 +281,11 @@ void bass_shutdownBASS(void)
 void bass_destroySample(HSAMPLE s)
 {
 	push("destroySample", NULL, s, 0, 0);
+}
+
+void bass_setMusicVolume(HMUSIC music, float vol)
+{
+	push("setMusicVolume", NULL, music, vol, 0);
 }
 
 void openURL(const char *url)

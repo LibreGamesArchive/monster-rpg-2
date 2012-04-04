@@ -2,6 +2,7 @@
 
 const float Fish::SPEED = 0.02f;
 
+
 static unsigned int last_id = 0;
 
 static int xoffsets[] = {
@@ -16,6 +17,7 @@ static int yoffsets[] = {
 };
 
 static float poison_x;
+
 
 unsigned int findUniqueId(void)
 {
@@ -66,16 +68,41 @@ void Object::setOffset(int ox, int oy)
 	this->oy = oy;
 }
 
+static bool shouldReference(std::string name)
+{
+	std::string names[] = {
+		"Eny",
+		"Tiggy",
+		"Rider",
+		"Rios",
+		"Gunnar",
+		"Faelon",
+		"Mel",
+		"Tipper",
+		"Guard",
+		""
+	};
+
+	for (int i = 0; names[i] != ""; i++) {
+		if (names[i] == name)
+			return true;
+	}
+
+	return false;
+}
 
 void Object::setAnimationSet(std::string name)
 {
+	battleAnimName = baseAnimName(name);
+	if (shouldReference(battleAnimName))
+		referenceBattleAnim(battleAnimName);
+
 	if (animationSet) {
 		delete animationSet;
 		animationSet = NULL;
 	}
 
 	animationSet = new AnimationSet(name.c_str());
-
 
 	animationSet->setSubAnimation("stand_s");
 	Animation *a = animationSet->getCurrentAnimation();
@@ -577,8 +604,10 @@ Object::~Object(void)
 {
 	if (input)
 		delete input;
-	if (animationSet)
+	if (animationSet) {
 		delete animationSet;
+		unreferenceBattleAnim(battleAnimName);
+	}
 	clearOccupied();
 }
 

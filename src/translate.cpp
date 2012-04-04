@@ -72,7 +72,10 @@ void load_translation(const char *filename)
 {
 	destroy_translation();
 
-	ALLEGRO_FILE *f = al_fopen(getResource("%s.utf8", filename), "rb");
+	int sz;
+	unsigned char *bytes = slurp_file(getResource("%s.utf8", filename), &sz);
+	ALLEGRO_FILE *f = al_open_memfile(bytes, sz, "rb");
+
 	ALLEGRO_USTR *ustr;
 	
 	while ((ustr = al_fget_ustr(f)) != NULL) {
@@ -92,6 +95,7 @@ void load_translation(const char *filename)
 	}
 	
 	al_fclose(f);
+	delete[] bytes;
 }
 
 const char *_t(const char *_tag)

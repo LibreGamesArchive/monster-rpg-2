@@ -8,6 +8,7 @@ public:
 	CombatantInfo &getInfo(void) { return info; }
 	int getDirection(void);
 	AnimationSet *getAnimationSet(void);
+	AnimationSet *getWhiteAnimationSet(void);
 	CombatLocation getLocation(void);
 	CombatLoyalty getLoyalty(void);
 	std::string getName(void);
@@ -32,6 +33,7 @@ protected:
 	std::string name;
 	Direction direction;
 	AnimationSet *animSet;
+	AnimationSet *whiteAnimSet;
 	CombatantInfo info;
 	CombatLocation location;
 	CombatLoyalty loyalty;

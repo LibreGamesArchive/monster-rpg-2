@@ -313,13 +313,6 @@ protected:
 	MBITMAP *bitmap;
 };
 
-/*
-struct WhirlpoolPixel {
-	float angle, radius;
-	MCOLOR color;
-};
-*/
-
 class WhirlpoolEffect : public CombatEntity {
 public:
 	static const float SPEED;
@@ -334,9 +327,11 @@ public:
 protected:
 	Combatant *target;
 	int count;
-//	WhirlpoolPixel *pixels;
-	MBITMAP *spiral;
 	float angle;
+	int w, h;
+	ALLEGRO_COLOR *colors;
+	float *atans;
+	float *roots;
 };
 
 

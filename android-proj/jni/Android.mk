@@ -21,6 +21,12 @@ LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro-debug.so
 include $(PREBUILT_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 
+LOCAL_MODULE := liballegro_memfile-prebuilt
+LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_memfile-debug.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+
 LOCAL_MODULE := liballegro_primitives-prebuilt
 LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_primitives-debug.so
 include $(PREBUILT_SHARED_LIBRARY)
@@ -95,9 +101,10 @@ LOCAL_SRC_FILES := \
 	atlas_accessor.c\
 	init.cpp\
 
+LOCAL_ARM_MODE := arm
 LOCAL_CFLAGS    := -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/user/armeabi/include -DDEBUGMODE -DA5_OGL -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/include
 
-LOCAL_LDLIBS    := -L$(ANDROID_NDK_TOOLCHAIN_ROOT)/user/armeabi/lib -L$(LOCAL_PATH)/$(TARGET_ARCH_ABI) -llog libs/$(TARGET_ARCH_ABI)/liballegro-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_primitives-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_image-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_font-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_ttf-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_shader-debug.so -lGLESv1_CM -lstdc++ -ltgui -llua -lz
+LOCAL_LDLIBS    := -L$(ANDROID_NDK_TOOLCHAIN_ROOT)/user/armeabi/lib -L$(LOCAL_PATH)/$(TARGET_ARCH_ABI) -llog libs/$(TARGET_ARCH_ABI)/liballegro-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_memfile-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_primitives-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_image-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_font-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_ttf-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_shader-debug.so -lGLESv1_CM -lstdc++ -ltgui -llua -lz
 
 include $(BUILD_SHARED_LIBRARY)
 

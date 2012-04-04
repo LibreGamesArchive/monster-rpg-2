@@ -80,10 +80,14 @@ bool CombatEnemy::act(int step, Battle *b)
 		thinkCount = 0;
 		defending = false;
 		if (name != "Relic" && name != "Lava") {
-			if (name == "Rider")
+			if (name == "Rider") {
 				animSet->setSubAnimation("stand");
-			else
+				whiteAnimSet->setSubAnimation("stand");
+			}
+			else {
 				animSet->setSubAnimation(0);
+				whiteAnimSet->setSubAnimation(0);
+			}
 		}
 	}
 
@@ -142,32 +146,40 @@ bool CombatEnemy::act(int step, Battle *b)
 				if (printableName == std::string(_t("Girl"))) {
 					if (std::string(spellName) == "Fireball") {
 						animSet->setSubAnimation("cast1");
+						whiteAnimSet->setSubAnimation("cast1");
 					}
 					else {
 						animSet->setSubAnimation("cast2");
+						whiteAnimSet->setSubAnimation("cast2");
 					}
 				}
 				else if (printableName == std::string(_t("Dragon"))) {
 					if (std::string(spellName) == "Talon") {
 						animSet->setSubAnimation("talon");
+						whiteAnimSet->setSubAnimation("talon");
 					}
 					else {
 						animSet->setSubAnimation("bof");
+						whiteAnimSet->setSubAnimation("bof");
 					}
 				}
 				else if (printableName == std::string(_t("Tode"))) {
 					if (std::string(spellName) == "BellyAcid") {
 						animSet->setSubAnimation("acid");
+						whiteAnimSet->setSubAnimation("acid");
 					}
 					else if (std::string(spellName) == "Swallow") {
 						animSet->setSubAnimation("swallow");
+						whiteAnimSet->setSubAnimation("swallow");
 					}
 					else if (std::string(spellName) == "Puke") {
 						animSet->setSubAnimation("puke");
+						whiteAnimSet->setSubAnimation("puke");
 					}
 				}
 				else {
 					animSet->setSubAnimation("cast");
+					whiteAnimSet->setSubAnimation("cast");
 				}
 				// add message
 				std::string msg = "{008}" + std::string(_t(spellName));
@@ -182,6 +194,7 @@ bool CombatEnemy::act(int step, Battle *b)
 			}
 			case COMBAT_ATTACKING: {
 				animSet->setSubAnimation("attack");
+				whiteAnimSet->setSubAnimation("attack");
 				animSet->reset();
 				numTargets = (int)lua_tonumber(luaState, -9);
 				std::list<CombatEntity *> &e = battle->getEntities();
@@ -202,6 +215,7 @@ bool CombatEnemy::act(int step, Battle *b)
 				defending = true;
 				status.type = COMBAT_WAITING;
 				animSet->setSubAnimation("defend");
+				whiteAnimSet->setSubAnimation("defend");
 				animSet->reset();
 				lua_pop(luaState, 10);
 				return true;
@@ -247,6 +261,7 @@ bool CombatEnemy::act(int step, Battle *b)
 				status.type = COMBAT_WAITING;
 				if (name != "Relic" && name != "Lava") {
 					animSet->setSubAnimation("stand");
+					whiteAnimSet->setSubAnimation("stand");
 				}
 				return true;
 			}
@@ -351,11 +366,12 @@ static int dragon_y;
 static int dragon_flags;
 
 
-void dragon_blackAnd0(AnimationSet *a)
+void dragon_blackAnd0(AnimationSet *a, AnimationSet *a2)
 {
 	char animName[100];
 	sprintf(animName, "transform0");
 	a->setSubAnimation(std::string(animName));
+	a2->setSubAnimation(std::string(animName));
 
 	long start = tguiCurrentTimeMillis();
 	while (tguiCurrentTimeMillis() < (unsigned long)start+1000) {
@@ -379,12 +395,13 @@ void dragon_blackAnd0(AnimationSet *a)
 	}
 }
 
-void dragon_normal(AnimationSet *a, int frame)
+void dragon_normal(AnimationSet *a, AnimationSet *a2, int frame)
 {
 	m_set_target_bitmap(buffer);
 	char animName[100];
 	sprintf(animName, "transform%d", frame);
 	a->setSubAnimation(std::string(animName));
+	a2->setSubAnimation(std::string(animName));
 	
 	m_clear(black);
 	a->draw(dragon_x, dragon_y-a->getHeight(), dragon_flags);
@@ -398,11 +415,12 @@ void dragon_normal(AnimationSet *a, int frame)
 	}
 }
 
-void dragon_flash(AnimationSet *a, int frame, float startAlpha)
+void dragon_flash(AnimationSet *a, AnimationSet *a2, int frame, float startAlpha)
 {
 	char animName[100];
 	sprintf(animName, "transform%d", frame);
 	a->setSubAnimation(std::string(animName));
+	a2->setSubAnimation(std::string(animName));
 	
 	long start = tguiCurrentTimeMillis();
 	while (tguiCurrentTimeMillis() < (unsigned long)start+125) {
@@ -423,14 +441,16 @@ void dragon_flash(AnimationSet *a, int frame, float startAlpha)
 	}
 }
 
-void dragon_fade(AnimationSet *a, int fullframe, int fadeframe)
+void dragon_fade(AnimationSet *a, AnimationSet *a2, int fullframe, int fadeframe)
 {
 	char animName[100];
 	sprintf(animName, "transform%d", fullframe);
 	a->setSubAnimation(std::string(animName));
+	a2->setSubAnimation(std::string(animName));
 	MBITMAP *full = a->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 	sprintf(animName, "transform%d", fadeframe);
 	a->setSubAnimation(std::string(animName));
+	a2->setSubAnimation(std::string(animName));
 	MBITMAP *fade = a->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 	
 	long start = tguiCurrentTimeMillis();
@@ -456,9 +476,10 @@ void dragon_fade(AnimationSet *a, int fullframe, int fadeframe)
 	}
 }
 
-void dragon_players(AnimationSet *a)
+void dragon_players(AnimationSet *a, AnimationSet *a2)
 {
 	a->setSubAnimation("stand");
+	a2->setSubAnimation("stand");
 
 	CombatPlayer *players[MAX_PARTY] = { NULL };
 
@@ -493,9 +514,11 @@ void CombatEnemy::draw_shadow(void)
 	if (name == "Relic" || name == "Lava") {
 		if (info.abilities.hp < info.abilities.maxhp/2) {
 			animSet->setSubAnimation("hurt");
+			whiteAnimSet->setSubAnimation("hurt");
 		}
 		else {
 			animSet->setSubAnimation("stand");
+			whiteAnimSet->setSubAnimation("stand");
 		}
 	}
 
@@ -511,9 +534,11 @@ void CombatEnemy::draw(void)
 	if (name == "Relic" || name == "Lava") {
 		if (info.abilities.hp < info.abilities.maxhp/2) {
 			animSet->setSubAnimation("hurt");
+			whiteAnimSet->setSubAnimation("hurt");
 		}
 		else {
 			animSet->setSubAnimation("stand");
+			whiteAnimSet->setSubAnimation("stand");
 		}
 	}
 
@@ -549,41 +574,42 @@ void CombatEnemy::draw(void)
 		dragon_flags = flags;
 
 		/* Transition into dragon from girl */
-		dragon_blackAnd0(animSet);
-		dragon_normal(animSet, 1);
-		dragon_normal(animSet, 2);
-		dragon_normal(animSet, 3);
-		dragon_normal(animSet, 4);
-		dragon_normal(animSet, 3);
-		dragon_normal(animSet, 2);
-		dragon_normal(animSet, 3);
-		dragon_normal(animSet, 4);
-		dragon_normal(animSet, 3);
-		dragon_normal(animSet, 2);
-		dragon_normal(animSet, 3);
-		dragon_normal(animSet, 4);
-		dragon_normal(animSet, 5);
+		dragon_blackAnd0(animSet, whiteAnimSet);
+		dragon_normal(animSet, whiteAnimSet, 1);
+		dragon_normal(animSet, whiteAnimSet, 2);
+		dragon_normal(animSet, whiteAnimSet, 3);
+		dragon_normal(animSet, whiteAnimSet, 4);
+		dragon_normal(animSet, whiteAnimSet, 3);
+		dragon_normal(animSet, whiteAnimSet, 2);
+		dragon_normal(animSet, whiteAnimSet, 3);
+		dragon_normal(animSet, whiteAnimSet, 4);
+		dragon_normal(animSet, whiteAnimSet, 3);
+		dragon_normal(animSet, whiteAnimSet, 2);
+		dragon_normal(animSet, whiteAnimSet, 3);
+		dragon_normal(animSet, whiteAnimSet, 4);
+		dragon_normal(animSet, whiteAnimSet, 5);
 		playPreloadedSample("low_cackle.ogg");
-		dragon_flash(animSet, 6, 1.0);
-		dragon_flash(animSet, 7, 0.8333);
-		dragon_flash(animSet, 8, 0.6666);
-		dragon_flash(animSet, 9, 0.5);
-		dragon_flash(animSet, 10, 0.3333);
-		dragon_flash(animSet, 11, 0.1666);
-		dragon_fade(animSet, 12, 11);
-		dragon_fade(animSet, 13, 12);
-		dragon_fade(animSet, 14, 13);
-		dragon_fade(animSet, 15, 14);
-		dragon_normal(animSet, 16);
-		dragon_normal(animSet, 17);
-		dragon_normal(animSet, 16);
-		dragon_normal(animSet, 17);
-		dragon_normal(animSet, 16);
-		dragon_normal(animSet, 17);
-		dragon_normal(animSet, 18);
-		dragon_players(animSet);
+		dragon_flash(animSet, whiteAnimSet, 6, 1.0);
+		dragon_flash(animSet, whiteAnimSet, 7, 0.8333);
+		dragon_flash(animSet, whiteAnimSet, 8, 0.6666);
+		dragon_flash(animSet, whiteAnimSet, 9, 0.5);
+		dragon_flash(animSet, whiteAnimSet, 10, 0.3333);
+		dragon_flash(animSet, whiteAnimSet, 11, 0.1666);
+		dragon_fade(animSet, whiteAnimSet, 12, 11);
+		dragon_fade(animSet, whiteAnimSet, 13, 12);
+		dragon_fade(animSet, whiteAnimSet, 14, 13);
+		dragon_fade(animSet, whiteAnimSet, 15, 14);
+		dragon_normal(animSet, whiteAnimSet, 16);
+		dragon_normal(animSet, whiteAnimSet, 17);
+		dragon_normal(animSet, whiteAnimSet, 16);
+		dragon_normal(animSet, whiteAnimSet, 17);
+		dragon_normal(animSet, whiteAnimSet, 16);
+		dragon_normal(animSet, whiteAnimSet, 17);
+		dragon_normal(animSet, whiteAnimSet, 18);
+		dragon_players(animSet, whiteAnimSet);
 
 		animSet->setSubAnimation("stand");
+		whiteAnimSet->setSubAnimation("stand");
 		sample_played = false;
 		deadCount = 0;
 		// change stats
@@ -679,9 +705,8 @@ void CombatEnemy::draw(void)
 				al_set_shader(display, default_shader);
 			}
 			else {
-				MBITMAP *bmp = animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
-				float brightness = 0.7;
-				add_blit(bmp, ox+x-(w/2), oy+y-h, white, brightness, flags);
+				MBITMAP *bmp = whiteAnimSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
+				m_draw_bitmap(bmp, ox+x-(w/2), oy+y-h, flags);
 			}
 		}
 		else {
@@ -793,7 +818,7 @@ void CombatEnemy::initLua(void)
 	int file_size;
 
 	debug_message("Loading global enemy script...\n");
-	bytes = slurp_text_file(getResource("combat_enemies/global.%s", getScriptExtension().c_str()), &file_size);
+	bytes = slurp_file(getResource("combat_enemies/global.%s", getScriptExtension().c_str()), &file_size);
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
@@ -813,7 +838,7 @@ void CombatEnemy::initLua(void)
 	if (name == "UFO") name = "ufo";
 #endif
 	debug_message("Loading enemy script...\n");
-	bytes = slurp_text_file(getResource("combat_enemies/%s.%s", name.c_str(), getScriptExtension().c_str()), &file_size);
+	bytes = slurp_file(getResource("combat_enemies/%s.%s", name.c_str(), getScriptExtension().c_str()), &file_size);
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
@@ -932,6 +957,10 @@ void CombatEnemy::construct(std::string name, int x, int y, bool alpha)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	death_blitted = false;
 #endif
+	
+	whiteAnimSet = animSet->clone(CLONE_ENEMY);
+
+	mkdeath();
 }
 
 class create_death_blit_data : public RecreateData
@@ -1005,16 +1034,12 @@ CombatEnemy::CombatEnemy(std::string name, int x, int y, bool alpha) :
 	Combatant(name, alpha)
 {
 	construct(name, x, y, alpha);
-	
-	mkdeath();
 }
 
 CombatEnemy::CombatEnemy(std::string name, int x, int y) :
 	Combatant(name, false)
 {
 	construct(name, x, y, false);
-	
-	mkdeath();
 }
 
 
@@ -1031,6 +1056,8 @@ CombatEnemy::~CombatEnemy(void)
 	}	
 	if (oldAnim)
 		delete oldAnim;
+	
+	delete whiteAnimSet;
 }
 
 void CombatEnemyTode::draw_shadow(void)
@@ -1045,6 +1072,7 @@ void CombatEnemyTode::draw_shadow(void)
 
 	if (full && animSet->getSubName() == "stand") {
 		animSet->setSubAnimation("full");
+		whiteAnimSet->setSubAnimation("full");
 	}
 
 	if (ox == 0 && oy == 0) {
@@ -1065,6 +1093,7 @@ void CombatEnemyTode::draw(void)
 
 	if (animSet->getSubName() == "stand" && nswallowed > 0) {
 		animSet->setSubAnimation("full");
+		whiteAnimSet->setSubAnimation("full");
 	}
 
 	int flags;
@@ -1091,17 +1120,11 @@ void CombatEnemyTode::draw(void)
 			al_set_shader(display, default_shader);
 		}
 		else {
-			MBITMAP *bmp = animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
+			MBITMAP *bmp = whiteAnimSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 			float brightness = 0.7;
 			add_blit(bmp, ox+x-(w/2), oy+y-h, white, brightness, flags);
 		}
 	}
-
-	/*
-	if (thinkCount < 1000) {
-		animSet->setSubAnimation("thinking");
-	}
-	*/
 
 	// Draw fading out purple waving
 	if (info.abilities.hp <= 0) {
@@ -1236,6 +1259,7 @@ bool CombatEnemyTode::act(int step, Battle *b)
 		battle->addMessage(MESSAGE_LEFT, "{008} Puke", 1500);
 		pukenext = false;
 		animSet->setSubAnimation("puke");
+		whiteAnimSet->setSubAnimation("puke");
 	}
 
 	if (spell) {
@@ -1246,8 +1270,10 @@ bool CombatEnemyTode::act(int step, Battle *b)
 			spell = NULL;
 			status.type = COMBAT_WAITING;
 			animSet->setSubAnimation("hurt");
+			whiteAnimSet->setSubAnimation("hurt");
 			if (animSet->getSubName() != "hurt") {
 				animSet->setSubAnimation("stand");
+				whiteAnimSet->setSubAnimation("stand");
 			}
 			return true;
 		}

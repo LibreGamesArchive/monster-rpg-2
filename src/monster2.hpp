@@ -60,9 +60,10 @@
 #include <allegro5/allegro_native_dialog.h>
 #include <allegro5/allegro_shader.h>
 #include <allegro5/allegro_shader_glsl.h>
+#include <allegro5/allegro_memfile.h>
 #endif
 
-ALLEGRO_DEBUG_CHANNEL("morpg2");
+ALLEGRO_DEBUG_CHANNEL("morpg2")
 
 #ifndef ALLEGRO_ANDROID
 #include <allegro5/allegro_physfs.h>
@@ -108,9 +109,6 @@ ALLEGRO_DEBUG_CHANNEL("morpg2");
 #include <bass.h>
 #endif
 
-// FIXME!
-#include "my_load_bitmap.h"
-
 
 const int LETTER_INDEX = 3;
 
@@ -150,20 +148,11 @@ const int LOGIC_MILLIS = (1000/LOGIC_RATE);
 #endif
 
 // Lua must be built as C++ code (at least on iPhone!)
-#ifndef ALLEGRO_IPHONE
-#if defined ALLEGRO_WINDOWS || defined __linux__ || defined ALLEGRO_ANDROID
 extern "C" {
-#endif
-#endif
 #include <lua-fixed/lua.h>
 #include <lua-fixed/lauxlib.h>
 #include <lua-fixed/lualib.h>
-#ifndef ALLEGRO_IPHONE
-#if defined ALLEGRO_WINDOWS || defined __linux__ || defined ALLEGRO_ANDROID
 }
-#endif
-#endif
-
 
 #ifdef A5_D3D
 #include <d3d9.h>
@@ -221,8 +210,6 @@ const int BUTTON_SIZE = 25;
 struct ScreenDescriptor {
 	int width;
 	int height;
-	int real_width;
-	int real_height;
 	bool fullscreen;
 };
 
@@ -304,6 +291,8 @@ class Combatant;
 #include "GenericEffect.hpp"
 #include "Items.hpp"
 #include "widgets.hpp"
+
+#include "my_load_bitmap.h"
 
 #ifdef EDITOR
 #include "editor.hpp"

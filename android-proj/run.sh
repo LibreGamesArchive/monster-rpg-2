@@ -9,10 +9,10 @@ V=1 ~/code/android-ndk-r7b/ndk-build
 ant clean
 ant debug
 
-echo uninstall
-/Users/trent/code/android-sdk-macosx/platform-tools/adb -d uninstall org.liballeg.app
+#echo uninstall
+#/Users/trent/code/android-sdk-macosx/platform-tools/adb -d uninstall org.liballeg.app
 echo install
-/Users/trent/code/android-sdk-macosx/platform-tools/adb -d install bin/alandroid-project-debug.apk
+/Users/trent/code/android-sdk-macosx/platform-tools/adb -d install -r bin/alandroid-project-debug.apk
 echo start
 /Users/trent/code/android-sdk-macosx/platform-tools/adb -d shell 'am start -a android.intent.action.MAIN -n org.liballeg.app/.AllegroActivity'
 

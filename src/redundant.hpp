@@ -74,7 +74,7 @@ int m_get_bitmap_width(MBITMAP *bmp);
 int m_get_bitmap_height(MBITMAP *bmp);
 MBITMAP *m_load_bitmap(const char *name, bool force_memory = false);
 MFONT *m_load_font(const char *name);
-MBITMAP *m_create_bitmap(int w, int h, void (*func)(MBITMAP *bitmap, RecreateData *data) = NULL, RecreateData *data = NULL); // check
+MBITMAP *m_create_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateData *data) = NULL, RecreateData *data = NULL, void (*destroy)(MBITMAP *b) = NULL); // check
 MBITMAP *m_create_sub_bitmap(MBITMAP *parent, int x, int y, int w, int h); // check
 void m_destroy_bitmap(MBITMAP *bmp);
 void m_flip_display(void);
@@ -104,7 +104,7 @@ void m_draw_trans_bitmap(MBITMAP *b, int x, int y, int alpha);
 void m_destroy_font(MFONT *f);
 void m_draw_alpha_bitmap(MBITMAP *b, int x, int y);
 void m_draw_alpha_bitmap(MBITMAP *b, int x, int y, int flags);
-MBITMAP *m_create_alpha_bitmap(int w, int h, void (*func)(MBITMAP *bitmap, RecreateData *data) = NULL, RecreateData *data = NULL); // check
+MBITMAP *m_create_alpha_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateData *data) = NULL, RecreateData *data = NULL, void (*destroy)(MBITMAP *b) = NULL); // check
 MBITMAP *m_load_alpha_bitmap(const char *name, bool force_memory = false);
 
 #ifndef ALLEGRO4
@@ -153,6 +153,10 @@ struct Load {
 	std::string filename;
 };
 
+struct Destroy {
+	void (*func)(MBITMAP *bitmap);
+};
+
 struct Recreate {
 	void (*func)(MBITMAP *bitmap, RecreateData *data);
 	RecreateData *data;
@@ -162,6 +166,7 @@ struct Recreate {
 struct LoadedBitmap {
 	LoadType load_type;
 	Load load;
+	Destroy destroy;
 	Recreate recreate;
 	MBITMAP *bitmap;
 	int flags, format;
@@ -176,5 +181,8 @@ ALLEGRO_LOCKED_REGION *m_lock_bitmap(MBITMAP *b, int format, int flags);
 ALLEGRO_LOCKED_REGION *m_lock_bitmap_region(MBITMAP *b, int x, int y, int w, int h, int format, int flags);
 void m_unlock_bitmap(MBITMAP *b);
 MBITMAP *m_clone_bitmap(MBITMAP *b);
+
+void m_draw_bitmap_to_self(MBITMAP *b, int x, int y, int flags);
+void m_draw_bitmap_region_to_self(MBITMAP *b, int sx, int sy, int sw, int sh, int dx, int dy, int flags);
 
 #define m_clear_to_color al_clear_to_color

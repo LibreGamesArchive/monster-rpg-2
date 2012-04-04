@@ -165,7 +165,13 @@ void save_memory(bool save_screenshot)
 		gzclose(f);
 	}
 	if (screenshot && save_screenshot) {
+#ifdef ALLEGRO_ANDROID
+		al_set_standard_file_interface();
+#endif
 		al_save_bitmap(getUserResource("auto0.bmp"), screenshot->bitmap);
+#ifdef ALLEGRO_ANDROID
+		al_set_apk_file_interface();
+#endif
 	}
 #endif
 }
@@ -907,7 +913,7 @@ void Area::initLua()
 	ALLEGRO_DEBUG("going to load global area script");
 
 	debug_message("Loading global area script...\n");
-	bytes = slurp_text_file(getResource("area_scripts/global.%s", getScriptExtension().c_str()), &file_size);
+	bytes = slurp_file(getResource("area_scripts/global.%s", getScriptExtension().c_str()), &file_size);
 	ALLEGRO_DEBUG("slurped %d bytes", file_size);
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
@@ -926,7 +932,7 @@ void Area::initLua()
 	ALLEGRO_DEBUG("gonna load the other one");
 
 	debug_message("Loading area script (%s)...\n", name.c_str());
-	bytes = slurp_text_file(getResource("area_scripts/%s.%s", name.c_str(), getScriptExtension().c_str()), &file_size);
+	bytes = slurp_file(getResource("area_scripts/%s.%s", name.c_str(), getScriptExtension().c_str()), &file_size);
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		lua_close(luaState);
@@ -958,7 +964,6 @@ void Area::initLua()
 void Area::startMusic(void)
 {
 	playAmbience("");
-	//playMusic("");
 
 	std::string mname;
 	std::string aname;
@@ -1020,10 +1025,18 @@ void Area::tint(MCOLOR *target, bool reverse)
 void startArea(std::string name)
 {
 	char resName[1000];
+#ifdef ALLEGRO_ANDROID
 	snprintf(resName, 1000, "areas/%s.area", name.c_str());
+#else
+	snprintf(resName, 1000, "%s.area", name.c_str());
+#endif
 	
 	area = new Area();
+#ifdef ALLEGRO_ANDROID
 	area->load(getResource(resName));
+#else
+	area->load(resName);
+#endif
 
 	area->addObject(party[heroSpot]->getObject());
 
@@ -2378,7 +2391,13 @@ void Area::reloadAnimations(void)
 
 void Area::load(std::string filename)
 {
+#ifndef ALLEGRO_ANDROID
+	al_set_physfs_file_interface();
+#endif
 	ALLEGRO_FILE *f = al_fopen(filename.c_str(), "rb");
+#ifndef ALLEGRO_ANDROID
+	al_set_standard_file_interface();
+#endif
 	if (!f)
 		throw ReadError();
 	
@@ -2438,7 +2457,11 @@ void Area::load(std::string filename)
 	bg = NULL;
 
 	// Can be null, it's ok
+#ifndef ALLEGRO_ANDROID
 	const char *_tmp = getResource("media/%s_bg.png", name.c_str());
+#else
+	const char *_tmp = getResource("media/%s_bg.tga", name.c_str());
+#endif
 	ALLEGRO_FILE *_f = al_fopen(_tmp, "rb");
 	if (_f) {
 		al_fclose(_f);

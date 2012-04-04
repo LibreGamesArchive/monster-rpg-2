@@ -1,5 +1,80 @@
 #include "monster2.hpp"
 
+struct BattleAnim
+{
+	std::string name;
+	int refcount;
+	AnimationSet *anim;
+};
+
+static std::vector<BattleAnim> battleAnims;
+std::string baseAnimName(std::string name)
+{
+	std::string tmp = name;
+	size_t idx;
+	if ((idx = tmp.find(".png")) != std::string::npos) {
+		tmp = tmp.substr(0, idx);
+	}
+	if ((idx = tmp.rfind("/")) != std::string::npos) {
+		tmp = tmp.substr(idx+1);
+	}
+	if ((idx = tmp.rfind("\\")) != std::string::npos) {
+		tmp = tmp.substr(idx+1);
+	}
+	return tmp;
+}
+static bool shouldReference(std::string name)
+{
+	return true;
+}
+void referenceBattleAnim(std::string name)
+{
+	name = baseAnimName(name);
+	if (!shouldReference(name))
+		return;
+	for (size_t i = 0; i < battleAnims.size(); i++) {
+		if (battleAnims[i].name == name) {
+			battleAnims[i].refcount++;
+			return;
+		}
+	}
+
+	BattleAnim b;
+	b.name = name;
+	b.refcount = 1;
+	b.anim = new AnimationSet(getResource("combat_media/%s.png", name.c_str()));
+	if (b.anim != NULL) {
+		battleAnims.push_back(b);
+	}
+}
+void unreferenceBattleAnim(std::string name)
+{
+	name = baseAnimName(name);
+	if (!shouldReference(name))
+		return;
+	for (size_t i = 0; i < battleAnims.size(); i++) {
+		if (battleAnims[i].name == name) {
+			battleAnims[i].refcount--;
+			if (battleAnims[i].refcount <= 0) {
+				delete battleAnims[i].anim;
+				battleAnims.erase(battleAnims.begin() + i);
+			}
+			return;
+		}
+	}
+}
+AnimationSet *findBattleAnim(std::string name)
+{
+	name = baseAnimName(name);
+	for (size_t i = 0; i < battleAnims.size(); i++) {
+		if (battleAnims[i].name == name) {
+			return battleAnims[i].anim;
+		}
+	}
+
+	return NULL;
+}
+
 
 Player *party[MAX_PARTY] = {
 	NULL,
@@ -362,20 +437,26 @@ Combatant *Player::makeCombatant(int number)
 
 	int lid = info.equipment.lhand;
 	int rid = info.equipment.rhand;
+		
+	c->getAnimationSet()->setPrefix("");
+	c->getWhiteAnimationSet()->setPrefix("");
 
 	if ((lid < 0) && (rid < 0)) {
 		c->getAnimationSet()->setPrefix("noweapon_");
+		c->getWhiteAnimationSet()->setPrefix("noweapon_");
 	}
 	else if ((lid >= 0 && weapons[items[lid].id].needs >= 0) ||
 		(rid >= 0 && weapons[items[rid].id].needs >= 0)) {
 		if ((lid >= 0) && !weapons[items[lid].id].ammo) {
 			if (rid < 0) {
 				c->getAnimationSet()->setPrefix("noweapon_");
+				c->getWhiteAnimationSet()->setPrefix("noweapon_");
 			}
 		}
 		else if ((rid >= 0) && !weapons[items[rid].id].ammo) {
 			if (lid < 0) {
 				c->getAnimationSet()->setPrefix("noweapon_");
+				c->getWhiteAnimationSet()->setPrefix("noweapon_");
 			}
 		}
 	}
@@ -397,12 +478,15 @@ Player::Player(std::string name, bool putInParty) :
 	icon = m_load_bitmap(getResource("media/%s_profile.png", name.c_str()));
 
 	formation = FORMATION_FRONT;
+
+	referenceBattleAnim(name);
 }
 
 
 Player::~Player()
 {
 	m_destroy_bitmap(icon);
+	unreferenceBattleAnim(name);
 }
 
 

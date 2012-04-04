@@ -172,19 +172,7 @@ private:
 
 class MShadow : public TGUIWidget {
 public:
-	void draw(void)
-	{
-		/*
-		drew_shadow = true;
-		for (int i = 0; i < SHADOW_CORNER_SIZE; i++) {
-			float a = (1.0-sin(((float)i/(SHADOW_CORNER_SIZE-1))*(M_PI/2))) * 255;
-			a /= 1.6;
-			m_draw_line((BW*2)/3+i, BH-50, (BW*2)/3+i, BH,
-				m_map_rgba(0, 0, 0, a));
-		}
-		*/
-		al_draw_prim(verts, NULL, NULL, 0, SHADOW_CORNER_SIZE*2, ALLEGRO_PRIM_LINE_LIST);
-	}
+	void draw(void);
 	bool acceptsFocus() { return false; }
 	
 	int update(int step)
@@ -199,22 +187,41 @@ public:
 		height = 50;
 		hotkeys = NULL;
 
+		/*
 		for (int i = 0; i < SHADOW_CORNER_SIZE; i++) {
 			float a = (float)((1.0f-(float)sin(((float)i/(SHADOW_CORNER_SIZE-1))*(M_PI/2))) * 255);
 			a /= 1.6f;
-			verts[i*2].x = (BW*2)/3+i;
-			verts[i*2].y = BH-50;
+			verts[i*2].x = (BW*2)/3+i + 0.5;
+			verts[i*2].y = BH-50 + 0.5;
 			verts[i*2].z = 0;
 			verts[i*2].color = m_map_rgba(0, 0, 0, a);
-			verts[i*2+1].x = (BW*2)/3+i;
-			verts[i*2+1].y = BH;
+			verts[i*2+1].x = (BW*2)/3+i + 0.5;
+			verts[i*2+1].y = BH + 0.5;
 			verts[i*2+1].z = 0;
 			verts[i*2+1].color = m_map_rgba(0, 0, 0, a);
 		}
+		*/
+
+		verts[0].x = BW*2/3;
+		verts[0].y = BH;
+		verts[0].z = 0;
+		verts[0].color = m_map_rgba(0, 0, 0, 255);
+		verts[1].x = BW*2/3;
+		verts[1].y = BH-50;
+		verts[1].z = 0;
+		verts[1].color = m_map_rgba(0, 0, 0, 255);
+		verts[2].x = BW*2/3 + SHADOW_CORNER_SIZE;
+		verts[2].y = BH;
+		verts[2].z = 0;
+		verts[2].color = m_map_rgba(0, 0, 0, 0);
+		verts[3].x = BW*2/3 + SHADOW_CORNER_SIZE;
+		verts[3].y = BH-50;
+		verts[3].z = 0;
+		verts[3].color = m_map_rgba(0, 0, 0, 0);
 	}
 
 private:
-	ALLEGRO_VERTEX verts[2*SHADOW_CORNER_SIZE];
+	ALLEGRO_VERTEX verts[4];
 };
 
 
