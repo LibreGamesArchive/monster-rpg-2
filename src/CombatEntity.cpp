@@ -2724,13 +2724,29 @@ void Fire3Effect::draw(void)
 		dest = H;
 	}
 
-	for (int y = 0; y < H && y < offs; y++) {
-		float max = offs < H ? offs : H;
-		float alpha = y/max;
-		MCOLOR c = m_map_rgba(alpha*255, alpha*255, alpha*255, alpha);
-		al_draw_tinted_bitmap_region(fire_bmp->bitmap, c, 0, y+sy, W, 1,
-			dx, dy-dest+y, 0);
+	int min = MIN(H, offs);
+	ALLEGRO_VERTEX verts[min * 2];
+
+	for (int y = 0; y < min; y++) {
+		float alpha = (float)y/min;
+		MCOLOR c = m_map_rgba(alpha*255, alpha*255, alpha*255, alpha*255);
+		verts[y*2+0].x = dx+0.5;
+		verts[y*2+0].y = dy-dest+y+0.5;
+		verts[y*2+0].z = 0;
+		verts[y*2+0].color = c;
+		verts[y*2+0].u = 0;
+		verts[y*2+0].v = y+sy;
+		verts[y*2+1].x = dx+W+0.5;
+		verts[y*2+1].y = dy-dest+y+0.5;
+		verts[y*2+1].z = 0;
+		verts[y*2+1].color = c;
+		verts[y*2+1].u = W;
+		verts[y*2+1].v = y+sy;
+		//al_draw_tinted_bitmap_region(fire_bmp->bitmap, c, 0, y+sy, W, 1,
+		//	dx, dy-dest+y, 0);
 	}
+
+	m_draw_prim(verts, NULL, fire_bmp, 0, min*2, ALLEGRO_PRIM_LINE_LIST);
 }
 
 

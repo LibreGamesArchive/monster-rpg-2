@@ -55,18 +55,6 @@ static const char *strings[] = {
 };
 
 
-/*
-static bool contains(char *s, char c)
-{
-	while (*s) {
-		if (*s == c)
-			return true;
-		s++;
-	}
-	return false;
-}
-*/
-
 char *create_url(unsigned char *bytes, int len)
 {
 	static char store[5000*3];
@@ -328,7 +316,7 @@ void showSaveStateInfo(const char *basename)
 	int x = (BW-w)/2;
 	int y = (BH-h)/2;
 
-	ALLEGRO_DEBUG("loading screenshot");
+	//ALLEGRO_DEBUG("loading screenshot");
 #ifdef ALLEGRO_ANDROID
 	al_set_standard_file_interface();
 #endif
@@ -337,10 +325,10 @@ void showSaveStateInfo(const char *basename)
 	al_set_apk_file_interface();
 #endif
 
-	ALLEGRO_DEBUG("getting file date");
+	//ALLEGRO_DEBUG("getting file date");
 	char d[100];
 	strcpy(d, file_date(getUserResource("%s.save", basename)));
-	ALLEGRO_DEBUG("got file date");
+	//ALLEGRO_DEBUG("got file date");
 
 	tguiPush();
 
@@ -825,6 +813,8 @@ static bool choose_save_slot(int num, bool exists, void *data)
 bool pause(bool can_save, bool change_music_volume, std::string map_name)
 {
 	in_pause = true;
+	
+	save_memory(true);
 
 	dpad_off();
 	
@@ -1760,8 +1750,6 @@ done:
 	
 	tguiPop();
 
-	save_memory();
-
 	in_pause = false;
 
 	return ret;
@@ -1793,23 +1781,23 @@ void doMap(std::string startPlace, std::string prefix)
 		playMusic("map.caf");
 	}
 
-	ALLEGRO_DEBUG("doMap 1");
+	//ALLEGRO_DEBUG("doMap 1");
 
 	mapWidget = new MMap(startPlace, prefix);
 
-	ALLEGRO_DEBUG("doMap 2");
+	//ALLEGRO_DEBUG("doMap 2");
 	tguiSetParent(0);
 	tguiAddWidget(mapWidget);
 	tguiSetFocus(mapWidget);
-	ALLEGRO_DEBUG("doMap 3");
+	//ALLEGRO_DEBUG("doMap 3");
 
 	m_set_target_bitmap(buffer);
 	tguiDraw();
 	fadeIn(black);
-	ALLEGRO_DEBUG("doMap 4");
+	//ALLEGRO_DEBUG("doMap 4");
 
 	clear_input_events();
-	ALLEGRO_DEBUG("doMap 5");
+	//ALLEGRO_DEBUG("doMap 5");
 
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
@@ -2608,9 +2596,11 @@ void credits(void)
 
 void choose_savestate_old(std::string caption, bool paused, bool autosave, bool (*callback)(int n, bool exists, void *data), void *data)
 {
+	//ALLEGRO_DEBUG("hoo 1");
 	dpad_off();
 
 	SaveStateInfo infos[10];
+	//ALLEGRO_DEBUG("hoo 2");
 
 	try {
 		for (int i = 0; i < 10; i++) {
@@ -2622,11 +2612,14 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 		callback(-1, false, data);
 		return;
 	}
+	//ALLEGRO_DEBUG("hoo 3");
 
 	MIcon *bg = new MIcon(0, 0, std::string(getResource("media/savebg.png")), white, false, "", false, false, false);
+	//ALLEGRO_DEBUG("hoo 4");
 
 	MTextButtonFullShadow *buttons[10];
 	for (int i = 0; i < 10; i++) {
+	//ALLEGRO_DEBUG("hoo 5 i=%d", i);
 		char buf[100];
 		if (infos[i].exp == 0 && infos[i].gold == 0 && infos[i].time == 0) {
 			sprintf(buf, "(Empty)");
@@ -2642,6 +2635,7 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 	}
 
 	MLabel *lcaption = new MLabel(0, 0, caption, m_map_rgb(220, 220, 220));
+	//ALLEGRO_DEBUG("hoo 6");
 
 	tguiPush();
 
@@ -2653,6 +2647,7 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 		tguiAddWidget(buttons[i]);
 	}
 	tguiSetFocus(buttons[0]);
+	//ALLEGRO_DEBUG("hoo 7");
 
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
@@ -2672,13 +2667,16 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 			TGUIWidget *widget = tguiUpdate();
 
 			for (int i = 0; i < 10; i++) {
+	//ALLEGRO_DEBUG("hoo 8 i=%d", i);
 				if (widget == buttons[i]) {
+	//ALLEGRO_DEBUG("hoo 9 calling!");
 					if (callback(i, (infos[i].exp == 0 && infos[i].gold == 0 && infos[i].time == 0) ? false : true, data)) {
 						goto done;
 					}
 				}
 			}
 			
+	//ALLEGRO_DEBUG("hoo 10");
 			INPUT_EVENT ie = get_next_input_event();
 			if (ie.button2 == DOWN || iphone_shaken(0.1)) {
 				use_input_event();
@@ -2690,6 +2688,7 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 			}
 
 		}
+	//ALLEGRO_DEBUG("hoo 11");
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
@@ -2843,31 +2842,42 @@ struct CHOOSE_SAVESTATE_INFO {
 static bool choose_copy_state(int n, bool exists, void *data)
 {
 	(void)data;
+
+	//ALLEGRO_DEBUG("!1");
 	
 	if (n >= 0) {
+	//ALLEGRO_DEBUG("!2");
 		if (exists) {
-			FILE *f = fopen(getUserResource("%d.save", n), "rb");
-			unsigned char buf[5000];
-			int bytes = 0;
-			while (1) {
-				int i = fgetc(f);
-				if (i < 0)
-					break;
-				buf[bytes++] = i;
-			}
-			fclose(f);
+#ifdef ALLEGRO_ANDROID
+			al_set_standard_file_interface();
+#endif
+	//ALLEGRO_DEBUG("!3");
+			int sz;
+			unsigned char *bytes = slurp_file(getUserResource("%d.save", n), &sz);
+#ifdef ALLEGRO_ANDROID
+			al_set_apk_file_interface();
+#endif
+	//ALLEGRO_DEBUG("!4");
 
-			char *encoded = create_url(buf, bytes);
+			char *encoded = create_url(bytes, sz);
+	//ALLEGRO_DEBUG("!5");
 			set_clipboard(encoded);
+	//ALLEGRO_DEBUG("!6");
 			notify("", "Save state copied.", "");
+	//ALLEGRO_DEBUG("!7");
 		}
 		else {
+	//ALLEGRO_DEBUG("!8");
 			notify("Can't copy", "empty save state!", "");
+	//ALLEGRO_DEBUG("!9");
 		}
 	}
 	else {
+	//ALLEGRO_DEBUG("!10");
 		notify("", "Cancelled", "");
+	//ALLEGRO_DEBUG("!11");
 	}
+	//ALLEGRO_DEBUG("!12");
 	
 	return true;
 }
@@ -3105,6 +3115,7 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 			}
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			else if (widget == copy_button) {
+				//ALLEGRO_DEBUG("calling choose_savestate_old");
 				choose_savestate_old("Choose state to copy", true, false, choose_copy_state, NULL);
 			}
 			else if (widget == paste_button) {

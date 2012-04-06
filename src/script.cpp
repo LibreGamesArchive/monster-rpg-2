@@ -293,8 +293,6 @@ std::string getScriptExtension()
 
 static int CStartArea(lua_State* stack)
 {
-	//save_memory();
-
 	const char* name = lua_tostring(stack, 1);
 
 	startArea(std::string(name));
@@ -3664,6 +3662,18 @@ int C_dbg(lua_State *stack)
 	return 0;
 }
 
+int C_BonusPoints(lua_State *stack)
+{
+	increaseGold(5000);
+	for (int i = 0; i < MAX_PARTY; i++) {
+		if (party[i])
+			while (levelUp(party[i], 50))
+				;
+	}
+
+	return 0;
+}
+
 /*
  * This registers all the required C/C++ functions
  * with the Lua interpreter, so they can be called
@@ -4234,5 +4244,8 @@ void registerCFunctions(lua_State* luaState)
 
 	lua_pushcfunction(luaState, C_dbg);
 	lua_setglobal(luaState, "dbg");
+
+	lua_pushcfunction(luaState, C_BonusPoints);
+	lua_setglobal(luaState, "bonusPoints");
 }
 

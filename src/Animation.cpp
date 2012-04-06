@@ -192,12 +192,12 @@ void Animation::wrap(void)
 	}
 }
 
-Animation *Animation::clone(void)
+Animation *Animation::clone(int type)
 {
 	Animation *a = new Animation();
 
 	for (int i = 0; i < frames.size(); i++) {
-		a->frames.push_back(frames[i]->clone());
+		a->frames.push_back(frames[i]->clone(type));
 	}
 
 	a->nFrames = nFrames;
@@ -209,6 +209,8 @@ Animation *Animation::clone(void)
 	a->loopMode = loopMode;
 	a->increment = increment;
 	a->tags = tags;
+
+	a->reset();
 
 	return a;
 }

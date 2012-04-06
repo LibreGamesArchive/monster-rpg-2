@@ -883,8 +883,8 @@ void playMusic(std::string name, float vol, bool force)
 		BASS_ChannelSetSync(music, BASS_SYNC_END | BASS_SYNC_MIXTIME,
 			0, MusicSyncProc, 0);
 
-		setMusicVolume(vol);
 		BASS_ChannelPlay(music, FALSE);
+		setMusicVolume(vol);
 #if defined ALLEGRO_IPHONE_XX || defined ALLEGRO_MACOSX_XX
 	}
 #endif
@@ -916,7 +916,7 @@ static void CALLBACK AmbienceSyncProc(HSYNC handle, DWORD channel, DWORD data, v
 }
 
 
-void playAmbience(std::string name)
+void playAmbience(std::string name, float vol)
 {
 	if (!sound_inited) return;
 
@@ -947,8 +947,8 @@ void playAmbience(std::string name)
 	BASS_ChannelSetSync(ambience, BASS_SYNC_END | BASS_SYNC_MIXTIME,
 		0, AmbienceSyncProc, 0);
 
-	setMusicVolume(1);
 	BASS_ChannelPlay(ambience, FALSE);
+	setMusicVolume(vol);
 }
 
 void setAmbienceVolume(float volume)

@@ -121,11 +121,6 @@ public:
 		if (!display)
 			return;
 		//set_linear_mag_filter(buffer, t == FILTER_LINEAR);
-#ifdef ALLEGRO_IPHONE
-		if (scaleXX_buffer) {
-			set_linear_mag_filter(scaleXX_buffer, t == FILTER_SCALE2X_LINEAR || t == FILTER_SCALE3X_LINEAR);
-		}
-#endif
 	}
 #ifdef ALLEGRO_IPHONE
 	int getAutoRotation(void) {

@@ -92,17 +92,6 @@ void Combatant::construct(std::string name, bool alpha)
 	s = s.substr(0, loc);
 	printableName = s;
 
-	s = name;
-	loc = s.find("_", 0);
-	s = s.substr(0, loc);
-
-	s = std::string(getResource("combat_media/")) + s + ".png";
-
-	referenceBattleAnim(name);
-	animSet = findBattleAnim(name);
-
-	animSet->setSubAnimation("stand");
-
 	defending = false;
 }
 
@@ -122,6 +111,5 @@ Combatant::Combatant(std::string name) :
 
 Combatant::~Combatant(void)
 {
-	unreferenceBattleAnim(name);
 }
 

@@ -131,7 +131,7 @@ void Image::draw_trans(int x, int y, int alpha)
 	m_draw_trans_bitmap(bitmap, x, y, alpha);
 }
 
-Image *Image::clone(void)
+Image *Image::clone(int type)
 {
 	Image *img = new Image();
 	img->transparent = transparent;
@@ -151,7 +151,8 @@ Image *Image::clone(void)
 	m_set_target_bitmap(img->bitmap);
 	al_clear_to_color(al_map_rgba_f(0, 0, 0 ,0));
 	m_draw_bitmap(bitmap, 0, 0, 0);
-	add_blit(bitmap, 0, 0, white, 0.7, 0);
+	if (type == CLONE_ENEMY || type == CLONE_PLAYER)
+		add_blit(bitmap, 0, 0, white, 0.7, 0);
 	al_set_target_bitmap(target);
 
 	return img;

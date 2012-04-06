@@ -15,7 +15,10 @@ public:
 			m_draw_bitmap(buttonup, x, y, 0);
 		}
 	}
-	int update(int millis) { return TGUI_CONTINUE; }
+	int update(int millis) {
+		monitor->update();
+		return TGUI_CONTINUE;
+	}
 	bool acceptsFocus(void) { return true; }
 	bool on(int xx, int yy) {
 		float dx = xx - (x+RADIUS);
@@ -25,20 +28,9 @@ public:
 			return true;
 		return false;
 	}
-	void mouseMove(int x, int y) {
-		monitor->process_touch(x, y, MouseMonitor::MOUSE_AXES);
-	}
-	void mouseUpAbs(int x, int y, int b) {
-		monitor->process_touch(x, y, MouseMonitor::MOUSE_UP);
-	}
-	void mouseDownAbs(int x, int y, int b) {
-		monitor->process_touch(x, y, MouseMonitor::MOUSE_DOWN);
-	}
 
 	bool getPressed(void) {
-		int n = monitor->curr_touches;
-		int i;
-		for (i = 0; i < n; i++) {
+		for (size_t i = 0; i < monitor->touches.size(); i++) {
 			if (on(monitor->touches[i].x, monitor->touches[i].y)) {
 				return true;
 			}

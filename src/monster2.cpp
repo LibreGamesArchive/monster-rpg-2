@@ -531,24 +531,31 @@ void run(void)
 				if (timer_time < 0) {
 					timer_time = 0;
 					if (saveFilename) saveTime(saveFilename);
+					ALLEGRO_DEBUG("HOO");
 
 					if (speechDialog) {
 						dpad_on();
 						delete speechDialog;
 						speechDialog = NULL;
 					}
+					ALLEGRO_DEBUG("HOO");
 
 					if (!battle)
 							fadeOut(m_map_rgb(255, 0, 0));
+					ALLEGRO_DEBUG("HOO");
 					m_set_target_bitmap(buffer);
+					ALLEGRO_DEBUG("HOO");
 					m_clear(m_map_rgb(255, 0, 0));
+					ALLEGRO_DEBUG("HOO");
 
 					if (battle) {
 						delete battle;
 						battle = NULL;
 					}
+					ALLEGRO_DEBUG("HOO");
 
 					anotherDoDialogue("You were not quick enough to stop the Golems.\n", false, true);
+					ALLEGRO_DEBUG("HOO");
 
 					return;
 				}
@@ -1265,7 +1272,7 @@ int main(int argc, char *argv[])
 		}
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		else if (choice == 4) {
-			save_memory();
+			save_memory(true);
 			config.write();
 #ifdef LITEXX
 			openFeedbackSite();
@@ -1317,7 +1324,7 @@ int main(int argc, char *argv[])
 
 		run();
 
-		save_memory();
+		save_memory(true);
 	
 		/* tguiDeleteWidget(manChooser)? */
 		if (manChooser) {

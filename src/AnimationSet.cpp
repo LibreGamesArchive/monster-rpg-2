@@ -281,17 +281,17 @@ AnimationSet *AnimationSet::clone(int type)
 	a->name = name;
 	for (int i = 0; i < anims.size(); i++) {
 		bool do_clone = false;
-		if (type == CLONE_ENEMY) {
-			do_clone = true;
-		}
-		else {
+		if (type == CLONE_PLAYER) {
 			if (anims[i]->getName() == "stand" || anims[i]->getName() == "stand2" || anims[i]->getName() == "walk" || anims[i]->getName() == "noweapon_stand" || anims[i]->getName() == "noweapon_walk") {
 				do_clone = true;
 			}
 		}
+		else {
+			do_clone = true;
+		}
 		if (!do_clone)
 			continue;
-		a->anims.push_back(anims[i]->clone());
+		a->anims.push_back(anims[i]->clone(type));
 	}
 	a->currAnim = currAnim;
 	a->prefix = prefix;

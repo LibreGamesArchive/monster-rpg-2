@@ -15,11 +15,6 @@ enum ChooseReason {
 enum WalkReason {
 	WALK_BACK = 0,
 	WALK_FORWARD
-	/*
-	WALK_ATTACK,
-	WALK_ITEM,
-	WALK_MAGIC
-	*/
 };
 
 enum ConfirmReason {
@@ -1529,58 +1524,54 @@ void CombatPlayer::draw(void)
 #endif
 	}
 	else {
+		if (info.condition != CONDITION_STONED) {
+			if (stone_bmp) {
+				m_destroy_bitmap(stone_bmp);
+				stone_bmp = NULL;
+			}
+		}
+
 		if (info.condition == CONDITION_STONED) {
-			work = animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
-			int ww = m_get_bitmap_width(work);
-			int wh = m_get_bitmap_height(work);
-			int lock_x = x-w/2;
-			if (lock_x < 0) {
-				ww += lock_x;
-				lock_x = 0;
-			}
-			else if (lock_x+ww >= BW) {
-				ww = BW - lock_x;
-			}
+			if (!stone_bmp) {
+				work = animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
+				int ww = m_get_bitmap_width(work);
+				int wh = m_get_bitmap_height(work);
+				stone_bmp = m_create_bitmap(ww, wh);
 
-			m_lock_bitmap(work, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
-			m_lock_bitmap(stoneTexture, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
+				m_lock_bitmap(work, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
+				m_lock_bitmap(stoneTexture, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
 
-			#ifndef __linux__
-			al_lock_bitmap_region(al_get_target_bitmap(), lock_x, y-h, ww, wh, ALLEGRO_PIXEL_FORMAT_ANY, 0);
-			#endif
-		
-			for (int yy = 0; yy < wh; yy++) {
-				for (int xx = 0; xx < ww; xx++) {
-					MCOLOR c = m_get_pixel(work, xx, yy);
-					if (c.a != 1.0f) continue;
-					MCOLOR c2;
-					c2 = m_get_pixel(stoneTexture, xx%m_get_bitmap_width(stoneTexture), yy%m_get_bitmap_width(stoneTexture));
-					MCOLOR result;
-					float avg = (c.r + c.g + c.b) / 6.0f;
-					result.r = avg + c2.r/2;
-					result.g = avg + c2.g/2;
-					result.b = avg + c2.b/2;
-					result.a = 1.0f;
-					int _x;
-					if (location == LOCATION_RIGHT) {
-						_x = xx+lock_x;
+				ALLEGRO_BITMAP *target = al_get_target_bitmap();
+				
+				m_set_target_bitmap(stone_bmp);
+				al_clear_to_color(al_map_rgba_f(0, 0, 0, 0));
+
+				m_lock_bitmap(stone_bmp, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READWRITE);
+			
+				for (int yy = 0; yy < wh; yy++) {
+					for (int xx = 0; xx < ww; xx++) {
+						MCOLOR c = m_get_pixel(work, xx, yy);
+						if (c.a != 1.0f) continue;
+						MCOLOR c2;
+						c2 = m_get_pixel(stoneTexture, xx%m_get_bitmap_width(stoneTexture), yy%m_get_bitmap_width(stoneTexture));
+						MCOLOR result;
+						float avg = (c.r + c.g + c.b) / 6.0f;
+						result.r = avg + c2.r/2;
+						result.g = avg + c2.g/2;
+						result.b = avg + c2.b/2;
+						result.a = 1.0f;
+						m_put_pixel(xx, yy, result);
 					}
-					else {
-						_x = (ww-xx-1)+lock_x;
-					}
-					#ifdef __linux__
-					m_draw_pixel(_x, (y-h)+yy, result);
-					#else
-					m_put_pixel(_x, (y-h)+yy, result);
-					#endif
 				}
-			}
-			m_unlock_bitmap(work);
-			m_unlock_bitmap(stoneTexture);
+				m_unlock_bitmap(work);
+				m_unlock_bitmap(stoneTexture);
 
-			#ifndef __linux__
-			al_unlock_bitmap(al_get_target_bitmap());
-			#endif
+				m_unlock_bitmap(stone_bmp);
+
+				al_set_target_bitmap(target);
+			}
+
+			m_draw_bitmap(stone_bmp, x-(w/2), y-h, flags);
 		}
 		else if (info.condition == CONDITION_MUSHROOM) {
 			m_draw_bitmap(mushroom, x-TILE_SIZE/2, y-TILE_SIZE, 0);
@@ -1616,17 +1607,6 @@ void CombatPlayer::draw(void)
 			
 			if (info.condition == CONDITION_WEBBED)
 				m_draw_bitmap(webbed, x-16, y-32, 0);
-			/*
-			if (drawWeapon) {
-				// FIXME: both hands
-				AnimationSet *wAnim = getWeaponAnimation(info);
-				if (wAnim) {
-					w = wAnim->getWidth();
-					h = wAnim->getHeight();
-					wAnim->draw(x-(w/2), y-h, flags);
-				}
-			}
-			*/
 			if (info.condition == CONDITION_QUICK || info.condition == CONDITION_SLOW
 				|| info.condition == CONDITION_CHARMED) {
 				int cx = location == LOCATION_LEFT ? x+w/2 : x-w/2;
@@ -1680,15 +1660,17 @@ bool CombatPlayer::isActing(void)
 }
 
 
-CombatPlayer::CombatPlayer(std::string name, int number, std::string prefix) :
+CombatPlayer::CombatPlayer(std::string name, int number, AnimationSet *animSet, std::string prefix) :
 	Combatant(name),
 	number(number),
 	handler(NULL),
 	choosing(false),
 	acting(false),
 	drawWeapon(false),
-	running(false)
+	running(false),
+	stone_bmp(NULL)
 {
+	this->animSet = animSet;
 	whiteAnimSet = animSet->clone(CLONE_PLAYER);
 	whiteAnimSet->setSubAnimation("stand");
 	
@@ -1722,5 +1704,10 @@ CombatPlayer::~CombatPlayer(void)
 #endif
 
 	delete whiteAnimSet;
+			
+	if (stone_bmp) {
+		m_destroy_bitmap(stone_bmp);
+		stone_bmp = NULL;
+	}
 }
 

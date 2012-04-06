@@ -98,7 +98,7 @@ public:
 	
 	int getAlpha(void);
 
-	Animation *clone(void);
+	Animation *clone(int type);
 
 	Animation(void);
 	Animation(const char *name, int alpha);

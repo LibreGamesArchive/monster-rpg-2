@@ -527,7 +527,6 @@
 		96DDE20813DB24A9008AA371 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon@2x.png"; path = "../../icons/lite/Icon@2x.png"; sourceTree = "<group>"; };
 		96DDE20913DB24A9008AA371 /* iTunesArtwork */ = {isa = PBXFileReference; lastKnownFileType = file; name = iTunesArtwork; path = ../../icons/lite/iTunesArtwork; sourceTree = "<group>"; };
 		96ED3258136349520057B4C7 /* Monster_2-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Monster_2-Info.plist"; sourceTree = "<group>"; };
-		96F822DC151D1FA9004B1B54 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = "../../android-data/data"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -670,7 +669,6 @@
 				965C7FA61526804800AD9919 /* data */,
 				9631BB8F151E220A00CE43D0 /* libphysfs_xcode.a */,
 				96A460A6151D836A001BC99C /* libAllegro.a */,
-				96F822DC151D1FA9004B1B54 /* data */,
 				966E2380148D80030056951D /* data */,
 				96789CB714831C72003F393D /* full data ios */,
 				968BA9801481EB9900F768C5 /* lite data pc */,
@@ -1309,8 +1307,8 @@
 					"$(ARCHS_STANDARD_32_BIT)",
 					armv6,
 				);
-				CODE_SIGN_IDENTITY = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1336,8 +1334,8 @@
 					/usr/lib/libSystem.B.dylib,
 					"-ObjC",
 				);
-				PROVISIONING_PROFILE = "488DBF4A-860A-4A20-9A23-8869B11BCB72";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "488DBF4A-860A-4A20-9A23-8869B11BCB72";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SUPPORTED_PLATFORMS = iphoneos;
 			};
 			name = Release;
@@ -1554,8 +1552,8 @@
 					"$(ARCHS_STANDARD_32_BIT)",
 					armv6,
 				);
-				CODE_SIGN_IDENTITY = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Monster_2_Prefix.pch;
@@ -1581,8 +1579,8 @@
 					/usr/lib/libSystem.B.dylib,
 					"-ObjC",
 				);
-				PROVISIONING_PROFILE = "488DBF4A-860A-4A20-9A23-8869B11BCB72";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "488DBF4A-860A-4A20-9A23-8869B11BCB72";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SUPPORTED_PLATFORMS = iphoneos;
 			};
 			name = Lite;
@@ -1637,8 +1635,8 @@
 					"$(ARCHS_STANDARD_32_BIT)",
 					armv6,
 				);
-				CODE_SIGN_IDENTITY = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1665,8 +1663,8 @@
 					/usr/lib/libSystem.B.dylib,
 					"-ObjC",
 				);
-				PROVISIONING_PROFILE = "488DBF4A-860A-4A20-9A23-8869B11BCB72";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "488DBF4A-860A-4A20-9A23-8869B11BCB72";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SUPPORTED_PLATFORMS = iphoneos;
 			};
 			name = Debug;
@@ -1710,8 +1708,8 @@
 					"$(ARCHS_STANDARD_32_BIT)",
 					armv6,
 				);
-				CODE_SIGN_IDENTITY = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1738,8 +1736,8 @@
 					/usr/lib/libSystem.B.dylib,
 					"-ObjC",
 				);
-				PROVISIONING_PROFILE = "488DBF4A-860A-4A20-9A23-8869B11BCB72";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "488DBF4A-860A-4A20-9A23-8869B11BCB72";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SUPPORTED_PLATFORMS = iphoneos;
 			};
 			name = "Release Simulator";

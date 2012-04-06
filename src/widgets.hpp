@@ -34,74 +34,65 @@ struct MultiPoint {
 class MouseMonitor {
 public:
 	struct Touch {
-		int x, y;
+		int x, y, id;
 	};
 
-	static const int MAX_TOUCHES = 10;
-	static const int MOUSE_DOWN = 1;
-	static const int MOUSE_UP = 2;
-	static const int MOUSE_AXES = 3;	
-
-	Touch touches[MAX_TOUCHES];
-	int curr_touches;
+	std::vector <Touch> touches;
 
 private:
 
+	ALLEGRO_EVENT_QUEUE *queue;
+
+	int find_touch(int id)
+	{
+		for (size_t i = 0; i < touches.size(); i++) {
+			if (touches[i].id == id) {
+				return i;
+			}
+		}
+	
+		return -1;
+	}
+
 public:
 	MouseMonitor(void) {
-		for (int i = 0; i < MAX_TOUCHES; i++) {
-			touches[i].x = -1;
-			touches[i].y = -1;
-		}
-		curr_touches = 0;
+		queue = al_create_event_queue();
+		al_register_event_source(queue, al_get_touch_input_event_source());
 	}
 	
 	~MouseMonitor(void) {
+		al_destroy_event_queue(queue);
 	}
 	
-	float distance(int idx, int x, int y) {
-		int dx = x - touches[idx].x;
-		int dy = y - touches[idx].y;
-		return (float)sqrt((float)dx*dx + dy*dy);
-	}
+	void update(void)
+	{
+		while (!al_event_queue_is_empty(queue)) {
+			ALLEGRO_EVENT event;
+			al_get_next_event(queue, &event);
 
-	int closest_touch(int x, int y) {
-		int ret = -1;
-		float min = 9999;
+			int x = event.touch.x;
+			int y = event.touch.y;
 
-		for (int i = 0; i < curr_touches; i++) {
-			float dist = distance(i, x, y);
-			if (dist < min) {
-				min = dist;
-				ret = i;
+			if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN)
+				tguiConvertMousePosition(&x, &y, 0, 0, screen_ratio_x, screen_ratio_y);
+			else
+				tguiConvertMousePosition(&x, &y, screen_offset_x, screen_offset_y, 1, 1);
+
+			if (event.type == ALLEGRO_EVENT_TOUCH_BEGIN) {
+				Touch t;
+				t.x = x;
+				t.y = y;
+				t.id = event.touch.id;
+				touches.push_back(t);
 			}
-		}
-
-		return ret;
-	}
-
-	void process_touch(int x, int y, int type) {
-		if (type == MOUSE_DOWN) {
-			if (curr_touches >= MAX_TOUCHES) {
-				return;
-			}
-			touches[curr_touches].x = x;
-			touches[curr_touches].y = y;
-			curr_touches++;
-		}
-		else if (type == MOUSE_UP) {
-			if (curr_touches > 0) {
-				int idx = closest_touch(x, y);
-				for (; idx < MAX_TOUCHES-1; idx++) {
-					touches[idx].x = touches[idx+1].x;
-					touches[idx].y = touches[idx+1].y;
+			else if (event.type == ALLEGRO_EVENT_TOUCH_END) {
+				int idx = find_touch(event.touch.id);
+				if (idx >= 0) {
+					touches.erase(touches.begin()+idx);
 				}
-				curr_touches--;
 			}
-		}
-		else {
-			int idx = closest_touch(x, y);
-			if (idx >= 0) {
+			else if (event.type == ALLEGRO_EVENT_TOUCH_MOVE) {
+				int idx = find_touch(event.touch.id);
 				touches[idx].x = x;
 				touches[idx].y = y;
 			}

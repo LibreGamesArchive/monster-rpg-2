@@ -867,7 +867,7 @@ void m_draw_precise_line(MBITMAP *bitmap, float x1, float y1, float x2, float y2
 	}
 
 	if (vcount > 0) {
-#ifdef __linux__
+#if defined __linux__ && !defined ALLEGRO_ANDROID
 		draw_points_locked(verts, vcount);
 #else
 		m_draw_prim(verts, 0, 0, 0, vcount, ALLEGRO_PRIM_POINT_LIST);

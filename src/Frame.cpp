@@ -1,8 +1,8 @@
 #include "monster2.hpp"
 
-Frame *Frame::clone(void)
+Frame *Frame::clone(int type)
 {
-	Frame *frame = new Frame(image->clone(), delay);
+	Frame *frame = new Frame(image->clone(type), delay);
 	return frame;
 }
 

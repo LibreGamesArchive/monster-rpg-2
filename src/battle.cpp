@@ -984,8 +984,6 @@ void Battle::start(void)
 #ifdef ALLEGRO_IPHONE
 	vibrate();
 #endif
-	save_memory();
-
 	std::string musicname;
 
 	if (name == "1Tode")
@@ -1249,6 +1247,10 @@ extern bool fairy_used;
 
 Battle::~Battle(void)
 {
+	if (area && !player_scripted) {
+		save_memory(true);
+	}
+
 	fairy_used = false;
 
 	std::list<CombatEntity *>::iterator it;

@@ -414,49 +414,7 @@ static int progress_percent = 0;
 
 static void show_progress(int percent)
 {
-#if defined WIZ
-	MBITMAP *old_target = m_get_target_bitmap();
-	//m_set_target_bitmap(m_get_backbuffer());
-	m_set_target_bitmap(buffer);
-
-	m_clear(black);
-	percent = 100 - percent;
-	const int BAR_W = 200;
-	const int BAR_H = 16;
-	float p = percent / 100.0;
-	int bar_width = p * BAR_W;
-	if (bar_width > BAR_W)
-		bar_width = BAR_W;
-	else if (bar_width <= 0)
-		bar_width = 1;
-	int x = BW/2;
-	int y = 20;
-	al_draw_filled_rectangle((x-BAR_W/2)-6, (y-BAR_H/2)-5,
-		(x+BAR_W/2)+5, (y+BAR_H/2)+5, white);
-	al_draw_filled_rectangle((x-BAR_W/2)-4, (y-BAR_H/2)-3,
-		(x+BAR_W/2)+3, (y+BAR_H/2)+3, black);
-	if (p > 0) {
-		MCOLOR colors[4];
-		colors[0] = m_map_rgb(255, 0, 0);
-		colors[1] = m_map_rgb(255, 155, 0);
-		colors[2] = m_map_rgb(255, 255, 0);
-		colors[3] = m_map_rgb(0, 255, 0);
-		MCOLOR c = colors[(bar_width-1)/(BAR_W/4)];
-		m_draw_rectangle((x-BAR_W/2)-1, y-BAR_H/2,
-			(x-BAR_W/2)+bar_width, y+BAR_H/2, c,
-			M_FILLED);
-	}
-	int w = harpy->getWidth();
-	int h = harpy->getHeight();
-	float scale = (BW+100)/(float)w;
-	harpy->drawScaled(-50, 50, w*scale, h*scale, M_FLIP_HORIZONTAL);
-	drawBufferToScreen();
-	m_flip_display();
-
-	m_set_target_bitmap(old_target);
-#else
 	progress_percent = percent;
-#endif
 }
 
 static void get_inputs(int x, int y, bool *l, bool *r, bool *u, bool *d, bool *b1, bool *b2, bool *b3)
@@ -2738,8 +2696,7 @@ bool init(int *argc, char **argv[])
 
 	bool done_loading_samples = false;
 
-	long start = -1;
-	int draw = 1000/30;
+	double start = al_get_time();
 	while (1) {
 		if (!done_loading_samples) {
 			done_loading_samples = loadSamples(load_samples_cb);
@@ -2747,24 +2704,24 @@ bool init(int *argc, char **argv[])
 				al_run_detached_thread(loader_proc, NULL);
 			}
 		}
-		long now = tguiCurrentTimeMillis();
-		if (start < 0) start = now;
-		int elapsed = (int)(now - start);
-		start = now;
-		eny_loader->update(elapsed);
-		dot_loader->update(elapsed);
-		draw -= elapsed;
 		
-		is_close_pressed();
+		//is_close_pressed();
 
  		int percent = progress_percent;
- 		if (draw < 0 || percent == 100) {
- 			draw = 1000/30;
-			draw_loading_screen(tmp, percent, sd);
- 		}
-		if (percent == 95) {
+		draw_loading_screen(tmp, percent, sd);
+		if (percent >= 95) {
  			break;
  		}
+
+		al_rest(0.016);
+
+		double now = al_get_time();
+		double elapsed = now - start;
+		start = now;
+		int millis = elapsed * 1000;
+		ALLEGRO_DEBUG("millis=%d elapsed=%f", millis, elapsed);
+		eny_loader->update(millis);
+		dot_loader->update(millis);
 	}
 
 	while (!loading_done) {
@@ -2811,7 +2768,11 @@ bool init(int *argc, char **argv[])
 			return false;
 	}
 	
+#ifdef ALLEGRO_ANDROID
+	huge_font = m_load_font(getResource("huge_font.tga"));
+#else
 	huge_font = m_load_font(getResource("huge_font.png"));
+#endif
 	if (!huge_font) {
 		if (!native_error("Failed to load huge_font"))
 			return false;

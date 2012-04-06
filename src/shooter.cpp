@@ -23,11 +23,7 @@ void vecXmat(double x, double y, double z, ALLEGRO_TRANSFORM *mat, double *ox, d
 static void draw_billboard_bitmap(ALLEGRO_TRANSFORM *proj, MBITMAP *b, int x, int y)
 {
 	double ox, oy, oz, ow;
-	//ALLEGRO_TRANSFORM t;
 
-	//al_copy_transform(&t, al_get_current_transform());
-	//al_compose_transform(&t, proj);
-	//vecXmat(x, y, 0, &t, &ox, &oy, &oz, &ow);
 	vecXmat(x, y, 0, proj, &ox, &oy, &oz, &ow);
 
 	ox /= ow;
@@ -76,30 +72,22 @@ public:
 	}
 	
 	int update(int millis) {
-		int n = monitor->curr_touches;
-		int i;
-		for (i = 0; i < n; i++) {
+		monitor->update();
+
+		size_t i;
+
+		for (i = 0; i < monitor->touches.size(); i++) {
 			if (on(monitor->touches[i].x, monitor->touches[i].y)) {
 				moveSlider(monitor->touches[i].x, monitor->touches[i].y);
 				break;
 			}
 		}
-		if (i >= n) {
+
+		if (i >= monitor->touches.size()) {
 			value = 0;
 		}
-		return TGUI_CONTINUE;
-	}
 
-	void mouseMove(int x, int y) {
-		monitor->process_touch(x, y, MouseMonitor::MOUSE_AXES);
-	}
-	
-	void mouseUpAbs(int x, int y, int b) {
-		monitor->process_touch(x, y, MouseMonitor::MOUSE_UP);
-	}
-	
-	void mouseDownAbs(int x, int y, int b) {
-		monitor->process_touch(x, y, MouseMonitor::MOUSE_DOWN);
+		return TGUI_CONTINUE;
 	}
 
 	double getValue(void) { return value; }
@@ -144,7 +132,10 @@ public:
 			m_draw_bitmap(buttonup, X, Y, 0);
 		}
 	}
-	int update(int millis) { return TGUI_CONTINUE; }
+	int update(int millis) {
+		monitor->update();
+		return TGUI_CONTINUE;
+	}
 	bool acceptsFocus(void) { return true; }
 	bool on(int x, int y) {
 		double dx = x - (X+RADIUS);
@@ -154,20 +145,9 @@ public:
 			return true;
 		return false;
 	}
-	void mouseMove(int x, int y) {
-		monitor->process_touch(x, y, MouseMonitor::MOUSE_AXES);
-	}
-	void mouseUpAbs(int x, int y, int b) {
-		monitor->process_touch(x, y, MouseMonitor::MOUSE_UP);
-	}
-	void mouseDownAbs(int x, int y, int b) {
-		monitor->process_touch(x, y, MouseMonitor::MOUSE_DOWN);
-	}
 
 	bool getPressed(void) {
-		int n = monitor->curr_touches;
-		int i;
-		for (i = 0; i < n; i++) {
+		for (size_t i = 0; i < monitor->touches.size(); i++) {
 			if (on(monitor->touches[i].x, monitor->touches[i].y)) {
 				return true;
 			}
@@ -265,7 +245,6 @@ static MBITMAP *shark_bmp;
 static char *scene;
 static char *solid;
 static int *starts;
-static MBITMAP *tiles[NUM_TILE_TYPES];
 
 static MBITMAP *underwater;
 
@@ -273,7 +252,7 @@ static double tu[NUM_TILE_TYPES];
 static double tv[NUM_TILE_TYPES];
 
 struct Bullet : public MPoint {
-	long fireTime;
+	double fireTime;
 };
 
 struct Shark : public MPoint {
@@ -624,6 +603,8 @@ static void draw(double cx, double cy)
 	// draw crabs
 	crab_bmp = crab->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 	for (int i = 0; i < (int)crabs.size(); i++) {
+		bool held = al_is_bitmap_drawing_held();
+		al_hold_bitmap_drawing(true);
 		if (crabs[i].y > o-600 && crabs[i].y < o+64) {
 			draw_billboard_bitmap(
 				&proj,
@@ -632,19 +613,25 @@ static void draw(double cx, double cy)
 				crabs[i].y-cy+m_get_bitmap_height(crab_bmp)
 			);
 		}
+		al_hold_bitmap_drawing(held);
 	}
 	// draw bullets
 	for (int i = 0; i < (int)bullets.size(); i++) {
+		bool held = al_is_bitmap_drawing_held();
+		al_hold_bitmap_drawing(true);
 		draw_billboard_bitmap(
 			&proj,
 			bullet,
 			bullets[i].x-cx,
 			bullets[i].y-cy+m_get_bitmap_height(bullet)
 		);
+		al_hold_bitmap_drawing(held);
 	}
 	// draw sharks
 	shark_bmp = shark_anim->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 	for (int i = 0; i < (int)sharks.size(); i++) {
+		bool held = al_is_bitmap_drawing_held();
+		al_hold_bitmap_drawing(true);
 		if (sharks[i].y > o-600 && sharks[i].y < o+64) {
 			draw_billboard_bitmap(
 				&proj,
@@ -653,6 +640,7 @@ static void draw(double cx, double cy)
 				sharks[i].y-cy+m_get_bitmap_height(shark_bmp)
 			);
 		}
+		al_hold_bitmap_drawing(held);
 	}
 }
 
@@ -761,8 +749,7 @@ bool shooter(bool for_points)
 	int seed = rand();
 
 	int deadCount;
-	long start;
-	long lastFire;
+	double lastFire;
 
 	playMusic("underwater.caf");
 	srand(7);
@@ -812,8 +799,7 @@ start:
 
 	dead = false;
 	deadCount = 0;
-	start = tguiCurrentTimeMillis();
-	lastFire = tguiCurrentTimeMillis();
+	lastFire = al_get_time();
 	
 	draw_all();
 
@@ -1002,7 +988,7 @@ start:
 			if ((state.buttons && can_pause) || in.button2) {
 				int press_x = state.x;
 				int press_y = state.y;
-				if (is_ipad() && !config.getMaintainAspectRatio())
+				if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN)
 					tguiConvertMousePosition(&press_x, &press_y, 0, 0, screen_ratio_x, screen_ratio_y);
 				else
 					tguiConvertMousePosition(&press_x, &press_y, screen_offset_x, screen_offset_y, 1, 1);
@@ -1020,7 +1006,7 @@ start:
 					int th = m_text_height(game_font);
 					m_set_target_bitmap(buffer);
 					m_draw_rectangle(BW/2-tw/2-5, BH/2-th/2-5, BW/2+tw/2+5, BH/2+th/2+5, black, M_FILLED);
-					m_draw_rectangle(BW/2-tw/2-5, BH/2-th/2-5, BW/2+tw/2+5, BH/2+th/2+5, white, M_OUTLINED);
+					m_draw_rectangle(BW/2-tw/2-5+0.5, BH/2-th/2-5+0.5, BW/2+tw/2+5, BH/2+th/2+5, white, M_OUTLINED);
 					mTextout_simple(_t(pause_text), BW/2-tw/2, BH/2-th/2, white);
 					drawBufferToScreen();
 					m_flip_display();
@@ -1064,10 +1050,10 @@ start:
 			else if (!state.buttons) {
 				can_pause = true;
 			}
-			
-			if (!dead && (ie.button1 || pressed) && (tguiCurrentTimeMillis()-lastFire > 200)) {
+
+			if (!dead && (ie.button1 || pressed) && (al_get_time()-lastFire > 0.2)) {
 				playPreloadedSample("torpedo.ogg");
-				lastFire = tguiCurrentTimeMillis();
+				lastFire = al_get_time();
 				Bullet b;
 				b.fireTime = lastFire;
 				b.x = x;
@@ -1092,8 +1078,8 @@ start:
 			std::vector<Bullet>::iterator bit;
 			for (bit = bullets.begin(); bit != bullets.end();) {
 				Bullet &b = *bit;
-				long now = tguiCurrentTimeMillis();
-				if ((now - b.fireTime) > 1500) {
+				double now = al_get_time();
+				if ((now - b.fireTime) > 0.75) {
 					bit = bullets.erase(bit);
 				}
 				else {
@@ -1249,10 +1235,6 @@ done:
 	delete[] scene;
 	delete[] solid;
 	delete[] starts;
-
-	for (int i = 0; i < NUM_TILE_TYPES; i++) {
-		m_destroy_bitmap(tiles[i]);
-	}
 
 	m_destroy_bitmap(sub_bmp);
 	m_destroy_bitmap(bullet);

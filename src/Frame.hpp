@@ -17,7 +17,7 @@ public:
 		return delay;
 	}
 
-	Frame *clone(void);
+	Frame *clone(int type);
 
 	Frame(Image *image, int delay);
 	/* Image is destroyed

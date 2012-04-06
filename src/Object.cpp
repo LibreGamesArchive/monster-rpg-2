@@ -68,35 +68,8 @@ void Object::setOffset(int ox, int oy)
 	this->oy = oy;
 }
 
-static bool shouldReference(std::string name)
-{
-	std::string names[] = {
-		"Eny",
-		"Tiggy",
-		"Rider",
-		"Rios",
-		"Gunnar",
-		"Faelon",
-		"Mel",
-		"Tipper",
-		"Guard",
-		""
-	};
-
-	for (int i = 0; names[i] != ""; i++) {
-		if (names[i] == name)
-			return true;
-	}
-
-	return false;
-}
-
 void Object::setAnimationSet(std::string name)
 {
-	battleAnimName = baseAnimName(name);
-	if (shouldReference(battleAnimName))
-		referenceBattleAnim(battleAnimName);
-
 	if (animationSet) {
 		delete animationSet;
 		animationSet = NULL;
@@ -274,14 +247,45 @@ void Object::drawUpper(void)
 		m_push_target_bitmap();
 		m_set_target_bitmap(poison_bmp_tmp);
 		m_clear(m_map_rgba(0, 0, 0, 0));
-		for (int i = 0; i < m_get_bitmap_width(poison_bmp); i++) {
-			m_draw_bitmap_region(poison_bmp, i, 0, 1, m_get_bitmap_height(poison_bmp), i, 5+5*sin((float)i/m_get_bitmap_width(poison_bmp)*M_PI*4+poison_x), 0);
+		int w = m_get_bitmap_width(poison_bmp);
+		int h = m_get_bitmap_height(poison_bmp);
+		int w2 = m_get_bitmap_width(poison_bmp_tmp);
+		int h2 = m_get_bitmap_height(poison_bmp_tmp);
+		ALLEGRO_VERTEX verts[MAX(w, MAX(h, MAX(w2, h2))) * 2];
+		for (int i = 0; i < w; i++) {
+			verts[i*2+0].x = i;
+			verts[i*2+0].y = 5+5*sin((float)i/w*M_PI*4+poison_x);
+			verts[i*2+0].z = 0;
+			verts[i*2+0].color = white;
+			verts[i*2+0].u = i;
+			verts[i*2+0].v = 0;
+			verts[i*2+1].x = i;
+			verts[i*2+1].y = verts[i*2+0].y + h;
+			verts[i*2+1].z = 0;
+			verts[i*2+1].color = white;
+			verts[i*2+1].u = i;
+			verts[i*2+1].v = h;
+			//m_draw_bitmap_region(poison_bmp, i, 0, 1, m_get_bitmap_height(poison_bmp), i, 5+5*sin((float)i/m_get_bitmap_width(poison_bmp)*M_PI*4+poison_x), 0);
 		}
+		m_draw_prim(verts, NULL, poison_bmp, 0, w*2, ALLEGRO_PRIM_LINE_LIST);
 		m_set_target_bitmap(poison_bmp_tmp2);
 		m_clear(m_map_rgba(0, 0, 0, 0));
-		for (int i = 0; i < m_get_bitmap_height(poison_bmp_tmp); i++) {
-			m_draw_bitmap_region(poison_bmp_tmp, 0, i, m_get_bitmap_width(poison_bmp_tmp), 1, 5+5*cos((float)i/m_get_bitmap_height(poison_bmp_tmp)*M_PI*4+poison_x), i, 0);
+		for (int i = 0; i < h2; i++) {
+			verts[i*2+0].x = 5+5*cos((float)i/h2*M_PI*4+poison_x);
+			verts[i*2+0].y = i;
+			verts[i*2+0].z = 0;
+			verts[i*2+0].color = white;
+			verts[i*2+0].u = 0;
+			verts[i*2+0].v = i;
+			verts[i*2+1].x = verts[i*2+0].x + w2;
+			verts[i*2+1].y = i; 
+			verts[i*2+1].z = 0;
+			verts[i*2+1].color = white;
+			verts[i*2+1].u = w2;
+			verts[i*2+1].v = i;
+			//m_draw_bitmap_region(poison_bmp_tmp, 0, i, m_get_bitmap_width(poison_bmp_tmp), 1, 5+5*cos((float)i/m_get_bitmap_height(poison_bmp_tmp)*M_PI*4+poison_x), i, 0);
 		}
+		m_draw_prim(verts, NULL, poison_bmp_tmp, 0, h2*2, ALLEGRO_PRIM_LINE_LIST);
 		m_pop_target_bitmap();
 		ALLEGRO_COLOR col, tmp = poisonBlocks[0].color;
 		col.r = tmp.r * tmp.a;
@@ -606,7 +610,6 @@ Object::~Object(void)
 		delete input;
 	if (animationSet) {
 		delete animationSet;
-		unreferenceBattleAnim(battleAnimName);
 	}
 	clearOccupied();
 }

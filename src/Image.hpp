@@ -30,7 +30,7 @@ public:
 	void draw(int x, int y, int flags = 0);
 	void draw_trans(int x, int y, int alpha);
 
-	Image *clone(void);
+	Image *clone(int type);
 
 	Image(void);
 	Image(bool alpha);

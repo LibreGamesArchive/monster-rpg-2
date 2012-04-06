@@ -1033,12 +1033,30 @@ void CombatEnemy::mkdeath(void)
 CombatEnemy::CombatEnemy(std::string name, int x, int y, bool alpha) :
 	Combatant(name, alpha)
 {
+	std::string s = name;
+	std::string::size_type loc;
+	loc = s.find("_", 0);
+	s = s.substr(0, loc);
+
+	referenceBattleAnim(s, this);
+	animSet = findBattleAnim(s, this);
+	animSet->setSubAnimation("stand");
+
 	construct(name, x, y, alpha);
 }
 
 CombatEnemy::CombatEnemy(std::string name, int x, int y) :
 	Combatant(name, false)
 {
+	std::string s = name;
+	std::string::size_type loc;
+	loc = s.find("_", 0);
+	s = s.substr(0, loc);
+
+	referenceBattleAnim(s, this);
+	animSet = findBattleAnim(s, this);
+	animSet->setSubAnimation("stand");
+
 	construct(name, x, y, false);
 }
 
@@ -1057,6 +1075,7 @@ CombatEnemy::~CombatEnemy(void)
 	if (oldAnim)
 		delete oldAnim;
 	
+	unreferenceBattleAnim(name, this);
 	delete whiteAnimSet;
 }
 

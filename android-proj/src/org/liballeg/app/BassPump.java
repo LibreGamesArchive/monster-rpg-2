@@ -20,7 +20,7 @@ public class BassPump
 	{
 		BassPump.activity = activity;
 
-		sp = new SoundPool(16, AudioManager.STREAM_MUSIC, 0);
+		sp = new SoundPool(4, AudioManager.STREAM_MUSIC, 0);
 	}
 
 	public static void update()

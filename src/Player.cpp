@@ -3,7 +3,7 @@
 struct BattleAnim
 {
 	std::string name;
-	int refcount;
+	void *this_ptr;
 	AnimationSet *anim;
 };
 
@@ -27,50 +27,64 @@ static bool shouldReference(std::string name)
 {
 	return true;
 }
-void referenceBattleAnim(std::string name)
+void referenceBattleAnim(std::string name, void *this_ptr)
 {
 	name = baseAnimName(name);
+	ALLEGRO_DEBUG("ref %s", name.c_str());
+
 	if (!shouldReference(name))
 		return;
 	for (size_t i = 0; i < battleAnims.size(); i++) {
 		if (battleAnims[i].name == name) {
-			battleAnims[i].refcount++;
+			BattleAnim b;
+			b.name = name;
+			b.this_ptr = this_ptr;
+			b.anim = battleAnims[i].anim->clone(CLONE_FULL);
+			if (b.anim != NULL) {
+				battleAnims.push_back(b);
+			}
+			ALLEGRO_DEBUG("1");
 			return;
 		}
 	}
 
+	ALLEGRO_DEBUG("2");
+
 	BattleAnim b;
 	b.name = name;
-	b.refcount = 1;
+	b.this_ptr = this_ptr;
 	b.anim = new AnimationSet(getResource("combat_media/%s.png", name.c_str()));
 	if (b.anim != NULL) {
 		battleAnims.push_back(b);
 	}
 }
-void unreferenceBattleAnim(std::string name)
+void unreferenceBattleAnim(std::string name, void *this_ptr)
 {
 	name = baseAnimName(name);
+	ALLEGRO_DEBUG("unref %s", name.c_str());
 	if (!shouldReference(name))
 		return;
 	for (size_t i = 0; i < battleAnims.size(); i++) {
-		if (battleAnims[i].name == name) {
-			battleAnims[i].refcount--;
-			if (battleAnims[i].refcount <= 0) {
-				delete battleAnims[i].anim;
-				battleAnims.erase(battleAnims.begin() + i);
-			}
+		if (battleAnims[i].name == name && battleAnims[i].this_ptr == this_ptr) {
+			delete battleAnims[i].anim;
+			battleAnims.erase(battleAnims.begin() + i);
+	ALLEGRO_DEBUG("unref deleted");
 			return;
 		}
 	}
+	ALLEGRO_DEBUG("unref not found");
 }
-AnimationSet *findBattleAnim(std::string name)
+AnimationSet *findBattleAnim(std::string name, void *this_ptr)
 {
 	name = baseAnimName(name);
+	ALLEGRO_DEBUG("find %s", name.c_str());
 	for (size_t i = 0; i < battleAnims.size(); i++) {
-		if (battleAnims[i].name == name) {
+		if (battleAnims[i].name == name && battleAnims[i].this_ptr == this_ptr) {
+	ALLEGRO_DEBUG("found");
 			return battleAnims[i].anim;
 		}
 	}
+	ALLEGRO_DEBUG("find NULL");
 
 	return NULL;
 }
@@ -428,7 +442,8 @@ void Player::setName(std::string name)
 
 Combatant *Player::makeCombatant(int number)
 {
-	CombatPlayer *c = new CombatPlayer(name, number);
+	AnimationSet *banim = findBattleAnim(name, this);
+	CombatPlayer *c = new CombatPlayer(name, number, banim);
 
 	copyInfo(c->getInfo(), info);
 
@@ -479,14 +494,14 @@ Player::Player(std::string name, bool putInParty) :
 
 	formation = FORMATION_FRONT;
 
-	referenceBattleAnim(name);
+	referenceBattleAnim(name, this);
 }
 
 
 Player::~Player()
 {
 	m_destroy_bitmap(icon);
-	unreferenceBattleAnim(name);
+	unreferenceBattleAnim(name, this);
 }
 
 

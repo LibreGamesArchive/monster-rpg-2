@@ -66,8 +66,6 @@ void my_pack_putc(int c, gzFile f)
 int my_pack_getc(gzFile f)
 {
 	int c = gzgetc(f);
-	if (c == EOF)
-		throw ReadError();
 	return c;
 }
 
@@ -430,19 +428,16 @@ void saveTime(char *filename)
 	#define STRLEN (bytes[offs] | (bytes[offs+1] << 8) | (bytes[offs+2] << 16) | (bytes[offs+3] << 24))
 
 	std::vector<int> bytes;
-
 	gzFile f = NULL;
 	f = gzopen(filename, "rb");
 	if (!f)
 		return;
 	
-	try {
-		while (1) {
-			int i = my_pack_getc(f);
-			bytes.push_back(i);
-		}
-	}
-	catch (...) {
+	while (1) {
+		int i = my_pack_getc(f);
+		if (i == EOF)
+			break;
+		bytes.push_back(i);
 	}
 
 	gzclose(f);
@@ -490,7 +485,6 @@ void saveTime(char *filename)
 	}
 
 	gzclose(f);
-
 	#undef STRLEN
 }
 

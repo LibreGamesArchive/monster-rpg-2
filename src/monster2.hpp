@@ -244,6 +244,16 @@ class Combatant;
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #endif
 
+
+enum CloneType
+{
+	CLONE_PLAYER = 1,
+	CLONE_ENEMY,
+	CLONE_FULL,
+};
+
+
+
 #include "translate.hpp"
 
 #include "c.h"

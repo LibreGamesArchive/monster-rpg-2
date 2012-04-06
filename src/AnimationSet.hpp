@@ -4,13 +4,6 @@
 
 #include "monster2.hpp"
 
-enum CloneType
-{
-	CLONE_PLAYER = 1,
-	CLONE_ENEMY
-};
-
-
 class AnimationSet {
 public:
 	void setSubAnimation(int index);
@@ -39,6 +32,7 @@ public:
 	AnimationSet(const char *filename, bool alpha = false);
 	~AnimationSet();
 private:
+
 	std::string name;
 	std::vector<Animation *> anims;
 	int currAnim;
