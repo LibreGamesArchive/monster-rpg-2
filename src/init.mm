@@ -2412,7 +2412,11 @@ bool init(int *argc, char **argv[])
 
 	al_set_new_display_flags(flags);
 
-	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_REQUIRE);
+#ifdef ALLEGRO_ANDROID
+	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_SUGGEST);
+#else
+	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_SUGGEST);
+#endif
 	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 16, ALLEGRO_REQUIRE);
 
 #if !defined(ALLEGRO_IPHONE) && !defined(ALLEGRO_ANDROID)
@@ -2437,8 +2441,6 @@ bool init(int *argc, char **argv[])
 		sd->height = 640;
 	}
 #else
-	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_REQUIRE);
-	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 16, ALLEGRO_REQUIRE);
 	#ifndef ALLEGRO_ANDROID
 	// FIXME: do this for android when supporting multihead
 	al_set_new_display_adapter(0);

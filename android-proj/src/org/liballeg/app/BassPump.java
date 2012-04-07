@@ -134,6 +134,7 @@ public class BassPump
 	{
 		int idx = findMusic(music);
 		mps.get(idx).mp.stop();
+		mps.get(idx).mp.release();
 		mps.get(idx).mp = null;
 		mps.remove(idx);
 	}

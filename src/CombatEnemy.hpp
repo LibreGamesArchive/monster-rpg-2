@@ -2,7 +2,8 @@
 #define COMBAT_ENEMY_HPP
 
 
-class CombatEnemy : public Combatant {
+class CombatEnemy : public Combatant
+{
 public:
 	static const int DIE_TIME = 600;
 	
@@ -48,6 +49,7 @@ protected:
 	int numTargets;
 	Combatant **targets;
 	AnimationSet *oldAnim;
+	AnimationSet *oldWhiteAnim;
 	int float_height;
 	MBITMAP *work;
 	bool death_blitted;

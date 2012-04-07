@@ -568,6 +568,9 @@ void CombatEnemy::draw(void)
 		AnimationSet *tmp = oldAnim;
 		oldAnim = animSet;
 		animSet = tmp;
+		tmp = oldWhiteAnim;
+		oldWhiteAnim = whiteAnimSet;
+		whiteAnimSet = tmp;
 
 		dragon_x = x-animSet->getWidth()/2;
 		dragon_y = y;
@@ -941,10 +944,14 @@ void CombatEnemy::construct(std::string name, int x, int y, bool alpha)
 
 	status.type = COMBAT_WAITING;
 
-	if (printableName == std::string(_t("Girl")))
+	if (printableName == std::string(_t("Girl"))) {
 		oldAnim = new AnimationSet(getResource("combat_media/Dragon.png"));
-	else
+		oldWhiteAnim = oldAnim->clone(CLONE_ENEMY);
+	}
+	else {
 		oldAnim = NULL;
+		oldWhiteAnim = NULL;
+	}
 
 	charmAnim = new AnimationSet(getResource("combat_media/Charm.png"));
 
@@ -1072,8 +1079,10 @@ CombatEnemy::~CombatEnemy(void)
 	if (work) {
 		m_destroy_bitmap(work);
 	}	
-	if (oldAnim)
+	if (oldAnim) {
 		delete oldAnim;
+		delete oldWhiteAnim;
+	}
 	
 	unreferenceBattleAnim(name, this);
 	delete whiteAnimSet;

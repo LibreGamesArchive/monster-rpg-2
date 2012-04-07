@@ -226,6 +226,7 @@ bool is_close_pressed(void)
 #endif
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		if (event.type == ALLEGRO_EVENT_DISPLAY_HALT_DRAWING) {
+			save_memory(false);
 #if defined ALLEGRO_IPHONE
 			if (!isMultitaskingSupported()) {
 				if (!sound_was_playing_at_program_start)
@@ -1100,7 +1101,7 @@ int main(int argc, char *argv[])
 
 
 	// FIXME
-	//volcano_scene();
+	volcano_scene();
 	//do_lander(); 
 	//archery(false);
 	//shooter(false);

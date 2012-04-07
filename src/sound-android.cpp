@@ -434,6 +434,10 @@ void playMusic(std::string name, float volume, bool force)
 	if (ext_pos != std::string::npos) {
 		name = name.substr(0, ext_pos) + ".ogg";
 	}
+	ext_pos = name.find(".flac", 0);
+	if (ext_pos != std::string::npos) {
+		name = name.substr(0, ext_pos) + ".ogg";
+	}
 #else
 	if (ext_pos != std::string::npos) {
 		name = name.substr(0, ext_pos) + ".flac";
@@ -479,6 +483,10 @@ void playAmbience(std::string name, float vol)
 
 	size_t ext_pos = name.find(".caf", 0);
 #ifdef ALLEGRO_ANDROID
+	if (ext_pos != std::string::npos) {
+		name = name.substr(0, ext_pos) + ".ogg";
+	}
+	ext_pos = name.find(".flac", 0);
 	if (ext_pos != std::string::npos) {
 		name = name.substr(0, ext_pos) + ".ogg";
 	}

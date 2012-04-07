@@ -2814,12 +2814,20 @@ void Ice3Effect::draw(void)
 
 		al_set_clipping_rectangle(cx, cy, cw, ch);
 
+		ALLEGRO_VERTEX verts[NUM_PARTICLES];
 		for (int i = 0; i < NUM_PARTICLES; i++) {
 			particles[i].color.a = alpha;
 			ALLEGRO_COLOR c = particles[i].color;
+			/*
 			m_draw_trans_pixel(particles[i].x, particles[i].y,
 				al_map_rgba_f(c.r*c.a, c.g*c.a, c.b*c.a, c.a));
+			*/
+			verts[i].x = particles[i].x;
+			verts[i].y = particles[i].y;
+			verts[i].z = 0;
+			verts[i].color = al_map_rgba_f(c.r*c.a, c.g*c.a, c.b*c.a, c.a);
 		}
+		m_draw_prim(verts, NULL, NULL, 0, NUM_PARTICLES, ALLEGRO_PRIM_POINT_LIST);
 	}
 }
 
@@ -3952,13 +3960,27 @@ void BoFEffect::draw(void)
 	else {
 		int c = count - (count/3*2);
 		float extra = ((110-h) * ((float)c/lt));
+		ALLEGRO_VERTEX verts[w*2];
 		for (int i = 0; i < w; i++) {
 			float height = h + (1-cos(((float)i/w)*M_PI/2)) * extra;
 			int dy = 110/2 - height/2;
-			m_draw_scaled_bitmap(bitmap, line, 0, 1, h, BW/2+i, dy, 1, height, 0, 255);
+			verts[i*2+0].x = BW/2+i+0.5;
+			verts[i*2+0].y = dy+0.5;
+			verts[i*2+0].z = 0;
+			verts[i*2+0].color = white;
+			verts[i*2+0].u = line;
+			verts[i*2+0].v = 0;
+			verts[i*2+1].x = BW/2+i+0.5;
+			verts[i*2+1].y = dy+height+0.5;
+			verts[i*2+1].z = 0;
+			verts[i*2+1].color = white;
+			verts[i*2+1].u = line;
+			verts[i*2+1].v = h;
+			//m_draw_scaled_bitmap(bitmap, line, 0, 1, h, BW/2+i, dy, 1, height, 0, 255);
 			line++;
 			line %= w;
 		}
+		m_draw_prim(verts, NULL, bitmap, 0, w*2, ALLEGRO_PRIM_LINE_LIST);
 	}
 }
 

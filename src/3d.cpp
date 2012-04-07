@@ -351,7 +351,10 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 		uint32_t in;
 	};
 
-	ALLEGRO_FILE *f = al_fopen(filename, "rb");
+	int sz;
+	unsigned char *bytes = slurp_file(filename, &sz);
+
+	ALLEGRO_FILE *f = al_open_memfile(bytes, sz, "rb");
 	if (!f)
 		return NULL;
 
@@ -359,30 +362,28 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 	int vcount = 0;
 
 	/* count everything */
-	try {
-		while (1) {
-			int nv = al_fgetc(f);
-			for (int n = 0 ; n < nv; n++) {
-				al_fgetc(f); // skip
-				al_fgetc(f); // skip
-				al_fgetc(f); // skip
-				al_fread32le(f); // skip
-				al_fread32le(f); // skip
-				al_fread32le(f); // skip
-			}
-			if (nv == 3)
-				vcount += 3;
-			else
-				vcount += 6;
+	while (1) {
+		int nv = al_fgetc(f);
+		if (nv == EOF)
+			break;
+		for (int n = 0 ; n < nv; n++) {
+			al_fgetc(f); // skip
+			al_fgetc(f); // skip
+			al_fgetc(f); // skip
+			al_fread32le(f); // skip
+			al_fread32le(f); // skip
+			al_fread32le(f); // skip
 		}
-	}
-	catch (...) {
+		if (nv == 3)
+			vcount += 3;
+		else
+			vcount += 6;
 	}
 
 	m->num_verts = vcount;
 	m->verts = new ALLEGRO_VERTEX[vcount];
 
-	al_fclose(f);
+	al_fseek(f, 0, ALLEGRO_SEEK_SET);
 
 	bool load_txt = false;
 
@@ -395,10 +396,6 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 		strcpy(real_filename, filename);
 		strcpy(real_filename+strlen(real_filename)-3, "txt");
 		
-		ALLEGRO_FILE *f = al_fopen(real_filename, "r");
-		if (!f)
-			return NULL;
-
 		int i = 0;
 
 		while (1) {
@@ -451,69 +448,61 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 			if (i == vcount)
 				break;
 		}
-
-		al_fclose(f);
 	}
 	else {
-		f = al_fopen(filename, "rb");
-		if (!f)
-			return NULL;
-
 		int i = 0;
 
-		try {
-			while (1) {
-				int r, g, b;
-				float x, y, z;
-				std::vector<float> vv;
-				std::vector<int> cv;
-				int nv = al_fgetc(f);
-				for (int n = 0; n < nv; n++) {
-					r = al_fgetc(f);
-					g = al_fgetc(f);
-					b = al_fgetc(f);
-					in = (int)al_fread32le(f);
-					x = fl;
-					in = (int)al_fread32le(f);
-					y = fl;
-					in = (int)al_fread32le(f);
-					z = fl;
-					vv.push_back(x);
-					vv.push_back(y);
-					vv.push_back(z);
-					cv.push_back(r);
-					cv.push_back(g);
-					cv.push_back(b);
-				}
-				for (int j = 0; j < 3; j++) {
-					m->verts[i].x = vv[j*3+0];
-					m->verts[i].y = vv[j*3+1];
-					m->verts[i].z = vv[j*3+2];
-					m->verts[i].color = al_map_rgb(
-								cv[j*3+0],
-								cv[j*3+1],
-								cv[j*3+2]
-							    );
-					i++;
-				}
-				if (vv.size() > 9) {
-					m->verts[i] = m->verts[i-3];
-					m->verts[i+1] = m->verts[i-1];
-					m->verts[i+2].x = vv[3*3+0];
-					m->verts[i+2].y = vv[3*3+1];
-					m->verts[i+2].z = vv[3*3+2];
-					m->verts[i+2].color = al_map_rgb(
-								  cv[3*3+0],
-								  cv[3*3+1],
-								  cv[3*3+2]
-							      );
-					i += 3;
-				}
-				vv.clear();
-				cv.clear();
+		while (1) {
+			int r, g, b;
+			float x, y, z;
+			std::vector<float> vv;
+			std::vector<int> cv;
+			int nv = al_fgetc(f);
+			if (nv == EOF)
+				break;
+			for (int n = 0; n < nv; n++) {
+				r = al_fgetc(f);
+				g = al_fgetc(f);
+				b = al_fgetc(f);
+				in = (int)al_fread32le(f);
+				x = fl;
+				in = (int)al_fread32le(f);
+				y = fl;
+				in = (int)al_fread32le(f);
+				z = fl;
+				vv.push_back(x);
+				vv.push_back(y);
+				vv.push_back(z);
+				cv.push_back(r);
+				cv.push_back(g);
+				cv.push_back(b);
 			}
-		}
-		catch (...) {
+			for (int j = 0; j < 3; j++) {
+				m->verts[i].x = vv[j*3+0];
+				m->verts[i].y = vv[j*3+1];
+				m->verts[i].z = vv[j*3+2];
+				m->verts[i].color = al_map_rgb(
+							cv[j*3+0],
+							cv[j*3+1],
+							cv[j*3+2]
+						    );
+				i++;
+			}
+			if (vv.size() > 9) {
+				m->verts[i] = m->verts[i-3];
+				m->verts[i+1] = m->verts[i-1];
+				m->verts[i+2].x = vv[3*3+0];
+				m->verts[i+2].y = vv[3*3+1];
+				m->verts[i+2].z = vv[3*3+2];
+				m->verts[i+2].color = al_map_rgb(
+							  cv[3*3+0],
+							  cv[3*3+1],
+							  cv[3*3+2]
+						      );
+				i += 3;
+			}
+			vv.clear();
+			cv.clear();
 		}
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
@@ -544,9 +533,11 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 				m->verts[i+5].v = yy+inc;
 			}
 		}
-
-		al_fclose(f);
 	}
+
+	al_fclose(f);
+
+	delete[] bytes;
 
 	return m;
 }
