@@ -9,9 +9,6 @@
 #import "joypad_handler.h"
 #import "JoypadSDK.h"
 
-void connect_joypad(void);
-void disconnect_joypad(void);
-
 void lock_joypad_mutex(void);
 void unlock_joypad_mutex(void);
 
@@ -69,14 +66,14 @@ void joy_d_up(void);
 {
 	[device setDelegate:self];  // Use self to have the same delegate object as the joypad manager.
 	connected = true;
-	connect_joypad();
+	connect_external_controls();
 }
 
 -(void)joypadManager:(JoypadManager *)manager deviceDidDisconnect:(JoypadDevice *)device player:(unsigned int)player
 {
 	connected = false;
 	left = right = up = down = ba = bb = bx = by = bl = br = false;
-	disconnect_joypad();
+	disconnect_external_controls();
 }
 
 -(void)joypadDevice:(JoypadDevice *)device didAccelerate:(JoypadAcceleration)accel

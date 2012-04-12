@@ -279,7 +279,7 @@ AnimationSet *AnimationSet::clone(int type)
 	AnimationSet *a = new AnimationSet();
 
 	a->name = name;
-	for (int i = 0; i < anims.size(); i++) {
+	for (size_t i = 0; i < anims.size(); i++) {
 		bool do_clone = false;
 		if (type == CLONE_PLAYER) {
 			if (anims[i]->getName() == "stand" || anims[i]->getName() == "stand2" || anims[i]->getName() == "walk" || anims[i]->getName() == "noweapon_stand" || anims[i]->getName() == "noweapon_walk") {

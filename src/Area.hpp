@@ -117,8 +117,6 @@ private:
 	void drawLayer(int layer, int bw, int bh);
 
 	std::vector<Tile *> tiles;
-	std::vector<Animation *> tileAnimations;
-	std::vector<int> tileAnimationNums;
 	//std::vector<Object*> sObjects;	// sorted objects
 	bool follow;
 #ifdef EDITOR
@@ -157,6 +155,8 @@ public:
 	MBITMAP *partial_tm;
 	int tm_used;
 	std::map<int, int> newmap;
+	std::vector<int> tileAnimationNums;
+	std::vector<Animation *> tileAnimations;
 };
 
 

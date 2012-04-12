@@ -6,6 +6,7 @@
 //  Copyright 2011 Nooskewl. All rights reserved.
 //
 
+#define ASSERT ALLEGRO_ASSERT
 #include <allegro5/allegro.h>
 #include <allegro5/internal/aintern_iphone.h>
 #import "MyUIViewController.h"

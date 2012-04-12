@@ -196,7 +196,7 @@ Animation *Animation::clone(int type)
 {
 	Animation *a = new Animation();
 
-	for (int i = 0; i < frames.size(); i++) {
+	for (size_t i = 0; i < frames.size(); i++) {
 		a->frames.push_back(frames[i]->clone(type));
 	}
 

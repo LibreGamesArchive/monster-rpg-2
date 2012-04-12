@@ -1,5 +1,3 @@
-// FIXME!
-#ifdef ALLEGRO_ANDROID
 #define my_load_bitmap my_tmp_load_bmp
 static inline ALLEGRO_BITMAP *my_tmp_load_bmp(const char *filename)
 {
@@ -8,7 +6,8 @@ static inline ALLEGRO_BITMAP *my_tmp_load_bmp(const char *filename)
 	char ext[10];
 	char *p = fn + (strlen(fn)-1);
 	while (*p != '.') p--;
-#ifdef ALLEGRO_ANDROID
+	// Watch this! FIXME
+#if 1
 	strcpy(p, ".tga");
 #endif
 	strncpy(ext, p, 10);
@@ -31,7 +30,3 @@ static inline ALLEGRO_BITMAP *my_tmp_load_bmp(const char *filename)
 
 	return b;
 }
-#else
-#define my_load_bitmap al_load_bitmap
-#endif
-

@@ -158,6 +158,7 @@ void connect_second_display(void)
 #endif
 }
 
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 static void *wait_for_drawing_resume(void *arg)
 {
 	ALLEGRO_EVENT_QUEUE *queue = (ALLEGRO_EVENT_QUEUE *)arg;
@@ -175,7 +176,6 @@ static void *wait_for_drawing_resume(void *arg)
 	return NULL;
 }
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 static bool should_pause_game(void)
 {
 	return (area && !battle && !player_scripted && !in_pause && !in_map);
@@ -233,6 +233,7 @@ bool is_close_pressed(void)
 					iPodStop();
 				exit(0);
 			}
+			sb_stop();
 #elif defined ALLEGRO_ANDROID
 			std::string old_music_name = musicName;
 			std::string old_ambience_name = ambienceName;
@@ -255,8 +256,10 @@ bool is_close_pressed(void)
 			al_unlock_mutex(switch_mutex);
 			// resume
 			al_acknowledge_drawing_resume(display);
-#ifdef ALLEGRO_ANDROID
+#if defined ALLEGRO_ANDROID
       			glDisable(GL_DITHER);
+#elif defined ALLEGRO_IPHONE
+			sb_start();
 #endif
 			al_start_timer(logic_timer);
 			al_start_timer(draw_timer);
@@ -1101,7 +1104,7 @@ int main(int argc, char *argv[])
 
 
 	// FIXME
-	volcano_scene();
+	//volcano_scene();
 	//do_lander(); 
 	//archery(false);
 	//shooter(false);
@@ -1109,7 +1112,7 @@ int main(int argc, char *argv[])
 
 	while (!quit_game) {
 		playAmbience("");
-		playMusic("title.caf");
+		playMusic("title.ogg");
 
 		debug_message("After playmusic/ambience\n");
 		

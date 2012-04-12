@@ -1025,18 +1025,10 @@ void Area::tint(MCOLOR *target, bool reverse)
 void startArea(std::string name)
 {
 	char resName[1000];
-#ifdef ALLEGRO_ANDROID
 	snprintf(resName, 1000, "areas/%s.area", name.c_str());
-#else
-	snprintf(resName, 1000, "%s.area", name.c_str());
-#endif
 	
 	area = new Area();
-#ifdef ALLEGRO_ANDROID
 	area->load(getResource(resName));
-#else
-	area->load(resName);
-#endif
 
 	area->addObject(party[heroSpot]->getObject());
 
@@ -1146,30 +1138,6 @@ void Area::getWaterAnimation(int x, int y, Animation **anim, int *depth)
 }
 
 
-/*
- * Blit a frame of a tile in a tilemap to a smaller tile-sized bitmap.
- */
-#ifdef EDITOR
-void blitTile(int tile, MBITMAP* tilemap, MBITMAP* dest)
-{
-	// FIXME: not really needed anymore
-	int px = coord_map_x[tile];
-	int py = coord_map_y[tile];
-
-	MBITMAP *oldTarget = m_get_target_bitmap();
-        m_save_blender();
-
-	m_set_target_bitmap(dest);
-	m_set_blender(M_ONE, M_ZERO, white);
-
-	m_draw_bitmap_region(tilemap, px, py, TILE_SIZE, TILE_SIZE, 0.0f, 0.0f, 0);
-
-	m_set_target_bitmap(oldTarget);
-
-	m_restore_blender();
-}
-#endif
-
 void Area::drawLayer(int i, int bw, int bh)
 {
 	int startTilex = getOriginX() / TILE_SIZE;
@@ -1225,11 +1193,14 @@ void Area::drawLayer(int i, int bw, int bh)
 			if (n >= 0 && n < (int)tileAnimations.size() && tileAnimationNums[n]) {
 				int mapped = tileAnimationNums[n];
 #else
-			//if (n >= 0 && n < (int)tileAnimations.size() && mapping[tileAnimationNums[n]]) {
-			//if (n >= 0 && n < (int)tileAnimationNums.size() && newmap[tileAnimationNums[n]]) {
+			/*
 			if (n >= 0 && n < (int)tileAnimationNums.size()) {
-				//int mapped = mapping[tileAnimationNums[n]];
 				int mapped = newmap[tileAnimationNums[n]];
+			*/
+			// TEST
+			if (n >= 0 && n < (int)tileAnimations.size() && tileAnimationNums[n]) {
+				int mapped = newmap[tileAnimationNums[n]];
+				//int mapped = tileAnimationNums[n];
 #endif
 				std::map<int, anim_data>::iterator it  = anim_info.find(mapped);
 				float tu;
@@ -1526,13 +1497,13 @@ void Area::saveBmp(std::string filename)
 	MBITMAP *mem = m_create_bitmap(pixw, pixh); // check
 	al_set_new_display_flags(flags);
 
-	MBITMAP *target = al_get_target_bitmap();
-	al_set_target_bitmap(mem);
+	ALLEGRO_BITMAP *target = al_get_target_bitmap();
+	m_set_target_bitmap(mem);
 	al_clear_to_color(al_map_rgb(0, 0, 0));
 	draw(pixw, pixh);
 	al_set_target_bitmap(target);
 
-	al_save_bitmap(filename.c_str(), mem);
+	al_save_bitmap(filename.c_str(), mem->bitmap);
 
 	m_destroy_bitmap(mem);
 }
@@ -2229,16 +2200,8 @@ void Area::loadAnimation(int index, bool addIndex)
 	ALLEGRO_STATE st;
 	al_store_state(&st, ALLEGRO_STATE_BLENDER | ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
 	char nm[100];
-#ifndef ALLEGRO_ANDROID
-	al_set_physfs_file_interface();
-	sprintf(nm, "%d-%d.png", subx, suby);
-#else
 	sprintf(nm, "data/tiles/%d-%d.png", subx, suby);
-#endif
 	MBITMAP *tmp = m_load_bitmap(nm);
-#ifndef ALLEGRO_ANDROID
-	al_set_standard_file_interface();
-#endif
 	int xx = tm_used % tm_w;
 	int yy = tm_used / tm_w;
 	tm_used++;
@@ -2317,16 +2280,8 @@ void Area::loadAnimation(int index, bool addIndex)
 
 		ALLEGRO_STATE st;
 		al_store_state(&st, ALLEGRO_STATE_BLENDER | ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
-#ifndef ALLEGRO_ANDROID
-		al_set_physfs_file_interface();
-		sprintf(nm, "%d-%d.png", subx, suby);
-#else
 		sprintf(nm, "data/tiles/%d-%d.png", subx, suby);
-#endif
 		MBITMAP *tmp = m_load_bitmap(nm);
-#ifndef ALLEGRO_ANDROID
-		al_set_standard_file_interface();
-#endif
 		int xx = tm_used % tm_w;
 		int yy = tm_used / tm_w;
 		tm_used++;
@@ -2391,13 +2346,7 @@ void Area::reloadAnimations(void)
 
 void Area::load(std::string filename)
 {
-#ifndef ALLEGRO_ANDROID
-	al_set_physfs_file_interface();
-#endif
 	ALLEGRO_FILE *f = al_fopen(filename.c_str(), "rb");
-#ifndef ALLEGRO_ANDROID
-	al_set_standard_file_interface();
-#endif
 	if (!f)
 		throw ReadError();
 	
@@ -2446,7 +2395,6 @@ void Area::load(std::string filename)
 	al_set_new_bitmap_flags(flgs & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 	partial_tm = m_create_alpha_bitmap(tm_w*TILE_SIZE, tm_h*TILE_SIZE); // check
 	al_set_new_bitmap_flags(flgs);
-	printf("partial flags=%d\n", al_get_bitmap_flags(partial_tm->bitmap));
 
 	char tmp[MAX_AREA_NAME];
 	ALLEGRO_PATH *path = al_create_path(filename.c_str());
@@ -2457,11 +2405,7 @@ void Area::load(std::string filename)
 	bg = NULL;
 
 	// Can be null, it's ok
-#ifndef ALLEGRO_ANDROID
-	const char *_tmp = getResource("media/%s_bg.png", name.c_str());
-#else
 	const char *_tmp = getResource("media/%s_bg.tga", name.c_str());
-#endif
 	ALLEGRO_FILE *_f = al_fopen(_tmp, "rb");
 	if (_f) {
 		al_fclose(_f);

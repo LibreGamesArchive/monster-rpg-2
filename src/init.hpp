@@ -227,6 +227,10 @@ extern double allegro_iphone_shaken;
 bool imperfect_aspect(void);
 void create_buffers(void);
 
+extern "C" {
+void connect_external_controls(void);
+void disconnect_external_controls(void);
+}
 
 #endif
 

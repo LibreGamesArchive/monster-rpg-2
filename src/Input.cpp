@@ -129,12 +129,6 @@ void Input::set(bool l, bool r, bool u, bool d, int set_sets, bool clear_on_fals
 	al_lock_mutex(mutex);
 	
 	if (!l && !r && !u && !d) {
-		/*
-		while (this == getInput() && clear_on_false && curr_touches > 0) {
-			al_rest(0.01);
-		}
-		*/
-			
 		startDirection = (Direction)DIRECTION_NONE;
 		descriptor.left = false;
 		descriptor.right = false;
@@ -197,14 +191,6 @@ void Input::set(bool b1, bool b2, bool b3, int set_sets, bool clear_on_false)
 {
 	al_lock_mutex(mutex);
 
-	/*
-	if (!b1 && !b2 && !b3) {
-		while (this == getInput() && clear_on_false && curr_touches > 0) {
-			al_rest(0.01);
-		}
-	}
-	*/
-	
 	descriptor.button1 = b1;
 	descriptor.button2 = b2;
 	descriptor.button3 = b3;
@@ -484,25 +470,27 @@ void TripleInput::update()
 		false
 	);
 #elif defined ALLEGRO_IPHONE
+	InputDescriptor id3;
 	if (joypad_connected()) {
-		lock_joypad_mutex();
-
-		InputDescriptor id3;
 		id3 = get_joypad_state();
-		
-		set(
-		    sets.left || id3.left,
-		    sets.right || id3.right,
-		    sets.up || id3.up,
-		    sets.down || id3.down,
-		    sets.button1 || id3.button1,
-		    sets.button2 || id3.button2,
-		    sets.button3 || id3.button3,
-		    false
-		    );
-		
-		unlock_joypad_mutex();
 	}
+	else {
+		id3.left = id3.right = id3.up = id3.down = id3.button1 = id3.button2 = id3.button3 = false;
+	}
+
+	InputDescriptor id4;
+	get_sb_state(&id4.left, &id4.right, &id4.up, &id4.down, &id4.button1, &id4.button2, &id4.button3);
+		
+	set(
+	    sets.left || id3.left || id4.left,
+	    sets.right || id3.right || id4.right,
+	    sets.up || id3.up || id4.up,
+	    sets.down || id3.down || id4.down,
+	    sets.button1 || id3.button1 || id4.button1,
+	    sets.button2 || id3.button2 || id4.button2,
+	    sets.button3 || id3.button3 || id4.button3,
+	    false
+	    );
 #endif
 
 	al_unlock_mutex(mutex);

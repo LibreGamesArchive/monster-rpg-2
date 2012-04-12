@@ -8,7 +8,6 @@
 #include <Carbon/Carbon.h>
 #endif
 
-
 //M_KBDSTATE kbdstate;
 
 const int MINI_ROWS = 10;
@@ -295,10 +294,9 @@ std::vector<Tile *> *createTileState(void)
 			for (int i = 0; i < TILE_LAYERS; i++) {
 				animNums[i] = t->getAnimationNum(i);
 				if (animNums[i] >= 0) {
-					int n = area->getAnimationNums()[animNums[i]];
-					/* FIXME HARDCODED :(( */
-					tu[i] = coord_map_x[n];
-					tv[i] = coord_map_y[n];
+					int n = area->newmap[area->tileAnimationNums[animNums[i]]];
+					tu[i] = (n % area->tm_w) * TILE_SIZE;
+					tv[i] = (n / area->tm_w) * TILE_SIZE;
 				}
 			}
 			Tile *newTile = new Tile(animNums, solid, tu, tv);
@@ -414,8 +412,12 @@ void brush(int i, int mx, int my)
 	}
 
 	t->setAnimationNum(currentLayer, i);
-	t->setTU(currentLayer, coord_map_x[currentTile]);
-	t->setTV(currentLayer, coord_map_y[currentTile]);
+	int n = area->newmap[currentTile];
+	int u = (n % area->tm_w) * TILE_SIZE;
+	int v = (n / area->tm_w) * TILE_SIZE;
+	t->setTU(currentLayer, u);
+	t->setTV(currentLayer, v);
+					
 
 	if (macroRecording) {
 		if (macroStartX < 0) {
@@ -658,6 +660,8 @@ int main(int argc, char *argv[])
 		debug_message("Initialization failed.\n");
 		return 1;
 	}
+
+	tilemap = m_load_bitmap("data/tilemap.png");
 
 	big_font = al_load_font("data/big_font.png", 0, 0);
 
@@ -995,11 +999,7 @@ int main(int argc, char *argv[])
 		/* draw the Area */
 		m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 		area->draw();
-#ifdef ALLEGRO4
-		m_set_target_bitmap(backbuffer);
-#else
-		m_set_target_bitmap(al_get_backbuffer(display));
-#endif
+		al_set_target_bitmap(al_get_backbuffer(display));
 		color = m_map_rgb(255, 0, 255);
 		m_clear(color);
 		m_set_blender(M_ONE, M_ZERO, white);
@@ -1013,7 +1013,9 @@ int main(int argc, char *argv[])
 		}
 		m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 		// Draw the current tile
-		blitTile(currentTile, tilemap, tile);
+		int i = currentTile;
+		tile = area->tileAnimations[area->newmap[area->tileAnimationNums[i]]]->getCurrentFrame()->getImage()->getBitmap();
+		// HERE
 		m_draw_scaled_bitmap(tile, 0, 0, TILE_SIZE, TILE_SIZE,
 				BW*2+16, 52, TILE_SIZE*2, TILE_SIZE*2, 0);
 		// Draw the GUI

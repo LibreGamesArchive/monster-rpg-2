@@ -4563,7 +4563,7 @@ int WebEffect::getLifetime(void)
 
 void WebEffect::draw(void)
 {
-	m_draw_rotated_bitmap(bitmap, 16, 16, cx, cy, angle, 0);
+	m_draw_rotated_bitmap(bitmap, m_get_bitmap_width(bitmap)/2, m_get_bitmap_height(bitmap)/2, cx, cy, 0, draw_flags);
 }
 
 
@@ -4594,9 +4594,11 @@ WebEffect::WebEffect(Combatant *caster, Combatant *target) :
 
 	if (caster->getLocation() == LOCATION_LEFT) {
 		sx = caster->getX()+caster->getAnimationSet()->getWidth()/2;
+		draw_flags = 0;
 	}
 	else {
 		sx = caster->getX()-caster->getAnimationSet()->getWidth()/2;
+		draw_flags = ALLEGRO_FLIP_HORIZONTAL;
 	}
 	sy = caster->getY()-caster->getAnimationSet()->getHeight()/2;
 
@@ -4793,14 +4795,24 @@ void PukeEffect::draw(void)
 		puke_sound = true;
 	}
 
+	ALLEGRO_VERTEX verts[lines.size()*2];
 	for (int i = 0; i < (int)lines.size(); i++) {
 		int x1, y1, x2, y2;
 		x1 = -cos(lines[i].angle) * 10 + lines[i].cx;
 		y1 = -sin(lines[i].angle) * 10 + lines[i].cy;
 		x2 = cos(lines[i].angle) * 10 + lines[i].cx;
 		y2 = sin(lines[i].angle) * 10 + lines[i].cy;
-		m_draw_line(x1, y1, x2, y2, lines[i].color);
+		//m_draw_line(x1, y1, x2, y2, lines[i].color);
+		verts[i*2+0].x = x1;
+		verts[i*2+0].y = y1;
+		verts[i*2+0].z = 0;
+		verts[i*2+0].color = lines[i].color;
+		verts[i*2+1].x = x2;
+		verts[i*2+1].y = y2;
+		verts[i*2+1].z = 0;
+		verts[i*2+1].color = lines[i].color;
 	}
+	m_draw_prim(verts, NULL, NULL, 0, lines.size()*2, ALLEGRO_PRIM_LINE_LIST);
 }
 
 

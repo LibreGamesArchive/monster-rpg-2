@@ -987,12 +987,12 @@ void Battle::start(void)
 	std::string musicname;
 
 	if (name == "1Tode")
-		musicname = "final_boss.caf";
+		musicname = "final_boss.ogg";
 	else if (boss_fight) {
-		musicname = "boss.caf";
+		musicname = "boss.ogg";
 	}
 	else {
-		musicname = "battle.caf";
+		musicname = "battle.ogg";
 	}
 
 	if (!(name == "1Golem") && !manChooser) {

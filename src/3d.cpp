@@ -694,7 +694,7 @@ static bool real_archery(int *accuracy_pts)
 	}
 
 #ifdef ALLEGRO_IPHONE
-	if (use_dpad || joypad_connected() || airplay_connected)
+	if (use_dpad || joypad_connected() || airplay_connected || is_sb_connected())
 #else
 #if defined ALLEGRO_MACOSX
 	bool jp_conn = joypad_connected();
@@ -721,7 +721,7 @@ static bool real_archery(int *accuracy_pts)
 	m_set_target_bitmap(buffer);
 	m_clear(m_map_rgb(0, 0, 0));
 
-	playMusic("shmup2.caf");
+	playMusic("shmup2.ogg");
 
 	std::vector<Goblin> goblins;
 	int total_goblins = 0;
@@ -1122,7 +1122,7 @@ done:
 
 	m_destroy_bitmap(progress);
 
-	playMusic("underwater_final.caf");
+	playMusic("underwater_final.ogg");
 
 	*accuracy_pts = ((float)NUM_GOBLINS/num_shots) * 30 + 2;
 

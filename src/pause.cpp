@@ -1444,7 +1444,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				std::string prevMusicName = musicName;
 				std::string prevAmbienceName = ambienceName;
 				playAmbience("");
-				playMusic("loadsave.caf");
+				playMusic("loadsave.ogg");
 				m_rest(0.1);
 				setMusicVolume(0.5f);
 
@@ -1775,10 +1775,10 @@ void doMap(std::string startPlace, std::string prefix)
 	playAmbience("");
 
 	if (prefix == "map2") {
-		playMusic("map2.caf");
+		playMusic("map2.ogg");
 	}
 	else {
-		playMusic("map.caf");
+		playMusic("map.ogg");
 	}
 
 	//ALLEGRO_DEBUG("doMap 1");
@@ -2318,7 +2318,7 @@ void credits(void)
 	float offset = 0;
 	float amplitude = 0;
 
-	playMusic("credits.caf");
+	playMusic("credits.ogg");
 
 	MBITMAP *bg = m_load_bitmap(getResource("media/credit_bg.png"));
 	MBITMAP *font = m_load_bitmap(getResource("media/credit_font.png"));
@@ -2922,7 +2922,7 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 	dpad_off();
 
 	std::string prevMusicName = musicName;
-	playMusic("loadsave.caf");
+	playMusic("loadsave.ogg");
 
 	const int LIST_H = 100;
 
@@ -3132,10 +3132,14 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 			}
 #endif
 
-			INPUT_EVENT ie = get_next_input_event();
+			//INPUT_EVENT ie = get_next_input_event();
+			InputDescriptor id = getInput()->getDescriptor();
 
-			if (iphone_shaken(0.1) || ie.button2 == DOWN) {
-				use_input_event();
+			if (iphone_shaken(0.1) || id.button2 == DOWN) {
+				if (id.button2) {
+					getInput()->waitForReleaseOr(5, 250);
+				}
+				//use_input_event();
 				iphone_clear_shaken();
 				*num = -1;
 				goto done;
@@ -3239,7 +3243,7 @@ bool config_menu(bool start_on_fullscreen)
 	MSingleToggle *input_toggle;
 
 #ifdef ALLEGRO_IPHONE
-	if (airplay_connected || joypad_connected()) {
+	if (airplay_connected || joypad_connected() || is_sb_connected()) {
 		input_toggle = NULL;
 	}
 	else {
@@ -3338,7 +3342,13 @@ bool config_menu(bool start_on_fullscreen)
 	MSingleToggle *aspect_toggle = new MSingleToggle(xx, y, aspect_choices);
 	int curr_aspect = config.getMaintainAspectRatio();
 	aspect_toggle->setSelected(aspect_real_to_option(curr_aspect));
-	y += 13;
+#ifdef ALLEGRO_IPHONE
+	if (is_ipad()) {
+#endif
+		y += 13;
+#ifdef ALLEGRO_IPHONE
+	}
+#endif
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	std::vector<std::string> fullscreen_choices;
@@ -3515,7 +3525,7 @@ bool config_menu(bool start_on_fullscreen)
 			sel = input_toggle->getSelected();
 			if (config.getDpadType() != sel) {
 #ifdef ALLEGRO_IPHONE
-				if (joypad_connected() || airplay_connected) {
+				if (joypad_connected() || airplay_connected || is_sb_connected()) {
 					playPreloadedSample("error.ogg");
 					input_toggle->setSelected((int)config.getDpadType());
 				}
@@ -3601,11 +3611,17 @@ bool config_menu(bool start_on_fullscreen)
 		}
 #endif
 
+#ifdef ALLEGRO_IPHONE
+		if (is_ipad()) {
+#endif
 		sel = aspect_toggle->getSelected();
 		if (aspect_real_to_option(config.getMaintainAspectRatio()) != sel) {
 			config.setMaintainAspectRatio(aspect_option_to_real(sel));
 			set_screen_params();
 		}
+#ifdef ALLEGRO_IPHONE
+		}
+#endif
 
 		sel = filter_type_toggle->getSelected();
 		if (config.getFilterType() != sel) {

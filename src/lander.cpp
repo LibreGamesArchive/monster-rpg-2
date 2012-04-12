@@ -95,8 +95,14 @@ bool do_lander(void)
 	}
 	
 top:
-	playMusic("lander.caf");
+
+#ifdef ALLEGRO_IPHONE
+	playMusic("lander.flac");
 	playAmbience("boost.flac");
+#else
+	playMusic("lander.ogg");
+	playAmbience("boost.ogg");
+#endif
 
 	setAmbienceVolume(0);
 
@@ -403,7 +409,7 @@ done:
 	playAmbience("");
 	playMusic("");
 
-	playMusic("underwater_final.caf");
+	playMusic("underwater_final.ogg");
 
 	if (dead) {
 		if (prompt("G A M E O V E R", "Try Again?", 1, 1))

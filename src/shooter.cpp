@@ -751,14 +751,14 @@ bool shooter(bool for_points)
 	int deadCount;
 	double lastFire;
 
-	playMusic("underwater.caf");
+	playMusic("underwater.ogg");
 	srand(7);
 	generate();
 	
 	anotherDoDialogue("Gunnar: Oh, no, the throttle jammed! Eny, you steer.\nMel, Rider, blast anything in our path! I'll go fix the engine!\n", true);
 
 start:
-	playMusic("underwater.caf");
+	playMusic("underwater.ogg");
 
 	MShooterButton *button = NULL;
 	MShooterSlider *slider = NULL;
@@ -1206,7 +1206,7 @@ done:
 	m_clear(black);
 	m_rest(5);
 
-	playMusic("underwater_final.caf");
+	playMusic("underwater_final.ogg");
 
 	if (dead) {
 		if (prompt("G A M E O V E R", "Try Again?", 1, 1))

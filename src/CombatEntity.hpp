@@ -44,6 +44,7 @@ protected:
 	int _id;
 	float ox, oy; // offsets can be set by script to move
 	float angle; // angle can be set by script to rotate
+	int draw_flags;
 };
 
 

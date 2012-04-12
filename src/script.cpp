@@ -3657,7 +3657,7 @@ int C_dbg(lua_State *stack)
 {
 	const char *t = lua_tostring(stack, 1);
 
-	ALLEGRO_DEBUG(t);
+	ALLEGRO_DEBUG("%s", t);
 
 	return 0;
 }

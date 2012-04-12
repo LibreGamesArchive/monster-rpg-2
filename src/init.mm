@@ -975,7 +975,9 @@ static void *thread_proc(void *arg)
 #endif
 
 			Input *i = getInput();
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE
+			bool jp_conn = joypad_connected() || is_sb_connected();
+#elif defined defined ALLEGRO_MACOSX
 			bool jp_conn = joypad_connected();
 #else
 			bool jp_conn = false;
@@ -2398,12 +2400,6 @@ bool init(int *argc, char **argv[])
 	al_init_image_addon();
 	al_init_primitives_addon();
 	
-#ifndef ALLEGRO_ANDROID
-   	PHYSFS_init(myArgv[0]);
-	PHYSFS_addToSearchPath(getResource("tiles.zip"), 1);
-	PHYSFS_addToSearchPath(getResource("areas.zip"), 1);
-#endif
-
 	int flags = 0;
 
 #if defined A5_OGL
@@ -2414,10 +2410,11 @@ bool init(int *argc, char **argv[])
 
 #ifdef ALLEGRO_ANDROID
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_SUGGEST);
+	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 16, ALLEGRO_REQUIRE);
 #else
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_SUGGEST);
+	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 32, ALLEGRO_REQUIRE);
 #endif
-	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 16, ALLEGRO_REQUIRE);
 
 #if !defined(ALLEGRO_IPHONE) && !defined(ALLEGRO_ANDROID)
 	al_set_new_display_adapter(config.getAdapter());
@@ -2472,9 +2469,27 @@ bool init(int *argc, char **argv[])
 #endif
 
 	if (!use_fixed_pipeline) {
+#ifdef ALLEGRO_IPHONE
+		NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
+
+		NSString *reqSysVer = @"3.2";
+		NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
+		BOOL osVersionSupported = ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending);
+		if (osVersionSupported) {
+			al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_USE_PROGRAMMABLE_PIPELINE);
+		}
+		/*
+		else {
+			// No programmable pipeline
+		}
+		*/
+
+		[p drain];
+#else
 		al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_USE_PROGRAMMABLE_PIPELINE);
+#endif
 	}
-	
+
 #if defined ALLEGRO_IPHONE
 	al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE, ALLEGRO_REQUIRE);
 #elif defined ALLEGRO_ANDROID
@@ -2509,20 +2524,6 @@ bool init(int *argc, char **argv[])
 	set_screen_params();
 
 	initSound();
-
-#ifdef ALLEGRO_IPHONE_XXX
-	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
-
-	NSString *reqSysVer = @"3.2";
-	NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
-	BOOL osVersionSupported = ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending);
-	if (osVersionSupported) {
-		// FIXME!
-		//PRESERVE_TEXTURE = ALLEGRO_PRESERVE_TEXTURE;
-	}
-
-	[p drain];
-#endif
 
 	al_set_new_bitmap_flags(PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
 
@@ -2729,6 +2730,10 @@ bool init(int *argc, char **argv[])
 	while (!loading_done) {
 		m_rest(0.001);
 	}
+
+#if defined ALLEGRO_IPHONE
+	sb_start();
+#endif
 	
 	shadow_sheet = m_create_alpha_bitmap(4*16, 2*16, create_shadows, NULL, destroy_shadows);
 	draw_loading_screen(tmp, 100, sd);
@@ -2770,11 +2775,7 @@ bool init(int *argc, char **argv[])
 			return false;
 	}
 	
-#ifdef ALLEGRO_ANDROID
 	huge_font = m_load_font(getResource("huge_font.tga"));
-#else
-	huge_font = m_load_font(getResource("huge_font.png"));
-#endif
 	if (!huge_font) {
 		if (!native_error("Failed to load huge_font"))
 			return false;
@@ -2994,7 +2995,7 @@ void dpad_off(bool count)
 		al_lock_mutex(dpad_mutex);
 		use_dpad = (dpad_type == DPAD_TOTAL_1 || dpad_type == DPAD_TOTAL_2);
 #ifdef ALLEGRO_IPHONE
-		if (!joypad_connected()) {
+		if (!joypad_connected() && !is_sb_connected()) {
 #else
 		if (true) {
 #endif
@@ -3034,7 +3035,7 @@ void dpad_on(bool count)
 		al_lock_mutex(dpad_mutex);
 		use_dpad = dpad_type != DPAD_NONE;
 #ifdef ALLEGRO_IPHONE
-		if (!joypad_connected()) {
+		if (!joypad_connected() && !is_sb_connected()) {
 #else
 		if (true) {
 #endif
@@ -3115,29 +3116,23 @@ bool imperfect_aspect(void)
 	return false;
 }
 
-extern "C" {
-void connect_joypad(void);
-void disconnect_joypad(void);
-void lock_joypad_mutex(void);
-void unlock_joypad_mutex(void);
-
-void connect_joypad(void)
+void connect_external_controls(void)
 {
 	connect_airplay_controls();
 }
 
-void disconnect_joypad(void)
+void disconnect_external_controls(void)
 {
 	disconnect_airplay_controls();
 }
 
-void lock_joypad_mutex(void)
-{
-	al_lock_mutex(joypad_mutex);
-}
-void unlock_joypad_mutex(void)
-{
-	al_unlock_mutex(joypad_mutex);
-}
-
+extern "C" {
+	void lock_joypad_mutex(void)
+	{
+		al_lock_mutex(joypad_mutex);
+	}
+	void unlock_joypad_mutex(void)
+	{
+		al_unlock_mutex(joypad_mutex);
+	}
 }

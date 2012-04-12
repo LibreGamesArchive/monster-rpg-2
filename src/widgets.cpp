@@ -18,7 +18,8 @@ static MBITMAP *icon_bmp;
 
 void loadIcons(void)
 {
-	int pos[] = {
+	#define N 40
+	int pos[N*4] = {
 		0, 9, 9, 9,
 		0, 18, 9, 9,
 		0, 27, 9, 9,
@@ -61,12 +62,14 @@ void loadIcons(void)
 		11, 54, 9, 9,
 		11, 63, 9, 9,
 		11, 72, 9, 9,
-		11, 81, 9, 9
+		11, 81, 9, 9,
+		0, 45, 9, 9,
+		0, 54, 9, 9
 	};
 
 	icon_bmp = m_load_bitmap(getResource("media/icons.png"));
 	
-	for (int i = 0; i < 38; i++) {
+	for (int i = 0; i < N; i++) {
 		icons.push_back(
 			m_create_sub_bitmap(
 				icon_bmp,
@@ -291,6 +294,7 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 	al_set_clipping_rectangle(xxx, yyy, www, hhh);
 
 	if (!use_programmable_pipeline && shadow) {
+#ifdef ALLEGRO_ANDROID
 		ALLEGRO_VERTEX verts[6*8];
 
 		int i = 0;
@@ -360,41 +364,6 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 		verts[i].color = white;
 		FILL(SHADOW_CORNER_SIZE, h+4, SHADOW_CORNER_SIZE, 1);
 
-		/*
-		m_draw_scaled_bitmap(
-			shadow_sides[0],
-			0, 0,
-			1, SHADOW_CORNER_SIZE,
-			x-2, y-2-SHADOW_CORNER_SIZE,
-			w+4, SHADOW_CORNER_SIZE,
-			0
-		);
-		m_draw_scaled_bitmap(
-			shadow_sides[2],
-			0, 0,
-			1, SHADOW_CORNER_SIZE,
-			x-2, y+h+2,
-			w+4, SHADOW_CORNER_SIZE,
-			0
-		);
-		m_draw_scaled_bitmap(
-			shadow_sides[1],
-			0, 0,
-			SHADOW_CORNER_SIZE, 1,
-			x+w+2, y-2,
-			SHADOW_CORNER_SIZE, h+4,
-			0
-		);
-		m_draw_scaled_bitmap(
-			shadow_sides[3],
-			0, 0,
-			SHADOW_CORNER_SIZE, 1,
-			x-2-SHADOW_CORNER_SIZE, y-2,
-			SHADOW_CORNER_SIZE, h+4,
-			0
-		);
-		*/
-
 		verts[i+0].x = x-2-SHADOW_CORNER_SIZE;
 		verts[i+0].y = y-2-SHADOW_CORNER_SIZE;
 		verts[i+0].z = 0;
@@ -431,12 +400,49 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 
 		m_draw_prim(verts, 0, shadow_sheet, 0, 6*8, ALLEGRO_PRIM_TRIANGLE_LIST);
 		
-		/*
-		m_draw_alpha_bitmap(shadow_corners[0], x-2-SHADOW_CORNER_SIZE, y-2-SHADOW_CORNER_SIZE, 0);
-		m_draw_alpha_bitmap(shadow_corners[1], x+w+2, y-2-SHADOW_CORNER_SIZE, 0);
-		m_draw_alpha_bitmap(shadow_corners[2], x+w+2, y+h+2, 0);
-		m_draw_alpha_bitmap(shadow_corners[3], x-2-SHADOW_CORNER_SIZE, y+h+2, 0);
-		*/
+#else
+		m_draw_scaled_bitmap(
+			shadow_sheet,
+			0, 0,
+			1, SHADOW_CORNER_SIZE,
+			x-2, y-2-SHADOW_CORNER_SIZE,
+			w+4, SHADOW_CORNER_SIZE,
+			0
+		);
+		m_draw_scaled_bitmap(
+			shadow_sheet,
+			32, 0,
+			1, SHADOW_CORNER_SIZE,
+			x-2, y+h+2,
+#ifdef ALLEGRO_IPHONE
+			w+5, SHADOW_CORNER_SIZE,
+#else
+			w+4, SHADOW_CORNER_SIZE,
+#endif
+			0
+		);
+		m_draw_scaled_bitmap(
+			shadow_sheet,
+			16, 0,
+			SHADOW_CORNER_SIZE, 1,
+			x+w+2, y-2,
+			SHADOW_CORNER_SIZE, h+4,
+			0
+		);
+		m_draw_scaled_bitmap(
+			shadow_sheet,
+			48, 0,
+			SHADOW_CORNER_SIZE, 1,
+			x-2-SHADOW_CORNER_SIZE, y-2,
+			SHADOW_CORNER_SIZE, h+4,
+			0
+		);
+
+		al_draw_bitmap_region(shadow_sheet->bitmap, 0, 16, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x-2-SHADOW_CORNER_SIZE, y-2-SHADOW_CORNER_SIZE, 0);
+		al_draw_bitmap_region(shadow_sheet->bitmap, SHADOW_CORNER_SIZE, 16, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x+w+2, y-2-SHADOW_CORNER_SIZE, 0);
+		al_draw_bitmap_region(shadow_sheet->bitmap, SHADOW_CORNER_SIZE*2, 16, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x+w+2, y+h+2, 0);
+		al_draw_bitmap_region(shadow_sheet->bitmap, SHADOW_CORNER_SIZE*3, 16, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x-2-SHADOW_CORNER_SIZE, y+h+2, 0);
+#endif
 	}
 
 	m_restore_blender();
@@ -2325,6 +2331,10 @@ void MMap::draw()
 				s1 = "{036} Select";
 				s2 = "{037} Menu";
 			}
+			else if (is_sb_connected()) {
+				s1 = "{038} Select";
+				s2 = "{039} Menu";
+			}
 #endif
 			else if (dpad_type == DPAD_HYBRID_1 || dpad_type == DPAD_TOTAL_1) {
 				s1 = "{004} Select";
@@ -2517,7 +2527,7 @@ int MMap::update(int millis)
 
 		/* Scroll in a portrait of the keep if entering it */
 		if (points[selected].dest_area == "Keep_outer") {
-			playMusic("keep.caf");
+			playMusic("keep.ogg");
 			MBITMAP *bmp = m_load_bitmap(getResource("media/keep.png"));
 			m_save_blender();
 			int w = m_get_bitmap_width(bmp);
@@ -4310,6 +4320,10 @@ void MScrollingList::draw()
 	//int yy = y+scroll_offs;
 	int yy = y;
 
+	int cx, cy, cw, ch;
+	al_get_clipping_rectangle(&cx, &cy, &cw, &ch);
+	al_set_clipping_rectangle(x, y, width-30, 15*rows);
+
 	bool held = al_is_bitmap_drawing_held();
 	al_hold_bitmap_drawing(true);
 
@@ -4318,39 +4332,20 @@ void MScrollingList::draw()
 		if (r >= (int)items.size())
 			break;
 
-		char buf[1000];
-		int count = 0;
-
-		if (strlen(items[r].c_str()) > 1) {
-			while (1) {
-				strncpy(buf, _t(items[r].c_str()), count+1);
-				buf[count+1] = 0;
-				if (m_text_length(game_font, buf) > width-30)
-					break;
-				count++;
-				if (count == (int)strlen(items[r].c_str()))
-					break;
-			}
-		}
-		else {
-			count = strlen(items[r].c_str());
-		}
-
-		strncpy(buf, _t(items[r].c_str()), count);
-		buf[count] = 0;
-
 		if (r == selected) {
 			if (this == tguiActiveWidget)
-				mTextout_simple(buf, x, yy, m_map_rgb(255, 255, 0));
+				mTextout_simple(_t(items[r].c_str()), x, yy, m_map_rgb(255, 255, 0));
 			else
-				mTextout_simple(buf, x, yy, grey);
+				mTextout_simple(_t(items[r].c_str()), x, yy, grey);
 		}
 		else
-			mTextout_simple(buf, x, yy, grey);
+			mTextout_simple(_t(items[r].c_str()), x, yy, grey);
 		yy += 15;
 	}
 
 	al_hold_bitmap_drawing(held);
+	
+	al_set_clipping_rectangle(cx, cy, cw, ch);
 	
 	if (dragging) {
 		ALLEGRO_MOUSE_STATE state;
@@ -8458,7 +8453,7 @@ void WgtTileSelector::draw()
 		x1 = sx;
 		for (; x1 < x2; x1++) {
 			int i = y1 * (512 / TILE_SIZE) + x1;
-			blitTile(i, tilemap, tile);
+			tile = area->tileAnimations[area->newmap[area->tileAnimationNums[i]]]->getCurrentFrame()->getImage()->getBitmap();
 			int xx = ((x1 - sx) * (TILE_SIZE*scale)) + x;
 			int yy = ((y1 - sy) * (TILE_SIZE*scale)) + y;
 			m_draw_scaled_bitmap(tile, 0, 0, TILE_SIZE, TILE_SIZE,

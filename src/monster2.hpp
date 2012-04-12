@@ -109,6 +109,10 @@ ALLEGRO_DEBUG_CHANNEL("morpg2")
 #include <bass.h>
 #endif
 
+#ifdef ALLEGRO_IPHONE
+#include "60beat.h"
+#endif
+
 
 const int LETTER_INDEX = 3;
 
@@ -147,7 +151,6 @@ const int LOGIC_MILLIS = (1000/LOGIC_RATE);
 #include "../tgui/tgui.hpp"
 #endif
 
-// Lua must be built as C++ code (at least on iPhone!)
 extern "C" {
 #include <lua-fixed/lua.h>
 #include <lua-fixed/lauxlib.h>

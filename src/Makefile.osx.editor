@@ -63,7 +63,7 @@ OBJCXX_LIBOBJS=$(OBJCXX_SRCS:.mm=.o)
 OBJC_LIBOBJS=$(OBJC_SRCS:.m=.o)
 
 
-ALLEGROLIBS=-lallegro_shader -lallegro_dialog -lallegro_primitives -lallegro_font -lallegro_ttf -lallegro_image -lallegro -lallegro_main
+ALLEGROLIBS=-lallegro_shader -lallegro_dialog -lallegro_primitives -lallegro_font -lallegro_ttf -lallegro_image -lallegro -lallegro_main -lallegro_memfile
 LIBS=-llua-fixed -ltgui $(ALLEGROLIBS) -lz -framework OpenGL -framework Foundation -lbass -lJoypadCocoa -framework ApplicationServices
 
 
