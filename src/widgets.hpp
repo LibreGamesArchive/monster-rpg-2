@@ -2,10 +2,11 @@
 #define WIDGETS_HPP
 
 
-const int WGT_TEXT_NORMAL = 0; // no shadow
-const int WGT_TEXT_DROP_SHADOW = 1; // shadow down and to the right
-const int WGT_TEXT_BORDER = 2; // border all around text
-const int WGT_TEXT_SQUARE_BORDER = 3; // like BORDER but on corners too
+/* These names have become confused. NORMAL is no shadow. DROP_SHADOW is +1+1. BORDER is 8 directions around. SQUARE_BORDER is a square drop shadow, 3 positions bottom right */
+const int WGT_TEXT_NORMAL = 0;
+const int WGT_TEXT_DROP_SHADOW = 1;
+const int WGT_TEXT_BORDER = 2;
+const int WGT_TEXT_SQUARE_BORDER = 3;
 
 const int CONTEXT_MENU_W = 200;
 const int CONTEXT_MENU_H = 172;

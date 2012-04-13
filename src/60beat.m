@@ -17,6 +17,11 @@ void joy_r_up(void);
 void joy_u_up(void);
 void joy_d_up(void);
 
+void connect_external_controls(void);
+void disconnect_external_controls(void);
+
+static bool started = false;
+
 static bool sb_l, sb_r, sb_u, sb_d, sb_1, sb_2, sb_3, sb_4, sb_l1, sb_r1, sb_on;
 
 @interface SB_delegate : UIViewController<SBJoystickDelegate> {
@@ -29,6 +34,8 @@ static bool sb_l, sb_r, sb_u, sb_d, sb_1, sb_2, sb_3, sb_4, sb_l1, sb_r1, sb_on;
 @implementation SB_delegate
 -(void) joystickStatusChanged:(SBJoystick *)joystick
 {
+	[[UIApplication sharedApplication] setIdleTimerDisabled:joystick.joystickConnected];
+
 	sb_on = joystick.joystickConnected;
 	if (sb_on) {
 		connect_external_controls();
@@ -76,6 +83,8 @@ static SB_delegate *sb_delegate;
 
 void sb_start(void)
 {
+	if (started) return;
+	started = true;
 	[SBJoystick sharedInstance].enabled = YES;
 	sb_delegate = [[SB_delegate alloc] init];
 	[SBJoystick sharedInstance].delegate = sb_delegate;
@@ -83,6 +92,8 @@ void sb_start(void)
 
 void sb_stop(void)
 {
+	if (started == false) return;
+	started = false;
 	sb_on = false;
 	[SBJoystick sharedInstance].enabled = NO;
 	[SBJoystick sharedInstance].delegate = nil;

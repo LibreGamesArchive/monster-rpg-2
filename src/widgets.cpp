@@ -153,16 +153,6 @@ static void mTextout_real(MFONT *font, const char *text, int x, int y,
 			break;
 		case WGT_TEXT_BORDER:
 			to(font, ctext, x-inc, y, shadow_color);
-			to(font, ctext, x, y-inc, shadow_color);
-			to(font, ctext, x+inc, y, shadow_color);
-			to(font, ctext, x, y+inc, shadow_color);
-			break;
-		case WGT_TEXT_SQUARE_BORDER:
-			to(font, ctext, x+inc, y, shadow_color);
-			to(font, ctext, x, y+inc, shadow_color);
-			to(font, ctext, x+inc, y+inc, shadow_color);
-			/*
-			to(font, ctext, x-inc, y, shadow_color);
 			to(font, ctext, x-inc, y-inc, shadow_color);
 			to(font, ctext, x, y-inc, shadow_color);
 			to(font, ctext, x+inc, y-inc, shadow_color);
@@ -170,7 +160,11 @@ static void mTextout_real(MFONT *font, const char *text, int x, int y,
 			to(font, ctext, x+inc, y+inc, shadow_color);
 			to(font, ctext, x, y+inc, shadow_color);
 			to(font, ctext, x-inc, y+inc, shadow_color);
-			*/
+			break;
+		case WGT_TEXT_SQUARE_BORDER:
+			to(font, ctext, x+inc, y, shadow_color);
+			to(font, ctext, x, y+inc, shadow_color);
+			to(font, ctext, x+inc, y+inc, shadow_color);
 			break;
 	}
 	
@@ -1051,7 +1045,7 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 				WGT_TEXT_DROP_SHADOW, true);
 			mTextout(game_font, _t(bottom_msg.c_str()), BW/2, BH-10,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, true);
+				WGT_TEXT_BORDER, true);
 			// Draw "cursor"
 			int tick = (unsigned)tguiCurrentTimeMillis() % 1000;
 			if (tick < 800) {

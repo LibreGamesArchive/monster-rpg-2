@@ -247,39 +247,39 @@ void dumpLuaStack(lua_State *l)
         int i;
         int top = lua_gettop(l);
 
-        ALLEGRO_DEBUG ("--- stack ---\n");
-        ALLEGRO_DEBUG ("top=%u   ...   ", top);
+        printf ("--- stack ---\n");
+        printf ("top=%u   ...   ", top);
 
         for (i = 1; i <= top; i++) {  /* repeat for each level */
                 int t = lua_type(l, i);
                 switch (t) {
 
                 case LUA_TSTRING:  /* strings */
-                        ALLEGRO_DEBUG("`%s'", lua_tostring(l, i));
+                        printf("`%s'", lua_tostring(l, i));
                         break;
 
                 case LUA_TBOOLEAN:  /* booleans */
-                        ALLEGRO_DEBUG(lua_toboolean(l, i) ? "true" : "false");
+                        printf(lua_toboolean(l, i) ? "true" : "false");
                         break;
 
                 case LUA_TNUMBER:  /* numbers */
-                        ALLEGRO_DEBUG("%d", lua_tonumber(l, i));
+                        printf("%d", lua_tonumber(l, i));
                         break;
 
                 case LUA_TTABLE:   /* table */
-                        ALLEGRO_DEBUG("table");
+                        printf("table");
                         break;
 
                 default:  /* other values */
-                        ALLEGRO_DEBUG("%s", lua_typename(l, t));
+                        printf("%s", lua_typename(l, t));
                         break;
 
                 }
-                ALLEGRO_DEBUG("  ");  /* put a separator */
+                printf("  ");  /* put a separator */
         }
-        ALLEGRO_DEBUG("\n");  /* end the listing */
+        printf("\n");  /* end the listing */
 
-        ALLEGRO_DEBUG ("-------------\n");
+        printf ("-------------\n");
 }
 
 std::string getScriptExtension()

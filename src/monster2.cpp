@@ -166,7 +166,11 @@ static void *wait_for_drawing_resume(void *arg)
 	while (1) {
 		ALLEGRO_EVENT event;
 		al_wait_for_event(queue, &event);
+#ifdef ALLEGRO_IPHONE_XXX
+		if (event.type == ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING || event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN) {
+#else
 		if (event.type == ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING) {
+#endif
 			break;
 		}
 	}
@@ -224,8 +228,38 @@ bool is_close_pressed(void)
 			_reload_loaded_bitmaps();
 		}
 #endif
+#ifdef ALLEGRO_IPHONE
+		if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT)
+		{
+		//printf("switch out\n");
+			//sb_stop();
+			do_pause_game = should_pause_game();
+			if (do_pause_game || in_pause) {
+				backup_music_volume = 0.5;
+				backup_ambience_volume = 0.5;
+			}
+			else {
+				backup_music_volume = getMusicVolume();
+				backup_ambience_volume = getAmbienceVolume();
+			}
+			setMusicVolume(0.0);
+			setAmbienceVolume(0.0);
+		}
+		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN)
+		{
+	//printf("switch in\n");
+			//sb_start();
+			setMusicVolume(backup_music_volume);
+			setAmbienceVolume(backup_ambience_volume);
+		}
+#endif
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#ifdef ALLEGRO_IPHONE_XXX
+		if (event.type == ALLEGRO_EVENT_DISPLAY_HALT_DRAWING || event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT) {
+#else
 		if (event.type == ALLEGRO_EVENT_DISPLAY_HALT_DRAWING) {
+#endif
+	printf("halt\n");
 			save_memory(false);
 #if defined ALLEGRO_IPHONE
 			if (!isMultitaskingSupported()) {
@@ -233,7 +267,7 @@ bool is_close_pressed(void)
 					iPodStop();
 				exit(0);
 			}
-			sb_stop();
+			//sb_stop();
 #elif defined ALLEGRO_ANDROID
 			std::string old_music_name = musicName;
 			std::string old_ambience_name = ambienceName;
@@ -259,7 +293,8 @@ bool is_close_pressed(void)
 #if defined ALLEGRO_ANDROID
       			glDisable(GL_DITHER);
 #elif defined ALLEGRO_IPHONE
-			sb_start();
+//printf("resume\n");
+			//sb_start();
 #endif
 			al_start_timer(logic_timer);
 			al_start_timer(draw_timer);
@@ -267,27 +302,6 @@ bool is_close_pressed(void)
 			playMusic(old_music_name, old_music_volume, true);
 			playAmbience(old_ambience_name, old_ambience_volume);
 #endif
-		}
-#endif
-#if defined ALLEGRO_IPHONE
-		if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT)
-		{
-			do_pause_game = should_pause_game();
-			if (do_pause_game || in_pause) {
-				backup_music_volume = 0.5;
-				backup_ambience_volume = 0.5;
-			}
-			else {
-				backup_music_volume = getMusicVolume();
-				backup_ambience_volume = getAmbienceVolume();
-			}
-			setMusicVolume(0.0);
-			setAmbienceVolume(0.0);
-		}
-		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN)
-		{
-			setMusicVolume(backup_music_volume);
-			setAmbienceVolume(backup_ambience_volume);
 		}
 #endif
 	}
