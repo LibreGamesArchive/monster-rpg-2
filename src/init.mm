@@ -977,7 +977,7 @@ static void *thread_proc(void *arg)
 			Input *i = getInput();
 #if defined ALLEGRO_IPHONE
 			bool jp_conn = joypad_connected() || is_sb_connected();
-#elif defined defined ALLEGRO_MACOSX
+#elif defined ALLEGRO_MACOSX
 			bool jp_conn = joypad_connected();
 #else
 			bool jp_conn = false;
@@ -1780,7 +1780,9 @@ void init_shaders(void)
 		"}";
 		
 		const char *scale2x_pixel_source =
+#ifdef ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		"precision mediump float;\n"
+#endif
 		"uniform sampler2D tex;\n"
 		"varying vec2 varying_texcoord;\n"
 		"uniform " LOWP " float offset_x;\n"

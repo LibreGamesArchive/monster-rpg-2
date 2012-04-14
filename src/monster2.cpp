@@ -6,11 +6,6 @@ void openURL(const char *url);
 }
 #endif
 
-int pvr = false;
-int pvr_true_w = -1;
-int pvr_true_h = -1;
-
-
 TGUIWidget *mainWidget = NULL;
 uint32_t runtime;
 int runtime_ms = 0;

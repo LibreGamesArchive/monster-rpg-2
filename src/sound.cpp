@@ -153,6 +153,8 @@ static std::string preloaded_names[] = {
 
 #ifdef ALLEGRO_IPHONE
 extern HPLUGIN BASSFLACplugin;
+#else
+static HPLUGIN BASSFLACplugin;
 #endif
 
 void initSound(void)

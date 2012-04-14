@@ -310,9 +310,6 @@ enum CloneType
 #ifdef EDITOR
 #include "editor.hpp"
 #endif
-extern int pvr; // use a pvrtc texture
-extern int pvr_true_w;
-extern int pvr_true_h;
 extern uint32_t runtime;
 extern int runtime_ms;
 extern bool break_main_loop;
