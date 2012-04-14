@@ -1,0 +1,24 @@
+<bob>
+	<x>0</x>
+	<y>0</y>
+	<width>112</width>
+	<height>48</height>
+	<frames>2</frames>
+	<delays>
+		<0>700</0>
+		<1>700</1>
+	</delays>
+</bob>
+
+<with_gunnar>
+	<x>0</x>
+	<y>80</y>
+	<width>112</width>
+	<height>48</height>
+	<frames>2</frames>
+	<delays>
+		<0>700</0>
+		<1>700</1>
+	</delays>
+</with_gunnar>
+

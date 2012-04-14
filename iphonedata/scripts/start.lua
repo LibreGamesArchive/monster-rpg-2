@@ -1,0 +1,10 @@
+startArea("forest")
+setObjectPosition(0, 29, 23)
+setObjectDirection(0, DIRECTION_SOUTH)
+setObjectAnimationSetPrefix(0, "mushroom_")
+setObjectSubAnimation(0, "stand_s")
+clearBuffer()
+updateArea()
+drawArea()
+transitionIn()
+

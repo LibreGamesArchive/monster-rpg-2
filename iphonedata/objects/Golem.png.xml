@@ -1,0 +1,20 @@
+<stand>
+	<x>0</x>
+	<y>0</y>
+	<width>16</width>
+	<height>32</height>
+	<frames>1</frames>
+</stand>
+
+<punch>
+	<x>16</x>
+	<y>0</y>
+	<width>16</width>
+	<height>32</height>
+	<frames>2</frames>
+	<delays>
+		<0>500</0>
+		<1>500</1>
+	</delays>
+</punch>
+
