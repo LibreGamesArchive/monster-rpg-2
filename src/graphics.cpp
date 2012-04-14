@@ -900,67 +900,29 @@ void fadeOut(MCOLOR color)
  * 	in/out (e.g., focus of 2 would draw a two pixel square
  *	of the same color for every other pixel).
  */
-static bool transition(int initialRectSize, int endRectSize,
-	int initialFocus, int endFocus, int length, bool can_cancel = false,
-	bool toggle_dpad = true)
+static bool transition(bool focusing, int length, bool can_cancel = false, bool toggle_dpad = true)
 {
 	dpad_off();
 	global_draw_red = false;
 	global_draw_controls = false;
 
-	ALLEGRO_LOCKED_REGION *buf_region, *copy_region;
-	int lastFocus = -1;
-
-	MBITMAP *bufcopy;
-	//al_set_new_bitmap_flags(ALLEGRO_NO_PRESERVE_TEXTURE|ALLEGRO_CONVERT_BITMAP);
-	bufcopy = m_create_alpha_bitmap(BW, BH); // check
-	int oldflags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
+	MBITMAP *tmp = m_create_bitmap(BW, BH);
 	MBITMAP *bufdup = m_clone_bitmap(buffer);
-	al_set_new_bitmap_flags(oldflags);
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-#define PIXTYPE uint16_t
-#define PIXSIZE 2
-	if (!(buf_region = m_lock_bitmap(bufdup, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY))) {
-		m_destroy_bitmap(bufcopy);
-		clear_input_events();
-		return false;
-	}
-#else
-#define PIXTYPE uint32_t
-#define PIXSIZE 4
-#ifdef ALLEGRO_WINDOWS
-	if (!(buf_region = m_lock_bitmap(bufdup, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_READONLY))) {
-		m_destroy_bitmap(bufcopy);
-		clear_input_events();
-		return false;
-	}
-#else
-	if (!(buf_region = m_lock_bitmap(bufdup, ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE, ALLEGRO_LOCK_READONLY))) {
-		m_destroy_bitmap(bufcopy);
-		clear_input_events();
-		return false;
-	}
-#endif
-#endif
-		
 	unsigned long start = (unsigned long)(al_get_time()*1000);
 	unsigned long now = start;
-
+	
 	while ((now - start) < (unsigned long)length) {
 		INPUT_EVENT ie = get_next_input_event();
 		if (ie.button1 == DOWN || ie.button2 == DOWN || !released) {
 			use_input_event();
 			if (can_cancel) {
 				dpad_on();
-				m_unlock_bitmap(bufdup);
+				m_destroy_bitmap(tmp);
 				m_destroy_bitmap(bufdup);
-				m_destroy_bitmap(bufcopy);
 				m_set_target_bitmap(buffer);
 				global_draw_red = true;
 				global_draw_controls = true;
-				//clear_input_events();
 				return true;
 			}
 		}
@@ -968,68 +930,40 @@ static bool transition(int initialRectSize, int endRectSize,
 		int elapsed = now - start;
 		float p = (float)elapsed / length;
 		if (p > 1) p = 1;
-		int size = (int)(initialFocus - (p * (initialFocus - endFocus)));
-		/* draw focused area */
-		if (size != lastFocus) {
-			lastFocus = size;
-#if defined ALLEGRO_WINDOWS
-			copy_region = m_lock_bitmap(bufcopy, ALLEGRO_PIXEL_FORMAT_ARGB_8888, 0);
-#elif defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-			copy_region = m_lock_bitmap(bufcopy, ALLEGRO_PIXEL_FORMAT_ANY, 0);
-#else
-			copy_region = m_lock_bitmap(bufcopy, ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE, 0);
-#endif
-			for (int y = 0; y < BH; y += size) {
-				for (int x = 0; x < BW; x += size) {
-					char *getptr = (char *)buf_region->data +
-						(y*buf_region->pitch) +
-						(x*PIXSIZE);
-					PIXTYPE pixel = *((PIXTYPE *)getptr);
-					int dest_x = x + size;
-					int dest_y = y + size;
-					if (dest_x >= BW) dest_x = BW-1;
-					if (dest_y >= BH) dest_y = BH-1;
-					for (int yy = y; yy < dest_y && yy < BH; yy++) {
-						for (int xx = x; xx < dest_x && xx < BW; xx++) {
-							char *putptr = (char *)copy_region->data+
-								(yy*copy_region->pitch)+
-								(xx*PIXSIZE);
-							*((PIXTYPE *)putptr) =
-								pixel;
-						}
-					}
-				}
-			}
-			m_unlock_bitmap(bufcopy);
-		}
-		m_set_target_bitmap(bufcopy);
-		
-		/* draw black border */
-		int rectSize = (int)(initialRectSize - (p * (initialRectSize - endRectSize)));
-		int rw = (int)((float)BW * rectSize / 60.0f);
-		int rh = (int)((float)BH * rectSize / 60.0f);
-		int x1 = (BW - rw) / 2;
-		int y1 = (BH - rh) / 2;
-		int x2 = x1 + rw;
-		int y2 = y1 + rh;
+		if (focusing)
+			p = 1.0 - p;
+		int size = p * 32;
+		if (size < 1) size = 1;
+		p = 1.0 - p;
+		int rectw = p * BW;
+		int recth = p * BH;
+		if (rectw < 1) rectw = 1;
+		if (recth < 1) recth = 1;
 
-		// top
-		m_draw_rectangle(0, 0, BW, y1, black, M_FILLED);
-		// bottom
-		m_draw_rectangle(0, y2, BW, BH, black, M_FILLED);
-		// left
-		m_draw_rectangle(0, y1, x1, y2, black, M_FILLED);
-		// right
-		m_draw_rectangle(x2, y1, BW, y2, black, M_FILLED);
+		m_set_target_bitmap(tmp);
+		al_draw_scaled_bitmap(bufdup->bitmap, 0, 0, BW, BH, 0, 0, BW/size, BH/size, 0);
 
-		drawBufferToScreen(bufcopy, true);
+		m_set_target_bitmap(buffer);
+		al_clear_to_color(black);
+
+		int cx, cy, cw, ch;
+		al_get_clipping_rectangle(&cx, &cy, &cw, &ch);
+		al_set_clipping_rectangle(
+			(BW-rectw)/2,
+			(BH-recth)/2,
+			rectw, recth
+		);
+
+		al_draw_scaled_bitmap(tmp->bitmap, 0, 0, BW/size, BH/size, 0, 0, BW, BH, 0);
+
+		al_set_clipping_rectangle(cx, cy, cw, ch);
+
+		drawBufferToScreen(buffer, true);
 		m_flip_display();
 	}
 
-	m_unlock_bitmap(bufdup);
+	m_destroy_bitmap(tmp);
 	m_destroy_bitmap(bufdup);
-
-	m_destroy_bitmap(bufcopy);
 
 	m_set_target_bitmap(buffer); // be safe
 
@@ -1049,14 +983,14 @@ bool transitionIn(bool can_cancel, bool toggle_dpad)
 {
 	real_auto_save_screenshot();
 	save_memory(true);
-	bool ret = transition(0, 60, 24, 2, 600, can_cancel, toggle_dpad);
+	bool ret = transition(true, 600, can_cancel, toggle_dpad);
 	return ret;
 }
 
 
 void transitionOut(bool toggle_dpad)
 {
-	transition(60, 0, 2, 24, 600, false, toggle_dpad);
+	transition(false, 600, false, toggle_dpad);
 }
 
 

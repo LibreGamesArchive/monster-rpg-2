@@ -133,7 +133,6 @@ void connect_second_display(void)
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
 	for (int i = 0; i < 8; i++) {
 		blueblocks[i] = m_load_bitmap(getResource("media/blueblocks%d.png", i+1));
-		printf("loaded blueblocks %d\n", i);
 	}
 	al_set_new_bitmap_format(format);
 	game_font_second_display = al_load_ttf_font(getResource("DejaVuSans.ttf"), 10, 0);
@@ -226,8 +225,6 @@ bool is_close_pressed(void)
 #ifdef ALLEGRO_IPHONE
 		if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT)
 		{
-		//printf("switch out\n");
-			//sb_stop();
 			do_pause_game = should_pause_game();
 			if (do_pause_game || in_pause) {
 				backup_music_volume = 0.5;
@@ -242,8 +239,6 @@ bool is_close_pressed(void)
 		}
 		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN)
 		{
-	//printf("switch in\n");
-			//sb_start();
 			setMusicVolume(backup_music_volume);
 			setAmbienceVolume(backup_ambience_volume);
 		}
@@ -254,7 +249,6 @@ bool is_close_pressed(void)
 #else
 		if (event.type == ALLEGRO_EVENT_DISPLAY_HALT_DRAWING) {
 #endif
-	printf("halt\n");
 			save_memory(false);
 #if defined ALLEGRO_IPHONE
 			if (!isMultitaskingSupported()) {
@@ -288,8 +282,6 @@ bool is_close_pressed(void)
 #if defined ALLEGRO_ANDROID
       			glDisable(GL_DITHER);
 #elif defined ALLEGRO_IPHONE
-//printf("resume\n");
-			//sb_start();
 #endif
 			al_start_timer(logic_timer);
 			al_start_timer(draw_timer);
@@ -1093,10 +1085,7 @@ int main(int argc, char *argv[])
 		argv[3] = xS;
 		argv[4] = yS;
 		argv[5] = NULL;
-		//printf("doing something\n");
 		for (int i = 0; i < (int)d.milestones.size(); i++) {
-		//	printf("i=%d %d %d\n", i, d.milestones[i].first,
-		//		d.milestones[i].second);
 			forced_milestones.push_back(d.milestones[i]);
 		}
 	}

@@ -231,8 +231,6 @@ ALLEGRO_MUTEX *click_mutex;
 ALLEGRO_MUTEX *input_mutex;
 ALLEGRO_MUTEX *dpad_mutex;
 ALLEGRO_MUTEX *touch_mutex;
-//ALLEGRO_MUTEX *orient_mutex;
-int exit_minor_event_thread = 0;
 float area_panned_x = 0;
 float area_panned_y = 0;
 static AnimationSet *eny_loader;
@@ -245,7 +243,6 @@ ALLEGRO_VERTEX triangle_lines[32];
 MBITMAP *dpad_buttons;
 bool onscreen_swipe_to_attack;
 bool onscreen_drag_to_use;
-//bool mouse_off = false;
 bool reinstall_timer;
 ALLEGRO_TIMER *draw_timer;
 ALLEGRO_TIMER *logic_timer;
@@ -1780,7 +1777,7 @@ void init_shaders(void)
 		"}";
 		
 		const char *scale2x_pixel_source =
-#ifdef ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		"precision mediump float;\n"
 #endif
 		"uniform sampler2D tex;\n"
@@ -2835,10 +2832,6 @@ void destroy(void)
 
 	exit_event_thread = 1;
 	while (exit_event_thread != 2) {
-		m_rest(0.001);
-	}
-	exit_minor_event_thread = 1;
-	while (exit_minor_event_thread != 2) {
 		m_rest(0.001);
 	}
 	al_destroy_cond(wait_cond);

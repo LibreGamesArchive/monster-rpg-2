@@ -64,11 +64,6 @@ CXX_SRCS=\
 	widgets.cpp\
 	xml.cpp
 
-C_SRCS=atlas.c atlas_accessor.c
-
-OBJCXX_SRCS=\
-     init.mm
-
 CXX_LIBOBJS=$(CXX_SRCS:.cpp=.o)
 
 #ALLEGROLIBS=`pkg-config --libs allegro_ttf-static-5.1 allegro_dialog-static-5.1 allegro_primitives-static-5.1 allegro_font-static-5.1 allegro_image-static-5.1` -lallegro_shader-static -lallegro_memfile
