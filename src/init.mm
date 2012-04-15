@@ -40,7 +40,7 @@ void get_buffer_true_size(int *buffer_true_w, int *buffer_true_h)
 }
 
 #ifdef A5_D3D
-LPDIRECT3DSURFACE9 big_depth_surface = NULL;
+//LPDIRECT3DSURFACE9 big_depth_surface = NULL;
 ALLEGRO_MUTEX *d3d_resource_mutex;
 bool d3d_device_lost = false;
 
@@ -68,6 +68,7 @@ static void shaders_found(void)
 #endif
 }
 
+/*
 static void init_big_depth_surface(void)
 {
 	LPDIRECT3DDEVICE9 dev = al_get_d3d_device(display);
@@ -79,24 +80,38 @@ static void init_big_depth_surface(void)
 		&big_depth_surface,
 		NULL
 	);
-	dev->SetDepthStencilSurface(big_depth_surface);
+	//dev->SetDepthStencilSurface(big_depth_surface);
 }
+*/
 
-static void d3d_resource_restore(void)
-{
-	init_big_depth_surface();
-	shaders_found();
-	shooter_restoring = true;
-	d3d_device_lost = false;
-}
+bool main_halted = false;
+bool d3d_halted = false;
+bool should_suspend = false;
 
 static void d3d_resource_release(void)
 {
 	al_lock_mutex(d3d_resource_mutex);
 	d3d_device_lost = true;
-	big_depth_surface->Release();
-	shaders_lost();
+	//big_depth_surface->Release();
+	//shaders_lost();
 	al_unlock_mutex(d3d_resource_mutex);
+	d3d_halted = true;
+	should_suspend = true;
+	while (!main_halted) {
+		al_rest(0.01);
+	}
+}
+
+static void d3d_resource_restore(void)
+{
+	//init_big_depth_surface();
+	//shaders_found();
+	shooter_restoring = true;
+	d3d_device_lost = false;
+	d3d_halted = false;
+	while (main_halted) {
+		al_rest(0.01);
+	}
 }
 #endif
 
@@ -283,7 +298,6 @@ static void create_shadows(MBITMAP *bmp, RecreateData *data)
 	shadow_sides[3] = m_create_sub_bitmap(bmp, 16*3, 0, SHADOW_CORNER_SIZE, 16);
 	
 	for (int i = 0; i < 4; i++) {
-		//shadow_corners[i] = m_create_alpha_bitmap(SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE); // check
 		shadow_corners[i] = m_create_sub_bitmap(bmp, i*SHADOW_CORNER_SIZE, 16, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE);
 		m_set_target_bitmap(shadow_corners[i]);
 		m_clear(m_map_rgba(0, 0, 0, 0));
@@ -299,7 +313,7 @@ static void create_shadows(MBITMAP *bmp, RecreateData *data)
 			int dy = yy;
  			float dist = (float)sqrt((float)dx*dx + dy*dy) + 1;
 			if (dist > SHADOW_CORNER_SIZE) dist = SHADOW_CORNER_SIZE;
-			float a = (1.0f-(dist/SHADOW_CORNER_SIZE))*255; //(1.0-sin(((float)dist/(SHADOW_CORNER_SIZE-1))*(M_PI/2))) * 255;
+			float a = (1.0f-(dist/SHADOW_CORNER_SIZE))*255;
 			m_put_pixel(xx, yy, m_map_rgba(0, 0, 0, a));
 		}
 	}
@@ -2323,6 +2337,15 @@ bool init(int *argc, char **argv[])
 
 	al_init();
 
+#if !defined ALLEGRO_IPHONE
+	al_set_org_name("Nooskewl");
+#ifdef LITE
+	al_set_app_name("Monster RPG 2 Lite");
+#else
+	al_set_app_name("Monster RPG 2");
+#endif
+#endif
+
 	// must be before al_set_apk_file_interface
 	try {
 		config.read();
@@ -2340,15 +2363,6 @@ bool init(int *argc, char **argv[])
 #endif
 
 	input_event_mutex = al_create_mutex();
-
-#if !defined ALLEGRO_IPHONE
-	al_set_org_name("Nooskewl");
-#ifdef LITE
-	al_set_app_name("Monster RPG 2 Lite");
-#else
-	al_set_app_name("Monster RPG 2");
-#endif
-#endif
 
 #ifdef ALLEGRO_IPHONE
 	config.setAutoRotation(config.getAutoRotation());
@@ -2609,7 +2623,7 @@ bool init(int *argc, char **argv[])
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 #ifdef A5_D3D
 	d3d_resource_mutex = al_create_mutex();
-	init_big_depth_surface();
+	//init_big_depth_surface();
 	al_d3d_set_restore_callback(d3d_resource_restore);
 	al_d3d_set_release_callback(d3d_resource_release);
 #endif
@@ -2938,7 +2952,7 @@ void destroy(void)
 	#endif
 
 	#ifdef A5_D3D
-	big_depth_surface->Release();
+//	big_depth_surface->Release();
 	al_destroy_mutex(d3d_resource_mutex);
 	#endif
 

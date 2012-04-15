@@ -349,57 +349,19 @@ void Configuration::setLanguage(int l)
 
 void Configuration::read()
 {
-	char userDir[1000];
-	sprintf(userDir, "%s", getUserResource(""));
-
-	ALLEGRO_PATH *path = al_create_path(userDir);
-
-	debug_message("reading config\n");
-
 	char buf[1000];
-	strcpy(buf, al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP));
-#ifdef ALLEGRO_WINDOWS
+	sprintf(buf, "%s", getUserResource(""));
+	
+	mkdir(buf, 0755);
+
 	while (buf[strlen(buf)-1] == '\\' || buf[strlen(buf)-1] == '/')
 		buf[strlen(buf)-1] = 0;
-#endif
-
-	if (userDir[0] && !al_filename_exists(buf)) {
-		mkdir(userDir, 0755);
-		if (!al_filename_exists(buf)) {
-			notify("The user resource directory could not", "be created", "");
-			debug_message("boo\n");
-			loaded = false;
-			al_destroy_path(path);
-			debug_message("boo\n");
-			return;
-		}
-	}
-	debug_message("reading config\n");
-
-#ifdef ALLEGRO_WINDOWS
-	int len = strlen(buf);
-	buf[len] = '\\';
-	buf[len+1] = 0;
-	al_destroy_path(path);
-	path = al_create_path(buf);
-#endif
-
-	al_set_path_filename(path, "config");
-
-	debug_message("reading config\n");
-	if (!al_filename_exists(al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP))) {
-		debug_message("No config file to load\n");
-		loaded = false;
-		al_destroy_path(path);
-		return;
-	}
-	debug_message("reading config\n");
-
-	al_destroy_path(path);
-
-	debug_message("loading config\n");
+	
+	mkdir(buf, 0755);
 
 	// load
+
+	printf("buf='%s'\n", buf);
 	
 	XMLData* xml = new XMLData(getUserResource("config"));
 

@@ -269,8 +269,9 @@ AnimationSet::AnimationSet()
 
 AnimationSet::~AnimationSet()
 {
-	for (uint i = 0; i < anims.size(); i++)
+	for (uint i = 0; i < anims.size(); i++) {
 		delete anims[i];
+	}
 	anims.clear();
 }
 

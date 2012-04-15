@@ -68,7 +68,6 @@ void unreferenceBattleAnim(std::string name, void *this_ptr)
 		if (battleAnims[i].name == name && battleAnims[i].this_ptr == this_ptr) {
 			delete battleAnims[i].anim;
 			battleAnims.erase(battleAnims.begin() + i);
-	ALLEGRO_DEBUG("unref deleted");
 			return;
 		}
 	}

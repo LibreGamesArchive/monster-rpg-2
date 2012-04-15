@@ -223,7 +223,7 @@ MBITMAP *m_create_alpha_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, Rec
 		create(m, data);
 	}
 
-#ifdef ALLEGRO_ANDROID
+#if defined ALLEGRO_ANDROID || defined A5_D3D
 	LoadedBitmap lb;
 	lb.load_type = LOAD_CREATE;
 	lb.flags = al_get_bitmap_flags(b);
@@ -459,7 +459,7 @@ MBITMAP *m_load_bitmap(const char *name, bool force_memory)
 
 	MBITMAP *m = new_mbitmap(bitmap);
 
-#ifdef ALLEGRO_ANDROID
+#if defined ALLEGRO_ANDROID || defined A5_D3D
 	LoadedBitmap lb;
 	lb.load_type = LOAD_LOAD;
 	lb.flags = al_get_bitmap_flags(bitmap);
@@ -499,7 +499,7 @@ MBITMAP *m_load_alpha_bitmap(const char *name, bool force_memory)
 
 	MBITMAP *m = new_mbitmap(bitmap);
 
-#ifdef ALLEGRO_ANDROID
+#if defined ALLEGRO_ANDROID || defined A5_D3D
 	LoadedBitmap lb;
 	lb.load_type = LOAD_LOAD;
 	lb.flags = al_get_bitmap_flags(bitmap);
@@ -574,7 +574,7 @@ MBITMAP *m_create_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateD
 		create(m, data);
 	}
 
-#ifdef ALLEGRO_ANDROID
+#if defined ALLEGRO_ANDROID || defined A5_D3D
 	LoadedBitmap lb;
 	lb.load_type = LOAD_CREATE;
 	lb.flags = al_get_bitmap_flags(bitmap);
@@ -694,8 +694,8 @@ static int m_text_length_real(const MFONT *font, const char *text)
 
 void m_set_target_bitmap(MBITMAP *bmp)
 {
-
 #ifdef A5_D3D
+	/*
 	LPDIRECT3DDEVICE9 dev = al_get_d3d_device(display);
 	LPDIRECT3DSURFACE9 curr_surf;
 	al_lock_mutex(d3d_resource_mutex);
@@ -707,6 +707,7 @@ void m_set_target_bitmap(MBITMAP *bmp)
 			curr_surf->Release();
 	}
 	al_unlock_mutex(d3d_resource_mutex);
+	*/
 #endif
 	al_set_target_bitmap(bmp->bitmap);
 }

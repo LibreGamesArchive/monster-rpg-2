@@ -78,5 +78,5 @@ atlas_accessor.o: atlas_accessor.c
 clean:
 	-rm *.o
 	-rm meditor2.exe
-	-rm monster2.exe monster2-d3d.exe
+	-rm monster2.exe
 

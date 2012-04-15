@@ -9,7 +9,7 @@ CFLAGS=-DA5_D3D -O2 -I. -I"c:/users/trent/code/include" -I"C:\a5_d3d\include" -I
 endif
 CXXFLAGS=$(CFLAGS) -fcheck-new
 
-LINKFLAGS=-L"c:/a5_d3d/lib" -L"c:/users/trent/code/lib" -static-libgcc -static-libstdc++ -mwindows
+LINKFLAGS=-L"c:/a5_d3d/lib" -L"c:/users/trent/code/lib" -static-libgcc -static-libstdc++ #-mwindows
 
 
 CXX_SRCS=\
@@ -78,5 +78,5 @@ atlas_accessor.o: atlas_accessor.c
 clean:
 	-rm *.o
 	-rm meditor2.exe
-	-rm monster2.exe monster2-d3d.exe
+	-rm monster2-d3d.exe
 

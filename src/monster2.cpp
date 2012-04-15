@@ -152,6 +152,25 @@ void connect_second_display(void)
 #endif
 }
 
+#ifdef A5_D3D_XXX
+static void *wait_for_display_found(void *arg)
+{
+	ALLEGRO_EVENT_QUEUE *queue = (ALLEGRO_EVENT_QUEUE *)arg;
+
+	while (1) {
+		ALLEGRO_EVENT event;
+		al_wait_for_event(queue, &event);
+		if (event.type == ALLEGRO_EVENT_DISPLAY_FOUND) {
+			break;
+		}
+	}
+
+	al_broadcast_cond(switch_cond);
+
+	return NULL;
+}
+#endif
+
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 static void *wait_for_drawing_resume(void *arg)
 {
@@ -160,11 +179,7 @@ static void *wait_for_drawing_resume(void *arg)
 	while (1) {
 		ALLEGRO_EVENT event;
 		al_wait_for_event(queue, &event);
-#ifdef ALLEGRO_IPHONE_XXX
-		if (event.type == ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING || event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN) {
-#else
 		if (event.type == ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING) {
-#endif
 			break;
 		}
 	}
@@ -214,12 +229,29 @@ bool is_close_pressed(void)
 			do_acknowledge_resize = true;
 		}
 #endif
-#ifdef ALLEGRO_ANDROID
+#if defined ALLEGRO_ANDROID
 		if (event.type == ALLEGRO_EVENT_DISPLAY_LOST) {
 			_destroy_loaded_bitmaps();
 		}
 		else if (event.type == ALLEGRO_EVENT_DISPLAY_FOUND) {
 			_reload_loaded_bitmaps();
+		}
+#endif
+#ifdef A5_D3D_XXX
+		if (event.type == ALLEGRO_EVENT_DISPLAY_LOST) {
+			_destroy_loaded_bitmaps();
+			al_stop_timer(logic_timer);
+			al_stop_timer(draw_timer);
+			al_run_detached_thread(
+				wait_for_display_found,
+				events_minor
+			);
+			al_lock_mutex(switch_mutex);
+			al_wait_cond(switch_cond, switch_mutex);
+			al_unlock_mutex(switch_mutex);
+			_reload_loaded_bitmaps();
+			al_start_timer(logic_timer);
+			al_start_timer(draw_timer);
 		}
 #endif
 #ifdef ALLEGRO_IPHONE
@@ -365,6 +397,23 @@ bool is_close_pressed(void)
 			
 			airplay_connected = false;
 		}
+	}
+#endif
+
+#ifdef A5_D3D
+	if (should_suspend) {
+		_destroy_loaded_bitmaps();
+		al_stop_timer(logic_timer);
+		al_stop_timer(draw_timer);
+		main_halted = true;
+		while (d3d_halted) {
+			m_rest(0.01);
+		}
+		_reload_loaded_bitmaps();
+		al_start_timer(logic_timer);
+		al_start_timer(draw_timer);
+		main_halted = false;
+		should_suspend = false;
 	}
 #endif
 	
@@ -975,6 +1024,9 @@ int main(int argc, char *argv[])
 	if ((n = check_arg(argc, argv, "-adapter")) != -1) {
 		config.setAdapter(atoi(argv[n+1]));
 	}
+	if (check_arg(argc, argv, "-show-fps") != -1) {
+		fps_on = true;
+	}
 #else
 	int argc = 0;
 	char **argv = NULL;
@@ -1327,7 +1379,7 @@ int main(int argc, char *argv[])
 		run();
 
 		save_memory(true);
-	
+
 		/* tguiDeleteWidget(manChooser)? */
 		if (manChooser) {
 			delete manChooser;

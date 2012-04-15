@@ -224,6 +224,10 @@ extern bool sound_was_playing_at_program_start;
 extern double allegro_iphone_shaken;
 #endif
 
+extern bool main_halted;
+extern bool d3d_halted;
+extern bool should_suspend;
+
 bool imperfect_aspect(void);
 void create_buffers(void);
 

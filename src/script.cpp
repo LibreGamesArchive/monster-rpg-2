@@ -1224,7 +1224,7 @@ int CBattleLost(lua_State *stack)
 int CStartBattle(lua_State *stack)
 {
 #ifdef DEBUG
-	return 0;
+	//return 0;
 #endif
 
 	// FIXME: make sure this works. It's a hack to avoid
