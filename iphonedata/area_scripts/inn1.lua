@@ -23,7 +23,7 @@ function done()
 	--print("done 3")
 	for i=1,count do
 		--print("i = ", i)
-		if (not (names[i] == "Eny")) then
+		if (not (players[i].name == "Eny")) then
 			removeObject(players[i].id)
 		end
 	end
@@ -105,6 +105,7 @@ function update(step)
 					else
 						players[count] = Object:new{x=13, y=5, anim_set=names[i], person=true}
 					end
+					players[count].name = names[i]
 
 					setObjectSolid(players[count].id, false)
 					if (count == 1) then
@@ -127,13 +128,13 @@ function update(step)
 						}
 					else
 						players[count].scripted_events = {
-							{ event_type=EVENT_WALK, dest_x=13+(i+(i-3)), dest_y=5 },
-							{ event_type=EVENT_WALK, dest_x=13+(i+(i-3)), dest_y=3 },
-							{ event_type=EVENT_WALK, dest_x=13+(i+(i-3))+1, dest_y=3 },
+							{ event_type=EVENT_WALK, dest_x=13+(count+(count-3)), dest_y=5 },
+							{ event_type=EVENT_WALK, dest_x=13+(count+(count-3)), dest_y=3 },
+							{ event_type=EVENT_WALK, dest_x=13+(count+(count-3))+1, dest_y=3 },
 							{ event_type=EVENT_LOOK, direction=DIRECTION_SOUTH },
 							{ event_type=EVENT_SYNC, who=players[1], number=8 },
-							{ event_type=EVENT_WALK, dest_x=13+(i+(i-3)), dest_y=3 },
-							{ event_type=EVENT_WALK, dest_x=13+(i+(i-3)), dest_y=5 },
+							{ event_type=EVENT_WALK, dest_x=13+(count+(count-3)), dest_y=3 },
+							{ event_type=EVENT_WALK, dest_x=13+(count+(count-3)), dest_y=5 },
 							{ event_type=EVENT_WALK, dest_x=13, dest_y=5 },
 							{ event_type=EVENT_SYNC, who=players[1], number=15 },
 						}

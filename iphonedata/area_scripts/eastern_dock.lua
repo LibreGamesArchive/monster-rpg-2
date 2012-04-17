@@ -270,10 +270,15 @@ function activate(activator, activated)
 	elseif (activated == mate.id) then
 		doDialogue("Mate: G'day! ...\n")
 	elseif (fleer and activated == fleer.id) then
-		setObjectDirection(fleer.id, player_dir(fleer))
-		smartDialogue{"Girl: There are monsters attacking people in the area near Flowey.\nGirl: The King will not believe that monsters have risen again!\nGirl: The people of Flowey cannot hold the city much longer!\n",
-			MS_GUNNAR_LEFT, "Girl: Sure Flowey is safer now... but how long will it last?\n"
-		}
+		if (getMilestone(MS_GUNNAR_LEFT)) then
+			local _d = getObjectDirection(fleer.id)
+			setObjectDirection(fleer.id, player_dir(fleer))
+			doDialogue("Girl: Sure Flowey is safer now... but how long will it last?\n", true)
+			setObjectDirection(fleer.id, _d)
+		else
+			setObjectDirection(fleer.id, player_dir(fleer))
+			doDialogue("Girl: There are monsters attacking people in the area near Flowey.\nGirl: The King will not believe that monsters have risen again!\nGirl: The people of Flowey cannot hold the city much longer!\n")
+		end
 	elseif (gunnar and activated == gunnar.id) then
 		local _d = getObjectDirection(gunnar.id)
 		setObjectDirection(gunnar.id, player_dir(gunnar))

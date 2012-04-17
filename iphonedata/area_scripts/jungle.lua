@@ -89,7 +89,10 @@ end
 function activate(activator, activated)
 	if (getMilestone(MS_FREED_PRISONER)) then
 		if (activated == prisoner.id) then
-			doDialogue("Thank you for freeing me from Ohleo Keep!\nThere is a village North East of here.\n")
+			local _d = getObjectDirection(prisoner.id)
+			setObjectDirection(prisoner.id, player_dir(prisoner))
+			doDialogue("Thank you for freeing me from Ohleo Keep!\nThere is a village North East of here.\n", true)
+			setObjectDirection(prisoner.id, _d)
 		end
 	end
 

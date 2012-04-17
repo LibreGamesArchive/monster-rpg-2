@@ -2475,16 +2475,24 @@ int CRemovePlayer(lua_State *stack)
 	const char *name = lua_tostring(stack, 1);
 
 	for (int i = 0; i < MAX_PARTY; i++) {
-		if (party[i]->getName() == std::string(name)) {
+		if (party[i] && party[i]->getName() == std::string(name)) {
 			delete party[i];
-			for (int j = i; j < MAX_PARTY-1; j++) {
-				party[j] = party[j+1];
-			}
+			party[i] = NULL;
 			break;
 		}
 	}
-
-	party[MAX_PARTY-1] = NULL;
+	
+	for (int j = 0; j < MAX_PARTY-1; j++) {
+		if (party[j] == NULL) {
+			for (int k = j+1; k < MAX_PARTY; k++) {
+				if (party[k] != NULL) {
+					party[j] = party[k];
+					party[k] = NULL;
+					break;
+				}
+			}
+		}
+	}
 
 	heroSpot = -1;
 
