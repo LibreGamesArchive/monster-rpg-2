@@ -69,12 +69,8 @@ void disable_zbuffer(void)
 #if defined A5_OGL
 	glDisable(GL_DEPTH_TEST);
 #else
-	al_lock_mutex(d3d_resource_mutex);
-	if (!d3d_device_lost) {
-		LPDIRECT3DDEVICE9 dev = al_get_d3d_device(display);
-		dev->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
-	}
-	al_unlock_mutex(d3d_resource_mutex);
+	LPDIRECT3DDEVICE9 dev = al_get_d3d_device(display);
+	dev->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
 #endif
 }
 
@@ -83,12 +79,8 @@ void enable_zbuffer(void)
 #if defined A5_OGL
 	glEnable(GL_DEPTH_TEST);
 #else
-	al_lock_mutex(d3d_resource_mutex);
-	if (!d3d_device_lost) {
-		LPDIRECT3DDEVICE9 dev = al_get_d3d_device(display);
-		dev->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
-	}
-	al_unlock_mutex(d3d_resource_mutex);
+	LPDIRECT3DDEVICE9 dev = al_get_d3d_device(display);
+	dev->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 #endif
 }
 
@@ -1195,12 +1187,8 @@ void enable_cull_face(bool ccw)
 	glCullFace(ccw ? GL_FRONT : GL_BACK);
 	glEnable(GL_CULL_FACE);
 #else
-	al_lock_mutex(d3d_resource_mutex);
-	if (!d3d_device_lost) {
-		LPDIRECT3DDEVICE9 device = al_get_d3d_device(display);
-		device->SetRenderState(D3DRS_CULLMODE, ccw ? D3DCULL_CCW : D3DCULL_CW);
-	}
-	al_unlock_mutex(d3d_resource_mutex);
+	LPDIRECT3DDEVICE9 device = al_get_d3d_device(display);
+	device->SetRenderState(D3DRS_CULLMODE, ccw ? D3DCULL_CCW : D3DCULL_CW);
 #endif
 }
 
@@ -1209,12 +1197,8 @@ void disable_cull_face(void)
 #ifdef A5_OGL
 	glDisable(GL_CULL_FACE);
 #else
-	al_lock_mutex(d3d_resource_mutex);
-	if (!d3d_device_lost) {
-		LPDIRECT3DDEVICE9 device = al_get_d3d_device(display);
-		device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-	}
-	al_unlock_mutex(d3d_resource_mutex);
+	LPDIRECT3DDEVICE9 device = al_get_d3d_device(display);
+	device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 #endif
 }
 
@@ -1304,7 +1288,6 @@ void volcano_scene(void)
 
 	float staff_oy = 0.0f;
 	float staff_dy1 = 0.0002f;
-	//float staff_dy2 = 0.005f;
 	float staff_oz = 0.0f;
 	float staff_dz = 0.001f;
 	float staff_a = 0;
@@ -1383,7 +1366,6 @@ void volcano_scene(void)
 				}
 			}
 			else if (stage == STAGE_SHOOTING) {
-				//staff_oy += staff_dy2 * step;
 				star_top_y += star_top_dy2 * LOGIC_MILLIS;
 				staff_oz += staff_dz * LOGIC_MILLIS;
 				if (star_top_y >= 0) {
@@ -1467,46 +1449,31 @@ void volcano_scene(void)
 			enable_cull_face(true);
 
 
-			if (true /*use_programmable_pipeline*/) {
+			if (true) {
 				al_identity_transform(&view_transform);
-
 				mesa_scale((float *)view_transform.m, 50, 50, 50);
-				mesa_translate((float *)view_transform.m, 0, 0.1+staff_oy, -0.3);
+
+				//mesa_translate((float *)view_transform.m, 1, 0.1+staff_oy, -0.3);
+				mesa_translate((float *)view_transform.m, 0.01, 0.1+staff_oy, -0.3);
 				mesa_rotate((float *)view_transform.m, R2D(land_angle), 0, 1, 0);
 				mesa_rotate((float *)view_transform.m, 90, 1, 0, 0);
 				al_use_transform(&view_transform);
 			}
-#ifdef A5_OGL
-			else {
-				glMatrixMode(GL_MODELVIEW);
-				glLoadIdentity();
-				glTranslatef(0, -0.1f-staff_oy, -0.2f);
-				glRotatef(R2D(land_angle), 0, 1, 0);
-				glRotatef(R2D(-M_PI/2), 1, 0, 0);
-			}
-#endif
-
 
 			draw_model(land_model, land_texture);
 			clear_zbuffer();
 
-			if (true /*use_programmable_pipeline*/) {
+			if (true) {
+
 				mesa_translate((float *)view_transform.m, 0, 0.12-staff_oz, 0.05+staff_oy);
 				mesa_rotate((float *)view_transform.m, R2D(staff_a), 1, 0, 0);
 				mesa_scale((float *)view_transform.m, 1.0/256, 1.0/256, 1.0/256);
 				al_use_transform(&view_transform);
 			}
-#ifdef A5_OGL
-			else {
-				glTranslatef(0, 0.12+staff_oz, 0.05+staff_oy);
-				glRotatef(R2D(staff_a), 1, 0, 0);
-				glScalef(1.0/256, 1.0/256, 1.0/256);
-			}
-#endif
 			if (stage != STAGE_POOFING)
 				draw_model(staff_model);
 			else {
-				if (true /*use_programmable_pipeline*/) {
+				if (true) {
 					al_identity_transform(&view_transform);
 					mesa_translate((float *)view_transform.m, 0.5, 0.5, ring_z);
 					al_use_transform(&view_transform);
@@ -1514,33 +1481,15 @@ void volcano_scene(void)
 					draw_model(ring_model, ring_texture);
 					enable_cull_face(true);
 				}
-#ifdef A5_OGL
-				else {
-					glLoadIdentity();
-					glTranslatef(0, 0, ring_z);
-					disable_cull_face();
-					draw_model(ring_model, ring_texture);
-					enable_cull_face(true);
-				}
-#endif
 			}
 
 			disable_cull_face();
 			disable_zbuffer();
 
-			if (true /*use_programmable_pipeline*/) {
+			if (true) {
 				al_set_projection_transform(display, &proj_push);
 				al_use_transform(&view_push);
 			}
-#ifdef A5_OGL
-			else {
-				glMatrixMode(GL_PROJECTION);
-				glPopMatrix();
-				glMatrixMode(GL_MODELVIEW);
-				glPopMatrix();
-			}
-
-#endif
 
 #ifdef A5_D3D
 			device->SetViewport(&old);

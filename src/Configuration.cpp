@@ -361,8 +361,6 @@ void Configuration::read()
 
 	// load
 
-	printf("buf='%s'\n", buf);
-	
 	XMLData* xml = new XMLData(getUserResource("config"));
 
 	debug_message("cfgfn='%s'\n", getUserResource("config"));

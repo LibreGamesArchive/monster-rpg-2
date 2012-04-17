@@ -613,11 +613,6 @@ void m_flip_display(void)
 {
 	al_flip_display();
 
-	if (do_toggle_fullscreen) {
-		do_toggle_fullscreen = false;
-		toggle_fullscreen();
-	}
-	
 	if (controller_display)
 	{
 		ALLEGRO_BITMAP *target = al_get_target_bitmap();
@@ -694,20 +689,14 @@ static int m_text_length_real(const MFONT *font, const char *text)
 
 void m_set_target_bitmap(MBITMAP *bmp)
 {
-#ifdef A5_D3D
-	/*
+#ifdef A5_D3D_XXX
 	LPDIRECT3DDEVICE9 dev = al_get_d3d_device(display);
 	LPDIRECT3DSURFACE9 curr_surf;
-	al_lock_mutex(d3d_resource_mutex);
-	if (!d3d_device_lost) {
-		dev->GetDepthStencilSurface(&curr_surf);
-		if (curr_surf != big_depth_surface)
-			dev->SetDepthStencilSurface(big_depth_surface);
-		if (curr_surf)
-			curr_surf->Release();
-	}
-	al_unlock_mutex(d3d_resource_mutex);
-	*/
+	dev->GetDepthStencilSurface(&curr_surf);
+	if (curr_surf != big_depth_surface)
+		dev->SetDepthStencilSurface(big_depth_surface);
+	if (curr_surf)
+		curr_surf->Release();
 #endif
 	al_set_target_bitmap(bmp->bitmap);
 }

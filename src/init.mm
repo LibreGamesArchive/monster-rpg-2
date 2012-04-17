@@ -40,77 +40,55 @@ void get_buffer_true_size(int *buffer_true_w, int *buffer_true_h)
 }
 
 #ifdef A5_D3D
-//LPDIRECT3DSURFACE9 big_depth_surface = NULL;
-ALLEGRO_MUTEX *d3d_resource_mutex;
-bool d3d_device_lost = false;
+LPDIRECT3DSURFACE9 big_depth_surface = NULL;
 
-static void shaders_lost(void)
-{
-#if 0
-	al_get_direct3d_effect(default_shader)->OnLostDevice();
-	al_get_direct3d_effect(cheap_shader)->OnLostDevice();
-	al_get_direct3d_effect(tinter)->OnLostDevice();
-	al_get_direct3d_effect(brighten)->OnLostDevice();
-	al_get_direct3d_effect(warp)->OnLostDevice();
-	al_get_direct3d_effect(shadow_shader)->OnLostDevice();
-#endif
-}
-
-static void shaders_found(void)
-{
-#if 0
-	al_get_direct3d_effect(default_shader)->OnResetDevice();
-	al_get_direct3d_effect(cheap_shader)->OnResetDevice();
-	al_get_direct3d_effect(tinter)->OnResetDevice();
-	al_get_direct3d_effect(brighten)->OnResetDevice();
-	al_get_direct3d_effect(warp)->OnResetDevice();
-	al_get_direct3d_effect(shadow_shader)->OnResetDevice();
-#endif
-}
-
-/*
-static void init_big_depth_surface(void)
+void init_big_depth_surface(void)
 {
 	LPDIRECT3DDEVICE9 dev = al_get_d3d_device(display);
+	ALLEGRO_MONITOR_INFO mi;
+	
+	al_get_monitor_info(config.getAdapter(), &mi);
+	int w = mi.x2 - mi.x1;
+	int h = mi.y2 - mi.y1;
+	int size = 1024;
+	while (size < w || size < h)
+		size = size * 2;
+
 	dev->CreateDepthStencilSurface(
-		1024, 1024,
+		size, size,
 		D3DFMT_D16,
 		D3DMULTISAMPLE_NONE, 0,
 		true,
 		&big_depth_surface,
 		NULL
 	);
-	//dev->SetDepthStencilSurface(big_depth_surface);
+	dev->SetDepthStencilSurface(big_depth_surface);
 }
-*/
 
 bool main_halted = false;
 bool d3d_halted = false;
-bool should_suspend = false;
+bool should_reset = false;
+
+bool is_fs_toggle = false;
 
 static void d3d_resource_release(void)
 {
-	al_lock_mutex(d3d_resource_mutex);
-	d3d_device_lost = true;
-	//big_depth_surface->Release();
-	//shaders_lost();
-	al_unlock_mutex(d3d_resource_mutex);
-	d3d_halted = true;
-	should_suspend = true;
-	while (!main_halted) {
-		al_rest(0.01);
+	if (!is_fs_toggle) {
+		d3d_halted = true;
+		should_reset = true;
+		while (!main_halted) {
+			al_rest(0.01);
+		}
 	}
 }
 
 static void d3d_resource_restore(void)
 {
-	//init_big_depth_surface();
-	//shaders_found();
-	shooter_restoring = true;
-	d3d_device_lost = false;
-	d3d_halted = false;
-	while (main_halted) {
-		al_rest(0.01);
+	if (!is_fs_toggle) {
+		d3d_halted = false;
+		while (main_halted) {
+			al_rest(0.01);
+		}
 	}
 }
 #endif
@@ -2622,8 +2600,7 @@ bool init(int *argc, char **argv[])
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 #ifdef A5_D3D
-	d3d_resource_mutex = al_create_mutex();
-	//init_big_depth_surface();
+	init_big_depth_surface();
 	al_d3d_set_restore_callback(d3d_resource_restore);
 	al_d3d_set_release_callback(d3d_resource_release);
 #endif
@@ -2952,8 +2929,7 @@ void destroy(void)
 	#endif
 
 	#ifdef A5_D3D
-//	big_depth_surface->Release();
-	al_destroy_mutex(d3d_resource_mutex);
+	big_depth_surface->Release();
 	#endif
 
 	al_destroy_display(display);
@@ -3110,8 +3086,21 @@ void toggle_fullscreen(void)
 	pause_joystick_repeat_events = true;
 	ScreenDescriptor *sd = config.getWantedGraphicsMode();
 	sd->fullscreen = !sd->fullscreen;
+#ifdef A5_D3D
+	is_fs_toggle = true;
+	big_depth_surface->Release();
+	_destroy_loaded_bitmaps();
+#endif
 	al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, config.getWantedGraphicsMode()->fullscreen);
+#ifdef A5_D3D
+	_reload_loaded_bitmaps();
+#endif
 	set_screen_params();
+#ifdef A5_D3D
+	init_big_depth_surface();
+	shooter_restoring = true;
+	is_fs_toggle = false;
+#endif
 	pause_joystick_repeat_events = false;
 }
 

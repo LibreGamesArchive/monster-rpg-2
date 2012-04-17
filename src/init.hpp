@@ -163,7 +163,6 @@ extern bool do_toggle_fullscreen;
 #ifdef A5_D3D
 extern bool d3d_device_lost;
 extern LPDIRECT3DSURFACE9 big_depth_surface;
-extern ALLEGRO_MUTEX *d3d_resource_mutex;
 #endif
 extern bool use_digital_joystick;
 
@@ -226,7 +225,9 @@ extern double allegro_iphone_shaken;
 
 extern bool main_halted;
 extern bool d3d_halted;
-extern bool should_suspend;
+extern bool should_reset;
+extern bool is_fs_toggle;
+void init_big_depth_surface(void);
 
 bool imperfect_aspect(void);
 void create_buffers(void);

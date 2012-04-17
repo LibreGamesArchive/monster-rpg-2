@@ -512,7 +512,7 @@ void render(void)
 	}
 }
 
-static void draw(double cx, double cy)
+static void draw(double cx, double cy, bool draw_objects = true)
 {
 	render();
 
@@ -585,6 +585,8 @@ static void draw(double cx, double cy)
 	#ifdef A5_D3D
 	al_get_d3d_device(display)->SetViewport(&backup_vp);
 	#endif
+
+	if (!draw_objects) return;
 
 	// draw player
 	if (!dead) {
@@ -667,11 +669,15 @@ bool shooter(bool for_points)
 
 	int shark_value, crab_value;
 
+#ifndef A5_D3D_XXX
 	int flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
+#endif
 	bbot = m_create_bitmap(1024, 1024); // check
 	btop = m_create_bitmap(1024, 1024); // check
+#ifndef A5_D3D
 	al_set_new_bitmap_flags(flags);
+#endif
 
 	if (config.getDifficulty() == CFG_DIFFICULTY_EASY) {
 		h = easy_h;
@@ -814,8 +820,6 @@ start:
 		// Logic
 		int tmp_counter = logic_counter;
 		logic_counter = 0;
-		if (tmp_counter > 10)
-			tmp_counter = 1;
 		while  (tmp_counter > 0) {
 			next_input_event_ready = true;
 
@@ -1129,10 +1133,35 @@ start:
 
 			m_set_target_bitmap(buffer);
 			m_clear(m_map_rgb(105, 115, 145));
-
+	
 			if (shooter_restoring) {
+				al_stop_timer(logic_timer);
+				ALLEGRO_BITMAP *target = al_get_target_bitmap();
+				m_set_target_bitmap(buffer);
+				m_clear(black);
+				mTextout(
+					medium_font,
+					"Loading...",
+					BW/2,
+					BH/2,
+					white,
+					black,
+					WGT_TEXT_NORMAL,
+					true
+				);
+				drawBufferToScreen();
+				m_flip_display();
+				double d = o;
+				o = (h*TILE_SIZE)-starty;
 				draw_all();
+				while (fabs(d-o) > 0.1) {
+					o -= LOGIC_MILLIS * 0.3;
+					py = o - 64;
+					start_render = (o - 2048) / TILE_SIZE;
+					draw(x, o, false);
+				}
 				shooter_restoring = false;
+				al_start_timer(logic_timer);
 			}
 			else {
 				draw(x, o);

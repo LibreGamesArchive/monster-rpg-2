@@ -239,19 +239,10 @@ bool is_close_pressed(void)
 #endif
 #ifdef A5_D3D_XXX
 		if (event.type == ALLEGRO_EVENT_DISPLAY_LOST) {
-			_destroy_loaded_bitmaps();
-			al_stop_timer(logic_timer);
-			al_stop_timer(draw_timer);
-			al_run_detached_thread(
-				wait_for_display_found,
-				events_minor
-			);
-			al_lock_mutex(switch_mutex);
-			al_wait_cond(switch_cond, switch_mutex);
-			al_unlock_mutex(switch_mutex);
-			_reload_loaded_bitmaps();
-			al_start_timer(logic_timer);
-			al_start_timer(draw_timer);
+			printf("lost event\n");
+		}
+		else if (event.type == ALLEGRO_EVENT_DISPLAY_FOUND) {
+			printf("found event\n");
 		}
 #endif
 #ifdef ALLEGRO_IPHONE
@@ -401,7 +392,8 @@ bool is_close_pressed(void)
 #endif
 
 #ifdef A5_D3D
-	if (should_suspend) {
+	if (should_reset) {
+		big_depth_surface->Release();
 		_destroy_loaded_bitmaps();
 		al_stop_timer(logic_timer);
 		al_stop_timer(draw_timer);
@@ -409,13 +401,21 @@ bool is_close_pressed(void)
 		while (d3d_halted) {
 			m_rest(0.01);
 		}
+		init_big_depth_surface();
 		_reload_loaded_bitmaps();
+		shooter_restoring = true;
 		al_start_timer(logic_timer);
 		al_start_timer(draw_timer);
 		main_halted = false;
-		should_suspend = false;
+		should_reset = false;
 	}
 #endif
+	
+	if (do_toggle_fullscreen) {
+		do_toggle_fullscreen = false;
+		toggle_fullscreen();
+	}
+	
 	
 	return close_pressed;
 }

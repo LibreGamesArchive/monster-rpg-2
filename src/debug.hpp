@@ -2,7 +2,7 @@
 #define DEBUG_HPP
 
 
-#ifndef debug_message
+#ifdef DEBUG
 void debug_message(const char *fmt, ...);
 #endif
 
