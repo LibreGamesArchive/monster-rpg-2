@@ -459,7 +459,7 @@ static void drawOverlay(bool draw_controls, ALLEGRO_COLOR tint)
 #ifdef ALLEGRO_IPHONE
 	if (controller_display) {
 		al_set_target_backbuffer(controller_display);
-		al_clear_to_color(al_map_rgb(0, 0, 0));
+		m_clear(al_map_rgb(0, 0, 0));
 	}
 #endif
 
@@ -561,7 +561,7 @@ void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 
 	al_set_target_backbuffer(display);
 
-	al_clear_to_color(black);
+	m_clear(black);
 
 	ALLEGRO_SHADER *scale2x_shader = NULL;
 
@@ -909,6 +909,8 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 	MBITMAP *tmp = m_create_bitmap(BW, BH);
 	MBITMAP *bufdup = m_clone_bitmap(buffer);
 
+	ALLEGRO_DEBUG("tmp format=%d bufdup format=%d\n", al_get_bitmap_format(tmp->bitmap), al_get_bitmap_format(bufdup->bitmap));
+
 	unsigned long start = (unsigned long)(al_get_time()*1000);
 	unsigned long now = start;
 	
@@ -944,7 +946,7 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 		al_draw_scaled_bitmap(bufdup->bitmap, 0, 0, BW, BH, 0, 0, BW/size, BH/size, 0);
 
 		m_set_target_bitmap(buffer);
-		al_clear_to_color(black);
+		m_clear(black);
 
 		int cx, cy, cw, ch;
 		al_get_clipping_rectangle(&cx, &cy, &cw, &ch);
@@ -959,6 +961,12 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 		al_set_clipping_rectangle(cx, cy, cw, ch);
 
 		drawBufferToScreen(buffer, true);
+		m_flip_display();
+	}
+
+	if (!focusing) {
+		al_set_target_backbuffer(display);
+		m_clear(black);
 		m_flip_display();
 	}
 

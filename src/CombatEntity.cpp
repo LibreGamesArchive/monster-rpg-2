@@ -1462,7 +1462,7 @@ SlimeEffect::SlimeEffect(Combatant *target) :
 	blob = m_create_bitmap(10, 10); // check
 	ALLEGRO_BITMAP *t = al_get_target_bitmap();
 	m_set_target_bitmap(blob);
-	al_clear_to_color(m_map_rgba(0, 0, 0, 0));
+	m_clear(m_map_rgba(0, 0, 0, 0));
 	al_draw_filled_circle(5, 5, 4, white);
 	al_set_target_bitmap(t);
 

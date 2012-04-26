@@ -98,7 +98,6 @@
         resourcefilter="${aapt.resource.filter}">
     <res path="${resource.absolute.dir}" />
     <nocompress />
-    <!-- <nocompress extension="xml" /> forces no compression on specific file   extensions in assets and res/raw -->
     </aapt>
 </target>
 

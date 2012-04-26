@@ -65,11 +65,9 @@ void load_image_callback(MBITMAP *bitmap, RecreateData *data)
 	ALLEGRO_BITMAP *b;
 
 	if (cached_bitmap && d->filename == cached_bitmap_filename) {
-		ALLEGRO_DEBUG("A CHOSEN");
 		b = cached_bitmap;
 	}
 	else {
-		ALLEGRO_DEBUG("BBB CHOSEN");
 		if (cached_bitmap) {
 			al_destroy_bitmap(cached_bitmap);
 		}
@@ -149,7 +147,7 @@ Image *Image::clone(int type)
 
 	ALLEGRO_BITMAP *target = al_get_target_bitmap();
 	m_set_target_bitmap(img->bitmap);
-	al_clear_to_color(al_map_rgba_f(0, 0, 0 ,0));
+	m_clear(al_map_rgba_f(0, 0, 0 ,0));
 	m_draw_bitmap(bitmap, 0, 0, 0);
 	if (type == CLONE_ENEMY || type == CLONE_PLAYER)
 		add_blit(bitmap, 0, 0, white, 0.7, 0);

@@ -1544,7 +1544,7 @@ void CombatPlayer::draw(void)
 				ALLEGRO_BITMAP *target = al_get_target_bitmap();
 				
 				m_set_target_bitmap(stone_bmp);
-				al_clear_to_color(al_map_rgba_f(0, 0, 0, 0));
+				m_clear(al_map_rgba_f(0, 0, 0, 0));
 
 				m_lock_bitmap(stone_bmp, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READWRITE);
 			

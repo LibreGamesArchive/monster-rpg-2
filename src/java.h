@@ -5,6 +5,10 @@
 extern "C" {
 #endif
 
+typedef int HSAMPLE;
+typedef int HMUSIC;
+
+
 void bass_initSound(void);
 HSAMPLE bass_loadSample(const char *name);;
 HSAMPLE bass_loadSampleLoop(const char *name);

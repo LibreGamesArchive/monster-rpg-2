@@ -11,9 +11,9 @@
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 #define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_RGBA_4444
 #elif defined A5_OGL
-#define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_RGBA_4444
+#define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE
 #else
-#define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_ARGB_8888
+#define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_ARGB_8888 HELLO ###############
 #endif
 
 #include "config.h"
@@ -57,7 +57,9 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
+#ifndef ALLEGRO_ANDROID
 #include <allegro5/allegro_native_dialog.h>
+#endif
 #include <allegro5/allegro_shader.h>
 #include <allegro5/allegro_shader_glsl.h>
 #include <allegro5/allegro_memfile.h>
@@ -105,8 +107,10 @@ ALLEGRO_DEBUG_CHANNEL("morpg2")
 
 #include <zlib.h>
 
+#ifndef ALLEGRO_ANDROID
 #if !defined KCM_AUDIO
 #include <bass.h>
+#endif
 #endif
 
 #ifdef ALLEGRO_IPHONE

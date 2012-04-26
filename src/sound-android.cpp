@@ -1,5 +1,4 @@
 #include "monster2.hpp"
-#include <allegro5/allegro_acodec.h>
 
 #include "java.h"
 
@@ -15,12 +14,10 @@ std::map<std::string, MSAMPLE> preloaded_samples;
 
 static MSAMPLE sample;
 
-static DWORD music = 0;
-static DWORD ambience = 0;
+static int music = 0;
+static int ambience = 0;
 std::string musicName = "";
 std::string ambienceName = "";
-static QWORD music_loop_start = 0;
-static QWORD ambience_loop_start = 0;
 static float musicVolume = 1.0f;
 static float ambienceVolume = 1.0f;
 
@@ -219,12 +216,19 @@ void destroySound(void)
 	bass_shutdownBASS();
 }
 
+static void playSampleVolume(MSAMPLE s, float vol)
+{
+	if (!sound_inited) return;
+
+	bass_playSampleVolume(s, vol);
+}
 
 void playPreloadedSample(std::string name)
 {
 	if (!sound_inited) return;
 
-	playSample(preloaded_samples[name]);
+	float vol = (float)config.getSFXVolume()/255.0;
+	playSampleVolume(preloaded_samples[name], vol);
 }
 
 
@@ -232,9 +236,9 @@ MSAMPLE loadSample(std::string name)
 {
 	MSAMPLE s = 0;
 
-	if (!sound_inited) return s;
-
-	s = bass_loadSample(getResource("sfx/%s", name.c_str()));
+	if (sound_inited) {
+		s = bass_loadSample(getResource("sfx/%s", name.c_str()));
+	}
 
 	return s;
 }
@@ -253,7 +257,8 @@ void playSample(MSAMPLE sample, MSAMPLE_ID *unused)
 	(void)unused;
 	if (!sound_inited) return;
 
-	bass_playSample(sample);
+	float vol = (float)config.getSFXVolume()/255.0;
+	playSampleVolume(sample, vol);
 }
 
 

@@ -6,6 +6,9 @@
 
 #include <stdio.h>
 
+#include <allegro5/allegro.h>
+void m_clear(ALLEGRO_COLOR c);
+
 typedef struct {
 	int x, y, w, h;
 	int sheet;
@@ -64,7 +67,7 @@ static void insert_sheet(ATLAS *atlas, _AL_LIST *rect_list)
 	al_set_new_bitmap_flags(flags);
 
 	al_set_target_bitmap(atlas->sheets[sheet]);
-	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
+	m_clear(al_map_rgba(0, 0, 0, 0));
 
 	atlas->num_sheets++;
 }

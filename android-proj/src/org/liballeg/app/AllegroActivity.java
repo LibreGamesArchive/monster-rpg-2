@@ -428,6 +428,8 @@ public class AllegroActivity extends Activity implements SensorEventListener
          Log.e("AllegroActivity", "Couldn't load BassPump");
       }
 
+      Log.d("HELLO", "HELLO " + Runtime.getRuntime().maxMemory() + " HELLO");
+
       nativeOnOrientationChange(0, true);
 
       requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -526,7 +528,7 @@ public class AllegroActivity extends Activity implements SensorEventListener
       
       if((changes & ActivityInfo.CONFIG_NAVIGATION) != 0)
          Log.d("AllegroActivity", "navigation changed");
-         
+        
       if((changes & ActivityInfo.CONFIG_ORIENTATION) != 0) {
          Log.d("AllegroActivity", "orientation changed");
          nativeOnOrientationChange(getAllegroOrientation(), false);
@@ -752,6 +754,8 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
    static final int ALLEGRO_STENCIL_SIZE = 16;
    static final int ALLEGRO_SAMPLE_BUFFERS = 17;
    static final int ALLEGRO_SAMPLES = 18;
+
+   static final int EGL_CONTEXT_CLIENT_VERSION = 0x3098; 
    
    static final int ALLEGRO_KEY_A     = 1;
    static final int ALLEGRO_KEY_B     = 2;
@@ -1036,7 +1040,7 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
    private boolean captureVolume = false;
    
    public boolean egl_Init()
-   {      
+   {
       Log.d("AllegroSurface", "egl_Init");
       EGL10 egl = (EGL10)EGLContext.getEGL();
 
@@ -1102,13 +1106,6 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
          case ALLEGRO_SAMPLES:
             egl_attr = egl.EGL_SAMPLES;
             break;
-         
-         case 1001:
-            egl_attr = 0x303B;
-            break;
-         case 1002:
-            egl_attr = 0x303C;
-            break;
 
          default:
             Log.e("AllegroSurface", "got unknown attribute " + attr);
@@ -1123,23 +1120,74 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
       
       return value[0];
    }
+
+   private boolean checkGL20Support( Context context )
+   {
+      EGL10 egl = (EGL10) EGLContext.getEGL();      
+      EGLDisplay display = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
    
-   public boolean egl_createContext(int conf)
+      int[] version = new int[2];
+      egl.eglInitialize(display, version);
+   
+      int EGL_OPENGL_ES2_BIT = 4;
+      int[] configAttribs =
+      {
+         EGL10.EGL_RED_SIZE, 4,
+         EGL10.EGL_GREEN_SIZE, 4,
+         EGL10.EGL_BLUE_SIZE, 4,
+         EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+         EGL10.EGL_NONE
+      };
+   
+      EGLConfig[] configs = new EGLConfig[10];
+      int[] num_config = new int[1];
+      egl.eglChooseConfig(display, configAttribs, configs, 10, num_config);    
+      egl.eglTerminate(display);
+      Log.d("AllegroSurface", "" + num_config[0] + " OpenGL ES 2 configurations found.");
+      return num_config[0] > 0;
+   } 
+
+   /* Return values:
+    * 0 - failure
+    * 1 - success
+    * 2 - fell back to older ES version
+    */
+   public int egl_createContext(int conf, int version)
    {
       Log.d("AllegroSurface", "egl_createContext");
       EGL10 egl = (EGL10)EGLContext.getEGL();
+      int ret = 1;
 
-      EGLContext ctx = egl.eglCreateContext(egl_Display, egl_Config[conf], EGL10.EGL_NO_CONTEXT, null);
-      if(ctx == EGL10.EGL_NO_CONTEXT) {
-         Log.d("AllegroSurface", "egl_createContext no context");
-         return false;
+      int[] attrib;
+      if (version == 2) {
+         if (checkGL20Support(context)) {
+            attrib = new int[3];
+            attrib[0] = EGL_CONTEXT_CLIENT_VERSION;
+            attrib[1] = 2;
+            attrib[2] = EGL10.EGL_NONE;
+         }
+         else {
+            attrib = null;
+            ret = 2;
+         }
       }
+      else {
+         attrib = null;
+      }
+
+      EGLContext ctx = egl.eglCreateContext(egl_Display, egl_Config[conf], EGL10.EGL_NO_CONTEXT, attrib);
+      if (ctx == EGL10.EGL_NO_CONTEXT) {
+         Log.d("AllegroSurface", "egl_createContext no context");
+         return 0;
+      }
+
       Log.d("AllegroSurface", "EGL context created");
       
       egl_Context = ctx;
       
       Log.d("AllegroSurface", "egl_createContext end");
-      return true;
+
+      return ret;
    }
    
    public void egl_destroyContext()
@@ -1306,22 +1354,28 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
 
         
       Log.d("AllegroSurface", "ctor");
-      
-      setFocusable(true);
-      setFocusableInTouchMode(true);
-      requestFocus();
-      setOnKeyListener(this); 
-      setOnTouchListener(this);   
-      
+
       getHolder().addCallback(this); 
       
       Log.d("AllegroSurface", "ctor end");
    }
 
+   void grabFocus()
+   {
+      Log.d("AllegroSurface", "Grabbing focus");
+
+      setFocusable(true);
+      setFocusableInTouchMode(true);
+      requestFocus();
+      setOnKeyListener(this); 
+      setOnTouchListener(this);
+   }
+      
    public void surfaceCreated(SurfaceHolder holder)
    {
       Log.d("AllegroSurface", "surfaceCreated");
       nativeOnCreate();
+      grabFocus();
       Log.d("AllegroSurface", "surfaceCreated end");
    }
 
@@ -1332,7 +1386,7 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
       nativeOnDestroy();
 
       egl_makeCurrent();
-
+      
       egl_destroySurface();
       egl_destroyContext();
       

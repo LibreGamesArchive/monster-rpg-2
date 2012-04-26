@@ -1,5 +1,11 @@
 #include "monster2.hpp"
 
+// FIXME
+#define ASSERT ALLEGRO_ASSERT
+#include <allegro5/internal/aintern_bitmap.h>
+#include <allegro5/internal/aintern_display.h>
+#include <allegro5/internal/aintern_opengl.h>
+
 #ifdef ALLEGRO_ANDROID
 extern "C" {
 void openURL(const char *url);
@@ -48,10 +54,8 @@ bool global_can_save = true;
 bool tutorial_started = false;
 bool gonna_fade_in_red = false;
 
-
 // FIXME:
 void check_some_stuff_in_shooter(void);
-
 
 int old_control_mode = -1;
 
@@ -152,26 +156,8 @@ void connect_second_display(void)
 #endif
 }
 
-#ifdef A5_D3D_XXX
-static void *wait_for_display_found(void *arg)
-{
-	ALLEGRO_EVENT_QUEUE *queue = (ALLEGRO_EVENT_QUEUE *)arg;
-
-	while (1) {
-		ALLEGRO_EVENT event;
-		al_wait_for_event(queue, &event);
-		if (event.type == ALLEGRO_EVENT_DISPLAY_FOUND) {
-			break;
-		}
-	}
-
-	al_broadcast_cond(switch_cond);
-
-	return NULL;
-}
-#endif
-
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+bool got_resume = false;
 static void *wait_for_drawing_resume(void *arg)
 {
 	ALLEGRO_EVENT_QUEUE *queue = (ALLEGRO_EVENT_QUEUE *)arg;
@@ -180,6 +166,7 @@ static void *wait_for_drawing_resume(void *arg)
 		ALLEGRO_EVENT event;
 		al_wait_for_event(queue, &event);
 		if (event.type == ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING) {
+			got_resume = true;
 			break;
 		}
 	}
@@ -229,22 +216,6 @@ bool is_close_pressed(void)
 			do_acknowledge_resize = true;
 		}
 #endif
-#if defined ALLEGRO_ANDROID
-		if (event.type == ALLEGRO_EVENT_DISPLAY_LOST) {
-			_destroy_loaded_bitmaps();
-		}
-		else if (event.type == ALLEGRO_EVENT_DISPLAY_FOUND) {
-			_reload_loaded_bitmaps();
-		}
-#endif
-#ifdef A5_D3D_XXX
-		if (event.type == ALLEGRO_EVENT_DISPLAY_LOST) {
-			printf("lost event\n");
-		}
-		else if (event.type == ALLEGRO_EVENT_DISPLAY_FOUND) {
-			printf("found event\n");
-		}
-#endif
 #ifdef ALLEGRO_IPHONE
 		if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT)
 		{
@@ -267,11 +238,7 @@ bool is_close_pressed(void)
 		}
 #endif
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-#ifdef ALLEGRO_IPHONE_XXX
-		if (event.type == ALLEGRO_EVENT_DISPLAY_HALT_DRAWING || event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT) {
-#else
 		if (event.type == ALLEGRO_EVENT_DISPLAY_HALT_DRAWING) {
-#endif
 			save_memory(false);
 #if defined ALLEGRO_IPHONE
 			if (!isMultitaskingSupported()) {
@@ -287,31 +254,44 @@ bool is_close_pressed(void)
 			float old_ambience_volume = getAmbienceVolume();
 			playMusic("");
 			playAmbience("");
+			_destroy_loaded_bitmaps();
+			destroy_shaders();
 #endif
 			config.write();
 			al_stop_timer(logic_timer);
 			al_stop_timer(draw_timer);
 			// halt
 			al_acknowledge_drawing_halt(display);
+			got_resume = false;
 			al_run_detached_thread(
 				wait_for_drawing_resume,
 				events_minor
 			);
 			al_lock_mutex(switch_mutex);
-			al_wait_cond(switch_cond, switch_mutex);
+			while (!got_resume) {
+				al_wait_cond(switch_cond, switch_mutex);
+			}
+			ALLEGRO_DEBUG("after cond");
 			al_unlock_mutex(switch_mutex);
 			// resume
 			al_acknowledge_drawing_resume(display);
-#if defined ALLEGRO_ANDROID
-      			glDisable(GL_DITHER);
-#elif defined ALLEGRO_IPHONE
+#ifdef ALLEGRO_ANDROID
+			_reload_loaded_bitmaps();
+			init_shaders();
+			init2_shaders();
+			if (in_shooter) {
+				shooter_restoring = true;
+			}
 #endif
+      			glDisable(GL_DITHER);
 			al_start_timer(logic_timer);
 			al_start_timer(draw_timer);
+			ALLEGRO_DEBUG("HERE1");
 #ifdef ALLEGRO_ANDROID
 			playMusic(old_music_name, old_music_volume, true);
 			playAmbience(old_ambience_name, old_ambience_volume);
 #endif
+			ALLEGRO_DEBUG("HERE2");
 		}
 #endif
 	}
@@ -403,7 +383,9 @@ bool is_close_pressed(void)
 		}
 		init_big_depth_surface();
 		_reload_loaded_bitmaps();
-		shooter_restoring = true;
+		if (in_shooter) {
+			shooter_restoring = true;
+		}
 		al_start_timer(logic_timer);
 		al_start_timer(draw_timer);
 		main_halted = false;
@@ -415,7 +397,6 @@ bool is_close_pressed(void)
 		do_toggle_fullscreen = false;
 		toggle_fullscreen();
 	}
-	
 	
 	return close_pressed;
 }
@@ -445,9 +426,9 @@ void do_close(bool quit)
 		if (saveFilename) saveTime(saveFilename);
 		config.write();
 		al_set_target_bitmap(al_get_backbuffer(display));
-		al_clear_to_color(al_map_rgb(0, 0, 0));
+		m_clear(al_map_rgb(0, 0, 0));
 		m_flip_display();
-		al_clear_to_color(al_map_rgb(0, 0, 0));
+		m_clear(al_map_rgb(0, 0, 0));
 		m_flip_display();
 #ifdef ALLEGRO_WINDOWS
 		throw QuitError();
@@ -840,8 +821,8 @@ void run(void)
 				int minutes = (timer_time/1000) / 60;
 				int seconds = (timer_time/1000) % 60;
 				char text[10];
-				sprintf(text, "%2d:%02d", minutes, seconds);
-				int tw = m_text_length(huge_font, text);
+				sprintf(text, "%d:%02d", minutes, seconds);
+				int tw = m_text_length(huge_font, "5:55") + 10;
 				int th = m_text_height(huge_font);
 				mTextout(huge_font, text, BW-(tw/2)-10, th/2+5,
 					white, black,
@@ -978,7 +959,6 @@ void run(void)
 	break_main_loop = false;
 }
 
-
 #ifndef EDITOR
 #ifdef ALLEGRO_ANDROID
 int main(void)
@@ -986,7 +966,6 @@ int main(void)
 int main(int argc, char *argv[])
 #endif
 {
-
 #if defined ALLEGRO_WINDOWS && defined A5_OGL
 	LPTSTR cmdline = GetCommandLine();
 	argc = 1;
@@ -1067,7 +1046,9 @@ int main(int argc, char *argv[])
 	//#endif
 #endif
 
+	ALLEGRO_DEBUG("format=%d\n", al_get_new_bitmap_format());
 	MBITMAP *nooskewl = m_load_bitmap(getResource("media/nooskewl.png"));
+	ALLEGRO_DEBUG("HERE\n");
 
 #ifndef ALLEGRO_ANDROID
 	if ((n = check_arg(argc, argv, "-stick")) != -1) {
@@ -1083,12 +1064,18 @@ int main(int argc, char *argv[])
 	}
 #endif
 	
+	ALLEGRO_DEBUG("huh1");
 	al_set_target_backbuffer(display);
-	al_clear_to_color(al_map_rgb(0, 0, 0));
+	ALLEGRO_DEBUG("huh2");
+	m_clear(al_map_rgb(0, 0, 0));
+	ALLEGRO_DEBUG("huh3");
 	m_flip_display();
+	ALLEGRO_DEBUG("huh4");
 
 	debug_message("loaded nooskewl bmp\n");
+	ALLEGRO_DEBUG("buffer format=%d\n", al_get_bitmap_format(buffer->bitmap));
 	m_set_target_bitmap(buffer);
+	ALLEGRO_DEBUG("HERE2\n");
 	debug_message("set target to buffer\n");
 	debug_message("cleared buffer\n");
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
@@ -1419,9 +1406,9 @@ int main(int argc, char *argv[])
 		
 	} catch (QuitError e) {
 		al_set_target_bitmap(al_get_backbuffer(display));
-		al_clear_to_color(al_map_rgb(0, 0, 0));
+		m_clear(al_map_rgb(0, 0, 0));
 		m_flip_display();
-		al_clear_to_color(al_map_rgb(0, 0, 0));
+		m_clear(al_map_rgb(0, 0, 0));
 		m_flip_display();
 	}
 

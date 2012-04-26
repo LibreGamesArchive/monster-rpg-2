@@ -38,7 +38,6 @@ public class BassPump
 			return 0;
 		}
 		int id = sp.load(fd, 1);
-		Log.d("BassPump", "id=" + id + " in loadSample");
 		if (id <= 0) {
 			return 0;
 		}

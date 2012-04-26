@@ -4309,14 +4309,11 @@ void MScrollingList::mouseUpAbs(int xx, int yy, int b)
 
 void MScrollingList::draw()
 {
-	//m_set_clip(x, y, x+width, y+height);
-	
-	//int yy = y+scroll_offs;
 	int yy = y;
 
 	int cx, cy, cw, ch;
 	al_get_clipping_rectangle(&cx, &cy, &cw, &ch);
-	al_set_clipping_rectangle(x, y, width-30, 15*rows);
+	al_set_clipping_rectangle(x, y-1, width-30, 15*rows+1);
 
 	bool held = al_is_bitmap_drawing_held();
 	al_hold_bitmap_drawing(true);

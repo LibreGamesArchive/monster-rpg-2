@@ -1307,8 +1307,8 @@
 					"$(ARCHS_STANDARD_32_BIT)",
 					armv6,
 				);
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1335,8 +1335,8 @@
 					/usr/lib/libSystem.B.dylib,
 					"-ObjC",
 				);
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "CFF395F0-AF5F-4B65-8147-E39BF6C3B976";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "CFF395F0-AF5F-4B65-8147-E39BF6C3B976";
 				SUPPORTED_PLATFORMS = iphoneos;
 			};
 			name = Release;
@@ -1553,8 +1553,8 @@
 					"$(ARCHS_STANDARD_32_BIT)",
 					armv6,
 				);
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Monster_2_Prefix.pch;
@@ -1581,8 +1581,8 @@
 					/usr/lib/libSystem.B.dylib,
 					"-ObjC",
 				);
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "CFF395F0-AF5F-4B65-8147-E39BF6C3B976";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "CFF395F0-AF5F-4B65-8147-E39BF6C3B976";
 				SUPPORTED_PLATFORMS = iphoneos;
 			};
 			name = Lite;
@@ -1637,8 +1637,8 @@
 					"$(ARCHS_STANDARD_32_BIT)",
 					armv6,
 				);
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1666,8 +1666,8 @@
 					/usr/lib/libSystem.B.dylib,
 					"-ObjC",
 				);
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "CFF395F0-AF5F-4B65-8147-E39BF6C3B976";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "CFF395F0-AF5F-4B65-8147-E39BF6C3B976";
 				SUPPORTED_PLATFORMS = iphoneos;
 			};
 			name = Debug;
@@ -1711,8 +1711,8 @@
 					"$(ARCHS_STANDARD_32_BIT)",
 					armv6,
 				);
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1740,8 +1740,8 @@
 					/usr/lib/libSystem.B.dylib,
 					"-ObjC",
 				);
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "CFF395F0-AF5F-4B65-8147-E39BF6C3B976";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "CFF395F0-AF5F-4B65-8147-E39BF6C3B976";
 				SUPPORTED_PLATFORMS = iphoneos;
 			};
 			name = "Release Simulator";

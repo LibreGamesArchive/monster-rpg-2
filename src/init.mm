@@ -128,7 +128,7 @@ bool use_digital_joystick = false;
 int screen_offset_x, screen_offset_y;
 float screen_ratio_x, screen_ratio_y;
 #ifdef ALLEGRO_IPHONE
-double allegro_iphone_shaken = 0.0;
+double allegro_iphone_shaken = DBL_MIN;
 #endif
 float initial_screen_scale = 0.0f;
 bool sound_was_playing_at_program_start;
@@ -266,9 +266,8 @@ static void create_shadows(MBITMAP *bmp, RecreateData *data)
 
 	ALLEGRO_BITMAP *__old_target__ = al_get_target_bitmap();
 	m_save_blender();
-
 	m_set_target_bitmap(bmp);
-	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
+	m_clear(al_map_rgba(0, 0, 0, 0));
 
 	shadow_sides[0] = m_create_sub_bitmap(bmp, 16*0, 0, 16, SHADOW_CORNER_SIZE);
 	shadow_sides[1] = m_create_sub_bitmap(bmp, 16*1, 0, SHADOW_CORNER_SIZE, 16);
@@ -277,10 +276,6 @@ static void create_shadows(MBITMAP *bmp, RecreateData *data)
 	
 	for (int i = 0; i < 4; i++) {
 		shadow_corners[i] = m_create_sub_bitmap(bmp, i*SHADOW_CORNER_SIZE, 16, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE);
-		m_set_target_bitmap(shadow_corners[i]);
-		m_clear(m_map_rgba(0, 0, 0, 0));
-		m_set_target_bitmap(shadow_sides[i]);
-		m_clear(m_map_rgba(0, 0, 0, 0));
 	}
 	
 	m_set_target_bitmap(shadow_corners[2]);
@@ -314,23 +309,20 @@ static void create_shadows(MBITMAP *bmp, RecreateData *data)
 
 	// Can't draw bitmaps to themselves except MEMORY or locked ones, so lock it
 
-	m_set_target_bitmap(shadow_corners[0]);
-	m_draw_bitmap_to_self(shadow_corners[2], 0, 0, M_FLIP_HORIZONTAL|M_FLIP_VERTICAL);
-	
-	m_set_target_bitmap(shadow_corners[1]);
-	m_draw_bitmap_to_self(shadow_corners[2], 0, 0, M_FLIP_VERTICAL);
-	m_set_target_bitmap(shadow_corners[3]);
-	m_draw_bitmap_to_self(shadow_corners[2], 0, 0, M_FLIP_HORIZONTAL);
-	m_set_target_bitmap(shadow_sides[0]);
+	m_set_target_bitmap(bmp);
+
+	m_draw_bitmap_to_self(shadow_corners[2], 0, 16, M_FLIP_HORIZONTAL|M_FLIP_VERTICAL);
+	m_draw_bitmap_to_self(shadow_corners[2], 10, 16, M_FLIP_VERTICAL);
+	m_draw_bitmap_to_self(shadow_corners[2], 30, 16, M_FLIP_HORIZONTAL);
 	m_draw_bitmap_region_to_self(shadow_corners[0], SHADOW_CORNER_SIZE-1, 0, 1, SHADOW_CORNER_SIZE, 0, 0, 0);
-	m_set_target_bitmap(shadow_sides[3]);
-	m_draw_bitmap_region_to_self(shadow_corners[0], 0, SHADOW_CORNER_SIZE-1, SHADOW_CORNER_SIZE, 1, 0, 0, 0);
-	m_set_target_bitmap(shadow_sides[2]);
-	m_draw_bitmap_to_self(shadow_sides[0], 0, 0, M_FLIP_VERTICAL);
-	m_set_target_bitmap(shadow_sides[1]);
-	m_draw_bitmap_to_self(shadow_sides[3], 0, 0, M_FLIP_HORIZONTAL);
-	al_set_target_bitmap(__old_target__);
+	m_draw_bitmap_region_to_self(shadow_corners[0], 0, SHADOW_CORNER_SIZE-1, SHADOW_CORNER_SIZE, 1, 48, 0, 0);
+	m_draw_bitmap_to_self(shadow_sides[0], 32, 0, M_FLIP_VERTICAL);
+	m_draw_bitmap_to_self(shadow_sides[3], 16, 0, M_FLIP_HORIZONTAL);
+	
 	m_restore_blender();
+	al_set_target_bitmap(__old_target__);
+
+	ALLEGRO_DEBUG("created shadows in callback thing");
 
 	for (int i = 0; i < 4; i++) {
 		m_destroy_bitmap(shadow_corners[i]);
@@ -659,7 +651,7 @@ static void *thread_proc(void *arg)
 #if defined A5_D3D || defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_register_event_source(events, al_get_display_event_source(display));
 #endif
-#if !defined ALLEGRO_IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	al_register_event_source(events, al_get_keyboard_event_source());
 #endif
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
@@ -1213,7 +1205,7 @@ static void *loader_proc(void *arg)
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
 #endif
 #else
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
+	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888); HELLO
 #endif
 	
 	config.setUseOnlyMemoryBitmaps(true);
@@ -1341,14 +1333,6 @@ static void *loader_proc(void *arg)
 
 	show_progress(80);
 
-	debug_message("Loading weapon animations\n");
-
-	// FIXME: return value
-	//initWeaponAnimations();
-
-
-	show_progress(85);
-
 	debug_message("Loading miscellaneous graphics\n");
 
 	stoneTexture = m_load_bitmap(getResource("combat_media/stone.png"));
@@ -1465,82 +1449,9 @@ bool loadTilemap(void)
 #define LOWP "lowp"
 #endif	
 
-/*void init_controller_shader(void)
-{
-	static const char *main_vertex_source =
-	"attribute vec4 pos;\n"
-	"attribute vec4 color;\n"
-	"attribute vec2 texcoord;\n"
-	"uniform mat4 projview_matrix;\n"
-	"varying vec4 varying_color;\n"
-	"varying vec2 varying_texcoord;\n"
-	"void main()\n"
-	"{\n"
-	"   varying_color = color;\n"
-	"   varying_texcoord = texcoord;\n"
-#ifndef __linux__
-	"   gl_PointSize = 1.0;\n"
-#endif
-	"   gl_Position = projview_matrix * pos;\n"
-	"}\n";
-
-	static const char *main_pixel_source =
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	"precision mediump float;\n"
-#endif
-	"uniform bool use_tex;\n"
-	"uniform sampler2D tex;\n"
-	"uniform bool use_tex_matrix;\n"
-	"uniform mat4 tex_matrix;\n"
-	"varying " LOWP " vec4 varying_color;\n"
-	"varying vec2 varying_texcoord;\n"
-	"void main()\n"
-	"{\n"
-	"  " LOWP " vec4 tmp = varying_color;\n"
-	"  vec4 coord = vec4(varying_texcoord, 0.0, 1.0);\n"
-	"  if (use_tex_matrix) {\n"
-	"     coord = coord * tex_matrix;\n"
-	"     " LOWP " vec4 sample = texture2D(tex, coord.st);\n"
-	"     tmp *= sample;\n"
-	"  }\n"
-	"  else if (use_tex) {\n"
-	"     " LOWP " vec4 sample = texture2D(tex, coord.st);\n"
-	"     tmp *= sample;\n"
-	"  }\n"
-	"  gl_FragColor = tmp;\n"
-	"}\n";
-	
-	controller_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
-
-	al_attach_shader_source(
-				controller_shader,
-				ALLEGRO_VERTEX_SHADER,
-				main_vertex_source
-				);
-	
-	al_attach_shader_source(
-				controller_shader,
-				ALLEGRO_PIXEL_SHADER,
-				main_pixel_source
-				);
-
-	al_link_shader(controller_shader);
-printf("-- %s --\n", al_get_shader_log(controller_shader));
-	
-	al_set_opengl_program_object(controller_display, al_get_opengl_program_object(controller_shader));
-
-}
-
-void destroy_controller_shader(void)
-{
-	al_destroy_shader(controller_shader);
-}
-*/
-
 #ifndef A5_D3D
 void init_shaders(void)
 {
-#if !defined NO_SHADERS
 	if (use_programmable_pipeline) {
 		
 #ifdef A5_OGL
@@ -1947,36 +1858,6 @@ void init_shaders(void)
 		"   return color;\n"
 		"}\n";
 		
-		// spiral transition
-#if 0
-		static const char *warp_pixel_source =
-		"float angle;\n"
-		"float cx;\n"
-		"float cy;\n"
-		"texture tex;\n"
-		"sampler2D s = sampler_state {\n"
-		"   texture = <tex>;\n"
-		"};\n"
-		"float4 ps_main(VS_OUTPUT Input) : COLOR0\n"
-		"{\n"
-		"   float x_offs = Input.TexCoord.x - cx;\n"
-		"   float y_offs = Input.TexCoord.y - cy;\n"
-		"   float dist = sqrt(x_offs*x_offs + y_offs*y_offs);\n"
-		"   float curr_a = atan2(y_offs, x_offs);\n"
-		"   float wave;\n"
-		"   if (angle <= 3.14159) {\n"
-		"      wave = angle;\n"
-		"   }\n"
-		"   else {\n"
-		"      wave = (3.14159*2.0) - angle;\n"
-		"   }\n"
-		"   wave = dist/0.707*wave*4;\n"
-		"   float v1 = cos(curr_a + angle) * dist + cx;\n"
-		"   float v2 = sin(curr_a + (angle * wave)) * dist + cy;\n"
-		"   return tex2D(s, float2(v1, v2));\n"
-		"}\n";
-#endif
-		
 		const char *warp2_pixel_source =
 		"texture tex;\n"
 		"sampler2D s = sampler_state {\n"
@@ -2200,16 +2081,8 @@ void init_shaders(void)
 #endif
 
 #if defined A5_OGL
-      glDisable(GL_DITHER);
-      /*
-   if (!use_programmable_pipeline) {
-      glShadeModel(GL_FLAT);
-      glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-   }
-   */
+	glDisable(GL_DITHER);
 #endif
-
-
 }
 
 void init2_shaders(void)
@@ -2248,7 +2121,6 @@ void destroy_shaders(void)
 		al_destroy_shader(scale2x);
 	}	
 }
-#endif
 
 void draw_loading_screen(MBITMAP *tmp, int percent, ScreenDescriptor *sd)
 {
@@ -2367,7 +2239,7 @@ bool init(int *argc, char **argv[])
 
 
 	al_install_mouse();
-#if !defined ALLEGRO_IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	al_install_keyboard();
 #endif
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -2449,13 +2321,9 @@ bool init(int *argc, char **argv[])
 
 	tguiInit();
 	tguiSetRotation(0);
-	
-#ifdef A5_D3D
-	use_fixed_pipeline = true;
-#endif
 
-	// FIXME:
-#ifdef ALLEGRO_ANDROID
+	// Android because it's very slow switching back in on some devices
+#if defined A5_D3D || defined ALLEGRO_ANDROID
 	use_fixed_pipeline = true;
 #endif
 
@@ -2513,6 +2381,10 @@ bool init(int *argc, char **argv[])
 	}
 
 	set_screen_params();
+      
+#ifdef A5_OGL
+	glDisable(GL_DITHER);
+#endif
 
 	initSound();
 
@@ -2566,7 +2438,7 @@ bool init(int *argc, char **argv[])
 		use_programmable_pipeline = al_get_display_flags(display) & ALLEGRO_USE_PROGRAMMABLE_PIPELINE;
 	}
 
-	#ifndef A5_D3D
+	#if !defined A5_D3D
 	init_shaders();
 	#endif
 
@@ -2618,13 +2490,13 @@ bool init(int *argc, char **argv[])
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
 #ifdef A5_OGL
-#if defined ALLEGOR_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGBA_4444);
 #else
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
 #endif
 #else
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
+	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888); HELLO
 #endif
 
 	create_buffers();
@@ -2636,17 +2508,21 @@ bool init(int *argc, char **argv[])
 
 	scaleXX_buffer = m_create_bitmap(BW*2, BH*2); // check
 
-#ifndef A5_D3D
+#if !defined A5_D3D
 	init2_shaders();
 #endif
+	
+	ALLEGRO_DEBUG("format way way before = %d\n", al_get_new_bitmap_format());
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGBA_4444);
 #elif defined A5_OGL
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
+	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE); CRAPPPPPPP
 #else
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
+	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888); HELLO
 #endif
+	
+	ALLEGRO_DEBUG("format way before = %d\n", al_get_new_bitmap_format());
 
 	if (!buffer) {
 		if (!native_error("Failed to create buffer"))
@@ -2668,12 +2544,16 @@ bool init(int *argc, char **argv[])
 	}
 
 
+	int bflags = al_get_new_bitmap_flags();
+
+
 	eny_loader = new AnimationSet(getResource("media/eny-loader.png"));
 	dot_loader = new AnimationSet(getResource("media/dot-loader.png"));
 	bg_loader = m_load_bitmap(getResource("media/bg-loader.png"));
 	bar_loader = m_load_bitmap(getResource("media/bar-loader.png"));
 	loading_loader = m_load_bitmap(getResource("media/loading-loader.png"));
 
+	ALLEGRO_DEBUG("format before = %d\n", al_get_new_bitmap_format());
 	MBITMAP *tmp = m_create_bitmap(BH, BW); // check
 
 
@@ -2681,15 +2561,15 @@ bool init(int *argc, char **argv[])
 	 * CONVERT THEM TO DISPLAY BITMAPS SO WE CAN SHOW A SMOOTH
 	 * PROGRESS BAR */
 	
+	bool done_loading_samples = false;
+	double start = al_get_time();
+
 	if (cached_bitmap) {
 		al_destroy_bitmap(cached_bitmap);
 		cached_bitmap = NULL;
 		cached_bitmap_filename = "";
 	}
 
-	bool done_loading_samples = false;
-
-	double start = al_get_time();
 	while (1) {
 		if (!done_loading_samples) {
 			done_loading_samples = loadSamples(load_samples_cb);
@@ -2712,7 +2592,6 @@ bool init(int *argc, char **argv[])
 		double elapsed = now - start;
 		start = now;
 		int millis = elapsed * 1000;
-		ALLEGRO_DEBUG("millis=%d elapsed=%f", millis, elapsed);
 		eny_loader->update(millis);
 		dot_loader->update(millis);
 	}
@@ -2721,23 +2600,31 @@ bool init(int *argc, char **argv[])
 		m_rest(0.001);
 	}
 
-#if defined ALLEGRO_IPHONE
-	sb_start();
-#endif
-	
-	shadow_sheet = m_create_alpha_bitmap(4*16, 2*16, create_shadows, NULL, destroy_shadows);
-	draw_loading_screen(tmp, 100, sd);
-	m_destroy_bitmap(tmp);
-	
-	int bflags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags((bflags & ~ALLEGRO_NO_PRESERVE_TEXTURE) & ~ALLEGRO_MEMORY_BITMAP);
-
+	// Must be first thing after thread end or before thread start
 	if (cached_bitmap) {
 		al_destroy_bitmap(cached_bitmap);
 		cached_bitmap = NULL;
 		cached_bitmap_filename = "";
 	}
+
+#if defined ALLEGRO_IPHONE
+	sb_start();
+#endif
+
+	ALLEGRO_DEBUG("format after = %d\n", al_get_new_bitmap_format());
+
+	al_set_new_bitmap_flags((bflags & ~ALLEGRO_NO_PRESERVE_TEXTURE) & ~ALLEGRO_MEMORY_BITMAP);
+
+	shadow_sheet = m_create_alpha_bitmap(4*16, 2*16, create_shadows, NULL, destroy_shadows);
+	draw_loading_screen(tmp, 100, sd);
 	
+	m_destroy_bitmap(tmp);
+	delete eny_loader;
+	delete dot_loader;
+	m_destroy_bitmap(bg_loader);
+	m_destroy_bitmap(bar_loader);
+	m_destroy_bitmap(loading_loader);
+
 	int ttf_flags;
 
 #ifdef ALLEGRO_IPHONE
@@ -2765,6 +2652,12 @@ bool init(int *argc, char **argv[])
 			return false;
 	}
 	
+	if (cached_bitmap) {
+		al_destroy_bitmap(cached_bitmap);
+		cached_bitmap = NULL;
+		cached_bitmap_filename = "";
+	}
+
 	huge_font = m_load_font(getResource("huge_font.tga"));
 	if (!huge_font) {
 		if (!native_error("Failed to load huge_font"))
@@ -2799,7 +2692,7 @@ bool init(int *argc, char **argv[])
 	mushroom = m_make_display_bitmap(mushroom);
 	webbed = m_make_display_bitmap(webbed);
 
-	al_set_new_display_flags(bflags & ~ALLEGRO_MEMORY_BITMAP);
+	al_set_new_bitmap_flags(bflags & ~ALLEGRO_MEMORY_BITMAP);
 	
 	dpad_buttons = m_load_bitmap(getResource("media/buttons.png"));
 	batteryIcon = m_load_bitmap(getResource("media/battery_icon.png"));
@@ -2896,11 +2789,6 @@ void destroy(void)
 		m_destroy_bitmap(screenshot);
 	}
 
-	delete eny_loader;
-	delete dot_loader;
-	m_destroy_bitmap(bg_loader);
-	m_destroy_bitmap(bar_loader);
-	m_destroy_bitmap(loading_loader);
 	m_destroy_bitmap(corner_bmp);
 
 	m_destroy_bitmap(shadow_sheet);
@@ -2924,7 +2812,7 @@ void destroy(void)
 		delete area;
 	debug_message("Destroy 17\n");
 
-	#ifndef A5_D3D
+	#if !defined A5_D3D
 	destroy_shaders();
 	#endif
 

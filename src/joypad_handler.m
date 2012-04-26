@@ -27,6 +27,9 @@ void joy_r_up(void);
 void joy_u_up(void);
 void joy_d_up(void);
 
+void connect_external_controls(void);
+void disconnect_external_controls(void);
+
 @implementation joypad_handler
 
 - (id)init

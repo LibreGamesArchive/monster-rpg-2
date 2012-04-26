@@ -1499,7 +1499,7 @@ void Area::saveBmp(std::string filename)
 
 	ALLEGRO_BITMAP *target = al_get_target_bitmap();
 	m_set_target_bitmap(mem);
-	al_clear_to_color(al_map_rgb(0, 0, 0));
+	m_clear(al_map_rgb(0, 0, 0));
 	draw(pixw, pixh);
 	al_set_target_bitmap(target);
 

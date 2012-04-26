@@ -82,7 +82,7 @@ UIWindow *al_iphone_get_window(ALLEGRO_DISPLAY *display);
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationLandscapeRight);
+    return (interfaceOrientation == UIInterfaceOrientationLandscapeRight) || (interfaceOrientation == UIInterfaceOrientationLandscapeLeft);
 }
 
 - (void) showAchievements

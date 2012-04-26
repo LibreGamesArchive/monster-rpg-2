@@ -213,7 +213,7 @@ MBITMAP *m_create_alpha_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, Rec
 		ALLEGRO_DEBUG("NO don't use only mem bitmaps");
 		b = al_create_bitmap(w, h);
 	}
-	
+
 	al_set_new_bitmap_flags(flags);
 	al_set_new_bitmap_format(f);
 
@@ -221,6 +221,10 @@ MBITMAP *m_create_alpha_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, Rec
 
 	if (create) {
 		create(m, data);
+	}
+
+	if (al_get_bitmap_flags(b) & ALLEGRO_MEMORY_BITMAP) {
+		return m;
 	}
 
 #if defined ALLEGRO_ANDROID || defined A5_D3D
@@ -318,7 +322,7 @@ MBITMAP *get_string_bitmap(const MFONT *font, std::string s, ALLEGRO_COLOR c)
 		ALLEGRO_STATE state;
 		al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
 		m_set_target_bitmap(bmp);
-		m_clear_to_color(al_map_rgba(0, 0, 0, 0));
+		m_clear(al_map_rgba(0, 0, 0, 0));
 		al_draw_text(font, c, 0, 0, 0, s.c_str());
 		al_restore_state(&state);
 		StringBitmap *sb = new StringBitmap;
@@ -431,7 +435,6 @@ MBITMAP *new_mbitmap(ALLEGRO_BITMAP *bitmap)
 	return m;
 }
 
-// HERE FIXME
 MBITMAP *m_load_bitmap(const char *name, bool force_memory)
 {
 	ALLEGRO_BITMAP *bitmap = 0;
@@ -458,6 +461,10 @@ MBITMAP *m_load_bitmap(const char *name, bool force_memory)
 	}
 
 	MBITMAP *m = new_mbitmap(bitmap);
+
+	if (al_get_bitmap_flags(bitmap) & ALLEGRO_MEMORY_BITMAP) {
+		return m;
+	}
 
 #if defined ALLEGRO_ANDROID || defined A5_D3D
 	LoadedBitmap lb;
@@ -499,6 +506,10 @@ MBITMAP *m_load_alpha_bitmap(const char *name, bool force_memory)
 
 	MBITMAP *m = new_mbitmap(bitmap);
 
+	if (al_get_bitmap_flags(bitmap) & ALLEGRO_MEMORY_BITMAP) {
+		return m;
+	}
+
 #if defined ALLEGRO_ANDROID || defined A5_D3D
 	LoadedBitmap lb;
 	lb.load_type = LOAD_LOAD;
@@ -539,7 +550,7 @@ void my_clear_bitmap(MBITMAP *b)
 {
 	ALLEGRO_BITMAP *target = al_get_target_bitmap();
 	m_set_target_bitmap(b);
-	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
+	m_clear(al_map_rgba(0, 0, 0, 0));
 	al_set_target_bitmap(target);
 }
 
@@ -572,6 +583,10 @@ MBITMAP *m_create_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateD
 	
 	if (create) {
 		create(m, data);
+	}
+
+	if (al_get_bitmap_flags(bitmap) & ALLEGRO_MEMORY_BITMAP) {
+		return m;
 	}
 
 #if defined ALLEGRO_ANDROID || defined A5_D3D
@@ -676,9 +691,15 @@ int m_get_display_height(void)
 void m_clear(MCOLOR color)
 {
 	al_clear_to_color(color);
-#if defined A5_OGL && defined ALLEGRO_WINDOWS
-	//glClear(GL_DEPTH_BUFFER_BIT);
-#endif
+	/*
+	ALLEGRO_BITMAP *target = al_get_target_bitmap();
+	int w = al_get_bitmap_width(target);
+	int h = al_get_bitmap_height(target);
+	m_save_blender();
+	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+	al_draw_filled_rectangle(0, 0, w, h, color);
+	m_restore_blender();
+	*/
 }
 
 
@@ -1025,10 +1046,11 @@ void _destroy_loaded_bitmaps(void)
 		if (!(loaded_bitmaps[i].flags & ALLEGRO_NO_PRESERVE_TEXTURE)) {
 			continue;
 		}
+		ALLEGRO_DEBUG("destroying %p", loaded_bitmaps[i].bitmap);
 		if (loaded_bitmaps[i].load_type == LOAD_CREATE && loaded_bitmaps[i].destroy.func) {
 			(*loaded_bitmaps[i].destroy.func)(loaded_bitmaps[i].bitmap);
 		}
-		else {
+		else if (!(loaded_bitmaps[i].load_type == LOAD_CREATE && !loaded_bitmaps[i].recreate.func)) {
 			MBITMAP *m = loaded_bitmaps[i].bitmap;
 			al_destroy_bitmap(m->bitmap);
 		}
@@ -1045,6 +1067,7 @@ void _reload_loaded_bitmaps(void)
 		if (loaded_bitmaps[i].flags & ALLEGRO_NO_PRESERVE_TEXTURE) {
 			al_set_new_bitmap_flags(loaded_bitmaps[i].flags);
 			al_set_new_bitmap_format(loaded_bitmaps[i].format);
+			ALLEGRO_DEBUG("reloading %p", m);
 			if (loaded_bitmaps[i].load_type == LOAD_LOAD) {
 				m->bitmap = my_load_bitmap(loaded_bitmaps[i].load.filename.c_str());
 			}
@@ -1073,13 +1096,10 @@ static MBITMAP *clone_sub_bitmap(MBITMAP *b)
 	);
 
 	m_set_target_bitmap(clone);
-	al_clear_to_color(al_map_rgba_f(0, 0, 0, 0));
+	m_clear(al_map_rgba_f(0, 0, 0, 0));
 
-	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+	//al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
 	m_draw_bitmap(b, 0, 0, 0);
-
-	m_set_target_bitmap(b);
-	m_draw_bitmap(clone, 0, 0, 0);
 
 	al_restore_state(&st);
 

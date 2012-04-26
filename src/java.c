@@ -1,7 +1,9 @@
 #include <allegro5/allegro.h>
-#include <bass.h>
+//#include <bass.h>
 
 #include <jni.h>
+
+#include "java.h"
 
 static bool ok = false;
 

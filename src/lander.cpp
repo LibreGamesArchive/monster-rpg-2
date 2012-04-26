@@ -118,7 +118,7 @@ top:
 	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
 	MBITMAP *lander_tmp = m_create_bitmap(30, 30); // check
 	m_set_target_bitmap(lander_tmp);
-	m_clear_to_color(al_map_rgba(0, 0, 0, 0));
+	m_clear(al_map_rgba(0, 0, 0, 0));
 	m_draw_bitmap(land_bmp, 3, 3, 0);
 	al_restore_state(&state);
 	
@@ -268,7 +268,7 @@ top:
 			// end game logic check
 			// this drawing really has to be done here unfortunately
 			m_set_target_bitmap(lander_tmp);
-			m_clear_to_color(al_map_rgba(0, 0, 0, 0));
+			m_clear(al_map_rgba(0, 0, 0, 0));
 			m_draw_rotated_bitmap(lander_mem, 15, 15, 15, 15, -(lander_angle-M_PI*3/2), 0);
 			
 			green = 0;

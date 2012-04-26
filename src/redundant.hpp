@@ -83,7 +83,9 @@ void m_rest(double seconds);
 void m_flip_display(void);
 int m_get_display_width(void);
 int m_get_display_height(void);
+extern "C" {
 void m_clear(MCOLOR color);
+}
 void m_set_clip(int x1, int y1, int x2, int  y2);
 void m_draw_tinted(MBITMAP *bitmap, int x, int  y,
 	int r, int g, int b, int a,
@@ -185,4 +187,3 @@ MBITMAP *m_clone_bitmap(MBITMAP *b);
 void m_draw_bitmap_to_self(MBITMAP *b, int x, int y, int flags);
 void m_draw_bitmap_region_to_self(MBITMAP *b, int sx, int sy, int sw, int sh, int dx, int dy, int flags);
 
-#define m_clear_to_color al_clear_to_color

@@ -1003,7 +1003,7 @@ void create_death_blit(MBITMAP *bitmap, RecreateData *data)
 
 	m_push_target_bitmap();
 	m_set_target_bitmap(bitmap);
-	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
+	m_clear(al_map_rgba(0, 0, 0, 0));
 	death_blit_region(bmp, 0, 0, w, h, 0, 0, al_map_rgb_f(0.8, 0, 0.8), location == LOCATION_RIGHT ? 0 : ALLEGRO_FLIP_HORIZONTAL);
 	m_pop_target_bitmap();
 	

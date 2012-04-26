@@ -12,6 +12,8 @@
 #define glFrustum glFrustumf
 #endif
 
+bool in_shooter = false;
+
 void vecXmat(double x, double y, double z, ALLEGRO_TRANSFORM *mat, double *ox, double *oy, double *oz, double *ow)
 {
 	*ox = x*mat->m[0][0] + y*mat->m[1][0] + z*mat->m[2][0] + mat->m[3][0];
@@ -664,20 +666,18 @@ static void draw_all(void)
 
 bool shooter(bool for_points)
 {
+	in_shooter = true;
+
 	// stop set_sets (astar with mouse)
 	getInput()->set(false, false, false, false, false, false, false);
 
 	int shark_value, crab_value;
 
-#ifndef A5_D3D_XXX
 	int flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
-#endif
 	bbot = m_create_bitmap(1024, 1024); // check
 	btop = m_create_bitmap(1024, 1024); // check
-#ifndef A5_D3D
 	al_set_new_bitmap_flags(flags);
-#endif
 
 	if (config.getDifficulty() == CFG_DIFFICULTY_EASY) {
 		h = easy_h;
@@ -764,6 +764,8 @@ bool shooter(bool for_points)
 	anotherDoDialogue("Gunnar: Oh, no, the throttle jammed! Eny, you steer.\nMel, Rider, blast anything in our path! I'll go fix the engine!\n", true);
 
 start:
+	bool replay = false;
+
 	playMusic("underwater.ogg");
 
 	MShooterButton *button = NULL;
@@ -1014,6 +1016,8 @@ start:
 					mTextout_simple(_t(pause_text), BW/2-tw/2, BH/2-th/2, white);
 					drawBufferToScreen();
 					m_flip_display();
+
+					al_stop_timer(logic_timer);
 					
 					while (true) {
 						in = getInput()->getDescriptor();
@@ -1049,6 +1053,8 @@ start:
 						m_flip_display();
 						m_rest(0.005);
 					}
+
+					al_start_timer(logic_timer);
 				}
 			}
 			else if (!state.buttons) {
@@ -1135,8 +1141,8 @@ start:
 			m_clear(m_map_rgb(105, 115, 145));
 	
 			if (shooter_restoring) {
+				/*
 				al_stop_timer(logic_timer);
-				ALLEGRO_BITMAP *target = al_get_target_bitmap();
 				m_set_target_bitmap(buffer);
 				m_clear(black);
 				mTextout(
@@ -1162,6 +1168,10 @@ start:
 				}
 				shooter_restoring = false;
 				al_start_timer(logic_timer);
+				*/
+				shooter_restoring = false;
+				replay = true;
+				goto done;
 			}
 			else {
 				draw(x, o);
@@ -1230,6 +1240,10 @@ done:
 	}
 	explosions.clear();
 
+	if (replay) {
+		goto start;
+	}
+
 	fadeOut(black);
 	m_set_target_bitmap(buffer);
 	m_clear(black);
@@ -1291,6 +1305,7 @@ done:
 	if (dead) {
 		if (saveFilename) saveTime(saveFilename);
 		dpad_on();
+		in_shooter = false;
 		return false;
 	}
 	else {
@@ -1305,6 +1320,7 @@ done:
 			}
 		}
 		dpad_on();
+		in_shooter = false;
 		return true;
 	}
 }

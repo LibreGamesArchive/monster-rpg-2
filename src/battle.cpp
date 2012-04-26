@@ -1193,6 +1193,10 @@ Battle::Battle(std::string name, bool can_run) :
 	draw_enemy_status(true),
 	draw_player_status(true)
 {
+	if (area && !player_scripted) {
+		save_memory(true);
+	}
+
 	dpad_off();
 
 	this->can_run = can_run;
@@ -1247,10 +1251,6 @@ extern bool fairy_used;
 
 Battle::~Battle(void)
 {
-	if (area && !player_scripted) {
-		save_memory(true);
-	}
-
 	fairy_used = false;
 
 	std::list<CombatEntity *>::iterator it;

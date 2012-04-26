@@ -316,7 +316,6 @@ void showSaveStateInfo(const char *basename)
 	int x = (BW-w)/2;
 	int y = (BH-h)/2;
 
-	//ALLEGRO_DEBUG("loading screenshot");
 #ifdef ALLEGRO_ANDROID
 	al_set_standard_file_interface();
 #endif
@@ -325,10 +324,8 @@ void showSaveStateInfo(const char *basename)
 	al_set_apk_file_interface();
 #endif
 
-	//ALLEGRO_DEBUG("getting file date");
 	char d[100];
 	strcpy(d, file_date(getUserResource("%s.save", basename)));
-	//ALLEGRO_DEBUG("got file date");
 
 	tguiPush();
 
@@ -814,16 +811,12 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 {
 	in_pause = true;
 	
-	save_memory(true);
-
 	dpad_off();
 	
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (timer_on)
 		can_save = false;
 	else
 		can_save = true;
-#endif
 
 	if (!global_can_save)
 		can_save = false;
@@ -950,8 +943,11 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 		mainSave = new MLabel(162+m_text_height(game_font)/2+2, yy, "Save", m_map_rgb(128, 128, 128));
 	yy += yinc;
 	MTextButton *mainResume = new MTextButton(162, yy, "Play", false, left_widget);
-#if !defined ALLEGRO_IPHONE && !defined ALLEGR_ANDROID
-	yy += yinc;
+#if !defined ALLEGRO_IPHONE
+	#ifdef ALLEGRO_ANDROID
+	if (!use_dpad)
+	#endif
+		yy += yinc;
 #endif
 	MTextButton *mainQuit = new MTextButton(162, yy, "Quit", false, left_widget);
 	yy += yinc;
@@ -1041,8 +1037,11 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	tguiAddWidget(mainExamine);
 	#endif
 	tguiAddWidget(mainSave);
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	tguiAddWidget(mainResume);
+#if !defined ALLEGRO_IPHONE
+	#ifdef ALLEGRO_ANDROID
+	if (!use_dpad)
+	#endif
+		tguiAddWidget(mainResume);
 #endif
 	tguiAddWidget(mainQuit);
 #ifdef ALLEGRO_IPHONE
@@ -1686,6 +1685,8 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 
 done:
 
+	save_memory(true);
+
 printf("1.\n");
 	stopAllOmni();
 
@@ -1793,23 +1794,17 @@ void doMap(std::string startPlace, std::string prefix)
 		playMusic("map.ogg");
 	}
 
-	//ALLEGRO_DEBUG("doMap 1");
-
 	mapWidget = new MMap(startPlace, prefix);
 
-	//ALLEGRO_DEBUG("doMap 2");
 	tguiSetParent(0);
 	tguiAddWidget(mapWidget);
 	tguiSetFocus(mapWidget);
-	//ALLEGRO_DEBUG("doMap 3");
 
 	m_set_target_bitmap(buffer);
 	tguiDraw();
 	fadeIn(black);
-	//ALLEGRO_DEBUG("doMap 4");
 
 	clear_input_events();
-	//ALLEGRO_DEBUG("doMap 5");
 
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
@@ -2608,11 +2603,9 @@ void credits(void)
 
 void choose_savestate_old(std::string caption, bool paused, bool autosave, bool (*callback)(int n, bool exists, void *data), void *data)
 {
-	//ALLEGRO_DEBUG("hoo 1");
 	dpad_off();
 
 	SaveStateInfo infos[10];
-	//ALLEGRO_DEBUG("hoo 2");
 
 	try {
 		for (int i = 0; i < 10; i++) {
@@ -2624,14 +2617,11 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 		callback(-1, false, data);
 		return;
 	}
-	//ALLEGRO_DEBUG("hoo 3");
 
 	MIcon *bg = new MIcon(0, 0, std::string(getResource("media/savebg.png")), white, false, "", false, false, false);
-	//ALLEGRO_DEBUG("hoo 4");
 
 	MTextButtonFullShadow *buttons[10];
 	for (int i = 0; i < 10; i++) {
-	//ALLEGRO_DEBUG("hoo 5 i=%d", i);
 		char buf[100];
 		if (infos[i].exp == 0 && infos[i].gold == 0 && infos[i].time == 0) {
 			sprintf(buf, "(Empty)");
@@ -2647,7 +2637,6 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 	}
 
 	MLabel *lcaption = new MLabel(0, 0, caption, m_map_rgb(220, 220, 220));
-	//ALLEGRO_DEBUG("hoo 6");
 
 	tguiPush();
 
@@ -2659,7 +2648,6 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 		tguiAddWidget(buttons[i]);
 	}
 	tguiSetFocus(buttons[0]);
-	//ALLEGRO_DEBUG("hoo 7");
 
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
@@ -2679,16 +2667,13 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 			TGUIWidget *widget = tguiUpdate();
 
 			for (int i = 0; i < 10; i++) {
-	//ALLEGRO_DEBUG("hoo 8 i=%d", i);
 				if (widget == buttons[i]) {
-	//ALLEGRO_DEBUG("hoo 9 calling!");
 					if (callback(i, (infos[i].exp == 0 && infos[i].gold == 0 && infos[i].time == 0) ? false : true, data)) {
 						goto done;
 					}
 				}
 			}
 			
-	//ALLEGRO_DEBUG("hoo 10");
 			INPUT_EVENT ie = get_next_input_event();
 			if (ie.button2 == DOWN || iphone_shaken(0.1)) {
 				use_input_event();
@@ -2700,7 +2685,6 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 			}
 
 		}
-	//ALLEGRO_DEBUG("hoo 11");
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
@@ -2855,41 +2839,27 @@ static bool choose_copy_state(int n, bool exists, void *data)
 {
 	(void)data;
 
-	//ALLEGRO_DEBUG("!1");
-	
 	if (n >= 0) {
-	//ALLEGRO_DEBUG("!2");
 		if (exists) {
 #ifdef ALLEGRO_ANDROID
 			al_set_standard_file_interface();
 #endif
-	//ALLEGRO_DEBUG("!3");
 			int sz;
 			unsigned char *bytes = slurp_file(getUserResource("%d.save", n), &sz);
 #ifdef ALLEGRO_ANDROID
 			al_set_apk_file_interface();
 #endif
-	//ALLEGRO_DEBUG("!4");
-
 			char *encoded = create_url(bytes, sz);
-	//ALLEGRO_DEBUG("!5");
 			set_clipboard(encoded);
-	//ALLEGRO_DEBUG("!6");
 			notify("", "Save state copied.", "");
-	//ALLEGRO_DEBUG("!7");
 		}
 		else {
-	//ALLEGRO_DEBUG("!8");
 			notify("Can't copy", "empty save state!", "");
-	//ALLEGRO_DEBUG("!9");
 		}
 	}
 	else {
-	//ALLEGRO_DEBUG("!10");
 		notify("", "Cancelled", "");
-	//ALLEGRO_DEBUG("!11");
 	}
-	//ALLEGRO_DEBUG("!12");
 	
 	return true;
 }
@@ -3127,7 +3097,6 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 			}
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			else if (widget == copy_button) {
-				//ALLEGRO_DEBUG("calling choose_savestate_old");
 				choose_savestate_old("Choose state to copy", true, false, choose_copy_state, NULL);
 			}
 			else if (widget == paste_button) {
@@ -3654,7 +3623,7 @@ bool config_menu(bool start_on_fullscreen)
 
 			m_set_target_bitmap(buffer);
 
-			m_clear_to_color(m_map_rgb(0, 0, 0));
+			m_clear(m_map_rgb(0, 0, 0));
 			
 			al_draw_tinted_bitmap(bg->bitmap, al_map_rgba(64, 64, 64, 255), 0, 0, 0);
 			
@@ -3975,9 +3944,8 @@ int title_menu(void)
 		}
 
 		if (draw_counter > 0) {
-			// FIXME
-			//ALLEGRO_DEBUG("drawing loop");
 			draw_counter = 0;
+
 			m_set_target_bitmap(buffer);
 		
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);

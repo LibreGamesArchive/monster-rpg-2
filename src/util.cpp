@@ -244,7 +244,7 @@ bool iphone_line(IPHONE_LINE_DIR dir, double since)
 
 bool iphone_shaken(double since)
 {
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (use_dpad) return false;
 #endif
 
