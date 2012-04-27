@@ -28,7 +28,7 @@
 #define NUM_FILES 42 // FIXME: change this as needed
 #define EXPECTED_LIST_SIZE (NUM_FILES * 81) // 60 chars filename 20 chars length + 1 \n
 
-#define DOWNLOAD_PATH "." // FIXME: change me
+#define DOWNLOAD_PATH "flacs" // FIXME: change me
 
 static volatile bool stop = false;
 
@@ -38,35 +38,18 @@ static socklen_t saddr_len;
 
 static int get(char *buf, int len)
 {
-	int n;
-	int i;
+	int n = recvfrom(
+		sock,
+		buf,
+		len,
+		0,
+		&saddr,
+		&saddr_len
+	);
 
-	for (i = 0; i < 60/0.1; i++) {
-		n = recvfrom(
-			sock,
-			buf,
-			len,
-			0,
-			&saddr,
-			&saddr_len
-		);
-		printf("n=%d\n", n);
-#ifdef WINPC
-		int e = WSAGetLastError();
-		printf("WSAGetLastError()=%d\n", e);
-		if (n == -1 && e == WSAEWOULDBLOCK) {
-#else
-		printf("errno=%d EAGAIN=%d\n", errno, EAGAIN);
-		if (n == -1 && errno == EAGAIN) {
-#endif
-			printf("HERE\n");
-			al_rest(0.1);
-			continue;
-		}
-		break;
+	if (n < 1) {
+		return 0;
 	}
-
-	if (n < 1) return 0;
 
 	return n;
 }
@@ -89,7 +72,6 @@ static bool connect_to_server(void)
 	struct addrinfo hints, *res;
 
 	// first, load up address structs with getaddrinfo():
-
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_DGRAM;
@@ -102,13 +84,13 @@ static bool connect_to_server(void)
 	}
 	
 	// make a socket:
-
 	sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if (sock == INVALID_SOCKET) {
 		freeaddrinfo(res);
 		return false;
 	}
 
+#if 0
 #ifdef WINPC
 	DWORD nonBlocking = 1;
 	if (ioctlsocket(sock, FIONBIO, &nonBlocking) != 0) {
@@ -121,6 +103,7 @@ static bool connect_to_server(void)
 		printf("failed to set non-blocking socket\n");
 		return false;
 	}
+#endif
 #endif
 
 	saddr_len = sizeof(struct sockaddr);
@@ -130,54 +113,6 @@ static bool connect_to_server(void)
 
 	return true;
 }
-
-#if 0
-static bool connect_to_server(void)
-{
-	sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (sock == INVALID_SOCKET) {
-		return false;
-	}
-
-	struct sockaddr_in address;
-	address.sin_family = AF_INET;
-	address.sin_addr.s_addr = INADDR_ANY;
-	address.sin_port = htons(0);
-
-	if (bind(sock, (const struct sockaddr *)&address, sizeof(struct sockaddr_in)) < 0) {
-		return false;
-	}
-
-#ifdef WINPC
-	DWORD nonBlocking = 1;
-	if (ioctlsocket(sock, FIONBIO, &nonBlocking) != 0) {
-		printf("failed to set non-blocking socket\n");
-		return false;
-	}
-#else
-	int nonBlocking = 1;
-	if (fcntl(sock, F_SETFL, O_NONBLOCK, nonBlocking) == -1) {
-		printf("failed to set non-blocking socket\n");
-		return false;
-	}
-#endif
-
-	unsigned int a = 64;
-	unsigned int b = 85;
-	unsigned int c = 168;
-	unsigned int d = 26;
-	unsigned short port = 69;
-
-	unsigned int destination_address = ( a << 24 ) | ( b << 16 ) | ( c << 8 ) | d;
-	unsigned short destination_port = port;
-
-	srvaddr.sin_family = AF_INET;
-	srvaddr.sin_addr.s_addr = htonl(destination_address);
-	srvaddr.sin_port = htons(destination_port);
-
-	return true;
-}
-#endif
 
 static void shutdown_connection(void)
 {
@@ -221,6 +156,7 @@ int get16bits(const char *buf)
 
 static int download_file(const char *filename)
 {
+	char fn[1000];
 	char buf[4+BLKSIZE];
 	int sz, total_size = 0;
 	int last_blocknum = -1;
@@ -244,6 +180,7 @@ static int download_file(const char *filename)
 	// read option acknowledgement
 	sz = get(buf, 2+strlen("blksize")+1+strlen(BLKSIZE_S)+1);
 	if ((sz != (2+strlen("blksize")+1+strlen(BLKSIZE_S)+1)) || get16bits(buf) != 6) {
+		printf("Bad oack\n");
 		shutdown_connection();
 		return -1;
 	}
@@ -260,14 +197,26 @@ static int download_file(const char *filename)
 	}
 
 	printf("downloading %s\n", filename);
-	
-	FILE *f = fopen(filename, "wb");
+
+	sprintf(fn, "%s/%s", DOWNLOAD_PATH, filename);
+	FILE *f = fopen(fn, "wb");
 
 	while (1) {
 		if (stop) {
 			fclose(f);
 			shutdown_connection();
 			stop = false;
+			return -1;
+		}
+		fd_set fdset;
+		FD_ZERO(&fdset);
+		FD_SET(sock, &fdset);
+		struct timeval tv;
+		tv.tv_sec = 60;
+		tv.tv_usec = 0;
+		if (select(sock+1, &fdset, 0, 0, &tv) == 0) {
+			fclose(f);
+			shutdown_connection();
 			return -1;
 		}
 		sz = get(buf, 4+BLKSIZE);
@@ -331,10 +280,11 @@ bool download_all(void)
 	char **filenames = NULL;
 	int *lengths = NULL;
 	int count = 0;
-	while ((read = fread(buf, 80, 1, f)) == 1) {
-		fseek(f, 1, SEEK_CUR);
+	while ((read = fread(buf, 1, 80, f)) == 80) {
+		fgetc(f); // skip, fseek malfunctioning on windows oO
 		buf[80] = 0;
 		if (sscanf(buf, "%s %d", fn, &sz) != 2) {
+			printf("scan failed\n");
 			fclose(f);
 			return false;
 		}
