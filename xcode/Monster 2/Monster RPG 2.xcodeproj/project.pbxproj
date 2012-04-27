@@ -179,6 +179,8 @@
 		968C1E6213BBE28800615225 /* atlas_accessor.c in Sources */ = {isa = PBXBuildFile; fileRef = 968C1E5E13BBE28800615225 /* atlas_accessor.c */; };
 		968C1E6313BBE28800615225 /* atlas.c in Sources */ = {isa = PBXBuildFile; fileRef = 968C1E6013BBE28800615225 /* atlas.c */; };
 		968C1E7A13BCED5E00615225 /* libbassflac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 968C1E7913BCED5D00615225 /* libbassflac.a */; };
+		9691EA86154AF63800927975 /* libbass.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0CE143BBA8400ACA64C /* libbass.dylib */; };
+		9691EA87154AF63800927975 /* libbassflac.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0CF143BBA8400ACA64C /* libbassflac.dylib */; };
 		9695A140138D706500FB0417 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9695A133138D706400FB0417 /* libfreetype.a */; };
 		9695A141138D706500FB0417 /* liblua-fixed.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9695A134138D706400FB0417 /* liblua-fixed.a */; };
 		9695A142138D706500FB0417 /* libtgui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9695A135138D706400FB0417 /* libtgui.a */; };
@@ -241,8 +243,6 @@
 		96B4B130143BBBF300ACA64C /* xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224274103D96D400756C5B /* xml.cpp */; };
 		96B4B135143BBEDC00ACA64C /* liblua-fixed.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B131143BBC4800ACA64C /* liblua-fixed.a */; };
 		96B4B136143BBEDC00ACA64C /* libJoypadCocoa.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0DD143BBB6200ACA64C /* libJoypadCocoa.a */; };
-		96B4B137143BBEDC00ACA64C /* libbass.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0CE143BBA8400ACA64C /* libbass.dylib */; };
-		96B4B138143BBEDC00ACA64C /* libbassflac.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0CF143BBA8400ACA64C /* libbassflac.dylib */; };
 		96B4B139143BBEDC00ACA64C /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0D0143BBA8400ACA64C /* libfreetype.a */; };
 		96B4B13A143BBEDC00ACA64C /* libtgui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0D2143BBA8400ACA64C /* libtgui.a */; };
 		96B4B13B143BBEDC00ACA64C /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0D3143BBA8400ACA64C /* libz.a */; };
@@ -641,6 +641,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9691EA86154AF63800927975 /* libbass.dylib in Frameworks */,
+				9691EA87154AF63800927975 /* libbassflac.dylib in Frameworks */,
 				96A4D272154A7EC0009ECD44 /* liballegro_native_dialog-static.a in Frameworks */,
 				96A4D26D154A7E66009ECD44 /* libpng.a in Frameworks */,
 				96A4D26B154A7E21009ECD44 /* IOKit.framework in Frameworks */,
@@ -656,8 +658,6 @@
 				96A4D259154A7D55009ECD44 /* OpenGL.framework in Frameworks */,
 				96B4B135143BBEDC00ACA64C /* liblua-fixed.a in Frameworks */,
 				96B4B136143BBEDC00ACA64C /* libJoypadCocoa.a in Frameworks */,
-				96B4B137143BBEDC00ACA64C /* libbass.dylib in Frameworks */,
-				96B4B138143BBEDC00ACA64C /* libbassflac.dylib in Frameworks */,
 				96B4B139143BBEDC00ACA64C /* libfreetype.a in Frameworks */,
 				96B4B13A143BBEDC00ACA64C /* libtgui.a in Frameworks */,
 				96B4B13B143BBEDC00ACA64C /* libz.a in Frameworks */,

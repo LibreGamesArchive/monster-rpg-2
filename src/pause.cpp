@@ -3917,14 +3917,18 @@ void hqm_menu(void)
 
 			// top descriptions
 			const char *text = "Free HQ soundtrack download";
-			mTextout_simple(text, (BW-m_text_length(game_font, text))/2, 15, m_map_rgb(255, 255, 0));
+			mTextout_simple(_t(text), (BW-m_text_length(game_font, text))/2, 15, m_map_rgb(255, 255, 0));
 
 			// draw status
 			float percent;
 			int status = hqm_get_status(&percent);
 			const char *status_txt = hqm_status_string(status);
 			char buf[100];
-			sprintf(buf, "Status: %s. %s. (%d%%)", status_txt, hqm_is_downloading() ? "Downloading" : "Stopped", (int)(percent * 100));
+			char s[100];
+			char s2[100];
+			strcpy(s, hqm_is_downloading() ? _t("Downloading") : _t("Stopped"));
+			strcpy(s2, _t(status_txt));
+			sprintf(buf, _t("Status: %s. %s. (%d%%)"), s2, s, (int)(percent * 100));
 			mTextout(
 				game_font,
 				buf,

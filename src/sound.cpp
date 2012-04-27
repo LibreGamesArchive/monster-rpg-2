@@ -191,7 +191,7 @@ void initSound(void)
 	if (!BASSFLACplugin) {
 		printf("Error loading FLAC plugin (%d)\n", BASS_ErrorGetCode());
 	}
-	
+
 	for (int i = 0; preloaded_names[i] != ""; i++) {
 		total_samples++;
 	}
@@ -203,8 +203,10 @@ bool loadSamples(void (*cb)(int, int))
 		loadSample(preloaded_names[curr_sample]);
 	(*cb)(curr_sample, total_samples);
 	curr_sample++;
-	if (curr_sample == total_samples)
+	if (curr_sample == total_samples) {
+		curr_sample = 0;
 		return true;
+	}
 	return false;
 }
 
@@ -289,7 +291,6 @@ static void CALLBACK MusicSyncProc(HSYNC handle, DWORD channel, DWORD data, void
 static std::string check_music_name(std::string name)
 {
 	if (hqm_get_status(NULL) == HQM_STATUS_COMPLETE) {
-		printf("COMPLETE!\n");
 		std::string::size_type p = name.rfind(".");
 		if (p != std::string::npos) {
 			name = name.substr(0, p) + ".flac";
@@ -297,7 +298,6 @@ static std::string check_music_name(std::string name)
 			return name;
 		}
 	}
-	else printf("INCOMPLETE :(\n");
 	
 	return getResource("music/%s", name.c_str());
 }
@@ -322,8 +322,6 @@ void playMusic(std::string name, float vol, bool force)
 	}
 
 	name = check_music_name(name);
-
-	printf("name='%s'\n", name.c_str());
 
 	music = BASS_StreamCreateFile(false,
 		name.c_str(),
@@ -425,7 +423,7 @@ static void destroyMusic(void)
 	}
 	
 	musicName = "";
-	
+
 	BASS_PluginFree((HPLUGIN)BASSFLACplugin);
 }
 
