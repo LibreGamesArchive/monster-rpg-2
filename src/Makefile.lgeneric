@@ -73,8 +73,8 @@ LIBS=-lbass -lGL -llua-fixed -ltgui `pkg-config --libs xinerama` $(ALLEGROLIBS) 
 default: monster2
 
 
-monster2: $(CXX_LIBOBJS) init.o atlas.o atlas_accessor.o
-	g++ $(LDFLAGS) $(CXX_LIBOBJS) init.o atlas.o atlas_accessor.o $(LIBS) -o monster2
+monster2: $(CXX_LIBOBJS) init.o atlas.o atlas_accessor.o tftp_get.o
+	g++ $(LDFLAGS) $(CXX_LIBOBJS) init.o atlas.o atlas_accessor.o tftp_get.o $(LIBS) -o monster2
 
 .cpp.o:
 	$(CXX) $(CFLAGS) -c $<
@@ -87,6 +87,9 @@ atlas.o: atlas.c
 
 atlas_accessor.o: atlas_accessor.c
 	$(CC) $(CFLAGS) -c atlas_accessor.c
+
+tftp_get.o: tftp_get.c
+	$(CC) $(CFLAGS) -c tftp_get.c
 
 clean:
 	-rm -f *.o
