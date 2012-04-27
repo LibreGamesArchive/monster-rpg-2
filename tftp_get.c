@@ -1,3 +1,4 @@
+#define _WIN32_WINNT 0x0501
 #include <allegro5/allegro.h>
 
 #include <stdio.h>
@@ -5,17 +6,19 @@
 #include <string.h>
 
 #ifdef WINPC
+#undef UNICODE
 #include <windows.h>
 #include <winsock2.h>
+#include <ws2tcpip.h>
 #define my_shutdown(a, b) closesocket(a)
 #define SHUT_RDWR 0xf008a7
+#define socklen_t int
 #else
 #include <sys/socket.h>
 #include <netdb.h>
 #define INVALID_SOCKET -1
 #define my_shutdown shutdown
 #endif
-#include <sys/time.h>
 
 #define SERVER "nooskewl.com"
 #define PORT "69"
@@ -35,24 +38,54 @@ static socklen_t saddr_len;
 
 static int get(char *buf, int len)
 {
-	int n = recvfrom(sock, buf, len, 0, &saddr, &saddr_len);
+	int n;
+	int i;
+
+	for (i = 0; i < 60/0.1; i++) {
+		n = recvfrom(
+			sock,
+			buf,
+			len,
+			0,
+			&saddr,
+			&saddr_len
+		);
+		printf("n=%d\n", n);
+#ifdef WINPC
+		int e = WSAGetLastError();
+		printf("WSAGetLastError()=%d\n", e);
+		if (n == -1 && e == WSAEWOULDBLOCK) {
+#else
+		printf("errno=%d EAGAIN=%d\n", errno, EAGAIN);
+		if (n == -1 && errno == EAGAIN) {
+#endif
+			printf("HERE\n");
+			al_rest(0.1);
+			continue;
+		}
+		break;
+	}
+
 	if (n < 1) return 0;
+
 	return n;
 }
 
 static int put(const char *buf, int len)
 {
-	int n = sendto(sock, buf, len, 0, &saddr, saddr_len);
+	int n = sendto(
+		sock,
+		buf,
+		len,
+		0,
+		&saddr,
+		saddr_len
+	);
 	return n;
 }
 
 static bool connect_to_server(void)
 {
-#ifdef WINPC
-	WSAData crap;
-	WSAStartup(2, &crap);
-#endif
-
 	struct addrinfo hints, *res;
 
 	// first, load up address structs with getaddrinfo():
@@ -76,13 +109,75 @@ static bool connect_to_server(void)
 		return false;
 	}
 
-	saddr_len = res->ai_addrlen;
-	memcpy(&saddr, res->ai_addr, sizeof(struct sockaddr));
+#ifdef WINPC
+	DWORD nonBlocking = 1;
+	if (ioctlsocket(sock, FIONBIO, &nonBlocking) != 0) {
+		printf("failed to set non-blocking socket\n");
+		return false;
+	}
+#else
+	int nonBlocking = 1;
+	if (fcntl(sock, F_SETFL, O_NONBLOCK, nonBlocking) == -1) {
+		printf("failed to set non-blocking socket\n");
+		return false;
+	}
+#endif
+
+	saddr_len = sizeof(struct sockaddr);
+	memcpy(&saddr, res->ai_addr, saddr_len);
 
 	freeaddrinfo(res);
 
 	return true;
 }
+
+#if 0
+static bool connect_to_server(void)
+{
+	sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (sock == INVALID_SOCKET) {
+		return false;
+	}
+
+	struct sockaddr_in address;
+	address.sin_family = AF_INET;
+	address.sin_addr.s_addr = INADDR_ANY;
+	address.sin_port = htons(0);
+
+	if (bind(sock, (const struct sockaddr *)&address, sizeof(struct sockaddr_in)) < 0) {
+		return false;
+	}
+
+#ifdef WINPC
+	DWORD nonBlocking = 1;
+	if (ioctlsocket(sock, FIONBIO, &nonBlocking) != 0) {
+		printf("failed to set non-blocking socket\n");
+		return false;
+	}
+#else
+	int nonBlocking = 1;
+	if (fcntl(sock, F_SETFL, O_NONBLOCK, nonBlocking) == -1) {
+		printf("failed to set non-blocking socket\n");
+		return false;
+	}
+#endif
+
+	unsigned int a = 64;
+	unsigned int b = 85;
+	unsigned int c = 168;
+	unsigned int d = 26;
+	unsigned short port = 69;
+
+	unsigned int destination_address = ( a << 24 ) | ( b << 16 ) | ( c << 8 ) | d;
+	unsigned short destination_port = port;
+
+	srvaddr.sin_family = AF_INET;
+	srvaddr.sin_addr.s_addr = htonl(destination_address);
+	srvaddr.sin_port = htons(destination_port);
+
+	return true;
+}
+#endif
 
 static void shutdown_connection(void)
 {
@@ -126,62 +221,53 @@ int get16bits(const char *buf)
 
 static int download_file(const char *filename)
 {
-	char fn[1000];
-	sprintf(fn, "%s/%s", DOWNLOAD_PATH, filename);
-	FILE *f = fopen(filename, "wb"); // FIXME
 	char buf[4+BLKSIZE];
 	int sz, total_size = 0;
 	int last_blocknum = -1;
 	
 	if (!connect_to_server()) {
 		printf("couldn't connect\n");
-		fclose(f);
 		return -1;
 	}
+
+	printf("connected\n");
 
 	sz = get_rrq(buf, filename);
 	if (put(buf, sz) != sz) {
 		printf("read request fail\n");
-		fclose(f);
 		shutdown_connection();
 		return -1;
 	}
 
+	printf("sent rrq\n");
+
 	// read option acknowledgement
 	sz = get(buf, 2+strlen("blksize")+1+strlen(BLKSIZE_S)+1);
 	if ((sz != (2+strlen("blksize")+1+strlen(BLKSIZE_S)+1)) || get16bits(buf) != 6) {
-		fclose(f);
 		shutdown_connection();
 		return -1;
 	}
+
+	printf("got oack\n");
 
 	buf[0] = 0;
 	buf[1] = 4;
 	buf[2] = 0;
 	buf[3] = 0;
 	if (put(buf, 4) != 4) {
-		fclose(f);
 		shutdown_connection();
 		return -1;
 	}
 
 	printf("downloading %s\n", filename);
+	
+	FILE *f = fopen(filename, "wb");
 
 	while (1) {
 		if (stop) {
 			fclose(f);
 			shutdown_connection();
-			return -1;
-		}
-		fd_set fdset;
-		FD_ZERO(&fdset);
-		FD_SET(sock, &fdset);
-		struct timeval tv;
-		tv.tv_sec = 60;
-		tv.tv_usec = 0;
-		if (select(sock+1, &fdset, 0, 0, &tv) == 0) {
-			fclose(f);
-			shutdown_connection();
+			stop = false;
 			return -1;
 		}
 		sz = get(buf, 4+BLKSIZE);
@@ -370,6 +456,11 @@ int main(void)
 {
 	al_init();
 
+#ifdef WINPC
+	WSADATA crap;
+	WSAStartup(MAKEWORD(2, 2), &crap);
+#endif
+
 	al_run_detached_thread(test_thread, NULL);
 	
 	int len = download_file("list.txt");
@@ -386,6 +477,10 @@ int main(void)
 	bool ret = download_all();
 	if (ret) printf("Success!\n");
 	else printf("Error!\n");
+
+#ifdef WINPC
+	WSACleanup();
+#endif
 
 	return 0;
 }
