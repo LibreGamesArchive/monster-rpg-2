@@ -104,6 +104,8 @@ double next_shake;
 
 bool do_acknowledge_resize = false;
 
+static ALLEGRO_JOYSTICK *user_joystick = NULL;
+
 bool achievement_show = false;
 double achievement_time = 0;
 MBITMAP *achievement_bmp;
@@ -638,6 +640,21 @@ void register_display(ALLEGRO_DISPLAY *display)
 	al_register_event_source(events_minor, al_get_display_event_source(display));
 }
 
+static ALLEGRO_JOYSTICK *set_user_joystick(void)
+{
+	int nj = al_get_num_joysticks();
+	user_joystick = NULL;
+	for (int k = 0; k < nj; k++) {
+		ALLEGRO_JOYSTICK *j;
+		j = al_get_joystick(k);
+		int nb = al_get_joystick_num_buttons(j);
+		if (nb > 0) {
+			user_joystick = al_get_joystick(k);
+			break;
+		}
+	}
+}
+
 /* FIXME: Any new Effects have to be freed/restored here! */
 static void *thread_proc(void *arg)
 {
@@ -859,86 +876,100 @@ static void *thread_proc(void *arg)
 			}
 			else if (event.type == ALLEGRO_EVENT_JOYSTICK_CONFIGURATION) {
 				al_reconfigure_joysticks();
-				if (al_get_num_joysticks() == 0) {
+				int nj = al_get_num_joysticks();
+				if (nj == 0) {
 					num_joystick_buttons = 0;
 					config.setGamepadAvailable(false);
 				}
-				else if (al_get_num_joysticks() > 0) {
-					num_joystick_buttons = al_get_joystick_num_buttons(al_get_joystick(0));
-					config.setGamepadAvailable(true);
+				else if (nj > 0) {
+					set_user_joystick();
+					if (user_joystick != NULL) {
+						num_joystick_buttons = al_get_joystick_num_buttons(user_joystick);
+						config.setGamepadAvailable(true);
+					}
+					else {
+						num_joystick_buttons = 0;
+						config.setGamepadAvailable(false);
+					}
 				}
 				getInput()->reconfig();
 			}
 			else if (event.type == ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN) {
-				if (event.joystick.button == config.getJoyButton1()) {
-					joy_b1_down();
-				}
-				else if (event.joystick.button == config.getJoyButton2()) {
-					joy_b2_down();
-				}
-				else if (event.joystick.button == config.getJoyButton3()) {
-					joy_b3_down();
+				if (event.joystick.id == user_joystick) {
+					if (event.joystick.button == config.getJoyButton1()) {
+						joy_b1_down();
+					}
+					else if (event.joystick.button == config.getJoyButton2()) {
+						joy_b2_down();
+					}
+					else if (event.joystick.button == config.getJoyButton3()) {
+						joy_b3_down();
+					}
 				}
 			}
 			else if (event.type == ALLEGRO_EVENT_JOYSTICK_BUTTON_UP) {
-				if (event.joystick.button == config.getJoyButton1()) {
-					joy_b1_up();
-				}
-				else if (event.joystick.button == config.getJoyButton2()) {
-					joy_b2_up();
-				}
-				else if (event.joystick.button == config.getJoyButton3()) {
-					joy_b3_up();
+				if (event.joystick.id == user_joystick) {
+					if (event.joystick.button == config.getJoyButton1()) {
+						joy_b1_up();
+					}
+					else if (event.joystick.button == config.getJoyButton2()) {
+						joy_b2_up();
+					}
+					else if (event.joystick.button == config.getJoyButton3()) {
+						joy_b3_up();
+					}
 				}
 			}
 			else if (event.type == ALLEGRO_EVENT_JOYSTICK_AXIS) {
-				int axis = event.joystick.axis;
-				float pos = event.joystick.pos;
-				if (axis == 0) {
-					if (joy_axes[0] == -1) {
-						if (pos >= -0.5) {
-							joy_axes[0] = 0;
-							joy_l_up();
+				if (event.joystick.id == user_joystick) {
+					int axis = event.joystick.axis;
+					float pos = event.joystick.pos;
+					if (axis == 0) {
+						if (joy_axes[0] == -1) {
+							if (pos >= -0.5) {
+								joy_axes[0] = 0;
+								joy_l_up();
+							}
+						}
+						else if (joy_axes[0] == 1) {
+							if (pos <= 0.5) {
+								joy_axes[0] = 0;
+								joy_r_up();
+							}
+						}
+						else {
+							if (pos < -0.5) {
+								joy_axes[0] = -1;
+								joy_l_down();
+							}
+							else if (pos > 0.5) {
+								joy_axes[0] = 1;
+								joy_r_down();
+							}
 						}
 					}
-					else if (joy_axes[0] == 1) {
-						if (pos <= 0.5) {
-							joy_axes[0] = 0;
-							joy_r_up();
+					else if (axis == 1) {
+						if (joy_axes[1] == -1) {
+							if (pos >= -0.5) {
+								joy_axes[1] = 0;
+								joy_u_up();
+							}
 						}
-					}
-					else {
-						if (pos < -0.5) {
-							joy_axes[0] = -1;
-							joy_l_down();
+						else if (joy_axes[1] == 1) {
+							if (pos <= 0.5) {
+								joy_axes[1] = 0;
+								joy_d_up();
+							}
 						}
-						else if (pos > 0.5) {
-							joy_axes[0] = 1;
-							joy_r_down();
-						}
-					}
-				}
-				else if (axis == 1) {
-					if (joy_axes[1] == -1) {
-						if (pos >= -0.5) {
-							joy_axes[1] = 0;
-							joy_u_up();
-						}
-					}
-					else if (joy_axes[1] == 1) {
-						if (pos <= 0.5) {
-							joy_axes[1] = 0;
-							joy_d_up();
-						}
-					}
-					else {
-						if (pos > 0.5) {
-							joy_axes[1] = 1;
-							joy_d_down();
-						}
-						else if (pos < -0.5) {
-							joy_axes[1] = -1;
-							joy_u_down();
+						else {
+							if (pos > 0.5) {
+								joy_axes[1] = 1;
+								joy_d_down();
+							}
+							else if (pos < -0.5) {
+								joy_axes[1] = -1;
+								joy_u_down();
+							}
 						}
 					}
 				}
@@ -2443,10 +2474,13 @@ bool init(int *argc, char **argv[])
 	#endif
 
 	if (al_install_joystick()) {
-		if (al_get_num_joysticks() > 0)
+		set_user_joystick();
+		if (user_joystick != NULL) {
 			config.setGamepadAvailable(true);
-		else
+		}
+		else {
 			config.setGamepadAvailable(false);
+		}
 	}
 	else {
 		config.setGamepadAvailable(false);
