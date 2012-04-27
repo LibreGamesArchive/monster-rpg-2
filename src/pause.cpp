@@ -18,6 +18,8 @@
 #include "java.h"
 #endif
 
+#include "tftp_get.h"
+
 bool fairy_used = false;
 
 bool in_map = false;
@@ -3822,7 +3824,147 @@ done:
 	fadeOut(black);
 }
 
-// return 0xDEAD to quit app with restart, 0xBEEF to just quit
+void hqm_menu(void)
+{
+	dpad_off();
+	
+	MBITMAP *bg = m_load_bitmap(getResource("media/options_bg.png"));
+
+	MTextButtonFullShadow *buttons[4];
+	buttons[0] = new MTextButtonFullShadow(20, 50, "Start/resume download");
+	buttons[1] = new MTextButtonFullShadow(20, 65, "Stop/pause download");
+	buttons[2] = new MTextButtonFullShadow(20, 80, "Delete downloads");
+	buttons[3] = new MTextButtonFullShadow(20, 95, "Done");
+
+	tguiPush();
+
+	tguiSetParent(0);
+	for (int i = 0; i < 4; i++) {
+		tguiAddWidget(buttons[i]);
+	}
+
+	tguiSetFocus(buttons[3]);
+
+	bool first_frame = true;
+	bool nofade = false;
+
+	for (;;) {
+		al_wait_cond(wait_cond, wait_mutex);
+		// Logic
+		int tmp_counter = logic_counter;
+		logic_counter = 0;
+		if (tmp_counter > 10)
+			tmp_counter = 1;
+		while  (tmp_counter > 0) {
+			next_input_event_ready = true;
+
+			tmp_counter--;
+			if (is_close_pressed()) {
+				do_close();
+				close_pressed = false;
+			}
+
+			TGUIWidget *widget = tguiUpdate();
+
+			if (widget == buttons[0]) {
+				if (!hqm_is_downloading()) {
+					hqm_go();
+				}
+			}
+			else if (widget == buttons[1]) {
+				if (hqm_is_downloading()) {
+					hqm_stop();
+				}
+			}
+			else if (widget == buttons[2]) {
+				if (prompt("Really delete flacs directory", "and all contents?", 0, 0)) {
+					std::string old_music_name = musicName;
+					std::string old_ambience_name = ambienceName;
+					float old_music_volume = getMusicVolume();
+					float old_ambience_volume = getAmbienceVolume();
+					playMusic("");
+					playAmbience("");
+
+					hqm_delete();
+
+					playMusic(old_music_name, old_music_volume, true);
+					playAmbience(old_ambience_name, old_ambience_volume);
+				}
+			}
+			else if (widget == buttons[3]) {
+				goto done;
+			}
+
+			INPUT_EVENT ie = get_next_input_event();
+			if ((use_dpad && ie.button2 == DOWN) || iphone_shaken(0.1)) {
+				nofade = true;
+				use_input_event();
+				iphone_clear_shaken();
+				goto done;
+			}
+		}
+
+		if (draw_counter > 0) {
+			draw_counter = 0;
+
+			m_set_target_bitmap(buffer);
+		
+			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
+
+			m_draw_bitmap(bg, 0, 0, 0);
+
+			tguiDraw();
+
+			// top descriptions
+			const char *text = "Free HQ soundtrack download";
+			mTextout_simple(text, (BW-m_text_length(game_font, text))/2, 15, m_map_rgb(255, 255, 0));
+
+			// draw status
+			float percent;
+			int status = hqm_get_status(&percent);
+			const char *status_txt = hqm_status_string(status);
+			char buf[100];
+			sprintf(buf, "Status: %s. %s. (%d%%)", status_txt, hqm_is_downloading() ? "Downloading" : "Stopped", (int)(percent * 100));
+			mTextout(
+				game_font,
+				buf,
+				BW/2,
+				125,
+				black,
+				m_map_rgb(65, 65, 65),
+				WGT_TEXT_DROP_SHADOW,
+				true
+			);
+	
+			if (first_frame) {
+				fadeIn(black);
+				first_frame = false;
+			}
+			else {
+				drawBufferToScreen();
+				m_flip_display();
+			}
+		}
+	}
+
+done:
+
+	m_destroy_bitmap(bg);
+
+	for (int i = 0; i < 4; i++) {
+		tguiDeleteWidget(buttons[i]);
+		delete buttons[i];
+	}
+
+	dpad_on();
+
+	tguiPop();
+
+	if (!nofade) {
+		fadeOut(black);
+	}
+}
+
 int title_menu(void)
 {
 	dpad_off();
@@ -3856,7 +3998,8 @@ int title_menu(void)
 	buttons[curr_button++] = new MTextButtonFullShadow(20, oy+30, "Help");
 #endif
 
-	MTextButton *config_button = new MTextButtonFullShadow(240-75, oy+45, "Options");
+	MTextButton *hqm_button = new MTextButtonFullShadow(240-100, oy+30, "HQ sound track");
+	MTextButton *config_button = new MTextButtonFullShadow(240-100, oy+45, "Options");
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	MIcon *joypad = NULL;
@@ -3877,6 +4020,7 @@ int title_menu(void)
 	for (int i = 0; i < curr_button; i++) {
 		tguiAddWidget(buttons[i]);
 	}
+	tguiAddWidget(hqm_button);
 	tguiAddWidget(config_button);
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
@@ -3916,6 +4060,13 @@ int title_menu(void)
 				}
 			}
 
+			if (widget == hqm_button) {
+				fadeOut(black);
+				first_frame = true;
+				tguiPush();
+				hqm_menu();
+				tguiPop();
+			}
 			if (widget == config_button) {
 				fadeOut(black);
 				first_frame = true;
@@ -3976,6 +4127,8 @@ done:
 		tguiDeleteWidget(buttons[i]);
 		delete buttons[i];
 	}
+	tguiDeleteWidget(hqm_button);
+	delete hqm_button;
 	tguiDeleteWidget(config_button);
 	delete config_button;
 
