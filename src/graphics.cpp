@@ -425,7 +425,7 @@ static void drawOverlay(bool draw_controls, ALLEGRO_COLOR tint)
 	if (draw_red && global_draw_red && !path_head && !joypad_connected() && !is_sb_connected() && !airplay_connected) {
 #else
 #ifdef ALLEGRO_MACOSX
-	bool jp_conn = joypad_connected() || is_sb_connected();
+	bool jp_conn = joypad_connected();
 #else
 	bool jp_conn = false;
 #endif

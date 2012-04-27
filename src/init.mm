@@ -2517,9 +2517,9 @@ bool init(int *argc, char **argv[])
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGBA_4444);
 #elif defined A5_OGL
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE); CRAPPPPPPP
+	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
 #else
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888); HELLO
+	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 #endif
 	
 	ALLEGRO_DEBUG("format way before = %d\n", al_get_new_bitmap_format());

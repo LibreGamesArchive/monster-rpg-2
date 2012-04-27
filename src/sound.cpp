@@ -1,5 +1,7 @@
 #include "monster2.hpp"
 
+#include "tftp_get.h"
+
 static void destroyMusic(void);
 
 std::string shutdownMusicName = "";
@@ -284,6 +286,22 @@ static void CALLBACK MusicSyncProc(HSYNC handle, DWORD channel, DWORD data, void
 		BASS_ChannelSetPosition(channel, 0, BASS_POS_BYTE);
 }
 
+static std::string check_music_name(std::string name)
+{
+	if (hqm_get_status(NULL) == HQM_STATUS_COMPLETE) {
+		printf("COMPLETE!\n");
+		std::string::size_type p = name.rfind(".");
+		if (p != std::string::npos) {
+			name = name.substr(0, p) + ".flac";
+			name = getUserResource((std::string("flacs/") + name).c_str());
+			return name;
+		}
+	}
+	else printf("INCOMPLETE :(\n");
+	
+	return getResource("music/%s", name.c_str());
+}
+
 void playMusic(std::string name, float vol, bool force)
 {
 	if (!sound_inited) return;
@@ -303,8 +321,12 @@ void playMusic(std::string name, float vol, bool force)
 		return;
 	}
 
+	name = check_music_name(name);
+
+	printf("name='%s'\n", name.c_str());
+
 	music = BASS_StreamCreateFile(false,
-		getResource("music/%s", name.c_str()),
+		name.c_str(),
 		0, 0, 0);
 	
 	music_loop_start = 0;
@@ -350,9 +372,11 @@ void playAmbience(std::string name, float vol)
 		ambience = 0;
 		return;
 	}
+	
+	name = check_music_name(name);
 
 	ambience = BASS_StreamCreateFile(false,
-		getResource("music/%s", name.c_str()),
+		name.c_str(),
 		0, 0, 0);
 	
 	ambience_loop_start = 0;

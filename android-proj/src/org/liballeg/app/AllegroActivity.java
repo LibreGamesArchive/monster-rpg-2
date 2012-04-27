@@ -428,8 +428,6 @@ public class AllegroActivity extends Activity implements SensorEventListener
          Log.e("AllegroActivity", "Couldn't load BassPump");
       }
 
-      Log.d("HELLO", "HELLO " + Runtime.getRuntime().maxMemory() + " HELLO");
-
       nativeOnOrientationChange(0, true);
 
       requestWindowFeature(Window.FEATURE_NO_TITLE);

@@ -6,6 +6,8 @@
 #include <allegro5/internal/aintern_display.h>
 #include <allegro5/internal/aintern_opengl.h>
 
+#include "tftp_get.h"
+
 #ifdef ALLEGRO_ANDROID
 extern "C" {
 void openURL(const char *url);
@@ -1045,6 +1047,11 @@ int main(int argc, char *argv[])
 	fclose(f);
 	//#endif
 #endif
+
+
+	// Setup HQM (High Quality Music) download path
+	hqm_set_download_path(getUserResource("flacs"));
+
 
 	ALLEGRO_DEBUG("format=%d\n", al_get_new_bitmap_format());
 	MBITMAP *nooskewl = m_load_bitmap(getResource("media/nooskewl.png"));
