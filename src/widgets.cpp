@@ -2013,10 +2013,10 @@ void MStats::draw()
 
 	mTextout_simple(_t("HP:"), x+2, y+38, grey);
 	sprintf(text, "%d/%d", info.abilities.hp >= 0 ? info.abilities.hp : 0, info.abilities.maxhp);
-	mTextout_simple(text, x+50, y+40, grey);
+	mTextout_simple(text, x+50, y+38, grey);
 	mTextout_simple(_t("MP:"), x+2, y+50, grey);
 	sprintf(text, "%d/%d", info.abilities.mp, info.abilities.maxmp);
-	mTextout_simple(text, x+50, y+52, grey);
+	mTextout_simple(text, x+50, y+50, grey);
 
 	std::string equip_labels[] = {
 		"LHand:",

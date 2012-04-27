@@ -1689,25 +1689,20 @@ done:
 
 	save_memory(true);
 
-printf("1.\n");
 	stopAllOmni();
 
 	tguiDeleteActive();
-printf("2.\n");
 
 	delete fullscreenRect;
 	delete corner;
 	delete mainFrame;
-printf("3.\n");
 	delete mainItem;
 	delete mainMagic;
 	delete mainForm;
-printf("4.\n");
 	delete mainStats;
 	delete mainExamine;
 	delete mainSave;
 	delete mainResume;
-printf("5.\n");
 	delete mainQuit;
 	delete mainLevelUp;
 #if defined IPHONE
@@ -1717,20 +1712,17 @@ printf("5.\n");
 		delete dndForm;
 	delete partyStats;
 	delete mainTimeLabel;
-printf("6.\n");
 	delete mainTime;
 	delete mainGoldLabel;
 	delete mainGold;
 	delete stats;
 	delete formChooser2;
-printf("7.\n");
 	delete spellSelector;
 
 	delete fullscreenRect2;
 	delete fullscreenRect3;
 	delete partySelectorTop;
 	delete partySelectorTop2;
-printf("8.\n");
 	delete itemSelector;
 	delete equipChooser;
 	equipPoints.clear();
@@ -1740,7 +1732,6 @@ printf("8.\n");
 	if (formChooser_target) {
 		delete formChooser_target;
 	}
-printf("9.\n");
 	
 	delete fairy;
 #ifdef ALLEGRO_IPHONE
@@ -1752,7 +1743,6 @@ printf("9.\n");
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	delete joypad;
 #endif
-printf("10.\n");
 
 	setMusicVolume(1);
 	setAmbienceVolume(1);
@@ -1765,7 +1755,6 @@ printf("10.\n");
 	tguiPop();
 
 	in_pause = false;
-printf("11.\n");
 
 	return ret;
 }
