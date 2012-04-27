@@ -60,8 +60,8 @@ OBJCXX_LIBOBJS=$(OBJCXX_SRCS:.mm=.o)
 OBJC_LIBOBJS=$(OBJC_SRCS:.m=.o)
 
 
-ALLEGROLIBS=-lallegro_physfs -lallegro_shader-static -lallegro_dialog-static -lallegro_primitives-static -lallegro_font-static -lallegro_ttf-static -lallegro_image-static -lallegro-static -lallegro_main-static 
-LIBS=-llua-fixed -ltgui $(ALLEGROLIBS) -lz -framework OpenGL -framework Foundation -lbass -lJoypadCocoa -framework ApplicationServices -framework AppKit -framework IOKit -lfreetype -lphysfs
+ALLEGROLIBS=-lallegro_shader-static -lallegro_dialog-static -lallegro_primitives-static -lallegro_font-static -lallegro_ttf-static -lallegro_image-static -lallegro-static -lallegro_main-static 
+LIBS=-llua-fixed -ltgui $(ALLEGROLIBS) -lz -framework OpenGL -framework Foundation -lbass -lJoypadCocoa -framework ApplicationServices -framework AppKit -framework IOKit -lfreetype
 
 
 default: monster2

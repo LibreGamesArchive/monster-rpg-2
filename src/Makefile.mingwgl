@@ -52,9 +52,9 @@ CXX_SRCS=\
 
 CXX_LIBOBJS=$(CXX_SRCS:.cpp=.o)
 
-ALLEGROLIBS=-lallegro_physfs-static -lallegro_shader-static -lallegro_acodec-static -lallegro_audio-static -lallegro_native_dialog-static -lallegro_primitives-static -lallegro_ttf-static -lallegro_font-static -lallegro_image-static -lallegro-static -lallegro_main-static -lallegro_memfile-static
+ALLEGROLIBS=-lallegro_shader-static -lallegro_acodec-static -lallegro_audio-static -lallegro_native_dialog-static -lallegro_primitives-static -lallegro_ttf-static -lallegro_font-static -lallegro_image-static -lallegro-static -lallegro_main-static -lallegro_memfile-static
 STATIC_LIBS=-lkernel32 -luser32 -lgdi32 -lcomdlg32 -lole32 -lwinmm -lpsapi -ldxguid -lgdiplus -luuid -lshlwapi
-LIBS=-llua-fixed -ltgui $(ALLEGROLIBS) -lz -lopengl32 -lwinmm -lbass -lfreetype $(STATIC_LIBS) -lphysfs
+LIBS=-llua-fixed -ltgui $(ALLEGROLIBS) -lz -lopengl32 -lwinmm -lbass -lfreetype $(STATIC_LIBS)
 
 
 default: monster2
