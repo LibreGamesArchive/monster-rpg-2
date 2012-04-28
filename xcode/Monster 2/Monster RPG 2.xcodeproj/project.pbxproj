@@ -54,6 +54,15 @@
 		9609BD8F13636F270068EB38 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7B13636EDE0068EB38 /* OpenGLES.framework */; };
 		9609BD9013636F270068EB38 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7C13636EDE0068EB38 /* QuartzCore.framework */; };
 		9609BD9113636F270068EB38 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7D13636EDE0068EB38 /* UIKit.framework */; };
+		960DB499154C82EA000869BD /* NetReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB489154C82EA000869BD /* NetReachability.m */; };
+		960DB49A154C82EA000869BD /* NetServiceBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB48B154C82EA000869BD /* NetServiceBrowser.m */; };
+		960DB49B154C82EA000869BD /* NetUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB48D154C82EA000869BD /* NetUtilities.m */; };
+		960DB49C154C82EA000869BD /* TCPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB490154C82EA000869BD /* TCPConnection.m */; };
+		960DB49D154C82EA000869BD /* TCPServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB492154C82EA000869BD /* TCPServer.m */; };
+		960DB49E154C82EA000869BD /* TCPService.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB494154C82EA000869BD /* TCPService.m */; };
+		960DB49F154C82EA000869BD /* ThrottledTCPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB496154C82EA000869BD /* ThrottledTCPConnection.m */; };
+		960DB4A0154C82EA000869BD /* UDPSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB498154C82EA000869BD /* UDPSocket.m */; };
+		960DB4A2154C8341000869BD /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960DB4A1154C8341000869BD /* SystemConfiguration.framework */; };
 		960EFA3F1536971C008A2033 /* 60beat.m in Sources */ = {isa = PBXBuildFile; fileRef = 960EFA3E1536971C008A2033 /* 60beat.m */; };
 		960EFA45153697B8008A2033 /* SBGamepad.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 960EFA42153697B8008A2033 /* SBGamepad.bundle */; };
 		960EFA46153697B8008A2033 /* SBJoystickLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 960EFA44153697B8008A2033 /* SBJoystickLib.a */; };
@@ -369,6 +378,24 @@
 		9609BD7B13636EDE0068EB38 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		9609BD7C13636EDE0068EB38 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		9609BD7D13636EDE0068EB38 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		960DB488154C82EA000869BD /* NetReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NetReachability.h; path = ../../src/NetworkingSupport/NetReachability.h; sourceTree = "<group>"; };
+		960DB489154C82EA000869BD /* NetReachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NetReachability.m; path = ../../src/NetworkingSupport/NetReachability.m; sourceTree = "<group>"; };
+		960DB48A154C82EA000869BD /* NetServiceBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NetServiceBrowser.h; path = ../../src/NetworkingSupport/NetServiceBrowser.h; sourceTree = "<group>"; };
+		960DB48B154C82EA000869BD /* NetServiceBrowser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NetServiceBrowser.m; path = ../../src/NetworkingSupport/NetServiceBrowser.m; sourceTree = "<group>"; };
+		960DB48C154C82EA000869BD /* NetUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NetUtilities.h; path = ../../src/NetworkingSupport/NetUtilities.h; sourceTree = "<group>"; };
+		960DB48D154C82EA000869BD /* NetUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NetUtilities.m; path = ../../src/NetworkingSupport/NetUtilities.m; sourceTree = "<group>"; };
+		960DB48E154C82EA000869BD /* Networking_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Networking_Internal.h; path = ../../src/NetworkingSupport/Networking_Internal.h; sourceTree = "<group>"; };
+		960DB48F154C82EA000869BD /* TCPConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TCPConnection.h; path = ../../src/NetworkingSupport/TCPConnection.h; sourceTree = "<group>"; };
+		960DB490154C82EA000869BD /* TCPConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TCPConnection.m; path = ../../src/NetworkingSupport/TCPConnection.m; sourceTree = "<group>"; };
+		960DB491154C82EA000869BD /* TCPServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TCPServer.h; path = ../../src/NetworkingSupport/TCPServer.h; sourceTree = "<group>"; };
+		960DB492154C82EA000869BD /* TCPServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TCPServer.m; path = ../../src/NetworkingSupport/TCPServer.m; sourceTree = "<group>"; };
+		960DB493154C82EA000869BD /* TCPService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TCPService.h; path = ../../src/NetworkingSupport/TCPService.h; sourceTree = "<group>"; };
+		960DB494154C82EA000869BD /* TCPService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TCPService.m; path = ../../src/NetworkingSupport/TCPService.m; sourceTree = "<group>"; };
+		960DB495154C82EA000869BD /* ThrottledTCPConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ThrottledTCPConnection.h; path = ../../src/NetworkingSupport/ThrottledTCPConnection.h; sourceTree = "<group>"; };
+		960DB496154C82EA000869BD /* ThrottledTCPConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ThrottledTCPConnection.m; path = ../../src/NetworkingSupport/ThrottledTCPConnection.m; sourceTree = "<group>"; };
+		960DB497154C82EA000869BD /* UDPSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UDPSocket.h; path = ../../src/NetworkingSupport/UDPSocket.h; sourceTree = "<group>"; };
+		960DB498154C82EA000869BD /* UDPSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UDPSocket.m; path = ../../src/NetworkingSupport/UDPSocket.m; sourceTree = "<group>"; };
+		960DB4A1154C8341000869BD /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		960EFA3D1536971C008A2033 /* 60beat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = 60beat.h; path = ../../src/60beat.h; sourceTree = "<group>"; };
 		960EFA3E1536971C008A2033 /* 60beat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = 60beat.m; path = ../../src/60beat.m; sourceTree = "<group>"; };
 		960EFA40153697B8008A2033 /* SBControlScheme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBControlScheme.h; path = ../../../../Downloads/SBGamepad_SDK_1_1/lib/SBControlScheme.h; sourceTree = "<group>"; };
@@ -556,6 +583,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				960DB4A2154C8341000869BD /* SystemConfiguration.framework in Frameworks */,
 				9631BB90151E220A00CE43D0 /* libphysfs_xcode.a in Frameworks */,
 				96A460A7151D836A001BC99C /* libAllegro.a in Frameworks */,
 				961BFB43143E093A00DD1693 /* GameKit.framework in Frameworks */,
@@ -688,6 +716,8 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				960DB4A1154C8341000869BD /* SystemConfiguration.framework */,
+				960DB487154C82C3000869BD /* NetworkingSupport */,
 				96A4D271154A7EC0009ECD44 /* liballegro_native_dialog-static.a */,
 				96A4D26C154A7E66009ECD44 /* libpng.a */,
 				96A4D26A154A7E21009ECD44 /* IOKit.framework */,
@@ -853,6 +883,30 @@
 				96ED3258136349520057B4C7 /* Monster_2-Info.plist */,
 			);
 			name = Resources;
+			sourceTree = "<group>";
+		};
+		960DB487154C82C3000869BD /* NetworkingSupport */ = {
+			isa = PBXGroup;
+			children = (
+				960DB488154C82EA000869BD /* NetReachability.h */,
+				960DB489154C82EA000869BD /* NetReachability.m */,
+				960DB48A154C82EA000869BD /* NetServiceBrowser.h */,
+				960DB48B154C82EA000869BD /* NetServiceBrowser.m */,
+				960DB48C154C82EA000869BD /* NetUtilities.h */,
+				960DB48D154C82EA000869BD /* NetUtilities.m */,
+				960DB48E154C82EA000869BD /* Networking_Internal.h */,
+				960DB48F154C82EA000869BD /* TCPConnection.h */,
+				960DB490154C82EA000869BD /* TCPConnection.m */,
+				960DB491154C82EA000869BD /* TCPServer.h */,
+				960DB492154C82EA000869BD /* TCPServer.m */,
+				960DB493154C82EA000869BD /* TCPService.h */,
+				960DB494154C82EA000869BD /* TCPService.m */,
+				960DB495154C82EA000869BD /* ThrottledTCPConnection.h */,
+				960DB496154C82EA000869BD /* ThrottledTCPConnection.m */,
+				960DB497154C82EA000869BD /* UDPSocket.h */,
+				960DB498154C82EA000869BD /* UDPSocket.m */,
+			);
+			name = NetworkingSupport;
 			sourceTree = "<group>";
 		};
 		9638490E1481A7BA000F7B07 /* lite data ios */ = {
@@ -1188,6 +1242,14 @@
 				961BFB46143E097800DD1693 /* MyUIViewController.m in Sources */,
 				960EFA3F1536971C008A2033 /* 60beat.m in Sources */,
 				96A4D270154A7EA0009ECD44 /* tftp_get.c in Sources */,
+				960DB499154C82EA000869BD /* NetReachability.m in Sources */,
+				960DB49A154C82EA000869BD /* NetServiceBrowser.m in Sources */,
+				960DB49B154C82EA000869BD /* NetUtilities.m in Sources */,
+				960DB49C154C82EA000869BD /* TCPConnection.m in Sources */,
+				960DB49D154C82EA000869BD /* TCPServer.m in Sources */,
+				960DB49E154C82EA000869BD /* TCPService.m in Sources */,
+				960DB49F154C82EA000869BD /* ThrottledTCPConnection.m in Sources */,
+				960DB4A0154C82EA000869BD /* UDPSocket.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1387,8 +1449,8 @@
 					/usr/lib/libSystem.B.dylib,
 					"-ObjC",
 				);
-				PROVISIONING_PROFILE = "CFF395F0-AF5F-4B65-8147-E39BF6C3B976";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "CFF395F0-AF5F-4B65-8147-E39BF6C3B976";
+				PROVISIONING_PROFILE = "EA0A5F20-39CE-4905-8471-79DD6659A3D4";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "EA0A5F20-39CE-4905-8471-79DD6659A3D4";
 				SUPPORTED_PLATFORMS = iphoneos;
 			};
 			name = Release;
@@ -1633,8 +1695,8 @@
 					/usr/lib/libSystem.B.dylib,
 					"-ObjC",
 				);
-				PROVISIONING_PROFILE = "CFF395F0-AF5F-4B65-8147-E39BF6C3B976";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "CFF395F0-AF5F-4B65-8147-E39BF6C3B976";
+				PROVISIONING_PROFILE = "EA0A5F20-39CE-4905-8471-79DD6659A3D4";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "EA0A5F20-39CE-4905-8471-79DD6659A3D4";
 				SUPPORTED_PLATFORMS = iphoneos;
 			};
 			name = Lite;
@@ -1718,8 +1780,8 @@
 					/usr/lib/libSystem.B.dylib,
 					"-ObjC",
 				);
-				PROVISIONING_PROFILE = "CFF395F0-AF5F-4B65-8147-E39BF6C3B976";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "CFF395F0-AF5F-4B65-8147-E39BF6C3B976";
+				PROVISIONING_PROFILE = "EA0A5F20-39CE-4905-8471-79DD6659A3D4";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "EA0A5F20-39CE-4905-8471-79DD6659A3D4";
 				SUPPORTED_PLATFORMS = iphoneos;
 			};
 			name = Debug;
@@ -1792,8 +1854,8 @@
 					/usr/lib/libSystem.B.dylib,
 					"-ObjC",
 				);
-				PROVISIONING_PROFILE = "CFF395F0-AF5F-4B65-8147-E39BF6C3B976";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "CFF395F0-AF5F-4B65-8147-E39BF6C3B976";
+				PROVISIONING_PROFILE = "EA0A5F20-39CE-4905-8471-79DD6659A3D4";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "EA0A5F20-39CE-4905-8471-79DD6659A3D4";
 				SUPPORTED_PLATFORMS = iphoneos;
 			};
 			name = "Release Simulator";

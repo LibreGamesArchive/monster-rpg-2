@@ -3857,7 +3857,19 @@ void hqm_menu(void)
 
 			if (widget == buttons[0]) {
 				if (!hqm_is_downloading()) {
-					hqm_go();
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+					if (wifiConnected())
+#endif
+						hqm_go();
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+					else {
+						notify(
+							"Can only download",
+							"over wifi.",
+							""
+						);
+					}
+#endif
 				}
 			}
 			else if (widget == buttons[1]) {
@@ -3977,22 +3989,22 @@ int title_menu(void)
 	MTextButtonFullShadow *buttons[MAX_BUTTONS];
 	int oy = 100;
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	buttons[curr_button++] = new MTextButtonFullShadow(20, oy, "Continue");
-	buttons[curr_button++] = new MTextButtonFullShadow(20, oy+15, "Start/Load Game");
-	buttons[curr_button++] = new MTextButtonFullShadow(20, oy+30, "Tutorial");
+	buttons[curr_button++] = new MTextButtonFullShadow(5, oy, "Continue");
+	buttons[curr_button++] = new MTextButtonFullShadow(5, oy+15, "Start/Load Game");
+	buttons[curr_button++] = new MTextButtonFullShadow(5, oy+30, "Tutorial");
 #ifdef LITEXX
-	buttons[curr_button++] = new MTextButtonFullShadow(20, oy+45, "Leave feedback & win!");
+	buttons[curr_button++] = new MTextButtonFullShadow(5, oy+45, "Leave feedback & win!");
 #else
-	buttons[curr_button++] = new MTextButtonFullShadow(20, oy+45, "Visit WWW site");
+	buttons[curr_button++] = new MTextButtonFullShadow(5, oy+45, "Visit WWW site");
 #endif
 #else
-	buttons[curr_button++] = new MTextButtonFullShadow(20, oy, "Start");
-	buttons[curr_button++] = new MTextButtonFullShadow(20, oy+15, "Tutorial");
-	buttons[curr_button++] = new MTextButtonFullShadow(20, oy+30, "Help");
+	buttons[curr_button++] = new MTextButtonFullShadow(5, oy, "Start");
+	buttons[curr_button++] = new MTextButtonFullShadow(5, oy+15, "Tutorial");
+	buttons[curr_button++] = new MTextButtonFullShadow(5, oy+30, "Help");
 #endif
 
-	MTextButton *hqm_button = new MTextButtonFullShadow(240-100, oy+30, "HQ sound track");
-	MTextButton *config_button = new MTextButtonFullShadow(240-100, oy+45, "Options");
+	MTextButton *hqm_button = new MTextButtonFullShadow(240-90, oy+30, "HQ sound track");
+	MTextButton *config_button = new MTextButtonFullShadow(240-90, oy+45, "Options");
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	MIcon *joypad = NULL;

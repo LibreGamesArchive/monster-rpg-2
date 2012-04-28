@@ -27,6 +27,7 @@ bool isMultitaskingSupported(void);
 float getScreenScale(void);
 void nslog_message(const char *fmt, ...);
 void vibrate(void);
+bool wifiConnected(void);
 
 #define MS_REMOVED_SQUEEKY_BOARDS_3 @"M2.0001"
 #define MS_RIDER_JOINED_15 @"M2.0002"
