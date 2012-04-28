@@ -8,57 +8,6 @@
 
 Configuration config;
 
-#if UNUSED_NOW
-static int get_joy_button(void)
-{
-	if (!config.getGamepadAvailable()) {
-		notify("", "No gamepad attached", "");
-		return -1;
-	}
-
-	m_rest(1);
-
-	m_set_target_bitmap(buffer);
-
-	mDrawFrame(BW/2-100, BH/2-50, 200, 100);
-	mTextout(game_font, _t("Press a button"), BW/2, BH/2-30, white, black,
-		WGT_TEXT_DROP_SHADOW, true);
-	mTextout(game_font, _t("on your Gamepad"), BW/2, BH/2-10, white, black,
-		WGT_TEXT_DROP_SHADOW, true);
-	mTextout(game_font, _t("Press Escape to cancel"), BW/2, BH/2+30, white, black,
-		WGT_TEXT_DROP_SHADOW, true);
-
-	drawBufferToScreen();
-	m_flip_display();
-
-	while  (1) {
-#ifdef ALLEGRO4
-		if (key[KEY_ESC])
-			return -1;
-		poll_joystick();
-		for (int i = 0; i < joy[0].num_buttons; i++) {
-			if (joy[0].button[i].b)
-				return i;
-		}
-#else
-		ALLEGRO_KEYBOARD_STATE kbstate;
-		al_get_keyboard_state(&kbstate);
-		if (al_key_down(&kbstate, ALLEGRO_KEY_ESCAPE))
-			return -1;
-		ALLEGRO_JOYSTICK *joystick = al_get_joystick(0);
-		ALLEGRO_JOYSTICK_STATE joystate;
-		al_get_joystick_state(joystick, &joystate);
-		for (int i = 0; i < al_get_joystick_num_buttons(joystick); i++) {
-			if (joystate.button[i])
-				return i;
-		}
-#endif
-		m_rest(0.001);
-	}
-}
-
-#endif
-
 bool Configuration::getLowCpuUsage(void)
 {
 	return lowCpuUsage;
