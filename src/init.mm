@@ -104,7 +104,7 @@ double next_shake;
 
 bool do_acknowledge_resize = false;
 
-static ALLEGRO_JOYSTICK *user_joystick = NULL;
+ALLEGRO_JOYSTICK *user_joystick = NULL;
 
 bool achievement_show = false;
 double achievement_time = 0;

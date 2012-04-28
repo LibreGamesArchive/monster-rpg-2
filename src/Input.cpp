@@ -363,6 +363,9 @@ void GamepadInput::handle_event(ALLEGRO_EVENT *event)
 	if (!config.getGamepadAvailable())
 		return;
 
+	if (user_joystick == NULL || event->joystick.id != user_joystick)
+		return;
+
 	if (event->type == ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN) {
 		if (event->joystick.button == config.getJoyButton1()) {
 			button1 = true;
