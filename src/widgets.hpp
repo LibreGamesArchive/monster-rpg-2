@@ -860,9 +860,7 @@ public:
 	}
 	
 	void mouseMove(int x, int y) {
-		if (x >= this->x && y >= this->y && x < this->x+width && y < this->y+height)
-			mouse_is_down = true;
-		else
+		if (!(x >= this->x && y >= this->y && x < this->x+width && y < this->y+height))
 			mouse_is_down = false;
 	}
 	
