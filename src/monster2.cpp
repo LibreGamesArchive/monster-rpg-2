@@ -455,7 +455,7 @@ static bool playerCanLevel(std::string name)
 void run(void)
 {
 	// FIXME!.
-	levelUp(party[heroSpot], 10);
+	//levelUp(party[heroSpot], 10);
 
 	// Fix because Eny used to be only CLASS_WARRIOR, some save
 	// states are missing CLASS_ENY
