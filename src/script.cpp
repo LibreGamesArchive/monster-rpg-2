@@ -2750,7 +2750,7 @@ static int CDoVolcanoEndScene(lua_State *stack)
 }
 
 
-static static int CStartRocket(lua_State *stack)
+static int CStartRocket(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 

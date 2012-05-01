@@ -1,6 +1,6 @@
 #include "monster2.hpp"
 
-void draw_points_locked(ALLEGRO_VERTEX *verts, int n);
+//void draw_points_locked(ALLEGRO_VERTEX *verts, int n);
 
 class MLanderButton : public TGUIWidget {
 public:
@@ -358,7 +358,7 @@ top:
 				vcount++;
 			}
 
-#ifdef __linux__
+#ifdef __linux__XXX
 			draw_points_locked(verts, vcount);
 #else
 			m_draw_prim(verts, 0, 0, 0, vcount, ALLEGRO_PRIM_POINT_LIST);
