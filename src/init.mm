@@ -640,7 +640,7 @@ void register_display(ALLEGRO_DISPLAY *display)
 	al_register_event_source(events_minor, al_get_display_event_source(display));
 }
 
-static ALLEGRO_JOYSTICK *set_user_joystick(void)
+static void set_user_joystick(void)
 {
 	int nj = al_get_num_joysticks();
 	user_joystick = NULL;
@@ -1214,7 +1214,7 @@ static void *thread_proc(void *arg)
 	return NULL;
 }
 
-void load_samples_cb(int curr, int total)
+static void load_samples_cb(int curr, int total)
 {
 	show_progress((50*curr)/total);
 }
@@ -2153,7 +2153,7 @@ void destroy_shaders(void)
 	}	
 }
 
-void draw_loading_screen(MBITMAP *tmp, int percent, ScreenDescriptor *sd)
+static void draw_loading_screen(MBITMAP *tmp, int percent, ScreenDescriptor *sd)
 {
 	m_set_target_bitmap(tmp);
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
@@ -3050,13 +3050,11 @@ void disconnect_external_controls(void)
 	disconnect_airplay_controls();
 }
 
-extern "C" {
-	void lock_joypad_mutex(void)
-	{
-		al_lock_mutex(joypad_mutex);
-	}
-	void unlock_joypad_mutex(void)
-	{
-		al_unlock_mutex(joypad_mutex);
-	}
+void lock_joypad_mutex(void)
+{
+	al_lock_mutex(joypad_mutex);
+}
+void unlock_joypad_mutex(void)
+{
+	al_unlock_mutex(joypad_mutex);
 }

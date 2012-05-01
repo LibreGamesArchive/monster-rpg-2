@@ -373,7 +373,7 @@ CombatantInfo tipperStartInfo = {
 int gold = 0;
 
 
-int findSpotForPlayer(void)
+static int findSpotForPlayer(void)
 {
 	for (int i = 0; i < MAX_PARTY; i++) {
 		if (party[i] == NULL) {
@@ -537,7 +537,7 @@ int getExperience(int level)
 }
 
 
-std::vector<std::string> getLearnedSpells(std::string who, int newLevel)
+static std::vector<std::string> getLearnedSpells(std::string who, int newLevel)
 {
 	std::vector<std::string> spells;
 
@@ -585,7 +585,7 @@ struct LEVEL_UP_CALLBACK_DATA {
 };
 
 
-void levelUpCallback(int selected, LEVEL_UP_CALLBACK_DATA *d)
+static void levelUpCallback(int selected, LEVEL_UP_CALLBACK_DATA *d)
 {
 	dpad_off();
 

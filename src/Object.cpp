@@ -19,7 +19,7 @@ static int yoffsets[] = {
 static float poison_x;
 
 
-unsigned int findUniqueId(void)
+static unsigned int findUniqueId(void)
 {
 	// Ok, this is easy enough...
 	return last_id++;

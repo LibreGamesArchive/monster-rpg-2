@@ -1,6 +1,10 @@
 #define _WIN32_WINNT 0x0501
 #include <allegro5/allegro.h>
 
+#ifdef ALLEGRO_ANDROID
+#define IPPROTO_UDP 17
+#endif
+
 #include "tftp_get.h"
 
 #include <stdio.h>
@@ -337,8 +341,9 @@ static void *hqm_go_thread(void *arg)
 		return NULL;
 	}
 
-	float percent;
-	int status = hqm_get_status(&percent);
+	//float percent;
+	//int status = hqm_get_status(&percent);
+	hqm_get_status(NULL);
 
 	download_all();
 

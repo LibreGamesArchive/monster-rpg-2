@@ -58,7 +58,7 @@ include $(PREBUILT_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_ALLOW_UNDEFINED_SYMBOLS := false
-LOCAL_MODULE    := allegro-example
+LOCAL_MODULE    := monsterrpg2
 LOCAL_SRC_FILES := \
 	3d.cpp\
 	Area.cpp\
@@ -76,6 +76,7 @@ LOCAL_SRC_FILES := \
 	Frame.cpp\
 	GenericEffect.cpp\
 	graphics.cpp\
+	tftp_get.c\
 	Image.cpp\
 	Input.cpp\
 	inventory.cpp\

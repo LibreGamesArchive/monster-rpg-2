@@ -1,4 +1,4 @@
-package org.liballeg.app;
+package com.nooskewl.monsterrpg2;
 
 import java.io.InputStream;
 import java.io.IOException;

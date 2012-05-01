@@ -237,6 +237,8 @@ void create_buffers(void);
 extern "C" {
 void connect_external_controls(void);
 void disconnect_external_controls(void);
+void lock_joypad_mutex(void);
+void unlock_joypad_mutex(void);
 }
 
 #endif

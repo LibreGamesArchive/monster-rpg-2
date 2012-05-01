@@ -120,7 +120,7 @@ void save_url(const char *filename, const char *buf)
 }
 
 
-std::string getTimeString(uint32_t runtime)
+static std::string getTimeString(uint32_t runtime)
 {
 	char s[15];
 
@@ -3813,7 +3813,7 @@ done:
 	fadeOut(black);
 }
 
-void hqm_menu(void)
+static void hqm_menu(void)
 {
 	dpad_off();
 	
@@ -3857,11 +3857,11 @@ void hqm_menu(void)
 
 			if (widget == buttons[0]) {
 				if (!hqm_is_downloading()) {
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID_XXX
 					if (wifiConnected())
 #endif
 						hqm_go();
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID_XXX
 					else {
 						notify(
 							"Can only download",

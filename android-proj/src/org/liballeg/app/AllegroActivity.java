@@ -1,4 +1,4 @@
-package org.liballeg.app;
+package com.nooskewl.monsterrpg2;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -51,10 +51,10 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.egl.*;
 
-import org.liballeg.app.AllegroInputStream;
+import com.nooskewl.monsterrpg2.AllegroInputStream;
 import android.media.AudioManager;
 
-import org.liballeg.app.BassPump;
+import com.nooskewl.monsterrpg2.BassPump;
 
 
 class Utils
@@ -116,7 +116,7 @@ public class AllegroActivity extends Activity implements SensorEventListener
       System.loadLibrary("allegro_font-debug");
       System.loadLibrary("allegro_ttf-debug");
       System.loadLibrary("allegro_shader-debug");
-      System.loadLibrary("allegro-example");
+      System.loadLibrary("monsterrpg2");
    }
 	
         
@@ -163,7 +163,7 @@ public class AllegroActivity extends Activity implements SensorEventListener
    public String getAppName()
    {
       try {
-         return getPackageManager().getActivityInfo(getComponentName(), android.content.pm.PackageManager.GET_META_DATA).metaData.getString("org.liballeg.app_name");
+         return getPackageManager().getActivityInfo(getComponentName(), android.content.pm.PackageManager.GET_META_DATA).metaData.getString("com.nooskewl.app_name");
       } catch(PackageManager.NameNotFoundException ex) {
          return new String();
       }
@@ -422,7 +422,7 @@ public class AllegroActivity extends Activity implements SensorEventListener
 
       // init bass addon
       try {
-         Class.forName("org.liballeg.app.BassPump");
+         Class.forName("com.nooskewl.monsterrpg2.BassPump");
       }
       catch (ClassNotFoundException e) {
          Log.e("AllegroActivity", "Couldn't load BassPump");

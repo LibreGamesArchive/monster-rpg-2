@@ -62,7 +62,7 @@ int next_orientation = 0;
 double orientation_change_start;
 float orientation_angle;
 
-void draw_the_controls(bool draw_controls, ALLEGRO_COLOR tint)
+static void draw_the_controls(bool draw_controls, ALLEGRO_COLOR tint)
 {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 #if defined ALLEGRO_IPHONE
@@ -466,7 +466,7 @@ static void drawOverlay(bool draw_controls, ALLEGRO_COLOR tint)
 	draw_the_controls(draw_controls, tint);
 }
 
-void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
+static void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 {
 //#if !defined ALLEGRO_IPHONE || !defined ALLEGRO_ANDROID
 #if 1

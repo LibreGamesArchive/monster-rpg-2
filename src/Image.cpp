@@ -52,7 +52,7 @@ public:
 	int x1, y1, w, h;
 };
 
-void load_image_callback(MBITMAP *bitmap, RecreateData *data)
+static void load_image_callback(MBITMAP *bitmap, RecreateData *data)
 {
 	load_image_data *d = (load_image_data *)data;
 

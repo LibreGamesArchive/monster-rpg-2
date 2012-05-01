@@ -274,7 +274,9 @@ public:
 
 		if (tguiActiveWidget == this && use_dpad) {
 			INPUT_EVENT ie = get_next_input_event();
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			InputDescriptor id = getInput()->getDescriptor();
+#endif
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 			if (ie.button3 == DOWN) {

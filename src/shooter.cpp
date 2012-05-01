@@ -14,7 +14,7 @@
 
 bool in_shooter = false;
 
-void vecXmat(double x, double y, double z, ALLEGRO_TRANSFORM *mat, double *ox, double *oy, double *oz, double *ow)
+static void vecXmat(double x, double y, double z, ALLEGRO_TRANSFORM *mat, double *ox, double *oy, double *oz, double *ow)
 {
 	*ox = x*mat->m[0][0] + y*mat->m[1][0] + z*mat->m[2][0] + mat->m[3][0];
 	*oy = x*mat->m[0][1] + y*mat->m[1][1] + z*mat->m[2][1] + mat->m[3][1];
@@ -269,20 +269,6 @@ static std::vector<Shark> sharks_start;
 static std::vector<Explosion *> explosions;
 static std::vector<Bullet> bullets;
 
-
-// FIXME:
-void check_some_stuff_in_shooter(void)
-{
-	/*
-	if (explosions.size() != 0) {
-		loadPlayDestroy("nooskewl.ogg");
-		printf("WTF?!?!?!\n");
-		assert(false);
-	}
-	 */
-}
-
-
 inline void set_row(int y, int startx, int dir)
 {
 	if (y >= h) return;
@@ -327,7 +313,7 @@ inline void set_row(int y, int startx, int dir)
 }
 
 
-void generate(void)
+static void generate(void)
 {
 	int startx = w/2-(BW/TILE_SIZE/2);
 	const int minx = startx-(BW/TILE_SIZE);
@@ -409,7 +395,7 @@ static double start_cy;
 bool do_swap;
 int old_yoffset;
 
-double get_xofs(double cx)
+static double get_xofs(double cx)
 {
 	double abs_center = (w*TILE_SIZE)/2;
 	double player_ofs = cx - abs_center;
@@ -491,7 +477,7 @@ static void render(int start, int end, MBITMAP *bmp)
 	delete[] verts;
 }
 
-void render(void)
+static void render(void)
 {
 	int start = start_render;
 	int end = end_render;

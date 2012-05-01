@@ -24,7 +24,7 @@ extern "C" {
 void _al_blend_memory(ALLEGRO_COLOR *, ALLEGRO_BITMAP *, int, int, ALLEGRO_COLOR *);
 }
 
-void draw_points_locked(ALLEGRO_VERTEX *verts, int n)
+static void draw_points_locked(ALLEGRO_VERTEX *verts, int n)
 {
 	int minx = INT_MAX, miny = INT_MAX;
 	int maxx = INT_MIN, maxy = INT_MIN;
@@ -63,7 +63,7 @@ void draw_points_locked(ALLEGRO_VERTEX *verts, int n)
 	al_unlock_bitmap(target);
 }
 
-void get_bolt2_bitmaps(int n, MBITMAP **bmps)
+static void get_bolt2_bitmaps(int n, MBITMAP **bmps)
 {
 	num_bolt2_bmps = n;
 	if (bolt2_bmp_ref_count == 0) {
@@ -80,7 +80,7 @@ void get_bolt2_bitmaps(int n, MBITMAP **bmps)
 	bolt2_bmp_ref_count++;
 }
 
-void release_bolt2_bitmaps(void)
+static void release_bolt2_bitmaps(void)
 {
 	bolt2_bmp_ref_count--;
 	if (bolt2_bmp_ref_count == 0) {

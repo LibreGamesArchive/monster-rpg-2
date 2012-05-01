@@ -12,7 +12,7 @@ ant debug
 #echo uninstall
 #/Users/trent/code/android-sdk-macosx/platform-tools/adb -d uninstall org.liballeg.app
 echo install
-/Users/trent/code/android-sdk-macosx/platform-tools/adb -d install -r bin/alandroid-project-debug.apk
+/Users/trent/code/android-sdk-macosx/platform-tools/adb -d install -r bin/monsterrpg2-project-debug.apk
 echo start
-/Users/trent/code/android-sdk-macosx/platform-tools/adb -d shell 'am start -a android.intent.action.MAIN -n org.liballeg.app/.AllegroActivity'
+/Users/trent/code/android-sdk-macosx/platform-tools/adb -d shell 'am start -a android.intent.action.MAIN -n com.nooskewl.monsterrpg2/.AllegroActivity'
 

@@ -101,7 +101,7 @@ static void *thread_proc(void *arg)
    	JavaVMAttachArgs attach_args = { JNI_VERSION_1_4, "java_audio_thread", NULL };
       	(*javavm)->AttachCurrentThread(javavm, &thread_env, &attach_args);
 	
-	jmethodID meth_initSound = (*thread_env)->GetStaticMethodID(thread_env, bpc, "initSound", "(Lorg/liballeg/app/AllegroActivity;)V");
+	jmethodID meth_initSound = (*thread_env)->GetStaticMethodID(thread_env, bpc, "initSound", "(Lcom/nooskewl/monsterrpg2/AllegroActivity;)V");
 	jmethodID meth_update = (*thread_env)->GetStaticMethodID(thread_env, bpc, "update", "()V");
 	jmethodID meth_loadSample = (*thread_env)->GetStaticMethodID(thread_env, bpc, "loadSample", "(Ljava/lang/String;)I");
 	jmethodID meth_loadSampleLoop = (*thread_env)->GetStaticMethodID(thread_env, bpc, "loadSampleLoop", "(Ljava/lang/String;)I");
@@ -199,7 +199,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 	javavm = vm;
 	(*javavm)->GetEnv(javavm, (void **)&java_env, JNI_VERSION_1_4);
 
-	jclass cls = (*java_env)->FindClass(java_env, "org/liballeg/app/BassPump");
+	jclass cls = (*java_env)->FindClass(java_env, "com/nooskewl/monsterrpg2/BassPump");
 	bpc = (*java_env)->NewGlobalRef(java_env, cls);
 	
 	return JNI_VERSION_1_4;

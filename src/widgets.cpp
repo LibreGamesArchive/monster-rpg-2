@@ -546,7 +546,7 @@ done:
 	return;
 }
 
-void _drawSimpleStatus_real(Player *p, int x, int y, CombatantInfo info)
+static void _drawSimpleStatus_real(Player *p, int x, int y, CombatantInfo info)
 {
 	MBITMAP *icon = p->getIcon();
 	
@@ -581,7 +581,7 @@ static void drawSimpleStatus_real(int partyMember, int x, int y, CombatantInfo i
 	_drawSimpleStatus_real(p, x, y, info);
 }
 
-void _drawSimpleStatus(Player *p, int x, int y)
+static void _drawSimpleStatus(Player *p, int x, int y)
 {
 	CombatantInfo info = p->getInfo();
 	_drawSimpleStatus_real(p, x, y, info);
@@ -589,7 +589,7 @@ void _drawSimpleStatus(Player *p, int x, int y)
 
 
 
-void drawSimpleStatus(int partyMember, int x, int y)
+static void drawSimpleStatus(int partyMember, int x, int y)
 {
 	Player *p = party[partyMember];
 	_drawSimpleStatus(p, x, y);
@@ -597,7 +597,7 @@ void drawSimpleStatus(int partyMember, int x, int y)
 
 
 
-void playerMiniInfoDraw(int x, int y, int w, int h, void *data)
+static void playerMiniInfoDraw(int x, int y, int w, int h, void *data)
 {
 	int who = (int)(int64_t)data;
 	CombatantInfo info = battle->findPlayer(who)->getInfo();
@@ -616,7 +616,7 @@ void playerMiniInfoDraw(int x, int y, int w, int h, void *data)
 }
 
 
-void playerMiniInfoDraw_ptr(int x, int y, int w, int h, void *data)
+static void playerMiniInfoDraw_ptr(int x, int y, int w, int h, void *data)
 {
 	Player *p = (Player *)data;
 	CombatantInfo info = p->getInfo();
@@ -2147,7 +2147,7 @@ MStats::~MStats(void)
 }
 
 
-void drawSimpleEquipment(int partyMember, int x, int y, int height)
+static void drawSimpleEquipment(int partyMember, int x, int y, int height)
 {
 	char text[100];
 	CombatantInfo &info = party[partyMember]->getInfo();

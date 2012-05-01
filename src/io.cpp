@@ -117,7 +117,7 @@ bool readMilestones(bool* ms, int num, gzFile f)
 }
 
 
-bool writeMilestones(bool* ms, int num, gzFile f)
+static bool writeMilestones(bool* ms, int num, gzFile f)
 {
 	int i;
 	int count = 0;
@@ -140,7 +140,7 @@ bool writeMilestones(bool* ms, int num, gzFile f)
 }
 
 
-void writeStats(Player *p, gzFile f)
+static void writeStats(Player *p, gzFile f)
 {
 	if (!p) {
 		my_pack_putc(0, f);
@@ -197,7 +197,7 @@ void writeStats(Player *p, gzFile f)
 }
 
 
-void writeInventory(gzFile f)
+static void writeInventory(gzFile f)
 {
 	for (int i = 0; i < MAX_INVENTORY; i++) {
 		iputl(inventory[i].index, f);
@@ -206,7 +206,7 @@ void writeInventory(gzFile f)
 }
 
 
-void readStats(int who, gzFile f)
+static void readStats(int who, gzFile f)
 {
 	int exists = my_pack_getc(f);
 
@@ -274,7 +274,7 @@ void readStats(int who, gzFile f)
 }
 
 
-void readInventory(gzFile f)
+static void readInventory(gzFile f)
 {
 	for (int i = 0; i < MAX_INVENTORY; i++) {
 		inventory[i].index = igetl(f);

@@ -404,7 +404,7 @@ static int CSetObjectDirection(lua_State *stack)
 
 
 
-int CAddObject(lua_State *stack)
+static int CAddObject(lua_State *stack)
 {
 	Object *o = new Object();
 	int id = o->getId();
@@ -416,7 +416,7 @@ int CAddObject(lua_State *stack)
 }
 
 
-int CRemoveObject(lua_State *stack)
+static int CRemoveObject(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	area->removeObject(id);
@@ -424,7 +424,7 @@ int CRemoveObject(lua_State *stack)
 }
 
 
-int CSetObjectAnimationSet(lua_State *stack)
+static int CSetObjectAnimationSet(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	const char *name = lua_tostring(stack, 2);
@@ -444,7 +444,7 @@ int CSetObjectAnimationSet(lua_State *stack)
 
 
 
-int CSetObjectInputToScriptControlled(lua_State *stack)
+static int CSetObjectInputToScriptControlled(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -463,7 +463,7 @@ int CSetObjectInputToScriptControlled(lua_State *stack)
 }
 
 
-int CSetObjectInput(lua_State *stack)
+static int CSetObjectInput(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	bool l = lua_toboolean(stack, 2);
@@ -493,7 +493,7 @@ int CSetObjectInput(lua_State *stack)
 
 
 
-int CGetObjectPosition(lua_State *stack)
+static int CGetObjectPosition(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -513,7 +513,7 @@ int CGetObjectPosition(lua_State *stack)
 }
 
 
-int CGetObjectDirection(lua_State *stack)
+static int CGetObjectDirection(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -537,7 +537,7 @@ int CGetObjectDirection(lua_State *stack)
 }
 
 
-int CGetObjectOffset(lua_State *stack)
+static int CGetObjectOffset(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -559,7 +559,7 @@ int CGetObjectOffset(lua_State *stack)
 }
 
 
-int CGetMilestone(lua_State *stack)
+static int CGetMilestone(lua_State *stack)
 {
 	int num = (int)lua_tonumber(stack, 1)-1;
 
@@ -575,7 +575,7 @@ int CGetMilestone(lua_State *stack)
 }
 
 
-int CSetMilestone(lua_State *stack)
+static int CSetMilestone(lua_State *stack)
 {
 	int num = (int)lua_tonumber(stack, 1)-1;
 	bool value = (bool)lua_toboolean(stack, 2);
@@ -596,7 +596,7 @@ int CSetMilestone(lua_State *stack)
 
 
 
-int CSetObjectHigh(lua_State *stack)
+static int CSetObjectHigh(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	bool high = (bool)lua_toboolean(stack, 2);
@@ -615,7 +615,7 @@ int CSetObjectHigh(lua_State *stack)
 
 
 
-int CSetObjectLow(lua_State *stack)
+static int CSetObjectLow(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	bool low = (bool)lua_toboolean(stack, 2);
@@ -634,7 +634,7 @@ int CSetObjectLow(lua_State *stack)
 
 
 
-int CSetObjectHidden(lua_State *stack)
+static int CSetObjectHidden(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	bool hidden = (bool)lua_toboolean(stack, 2);
@@ -653,7 +653,7 @@ int CSetObjectHidden(lua_State *stack)
 
 
 
-int CScriptifyPlayer(lua_State *stack)
+static int CScriptifyPlayer(lua_State *stack)
 {
 	dpad_off();
 	al_lock_mutex(input_mutex);
@@ -668,7 +668,7 @@ int CScriptifyPlayer(lua_State *stack)
 }
 
 
-int CDeScriptifyPlayer(lua_State *stack)
+static int CDeScriptifyPlayer(lua_State *stack)
 {
 	dpad_on();
 	al_lock_mutex(input_mutex);
@@ -685,13 +685,13 @@ int CDeScriptifyPlayer(lua_State *stack)
 }
 
 
-int CPlayerIsScripted(lua_State *stack)
+static int CPlayerIsScripted(lua_State *stack)
 {
 	lua_pushboolean(stack, player_scripted);
 	return 1;
 }
 
-int CDoDialogue(lua_State *stack)
+static int CDoDialogue(lua_State *stack)
 {
 	const char *text = lua_tostring(stack, 1);
 	std::string textS(text);
@@ -796,7 +796,7 @@ done:
 }
 
 
-int CDoShakeDialogue(lua_State *stack)
+static int CDoShakeDialogue(lua_State *stack)
 {
 	const char *text = lua_tostring(stack, 1);
 	std::string textS(text);
@@ -970,7 +970,7 @@ done:
 }
 
 
-int CIsSpeechDialogActive(lua_State *stack)
+static int CIsSpeechDialogActive(lua_State *stack)
 {
 	lua_pushboolean(stack, speechDialog != NULL);
 	return 1;
@@ -1065,7 +1065,7 @@ static int CTint(lua_State *stack)
 }
 
 
-int CSetObjectIsPerson(lua_State *stack)
+static int CSetObjectIsPerson(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	bool person = (bool)lua_toboolean(stack, 2);
@@ -1083,7 +1083,7 @@ int CSetObjectIsPerson(lua_State *stack)
 }
 
 
-int CAddEnemy(lua_State *stack)
+static int CAddEnemy(lua_State *stack)
 {
 	if (!battle)
 		return 0;
@@ -1126,7 +1126,7 @@ int CAddEnemy(lua_State *stack)
 }
 
 
-int CGetRandomPlayer(lua_State *stack)
+static int CGetRandomPlayer(lua_State *stack)
 {
 	std::list<CombatEntity *> &entities = battle->getEntities();
 	std::list<CombatEntity *>::iterator it;
@@ -1161,7 +1161,7 @@ int CGetRandomPlayer(lua_State *stack)
 }
 
 
-int CGetWeakestPlayer(lua_State *stack)
+static int CGetWeakestPlayer(lua_State *stack)
 {
 	Combatant *c = findWeakestPlayer();
 	lua_pushnumber(stack, c->getId());
@@ -1169,7 +1169,7 @@ int CGetWeakestPlayer(lua_State *stack)
 }
 
 
-int CBattleKillCombatant(lua_State *stack)
+static int CBattleKillCombatant(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -1187,7 +1187,7 @@ int CBattleKillCombatant(lua_State *stack)
 }
 
 
-int CGetRandomEnemy(lua_State *stack)
+static int CGetRandomEnemy(lua_State *stack)
 {
 	std::list<CombatEntity *> &entities = battle->getEntities();
 	std::list<CombatEntity *>::iterator it;
@@ -1214,14 +1214,14 @@ int CGetRandomEnemy(lua_State *stack)
 }
 
 
-int CBattleLost(lua_State *stack)
+static int CBattleLost(lua_State *stack)
 {
 	lua_pushboolean(stack, battle_lost);
 	return 1;
 }
 
 
-int CStartBattle(lua_State *stack)
+static int CStartBattle(lua_State *stack)
 {
 #ifdef DEBUG
 	//return 0;
@@ -1294,7 +1294,7 @@ int CStartBattle(lua_State *stack)
 }
 
 
-int CInBattle(lua_State *stack)
+static int CInBattle(lua_State *stack)
 {
 	if (battle) {
 		lua_pushboolean(stack, 1);
@@ -1309,7 +1309,7 @@ int CInBattle(lua_State *stack)
 
 
 
-int CDrawArea(lua_State *stack)
+static int CDrawArea(lua_State *stack)
 {
 	m_set_target_bitmap(buffer);
 	area->draw();
@@ -1317,14 +1317,14 @@ int CDrawArea(lua_State *stack)
 }
 
 
-int CUpdateArea(lua_State *stack)
+static int CUpdateArea(lua_State *stack)
 {
 	area->update(1);
 	return 0;
 }
 
 
-int CClearScreen(lua_State *stack)
+static int CClearScreen(lua_State *stack)
 {
 	int r = (int)lua_tonumber(stack, 1);
 	int g = (int)lua_tonumber(stack, 2);
@@ -1337,7 +1337,7 @@ int CClearScreen(lua_State *stack)
 
 
 
-int CClearBuffer(lua_State *stack)
+static int CClearBuffer(lua_State *stack)
 {
 	int r = (int)lua_tonumber(stack, 1);
 	int g = (int)lua_tonumber(stack, 2);
@@ -1353,7 +1353,7 @@ int CClearBuffer(lua_State *stack)
 
 
 
-int CSetBufferTarget(lua_State *stack)
+static int CSetBufferTarget(lua_State *stack)
 {
 	m_set_target_bitmap(buffer);
 
@@ -1362,7 +1362,7 @@ int CSetBufferTarget(lua_State *stack)
 
 
 
-int CSetObjectDest(lua_State *stack)
+static int CSetObjectDest(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	int dx = (int)lua_tonumber(stack, 2);
@@ -1376,7 +1376,7 @@ int CSetObjectDest(lua_State *stack)
 }
 
 
-int CFindEmptyInventorySlot(lua_State *stack)
+static int CFindEmptyInventorySlot(lua_State *stack)
 {
 	int slot = findEmptyInventorySlot();
 	lua_pushnumber(stack, slot);
@@ -1384,7 +1384,7 @@ int CFindEmptyInventorySlot(lua_State *stack)
 }
 
 
-int CFindUnfullInventorySlot(lua_State *stack)
+static int CFindUnfullInventorySlot(lua_State *stack)
 {
 	int index = (int)lua_tonumber(stack, 1);
 	int slot = findUnfullInventorySlot(index);
@@ -1393,7 +1393,7 @@ int CFindUnfullInventorySlot(lua_State *stack)
 }
 
 
-int CGetInventory(lua_State *stack)
+static int CGetInventory(lua_State *stack)
 {
 	int slot = (int)lua_tonumber(stack, 1);
 
@@ -1404,7 +1404,7 @@ int CGetInventory(lua_State *stack)
 }
 
 
-int CSetInventory(lua_State *stack)
+static int CSetInventory(lua_State *stack)
 {
 	int slot = (int)lua_tonumber(stack, 1);
 	int index = (int)lua_tonumber(stack, 2);
@@ -1416,7 +1416,7 @@ int CSetInventory(lua_State *stack)
 }
 
 
-int CFindUsedInventorySlot(lua_State *stack)
+static int CFindUsedInventorySlot(lua_State *stack)
 {
 	int index = (int)lua_tonumber(stack, 1);
 
@@ -1428,7 +1428,7 @@ int CFindUsedInventorySlot(lua_State *stack)
 }
 
 
-int CGetItemName(lua_State *stack)
+static int CGetItemName(lua_State *stack)
 {
 	int index = (int)lua_tonumber(stack, 1);
 
@@ -1439,7 +1439,7 @@ int CGetItemName(lua_State *stack)
 	return 1;
 }
 
-int CGetItemIcon(lua_State *stack)
+static int CGetItemIcon(lua_State *stack)
 {
 	int index = (int)lua_tonumber(stack, 1);
 	lua_pushstring(stack, getItemIcon(index).c_str());
@@ -1447,7 +1447,7 @@ int CGetItemIcon(lua_State *stack)
 }
 
 
-int CGetRandomNumber(lua_State *stack)
+static int CGetRandomNumber(lua_State *stack)
 {
 	int max = (int)lua_tonumber(stack, 1);
 	lua_pushnumber(stack, rand() % max);
@@ -1455,7 +1455,7 @@ int CGetRandomNumber(lua_State *stack)
 }
 
 
-int CLoadPlayDestroy(lua_State *stack)
+static int CLoadPlayDestroy(lua_State *stack)
 {
 	const char *name = lua_tostring(stack, 1);
 
@@ -1465,7 +1465,7 @@ int CLoadPlayDestroy(lua_State *stack)
 }
 
 
-int CPlayPreloadedSample(lua_State *stack)
+static int CPlayPreloadedSample(lua_State *stack)
 {
 	const char *name = lua_tostring(stack, 1);
 
@@ -1475,7 +1475,7 @@ int CPlayPreloadedSample(lua_State *stack)
 }
 
 
-int CSetObjectIsFloater(lua_State *stack)
+static int CSetObjectIsFloater(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	bool floater = (bool)lua_toboolean(stack, 2);
@@ -1493,7 +1493,7 @@ int CSetObjectIsFloater(lua_State *stack)
 }
 
 
-int CAddPartyMember(lua_State *stack)
+static int CAddPartyMember(lua_State *stack)
 {
 	const char *name = lua_tostring(stack, 1);
 
@@ -1528,7 +1528,7 @@ int CAddPartyMember(lua_State *stack)
 	return 0;
 }
 
-int CRemovePartyMember(lua_State *stack)
+static int CRemovePartyMember(lua_State *stack)
 {
 	const char *name = lua_tostring(stack, 1);
 
@@ -1544,7 +1544,7 @@ int CRemovePartyMember(lua_State *stack)
 }
 
 
-int CStopObject(lua_State *stack)
+static int CStopObject(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -1560,14 +1560,14 @@ int CStopObject(lua_State *stack)
 	return 0;
 }
 
-int CAstarStop(lua_State *stack)
+static int CAstarStop(lua_State *stack)
 {
 	astar_stop();
 	return 0;
 }
 
 
-int CReviveAllPlayers(lua_State *stack)
+static int CReviveAllPlayers(lua_State *stack)
 {
 	for (int i = 0; i < MAX_PARTY; i++) {
 		Player *p = party[i];
@@ -1584,7 +1584,7 @@ int CReviveAllPlayers(lua_State *stack)
 }
 
 
-int CAddSmoke(lua_State *stack)
+static int CAddSmoke(lua_State *stack)
 {
 	int x = (int)lua_tonumber(stack, 1)*TILE_SIZE;
 	int y = (int)lua_tonumber(stack, 2)*TILE_SIZE;
@@ -1595,7 +1595,7 @@ int CAddSmoke(lua_State *stack)
 }
 
 
-int CAddSparklySpiralAroundPlayer(lua_State *stack)
+static int CAddSparklySpiralAroundPlayer(lua_State *stack)
 {
 	Object *o = area->findObject(0);
 	int x, y;
@@ -1608,7 +1608,7 @@ int CAddSparklySpiralAroundPlayer(lua_State *stack)
 	return 0;
 }
 
-int CAddSparklySpiralAroundObject(lua_State *stack)
+static int CAddSparklySpiralAroundObject(lua_State *stack)
 {
 	int number = (int)lua_tonumber(stack, 1);
 
@@ -1627,7 +1627,7 @@ int CAddSparklySpiralAroundObject(lua_State *stack)
 }
 
 
-int CDoMap(lua_State *stack)
+static int CDoMap(lua_State *stack)
 {	
 	int nargs = lua_gettop(stack);
 
@@ -1646,7 +1646,7 @@ int CDoMap(lua_State *stack)
 }
 
 
-int CDoShop(lua_State *stack)
+static int CDoShop(lua_State *stack)
 {
 	const char *name = lua_tostring(stack, 1);
 	const char *img = lua_tostring(stack, 2);
@@ -1676,7 +1676,7 @@ int CDoShop(lua_State *stack)
 }
 
 
-int CUpdateObject(lua_State *stack)
+static int CUpdateObject(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	int step = (int)lua_tonumber(stack, 2);
@@ -1693,7 +1693,7 @@ int CUpdateObject(lua_State *stack)
 }
 
 
-int CSetObjectDimensions(lua_State *stack)
+static int CSetObjectDimensions(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	int x = (int)lua_tonumber(stack, 2);
@@ -1710,7 +1710,7 @@ int CSetObjectDimensions(lua_State *stack)
 	return 0;
 }
 
-int CBattleGetX(lua_State *stack)
+static int CBattleGetX(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -1726,7 +1726,7 @@ int CBattleGetX(lua_State *stack)
 }
 
 
-int CBattleGetY(lua_State *stack)
+static int CBattleGetY(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -1742,7 +1742,7 @@ int CBattleGetY(lua_State *stack)
 }
 
 
-int CBattleSetX(lua_State *stack)
+static int CBattleSetX(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	int x = (int)lua_tonumber(stack, 2);
@@ -1759,7 +1759,7 @@ int CBattleSetX(lua_State *stack)
 }
 
 
-int CBattleSetY(lua_State *stack)
+static int CBattleSetY(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	int y = (int)lua_tonumber(stack, 2);
@@ -1776,7 +1776,7 @@ int CBattleSetY(lua_State *stack)
 }
 
 
-int CBattleResortEntity(lua_State *stack)
+static int CBattleResortEntity(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -1787,7 +1787,7 @@ int CBattleResortEntity(lua_State *stack)
 }
 
 
-int CBattleSetOx(lua_State *stack)
+static int CBattleSetOx(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	int ox = (int)lua_tonumber(stack, 2);
@@ -1803,7 +1803,7 @@ int CBattleSetOx(lua_State *stack)
 	return 0;
 }
 
-int CBattleSetOy(lua_State *stack)
+static int CBattleSetOy(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	int oy = (int)lua_tonumber(stack, 2);
@@ -1820,7 +1820,7 @@ int CBattleSetOy(lua_State *stack)
 }
 
 
-int CBattleGetEntityType(lua_State *stack)
+static int CBattleGetEntityType(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -1837,7 +1837,7 @@ int CBattleGetEntityType(lua_State *stack)
 }
 
 
-int CBattleGetEntityCondition(lua_State *stack)
+static int CBattleGetEntityCondition(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -1855,7 +1855,7 @@ int CBattleGetEntityCondition(lua_State *stack)
 }
 
 
-int CBattleSetEntityCondition(lua_State *stack)
+static int CBattleSetEntityCondition(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	CombatCondition condition = (CombatCondition)((int)lua_tonumber(stack, 2));
@@ -1873,7 +1873,7 @@ int CBattleSetEntityCondition(lua_State *stack)
 }
 
 
-int CBattleGetEntityHP(lua_State *stack)
+static int CBattleGetEntityHP(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -1891,7 +1891,7 @@ int CBattleGetEntityHP(lua_State *stack)
 }
 
 
-int CBattleSetEntityHP(lua_State *stack)
+static int CBattleSetEntityHP(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	int hp = (int)lua_tonumber(stack, 2);
@@ -1909,7 +1909,7 @@ int CBattleSetEntityHP(lua_State *stack)
 }
 
 
-int CBattleSetAngle(lua_State *stack)
+static int CBattleSetAngle(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	float a = al_fixtof(lua_tonumber(stack, 2));
@@ -1925,7 +1925,7 @@ int CBattleSetAngle(lua_State *stack)
 	return 0;
 }
 
-int CBattleGetLocation(lua_State *stack)
+static int CBattleGetLocation(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -1947,7 +1947,7 @@ int CBattleGetLocation(lua_State *stack)
 	return 1;
 }
 
-int CAreaIsSolid(lua_State *stack)
+static int CAreaIsSolid(lua_State *stack)
 {
 	int objId = (int)lua_tonumber(stack, 1);
 	int x = (int)lua_tonumber(stack, 2);
@@ -1959,7 +1959,7 @@ int CAreaIsSolid(lua_State *stack)
 }
 
 
-int CReverseTint(lua_State *stack)
+static int CReverseTint(lua_State *stack)
 {
 	int r = (int)lua_tonumber(stack, 1);
 	int g = (int)lua_tonumber(stack, 2);
@@ -1973,7 +1973,7 @@ int CReverseTint(lua_State *stack)
 }
 
 
-int CSetMusicVolume(lua_State *stack)
+static int CSetMusicVolume(lua_State *stack)
 {
 	double vol = lua_tonumber(stack, 1);
 
@@ -1983,7 +1983,7 @@ int CSetMusicVolume(lua_State *stack)
 }
 
 
-int CSetAmbienceVolume(lua_State *stack)
+static int CSetAmbienceVolume(lua_State *stack)
 {
 	double vol = al_fixtof(lua_tonumber(stack, 1));
 
@@ -1993,7 +1993,7 @@ int CSetAmbienceVolume(lua_State *stack)
 }
 
 
-int CBattleGetEntityIndex(lua_State *stack)
+static int CBattleGetEntityIndex(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -2002,7 +2002,7 @@ int CBattleGetEntityIndex(lua_State *stack)
 	return 1;
 }
 
-int CBattleGetNextEntity(lua_State *stack)
+static int CBattleGetNextEntity(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -2011,7 +2011,7 @@ int CBattleGetNextEntity(lua_State *stack)
 	return 1;
 }
 
-int CBattleGetNextEntityId(lua_State *stack)
+static int CBattleGetNextEntityId(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -2020,7 +2020,7 @@ int CBattleGetNextEntityId(lua_State *stack)
 	return 1;
 }
 
-int CBattleMoveEntity(lua_State *stack)
+static int CBattleMoveEntity(lua_State *stack)
 {
 	int which = (int)lua_tonumber(stack, 1);
 	int where = (int)lua_tonumber(stack, 2);
@@ -2030,7 +2030,7 @@ int CBattleMoveEntity(lua_State *stack)
 	return 0;
 }
 
-int CBattleFindCombatant(lua_State *stack)
+static int CBattleFindCombatant(lua_State *stack)
 {
 	const char *name = lua_tostring(stack, 1);
 
@@ -2054,7 +2054,7 @@ int CBattleFindCombatant(lua_State *stack)
 }
 
 
-int CFillEllipse(lua_State *stack)
+static int CFillEllipse(lua_State *stack)
 {
 	int dx = (int)lua_tonumber(stack, 1);
 	int dy = (int)lua_tonumber(stack, 2);
@@ -2073,7 +2073,7 @@ int CFillEllipse(lua_State *stack)
 }
 
 
-int CBattleDoAttack(lua_State *stack)
+static int CBattleDoAttack(lua_State *stack)
 {
 	int attackerId = (int)lua_tonumber(stack, 1);
 	int attackedId = (int)lua_tonumber(stack, 2);
@@ -2087,7 +2087,7 @@ int CBattleDoAttack(lua_State *stack)
 }
 
 
-int CBattleAddSlimeEffect(lua_State *stack)
+static int CBattleAddSlimeEffect(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -2099,7 +2099,7 @@ int CBattleAddSlimeEffect(lua_State *stack)
 }
 
 
-int CBattleAddFire3Effect(lua_State *stack)
+static int CBattleAddFire3Effect(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -2110,7 +2110,7 @@ int CBattleAddFire3Effect(lua_State *stack)
 	return 0;
 }
 
-int CBattleAddExplodeEffect(lua_State *stack)
+static int CBattleAddExplodeEffect(lua_State *stack)
 {
 	loadPlayDestroy("enemy_explosion.ogg");
 	int id = (int)lua_tonumber(stack, 1);
@@ -2122,7 +2122,7 @@ int CBattleAddExplodeEffect(lua_State *stack)
 	return 0;
 }
 
-int CBattleSetInfoUnionI(lua_State *stack)
+static int CBattleSetInfoUnionI(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	int n = (int)lua_tonumber(stack, 2);
@@ -2140,14 +2140,14 @@ int CBattleSetInfoUnionI(lua_State *stack)
 }
 
 
-int CBattleGetNumEnemies(lua_State *stack)
+static int CBattleGetNumEnemies(lua_State *stack)
 {
 	lua_pushnumber(stack, battle->getNumEnemies());
 	return 1;
 }
 
 
-int CSetTimer(lua_State *stack)
+static int CSetTimer(lua_State *stack)
 {
 	timer_time = 1000*(int)lua_tonumber(stack, 1);
 	timer_on = (bool)lua_toboolean(stack, 2);
@@ -2155,7 +2155,7 @@ int CSetTimer(lua_State *stack)
 }
 
 
-int CGetTimer(lua_State *stack)
+static int CGetTimer(lua_State *stack)
 {
 	lua_pushnumber(stack, timer_time/1000);
 	lua_pushboolean(stack, timer_on);
@@ -2163,7 +2163,7 @@ int CGetTimer(lua_State *stack)
 }
 
 
-int CPlayMusic(lua_State *stack)
+static int CPlayMusic(lua_State *stack)
 {
 	const char *name = lua_tostring(stack, 1);
 	playMusic(std::string(name));
@@ -2171,7 +2171,7 @@ int CPlayMusic(lua_State *stack)
 }
 
 
-int CAddLight(lua_State *stack)
+static int CAddLight(lua_State *stack)
 {
 	int x = (int)lua_tonumber(stack, 1);
 	int y = (int)lua_tonumber(stack, 2);
@@ -2191,7 +2191,7 @@ int CAddLight(lua_State *stack)
 	return 0;
 }
 
-int CGetPlayerNames(lua_State *stack)
+static int CGetPlayerNames(lua_State *stack)
 {
 	for (int i = 0; i < 4; i++) {
 		if (party[i]) {
@@ -2206,7 +2206,7 @@ int CGetPlayerNames(lua_State *stack)
 }
 
 
-int CAddFish(lua_State *stack)
+static int CAddFish(lua_State *stack)
 {
 	int x = (int)lua_tonumber(stack, 1);
 	int y = (int)lua_tonumber(stack, 2);
@@ -2219,7 +2219,7 @@ int CAddFish(lua_State *stack)
 }
 
 
-int CFollowPlayer(lua_State *stack)
+static int CFollowPlayer(lua_State *stack)
 {
 	bool f = (bool)lua_toboolean(stack, 1);
 
@@ -2228,7 +2228,7 @@ int CFollowPlayer(lua_State *stack)
 	return 0;
 }
 
-int CAddManChooser(lua_State *stack)
+static int CAddManChooser(lua_State *stack)
 {
 	dpad_off();
 
@@ -2262,7 +2262,7 @@ int CAddManChooser(lua_State *stack)
 }
 
 
-int CDestroyManChooser(lua_State *stack)
+static int CDestroyManChooser(lua_State *stack)
 {
 	delete manChooser;
 	manChooser = NULL;
@@ -2271,7 +2271,7 @@ int CDestroyManChooser(lua_State *stack)
 }
 
 
-int CBattleSetSubAnimation(lua_State *stack)
+static int CBattleSetSubAnimation(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	const char *name = lua_tostring(stack, 2);
@@ -2286,7 +2286,7 @@ int CBattleSetSubAnimation(lua_State *stack)
 }
 
 
-int CBattleGetWidth(lua_State *stack)
+static int CBattleGetWidth(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -2298,7 +2298,7 @@ int CBattleGetWidth(lua_State *stack)
 }
 
 
-int CBattleGetHeight(lua_State *stack)
+static int CBattleGetHeight(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -2310,7 +2310,7 @@ int CBattleGetHeight(lua_State *stack)
 }
 
 
-int CMarkMan(lua_State *stack)
+static int CMarkMan(lua_State *stack)
 {
 	int index = (int)lua_tonumber(stack, 1);
 	bool used = (bool)lua_toboolean(stack, 2);
@@ -2322,7 +2322,7 @@ int CMarkMan(lua_State *stack)
 }
 
 
-int CPushPlayers(lua_State *stack)
+static int CPushPlayers(lua_State *stack)
 {
 	for (int i = 0; i < MAX_PARTY; i++) {
 		pushed_players[i] = party[i];
@@ -2333,7 +2333,7 @@ int CPushPlayers(lua_State *stack)
 
 
 
-int CPopPlayers(lua_State *stack)
+static int CPopPlayers(lua_State *stack)
 {
 	for (int i = 0; i < MAX_PARTY; i++) {
 		party[i] = pushed_players[i];
@@ -2344,7 +2344,7 @@ int CPopPlayers(lua_State *stack)
 }
 
 
-int CPopPlayersNoClear(lua_State *stack)
+static int CPopPlayersNoClear(lua_State *stack)
 {
 	for (int i = 0; i < MAX_PARTY; i++) {
 		party[i] = pushed_players[i];
@@ -2354,7 +2354,7 @@ int CPopPlayersNoClear(lua_State *stack)
 }
 
 
-int CClearPushedPlayers(lua_State *stack)
+static int CClearPushedPlayers(lua_State *stack)
 {
 	for (int i = 0; i < MAX_PARTY; i++) {
 		pushed_players[i] = NULL;
@@ -2364,7 +2364,7 @@ int CClearPushedPlayers(lua_State *stack)
 }
 
 
-int CClearPlayers(lua_State *stack)
+static int CClearPlayers(lua_State *stack)
 {
 	for (int i = 0; i < MAX_PARTY; i++)
 		party[i] = NULL;
@@ -2373,7 +2373,7 @@ int CClearPlayers(lua_State *stack)
 
 
 
-int CAddPlayer(lua_State *stack)
+static int CAddPlayer(lua_State *stack)
 {
 	const char *name = lua_tostring(stack, 1);
 
@@ -2395,7 +2395,7 @@ int CAddPlayer(lua_State *stack)
 }
 
 
-int CCreateGuards(lua_State *stack)
+static int CCreateGuards(lua_State *stack)
 {
 	strategy_players = new Player *[8];
 
@@ -2409,7 +2409,7 @@ int CCreateGuards(lua_State *stack)
 }
 
 
-int CDestroyGuards(lua_State *stack)
+static int CDestroyGuards(lua_State *stack)
 {
 	for (int i = 0; i < 8; i++) {
 		delete strategy_players[i];
@@ -2421,7 +2421,7 @@ int CDestroyGuards(lua_State *stack)
 }
 
 
-int CAddGuard(lua_State *stack)
+static int CAddGuard(lua_State *stack)
 {
 	int n = (int)lua_tonumber(stack, 1);
 
@@ -2436,14 +2436,14 @@ int CAddGuard(lua_State *stack)
 }
 
 
-int CHideManChooser(lua_State *stack)
+static int CHideManChooser(lua_State *stack)
 {
 	tguiDeleteWidget(manChooser);
 	return 0;
 }
 
 
-int CShowManChooser(lua_State *stack)
+static int CShowManChooser(lua_State *stack)
 {
 	tguiSetParent(0);
 	tguiAddWidget(manChooser);
@@ -2453,14 +2453,14 @@ int CShowManChooser(lua_State *stack)
 
 
 
-int CBattleWon(lua_State *stack)
+static int CBattleWon(lua_State *stack)
 {
 	lua_pushboolean(stack, battle_won);
 	return 1;
 }
 
 
-int CBattleIsDead(lua_State *stack)
+static int CBattleIsDead(lua_State *stack)
 {
 	int n = (int)lua_tonumber(stack, 1);
 
@@ -2470,7 +2470,7 @@ int CBattleIsDead(lua_State *stack)
 }
 
 
-int CRemovePlayer(lua_State *stack)
+static int CRemovePlayer(lua_State *stack)
 {
 	const char *name = lua_tostring(stack, 1);
 
@@ -2508,7 +2508,7 @@ int CRemovePlayer(lua_State *stack)
 
 
 
-int CAllPointsUp(lua_State *stack)
+static int CAllPointsUp(lua_State *stack)
 {
 	int points = (int)lua_tonumber(stack, 1);
 
@@ -2522,21 +2522,21 @@ int CAllPointsUp(lua_State *stack)
 }
 
 
-int CDoShooter(lua_State *stack)
+static int CDoShooter(lua_State *stack)
 {
 	bool for_points = lua_toboolean(stack, 1);
 	lua_pushboolean(stack, shooter(for_points));
 	return 1;
 }
 
-int CDoArchery(lua_State *stack)
+static int CDoArchery(lua_State *stack)
 {
 	bool for_points = lua_toboolean(stack, 1);
 	lua_pushboolean(stack, archery(for_points));
 	return 1;
 }
 
-int CPrompt(lua_State *stack)
+static int CPrompt(lua_State *stack)
 {
 	const char *s1 = lua_tostring(stack, 1);
 	const char *s2 = lua_tostring(stack, 2);
@@ -2551,7 +2551,7 @@ int CPrompt(lua_State *stack)
 }
 
 
-int CTriplePrompt(lua_State *stack)
+static int CTriplePrompt(lua_State *stack)
 {
 	const char *s1 = lua_tostring(stack, 1);
 	const char *s2 = lua_tostring(stack, 2);
@@ -2569,7 +2569,7 @@ int CTriplePrompt(lua_State *stack)
 }
 
 
-int CNotify(lua_State *stack)
+static int CNotify(lua_State *stack)
 {
 	const char *s1 = lua_tostring(stack, 1);
 	const char *s2 = lua_tostring(stack, 2);
@@ -2581,7 +2581,7 @@ int CNotify(lua_State *stack)
 }
 
 
-int CSetTileSolid(lua_State *stack)
+static int CSetTileSolid(lua_State *stack)
 {
 	int x = (int)lua_tonumber(stack, 1);
 	int y = (int)lua_tonumber(stack, 2);
@@ -2594,7 +2594,7 @@ int CSetTileSolid(lua_State *stack)
 }
 
 
-int CSetTileLayer(lua_State *stack)
+static int CSetTileLayer(lua_State *stack)
 {
 	int x = (int)lua_tonumber(stack, 1);
 	int y = (int)lua_tonumber(stack, 2);
@@ -2613,7 +2613,7 @@ int CSetTileLayer(lua_State *stack)
 	return 0;
 }
 
-int CGetTileLayer(lua_State *stack)
+static int CGetTileLayer(lua_State *stack)
 {
 	int x = (int)lua_tonumber(stack, 1);
 	int y = (int)lua_tonumber(stack, 2);
@@ -2625,7 +2625,7 @@ int CGetTileLayer(lua_State *stack)
 	return 1;
 }
 
-int CGetAnimationNum(lua_State *stack)
+static int CGetAnimationNum(lua_State *stack)
 {
 	int tileNum = (int)lua_tonumber(stack, 1);
 
@@ -2646,7 +2646,7 @@ int CGetAnimationNum(lua_State *stack)
 }
 
 
-int CAreaTileToTilemap(lua_State *stack)
+static int CAreaTileToTilemap(lua_State *stack)
 {
 	int tileNum = (int)lua_tonumber(stack, 1);
 
@@ -2658,7 +2658,7 @@ int CAreaTileToTilemap(lua_State *stack)
 }
 
 
-int CRest(lua_State *stack)
+static int CRest(lua_State *stack)
 {
 	double seconds = lua_tonumber(stack, 1);
 	m_rest(seconds);
@@ -2666,7 +2666,7 @@ int CRest(lua_State *stack)
 }
 
 
-int CFlip(lua_State *stack)
+static int CFlip(lua_State *stack)
 {
 	drawBufferToScreen();
 	m_flip_display();
@@ -2674,7 +2674,7 @@ int CFlip(lua_State *stack)
 }
 
 
-int CGetPlayerHP(lua_State *stack)
+static int CGetPlayerHP(lua_State *stack)
 {
 	int who = (int)lua_tonumber(stack, 1);
 
@@ -2689,7 +2689,7 @@ int CGetPlayerHP(lua_State *stack)
 }
 
 
-int CSetPlayerHP(lua_State *stack)
+static int CSetPlayerHP(lua_State *stack)
 {
 	int who = (int)lua_tonumber(stack, 1);
 	int amount = (int)lua_tonumber(stack, 2);
@@ -2702,7 +2702,7 @@ int CSetPlayerHP(lua_State *stack)
 }
 
 
-int CGiveGold(lua_State *stack)
+static int CGiveGold(lua_State *stack)
 {
 	int n = (int)lua_tonumber(stack, 1);
 
@@ -2714,7 +2714,7 @@ int CGiveGold(lua_State *stack)
 }
 
 
-int CGameOver(lua_State *stack)
+static int CGameOver(lua_State *stack)
 {
 	if (saveFilename) saveTime(saveFilename);
 	fadeOut(m_map_rgb(255, 0, 0));
@@ -2723,7 +2723,7 @@ int CGameOver(lua_State *stack)
 }
 
 
-int CGameOverNoFade(lua_State *stack)
+static int CGameOverNoFade(lua_State *stack)
 {
 	if (saveFilename) saveTime(saveFilename);
 	break_main_loop = true;
@@ -2731,7 +2731,7 @@ int CGameOverNoFade(lua_State *stack)
 }
 
 
-int CBattleAddMessage(lua_State *stack)
+static int CBattleAddMessage(lua_State *stack)
 {
 	MessageLocation loc = (MessageLocation)((int)lua_tonumber(stack, 1));
 	const char *text = lua_tostring(stack, 2);
@@ -2743,14 +2743,14 @@ int CBattleAddMessage(lua_State *stack)
 }
 
 
-int CDoVolcanoEndScene(lua_State *stack)
+static int CDoVolcanoEndScene(lua_State *stack)
 {
 	volcano_scene();
 	return 0;
 }
 
 
-static int CStartRocket(lua_State *stack)
+static static int CStartRocket(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 
@@ -2761,7 +2761,7 @@ static int CStartRocket(lua_State *stack)
 }
 
 
-int CAddRocket(lua_State *stack)
+static int CAddRocket(lua_State *stack)
 {
 	int x = (int)lua_tonumber(stack, 1);
 	int y = (int)lua_tonumber(stack, 2);
@@ -2778,33 +2778,33 @@ int CAddRocket(lua_State *stack)
 
 
 
-int CDoLander(lua_State *stack)
+static int CDoLander(lua_State *stack)
 {
 	lander_success = do_lander();
 	return 0;
 }
 
-int CLanderSuccess(lua_State *stack)
+static int CLanderSuccess(lua_State *stack)
 {
 	lua_pushboolean(stack, lander_success);
 	return 1;
 }
 
 
-int Cinto_the_sun(lua_State *stack)
+static int Cinto_the_sun(lua_State *stack)
 {
 	into_the_sun();
 	return 0;
 }
 
 
-int Ccredits(lua_State *stack)
+static int Ccredits(lua_State *stack)
 {
 	credits();
 	return 0;
 }
 
-int CGetPlatform(lua_State *stack)
+static int CGetPlatform(lua_State *stack)
 {
 #if defined ALLEGRO_IPHONE
 	lua_pushstring(stack, "iphone");
@@ -2819,7 +2819,7 @@ int CGetPlatform(lua_State *stack)
 	return 1;
 }
 
-int CGetPlayerDest(lua_State *stack)
+static int CGetPlayerDest(lua_State *stack)
 {
 	if ((have_mouse && path_head) || !use_dpad) {
 		Node *tail = get_path_tail();
@@ -2846,14 +2846,14 @@ int CGetPlayerDest(lua_State *stack)
 }
 
 
-int CGetAreaPan(lua_State *stack)
+static int CGetAreaPan(lua_State *stack)
 {
 	lua_pushnumber(stack, area_panned_x);
 	lua_pushnumber(stack, area_panned_y);
 	return 2;
 }
 
-int CSetAreaPan(lua_State *stack)
+static int CSetAreaPan(lua_State *stack)
 {
 	int xpan = lua_tonumber(stack, 1);
 	int ypan = lua_tonumber(stack, 2);
@@ -2862,7 +2862,7 @@ int CSetAreaPan(lua_State *stack)
 	return 0;
 }
 
-int CDoItemTutorial(lua_State *stack)
+static int CDoItemTutorial(lua_State *stack)
 {
 	dpad_off();
 
@@ -3108,7 +3108,7 @@ done:
 	return 1;
 }
 
-int CStartsWithVowel(lua_State *stack)
+static int CStartsWithVowel(lua_State *stack)
 {
 	const char *str = lua_tostring(stack, 1);
 
@@ -3117,7 +3117,7 @@ int CStartsWithVowel(lua_State *stack)
 	return 1;
 }
 
-int CDoMapTutorial(lua_State *stack)
+static int CDoMapTutorial(lua_State *stack)
 {
 	dpad_off();
 
@@ -3229,21 +3229,21 @@ done:
 }
 
 
-int CGetAreaWidth(lua_State *stack)
+static int CGetAreaWidth(lua_State *stack)
 {
 	lua_pushnumber(stack, area->getWidth());
 	return 1;
 }
 
 
-int CGetAreaHeight(lua_State *stack)
+static int CGetAreaHeight(lua_State *stack)
 {
 	lua_pushnumber(stack, area->getHeight());
 	return 1;
 }
 
 
-int CSetSpecialWalkable(lua_State *stack)
+static int CSetSpecialWalkable(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
 	bool special = lua_toboolean(stack, 2);
@@ -3257,7 +3257,7 @@ int CSetSpecialWalkable(lua_State *stack)
 }
 
 
-int CAnotherDoDialogue(lua_State *stack)
+static int CAnotherDoDialogue(lua_State *stack)
 {
 	const char *text = lua_tostring(stack, 1);
 	bool clear_buf = lua_toboolean(stack, 2);
@@ -3268,7 +3268,7 @@ int CAnotherDoDialogue(lua_State *stack)
 }
 
 
-int CEnyHasWeapon(lua_State *stack)
+static int CEnyHasWeapon(lua_State *stack)
 {
 	Player *eny = NULL;
 
@@ -3292,7 +3292,7 @@ int CEnyHasWeapon(lua_State *stack)
 }
 
 
-int CDoKingKingAlbertLook(lua_State *stack)
+static int CDoKingKingAlbertLook(lua_State *stack)
 {
 	dpad_off();
 
@@ -3394,7 +3394,7 @@ static void get_shiney_stuff(int *x, int *y, ALLEGRO_COLOR *c)
 	}
 }
 
-int CDoKeepLook(lua_State *stack)
+static int CDoKeepLook(lua_State *stack)
 {
 	dpad_off();
 
@@ -3491,7 +3491,7 @@ done:
 }
 
 
-int CSetPlayerFormation(lua_State *stack)
+static int CSetPlayerFormation(lua_State *stack)
 {
 	int spot = lua_tonumber(stack, 1);
 	CombatFormation form = (CombatFormation)lua_tonumber(stack, 2);
@@ -3527,7 +3527,7 @@ static Player *get_beach_battle_player(int n)
 }
 
 
-int CShowBeachBattleInfo(lua_State *stack)
+static int CShowBeachBattleInfo(lua_State *stack)
 {
 	int who = lua_tonumber(stack, 1);
 
@@ -3548,7 +3548,7 @@ int CShowBeachBattleInfo(lua_State *stack)
 }
 
 
-int CSetGlobalCanSave(lua_State *stack)
+static int CSetGlobalCanSave(lua_State *stack)
 {
 	bool gcs = (bool)lua_toboolean(stack, 1);
 
@@ -3558,39 +3558,39 @@ int CSetGlobalCanSave(lua_State *stack)
 }
 
 
-int CDpadOff(lua_State *stack)
+static int CDpadOff(lua_State *stack)
 {
 	dpad_off();
 	return 0;
 }
 
 
-int CDpadOn(lua_State *stack)
+static int CDpadOn(lua_State *stack)
 {
 	dpad_on();
 	return 0;
 }
 
-int CGetUseDpad(lua_State *stack)
+static int CGetUseDpad(lua_State *stack)
 {
 	lua_pushboolean(stack, use_dpad);
 	return 1;
 }
 
-int CGetBreakMainLoop(lua_State *stack)
+static int CGetBreakMainLoop(lua_State *stack)
 {
 	lua_pushboolean(stack, break_main_loop);
 	return 1;
 }
 
 
-int CSetGonnaFadeInRed(lua_State *stack)
+static int CSetGonnaFadeInRed(lua_State *stack)
 {
 	gonna_fade_in_red = lua_toboolean(stack, 1);
 	return 0;
 }
 
-int CSetAreaFocus(lua_State *state)
+static int CSetAreaFocus(lua_State *state)
 {
 	int x = lua_tonumber(state, 1);
 	int y = lua_tonumber(state, 2);
@@ -3598,7 +3598,7 @@ int CSetAreaFocus(lua_State *state)
 	return 0;
 }
 
-int CSetGlobalDrawControls(lua_State *stack)
+static int CSetGlobalDrawControls(lua_State *stack)
 {
 	bool v = (bool)lua_toboolean(stack, 1);
 
@@ -3607,7 +3607,7 @@ int CSetGlobalDrawControls(lua_State *stack)
 	return 0;
 }
 
-int CSetGlobalDrawRed(lua_State *stack)
+static int CSetGlobalDrawRed(lua_State *stack)
 {
 	bool v = (bool)lua_toboolean(stack, 1);
 
@@ -3616,7 +3616,7 @@ int CSetGlobalDrawRed(lua_State *stack)
 	return 0;
 }
 
-int CSetRedOffPressOn(lua_State *stack)
+static int CSetRedOffPressOn(lua_State *stack)
 {
 	bool v = (bool)lua_toboolean(stack, 1);
 
@@ -3625,7 +3625,7 @@ int CSetRedOffPressOn(lua_State *stack)
 	return 0;
 }
 
-int CGetDpadType(lua_State *stack)
+static int CGetDpadType(lua_State *stack)
 {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	lua_pushnumber(stack, config.getDpadType());
@@ -3635,7 +3635,7 @@ int CGetDpadType(lua_State *stack)
 	return 1;
 }
 
-int C_t(lua_State *stack)
+static int C_t(lua_State *stack)
 {
 	const char *s = lua_tostring(stack, 1);
 
@@ -3644,7 +3644,7 @@ int C_t(lua_State *stack)
 	return 1;
 }
 
-int C_extra_battle_chances(lua_State *stack)
+static int C_extra_battle_chances(lua_State *stack)
 {
 	switch (config.getDifficulty()) {
 		case CFG_DIFFICULTY_EASY:
@@ -3661,7 +3661,7 @@ int C_extra_battle_chances(lua_State *stack)
 	return 1;
 }
 
-int C_dbg(lua_State *stack)
+static int C_dbg(lua_State *stack)
 {
 	const char *t = lua_tostring(stack, 1);
 
@@ -3670,7 +3670,7 @@ int C_dbg(lua_State *stack)
 	return 0;
 }
 
-int C_BonusPoints(lua_State *stack)
+static int C_BonusPoints(lua_State *stack)
 {
 	increaseGold(5000);
 	for (int i = 0; i < MAX_PARTY; i++) {

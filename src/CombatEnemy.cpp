@@ -366,7 +366,7 @@ static int dragon_y;
 static int dragon_flags;
 
 
-void dragon_blackAnd0(AnimationSet *a, AnimationSet *a2)
+static void dragon_blackAnd0(AnimationSet *a, AnimationSet *a2)
 {
 	char animName[100];
 	sprintf(animName, "transform0");
@@ -395,7 +395,7 @@ void dragon_blackAnd0(AnimationSet *a, AnimationSet *a2)
 	}
 }
 
-void dragon_normal(AnimationSet *a, AnimationSet *a2, int frame)
+static void dragon_normal(AnimationSet *a, AnimationSet *a2, int frame)
 {
 	m_set_target_bitmap(buffer);
 	char animName[100];
@@ -415,7 +415,7 @@ void dragon_normal(AnimationSet *a, AnimationSet *a2, int frame)
 	}
 }
 
-void dragon_flash(AnimationSet *a, AnimationSet *a2, int frame, float startAlpha)
+static void dragon_flash(AnimationSet *a, AnimationSet *a2, int frame, float startAlpha)
 {
 	char animName[100];
 	sprintf(animName, "transform%d", frame);
@@ -441,7 +441,7 @@ void dragon_flash(AnimationSet *a, AnimationSet *a2, int frame, float startAlpha
 	}
 }
 
-void dragon_fade(AnimationSet *a, AnimationSet *a2, int fullframe, int fadeframe)
+static void dragon_fade(AnimationSet *a, AnimationSet *a2, int fullframe, int fadeframe)
 {
 	char animName[100];
 	sprintf(animName, "transform%d", fullframe);
@@ -476,7 +476,7 @@ void dragon_fade(AnimationSet *a, AnimationSet *a2, int fullframe, int fadeframe
 	}
 }
 
-void dragon_players(AnimationSet *a, AnimationSet *a2)
+static void dragon_players(AnimationSet *a, AnimationSet *a2)
 {
 	a->setSubAnimation("stand");
 	a2->setSubAnimation("stand");
@@ -978,7 +978,7 @@ public:
 	~create_death_blit_data() {}
 };
 
-void create_death_blit(MBITMAP *bitmap, RecreateData *data)
+static void create_death_blit(MBITMAP *bitmap, RecreateData *data)
 {
 	create_death_blit_data *d = (create_death_blit_data *)data;
 

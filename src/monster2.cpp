@@ -452,7 +452,7 @@ static bool playerCanLevel(std::string name)
 }
 
 
-void run(void)
+static void run(void)
 {
 	// FIXME!.
 	//levelUp(party[heroSpot], 10);

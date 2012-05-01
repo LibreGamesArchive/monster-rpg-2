@@ -1,4 +1,4 @@
-package org.liballeg.app;
+package com.nooskewl.monsterrpg2;
 
 import android.media.AudioManager;
 import android.util.Log;

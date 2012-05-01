@@ -66,7 +66,7 @@ protected:
 
 
 // Returns a random number between lo and hi
-float randf(float lo, float hi)
+static float randf(float lo, float hi)
 {
    float range = hi - lo;
    int n = rand() % 10000;

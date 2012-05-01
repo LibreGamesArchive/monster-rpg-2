@@ -300,7 +300,7 @@ void destroy_string_bitmaps(void)
 	destroy_string_bitmaps((uint64_t)powf(2, 64));
 }
 
-MBITMAP *get_string_bitmap(const MFONT *font, std::string s, ALLEGRO_COLOR c)
+static MBITMAP *get_string_bitmap(const MFONT *font, std::string s, ALLEGRO_COLOR c)
 {
 	MBITMAP *ret = NULL;
 	
