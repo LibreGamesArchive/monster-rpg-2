@@ -105,6 +105,7 @@ double next_shake;
 bool do_acknowledge_resize = false;
 
 ALLEGRO_JOYSTICK *user_joystick = NULL;
+bool is_intel_gpu_on_desktop_linux = false;
 
 bool achievement_show = false;
 double achievement_time = 0;
@@ -2419,6 +2420,9 @@ bool init(int *argc, char **argv[])
       
 #ifdef A5_OGL
 	glDisable(GL_DITHER);
+#if defined __linux__ && !defined ALLEGRO_ANDROID
+	is_intel_gpu_on_desktop_linux = strstr((const char *)glGetString(GL_RENDERER), "Intel");
+#endif
 #endif
 
 	initSound();

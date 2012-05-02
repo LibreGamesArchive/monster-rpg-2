@@ -224,6 +224,7 @@ extern double allegro_iphone_shaken;
 #endif
 
 extern ALLEGRO_JOYSTICK *user_joystick;
+extern bool is_intel_gpu_on_desktop_linux;
 
 extern bool main_halted;
 extern bool d3d_halted;

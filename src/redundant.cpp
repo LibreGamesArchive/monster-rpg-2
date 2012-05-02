@@ -1000,7 +1000,7 @@ void m_draw_prim (const void* vtxs, const ALLEGRO_VERTEX_DECL* decl, MBITMAP* te
 #ifndef ALLEGRO_ANDROID
 #ifdef __linux__
 	// work around for nvidia+gallium
-	if (type == ALLEGRO_PRIM_POINT_LIST) {
+	if (!is_intel_gpu_on_desktop_linux && type == ALLEGRO_PRIM_POINT_LIST) {
 		ALLEGRO_VERTEX *verts = (ALLEGRO_VERTEX *)vtxs;
 		for (int i = start; i < end; i++) {
 			m_draw_trans_pixel(verts[i].x, verts[i].y, verts[i].color);
