@@ -2433,7 +2433,7 @@ bool init(int *argc, char **argv[])
 	authenticatePlayer();
 #endif
 
-#ifdef ALLEGRO_MACOSX
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (sd->fullscreen) {
 		sd->fullscreen = false; // hack
 		toggle_fullscreen();
