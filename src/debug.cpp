@@ -1,6 +1,5 @@
 #include "monster2.hpp"
 
-#ifndef debug_message
 void debug_message(const char *fmt, ...)
 {
 //	if (!config.showDebugMessages())
@@ -21,6 +20,6 @@ void debug_message(const char *fmt, ...)
 	}
 	*/
 
-	printf("%s", msg);
+//	printf("%s", msg);
+	ALLEGRO_DEBUG("%s", msg);
 }
-#endif

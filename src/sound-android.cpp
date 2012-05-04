@@ -2,158 +2,21 @@
 
 #include "java.h"
 
-bool sound_inited = false;
+#include "sound-android.hpp"
+
+static std::string shutdownMusicName = "";
+static std::string shutdownAmbienceName = "";
 static int total_samples = 0;
 static int curr_sample = 0;
-
-std::string shutdownMusicName = "";
-std::string shutdownAmbienceName = "";
 static std::string sample_name = "";
-
-std::map<std::string, MSAMPLE> preloaded_samples;
-
-static MSAMPLE sample;
-
 static int music = 0;
 static int ambience = 0;
-std::string musicName = "";
-std::string ambienceName = "";
 static float musicVolume = 1.0f;
 static float ambienceVolume = 1.0f;
 
-static std::string preloaded_names[] =
-{
-#ifdef LITE
-	"Cure.ogg",
-	"Darkness1.ogg",
-	"Elixir.ogg",
-	"Heal.ogg",
-	"HolyWater.ogg",
-	"Revive.ogg",
-	"Wave.ogg",
-	"Weep.ogg",
-	"Whirlpool.ogg",
-	"appear.ogg",
-	"battle.ogg",
-	"blip.ogg",
-	"bolt.ogg",
-	"boss.ogg",
-	"chest.ogg",
-	"door.ogg",
-	"enemy_die.ogg",
-	"error.ogg",
-	"fall.ogg",
-	"fire1.ogg",
-	"hit.ogg",
-	"ice1.ogg",
-	"jump.ogg",
-	"melee_woosh.ogg",
-	"new_party_member.ogg",
-	"nooskewl.ogg",
-	"select.ogg",
-	"slime.ogg",
-	"spin.ogg",
-	"suck.ogg",
-	"swipe.ogg",
-	"woosh.ogg",
-#else
-	"Acorns.ogg",
-	"Arc.ogg",
-	"Banana.ogg",
-	"Beam.ogg",
-	"BoF.ogg",
-	"Bolt2.ogg",
-	"Bolt3.ogg",
-	"Charm.ogg",
-	"Cure.ogg",
-	"Daisy.ogg",
-	"Darkness1.ogg",
-	"Darkness2.ogg",
-	"Darkness3.ogg",
-	"Elixir.ogg",
-	"Fire2.ogg",
-	"Fire3.ogg",
-	"Fireball.ogg",
-	"Heal.ogg",
-	"HolyWater.ogg",
-	"Ice3.ogg",
-	"Laser.ogg",
-	"Machine_Gun.ogg",
-	"Meow.ogg",
-	"Mmm.ogg",
-	"Orbit.ogg",
-	"Portal.ogg",
-	"Puke.ogg",
-	"Punch.ogg",
-	"Quick.ogg",
-	"Rend.ogg",
-	"Revive.ogg",
-	"Slow.ogg",
-	"Spray.ogg",
-	"Stomp.ogg",
-	"Stone.ogg",
-	"Stun.ogg",
-	"Swallow.ogg",
-	"Thud.ogg",
-	"TouchofDeath.ogg",
-	"Twister.ogg",
-	"UFO.ogg",
-	"Vampire.ogg",
-	"Wave.ogg",
-	"Web.ogg",
-	"Weep.ogg",
-	"Whip.ogg",
-	"Whirlpool.ogg",
-	"appear.ogg",
-	"battle.ogg",
-	"blip.ogg",
-	"bolt.ogg",
-	"boss.ogg",
-	"bow_draw.ogg",
-	"bow_release_and_draw.ogg",
-	"buzz.ogg",
-	"cartoon_fall.ogg",
-	"chest.ogg",
-	"ching.ogg",
-	"chomp.ogg",
-	"door.ogg",
-	"drain.ogg",
-	"enemy_die.ogg",
-	"enemy_explosion.ogg",
-	"error.ogg",
-	"explosion.ogg",
-	"fall.ogg",
-	"fire1.ogg",
-	"freeze.ogg",
-	"high_cackle.ogg",
-	"hit.ogg",
-	"ice1.ogg",
-	"ignite.ogg",
-	"jump.ogg",
-	"low_cackle.ogg",
-	"melee_woosh.ogg",
-	"new_party_member.ogg",
-	"nooskewl.ogg",
-	"pistol.ogg",
-	"push.ogg",
-	"rocket_launch.ogg",
-	"select.ogg",
-	"sleep.ogg",
-	"slice.ogg",
-	"slime.ogg",
-	"spin.ogg",
-	"splash.ogg",
-	"staff_fly.ogg",
-	"staff_poof.ogg",
-	"suck.ogg",
-	"swipe.ogg",
-	"torpedo.ogg",
-	"woosh.ogg",
-#endif
-	""
-};
+std::string check_music_name(std::string name, bool *is_flac);
 
-static void destroyMusic(void)
+static void destroyMusic_oldandroid(void)
 {
 	if (music) {
 		bass_destroyMusic(music);
@@ -168,83 +31,42 @@ static void destroyMusic(void)
 	sample_name = "";
 }
 
-void initSound(void)
+void initSound_oldandroid(void)
 {
-	sound_inited = true;
-
 	bass_initSound();
-	
-	for (int i = 0; preloaded_names[i] != ""; i++) {
-		total_samples++;
-	}
 }
 
-bool loadSamples(void (*cb)(int, int))
-{
-	preloaded_samples[preloaded_names[curr_sample]] =
-		loadSample(preloaded_names[curr_sample]);
-	(*cb)(curr_sample, total_samples);
-	curr_sample++;
-	if (curr_sample == total_samples)
-		return true;
-	return false;
-}
-
-void destroySound(void)
+void destroySound_oldandroid(void)
 {
 	if (!sound_inited) return;
 
-	std::map<std::string,  MSAMPLE>::iterator it;
-
-	for (it = preloaded_samples.begin(); it != preloaded_samples.end(); it++) {
-		HSAMPLE s = (HSAMPLE)it->second;
-		bass_destroySample(s);
-	}
-
-	preloaded_samples.clear();
-
-	if (sample) {
-		bass_destroySample(sample);
-		sample = 0;
-	}
-
-	destroyMusic();
-
-	shutdownMusicName = musicName;
-	shutdownAmbienceName = ambienceName;
-	
 	bass_shutdownBASS();
 }
 
-static void playSampleVolume(MSAMPLE s, float vol)
+static void playSampleVolume_oldandroid(MSAMPLE s, float vol)
 {
 	if (!sound_inited) return;
 
 	bass_playSampleVolume(s, vol);
 }
 
-void playPreloadedSample(std::string name)
-{
-	if (!sound_inited) return;
-
-	float vol = (float)config.getSFXVolume()/255.0;
-	playSampleVolume(preloaded_samples[name], vol);
-}
-
-
-MSAMPLE loadSample(std::string name)
+MSAMPLE loadSample_oldandroid(std::string name)
 {
 	MSAMPLE s = 0;
 
 	if (sound_inited) {
-		s = bass_loadSample(getResource("sfx/%s", name.c_str()));
+		ALLEGRO_PATH *p = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+		char fn[1000];
+		sprintf(fn, "%s/unpack/sfx/%s", al_path_cstr(p, '/'), name.c_str());
+		al_destroy_path(p);
+		s = bass_loadSample(fn);
 	}
 
 	return s;
 }
 
 
-void destroySample(MSAMPLE sample)
+void destroySample_oldandroid(MSAMPLE sample)
 {
 	if (!sound_inited) return;
 
@@ -252,28 +74,28 @@ void destroySample(MSAMPLE sample)
 }
 
 
-void playSample(MSAMPLE sample, MSAMPLE_ID *unused)
+void playSample_oldandroid(MSAMPLE sample, MSAMPLE_ID *unused)
 {
 	(void)unused;
 	if (!sound_inited) return;
 
 	float vol = (float)config.getSFXVolume()/255.0;
-	playSampleVolume(sample, vol);
+	playSampleVolume_oldandroid(sample, vol);
 }
 
 
-void loadPlayDestroy(std::string name)
+void loadPlayDestroy_oldandroid(std::string name)
 {
 	if (!sound_inited) return;
 
 	playPreloadedSample(name);
 }
 
-void stopAllSamples(void)
+void stopAllSamples_oldandroid(void)
 {
 }
 
-void playMusic(std::string name, float volume, bool force)
+void playMusic_oldandroid(std::string name, float volume, bool force)
 {
 	if (!sound_inited) return;
 
@@ -292,12 +114,21 @@ void playMusic(std::string name, float volume, bool force)
 		return;
 	}
 
-	music = bass_loadMusic(getResource("music/%s", name.c_str()));
+	bool is_flac;
+	name = check_music_name(name, &is_flac);
+
+	if (is_flac) {
+		al_set_standard_file_interface();
+	}
+	music = bass_loadMusic(name.c_str());
+	if (is_flac) {
+		al_set_apk_file_interface();
+	}
 	bass_playMusic(music);
 	setMusicVolume(volume);
 }
 
-void setMusicVolume(float volume)
+void setMusicVolume_oldandroid(float volume)
 {
 	if (!sound_inited) return;
 
@@ -310,7 +141,7 @@ void setMusicVolume(float volume)
 	}
 }
 
-void playAmbience(std::string name, float vol)
+void playAmbience_oldandroid(std::string name, float vol)
 {
 	if (!sound_inited) return;
 
@@ -325,12 +156,21 @@ void playAmbience(std::string name, float vol)
 		return;
 	}
 
+	bool is_flac;
+	name = check_music_name(name, &is_flac);
+
+	if (is_flac) {
+		al_set_standard_file_interface();
+	}
 	ambience = bass_loadMusic(getResource("music/%s", name.c_str()));
+	if (is_flac) {
+		al_set_apk_file_interface();
+	}
 	bass_playMusic(ambience);
 	setAmbienceVolume(vol);
 }
 
-void setAmbienceVolume(float volume)
+void setAmbienceVolume_oldandroid(float volume)
 {
 	if (!sound_inited) return;
 
@@ -342,35 +182,33 @@ void setAmbienceVolume(float volume)
 		bass_setMusicVolume(ambience, volume);
 }
 
-
-float getMusicVolume(void)
+float getMusicVolume_oldandroid(void)
 {
    return musicVolume;
 }
 
-float getAmbienceVolume(void)
+float getAmbienceVolume_oldandroid(void)
 {
    return ambienceVolume;
 }
 
-void unmuteMusic(void)
+void unmuteMusic_oldandroid(void)
 {
-    playMusic(musicName, 1.0f, true);
+    playMusic_oldandroid(musicName, 1.0f, true);
 }
 
-void unmuteAmbience(void)
+void unmuteAmbience_oldandroid(void)
 {
     playAmbience(ambienceName);
 }
 
-void restartMusic(void)
+void restartMusic_oldandroid(void)
 {
-	playMusic(shutdownMusicName, 1.0f, true);
+	playMusic_oldandroid(shutdownMusicName, 1.0f, true);
 }
 
-
-void restartAmbience(void)
+void restartAmbience_oldandroid(void)
 {
-	playAmbience(shutdownAmbienceName);
+	playAmbience_oldandroid(shutdownAmbienceName);
 }
 

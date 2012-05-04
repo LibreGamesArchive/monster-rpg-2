@@ -1,6 +1,8 @@
 #define _WIN32_WINNT 0x0501
 #include <allegro5/allegro.h>
 
+ALLEGRO_DEBUG_CHANNEL("tftp")
+
 #ifdef ALLEGRO_ANDROID
 #define IPPROTO_UDP 17
 #endif
@@ -11,7 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef WINPC
+#ifdef ALLEGRO_WINDOWS
 #undef UNICODE
 #include <windows.h>
 #include <winsock2.h>
@@ -89,6 +91,7 @@ static bool connect_to_server(void)
 	int r;
 
 	if ((r = getaddrinfo(SERVER, PORT, &hints, &res)) != 0) {
+		ALLEGRO_DEBUG("getaddrinfo failed: r=%d, errno=%d", r, errno);
 		return false;
 	}
 	
@@ -96,11 +99,12 @@ static bool connect_to_server(void)
 	sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if (sock == INVALID_SOCKET) {
 		freeaddrinfo(res);
+		ALLEGRO_DEBUG("socket failed");
 		return false;
 	}
 
 #if 0
-#ifdef WINPC
+#ifdef ALLEGRO_WINDOWS
 	DWORD nonBlocking = 1;
 	if (ioctlsocket(sock, FIONBIO, &nonBlocking) != 0) {
 		printf("failed to set non-blocking socket\n");
@@ -119,6 +123,8 @@ static bool connect_to_server(void)
 	memcpy(&saddr, res->ai_addr, saddr_len);
 
 	freeaddrinfo(res);
+
+	ALLEGRO_DEBUG("Connected?");
 
 	return true;
 }
@@ -176,6 +182,7 @@ static int download_file(const char *filename)
 
 	sz = get_rrq(buf, filename);
 	if (put(buf, sz) != sz) {
+		ALLEGRO_DEBUG("put != sz rrq");
 		shutdown_connection();
 		return -1;
 	}
@@ -184,6 +191,7 @@ static int download_file(const char *filename)
 	sz = get(buf, 2+strlen("blksize")+1+strlen(BLKSIZE_S)+1);
 	if ((sz != (2+strlen("blksize")+1+strlen(BLKSIZE_S)+1)) || get16bits(buf) != 6) {
 		shutdown_connection();
+		ALLEGRO_DEBUG("no option ack");
 		return -1;
 	}
 
@@ -193,6 +201,7 @@ static int download_file(const char *filename)
 	buf[3] = 0;
 	if (put(buf, 4) != 4) {
 		shutdown_connection();
+		ALLEGRO_DEBUG("put ack fail");
 		return -1;
 	}
 
@@ -203,6 +212,7 @@ static int download_file(const char *filename)
 		if (stop) {
 			fclose(f);
 			shutdown_connection();
+			ALLEGRO_DEBUG("told to stop");
 			return -1;
 		}
 		fd_set fdset;
@@ -214,6 +224,7 @@ static int download_file(const char *filename)
 		if (select(sock+1, &fdset, 0, 0, &tv) == 0) {
 			fclose(f);
 			shutdown_connection();
+			ALLEGRO_DEBUG("select returned 0");
 			return -1;
 		}
 		sz = get(buf, 4+BLKSIZE);
@@ -230,6 +241,7 @@ static int download_file(const char *filename)
 		if (put(buf, 4) != 4) {
 			fclose(f);
 			shutdown_connection();
+			ALLEGRO_DEBUG("loop ack fail");
 			return -1;
 		}
 	}
@@ -241,6 +253,7 @@ static int download_file(const char *filename)
 		if (put(buf, 4) != 4) {
 			fclose(f);
 			shutdown_connection();
+			ALLEGRO_DEBUG("end ack fail");
 			return -1;
 		}
 	}
@@ -326,11 +339,13 @@ static void *hqm_go_thread(void *arg)
 {
 	(void)arg;
 
+	al_set_standard_file_interface();
+
 	is_downloading = true;
 
 	mkdir(DOWNLOAD_PATH, 0755);
 
-#ifdef WINPC
+#ifdef ALLEGRO_WINDOWS
 	WSADATA crap;
 	WSAStartup(MAKEWORD(2, 2), &crap);
 #endif
@@ -341,13 +356,11 @@ static void *hqm_go_thread(void *arg)
 		return NULL;
 	}
 
-	//float percent;
-	//int status = hqm_get_status(&percent);
 	hqm_get_status(NULL);
 
 	download_all();
 
-#ifdef WINPC
+#ifdef ALLEGRO_WINDOWS
 	WSACleanup();
 #endif
 
@@ -389,6 +402,8 @@ int hqm_get_status(float *percent)
 
 	char fn[1000];
 	sprintf(fn, "%s/%s", DOWNLOAD_PATH, "list.txt");
+
+	al_set_standard_file_interface();
 
 	ALLEGRO_FILE *f = al_fopen(fn, "r");
 
@@ -440,6 +455,7 @@ int hqm_get_status(float *percent)
 		al_fclose(f);
 		if (percent)
 			*percent = 1.0f;
+		al_set_apk_file_interface();
 		return HQM_STATUS_COMPLETE;
 	}
 
@@ -447,9 +463,11 @@ partial:
 	al_fclose(f);
 	if (percent)
 		*percent = (float)count / NUM_FILES;
+	al_set_apk_file_interface();
 	return HQM_STATUS_PARTIAL;
 
 nuthin:
+	al_set_apk_file_interface();
 	return HQM_STATUS_NOTSTARTED;
 }
 
@@ -468,9 +486,16 @@ void hqm_set_download_path(const char *path)
 
 void hqm_delete(void)
 {
+	al_set_standard_file_interface();
 	ALLEGRO_FS_ENTRY *dir = al_create_fs_entry(DOWNLOAD_PATH);
-	if (!dir) return;
-	if (!al_open_directory(dir)) return;
+	if (!dir) {
+		al_set_apk_file_interface();
+		return;
+	}
+	if (!al_open_directory(dir)) {
+		al_set_apk_file_interface();
+		return;
+	}
 
 	ALLEGRO_FS_ENTRY *file;
 	while ((file = al_read_directory(dir)) != NULL) {
@@ -481,4 +506,6 @@ void hqm_delete(void)
 	al_close_directory(dir);
 	al_remove_fs_entry(dir);
 	al_destroy_fs_entry(dir);
+	
+	al_set_apk_file_interface();
 }

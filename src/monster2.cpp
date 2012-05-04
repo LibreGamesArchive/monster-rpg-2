@@ -962,11 +962,7 @@ static void run(void)
 }
 
 #ifndef EDITOR
-#ifdef ALLEGRO_ANDROID
-int main(void)
-#else
 int main(int argc, char *argv[])
-#endif
 {
 #if defined ALLEGRO_WINDOWS && defined A5_OGL
 	LPTSTR cmdline = GetCommandLine();

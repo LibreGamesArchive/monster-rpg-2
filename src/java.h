@@ -5,9 +5,7 @@
 extern "C" {
 #endif
 
-typedef int HSAMPLE;
-typedef int HMUSIC;
-
+#include <bass.h>
 
 void bass_initSound(void);
 HSAMPLE bass_loadSample(const char *name);;
@@ -28,6 +26,8 @@ void openURL(const char *url);
 
 bool get_clipboard(char *buf, int len);
 void set_clipboard(char *buf);
+
+bool wifiConnected(void);
 
 #ifdef __cplusplus
 }

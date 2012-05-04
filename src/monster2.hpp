@@ -18,10 +18,6 @@
 
 #include "config.h"
 
-#ifndef DEBUG
-#define debug_message(...)
-#endif
-
 #include <cstdio>
 #include <cstring>
 #include <cstdarg>
@@ -102,10 +98,8 @@ ALLEGRO_DEBUG_CHANNEL("morpg2")
 
 #include <zlib.h>
 
-#ifndef ALLEGRO_ANDROID
 #if !defined KCM_AUDIO
 #include <bass.h>
-#endif
 #endif
 
 #ifdef ALLEGRO_IPHONE

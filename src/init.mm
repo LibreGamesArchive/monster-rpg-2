@@ -30,6 +30,33 @@ extern "C" {
 }
 #endif
 
+static uint32_t parse_version(const char *s)
+{
+   char *p = (char *) s;
+   int v[4] = {0, 0, 0, 0};
+   int n;
+   uint32_t ver;
+
+   /* e.g. "4.0.0 Vendor blah blah" */
+   for (n = 0; n < 4; n++) {
+      char *end;
+      long l;
+
+      errno = 0;
+      l = strtol(p, &end, 10);
+      if (errno)
+         break;
+      v[n] = ((l < 0) ? 0 : ((l > 255) ? 255 : l));
+      if (*end != '.')
+         break;
+      p = end + 1; /* skip dot */
+   }
+
+   ver = (v[0] << 24) | (v[1] << 16) | (v[2] << 8) | v[3];
+   ALLEGRO_DEBUG("Parsed '%s' as 0x%08x\n", s, ver);
+   return ver;
+}
+
 void get_buffer_true_size(int *buffer_true_w, int *buffer_true_h)
 {
 #ifdef A5_OGL
@@ -106,6 +133,9 @@ bool do_acknowledge_resize = false;
 
 ALLEGRO_JOYSTICK *user_joystick = NULL;
 bool is_intel_gpu_on_desktop_linux = false;
+#ifdef ALLEGRO_ANDROID
+bool is_android_lessthan_2_3;
+#endif
 
 bool achievement_show = false;
 double achievement_time = 0;
@@ -2219,6 +2249,8 @@ bool init(int *argc, char **argv[])
 
 	al_init();
 
+	debug_message("after al_init 1");
+
 #if !defined ALLEGRO_IPHONE
 	al_set_org_name("Nooskewl");
 #ifdef LITE
@@ -2228,31 +2260,42 @@ bool init(int *argc, char **argv[])
 #endif
 #endif
 
+	debug_message("after set_app/org_name");
+
 	// must be before al_set_apk_file_interface
 	try {
+		// FIXME!
+		//debug_message("NOT READING CONFIG!!!!!!!!!!!!!!!!!!!");
 		config.read();
 	}
 	catch (ReadError e) {
 	}
 
+	debug_message("config read");
+
 #ifdef ALLEGRO_ANDROID
 	al_set_apk_file_interface();
 #endif
+
+	debug_message("apk interface set");
 
 #if defined ALLEGRO_LINUX
 	ALLEGRO_CONFIG *syscfg = al_get_system_config();
 	al_set_config_value(syscfg, "graphics", "config_selection", "old");
 #endif
 
+	debug_message("set config value");
+
 	input_event_mutex = al_create_mutex();
+
+	debug_message("created input_event_mutex");
 
 #ifdef ALLEGRO_IPHONE
 	config.setAutoRotation(config.getAutoRotation());
 #endif
 
-	load_translation_tags();
-	load_translation(get_language_name(config.getLanguage()).c_str());
-	
+	debug_message("setAutoRotation");
+
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	dpad_type = config.getDpadType();
 	use_dpad = false;
@@ -2425,6 +2468,14 @@ bool init(int *argc, char **argv[])
 #endif
 #endif
 
+#ifdef ALLEGRO_ANDROID
+	uint32_t vers1 = parse_version(al_android_get_os_version());
+	uint32_t vers2 = parse_version("2.3");
+	if (vers1 < vers2) {
+		is_android_lessthan_2_3 = true;
+	}
+#endif
+	
 	initSound();
 
 	al_set_new_bitmap_flags(PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
@@ -2682,7 +2733,18 @@ bool init(int *argc, char **argv[])
 
 	ALLEGRO_DEBUG("loading fonts");
 
+#ifndef ALLEGRO_ANDROID_XXX // always do this!
 	game_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 9, ttf_flags);
+#else
+	ALLEGRO_PATH *res_dir = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+	char boofer[1000];
+	sprintf(boofer, "%s/unpack/DejaVuSans.ttf", al_path_cstr(res_dir, '/'));
+	al_destroy_path(res_dir);
+	al_set_standard_file_interface();
+	//game_font = al_load_ttf_font(boofer, 9, ttf_flags);
+	game_font = al_load_ttf_font("/mnt/sdcard/removable_sdcard/DejaVuSans.ttf", 9, ttf_flags);
+	al_set_apk_file_interface();
+#endif
 	if (!game_font) {
 		if (!native_error("Failed to load game_font"))
 			return false;
@@ -2707,6 +2769,11 @@ bool init(int *argc, char **argv[])
 	}
 
 	ALLEGRO_DEBUG("done loading fonts");
+	
+	// NOTE: This has to be after display creation and loading of fonts
+	load_translation_tags();
+	load_translation(get_language_name(config.getLanguage()).c_str());
+
 
 	/* RELOAD EVERYTHING AS DISPLAY BITMAPS */
 	guiAnims.bitmap = m_make_display_bitmap(guiAnims.bitmap);

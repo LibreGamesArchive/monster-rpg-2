@@ -1,5 +1,4 @@
 #include <allegro5/allegro.h>
-//#include <bass.h>
 
 #include <jni.h>
 
@@ -32,6 +31,25 @@ void __jni_checkException(JNIEnv *env, const char *file, const char *fname, int 
    \
    _jni_callv(env, DeleteLocalRef, class_id); \
 })
+
+#define _jni_callBooleanMethodV(env, obj, name, sig, args...) ({ \
+   jclass class_id = _jni_call(env, jclass, GetObjectClass, obj); \
+   \
+   jmethodID method_id = _jni_call(env, jmethodID, GetMethodID, class_id, name, sig); \
+   \
+   bool ret = false; \
+   if(method_id == NULL) { \
+      ALLEGRO_DEBUG("couldn't find method :("); \
+   } \
+   else { \
+      ret = _jni_call(env, bool, CallBooleanMethod, obj, method_id, ##args); \
+   } \
+   \
+   _jni_callv(env, DeleteLocalRef, class_id); \
+   \
+   ret; \
+})
+
 
 static jobject _jni_callObjectMethod(JNIEnv *env, jobject object, char *name, char *sig)
 {
@@ -199,7 +217,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 	javavm = vm;
 	(*javavm)->GetEnv(javavm, (void **)&java_env, JNI_VERSION_1_4);
 
-	jclass cls = (*java_env)->FindClass(java_env, "com/nooskewl/monsterrpg2/BassPump");
+	jclass cls = (*java_env)->FindClass(java_env, "com/nooskewl/monsterrpg2/OldAndroid");
 	bpc = (*java_env)->NewGlobalRef(java_env, cls);
 	
 	return JNI_VERSION_1_4;
@@ -342,3 +360,14 @@ void set_clipboard(char *buf)
 
 	(*java_env)->DeleteLocalRef(java_env, saveS);
 }
+
+bool wifiConnected(void)
+{
+	return _jni_callBooleanMethodV(
+		java_env,
+		_al_android_activity_object(),
+		"wifiConnected",
+		"()Z"
+	);
+}
+

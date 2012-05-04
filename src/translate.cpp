@@ -75,6 +75,22 @@ void load_translation(const char *filename)
 
 	int sz;
 	unsigned char *bytes = slurp_file(getResource("%s.utf8", filename), &sz);
+
+	ALLEGRO_DEBUG("CRAP: %f", al_get_time());
+	int pos = 0;
+	int prev = 0;
+	int32_t ch;
+	ALLEGRO_USTR *tmpustr = al_ustr_new((const char *)bytes);
+	while ((ch = al_ustr_get_next(tmpustr, &pos)) >= 0) {
+		if (ch == '\n' || ch == '\r') {
+			al_ustr_set_chr(tmpustr, prev, ' ');
+		}
+		prev = pos;
+	}
+	al_get_ustr_width(game_font, tmpustr);
+	al_ustr_free(tmpustr);
+	ALLEGRO_DEBUG("CRAP2: %f", al_get_time());
+
 	ALLEGRO_FILE *f = al_open_memfile(bytes, sz, "rb");
 
 	ALLEGRO_USTR *ustr;

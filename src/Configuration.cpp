@@ -300,17 +300,21 @@ void Configuration::read()
 {
 	char buf[1000];
 	sprintf(buf, "%s", getUserResource(""));
+	debug_message("0");
 	
 	mkdir(buf, 0755);
+	debug_message("1");
 
 	while (buf[strlen(buf)-1] == '\\' || buf[strlen(buf)-1] == '/')
 		buf[strlen(buf)-1] = 0;
 	
 	mkdir(buf, 0755);
+	debug_message("2");
 
 	// load
 
 	XMLData* xml = new XMLData(getUserResource("config"));
+	debug_message("3");
 
 	debug_message("cfgfn='%s'\n", getUserResource("config"));
 

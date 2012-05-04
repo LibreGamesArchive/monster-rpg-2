@@ -3857,11 +3857,11 @@ static void hqm_menu(void)
 
 			if (widget == buttons[0]) {
 				if (!hqm_is_downloading()) {
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID_XXX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 					if (wifiConnected())
 #endif
 						hqm_go();
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID_XXX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 					else {
 						notify(
 							"Can only download",

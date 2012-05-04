@@ -2,16 +2,24 @@
 
 #include "tftp_get.h"
 
+#ifdef ALLEGRO_ANDROID
+#define ASSERT ALLEGRO_ASSERT
+extern "C" {
+#include <allegro5/internal/aintern_android.h>
+}
+#include "sound-android.hpp"
+#endif
+
 static void destroyMusic(void);
 
-std::string shutdownMusicName = "";
-std::string shutdownAmbienceName = "";
+static std::string shutdownMusicName = "";
+static std::string shutdownAmbienceName = "";
 
 bool sound_inited = false;
 static int total_samples = 0;
 static int curr_sample = 0;
 
-std::map<std::string, MSAMPLE> preloaded_samples;
+static std::map<std::string, MSAMPLE> preloaded_samples;
 
 static DWORD music = 0;
 static DWORD ambience = 0;
@@ -21,6 +29,7 @@ static QWORD music_loop_start = 0;
 static QWORD ambience_loop_start = 0;
 static float musicVolume = 1.0f;
 static float ambienceVolume = 1.0f;
+static BASS_FILEPROCS fileprocs;
 
 static std::string preloaded_names[] = {
 #ifdef LITE
@@ -153,6 +162,44 @@ static std::string preloaded_names[] = {
 	""
 };
 
+#ifdef ALLEGRO_ANDROID
+static void CALLBACK my_close(void *user)
+{
+	if (_al_android_get_jnienv() == NULL) {
+		_al_android_thread_created();
+	}
+	ALLEGRO_FILE *f = (ALLEGRO_FILE *)user;
+	al_fclose(f);
+}
+static QWORD CALLBACK my_len(void *user)
+{
+	if (_al_android_get_jnienv() == NULL) {
+		_al_android_thread_created();
+	}
+	ALLEGRO_FILE *f = (ALLEGRO_FILE *)user;
+	QWORD sz = al_fsize(f);
+	return sz;
+}
+static DWORD CALLBACK my_read(void *buf, DWORD length, void *user)
+{
+	if (_al_android_get_jnienv() == NULL) {
+		_al_android_thread_created();
+	}
+	ALLEGRO_FILE *f = (ALLEGRO_FILE *)user;
+	DWORD r = al_fread(f, buf, length);
+	return r;
+}
+static BOOL CALLBACK my_seek(QWORD offset, void *user)
+{
+	if (_al_android_get_jnienv() == NULL) {
+		_al_android_thread_created();
+	}
+	ALLEGRO_FILE *f = (ALLEGRO_FILE *)user;
+	BOOL b = al_fseek(f, offset, ALLEGRO_SEEK_SET);
+	return b;
+}
+#endif
+
 #ifdef ALLEGRO_IPHONE
 extern HPLUGIN BASSFLACplugin;
 #else
@@ -162,12 +209,26 @@ static HPLUGIN BASSFLACplugin;
 void initSound(void)
 {
 	sound_inited = true;
+	
+	for (int i = 0; preloaded_names[i] != ""; i++) {
+		total_samples++;
+	}
 
-#ifdef __linux__XXX
-	if (!BASS_Init(-1, 44100, BASS_DEVICE_DMIX, NULL, NULL)) {
-#else
-	if (!BASS_Init(-1, 44100, 0, NULL, NULL)) {
+#ifdef ALLEGRO_ANDROID
+	if (is_android_lessthan_2_3) {
+		initSound_oldandroid();
+		return;
+	}
 #endif
+	
+#ifdef ALLEGRO_ANDROID
+	fileprocs.close = my_close;
+	fileprocs.length = my_len;
+	fileprocs.read = my_read;
+	fileprocs.seek = my_seek;
+#endif
+
+	if (!BASS_Init(-1, 44100, 0, NULL, NULL)) {
 		sound_inited = false;
 		return;
 	}
@@ -191,10 +252,6 @@ void initSound(void)
 	if (!BASSFLACplugin) {
 		printf("Error loading FLAC plugin (%d)\n", BASS_ErrorGetCode());
 	}
-
-	for (int i = 0; preloaded_names[i] != ""; i++) {
-		total_samples++;
-	}
 }
 
 bool loadSamples(void (*cb)(int, int))
@@ -215,11 +272,11 @@ void destroySound(void)
 {
 	if (!sound_inited) return;
 
-	std::map<std::string,  MSAMPLE>::iterator it;
+	std::map<std::string, MSAMPLE>::iterator it;
 
 	for (it = preloaded_samples.begin(); it != preloaded_samples.end(); it++) {
 		HSAMPLE s = (HSAMPLE)it->second;
-		BASS_SampleFree(s);
+		destroySample(s);
 	}
 
 	preloaded_samples.clear();
@@ -229,9 +286,15 @@ void destroySound(void)
 	shutdownMusicName = musicName;
 	shutdownAmbienceName = ambienceName;
 
+#ifdef ALLEGRO_ANDROID
+	if (is_android_lessthan_2_3) {
+		destroySound_oldandroid();
+		return;
+	}
+#endif
+
 	BASS_Free();
 }
-
 
 void playPreloadedSample(std::string name)
 {
@@ -240,23 +303,45 @@ void playPreloadedSample(std::string name)
 	playSample(preloaded_samples[name]);
 }
 
-
 MSAMPLE loadSample(std::string name)
 {
+#ifdef ALLEGRO_ANDROID
+	if (is_android_lessthan_2_3) {
+		return loadSample_oldandroid(name);
+	}
+#endif
+
 	MSAMPLE s = 0;
 
 	if (!sound_inited) return s;
 
+#ifdef ALLEGRO_ANDROID
+	ALLEGRO_PATH *p = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+	char fn[1000];
+	sprintf(fn, "%s/unpack/sfx/%s", al_path_cstr(p, '/'), name.c_str());
+	al_destroy_path(p);
+	s = BASS_SampleLoad(false,
+		fn,
+		0, 0, 8,
+		BASS_SAMPLE_OVER_POS);
+#else
 	s = BASS_SampleLoad(false,
 		getResource("sfx/%s", name.c_str()),
 		0, 0, 8,
 		BASS_SAMPLE_OVER_POS);
+#endif
 
 	return s;
 }
 
 void destroySample(MSAMPLE sample)
 {
+#ifdef ALLEGRO_ANDROID
+	if (is_android_lessthan_2_3) {
+		destroySample_oldandroid(sample);
+		return;
+	}
+#endif
 	if (!sound_inited) return;
 
 	BASS_SampleFree(sample);
@@ -265,6 +350,12 @@ void destroySample(MSAMPLE sample)
 
 void playSample(MSAMPLE sample, MSAMPLE_ID *unused)
 {
+#ifdef ALLEGRO_ANDROID
+	if (is_android_lessthan_2_3) {
+		playSample_oldandroid(sample, unused);
+		return;
+	}
+#endif
 	(void)unused;
 	if (!sound_inited) return;
 
@@ -277,6 +368,12 @@ void playSample(MSAMPLE sample, MSAMPLE_ID *unused)
 
 void loadPlayDestroy(std::string name)
 {
+#ifdef ALLEGRO_ANDROID
+	if (is_android_lessthan_2_3) {
+		loadPlayDestroy_oldandroid(name);
+		return;
+	}
+#endif
 	if (!sound_inited) return;
 
 	playPreloadedSample(name);
@@ -288,22 +385,30 @@ static void CALLBACK MusicSyncProc(HSYNC handle, DWORD channel, DWORD data, void
 		BASS_ChannelSetPosition(channel, 0, BASS_POS_BYTE);
 }
 
-static std::string check_music_name(std::string name)
+std::string check_music_name(std::string name, bool *is_flac)
 {
 	if (hqm_get_status(NULL) == HQM_STATUS_COMPLETE) {
 		std::string::size_type p = name.rfind(".");
 		if (p != std::string::npos) {
 			name = name.substr(0, p) + ".flac";
 			name = getUserResource((std::string("flacs/") + name).c_str());
+			*is_flac = true;
 			return name;
 		}
 	}
-	
+
+	*is_flac = false;
 	return getResource("music/%s", name.c_str());
 }
 
 void playMusic(std::string name, float vol, bool force)
 {
+#ifdef ALLEGRO_ANDROID
+	if (is_android_lessthan_2_3) {
+		playMusic_oldandroid(name, vol, force);
+		return;
+	}
+#endif
 	if (!sound_inited) return;
 
 	if (!force && musicName == name)
@@ -321,11 +426,28 @@ void playMusic(std::string name, float vol, bool force)
 		return;
 	}
 
-	name = check_music_name(name);
+	bool is_flac;
+	name = check_music_name(name, &is_flac);
 
+#ifdef ALLEGRO_ANDROID
+	if (is_flac) {
+		al_set_standard_file_interface();
+	}
+	ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
+	if (is_flac) {
+		al_set_apk_file_interface();
+	}
+	music = BASS_StreamCreateFileUser(
+		STREAMFILE_NOBUFFER,
+		BASS_SAMPLE_LOOP,
+		&fileprocs,
+		(void *)f
+	);
+#else
 	music = BASS_StreamCreateFile(false,
 		name.c_str(),
 		0, 0, 0);
+#endif
 	
 	music_loop_start = 0;
 
@@ -339,6 +461,12 @@ void playMusic(std::string name, float vol, bool force)
 
 void setMusicVolume(float volume)
 {
+#ifdef ALLEGRO_ANDROID
+	if (is_android_lessthan_2_3) {
+		setMusicVolume_oldandroid(volume);
+		return;
+	}
+#endif
 	if (!sound_inited) return;
 
 	musicVolume = volume;
@@ -358,6 +486,12 @@ static void CALLBACK AmbienceSyncProc(HSYNC handle, DWORD channel, DWORD data, v
 
 void playAmbience(std::string name, float vol)
 {
+#ifdef ALLEGRO_ANDROID
+	if (is_android_lessthan_2_3) {
+		playAmbience_oldandroid(name, vol);
+		return;
+	}
+#endif
 	if (!sound_inited) return;
 
 	ambienceName = name;
@@ -370,12 +504,29 @@ void playAmbience(std::string name, float vol)
 		ambience = 0;
 		return;
 	}
-	
-	name = check_music_name(name);
 
+	bool is_flac;
+	name = check_music_name(name, &is_flac);
+
+#ifdef ALLEGRO_ANDROID
+	if (is_flac) {
+		al_set_standard_file_interface();
+	}
+	ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
+	if (is_flac) {
+		al_set_apk_file_interface();
+	}
+	ambience = BASS_StreamCreateFileUser(
+		STREAMFILE_BUFFER,
+		BASS_SAMPLE_LOOP,
+		&fileprocs,
+		(void *)f
+	);
+#else
 	ambience = BASS_StreamCreateFile(false,
 		name.c_str(),
 		0, 0, 0);
+#endif
 	
 	ambience_loop_start = 0;
 	BASS_ChannelSetSync(ambience, BASS_SYNC_END | BASS_SYNC_MIXTIME,
@@ -387,6 +538,12 @@ void playAmbience(std::string name, float vol)
 
 void setAmbienceVolume(float volume)
 {
+#ifdef ALLEGRO_ANDROID
+	if (is_android_lessthan_2_3) {
+		setAmbienceVolume_oldandroid(volume);
+		return;
+	}
+#endif
 	if (!sound_inited) return;
 
 	ambienceVolume = volume;
@@ -398,16 +555,32 @@ void setAmbienceVolume(float volume)
 
 float getMusicVolume(void)
 {
+#ifdef ALLEGRO_ANDROID
+	if (is_android_lessthan_2_3) {
+		return getMusicVolume_oldandroid();
+	}
+#endif
    return musicVolume;
 }
 
 float getAmbienceVolume(void)
 {
+#ifdef ALLEGRO_ANDROID
+	if (is_android_lessthan_2_3) {
+		return getAmbienceVolume_oldandroid();
+	}
+#endif
    return ambienceVolume;
 }
 
 void unmuteMusic(void)
 {
+#ifdef ALLEGRO_ANDROID
+	if (is_android_lessthan_2_3) {
+		unmuteMusic_oldandroid();
+		return;
+	}
+#endif
 	playMusic(musicName, 1.0, true);
 }
 
@@ -429,17 +602,35 @@ static void destroyMusic(void)
 
 void unmuteAmbience(void)
 {
+#ifdef ALLEGRO_ANDROID
+	if (is_android_lessthan_2_3) {
+		unmuteAmbience_oldandroid();
+		return;
+	}
+#endif
 	playAmbience(ambienceName);
 }
 
 void restartMusic(void)
 {
+#ifdef ALLEGRO_ANDROID
+	if (is_android_lessthan_2_3) {
+		restartMusic_oldandroid();
+		return;
+	}
+#endif
 	playMusic(shutdownMusicName, 1.0, true);
 }
 
 
 void restartAmbience(void)
 {
+#ifdef ALLEGRO_ANDROID
+	if (is_android_lessthan_2_3) {
+		restartAmbience_oldandroid();
+		return;
+	}
+#endif
 	playAmbience(shutdownAmbienceName);
 }
 
