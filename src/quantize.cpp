@@ -261,6 +261,10 @@ bool upload_paletted_image(ALLEGRO_BITMAP *bitmap, void *data)
 		tmpbuf
 	);
 
+	if (deletebuf) {
+		al_free(tmpbuf);
+	}
+	
 	e = glGetError();
 	if (e) {
 		ALLEGRO_ERROR("glCompressedTexImage2D failed <paletted> (%d)", e);
@@ -272,10 +276,6 @@ bool upload_paletted_image(ALLEGRO_BITMAP *bitmap, void *data)
 	
 	ALLEGRO_DEBUG("glCompressed....");
 
-	if (deletebuf) {
-		al_free(tmpbuf);
-	}
-	
 	ogl_bitmap->left = 0;
 	ogl_bitmap->right = (float) w / ogl_bitmap->true_w;
 	ogl_bitmap->top = (float) h / ogl_bitmap->true_h;

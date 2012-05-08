@@ -223,22 +223,27 @@ MBITMAP *m_create_alpha_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, Rec
 		create(m, data);
 	}
 
-	if (al_get_bitmap_flags(b) & ALLEGRO_MEMORY_BITMAP) {
-		return m;
-	}
-
 #if defined ALLEGRO_ANDROID || defined A5_D3D
-	LoadedBitmap lb;
-	lb.load_type = LOAD_CREATE;
-	lb.flags = al_get_bitmap_flags(b);
-	lb.format = al_get_bitmap_format(b);
-	lb.destroy.func = destroy;
-	lb.recreate.func = create;
-	lb.recreate.data = data;
-	lb.recreate.w = w;
-	lb.recreate.h = h;
-	lb.bitmap = m;
-	loaded_bitmaps.push_back(lb);
+	if (al_get_bitmap_flags(b) & ALLEGRO_NO_PRESERVE_TEXTURE) {
+		LoadedBitmap lb;
+		lb.load_type = LOAD_CREATE;
+		lb.flags = al_get_bitmap_flags(b);
+		lb.format = al_get_bitmap_format(b);
+		lb.destroy.func = destroy;
+		lb.recreate.func = create;
+		lb.recreate.data = data;
+		lb.recreate.w = w;
+		lb.recreate.h = h;
+		lb.bitmap = m;
+		loaded_bitmaps.push_back(lb);
+	}
+	else {
+#endif
+	if (data) {
+		delete data;
+	}
+#if defined ALLEGRO_ANDROID || defined A5_D3D
+	}
 #endif
 
 	return m;
@@ -467,13 +472,15 @@ MBITMAP *m_load_bitmap(const char *name, bool force_memory)
 	}
 
 #if defined ALLEGRO_ANDROID || defined A5_D3D
-	LoadedBitmap lb;
-	lb.load_type = LOAD_LOAD;
-	lb.flags = al_get_bitmap_flags(bitmap);
-	lb.format = al_get_bitmap_format(bitmap);
-	lb.load.filename = name;
-	lb.bitmap = m;
-	loaded_bitmaps.push_back(lb);
+	if (al_get_bitmap_flags(b) & ALLEGRO_NO_PRESERVE_TEXTURE) {
+		LoadedBitmap lb;
+		lb.load_type = LOAD_LOAD;
+		lb.flags = al_get_bitmap_flags(bitmap);
+		lb.format = al_get_bitmap_format(bitmap);
+		lb.load.filename = name;
+		lb.bitmap = m;
+		loaded_bitmaps.push_back(lb);
+	}
 #endif
 
 	return m;
@@ -505,14 +512,16 @@ MBITMAP *m_load_bitmap_redraw(const char *name, void (*redraw)(MBITMAP *bmp))
 	}
 
 #if defined ALLEGRO_ANDROID || defined A5_D3D
-	LoadedBitmap lb;
-	lb.load_type = LOAD_LOAD;
-	lb.flags = al_get_bitmap_flags(bitmap);
-	lb.format = al_get_bitmap_format(bitmap);
-	lb.load.filename = name;
-	lb.load.redraw = redraw;
-	lb.bitmap = m;
-	loaded_bitmaps.push_back(lb);
+	if (al_get_bitmap_flags(b) & ALLEGRO_NO_PRESERVE_TEXTURE) {
+		LoadedBitmap lb;
+		lb.load_type = LOAD_LOAD;
+		lb.flags = al_get_bitmap_flags(bitmap);
+		lb.format = al_get_bitmap_format(bitmap);
+		lb.load.filename = name;
+		lb.load.redraw = redraw;
+		lb.bitmap = m;
+		loaded_bitmaps.push_back(lb);
+	}
 #endif
 
 	return m;
@@ -550,13 +559,15 @@ MBITMAP *m_load_alpha_bitmap(const char *name, bool force_memory)
 	}
 
 #if defined ALLEGRO_ANDROID || defined A5_D3D
-	LoadedBitmap lb;
-	lb.load_type = LOAD_LOAD;
-	lb.flags = al_get_bitmap_flags(bitmap);
-	lb.format = al_get_bitmap_format(bitmap);
-	lb.load.filename = name;
-	lb.bitmap = m;
-	loaded_bitmaps.push_back(lb);
+	if (al_get_bitmap_flags(b) & ALLEGRO_NO_PRESERVE_TEXTURE) {
+		LoadedBitmap lb;
+		lb.load_type = LOAD_LOAD;
+		lb.flags = al_get_bitmap_flags(bitmap);
+		lb.format = al_get_bitmap_format(bitmap);
+		lb.load.filename = name;
+		lb.bitmap = m;
+		loaded_bitmaps.push_back(lb);
+	}
 #endif
 
 	return m;
@@ -624,33 +635,40 @@ MBITMAP *m_create_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateD
 		create(m, data);
 	}
 
-	if (al_get_bitmap_flags(bitmap) & ALLEGRO_MEMORY_BITMAP) {
-		return m;
-	}
-
 #if defined ALLEGRO_ANDROID || defined A5_D3D
-	LoadedBitmap lb;
-	lb.load_type = LOAD_CREATE;
-	lb.flags = al_get_bitmap_flags(bitmap);
-	lb.format = al_get_bitmap_format(bitmap);
-	lb.destroy.func = destroy;
-	lb.recreate.func = create;
-	lb.recreate.data = data;
-	lb.recreate.w = w;
-	lb.recreate.h = h;
-	lb.bitmap = m;
-	loaded_bitmaps.push_back(lb);
+	if (al_get_bitmap_flags(b) & ALLEGRO_NO_PRESERVE_TEXTURE) {
+		LoadedBitmap lb;
+		lb.load_type = LOAD_CREATE;
+		lb.flags = al_get_bitmap_flags(bitmap);
+		lb.format = al_get_bitmap_format(bitmap);
+		lb.destroy.func = destroy;
+		lb.recreate.func = create;
+		lb.recreate.data = data;
+		lb.recreate.w = w;
+		lb.recreate.h = h;
+		lb.bitmap = m;
+		loaded_bitmaps.push_back(lb);
+	}
+	else {
+#endif
+	if (data) {
+		delete data;
+	}
+#if defined ALLEGRO_ANDROID || defined A5_D3D
+	}
 #endif
 
 	return m;
 }
 
 
-void m_destroy_bitmap(MBITMAP *bmp)
+void m_destroy_bitmap(MBITMAP *bmp, bool internals_only)
 {
+	printf("bmp = %p size = %d\n", bmp, loaded_bitmaps.size());
 	for (size_t i = 0; i < loaded_bitmaps.size(); i++) {
 		if (loaded_bitmaps[i].bitmap == bmp) {
 			if (loaded_bitmaps[i].load_type == LOAD_CREATE && loaded_bitmaps[i].recreate.data) {
+				printf("HERE MAN\n");
 				delete loaded_bitmaps[i].recreate.data;
 			}
 			loaded_bitmaps.erase(loaded_bitmaps.begin()+i);
@@ -659,7 +677,10 @@ void m_destroy_bitmap(MBITMAP *bmp)
 	}
 
 	al_destroy_bitmap(bmp->bitmap);
-	delete bmp;
+	
+	if (!internals_only) {
+		delete bmp;
+	}
 }
 
 

@@ -1285,6 +1285,7 @@ static void *loader_proc(void *arg)
 
 	cursor = m_load_bitmap(getResource("media/cursor.png"));
 	if (!cursor) {
+		m_destroy_bitmap(deter_display_access_bmp);
 		return NULL;
 	}
 
@@ -1325,6 +1326,7 @@ static void *loader_proc(void *arg)
 
 	if (!tile) {
 		if (!native_error("Failed to create tile"))
+			m_destroy_bitmap(deter_display_access_bmp);
 			return NULL;
 	}
 
@@ -1386,13 +1388,6 @@ static void *loader_proc(void *arg)
 	}
 
 	debug_message("inventory initialized\n");
-
-	/*
-	profileBg = m_load_bitmap(getResource("media/profile_bg.png"));
-	if (!profileBg) {
-		return NULL;
-	}
-	*/
 
 	show_progress(80);
 
@@ -1459,6 +1454,9 @@ static void *loader_proc(void *arg)
 	config.setUseOnlyMemoryBitmaps(false);
 
 	loading_done = true;
+
+	m_destroy_bitmap(deter_display_access_bmp);
+
 	return NULL;
 }
 

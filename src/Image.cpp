@@ -60,6 +60,8 @@ public:
 static void load_image_callback(MBITMAP *bitmap, RecreateData *data)
 {
 	load_image_data *d = (load_image_data *)data;
+// FIXME:
+if (strstr(d->filename.c_str(), "eny-loader")) printf("eny bitmap=%p\n", bitmap);
 
 	int flags = al_get_new_bitmap_flags();
 	int format = al_get_new_bitmap_format();
@@ -156,9 +158,8 @@ bool Image::load(std::string copy_from, int x1, int y1, int x2, int y2)
 	else
 		bitmap = m_create_bitmap(w, h, load_image_callback, d); // check
 
-	if (!bitmap)
-		return false;
-	
+//#ifdef ALLEGRO_ANDROID
+#if 1
 	// Convert to an 8 bit paletted texture
 	ALLEGRO_DEBUG("Converting to paletted texture initial not clone");
 	w = m_get_bitmap_width(bitmap);
@@ -183,9 +184,11 @@ bool Image::load(std::string copy_from, int x1, int y1, int x2, int y2)
 	ALLEGRO_BITMAP *pal = al_create_custom_bitmap(w, h, upload_paletted_image, &p);
 	ALLEGRO_DEBUG("Trying palette stuff 8");
 	ALLEGRO_DEBUG("pal=%p", pal);
+	delete[] imgdata;
 
 	al_destroy_bitmap(bitmap->bitmap);
 	bitmap->bitmap = pal;
+#endif
 
 	return true;
 }
@@ -237,6 +240,8 @@ Image *Image::clone(int type)
 		add_blit(bitmap, 0, 0, white, 0.7, 0);
 	al_set_target_bitmap(target);
 
+//#ifdef ALLEGRO_ANDROID
+#if 1
 	// Convert to an 8 bit paletted texture
 	ALLEGRO_DEBUG("Converting to paletted texture");
 	int w = m_get_bitmap_width(img->bitmap);
@@ -261,9 +266,11 @@ Image *Image::clone(int type)
 	ALLEGRO_BITMAP *pal = al_create_custom_bitmap(w, h, upload_paletted_image, &p);
 	ALLEGRO_DEBUG("Trying palette stuff 8");
 	ALLEGRO_DEBUG("pal=%p", pal);
+	delete[] imgdata;
 
 	al_destroy_bitmap(img->bitmap->bitmap);
 	img->bitmap->bitmap = pal;
+#endif
 
 	return img;
 }

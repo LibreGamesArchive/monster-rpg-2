@@ -77,7 +77,7 @@ MBITMAP *m_load_bitmap_redraw(const char *name, void (*redraw)(MBITMAP *bmp));
 MFONT *m_load_font(const char *name);
 MBITMAP *m_create_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateData *data) = NULL, RecreateData *data = NULL, void (*destroy)(MBITMAP *b) = NULL); // check
 MBITMAP *m_create_sub_bitmap(MBITMAP *parent, int x, int y, int w, int h); // check
-void m_destroy_bitmap(MBITMAP *bmp);
+void m_destroy_bitmap(MBITMAP *bmp, bool internals_only = false);
 void m_flip_display(void);
 void m_draw_circle(int x, int y, int radius, MCOLOR color, int flags);
 void m_rest(double seconds);
