@@ -568,11 +568,7 @@ Configuration::Configuration() :
 	xbox360(false)
 	,cfg_tuning(CFG_TUNING_BALANCED)
 	,cfg_difficulty(CFG_DIFFICULTY_NORMAL)
-#ifdef ALLEGRO_ANDROID
-	,cfg_filter_type(FILTER_LINEAR)
-#else
 	,cfg_filter_type(FILTER_NONE)
-#endif
 	,cfg_maintain_aspect_ratio(0)
 	,language(0)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID

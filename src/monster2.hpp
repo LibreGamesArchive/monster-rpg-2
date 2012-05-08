@@ -8,14 +8,6 @@
 
 #define R2D(a) ((a)*180/M_PI)
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-#define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_RGBA_4444
-#elif defined A5_OGL
-#define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE
-#else
-#define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_ARGB_8888 HELLO ###############
-#endif
-
 #include "config.h"
 
 #include <cstdio>
@@ -104,6 +96,14 @@ ALLEGRO_DEBUG_CHANNEL("morpg2")
 
 #ifdef ALLEGRO_IPHONE
 #include "60beat.h"
+#endif
+
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_RGBA_4444
+#elif defined A5_OGL
+#define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE
+#else
+#define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_ARGB_8888 HELLO ###############
 #endif
 
 

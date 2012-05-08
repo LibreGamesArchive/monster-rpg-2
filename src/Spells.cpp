@@ -752,12 +752,14 @@ void LightningSpell::init(Combatant *caster, Combatant **targets, int numTargets
 {
 	Spell::init(caster, targets, numTargets);
 
+	ALLEGRO_DEBUG("in LightningSpell::init");
 	for (int i = 0; i < numTargets; i++) {
 		targets[i]->getAnimationSet()->setSubAnimation("hit");
 		LightningEffect *le = new LightningEffect(targets[i]);
 		lifetime = le->getLifetime();
 		battle->addEntity(le);
 	}
+	ALLEGRO_DEBUG("end of LightningSpell::init");
 }
 
 
@@ -3195,7 +3197,7 @@ void SwallowSpell::apply(void)
 	int flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 	MBITMAP *bitmap = m_create_bitmap(w, h); // check
-	al_set_new_display_flags(flags);
+	al_set_new_bitmap_flags(flags);
 	ALLEGRO_BITMAP *oldTarget = al_get_target_bitmap();
 	m_set_target_bitmap(bitmap);
 #ifdef ALLEGRO4

@@ -225,6 +225,7 @@ AnimationSet::AnimationSet(const char *filename, bool alpha) :
 			else
 			delays.push_back(0);
 		Animation *anim = new Animation(name.c_str(), 255);
+
 		for (int i = 0; i < frames; i++) {
 			Image *image;
 			if (alpha)

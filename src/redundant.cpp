@@ -400,14 +400,14 @@ void m_draw_line(int x1, int y1, int x2, int y2, MCOLOR color)
 }
 
 
-void m_draw_scaled_bitmap(MBITMAP *bmp, int sx, int sy, int sw, int sh,
-	int dx, int dy, int dw, int dh, int flags)
+void m_draw_scaled_bitmap(MBITMAP *bmp, float sx, float sy, float sw, float sh,
+	float dx, float dy, float dw, float dh, int flags)
 {
 	al_draw_tinted_scaled_bitmap(bmp->bitmap, _blend_color, sx, sy, sw, sh, dx, dy, dw, dh, flags);
 }
 
-void m_draw_scaled_bitmap(MBITMAP *bmp, int sx, int sy, int sw, int sh,
-	int dx, int dy, int dw, int dh, int flags, int alpha)
+void m_draw_scaled_bitmap(MBITMAP *bmp, float sx, float sy, float sw, float sh,
+	float dx, float dy, float dw, float dh, int flags, float alpha)
 {
 	m_save_blender();
 	float alpha_f = alpha/255.0;
@@ -472,6 +472,45 @@ MBITMAP *m_load_bitmap(const char *name, bool force_memory)
 	lb.flags = al_get_bitmap_flags(bitmap);
 	lb.format = al_get_bitmap_format(bitmap);
 	lb.load.filename = name;
+	lb.bitmap = m;
+	loaded_bitmaps.push_back(lb);
+#endif
+
+	return m;
+}
+
+
+MBITMAP *m_load_bitmap_redraw(const char *name, void (*redraw)(MBITMAP *bmp))
+{
+	ALLEGRO_DEBUG("m_load_bitmap_redraw");
+
+	ALLEGRO_BITMAP *bitmap = 0;
+
+	bitmap = my_load_bitmap(name);
+
+	if (!bitmap) {
+		debug_message("Error loading bitmap %s\n", name);
+		return NULL;
+	}
+
+	MBITMAP *m = new_mbitmap(bitmap);
+
+	if (al_get_bitmap_flags(bitmap) & ALLEGRO_MEMORY_BITMAP) {
+		return m;
+	}
+
+	if (redraw) {
+		ALLEGRO_DEBUG("redrawing");
+		redraw(m);
+	}
+
+#if defined ALLEGRO_ANDROID || defined A5_D3D
+	LoadedBitmap lb;
+	lb.load_type = LOAD_LOAD;
+	lb.flags = al_get_bitmap_flags(bitmap);
+	lb.format = al_get_bitmap_format(bitmap);
+	lb.load.filename = name;
+	lb.load.redraw = redraw;
 	lb.bitmap = m;
 	loaded_bitmaps.push_back(lb);
 #endif
@@ -1070,6 +1109,9 @@ void _reload_loaded_bitmaps(void)
 			ALLEGRO_DEBUG("reloading %p", m);
 			if (loaded_bitmaps[i].load_type == LOAD_LOAD) {
 				m->bitmap = my_load_bitmap(loaded_bitmaps[i].load.filename.c_str());
+				if (loaded_bitmaps[i].load.redraw) {
+					loaded_bitmaps[i].load.redraw(m);
+				}
 			}
 			else { // create
 				Recreate *d = &loaded_bitmaps[i].recreate;

@@ -339,7 +339,9 @@ static void *hqm_go_thread(void *arg)
 {
 	(void)arg;
 
+#ifdef ALLEGRO_ANDROID
 	al_set_standard_file_interface();
+#endif
 
 	is_downloading = true;
 
@@ -403,7 +405,9 @@ int hqm_get_status(float *percent)
 	char fn[1000];
 	sprintf(fn, "%s/%s", DOWNLOAD_PATH, "list.txt");
 
+#ifdef ALLEGRO_ANDROID
 	al_set_standard_file_interface();
+#endif
 
 	ALLEGRO_FILE *f = al_fopen(fn, "r");
 
@@ -455,7 +459,9 @@ int hqm_get_status(float *percent)
 		al_fclose(f);
 		if (percent)
 			*percent = 1.0f;
+#ifdef ALLEGRO_ANDROID
 		al_set_apk_file_interface();
+#endif
 		return HQM_STATUS_COMPLETE;
 	}
 
@@ -463,11 +469,15 @@ partial:
 	al_fclose(f);
 	if (percent)
 		*percent = (float)count / NUM_FILES;
+#ifdef ALLEGRO_ANDROID
 	al_set_apk_file_interface();
+#endif
 	return HQM_STATUS_PARTIAL;
 
 nuthin:
+#ifdef ALLEGRO_ANDROID
 	al_set_apk_file_interface();
+#endif
 	return HQM_STATUS_NOTSTARTED;
 }
 
@@ -486,14 +496,20 @@ void hqm_set_download_path(const char *path)
 
 void hqm_delete(void)
 {
+#ifdef ALLEGRO_ANDROID
 	al_set_standard_file_interface();
+#endif
 	ALLEGRO_FS_ENTRY *dir = al_create_fs_entry(DOWNLOAD_PATH);
 	if (!dir) {
+#ifdef ALLEGRO_ANDROID
 		al_set_apk_file_interface();
+#endif
 		return;
 	}
 	if (!al_open_directory(dir)) {
+#ifdef ALLEGRO_ANDROID
 		al_set_apk_file_interface();
+#endif
 		return;
 	}
 
@@ -507,5 +523,7 @@ void hqm_delete(void)
 	al_remove_fs_entry(dir);
 	al_destroy_fs_entry(dir);
 	
+#ifdef ALLEGRO_ANDROID
 	al_set_apk_file_interface();
+#endif
 }

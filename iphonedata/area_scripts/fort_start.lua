@@ -212,6 +212,8 @@ end
 
 
 function start()
+	samp = loadSample("drain.ogg")
+
 	sub = Object:new{x=34, y=51, anim_set="sub"}
 	setObjectLow(sub.id, true)
 	gunnar = Object:new{x=36, y=48, anim_set="Gunnar", person=true}
@@ -301,6 +303,7 @@ function start()
 end
 
 function stop()
+	destroySample(samp)
 end
 
 function update(step)
@@ -549,7 +552,7 @@ function activate(activator, activated)
 				getMilestone(MS_LIT_ALTER4)) then
 			started = true
 			-- start scene
-			loadPlayDestroy("drain.ogg")
+			playSample("drain.ogg")
 			scriptifyPlayer()
 			px, py = getObjectPosition(0)
 			tmp = Object:new{id=0, x=px, y=py}

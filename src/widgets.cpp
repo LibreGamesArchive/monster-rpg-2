@@ -13,10 +13,10 @@ MSpeechDialog *speechDialog = NULL;
 
 std::vector<MBITMAP *> icons;
 MManSelector *manChooser = NULL;
-static MBITMAP *icon_bmp;
+MBITMAP *icon_bmp;
 
 
-void loadIcons(void)
+void loadIcons(MBITMAP *bmp)
 {
 	#define N 40
 	int pos[N*4] = {
@@ -67,19 +67,22 @@ void loadIcons(void)
 		0, 54, 9, 9
 	};
 
-	icon_bmp = m_load_bitmap(getResource("media/icons.png"));
-	
+	for (int i = 0; i < icons.size(); i++) {
+		m_destroy_bitmap(icons[i]);
+	}
+	icons.clear();
+
 	for (int i = 0; i < N; i++) {
 		icons.push_back(
 			m_create_sub_bitmap(
-				icon_bmp,
+				bmp,
 				pos[i*4+0], pos[i*4+1],
 				pos[i*4+2], pos[i*4+3]
 			)
 		);
+		ALLEGRO_DEBUG("icons[%d]=%d", i, icons[i]);
 	}
 }
-//else {
 
 void destroyIcons(void)
 {
@@ -235,8 +238,6 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 		al_set_shader_float(shadow_shader, "y1", y);
 		al_set_shader_float(shadow_shader, "x2", x+w);
 		al_set_shader_float(shadow_shader, "y2", y+h);
-		al_set_shader_float(shadow_shader, "BW", buffer_true_w);
-		al_set_shader_float(shadow_shader, "BH", buffer_true_h);
 		al_use_shader(shadow_shader, true);
 		m_draw_rectangle(x-10, y-10, x+w+10, y+h+10, black, M_FILLED);
 		al_use_shader(shadow_shader, false);
@@ -288,113 +289,6 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 	al_set_clipping_rectangle(xxx, yyy, www, hhh);
 
 	if (!use_programmable_pipeline && shadow) {
-#ifdef ALLEGRO_ANDROID
-		ALLEGRO_VERTEX verts[6*8];
-
-		int i = 0;
-
-		#define FILL(xi, yi, ui, vi) \
-		verts[i+1].x = verts[i+0].x + xi; \
-		verts[i+1].y = verts[i+0].y; \
-		verts[i+1].z = 0; \
-		verts[i+1].u = verts[i+0].u + ui; \
-		verts[i+1].v = verts[i+0].v; \
-		verts[i+1].color = white; \
-		verts[i+2].x = verts[i+0].x; \
-		verts[i+2].y = verts[i+0].y + yi; \
-		verts[i+2].z = 0; \
-		verts[i+2].u = verts[i+0].u; \
-		verts[i+2].v = verts[i+0].v + vi; \
-		verts[i+2].color = white; \
-		verts[i+3].x = verts[i+0].x + xi; \
-		verts[i+3].y = verts[i+0].y; \
-		verts[i+3].z = 0; \
-		verts[i+3].u = verts[i+0].u + ui; \
-		verts[i+3].v = verts[i+0].v; \
-		verts[i+3].color = white; \
-		verts[i+4].x = verts[i+0].x; \
-		verts[i+4].y = verts[i+0].y + yi; \
-		verts[i+4].z = 0; \
-		verts[i+4].u = verts[i+0].u; \
-		verts[i+4].v = verts[i+0].v + vi; \
-		verts[i+4].color = white; \
-		verts[i+5].x = verts[i+0].x + xi; \
-		verts[i+5].y = verts[i+0].y + yi; \
-		verts[i+5].z = 0; \
-		verts[i+5].u = verts[i+0].u + ui; \
-		verts[i+5].v = verts[i+0].v + vi; \
-		verts[i+5].color = white; \
-		i += 6;
-
-		verts[i].x = x-2;
-		verts[i].y = y-2-SHADOW_CORNER_SIZE;
-		verts[i].z = 0;
-		verts[i].u = 0;
-		verts[i].v = 0;
-		verts[i].color = white;
-		FILL(w+4, SHADOW_CORNER_SIZE, 1, SHADOW_CORNER_SIZE);
-
-		verts[i].x = x-2;
-		verts[i].y = y+h+2;
-		verts[i].z = 0;
-		verts[i].u = 32;
-		verts[i].v = 0;
-		verts[i].color = white;
-		FILL(w+4, SHADOW_CORNER_SIZE, 1, SHADOW_CORNER_SIZE);
-
-		verts[i].x = x+w+2;
-		verts[i].y = y-2;
-		verts[i].z = 0;
-		verts[i].u = 16;
-		verts[i].v = 0;
-		verts[i].color = white;
-		FILL(SHADOW_CORNER_SIZE, h+4, SHADOW_CORNER_SIZE, 1);
-
-		verts[i].x = x-2-SHADOW_CORNER_SIZE;
-		verts[i].y = y-2;
-		verts[i].z = 0;
-		verts[i].u = 48;
-		verts[i].v = 0;
-		verts[i].color = white;
-		FILL(SHADOW_CORNER_SIZE, h+4, SHADOW_CORNER_SIZE, 1);
-
-		verts[i+0].x = x-2-SHADOW_CORNER_SIZE;
-		verts[i+0].y = y-2-SHADOW_CORNER_SIZE;
-		verts[i+0].z = 0;
-		verts[i+0].u = 0;
-		verts[i+0].v = 16;
-		verts[i+0].color = white;
-		FILL(SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE);
-		
-		verts[i+0].x = x+w+2;
-		verts[i+0].y = y-2-SHADOW_CORNER_SIZE;
-		verts[i+0].z = 0;
-		verts[i+0].u = SHADOW_CORNER_SIZE;
-		verts[i+0].v = 16;
-		verts[i+0].color = white;
-		FILL(SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE);
-		
-		verts[i+0].x = x+w+2;
-		verts[i+0].y = y+h+2;
-		verts[i+0].z = 0;
-		verts[i+0].u = SHADOW_CORNER_SIZE*2;
-		verts[i+0].v = 16;
-		verts[i+0].color = white;
-		FILL(SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE);
-		
-		verts[i+0].x = x-2-SHADOW_CORNER_SIZE;
-		verts[i+0].y = y+h+2;;
-		verts[i+0].z = 0;
-		verts[i+0].u = SHADOW_CORNER_SIZE*3;
-		verts[i+0].v = 16;
-		verts[i+0].color = white;
-		FILL(SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE);
-		
-		#undef FILL
-
-		m_draw_prim(verts, 0, shadow_sheet, 0, 6*8, ALLEGRO_PRIM_TRIANGLE_LIST);
-		
-#else
 		m_draw_scaled_bitmap(
 			shadow_sheet,
 			0, 0,
@@ -403,16 +297,21 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 			w+4, SHADOW_CORNER_SIZE,
 			0
 		);
+		#ifdef A5_OGL
+		int true_w, true_h;
+		al_get_opengl_texture_size(shadow_sheet->bitmap, &true_w, &true_h);
+		#endif
 		m_draw_scaled_bitmap(
 			shadow_sheet,
+		#ifdef A5_OGL
+			32 + (0.5 / true_w), 0,
+			0.5, SHADOW_CORNER_SIZE,
+		#else
 			32, 0,
 			1, SHADOW_CORNER_SIZE,
+		#endif
 			x-2, y+h+2,
-#ifdef ALLEGRO_IPHONE
-			w+5, SHADOW_CORNER_SIZE,
-#else
 			w+4, SHADOW_CORNER_SIZE,
-#endif
 			0
 		);
 		m_draw_scaled_bitmap(
@@ -436,7 +335,6 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 		al_draw_bitmap_region(shadow_sheet->bitmap, SHADOW_CORNER_SIZE, 16, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x+w+2, y-2-SHADOW_CORNER_SIZE, 0);
 		al_draw_bitmap_region(shadow_sheet->bitmap, SHADOW_CORNER_SIZE*2, 16, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x+w+2, y+h+2, 0);
 		al_draw_bitmap_region(shadow_sheet->bitmap, SHADOW_CORNER_SIZE*3, 16, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x-2-SHADOW_CORNER_SIZE, y+h+2, 0);
-#endif
 	}
 
 	m_restore_blender();
@@ -654,7 +552,7 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 	int flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 	MBITMAP *tmp = m_create_bitmap(BW, BH); // check
-	al_set_new_display_flags(flags);
+	al_set_new_bitmap_flags(flags);
 	ALLEGRO_BITMAP *oldTarget = al_get_target_bitmap();
 	m_set_target_bitmap(tmp);
 	m_draw_bitmap(buffer, 0, 0, 0);

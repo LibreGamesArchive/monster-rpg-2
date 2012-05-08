@@ -93,7 +93,9 @@ void doAttack(Combatant *attacker, Combatant *attacked, bool swoosh)
 			attackerInfo.equipment.lquantity = 0;
 			attackerInfo.equipment.lhand = -1;
 			attacker->getAnimationSet()->setPrefix("noweapon_");
-			attacker->getWhiteAnimationSet()->setPrefix("noweapon_");
+			if (!use_programmable_pipeline) {
+				attacker->getWhiteAnimationSet()->setPrefix("noweapon_");
+			}
 		}
 	}
 	else if ((rhand >= 0) && weapons[items[rhand].id].ammo) {
@@ -102,7 +104,9 @@ void doAttack(Combatant *attacker, Combatant *attacked, bool swoosh)
 			attackerInfo.equipment.rquantity = 0;
 			attackerInfo.equipment.rhand = -1;
 			attacker->getAnimationSet()->setPrefix("noweapon_");
-			attacker->getWhiteAnimationSet()->setPrefix("noweapon_");
+			if (!use_programmable_pipeline) {
+				attacker->getWhiteAnimationSet()->setPrefix("noweapon_");
+			}
 		}
 	}
 

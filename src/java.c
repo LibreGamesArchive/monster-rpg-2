@@ -1,10 +1,11 @@
 #include <allegro5/allegro.h>
 
 #include <jni.h>
-
 #include "java.h"
 
 static bool ok = false;
+
+JNIEnv *_al_android_get_jnienv(void);
 
 #define _jni_checkException(env) __jni_checkException(env, __FILE__, __FUNCTION__, __LINE__)
 void __jni_checkException(JNIEnv *env, const char *file, const char *fname, int line);
@@ -310,17 +311,17 @@ void bass_setMusicVolume(HMUSIC music, float vol)
 
 void openURL(const char *url)
 {
-	jstring urlS = (*java_env)->NewStringUTF(java_env, url);
+	jstring urlS = (*_al_android_get_jnienv())->NewStringUTF(_al_android_get_jnienv(), url);
 
 	_jni_callVoidMethodV(
-		java_env,
+		_al_android_get_jnienv(),
 		_al_android_activity_object(),
 		"openURL",
 		"(Ljava/lang/String;)V",
 		urlS
 	);
 	
-	(*java_env)->DeleteLocalRef(java_env, urlS);
+	(*_al_android_get_jnienv())->DeleteLocalRef(_al_android_get_jnienv(), urlS);
 }
 
 // return true on success
@@ -328,7 +329,7 @@ bool get_clipboard(char *buf, int len)
 {
 	jstring s =
 		(jstring)_jni_callObjectMethod(
-			java_env,
+			_al_android_get_jnienv(),
 			_al_android_activity_object(),
 			"getClipData",
 			"()Ljava/lang/String;"
@@ -337,37 +338,43 @@ bool get_clipboard(char *buf, int len)
 	if (s == NULL)
 		return false;
 	
-	const char *native = (*java_env)->GetStringUTFChars(java_env, s, 0);
+	const char *native = (*_al_android_get_jnienv())->GetStringUTFChars(_al_android_get_jnienv(), s, 0);
 
 	strncpy(buf, native, len);
 
-	(*java_env)->ReleaseStringUTFChars(java_env, s, native);
+	(*_al_android_get_jnienv())->ReleaseStringUTFChars(_al_android_get_jnienv(), s, native);
 
 	return true;
 }
 
 void set_clipboard(char *buf)
 {
-	jstring saveS = (*java_env)->NewStringUTF(java_env, buf);
+	jstring saveS = (*_al_android_get_jnienv())->NewStringUTF(_al_android_get_jnienv(), buf);
 
 	_jni_callVoidMethodV(
-		java_env,
+		_al_android_get_jnienv(),
 		_al_android_activity_object(),
 		"setClipData",
 		"(Ljava/lang/String;)V",
 		saveS
 	);
 
-	(*java_env)->DeleteLocalRef(java_env, saveS);
+	(*_al_android_get_jnienv())->DeleteLocalRef(_al_android_get_jnienv(), saveS);
 }
 
 bool wifiConnected(void)
 {
-	return _jni_callBooleanMethodV(
-		java_env,
+	ALLEGRO_DEBUG("calling java method wifiConnected");
+
+	bool ret = _jni_callBooleanMethodV(
+		_al_android_get_jnienv(),
 		_al_android_activity_object(),
 		"wifiConnected",
 		"()Z"
 	);
+
+	ALLEGRO_DEBUG("after calling java method wifiConnected");
+
+	return ret;
 }
 

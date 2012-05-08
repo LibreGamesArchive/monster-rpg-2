@@ -1098,13 +1098,17 @@ void battleTransition(void)
 		return;
 	}
 
+ALLEGRO_DEBUG("hum1");
 	MBITMAP *xfade_buf = m_create_bitmap(BW, BH); // check
+ALLEGRO_DEBUG("hum2");
 	MBITMAP *battle_buf = m_create_bitmap(BW, BH); // check
+ALLEGRO_DEBUG("hum3");
 
 	//set_linear_mag_filter(xfade_buf, config.getFilterType() == FILTER_LINEAR);
 
 	m_set_target_bitmap(battle_buf);
 	battle->draw();
+ALLEGRO_DEBUG("hum4");
 
 	dpad_off();
 
@@ -1112,8 +1116,10 @@ void battleTransition(void)
 	long start = now;
 	int length = 700;
 	float angle = 0;
+ALLEGRO_DEBUG("hum5");
 
 	while ((now - start) < (length*2)) {
+ALLEGRO_DEBUG("hum6");
 		int elapsed = now - start;
 		angle = ((double)elapsed / (length*2.0)) * (M_PI*2);
 
@@ -1165,9 +1171,9 @@ void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flag
 	int tw = al_get_bitmap_width(target);
 	int th = al_get_bitmap_height(target);
 	int sx, sy;
-	int cx, cy, cw, ch;
-	
-	al_get_clipping_rectangle(&cx, &cy, &cw, &ch);
+        int cx, cy, cw, ch;
+       
+        al_get_clipping_rectangle(&cx, &cy, &cw, &ch);
 
 	// clip to screen
 	if (dx < 0) {
@@ -1191,7 +1197,6 @@ void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flag
 		src_w -= (dx+src_w) - (cx+cw);
 	}
 	
-
 	// clip to screen
 	if (dy < 0) {
 		sy = -dy;
@@ -1215,9 +1220,9 @@ void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flag
 	}
 	
 	ALLEGRO_LOCKED_REGION *sreg = m_lock_bitmap_region(src, 0, sy, src_w, src_h, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READONLY);
-	if (!sreg) return;
+	if (!sreg) { ALLEGRO_DEBUG("!sreg returning"); return; }
 	ALLEGRO_LOCKED_REGION *dreg = al_lock_bitmap_region(target, dx, dy, src_w, src_h, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READWRITE);
-	if (!dreg) { m_unlock_bitmap(src); return; }
+	if (!dreg) { m_unlock_bitmap(src); ALLEGRO_DEBUG("!dreg returning"); return; }
 
 	float src_factor = 1 - amount;
 	
@@ -1269,7 +1274,6 @@ void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flag
 		}
 	}
 
-	
 	m_unlock_bitmap(src);
 	al_unlock_bitmap(target);
 }

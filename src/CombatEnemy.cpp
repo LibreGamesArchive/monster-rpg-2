@@ -82,11 +82,15 @@ bool CombatEnemy::act(int step, Battle *b)
 		if (name != "Relic" && name != "Lava") {
 			if (name == "Rider") {
 				animSet->setSubAnimation("stand");
-				whiteAnimSet->setSubAnimation("stand");
+				if (!use_programmable_pipeline) {
+					whiteAnimSet->setSubAnimation("stand");
+				}
 			}
 			else {
 				animSet->setSubAnimation(0);
-				whiteAnimSet->setSubAnimation(0);
+				if (!use_programmable_pipeline) {
+					whiteAnimSet->setSubAnimation(0);
+				}
 			}
 		}
 	}
@@ -146,40 +150,56 @@ bool CombatEnemy::act(int step, Battle *b)
 				if (printableName == std::string(_t("Girl"))) {
 					if (std::string(spellName) == "Fireball") {
 						animSet->setSubAnimation("cast1");
-						whiteAnimSet->setSubAnimation("cast1");
+						if (!use_programmable_pipeline) {
+							whiteAnimSet->setSubAnimation("cast1");
+						}
 					}
 					else {
 						animSet->setSubAnimation("cast2");
-						whiteAnimSet->setSubAnimation("cast2");
+						if (!use_programmable_pipeline) {
+							whiteAnimSet->setSubAnimation("cast2");
+						}
 					}
 				}
 				else if (printableName == std::string(_t("Dragon"))) {
 					if (std::string(spellName) == "Talon") {
 						animSet->setSubAnimation("talon");
-						whiteAnimSet->setSubAnimation("talon");
+						if (!use_programmable_pipeline) {
+							whiteAnimSet->setSubAnimation("talon");
+						}
 					}
 					else {
 						animSet->setSubAnimation("bof");
-						whiteAnimSet->setSubAnimation("bof");
+						if (!use_programmable_pipeline) {
+							whiteAnimSet->setSubAnimation("bof");
+						}
 					}
 				}
 				else if (printableName == std::string(_t("Tode"))) {
 					if (std::string(spellName) == "BellyAcid") {
 						animSet->setSubAnimation("acid");
-						whiteAnimSet->setSubAnimation("acid");
+						if (!use_programmable_pipeline) {
+							whiteAnimSet->setSubAnimation("acid");
+						}
 					}
 					else if (std::string(spellName) == "Swallow") {
 						animSet->setSubAnimation("swallow");
-						whiteAnimSet->setSubAnimation("swallow");
+						if (!use_programmable_pipeline) {
+							whiteAnimSet->setSubAnimation("swallow");
+						}
 					}
 					else if (std::string(spellName) == "Puke") {
 						animSet->setSubAnimation("puke");
-						whiteAnimSet->setSubAnimation("puke");
+						if (!use_programmable_pipeline) {
+							whiteAnimSet->setSubAnimation("puke");
+						}
 					}
 				}
 				else {
 					animSet->setSubAnimation("cast");
-					whiteAnimSet->setSubAnimation("cast");
+					if (!use_programmable_pipeline) {
+						whiteAnimSet->setSubAnimation("cast");
+					}
 				}
 				// add message
 				std::string msg = "{008}" + std::string(_t(spellName));
@@ -190,11 +210,14 @@ bool CombatEnemy::act(int step, Battle *b)
 					loc = MESSAGE_LEFT;
 				if (std::string(spellName) != "MachineGun")
 					battle->addMessage(loc, msg, 1500);
+				ALLEGRO_DEBUG("End of cast?");
 				break;
 			}
 			case COMBAT_ATTACKING: {
 				animSet->setSubAnimation("attack");
-				whiteAnimSet->setSubAnimation("attack");
+				if (!use_programmable_pipeline) {
+					whiteAnimSet->setSubAnimation("attack");
+				}
 				animSet->reset();
 				numTargets = (int)lua_tonumber(luaState, -9);
 				std::list<CombatEntity *> &e = battle->getEntities();
@@ -215,7 +238,9 @@ bool CombatEnemy::act(int step, Battle *b)
 				defending = true;
 				status.type = COMBAT_WAITING;
 				animSet->setSubAnimation("defend");
-				whiteAnimSet->setSubAnimation("defend");
+				if (!use_programmable_pipeline) {
+					whiteAnimSet->setSubAnimation("defend");
+				}
 				animSet->reset();
 				lua_pop(luaState, 10);
 				return true;
@@ -253,7 +278,9 @@ bool CombatEnemy::act(int step, Battle *b)
 				spell->init(this, targets, numTargets);
 				spellInited = true;
 			}
+			ALLEGRO_DEBUG("CALLING SPELL->UPDATE");
 			if (spell->update(step)) {
+				ALLEGRO_DEBUG("Spell->update true");
 				animSet->reset();
 				spell->apply();
 				delete spell;
@@ -261,10 +288,13 @@ bool CombatEnemy::act(int step, Battle *b)
 				status.type = COMBAT_WAITING;
 				if (name != "Relic" && name != "Lava") {
 					animSet->setSubAnimation("stand");
-					whiteAnimSet->setSubAnimation("stand");
+					if (!use_programmable_pipeline) {
+						whiteAnimSet->setSubAnimation("stand");
+					}
 				}
 				return true;
 			}
+			ALLEGRO_DEBUG("Spell->update false");
 		}
 	}
 	else if (status.type == COMBAT_ATTACKING) {
@@ -308,6 +338,8 @@ bool CombatEnemy::act(int step, Battle *b)
 			return true;
 		}
 	}
+
+	ALLEGRO_DEBUG("Done act");
 	return false;
 }
 
@@ -371,7 +403,9 @@ static void dragon_blackAnd0(AnimationSet *a, AnimationSet *a2)
 	char animName[100];
 	sprintf(animName, "transform0");
 	a->setSubAnimation(std::string(animName));
-	a2->setSubAnimation(std::string(animName));
+	if (!use_programmable_pipeline) {
+		a2->setSubAnimation(std::string(animName));
+	}
 
 	long start = tguiCurrentTimeMillis();
 	while (tguiCurrentTimeMillis() < (unsigned long)start+1000) {
@@ -401,7 +435,9 @@ static void dragon_normal(AnimationSet *a, AnimationSet *a2, int frame)
 	char animName[100];
 	sprintf(animName, "transform%d", frame);
 	a->setSubAnimation(std::string(animName));
-	a2->setSubAnimation(std::string(animName));
+	if (!use_programmable_pipeline) {
+		a2->setSubAnimation(std::string(animName));
+	}
 	
 	m_clear(black);
 	a->draw(dragon_x, dragon_y-a->getHeight(), dragon_flags);
@@ -420,7 +456,9 @@ static void dragon_flash(AnimationSet *a, AnimationSet *a2, int frame, float sta
 	char animName[100];
 	sprintf(animName, "transform%d", frame);
 	a->setSubAnimation(std::string(animName));
-	a2->setSubAnimation(std::string(animName));
+	if (!use_programmable_pipeline) {
+		a2->setSubAnimation(std::string(animName));
+	}
 	
 	long start = tguiCurrentTimeMillis();
 	while (tguiCurrentTimeMillis() < (unsigned long)start+125) {
@@ -446,11 +484,15 @@ static void dragon_fade(AnimationSet *a, AnimationSet *a2, int fullframe, int fa
 	char animName[100];
 	sprintf(animName, "transform%d", fullframe);
 	a->setSubAnimation(std::string(animName));
-	a2->setSubAnimation(std::string(animName));
+	if (!use_programmable_pipeline) {
+		a2->setSubAnimation(std::string(animName));
+	}
 	MBITMAP *full = a->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 	sprintf(animName, "transform%d", fadeframe);
 	a->setSubAnimation(std::string(animName));
-	a2->setSubAnimation(std::string(animName));
+	if (!use_programmable_pipeline) {
+		a2->setSubAnimation(std::string(animName));
+	}
 	MBITMAP *fade = a->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 	
 	long start = tguiCurrentTimeMillis();
@@ -479,7 +521,9 @@ static void dragon_fade(AnimationSet *a, AnimationSet *a2, int fullframe, int fa
 static void dragon_players(AnimationSet *a, AnimationSet *a2)
 {
 	a->setSubAnimation("stand");
-	a2->setSubAnimation("stand");
+	if (!use_programmable_pipeline) {
+		a2->setSubAnimation("stand");
+	}
 
 	CombatPlayer *players[MAX_PARTY] = { NULL };
 
@@ -514,11 +558,15 @@ void CombatEnemy::draw_shadow(void)
 	if (name == "Relic" || name == "Lava") {
 		if (info.abilities.hp < info.abilities.maxhp/2) {
 			animSet->setSubAnimation("hurt");
-			whiteAnimSet->setSubAnimation("hurt");
+			if (!use_programmable_pipeline) {
+				whiteAnimSet->setSubAnimation("hurt");
+			}
 		}
 		else {
 			animSet->setSubAnimation("stand");
-			whiteAnimSet->setSubAnimation("stand");
+			if (!use_programmable_pipeline) {
+				whiteAnimSet->setSubAnimation("stand");
+			}
 		}
 	}
 
@@ -534,11 +582,15 @@ void CombatEnemy::draw(void)
 	if (name == "Relic" || name == "Lava") {
 		if (info.abilities.hp < info.abilities.maxhp/2) {
 			animSet->setSubAnimation("hurt");
-			whiteAnimSet->setSubAnimation("hurt");
+			if (!use_programmable_pipeline) {
+				whiteAnimSet->setSubAnimation("hurt");
+			}
 		}
 		else {
 			animSet->setSubAnimation("stand");
-			whiteAnimSet->setSubAnimation("stand");
+			if (!use_programmable_pipeline) {
+				whiteAnimSet->setSubAnimation("stand");
+			}
 		}
 	}
 
@@ -568,9 +620,11 @@ void CombatEnemy::draw(void)
 		AnimationSet *tmp = oldAnim;
 		oldAnim = animSet;
 		animSet = tmp;
-		tmp = oldWhiteAnim;
-		oldWhiteAnim = whiteAnimSet;
-		whiteAnimSet = tmp;
+		if (!use_programmable_pipeline) {
+			tmp = oldWhiteAnim;
+			oldWhiteAnim = whiteAnimSet;
+			whiteAnimSet = tmp;
+		}
 
 		dragon_x = x-animSet->getWidth()/2;
 		dragon_y = y;
@@ -612,7 +666,9 @@ void CombatEnemy::draw(void)
 		dragon_players(animSet, whiteAnimSet);
 
 		animSet->setSubAnimation("stand");
-		whiteAnimSet->setSubAnimation("stand");
+		if (!use_programmable_pipeline) {
+			whiteAnimSet->setSubAnimation("stand");
+		}
 		sample_played = false;
 		deadCount = 0;
 		// change stats
@@ -946,11 +1002,16 @@ void CombatEnemy::construct(std::string name, int x, int y, bool alpha)
 
 	if (printableName == std::string(_t("Girl"))) {
 		oldAnim = new AnimationSet(getResource("combat_media/Dragon.png"));
-		oldWhiteAnim = oldAnim->clone(CLONE_ENEMY);
+		if (!use_programmable_pipeline) {
+			oldWhiteAnim = oldAnim->clone(CLONE_ENEMY);
+			oldWhiteAnim->setSubAnimation("stand");
+		}
 	}
 	else {
 		oldAnim = NULL;
-		oldWhiteAnim = NULL;
+		if (!use_programmable_pipeline) {
+			oldWhiteAnim = NULL;
+		}
 	}
 
 	charmAnim = new AnimationSet(getResource("combat_media/Charm.png"));
@@ -961,13 +1022,12 @@ void CombatEnemy::construct(std::string name, int x, int y, bool alpha)
 
 	work = NULL;
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	death_blitted = false;
-#endif
-	
-	whiteAnimSet = animSet->clone(CLONE_ENEMY);
+	if (!use_programmable_pipeline) {
+		whiteAnimSet = animSet->clone(CLONE_ENEMY);
+		whiteAnimSet->setSubAnimation("stand");
 
-	mkdeath();
+		mkdeath();
+	}
 }
 
 class create_death_blit_data : public RecreateData
@@ -1014,7 +1074,7 @@ void CombatEnemy::mkdeath(void)
 {
 	if (use_programmable_pipeline)
 		return;
-	
+
 	if (work) {
 		m_destroy_bitmap(work);
 	}
@@ -1076,16 +1136,27 @@ CombatEnemy::~CombatEnemy(void)
 	delete charmAnim;
 	if (explosionCircles)
 		delete[] explosionCircles;
-	if (work) {
-		m_destroy_bitmap(work);
-	}	
+	if (!use_programmable_pipeline) {
+		if (work) {
+			m_destroy_bitmap(work);
+		}	
+	}
 	if (oldAnim) {
 		delete oldAnim;
-		delete oldWhiteAnim;
+		if (!use_programmable_pipeline) {
+			delete oldWhiteAnim;
+		}
 	}
 	
-	unreferenceBattleAnim(name, this);
-	delete whiteAnimSet;
+	std::string s = name;
+	std::string::size_type loc;
+	loc = s.find("_", 0);
+	s = s.substr(0, loc);
+
+	unreferenceBattleAnim(s, this);
+	if (!use_programmable_pipeline) {
+		delete whiteAnimSet;
+	}
 }
 
 void CombatEnemyTode::draw_shadow(void)
@@ -1100,7 +1171,9 @@ void CombatEnemyTode::draw_shadow(void)
 
 	if (full && animSet->getSubName() == "stand") {
 		animSet->setSubAnimation("full");
-		whiteAnimSet->setSubAnimation("full");
+		if (!use_programmable_pipeline) {
+			whiteAnimSet->setSubAnimation("full");
+		}
 	}
 
 	if (ox == 0 && oy == 0) {
@@ -1121,7 +1194,9 @@ void CombatEnemyTode::draw(void)
 
 	if (animSet->getSubName() == "stand" && nswallowed > 0) {
 		animSet->setSubAnimation("full");
-		whiteAnimSet->setSubAnimation("full");
+		if (!use_programmable_pipeline) {
+			whiteAnimSet->setSubAnimation("full");
+		}
 	}
 
 	int flags;
@@ -1287,7 +1362,9 @@ bool CombatEnemyTode::act(int step, Battle *b)
 		battle->addMessage(MESSAGE_LEFT, "{008} Puke", 1500);
 		pukenext = false;
 		animSet->setSubAnimation("puke");
-		whiteAnimSet->setSubAnimation("puke");
+		if (!use_programmable_pipeline) {
+			whiteAnimSet->setSubAnimation("puke");
+		}
 	}
 
 	if (spell) {
@@ -1298,10 +1375,14 @@ bool CombatEnemyTode::act(int step, Battle *b)
 			spell = NULL;
 			status.type = COMBAT_WAITING;
 			animSet->setSubAnimation("hurt");
-			whiteAnimSet->setSubAnimation("hurt");
+			if (!use_programmable_pipeline) {
+				whiteAnimSet->setSubAnimation("hurt");
+			}
 			if (animSet->getSubName() != "hurt") {
 				animSet->setSubAnimation("stand");
-				whiteAnimSet->setSubAnimation("stand");
+				if (!use_programmable_pipeline) {
+					whiteAnimSet->setSubAnimation("stand");
+				}
 			}
 			return true;
 		}

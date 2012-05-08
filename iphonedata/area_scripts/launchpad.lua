@@ -5,6 +5,8 @@ local scene_started = false
 local rocket_count = 0
 
 function start()
+	samp = loadSample("rocket_launch.ogg")
+
 	gate = Portal:new{x=0, y=7}
 
 	farmer = Object:new{x=8, y=10, anim_set="Farmer", person=true}
@@ -18,6 +20,7 @@ function start()
 end
 
 function stop()
+	destroySample(samp)
 end
 
 function update(step)
@@ -80,7 +83,7 @@ end
 
 function done()
 	setObjectHidden(0, true)
-	loadPlayDestroy("rocket_launch.ogg")
+	playSample("rocket_launch.ogg")
 	setObjectSubAnimation(rocket, "door_closed")
 	removeObject(black.id)
 	startRocket(rocket)

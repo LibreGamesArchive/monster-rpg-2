@@ -62,7 +62,6 @@ public:
 	void save(std::string filename);
 	
 	void load(std::string filename);
-	void reloadAnimations(void);    
 	void update(int step);
 	void draw(int bw = BW, int bh = BH);
 	void tint(MCOLOR *color, bool reverse = false); // color is relative to the pixel in the texture

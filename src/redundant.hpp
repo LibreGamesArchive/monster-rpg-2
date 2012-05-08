@@ -67,12 +67,13 @@ void m_unmap_rgba(MCOLOR c,
 void m_draw_rectangle(float x1, float y1, float x2, float y2, MCOLOR color,
 	int flags);
 void m_draw_line(int x1, int y1, int x2, int y2, MCOLOR color);
-void m_draw_scaled_bitmap(MBITMAP *bmp, int sx, int sy, int sw, int sh,
-	int dx, int dy, int dw, int dh, int flags, int alpha);
-void m_draw_scaled_bitmap(MBITMAP *bmp, int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int flags);
+void m_draw_scaled_bitmap(MBITMAP *bmp, float sx, float sy, float sw, float sh,
+	float dx, float dy, float dw, float dh, int flags, float alpha);
+void m_draw_scaled_bitmap(MBITMAP *bmp, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh, int flags);
 int m_get_bitmap_width(MBITMAP *bmp);
 int m_get_bitmap_height(MBITMAP *bmp);
 MBITMAP *m_load_bitmap(const char *name, bool force_memory = false);
+MBITMAP *m_load_bitmap_redraw(const char *name, void (*redraw)(MBITMAP *bmp));
 MFONT *m_load_font(const char *name);
 MBITMAP *m_create_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateData *data) = NULL, RecreateData *data = NULL, void (*destroy)(MBITMAP *b) = NULL); // check
 MBITMAP *m_create_sub_bitmap(MBITMAP *parent, int x, int y, int w, int h); // check
@@ -153,6 +154,7 @@ enum LoadType {
 // use al_get_bitmap_(flags|format) to reload
 struct Load {
 	std::string filename;
+	void (*redraw)(MBITMAP *b);
 };
 
 struct Destroy {

@@ -30,131 +30,133 @@ static QWORD ambience_loop_start = 0;
 static float musicVolume = 1.0f;
 static float ambienceVolume = 1.0f;
 static BASS_FILEPROCS fileprocs;
+	
+
+/*
+	"Darkness1.ogg",
+	"Wave.ogg",
+	"Weep.ogg",
+	"Whirlpool.ogg",
+	"fall.ogg",
+	"jump.ogg",
+	"slime.ogg",
+	"spin.ogg",
+	"suck.ogg",
+
+
+	"Acorns.ogg", x
+	"Arc.ogg", x
+	"Banana.ogg", x
+	"Beam.ogg", x
+	"BoF.ogg", x
+	"Daisy.ogg", x
+	"Darkness1.ogg", x
+	"Darkness2.ogg", x
+	"Darkness3.ogg", x
+	"Fireball.ogg", x
+	"Laser.ogg", x
+	"Machine_Gun.ogg", x
+	"Meow.ogg", x
+	"Mmm.ogg", x
+	"Orbit.ogg", x
+	"Puke.ogg", x
+	"Punch.ogg", x
+	"Rend.ogg", x
+	"Spray.ogg", x
+	"Stomp.ogg", x
+	"Stone.ogg", x
+	"Swallow.ogg", x
+	"Thud.ogg",
+	"TouchofDeath.ogg", x
+	"Twister.ogg", x
+	"UFO.ogg", x
+	"Wave.ogg", x
+	"Web.ogg", x
+	"Weep.ogg", x
+	"Whip.ogg", x
+	"Whirlpool.ogg", x
+	"buzz.ogg",
+	"chomp.ogg",
+	"fall.ogg",
+	"freeze.ogg", x
+	"high_cackle.ogg", x
+	"jump.ogg", x
+	"slime.ogg", x
+	"spin.ogg",
+	"suck.ogg",
+*/
 
 static std::string preloaded_names[] = {
 #ifdef LITE
+	"bolt.ogg",
+	"ice1.ogg",
+	"fire1.ogg",
 	"Cure.ogg",
-	"Darkness1.ogg",
 	"Elixir.ogg",
 	"Heal.ogg",
 	"HolyWater.ogg",
 	"Revive.ogg",
-	"Wave.ogg",
-	"Weep.ogg",
-	"Whirlpool.ogg",
 	"appear.ogg",
 	"battle.ogg",
 	"blip.ogg",
-	"bolt.ogg",
 	"boss.ogg",
 	"chest.ogg",
 	"door.ogg",
 	"enemy_die.ogg",
 	"error.ogg",
-	"fall.ogg",
-	"fire1.ogg",
 	"hit.ogg",
-	"ice1.ogg",
-	"jump.ogg",
 	"melee_woosh.ogg",
 	"new_party_member.ogg",
-	"nooskewl.ogg",
 	"select.ogg",
-	"slime.ogg",
-	"spin.ogg",
-	"suck.ogg",
 	"swipe.ogg",
 	"woosh.ogg",
 #else
-	"Acorns.ogg",
-	"Arc.ogg",
-	"Banana.ogg",
-	"Beam.ogg",
-	"BoF.ogg",
 	"Bolt2.ogg",
 	"Bolt3.ogg",
-	"Charm.ogg",
-	"Cure.ogg",
-	"Daisy.ogg",
-	"Darkness1.ogg",
-	"Darkness2.ogg",
-	"Darkness3.ogg",
-	"Elixir.ogg",
 	"Fire2.ogg",
 	"Fire3.ogg",
-	"Fireball.ogg",
+	"Ice3.ogg",
+	"bolt.ogg",
+	"fire1.ogg",
+	"ice1.ogg",
+	"Charm.ogg",
+	"Cure.ogg",
+	"Elixir.ogg",
 	"Heal.ogg",
 	"HolyWater.ogg",
-	"Ice3.ogg",
-	"Laser.ogg",
-	"Machine_Gun.ogg",
-	"Meow.ogg",
-	"Mmm.ogg",
-	"Orbit.ogg",
 	"Portal.ogg",
-	"Puke.ogg",
-	"Punch.ogg",
 	"Quick.ogg",
-	"Rend.ogg",
 	"Revive.ogg",
 	"Slow.ogg",
-	"Spray.ogg",
-	"Stomp.ogg",
-	"Stone.ogg",
 	"Stun.ogg",
-	"Swallow.ogg",
-	"Thud.ogg",
-	"TouchofDeath.ogg",
-	"Twister.ogg",
-	"UFO.ogg",
 	"Vampire.ogg",
-	"Wave.ogg",
-	"Web.ogg",
-	"Weep.ogg",
-	"Whip.ogg",
-	"Whirlpool.ogg",
 	"appear.ogg",
 	"battle.ogg",
 	"blip.ogg",
-	"bolt.ogg",
 	"boss.ogg",
 	"bow_draw.ogg",
 	"bow_release_and_draw.ogg",
-	"buzz.ogg",
 	"cartoon_fall.ogg",
 	"chest.ogg",
 	"ching.ogg",
-	"chomp.ogg",
 	"door.ogg",
-	"drain.ogg",
 	"enemy_die.ogg",
 	"enemy_explosion.ogg",
 	"error.ogg",
 	"explosion.ogg",
-	"fall.ogg",
-	"fire1.ogg",
-	"freeze.ogg",
-	"high_cackle.ogg",
 	"hit.ogg",
-	"ice1.ogg",
 	"ignite.ogg",
-	"jump.ogg",
 	"low_cackle.ogg",
 	"melee_woosh.ogg",
 	"new_party_member.ogg",
-	"nooskewl.ogg",
 	"pistol.ogg",
 	"push.ogg",
-	"rocket_launch.ogg",
 	"select.ogg",
 	"sleep.ogg",
 	"slice.ogg",
-	"slime.ogg",
-	"spin.ogg",
 	"splash.ogg",
 	"staff_fly.ogg",
 	"staff_poof.ogg",
-	"suck.ogg",
 	"swipe.ogg",
 	"torpedo.ogg",
 	"woosh.ogg",
@@ -300,6 +302,9 @@ void playPreloadedSample(std::string name)
 {
 	if (!sound_inited) return;
 
+	if (playBattlePreload(name))
+		return;
+
 	playSample(preloaded_samples[name]);
 }
 
@@ -320,10 +325,17 @@ MSAMPLE loadSample(std::string name)
 	char fn[1000];
 	sprintf(fn, "%s/unpack/sfx/%s", al_path_cstr(p, '/'), name.c_str());
 	al_destroy_path(p);
+
+	/*
+	// FIXME!
+	char *pos = strrchr(fn, '.');
+	strcpy(pos, ".wav");
+	*/
+
 	s = BASS_SampleLoad(false,
 		fn,
 		0, 0, 8,
-		BASS_SAMPLE_OVER_POS);
+		BASS_SAMPLE_MONO|BASS_SAMPLE_OVER_POS);
 #else
 	s = BASS_SampleLoad(false,
 		getResource("sfx/%s", name.c_str()),

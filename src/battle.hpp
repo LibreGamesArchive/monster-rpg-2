@@ -135,6 +135,9 @@ std::string getConditionName(CombatCondition cc);
 Combatant *findRandomPlayer(void);
 Combatant *findWeakestPlayer(void);
 
+void preloadSFX(std::string name);
+void preloadSpellSFX(std::string spellName);
+bool playBattlePreload(std::string name);
 
 #endif
 

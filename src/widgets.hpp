@@ -422,7 +422,7 @@ public:
 		int flags = al_get_new_bitmap_flags();
 		al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 		bmp = m_create_bitmap(width, 14); // check
-		al_set_new_display_flags(flags);
+		al_set_new_bitmap_flags(flags);
 		m_push_target_bitmap();
 		m_set_target_bitmap(bmp);
 		mDrawFrame(2, 2, width-4, 20);
@@ -1774,8 +1774,10 @@ protected:
 #endif
 
 
-void loadIcons(void);
+void loadIcons(MBITMAP *bmp);
 void destroyIcons(void);
+
+extern MBITMAP *icon_bmp;
 
 #endif
 

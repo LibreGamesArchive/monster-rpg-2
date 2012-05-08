@@ -103,6 +103,8 @@
 		96224296103D96D400756C5B /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224272103D96D400756C5B /* util.cpp */; };
 		96224297103D96D400756C5B /* widgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224273103D96D400756C5B /* widgets.cpp */; };
 		96224298103D96D400756C5B /* xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224274103D96D400756C5B /* xml.cpp */; };
+		9629BBBA1557C5AA009EAD48 /* quantize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9629BBB81557C5AA009EAD48 /* quantize.cpp */; };
+		9629BBBB1557C6E8009EAD48 /* quantize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9629BBB81557C5AA009EAD48 /* quantize.cpp */; };
 		9631BB90151E220A00CE43D0 /* libphysfs_xcode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9631BB8F151E220A00CE43D0 /* libphysfs_xcode.a */; };
 		9638490A1481A67B000F7B07 /* libJoypadCocoaTouch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9659CDB0143A4E560007757E /* libJoypadCocoaTouch.a */; };
 		9638490B1481A6B9000F7B07 /* joypad.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA0143A426C0007757E /* joypad.mm */; };
@@ -441,6 +443,8 @@
 		96224272103D96D400756C5B /* util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util.cpp; path = ../../src/util.cpp; sourceTree = SOURCE_ROOT; };
 		96224273103D96D400756C5B /* widgets.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = widgets.cpp; path = ../../src/widgets.cpp; sourceTree = SOURCE_ROOT; };
 		96224274103D96D400756C5B /* xml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = xml.cpp; path = ../../src/xml.cpp; sourceTree = SOURCE_ROOT; };
+		9629BBB81557C5AA009EAD48 /* quantize.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quantize.cpp; path = ../../src/quantize.cpp; sourceTree = "<group>"; };
+		9629BBB91557C5AA009EAD48 /* quantize.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quantize.hpp; path = ../../src/quantize.hpp; sourceTree = "<group>"; };
 		9631BB8F151E220A00CE43D0 /* libphysfs_xcode.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libphysfs_xcode.a; path = ../../../iphone_libs_r/libphysfs_xcode.a; sourceTree = "<group>"; };
 		9638490F1481A7DC000F7B07 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = ../../litedataios/data; sourceTree = "<group>"; };
 		9639C4351152D3A900804984 /* iphone.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = iphone.mm; path = ../../src/iphone.mm; sourceTree = SOURCE_ROOT; };
@@ -716,6 +720,8 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				9629BBB81557C5AA009EAD48 /* quantize.cpp */,
+				9629BBB91557C5AA009EAD48 /* quantize.hpp */,
 				960DB4A1154C8341000869BD /* SystemConfiguration.framework */,
 				960DB487154C82C3000869BD /* NetworkingSupport */,
 				96A4D271154A7EC0009ECD44 /* liballegro_native_dialog-static.a */,
@@ -1250,6 +1256,7 @@
 				960DB49E154C82EA000869BD /* TCPService.m in Sources */,
 				960DB49F154C82EA000869BD /* ThrottledTCPConnection.m in Sources */,
 				960DB4A0154C82EA000869BD /* UDPSocket.m in Sources */,
+				9629BBBA1557C5AA009EAD48 /* quantize.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1381,6 +1388,7 @@
 				96B4B120143BBBF300ACA64C /* inventory.cpp in Sources */,
 				96B4B121143BBBF300ACA64C /* io.cpp in Sources */,
 				96B4B122143BBBF300ACA64C /* Items.cpp in Sources */,
+				9629BBBB1557C6E8009EAD48 /* quantize.cpp in Sources */,
 				96B4B123143BBBF300ACA64C /* lander.cpp in Sources */,
 				96B4B124143BBBF300ACA64C /* monster2.cpp in Sources */,
 				96B4B125143BBBF300ACA64C /* Object.cpp in Sources */,

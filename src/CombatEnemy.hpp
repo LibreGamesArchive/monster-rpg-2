@@ -52,7 +52,6 @@ protected:
 	AnimationSet *oldWhiteAnim;
 	int float_height;
 	MBITMAP *work;
-	bool death_blitted;
 };
 
 

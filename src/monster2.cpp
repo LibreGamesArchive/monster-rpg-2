@@ -273,7 +273,6 @@ bool is_close_pressed(void)
 			while (!got_resume) {
 				al_wait_cond(switch_cond, switch_mutex);
 			}
-			ALLEGRO_DEBUG("after cond");
 			al_unlock_mutex(switch_mutex);
 			// resume
 			al_acknowledge_drawing_resume(display);
@@ -288,12 +287,10 @@ bool is_close_pressed(void)
       			glDisable(GL_DITHER);
 			al_start_timer(logic_timer);
 			al_start_timer(draw_timer);
-			ALLEGRO_DEBUG("HERE1");
 #ifdef ALLEGRO_ANDROID
 			playMusic(old_music_name, old_music_volume, true);
 			playAmbience(old_ambience_name, old_ambience_volume);
 #endif
-			ALLEGRO_DEBUG("HERE2");
 		}
 #endif
 	}
@@ -568,31 +565,24 @@ static void run(void)
 				if (timer_time < 0) {
 					timer_time = 0;
 					if (saveFilename) saveTime(saveFilename);
-					ALLEGRO_DEBUG("HOO");
 
 					if (speechDialog) {
 						dpad_on();
 						delete speechDialog;
 						speechDialog = NULL;
 					}
-					ALLEGRO_DEBUG("HOO");
 
 					if (!battle)
 							fadeOut(m_map_rgb(255, 0, 0));
-					ALLEGRO_DEBUG("HOO");
 					m_set_target_bitmap(buffer);
-					ALLEGRO_DEBUG("HOO");
 					m_clear(m_map_rgb(255, 0, 0));
-					ALLEGRO_DEBUG("HOO");
 
 					if (battle) {
 						delete battle;
 						battle = NULL;
 					}
-					ALLEGRO_DEBUG("HOO");
 
 					anotherDoDialogue("You were not quick enough to stop the Golems.\n", false, true);
-					ALLEGRO_DEBUG("HOO");
 
 					return;
 				}
@@ -1015,8 +1005,6 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	ALLEGRO_DEBUG("returned from init");
-
 #ifndef ALLEGRO_ANDROID
 	int c = argc;
 	char **p = argv;
@@ -1048,10 +1036,8 @@ int main(int argc, char *argv[])
 	// Setup HQM (High Quality Music) download path
 	hqm_set_download_path(getUserResource("flacs"));
 
-
-	ALLEGRO_DEBUG("format=%d\n", al_get_new_bitmap_format());
+	
 	MBITMAP *nooskewl = m_load_bitmap(getResource("media/nooskewl.png"));
-	ALLEGRO_DEBUG("HERE\n");
 
 #ifndef ALLEGRO_ANDROID
 	if ((n = check_arg(argc, argv, "-stick")) != -1) {
@@ -1067,18 +1053,12 @@ int main(int argc, char *argv[])
 	}
 #endif
 	
-	ALLEGRO_DEBUG("huh1");
 	al_set_target_backbuffer(display);
-	ALLEGRO_DEBUG("huh2");
 	m_clear(al_map_rgb(0, 0, 0));
-	ALLEGRO_DEBUG("huh3");
 	m_flip_display();
-	ALLEGRO_DEBUG("huh4");
 
 	debug_message("loaded nooskewl bmp\n");
-	ALLEGRO_DEBUG("buffer format=%d\n", al_get_bitmap_format(buffer->bitmap));
 	m_set_target_bitmap(buffer);
-	ALLEGRO_DEBUG("HERE2\n");
 	debug_message("set target to buffer\n");
 	debug_message("cleared buffer\n");
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);

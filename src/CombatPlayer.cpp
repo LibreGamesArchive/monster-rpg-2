@@ -383,7 +383,9 @@ public:
 						player->setDirection(DIRECTION_EAST);
 					}
 					player->getAnimationSet()->setSubAnimation("stand");
-					player->getWhiteAnimationSet()->setSubAnimation("stand");
+					if (!use_programmable_pipeline) {
+						player->getWhiteAnimationSet()->setSubAnimation("stand");
+					}
 					return new EndHandler(player);
 				case WALK_FORWARD:
 					if (dir == DIRECTION_EAST) {
@@ -393,7 +395,9 @@ public:
 						player->setDirection(DIRECTION_WEST);
 					}
 					player->getAnimationSet()->setSubAnimation("stand");
-					player->getWhiteAnimationSet()->setSubAnimation("stand");
+					if (!use_programmable_pipeline) {
+						player->getWhiteAnimationSet()->setSubAnimation("stand");
+					}
 					return new MainHandler(player);
 			}
 			// done, choose based on reason
@@ -419,7 +423,9 @@ public:
 		initialX = (int)p->getX();
 		x = initialX;
 		player->getAnimationSet()->setSubAnimation("walk");
-		player->getWhiteAnimationSet()->setSubAnimation("walk");
+		if (!use_programmable_pipeline) {
+			player->getWhiteAnimationSet()->setSubAnimation("walk");
+		}
 		if (reason == WALK_BACK) {
 			if (player->getLocation() == LOCATION_RIGHT) {
 				player->setDirection(DIRECTION_EAST);
@@ -808,7 +814,9 @@ ActionHandler *AttackHandler::act(int step, Battle *b)
 		//fadeOut(black);
 		if (win) {
 			attacked[0]->getAnimationSet()->setSubAnimation("broken");
-			attacked[0]->getWhiteAnimationSet()->setSubAnimation("broken");
+			if (!use_programmable_pipeline) {
+				attacked[0]->getWhiteAnimationSet()->setSubAnimation("broken");
+			}
 		}
 		//m_set_target_bitmap(buffer);
 		//battle->draw();
@@ -853,7 +861,10 @@ AttackHandler::AttackHandler(CombatPlayer *p) :
 		rid = items[info.equipment.rhand].id;
 
 	player->getAnimationSet()->setSubAnimation("attack");
-	player->getWhiteAnimationSet()->setSubAnimation("attack");
+	if (!use_programmable_pipeline) {
+		player->getWhiteAnimationSet()->setSubAnimation("attack");
+	}
+	
 	player->getAnimationSet()->getCurrentAnimation()->reset();
 
 	std::string soundName = getWeaponSound(player->getInfo());
@@ -1010,7 +1021,9 @@ ActionHandler *UseMagicHandler::act(int step, Battle *b)
 void UseMagicHandler::init(void)
 {
 	player->getAnimationSet()->setSubAnimation("cast");
-	player->getWhiteAnimationSet()->setSubAnimation("cast");
+	if (!use_programmable_pipeline) {
+		player->getWhiteAnimationSet()->setSubAnimation("cast");
+	}
 	player->getAnimationSet()->reset();
 	
 	spell = createSpell(player->getInfo().spells[spellIndex]);
@@ -1065,7 +1078,9 @@ ActionHandler *UseItemHandler::act(int step, Battle *b)
 void UseItemHandler::init(void)
 {
 	player->getAnimationSet()->setSubAnimation("use");
-	player->getWhiteAnimationSet()->setSubAnimation("use");
+	if (!use_programmable_pipeline) {
+		player->getWhiteAnimationSet()->setSubAnimation("use");
+	}
 	player->getAnimationSet()->reset();
 
 	effect = createItemEffect(itemIndex);
@@ -1157,7 +1172,9 @@ void RunHandler::init(void)
 		if (p && p->getInfo().abilities.hp > 0) {
 			p->setRunning(true);
 			p->getAnimationSet()->setSubAnimation("walk");
-			p->getWhiteAnimationSet()->setSubAnimation("walk");
+			if (!use_programmable_pipeline) {
+				p->getWhiteAnimationSet()->setSubAnimation("walk");
+			}
 			if (p->getLocation() == LOCATION_RIGHT) {
 				p->setDirection(DIRECTION_EAST);
 			}
@@ -1203,7 +1220,9 @@ ActionHandler *ConfirmHandler::act(int step, Battle *b)
 		if (reason == CONFIRM_DEFEND) {
 			player->setDefending(true);
 			player->getAnimationSet()->setSubAnimation("defend");
-			player->getWhiteAnimationSet()->setSubAnimation("defend");
+			if (!use_programmable_pipeline) {
+				player->getWhiteAnimationSet()->setSubAnimation("defend");
+			}
 			// walk back
 			Direction dir;
 			if (player->getLocation() == LOCATION_RIGHT) {
@@ -1329,7 +1348,9 @@ bool CombatPlayer::update(int step)
 
 	if (!(info.condition == CONDITION_STONED) && !(info.condition == CONDITION_MUSHROOM)) {
 		animSet->update(step);
-		whiteAnimSet->update(step);
+		if (!use_programmable_pipeline) {
+			whiteAnimSet->update(step);
+		}
 	}
 	return false;
 }
@@ -1438,7 +1459,9 @@ void CombatPlayer::draw(void)
 		}
 		else if (getInfo().condition == CONDITION_NORMAL && animSet->getSubName() != "hit") {
 			animSet->setSubAnimation("stand");
-			whiteAnimSet->setSubAnimation("stand");
+			if (!use_programmable_pipeline) {
+				whiteAnimSet->setSubAnimation("stand");
+			}
 		}
 	}
 
@@ -1671,12 +1694,17 @@ CombatPlayer::CombatPlayer(std::string name, int number, AnimationSet *animSet, 
 	stone_bmp(NULL)
 {
 	this->animSet = animSet;
-	whiteAnimSet = animSet->clone(CLONE_PLAYER);
-	whiteAnimSet->setSubAnimation("stand");
+
+	if (!use_programmable_pipeline) {
+		whiteAnimSet = animSet->clone(CLONE_PLAYER);
+		whiteAnimSet->setSubAnimation("stand");
+	}
 	
 	if (prefix != "") {
 		animSet->setPrefix(prefix);
-		whiteAnimSet->setPrefix(prefix);
+		if (!use_programmable_pipeline) {
+			whiteAnimSet->setPrefix(prefix);
+		}
 	}
 
 	type = COMBATENTITY_TYPE_PLAYER;
@@ -1702,8 +1730,10 @@ CombatPlayer::~CombatPlayer(void)
 #ifndef LITE
 	delete charmAnim;
 #endif
-
-	delete whiteAnimSet;
+	
+	if (!use_programmable_pipeline) {
+		delete whiteAnimSet;
+	}
 			
 	if (stone_bmp) {
 		m_destroy_bitmap(stone_bmp);

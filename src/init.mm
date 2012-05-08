@@ -30,6 +30,7 @@ extern "C" {
 }
 #endif
 
+
 static uint32_t parse_version(const char *s)
 {
    char *p = (char *) s;
@@ -310,7 +311,7 @@ static void create_shadows(MBITMAP *bmp, RecreateData *data)
 	for (int i = 0; i < 4; i++) {
 		shadow_corners[i] = m_create_sub_bitmap(bmp, i*SHADOW_CORNER_SIZE, 16, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE);
 	}
-	
+
 	m_set_target_bitmap(shadow_corners[2]);
 	m_lock_bitmap(shadow_corners[2], ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
 	for (int yy = 0; yy < SHADOW_CORNER_SIZE; yy++) {
@@ -1690,8 +1691,6 @@ void init_shaders(void)
 		"uniform float y1;\n"
 		"uniform float x2;\n"
 		"uniform float y2;\n"
-		"uniform float BW;\n"
-		"uniform float BH;\n"
 		"void main() {\n"
 		// rx, ry is the closest point to gl_FragCoord on the rectangle
 		"   float rx, ry;\n"
@@ -1759,20 +1758,41 @@ void init_shaders(void)
 		"	" LOWP " vec4 H = texture2D(tex, tH);\n"
 		"	" LOWP " vec4 D = texture2D(tex, tD);\n"
 		"	" LOWP " vec4 F = texture2D(tex, tF);\n"
-		"	if (B != H && D != F) {\n"
+		"	if ((B.r != H.r || B.g != H.g || B.b != H.b || B.a != H.a) &&\n"
+		"           (D.r != F.r || D.g != F.g || D.b != F.b || D.a != F.a)) {\n"
 		"		" LOWP " float y = mod(gl_FragCoord.t-offset_x, 2.0);\n"
 		"		" LOWP " float x = mod(gl_FragCoord.s-offset_y, 2.0);\n"
 		"		if (x < 1.0 && y < 1.0) {\n"
-		"			gl_FragColor = D == B ? D : E;\n"
+		"			if (D.r == B.r && D.g == B.g && D.b == B.b && D.a == B.a) {\n"
+		"				gl_FragColor = D;\n"
+		"			}\n"
+		"			else {\n"
+		"				gl_FragColor = E;\n"
+		"			}\n"
 		"		}\n"
 		"		else if (x < 1.0 && y >= 1.0) {\n"
-		"			gl_FragColor = D == H ? D : E;\n"
+		"			if (D.r == H.r && D.g == H.g && D.b == H.b && D.a == H.a) {\n"
+		"				gl_FragColor = D;\n"
+		"			}\n"
+		"			else {\n"
+		"				gl_FragColor = E;\n"
+		"			}\n"
 		"		}\n"
 		"		else if (x >= 1.0 && y < 1.0) {\n"
-		"			gl_FragColor = B == F ? F : E;\n"
+		"			if (B.r == F.r && B.g == F.g && B.b == F.b && B.a == F.a) {\n"
+		"				gl_FragColor = F;\n"
+		"			}\n"
+		"			else {\n"
+		"				gl_FragColor = E;\n"
+		"			}\n"
 		"		}\n"
 		"		else{\n"
-		"			gl_FragColor = H == F ? F : E;\n"
+		"			if (H.r == F.r && H.g == F.g && H.b == F.b && H.a == F.a) {\n"
+		"				gl_FragColor = F;\n"
+		"			}\n"
+		"			else {\n"
+		"				gl_FragColor = E;\n"
+		"			}\n"
 		"		}\n"
 		"	}\n"
 		"	else {\n"
@@ -2017,121 +2037,144 @@ void init_shaders(void)
 		brighten = al_create_shader(ALLEGRO_SHADER_GLSL);
 		scale2x = al_create_shader(ALLEGRO_SHADER_GLSL);
 #endif
-		
+
+ALLEGRO_DEBUG("1 ass");
 		al_attach_shader_source(
 					default_shader,
 					ALLEGRO_VERTEX_SHADER,
 					main_vertex_source
 					);
 		
+ALLEGRO_DEBUG("2 ass");
 		al_attach_shader_source(
 					cheap_shader,
 					ALLEGRO_VERTEX_SHADER,
 					main_vertex_source
 					);
 		
+ALLEGRO_DEBUG("3 ass");
 		al_attach_shader_source(
 					tinter,
 					ALLEGRO_VERTEX_SHADER,
 					default_vertex_source
 					);
 		
+ALLEGRO_DEBUG("4 ass");
 		al_attach_shader_source(
 					warp,
 					ALLEGRO_VERTEX_SHADER,
 					warp_vertex_source
 					);
 		
+ALLEGRO_DEBUG("5 ass");
 		al_attach_shader_source(
 					shadow_shader,
 					ALLEGRO_VERTEX_SHADER,
 					default_vertex_source
 					);
 		
+ALLEGRO_DEBUG("6 ass");
 		al_attach_shader_source(
 					brighten,
 					ALLEGRO_VERTEX_SHADER,
 					default_vertex_source
 					);
 		
+ALLEGRO_DEBUG("7 ass");
 		al_attach_shader_source(
 					scale2x,
 					ALLEGRO_VERTEX_SHADER,
 					scale2x_vertex_source
 					);
 		
+ALLEGRO_DEBUG("8 ass");
 		al_attach_shader_source(
 					default_shader,
 					ALLEGRO_PIXEL_SHADER,
 					main_pixel_source
 					);
 		
+ALLEGRO_DEBUG("9 ass");
 		al_attach_shader_source(
 					cheap_shader,
 					ALLEGRO_PIXEL_SHADER,
 					cheap_pixel_source
 					);
 		
+ALLEGRO_DEBUG("10 ass");
 		al_attach_shader_source(
 					tinter,
 					ALLEGRO_PIXEL_SHADER,
 					tinter_pixel_source
 					);
 		
+ALLEGRO_DEBUG("11 ass");
 		al_attach_shader_source(
 					warp,
 					ALLEGRO_PIXEL_SHADER,
 					warp2_pixel_source
 					);
 		
+ALLEGRO_DEBUG("12 ass");
 		al_attach_shader_source(
 					shadow_shader,
 					ALLEGRO_PIXEL_SHADER,
 					shadow_pixel_source
 					);
 		
+ALLEGRO_DEBUG("13 ass");
 		al_attach_shader_source(
 					brighten,
 					ALLEGRO_PIXEL_SHADER,
 					brighten_pixel_source
 					);
 		
+ALLEGRO_DEBUG("14 ass");
 		al_attach_shader_source(
 					scale2x,
 					ALLEGRO_PIXEL_SHADER,
 					scale2x_pixel_source
 					);
+ALLEGRO_DEBUG("*** %s ***\n", al_get_shader_log(scale2x));
 		
 		const char *shader_log;
-		
+
+ALLEGRO_DEBUG("1 link");
 		al_link_shader(default_shader);
 		if ((shader_log = al_get_shader_log(default_shader))[0] != 0) {
 			printf("1. %s\n", shader_log);
 		}
+ALLEGRO_DEBUG("2 link");
 		al_link_shader(cheap_shader);
 		if ((shader_log = al_get_shader_log(cheap_shader))[0] != 0) {
 			printf("2. %s\n", shader_log);
 		}
+ALLEGRO_DEBUG("3 link");
 		al_link_shader(tinter);
 		if ((shader_log = al_get_shader_log(tinter))[0] != 0) {
 			printf("3. %s\n", shader_log);
 		}
+ALLEGRO_DEBUG("4 link");
 		al_link_shader(warp);
 		if ((shader_log = al_get_shader_log(warp))[0] != 0) {
 			printf("4. %s\n", shader_log);
 		}
+ALLEGRO_DEBUG("5 link");
 		al_link_shader(shadow_shader);
 		if ((shader_log = al_get_shader_log(shadow_shader))[0] != 0) {
 			printf("5. %s\n", shader_log);
 		}
+ALLEGRO_DEBUG("6 link");
 		al_link_shader(brighten);
 		if ((shader_log = al_get_shader_log(brighten))[0] != 0) {
 			printf("6. %s\n", shader_log);
 		}
+ALLEGRO_DEBUG("7 link");
 		al_link_shader(scale2x);
 		if ((shader_log = al_get_shader_log(scale2x))[0] != 0) {
 			printf("7. %s\n", shader_log);
 		}
+ALLEGRO_DEBUG("8 after link");
 		
 #ifdef A5_OGL
 		al_set_opengl_program_object(display, al_get_opengl_program_object(default_shader));
@@ -2348,7 +2391,16 @@ bool init(int *argc, char **argv[])
 
 #ifdef ALLEGRO_ANDROID
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_SUGGEST);
-	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 16, ALLEGRO_REQUIRE);
+	/*
+	al_set_new_display_option(ALLEGRO_RED_SIZE, 8, ALLEGRO_REQUIRE);
+	al_set_new_display_option(ALLEGRO_GREEN_SIZE, 8, ALLEGRO_REQUIRE);
+	al_set_new_display_option(ALLEGRO_BLUE_SIZE, 8, ALLEGRO_REQUIRE);
+	al_set_new_display_option(ALLEGRO_ALPHA_SIZE, 0, ALLEGRO_REQUIRE);
+	*/
+	al_set_new_display_option(ALLEGRO_RED_SIZE, 5, ALLEGRO_REQUIRE);
+	al_set_new_display_option(ALLEGRO_GREEN_SIZE, 6, ALLEGRO_REQUIRE);
+	al_set_new_display_option(ALLEGRO_BLUE_SIZE, 5, ALLEGRO_REQUIRE);
+	al_set_new_display_option(ALLEGRO_ALPHA_SIZE, 0, ALLEGRO_REQUIRE);
 #else
 #ifdef __linux__
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_SUGGEST);
@@ -2458,7 +2510,7 @@ bool init(int *argc, char **argv[])
 		if (!native_error("Failed to set gfx mode"))
 			return false;
 	}
-
+	
 	set_screen_params();
       
 #ifdef A5_OGL
@@ -2636,10 +2688,6 @@ bool init(int *argc, char **argv[])
 		return false;
 	}
 
-
-	int bflags = al_get_new_bitmap_flags();
-
-
 	eny_loader = new AnimationSet(getResource("media/eny-loader.png"));
 	dot_loader = new AnimationSet(getResource("media/dot-loader.png"));
 	bg_loader = m_load_bitmap(getResource("media/bg-loader.png"));
@@ -2706,7 +2754,7 @@ bool init(int *argc, char **argv[])
 
 	ALLEGRO_DEBUG("format after = %d\n", al_get_new_bitmap_format());
 
-	al_set_new_bitmap_flags((bflags & ~ALLEGRO_NO_PRESERVE_TEXTURE) & ~ALLEGRO_MEMORY_BITMAP);
+	al_set_new_bitmap_flags(ALLEGRO_CONVERT_BITMAP);
 
 	shadow_sheet = m_create_alpha_bitmap(4*16, 2*16, create_shadows, NULL, destroy_shadows);
 	draw_loading_screen(tmp, 100, sd);
@@ -2793,16 +2841,16 @@ bool init(int *argc, char **argv[])
 
 	debug_message("Loading icons\n");
 
-	// FIXME: return value
-	loadIcons();
+	al_set_new_bitmap_flags(PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
+	ALLEGRO_DEBUG("al_get_new_bitmap_flags=%x", al_get_new_bitmap_flags());
+
+	icon_bmp = m_load_bitmap_redraw(getResource("media/icons.png"), loadIcons);
 
 	stoneTexture = m_make_display_bitmap(stoneTexture);
 	
 	mushroom = m_make_display_bitmap(mushroom);
 	webbed = m_make_display_bitmap(webbed);
 
-	al_set_new_bitmap_flags(bflags & ~ALLEGRO_MEMORY_BITMAP);
-	
 	dpad_buttons = m_load_bitmap(getResource("media/buttons.png"));
 	batteryIcon = m_load_bitmap(getResource("media/battery_icon.png"));
 	achievement_bmp = m_load_bitmap(getResource("media/trophy.png"));
@@ -2812,6 +2860,8 @@ bool init(int *argc, char **argv[])
 	inited = true;
 
 	m_clear(black);
+	
+	ALLEGRO_DEBUG("end of init al_get_new_bitmap_flags=%x", al_get_new_bitmap_flags());
 
 	return true;
 }

@@ -31,7 +31,7 @@ public class OldAndroid
 	{
 		OldAndroid.activity = activity;
 
-		sp = new SoundPool(4, AudioManager.STREAM_MUSIC, 0);
+		sp = new SoundPool(8, AudioManager.STREAM_MUSIC, 0);
 	
 		BASS.BASS_Init(0, 44100, 0);
 

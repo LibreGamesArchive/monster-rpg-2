@@ -458,15 +458,7 @@ void LightningEffect::draw(void)
 	int dx = (int)(target->getX() - (m_get_bitmap_width(bitmaps[0])/2));
 	int dy = (int)(target->getY() - m_get_bitmap_height(bitmaps[0]));
 
-#ifndef ALLEGRO4
-
 	m_draw_bitmap(bitmaps[bmpIndex], dx, dy, 0);
-#else
-
-	set_alpha_blender();
-	draw_trans_sprite(m_get_target_bitmap(), bitmaps[bmpIndex], dx, dy);
-
-#endif
 }
 
 
@@ -496,10 +488,13 @@ LightningEffect::LightningEffect(Combatant *target) :
 		char name[100];
 		sprintf(name, "bolt1_%d.png", i);
 		bitmaps[i] = m_load_alpha_bitmap(getResource("combat_media/%s", name));
+		ALLEGRO_DEBUG("************* bitmaps[%d] = %p **************************", i, bitmaps[i]);
 		// FIXME!!!!!!!!!!!!!!
 		//al_save_bitmap(name, bitmaps[i]);
 
 	}
+
+	ALLEGRO_DEBUG("after loading lightning bitmaps");
 
 	//sample = loadSample("bolt.ogg");
 	//playSample(sample);

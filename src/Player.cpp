@@ -442,35 +442,47 @@ void Player::setName(std::string name)
 Combatant *Player::makeCombatant(int number)
 {
 	AnimationSet *banim = findBattleAnim(name, this);
+ALLEGRO_DEBUG("1derp");
 	CombatPlayer *c = new CombatPlayer(name, number, banim);
+ALLEGRO_DEBUG("2derp");
 
 	copyInfo(c->getInfo(), info);
+ALLEGRO_DEBUG("3derp");
 
 	c->setLoyalty(LOYALTY_GOOD);
 	c->setFormation(formation);
+ALLEGRO_DEBUG("4derp");
 
 	int lid = info.equipment.lhand;
 	int rid = info.equipment.rhand;
 		
 	c->getAnimationSet()->setPrefix("");
-	c->getWhiteAnimationSet()->setPrefix("");
+	if (!use_programmable_pipeline) {
+		c->getWhiteAnimationSet()->setPrefix("");
+	}
 
 	if ((lid < 0) && (rid < 0)) {
 		c->getAnimationSet()->setPrefix("noweapon_");
-		c->getWhiteAnimationSet()->setPrefix("noweapon_");
+		if (!use_programmable_pipeline) {
+			c->getWhiteAnimationSet()->setPrefix("noweapon_");
+		}
 	}
 	else if ((lid >= 0 && weapons[items[lid].id].needs >= 0) ||
 		(rid >= 0 && weapons[items[rid].id].needs >= 0)) {
 		if ((lid >= 0) && !weapons[items[lid].id].ammo) {
 			if (rid < 0) {
 				c->getAnimationSet()->setPrefix("noweapon_");
-				c->getWhiteAnimationSet()->setPrefix("noweapon_");
+				if (!use_programmable_pipeline) {
+					c->getWhiteAnimationSet()->setPrefix("noweapon_");
+				}
 			}
 		}
 		else if ((rid >= 0) && !weapons[items[rid].id].ammo) {
 			if (lid < 0) {
 				c->getAnimationSet()->setPrefix("noweapon_");
-				c->getWhiteAnimationSet()->setPrefix("noweapon_");
+				if (!use_programmable_pipeline) {
+					c->getWhiteAnimationSet()->setPrefix("noweapon_");
+				}
 			}
 		}
 	}

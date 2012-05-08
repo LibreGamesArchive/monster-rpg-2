@@ -1023,7 +1023,9 @@ static int CSetCombatantAnimationSetPrefix(lua_State *stack)
 	if (e) {
 		Combatant *c = (Combatant *)e;
 		c->getAnimationSet()->setPrefix(std::string(prefix));
-		c->getWhiteAnimationSet()->setPrefix(std::string(prefix));
+		if (!use_programmable_pipeline) {
+			c->getWhiteAnimationSet()->setPrefix(std::string(prefix));
+		}
 	}
 	else {
 		debug_message("Combatant %d not found to set animationset prefix\n", id);
@@ -3682,6 +3684,75 @@ static int C_BonusPoints(lua_State *stack)
 	return 0;
 }
 
+struct SFX {
+	int id;
+	int sample;
+};
+static int id_counter = 1;
+static std::vector<SFX> sfx;
+
+int CLoadSample(lua_State *stack)
+{
+	const char *name = lua_tostring(stack, 1);
+
+	SFX s;
+	s.id = id_counter++;
+	s.sample = loadSample(name);
+
+	sfx.push_back(s);
+
+	lua_pushnumber(stack, s.id);
+
+	return 1;
+}
+
+int CDestroySample(lua_State *stack)
+{
+	int id = lua_tonumber(stack, 1);
+
+	for (int i = 0; i < sfx.size(); i++) {
+		if (sfx[i].id == id) {
+			destroySample(sfx[i].sample);
+			sfx.erase(sfx.begin() + i);
+			break;
+		}
+	}
+
+	return 0;
+}
+
+int CPlaySample(lua_State *stack)
+{
+	int id = lua_tonumber(stack, 1);
+
+	for (int i = 0; i < sfx.size(); i++) {
+		if (sfx[i].id == id) {
+			playSample(sfx[i].sample);
+			break;
+		}
+	}
+
+	return 0;
+}
+
+int CPreloadSFX(lua_State *stack)
+{
+	const char *name = lua_tostring(stack, 1);
+
+	preloadSFX(name);
+
+	return 0;
+}
+
+int CPreloadSpellSFX(lua_State *stack)
+{
+	const char *name = lua_tostring(stack, 1);
+
+	preloadSpellSFX(name);
+
+	return 0;
+}
+
 /*
  * This registers all the required C/C++ functions
  * with the Lua interpreter, so they can be called
@@ -4255,5 +4326,20 @@ void registerCFunctions(lua_State* luaState)
 
 	lua_pushcfunction(luaState, C_BonusPoints);
 	lua_setglobal(luaState, "bonusPoints");
+
+	lua_pushcfunction(luaState, CLoadSample);
+	lua_setglobal(luaState, "loadSample");
+
+	lua_pushcfunction(luaState, CDestroySample);
+	lua_setglobal(luaState, "destroySample");
+
+	lua_pushcfunction(luaState, CPlaySample);
+	lua_setglobal(luaState, "playSample");
+
+	lua_pushcfunction(luaState, CPreloadSFX);
+	lua_setglobal(luaState, "preloadSFX");
+
+	lua_pushcfunction(luaState, CPreloadSpellSFX);
+	lua_setglobal(luaState, "preloadSpellSFX");
 }
 

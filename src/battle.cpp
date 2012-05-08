@@ -4,6 +4,145 @@ Battle *battle = NULL;
 
 static std::string nextSpeech = "";
 
+static std::map<std::string, MSAMPLE> preloaded_samples;
+void preloadSFX(std::string name)
+{
+	preloaded_samples[name] = loadSample(name);
+}
+void preloadSpellSFX(std::string spellName)
+{
+	if (spellName == "Acorns") {
+		preloadSFX("Acorns.ogg");
+	}
+	else if (spellName == "Arc") {
+		preloadSFX("Arc.ogg");
+	}
+	else if (spellName == "Banana" || spellName == "Boulder") {
+		preloadSFX("Banana.ogg");
+	}
+	else if (spellName == "Beam" || spellName == "Blaze") {
+		preloadSFX("Beam.ogg");
+	}
+	else if (spellName == "Bolt1") {
+		preloadSFX("bolt.ogg");
+	}
+	if (spellName == "Bolt2") {
+		preloadSFX("Bolt2.ogg");
+	}
+	if (spellName == "Bolt3") {
+		preloadSFX("Bolt3.ogg");
+	}
+	if (spellName == "Breath of Fire") {
+		preloadSFX("BoF.ogg");
+	}
+	else if (spellName == "Claw") {
+		preloadSFX("Meow.ogg");
+	}
+	else if (spellName == "Daisy") {
+		preloadSFX("Daisy.ogg");
+	}
+	else if (spellName == "Drop") {
+		preloadSFX("jump.ogg");
+	}
+	else if (spellName == "Darkness1") {
+		preloadSFX("Darkness1.ogg");
+	}
+	else if (spellName == "Darkness2") {
+		preloadSFX("Darkness2.ogg");
+	}
+	else if (spellName == "Darkness3") {
+		preloadSFX("Darkness3.ogg");
+	}
+	else if (spellName == "Fireball") {
+		preloadSFX("Fireball.ogg");
+	}
+	else if (spellName == "Fire1") {
+		preloadSFX("fire1.ogg");
+	}
+	else if (spellName == "Fire2") {
+		preloadSFX("Fire2.ogg");
+	}
+	else if (spellName == "Fire3") {
+		preloadSFX("Fire3.ogg");
+	}
+	else if (spellName == "freeze") {
+		preloadSFX("freeze.ogg");
+	}
+	else if (spellName == "Ice1") {
+		preloadSFX("ice1.ogg");
+	}
+	else if (spellName == "Ice3") {
+		preloadSFX("Ice3.ogg");
+	}
+	else if (spellName == "Kiss of Death") {
+		preloadSFX("high_cackle.ogg");
+	}
+	else if (spellName == "Laser") {
+		preloadSFX("Laser.ogg");
+	}
+	else if (spellName == "MachineGun") {
+		preloadSFX("Machine_Gun.ogg");
+	}
+	else if (spellName == "Orbit") {
+		preloadSFX("Orbit.ogg");
+	}
+	else if (spellName == "Puke") {
+		preloadSFX("Puke.ogg");
+	}
+	else if (spellName == "Punch") {
+		preloadSFX("Punch.ogg");
+	}
+	else if (spellName == "Rend" || spellName == "Talon") {
+		preloadSFX("Rend.ogg");
+	}
+	else if (spellName == "Sludge" || spellName == "Acid" || spellName == "BellyAcid") {
+		preloadSFX("slime.ogg");
+	}
+	else if (spellName == "Spray") {
+		preloadSFX("Spray.ogg");
+	}
+	else if (spellName == "Stomp") {
+		preloadSFX("Stomp.ogg");
+	}
+	else if (spellName == "Stone") {
+		preloadSFX("Stone.ogg");
+	}
+	else if (spellName == "Swallow") {
+		preloadSFX("Mmm.ogg");
+		preloadSFX("Swallow.ogg");
+	}
+	else if (spellName == "Touch of Death") {
+		preloadSFX("TouchofDeath.ogg");
+	}
+	else if (spellName == "Twister") {
+		preloadSFX("Twister.ogg");
+	}
+	else if (spellName == "UFO") {
+		preloadSFX("UFO.ogg");
+	}
+	else if (spellName == "Wave") {
+		preloadSFX("Wave.ogg");
+	}
+	else if (spellName == "Web") {
+		preloadSFX("Web.ogg");
+	}
+	else if (spellName == "Weep" || spellName == "Torrent") {
+		preloadSFX("Weep.ogg");
+	}
+	else if (spellName == "Whirlpool") {
+		preloadSFX("Whirlpool.ogg");
+	}
+	else if (spellName == "Whip") {
+		preloadSFX("Whip.ogg");
+	}
+}
+bool playBattlePreload(std::string name)
+{
+	if (preloaded_samples.find(name) == preloaded_samples.end())
+		return false;
+	playSample(preloaded_samples[name]);
+	return true;
+}
 
 std::string getConditionName(CombatCondition cc)
 {
@@ -298,7 +437,6 @@ void Battle::draw(void)
 		CombatEntity *e = *it;
 		e->draw();
 	}
-
 
 	if (player_acting && !boss_fight) {
 		for (it = zsorted_entities.begin(); it != zsorted_entities.end(); it++) {
@@ -708,6 +846,7 @@ BattleResult Battle::update(int step)
 			}
 		}
 quick_label:
+
 		if (ce->act(step, this)) {
 			if (ce->getType() == COMBATENTITY_TYPE_PLAYER ||
 				ce->getType() == COMBATENTITY_TYPE_ENEMY) {
@@ -1245,6 +1384,10 @@ Battle::Battle(std::string name, bool can_run) :
 
 
 	bg = m_load_bitmap(getResource("combat_bgs/%s.png", area->getTerrain().c_str()));
+
+	// FIXME!!!!!!!!!!!!!!!!!!!!!!
+	//delete area;
+	//area = NULL;
 }
 
 extern bool fairy_used;
@@ -1278,6 +1421,13 @@ Battle::~Battle(void)
 	lua_close(luaState);
 
 	dpad_on();
+	
+	std::map<std::string, MSAMPLE>::iterator it2;
+	for (it2 = preloaded_samples.begin(); it2 != preloaded_samples.end(); it2++) {
+		HSAMPLE s = (HSAMPLE)it2->second;
+		destroySample(s);
+	}
+	preloaded_samples.clear();
 }
 
 

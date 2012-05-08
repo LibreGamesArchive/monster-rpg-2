@@ -1495,7 +1495,7 @@ void Area::saveBmp(std::string filename)
 	int flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flags | ALLEGRO_MEMORY_BITMAP);
 	MBITMAP *mem = m_create_bitmap(pixw, pixh); // check
-	al_set_new_display_flags(flags);
+	al_set_new_bitmap_flags(flags);
 
 	ALLEGRO_BITMAP *target = al_get_target_bitmap();
 	m_set_target_bitmap(mem);
@@ -1681,11 +1681,13 @@ void Area::update(int step)
 	}
 
 	if (this == area) {
+		if (update_count == 0) {
+			update_count = 1;
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-		auto_save_game(step);
+			auto_save_game(step);
+			auto_save_screenshot(step);
 #endif
-		auto_save_screenshot(step);
-		if (update_count == 0) update_count = 1;
+		}
 	}
 	else
 		return;
@@ -2330,18 +2332,6 @@ void Area::loadAnimation(int index, bool addIndex)
 std::vector<Tile *> &Area::getTiles(void)
 {
 	return tiles;
-}
-
-void Area::reloadAnimations(void)
-{
-	for (unsigned int i = 0; i < tileAnimations.size(); i++) {
-		delete tileAnimations[i];
-	}
-	tileAnimations.clear();
-
-	for (unsigned int i = 0; i < tileAnimationNums.size(); i++) {
-		loadAnimation(tileAnimationNums[i], false);
-	}
 }
 
 void Area::load(std::string filename)

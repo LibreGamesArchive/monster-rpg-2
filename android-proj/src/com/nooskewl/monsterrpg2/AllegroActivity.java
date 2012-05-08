@@ -443,6 +443,8 @@ public class AllegroActivity extends Activity implements SensorEventListener
          Log.e("AllegroActivity", "Couldn't load OldAndroid");
       }
 
+      Log.d("CRAP", "heap size=" + Runtime.getRuntime().maxMemory());
+
       nativeOnOrientationChange(0, true);
 
       requestWindowFeature(Window.FEATURE_NO_TITLE);
