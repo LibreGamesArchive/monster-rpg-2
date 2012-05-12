@@ -13,6 +13,7 @@ function initId(id)
 end
 
 function start()
+	preloadSpellSFX("Orbit")
 end
 
 function get_action(step)

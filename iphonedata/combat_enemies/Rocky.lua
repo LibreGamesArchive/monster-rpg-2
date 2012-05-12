@@ -28,6 +28,9 @@ function initId(i)
 end
 
 function start()
+	preloadSFX("jump.ogg")
+	preloadSFX("fall.ogg")
+	preloadSFX("Thud.ogg")
 end
 
 function get_action(step)

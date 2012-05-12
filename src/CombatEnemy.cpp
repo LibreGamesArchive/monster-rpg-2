@@ -1211,24 +1211,6 @@ void CombatEnemyTode::draw(void)
 	int w = animSet->getWidth();
 	int h = animSet->getHeight();
 
-	bool bright;
-	bright = ((unsigned)tguiCurrentTimeMillis() % 200 < 100);
-	if (thinkCount < 1000 && bright) {
-		if (use_programmable_pipeline) {
-			al_set_shader(display, brighten);
-			al_set_shader_float(brighten, "brightness", 0.7);
-			al_use_shader(brighten, true);
-			animSet->draw(x+ox-(w/2), y+oy-h, flags);
-			al_use_shader(brighten, false);
-			al_set_shader(display, default_shader);
-		}
-		else {
-			MBITMAP *bmp = whiteAnimSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
-			float brightness = 0.7;
-			add_blit(bmp, ox+x-(w/2), oy+y-h, white, brightness, flags);
-		}
-	}
-
 	// Draw fading out purple waving
 	if (info.abilities.hp <= 0) {
 		int w = getAnimationSet()->getWidth();
@@ -1304,22 +1286,42 @@ void CombatEnemyTode::draw(void)
 		}
 	}
 	else {
-		int w = animSet->getWidth();
-		int h = animSet->getHeight();
-		MBITMAP *bitmap = animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
-		m_draw_alpha_bitmap(bitmap, x-w/2, y-h, flags);
-		if (animSet->getSubName() == "full") {
-			for (int i = 0; i < 4; i++) {
-				if (swallowed[i]) {
-					int bw = m_get_bitmap_width(swallowed[i]);
-					int bh = m_get_bitmap_height(swallowed[i]);
-
-					m_draw_rotated_bitmap(swallowed[i],
-						bw/2, bh/2, x+5, y-h/2+10, angles[i], 0);
-				}
+		bool bright;
+		bright = ((unsigned)tguiCurrentTimeMillis() % 500 < 250);
+		if (thinkCount < 1000 && bright) {
+			if (use_programmable_pipeline) {
+				al_set_shader(display, brighten);
+				al_set_shader_float(brighten, "brightness", 0.7);
+				al_use_shader(brighten, true);
+				animSet->draw(x+ox-(w/2), y+oy-h, flags);
+				al_use_shader(brighten, false);
+				al_set_shader(display, default_shader);
+			}
+			else {
+				MBITMAP *bmp = whiteAnimSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
+				float brightness = 0.7;
+				m_draw_bitmap(bmp, ox+x-(w/2), oy+y-h, flags);
 			}
 		}
-		m_draw_alpha_bitmap(bitmap, x-w/2, y-h, flags);
+
+		else {
+			int w = animSet->getWidth();
+			int h = animSet->getHeight();
+			MBITMAP *bitmap = animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
+			m_draw_alpha_bitmap(bitmap, x-w/2, y-h, flags);
+			if (animSet->getSubName() == "full") {
+				for (int i = 0; i < 4; i++) {
+					if (swallowed[i]) {
+						int bw = m_get_bitmap_width(swallowed[i]);
+						int bh = m_get_bitmap_height(swallowed[i]);
+
+						m_draw_rotated_bitmap(swallowed[i],
+							bw/2, bh/2, x+5, y-h/2+10, angles[i], 0);
+					}
+				}
+			}
+			m_draw_alpha_bitmap(bitmap, x-w/2, y-h, flags);
+		}
 	}
 }
 

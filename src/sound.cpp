@@ -104,6 +104,7 @@ static std::string preloaded_names[] = {
 	"door.ogg",
 	"enemy_die.ogg",
 	"error.ogg",
+	"freeze.ogg",
 	"hit.ogg",
 	"melee_woosh.ogg",
 	"new_party_member.ogg",
@@ -144,6 +145,7 @@ static std::string preloaded_names[] = {
 	"enemy_explosion.ogg",
 	"error.ogg",
 	"explosion.ogg",
+	"freeze.ogg",
 	"hit.ogg",
 	"ignite.ogg",
 	"low_cackle.ogg",
@@ -529,7 +531,7 @@ void playAmbience(std::string name, float vol)
 		al_set_apk_file_interface();
 	}
 	ambience = BASS_StreamCreateFileUser(
-		STREAMFILE_BUFFER,
+		STREAMFILE_NOBUFFER,
 		BASS_SAMPLE_LOOP,
 		&fileprocs,
 		(void *)f

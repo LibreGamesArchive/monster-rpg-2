@@ -552,7 +552,7 @@ function activate(activator, activated)
 				getMilestone(MS_LIT_ALTER4)) then
 			started = true
 			-- start scene
-			playSample("drain.ogg")
+			playSample(samp)
 			scriptifyPlayer()
 			px, py = getObjectPosition(0)
 			tmp = Object:new{id=0, x=px, y=py}

@@ -13,6 +13,9 @@ function initId(id)
 end
 
 function start()
+	preloadSpellSFX("Swallow")
+	preloadSpellSFX("Puke")
+	preloadSpellSFX("BellyAcid")
 end
 
 function get_action(step)

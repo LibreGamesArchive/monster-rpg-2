@@ -30,6 +30,60 @@ extern "C" {
 }
 #endif
 
+void destroy_fonts(void)
+{
+	m_destroy_font(game_font);
+	m_destroy_font(medium_font);
+	m_destroy_font(huge_font);
+}
+
+void load_fonts(void)
+{
+	int ttf_flags;
+
+	if (config.getFilterType() == FILTER_SCALE2X) {
+		ttf_flags = 0;
+	}
+	else {
+		ttf_flags = ALLEGRO_TTF_MONOCHROME;
+	}
+
+	ALLEGRO_DEBUG("loading fonts");
+
+#ifndef ALLEGRO_ANDROID_XXX // always do this!
+	game_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 9, ttf_flags);
+#else
+	ALLEGRO_PATH *res_dir = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+	char boofer[1000];
+	sprintf(boofer, "%s/unpack/DejaVuSans.ttf", al_path_cstr(res_dir, '/'));
+	al_destroy_path(res_dir);
+	al_set_standard_file_interface();
+	//game_font = al_load_ttf_font(boofer, 9, ttf_flags);
+	game_font = al_load_ttf_font("/mnt/sdcard/removable_sdcard/DejaVuSans.ttf", 9, ttf_flags);
+	al_set_apk_file_interface();
+#endif
+	if (!game_font) {
+		if (!native_error("Failed to load game_font"))
+			return;
+	}
+
+	medium_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 32, 0);
+	if (!game_font) {
+		if (!native_error("Failed to load medium_font"))
+			return;
+	}
+	
+	huge_font = m_load_font(getResource("huge_font.tga"));
+	if (!huge_font) {
+		if (!native_error("Failed to load huge_font"))
+			return;
+	}
+
+	ALLEGRO_DEBUG("done loading fonts");
+	
+	// NOTE: This has to be after display creation and loading of fonts
+	load_translation(get_language_name(config.getLanguage()).c_str());
+}
 
 static uint32_t parse_version(const char *s)
 {
@@ -266,7 +320,6 @@ static MBITMAP *bg_loader, *loading_loader, *bar_loader;
 MBITMAP *corner_bmp;
 bool had_battle = false;
 MBITMAP *shadow_sheet;
-ALLEGRO_VERTEX triangle_lines[32];
 MBITMAP *dpad_buttons;
 bool onscreen_swipe_to_attack;
 bool onscreen_drag_to_use;
@@ -696,11 +749,11 @@ static void *thread_proc(void *arg)
 	events = al_create_event_queue();
 	
 	ALLEGRO_EVENT event;
-	
+
 #if defined A5_D3D || defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_register_event_source(events, al_get_display_event_source(display));
 #endif
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE
 	al_register_event_source(events, al_get_keyboard_event_source());
 #endif
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
@@ -1008,6 +1061,15 @@ static void *thread_proc(void *arg)
 			}
 #endif
 
+#ifdef ALLEGRO_ANDROID
+			if (event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_BACK) {
+				if (al_current_time() > next_shake) {
+					iphone_shake_time = al_current_time();
+					next_shake = al_current_time()+0.5;
+				}
+			}
+#endif
+
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 #define BEGIN ALLEGRO_EVENT_TOUCH_BEGIN
 #define END ALLEGRO_EVENT_TOUCH_END
@@ -1283,13 +1345,6 @@ static void *loader_proc(void *arg)
 
 	guiAnims.bitmap = m_load_bitmap(getResource("gui.png"));
 
-	cursor = m_load_bitmap(getResource("media/cursor.png"));
-	if (!cursor) {
-		m_destroy_bitmap(deter_display_access_bmp);
-		return NULL;
-	}
-
-	//orb_bmp = m_load_alpha_bitmap(getResource("media/orb_bmp.png"), true);
 	poison_bmp = m_load_alpha_bitmap(getResource("media/poison.png"), true);
 	poison_bmp_tmp = m_create_alpha_bitmap( // check
 		m_get_bitmap_width(poison_bmp)+10,
@@ -1298,37 +1353,14 @@ static void *loader_proc(void *arg)
 		m_get_bitmap_width(poison_bmp)+10,
 		m_get_bitmap_height(poison_bmp)+10);
 
-	for (int i = 0; i < 16; i++) {
-		triangle_lines[i*2].x = 0;
-		triangle_lines[i*2].y = i;
-		triangle_lines[i*2].z = 0;
-		triangle_lines[i*2].color =
-			al_map_rgb(255, 0, 0);
-		triangle_lines[i*2+1].x = 16-i;
-		triangle_lines[i*2+1].y = i;
-		triangle_lines[i*2+1].z = 0;
-		triangle_lines[i*2+1].color =
-			al_map_rgb(255, 0, 0);
-	}
-
-	debug_message("Input initialized.\n");
 	initInput();
+	debug_message("Input initialized.\n");
 
 	show_progress(60);
 
 	gfx_mode_set = true;
 
 	al_inhibit_screensaver(true);
-
-	debug_message("Tilemap loaded\n");
-
-	tile = m_create_bitmap(TILE_SIZE, TILE_SIZE); // check
-
-	if (!tile) {
-		if (!native_error("Failed to create tile"))
-			m_destroy_bitmap(deter_display_access_bmp);
-			return NULL;
-	}
 
 	// Set an icon
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_MACOSX && !defined ALLEGRO_ANDROID
@@ -1338,8 +1370,6 @@ static void *loader_proc(void *arg)
 #endif
 
 	show_progress(65);
-
-	debug_message("TGUI initialized.\n");
 
 #ifdef ALLEGRO_IPHONE
 	if (iPodIsPlaying()) {
@@ -1351,11 +1381,6 @@ static void *loader_proc(void *arg)
 #ifdef ALLEGRO_IPHONE
 	sound_was_playing_at_program_start = iPodIsPlaying();
 #endif
-
-	debug_message("Sound initialized\n");
-
-
-	show_progress(70);
 
 	// load terrain file
 
@@ -1392,12 +1417,6 @@ static void *loader_proc(void *arg)
 	show_progress(80);
 
 	debug_message("Loading miscellaneous graphics\n");
-
-	stoneTexture = m_load_bitmap(getResource("combat_media/stone.png"));
-	
-	mushroom = m_load_bitmap(getResource("combat_media/mushroom.png"));
-	webbed = m_load_bitmap(getResource("combat_media/webbed.png"));
-
 
 	show_progress(90);
 
@@ -1510,7 +1529,6 @@ bool loadTilemap(void)
 #define LOWP "lowp"
 #endif	
 
-#ifndef A5_D3D
 void init_shaders(void)
 {
 	if (use_programmable_pipeline) {
@@ -2181,16 +2199,10 @@ ALLEGRO_DEBUG("8 after link");
 #endif
 		
 	}
-#endif
-
-#if defined A5_OGL
-	glDisable(GL_DITHER);
-#endif
 }
 
 void init2_shaders(void)
 {
-	
 	if (use_programmable_pipeline) {
 		int buffer_true_w, buffer_true_h;
 		get_buffer_true_size(&buffer_true_w, &buffer_true_h);
@@ -2355,7 +2367,7 @@ bool init(int *argc, char **argv[])
 
 
 	al_install_mouse();
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE
 	al_install_keyboard();
 #endif
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -2508,7 +2520,47 @@ bool init(int *argc, char **argv[])
 		if (!native_error("Failed to set gfx mode"))
 			return false;
 	}
-	
+
+#if 0
+// FIXME
+// FIXME
+// FIXME
+	ALLEGRO_BITMAP *crap = al_load_bitmap(getResource("8urcat.tga"));
+ALLEGRO_DEBUG("boo1");
+	double start_time = al_get_time();
+	// Convert to an 8 bit paletted texture
+	int w = al_get_bitmap_width(crap);
+	int h = al_get_bitmap_height(crap);
+	int true_w, true_h;
+	al_get_opengl_texture_size(crap, &true_w, &true_h);
+ALLEGRO_DEBUG("boo1");
+	int sz = (256*4) + (true_w * true_h);
+	unsigned char *imgdata = new unsigned char[sz];
+ALLEGRO_DEBUG("boo1");
+	gen_palette(crap, imgdata);
+ALLEGRO_DEBUG("boo1");
+	double mid = al_get_time();
+	ALLEGRO_DEBUG("EMITEMIT = %f", mid - start_time);
+	gen_paletted_image(crap, imgdata, imgdata+(256*4));
+	double end_time = al_get_time();
+	ALLEGRO_DEBUG("TIMETIME = %f", end_time - start_time);
+ALLEGRO_DEBUG("boo1");
+	Paletted_Image_Data p;
+	p.data = imgdata;
+	p.size = sz;
+ALLEGRO_DEBUG("boo1");
+	ALLEGRO_BITMAP *pal = al_create_custom_bitmap(w, h, upload_paletted_image, &p);
+ALLEGRO_DEBUG("boo1");
+	delete[] imgdata;
+ALLEGRO_DEBUG("boo1");
+	al_set_target_backbuffer(display);
+	al_clear_to_color(al_map_rgb(0, 0, 0));
+	al_draw_bitmap(pal, 0, 0, 0);
+	al_flip_display();
+ALLEGRO_DEBUG("boo1");
+	al_rest(20);
+#endif
+
 	set_screen_params();
       
 #ifdef A5_OGL
@@ -2578,9 +2630,7 @@ bool init(int *argc, char **argv[])
 		use_programmable_pipeline = al_get_display_flags(display) & ALLEGRO_USE_PROGRAMMABLE_PIPELINE;
 	}
 
-	#if !defined A5_D3D
 	init_shaders();
-	#endif
 
 	if (al_install_joystick()) {
 		set_user_joystick();
@@ -2649,11 +2699,11 @@ bool init(int *argc, char **argv[])
 	screenshot = m_create_bitmap(BW/2, BH/2); // check
 	al_set_new_bitmap_flags(flags);
 
-	scaleXX_buffer = m_create_bitmap(BW*2, BH*2); // check
+	if (use_programmable_pipeline) {
+		scaleXX_buffer = m_create_bitmap(BW*2, BH*2); // check
+	}
 
-#if !defined A5_D3D
 	init2_shaders();
-#endif
 	
 	ALLEGRO_DEBUG("format way way before = %d\n", al_get_new_bitmap_format());
 
@@ -2764,94 +2814,31 @@ bool init(int *argc, char **argv[])
 	m_destroy_bitmap(bar_loader);
 	m_destroy_bitmap(loading_loader);
 
-	int ttf_flags;
-
-#ifdef ALLEGRO_IPHONE
-	if (config.getFilterType() == FILTER_SCALE2X) {
-		ttf_flags = 0;
-	}
-	else {
-#endif
-		ttf_flags = ALLEGRO_TTF_MONOCHROME;
-#ifdef ALLEGRO_IPHONE
-	}
-#endif
-
-	ALLEGRO_DEBUG("loading fonts");
-
-#ifndef ALLEGRO_ANDROID_XXX // always do this!
-	game_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 9, ttf_flags);
-#else
-	ALLEGRO_PATH *res_dir = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
-	char boofer[1000];
-	sprintf(boofer, "%s/unpack/DejaVuSans.ttf", al_path_cstr(res_dir, '/'));
-	al_destroy_path(res_dir);
-	al_set_standard_file_interface();
-	//game_font = al_load_ttf_font(boofer, 9, ttf_flags);
-	game_font = al_load_ttf_font("/mnt/sdcard/removable_sdcard/DejaVuSans.ttf", 9, ttf_flags);
-	al_set_apk_file_interface();
-#endif
-	if (!game_font) {
-		if (!native_error("Failed to load game_font"))
-			return false;
-	}
-
-	medium_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 32, 0);
-	if (!game_font) {
-		if (!native_error("Failed to load medium_font"))
-			return false;
-	}
-	
-	if (cached_bitmap) {
-		al_destroy_bitmap(cached_bitmap);
-		cached_bitmap = NULL;
-		cached_bitmap_filename = "";
-	}
-
-	huge_font = m_load_font(getResource("huge_font.tga"));
-	if (!huge_font) {
-		if (!native_error("Failed to load huge_font"))
-			return false;
-	}
-
-	ALLEGRO_DEBUG("done loading fonts");
-	
-	// NOTE: This has to be after display creation and loading of fonts
 	load_translation_tags();
-	load_translation(get_language_name(config.getLanguage()).c_str());
+	load_fonts();
 
-
-	/* RELOAD EVERYTHING AS DISPLAY BITMAPS */
+	poison_bmp = m_make_alpha_display_bitmap(poison_bmp);
+	poison_bmp_tmp = m_make_alpha_display_bitmap(poison_bmp_tmp);
+	poison_bmp_tmp2 = m_make_alpha_display_bitmap(poison_bmp_tmp2);
+	orb_bmp = m_make_alpha_display_bitmap(orb_bmp);
 	guiAnims.bitmap = m_make_display_bitmap(guiAnims.bitmap);
 	guiAnims.corner_sub = m_create_sub_bitmap(guiAnims.bitmap, 0, 0, 3, 3);
 	guiAnims.wide_sub = m_create_sub_bitmap(guiAnims.bitmap, 0, 3, 32, 3);
 	guiAnims.tall_sub = m_create_sub_bitmap(guiAnims.bitmap, 0, 6, 3, 32);
 
-	cursor = m_make_display_bitmap(cursor);
-
-	poison_bmp = m_make_alpha_display_bitmap(poison_bmp);
-	poison_bmp_tmp = m_make_alpha_display_bitmap(poison_bmp_tmp);
-	poison_bmp_tmp2 = m_make_alpha_display_bitmap(poison_bmp_tmp2);
-
-	orb_bmp = m_make_alpha_display_bitmap(orb_bmp);
-
-	tile = m_make_display_bitmap(tile);
-
-	debug_message("Loading icons\n");
-
 	al_set_new_bitmap_flags(PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
-	ALLEGRO_DEBUG("al_get_new_bitmap_flags=%x", al_get_new_bitmap_flags());
-
-	icon_bmp = m_load_bitmap_redraw(getResource("media/icons.png"), loadIcons);
-
-	stoneTexture = m_make_display_bitmap(stoneTexture);
 	
-	mushroom = m_make_display_bitmap(mushroom);
-	webbed = m_make_display_bitmap(webbed);
-
+	cursor = m_load_bitmap(getResource("media/cursor.png"));
+	tile = m_create_bitmap(TILE_SIZE, TILE_SIZE); // check
+	stoneTexture = m_load_bitmap(getResource("combat_media/stone.png"));
+	mushroom = m_load_bitmap(getResource("combat_media/mushroom.png"));
+	webbed = m_load_bitmap(getResource("combat_media/webbed.png"));
 	dpad_buttons = m_load_bitmap(getResource("media/buttons.png"));
 	batteryIcon = m_load_bitmap(getResource("media/battery_icon.png"));
 	achievement_bmp = m_load_bitmap(getResource("media/trophy.png"));
+
+	debug_message("Loading icons\n");
+	icon_bmp = m_load_bitmap_redraw(getResource("media/icons.png"), loadIcons, NULL);
 
 	m_set_target_bitmap(buffer);
 	
@@ -2950,9 +2937,7 @@ void destroy(void)
 
 	m_destroy_bitmap(shadow_sheet);
 
-	m_destroy_font(game_font);
-	m_destroy_font(huge_font);
-	m_destroy_font(medium_font);
+	destroy_fonts();
 
 	for (int i = 0; i < MAX_PARTY; i++) {
 		if (party[i]) {

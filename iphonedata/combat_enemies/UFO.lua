@@ -13,6 +13,7 @@ function initId(id)
 end
 
 function start()
+	preloadSpellSFX("UFO")
 end
 
 function get_action(step)

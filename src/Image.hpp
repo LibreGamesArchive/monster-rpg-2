@@ -20,17 +20,12 @@ public:
 	MBITMAP *getBitmap(void);
 
 	void set(MBITMAP *b);
-	/* Load from file
-	 */
-	bool load(const char *filename);
-	/* Copy from bitmap (coords are inclusive)
-	 */
-	bool load(std::string filename, int x1, int y1, int x2, int y2);
-
+	bool load(MBITMAP *copy_from, int x1, int y1, int x2, int y2);
+	Image *clone(int type, MBITMAP *bitmap);
+	//void refresh(void);
+	
 	void draw(int x, int y, int flags = 0);
 	void draw_trans(int x, int y, int alpha);
-
-	Image *clone(int type);
 
 	Image(void);
 	Image(bool alpha);
@@ -45,6 +40,9 @@ protected:
 	MBITMAP *bitmap;
 	bool transparent;
 	bool alpha;
+
+	MBITMAP *copy_from;
+	int x1, y1, w, h;
 };
 
 extern ALLEGRO_BITMAP *cached_bitmap;

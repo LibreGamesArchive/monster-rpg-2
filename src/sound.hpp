@@ -41,6 +41,7 @@ void restartAmbience(void);
 void playMusicVolumeOff(std::string name);
 
 bool loadSamples(void (*cb)(int, int));
+std::string check_music_name(std::string name, bool *is_flac);
 
 #endif
 

@@ -23,6 +23,8 @@ function initId(i)
 end
 
 function start()
+	preloadSFX("buzz.ogg")
+	preloadSFX("suck.ogg")
 end
 
 function get_attack_condition()

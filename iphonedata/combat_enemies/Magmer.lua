@@ -14,6 +14,7 @@ function initId(id)
 end
 
 function start()
+	preloadSpellSFX("Boulder")
 end
 
 function get_action(step)

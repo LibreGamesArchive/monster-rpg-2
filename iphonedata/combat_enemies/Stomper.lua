@@ -11,6 +11,8 @@ weakness = ELEMENT_NONE
 first = true
 
 function start()
+	preloadSpellSFX("Stomp")
+	preloadSpellSFX("Spray")
 end
 
 function get_action()

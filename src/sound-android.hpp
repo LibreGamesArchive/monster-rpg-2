@@ -1,6 +1,8 @@
 #ifndef SOUND_ANDROID_HPP
 #define SOUND_ANDROID_HPP
 
+std::string check_music_name(std::string name, bool *is_flac);
+
 void unmuteMusic_oldandroid(void);
 void unmuteAmbience_oldandroid(void);
 float getMusicVolume_oldandroid(void);

@@ -250,14 +250,31 @@ bool is_close_pressed(void)
 			}
 			//sb_stop();
 #elif defined ALLEGRO_ANDROID
-			std::string old_music_name = musicName;
-			std::string old_ambience_name = ambienceName;
-			float old_music_volume = getMusicVolume();
-			float old_ambience_volume = getAmbienceVolume();
-			playMusic("");
-			playAmbience("");
+			std::string old_music_name;
+			std::string old_ambience_name;
+			float old_music_volume;
+			float old_ambience_volume;
+			if (is_android_lessthan_2_3) {
+				old_music_name = musicName;
+				old_ambience_name = ambienceName;
+				old_music_volume = getMusicVolume();
+				old_ambience_volume = getAmbienceVolume();
+				playMusic("");
+				playAmbience("");
+			}
+			else {
+				(void)old_music_name;
+				(void)old_ambience_name;
+				(void)old_music_volume;
+				(void)old_ambience_volume;
+				backup_music_volume = getMusicVolume();
+				backup_ambience_volume = getAmbienceVolume();
+				setMusicVolume(0.0);
+				setAmbienceVolume(0.0);
+			}
 			_destroy_loaded_bitmaps();
-			destroy_shaders();
+			destroy_fonts();
+			//destroy_shaders();
 #endif
 			config.write();
 			al_stop_timer(logic_timer);
@@ -278,18 +295,27 @@ bool is_close_pressed(void)
 			al_acknowledge_drawing_resume(display);
 #ifdef ALLEGRO_ANDROID
 			_reload_loaded_bitmaps();
-			init_shaders();
-			init2_shaders();
+			load_fonts();
+			//init_shaders();
+			//init2_shaders();
 			if (in_shooter) {
 				shooter_restoring = true;
 			}
 #endif
+			animset_post_reset();
       			glDisable(GL_DITHER);
+			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 			al_start_timer(logic_timer);
 			al_start_timer(draw_timer);
 #ifdef ALLEGRO_ANDROID
-			playMusic(old_music_name, old_music_volume, true);
-			playAmbience(old_ambience_name, old_ambience_volume);
+			if (is_android_lessthan_2_3) {
+				playMusic(old_music_name, old_music_volume, true);
+				playAmbience(old_ambience_name, old_ambience_volume);
+			}
+			else {
+				setMusicVolume(backup_music_volume);
+				setAmbienceVolume(backup_ambience_volume);
+			}
 #endif
 		}
 #endif
@@ -784,6 +810,17 @@ static void run(void)
 					}
 				}
 			}
+			
+			/* For testing
+			if (battle && area) {
+				// FIXME!!!!!!!!!!!!!!!!!!!!!!
+				ALLEGRO_DEBUG("DELETING AREA");
+				delete area;
+				ALLEGRO_DEBUG("DELETED AREA");
+				area = NULL;
+				ALLEGRO_DEBUG("area = NULL");
+			}
+			*/
 		}
 
 		if (break_main_loop) {

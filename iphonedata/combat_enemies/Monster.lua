@@ -9,6 +9,8 @@ strength = ELEMENT_NONE
 weakness = ELEMENT_ELECTRICITY
 
 function start()
+	preloadSpellSFX("Wave")
+	preloadSpellSFX("Whirlpool")
 end
 
 function get_action()

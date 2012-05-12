@@ -89,6 +89,9 @@ void load_translation(const char *filename)
 		}
 		prev = pos;
 	}
+	for (int i = 0; i < 10; i++) {
+		al_ustr_append_chr(newstr, '0'+i);
+	}
 	al_get_ustr_width(game_font, newstr);
 	al_ustr_free(fullstr);
 	al_ustr_free(newstr);

@@ -9,6 +9,7 @@ strength = ELEMENT_NONE
 weakness = ELEMENT_NONE
 
 function start()
+	preloadSpellSFX("Stone")
 end
 
 function get_action()

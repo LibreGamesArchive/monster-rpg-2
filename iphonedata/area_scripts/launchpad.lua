@@ -83,7 +83,7 @@ end
 
 function done()
 	setObjectHidden(0, true)
-	playSample("rocket_launch.ogg")
+	playSample(samp)
 	setObjectSubAnimation(rocket, "door_closed")
 	removeObject(black.id)
 	startRocket(rocket)

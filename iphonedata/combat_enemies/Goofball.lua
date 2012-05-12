@@ -25,6 +25,7 @@ function initId(id)
 end
 
 function start()
+	preloadSFX("spin.ogg")
 end
 
 function get_action(step)

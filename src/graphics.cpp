@@ -486,7 +486,7 @@ static void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 	else if (onscreen_drag_to_use) {
 		text = "Drag to use!";
 	}
-	if (text && area->getName() != "tutorial") {
+	if (text && area && area->getName() != "tutorial") {
 		int len = m_text_length(medium_font, _t(text));
 		int h = m_text_height(medium_font);		
 		float scale = 32.0/(h+4);
@@ -671,6 +671,8 @@ void drawBufferToScreen(bool draw_controls)
 
 void draw_shadow(MBITMAP *bmp, int x, int y, bool hflip)
 {
+	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
+
 	ALLEGRO_VERTEX verts[6];
 	int w = m_get_bitmap_width(bmp);
 	int h = m_get_bitmap_height(bmp);
@@ -910,8 +912,6 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 	MBITMAP *tmp = m_create_bitmap(BW, BH);
 	MBITMAP *bufdup = m_clone_bitmap(buffer);
 
-	ALLEGRO_DEBUG("tmp format=%d bufdup format=%d\n", al_get_bitmap_format(tmp->bitmap), al_get_bitmap_format(bufdup->bitmap));
-
 	unsigned long start = (unsigned long)(al_get_time()*1000);
 	unsigned long now = start;
 	
@@ -1098,17 +1098,13 @@ void battleTransition(void)
 		return;
 	}
 
-ALLEGRO_DEBUG("hum1");
 	MBITMAP *xfade_buf = m_create_bitmap(BW, BH); // check
-ALLEGRO_DEBUG("hum2");
 	MBITMAP *battle_buf = m_create_bitmap(BW, BH); // check
-ALLEGRO_DEBUG("hum3");
 
 	//set_linear_mag_filter(xfade_buf, config.getFilterType() == FILTER_LINEAR);
 
 	m_set_target_bitmap(battle_buf);
 	battle->draw();
-ALLEGRO_DEBUG("hum4");
 
 	dpad_off();
 
@@ -1116,10 +1112,8 @@ ALLEGRO_DEBUG("hum4");
 	long start = now;
 	int length = 700;
 	float angle = 0;
-ALLEGRO_DEBUG("hum5");
 
 	while ((now - start) < (length*2)) {
-ALLEGRO_DEBUG("hum6");
 		int elapsed = now - start;
 		angle = ((double)elapsed / (length*2.0)) * (M_PI*2);
 

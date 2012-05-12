@@ -376,7 +376,7 @@ void showSaveStateInfo(const char *basename)
 			// Draw info
 
 			// draw ss and date
-			if (ss) {
+			if (ss && ss->bitmap) {
 				m_draw_bitmap(ss, BW/2-BW/4, BH/3-BH/4, 0);
 			}
 			else {
@@ -3975,6 +3975,9 @@ int title_menu(void)
 	dpad_off();
 	
 	tguiEnableHotZone(false);
+	
+	bool gdr = global_draw_red;
+	global_draw_red = false;
 
 	debug_message("starting title menu\n");
 	int selected = -1;
@@ -4092,7 +4095,11 @@ int title_menu(void)
 #endif
 
 			INPUT_EVENT ie = get_next_input_event();
+#ifdef ALLEGRO_ANDROID
+			if (ie.button2 == DOWN || iphone_shaken(0.1)) {
+#else
 			if (ie.button2 == DOWN) {
+#endif
 				nofade = true;
 				selected = 0xBEEF;
 				goto done;
@@ -4153,6 +4160,8 @@ done:
 	}
 
 	tguiEnableHotZone(true);
+
+	global_draw_red = gdr;
 
 	return selected;
 }

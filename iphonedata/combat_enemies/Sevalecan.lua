@@ -13,6 +13,7 @@ function initId(id)
 end
 
 function start()
+	preloadSpellSFX("MachineGun")
 end
 
 function get_action(step)

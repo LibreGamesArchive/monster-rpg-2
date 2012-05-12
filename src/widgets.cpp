@@ -16,8 +16,10 @@ MManSelector *manChooser = NULL;
 MBITMAP *icon_bmp;
 
 
-void loadIcons(MBITMAP *bmp)
+void loadIcons(MBITMAP *bmp, RecreateData *data)
 {
+	(void)data;
+
 	#define N 40
 	int pos[N*4] = {
 		0, 9, 9, 9,
@@ -80,7 +82,7 @@ void loadIcons(MBITMAP *bmp)
 				pos[i*4+2], pos[i*4+3]
 			)
 		);
-		ALLEGRO_DEBUG("icons[%d]=%d", i, icons[i]);
+		ALLEGRO_DEBUG("icons[%d]=%p", i, icons[i]);
 	}
 }
 

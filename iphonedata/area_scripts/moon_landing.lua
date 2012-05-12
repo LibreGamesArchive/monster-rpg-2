@@ -12,6 +12,8 @@ function set_solids(state)
 end
 
 function start()
+	samp = loadSample("rocket_launch.ogg")
+
 	setMilestone(MS_ON_MOON, true)
 	
 	if (not getMilestone(MS_LANDER_LAUNCHED)) then
@@ -24,6 +26,7 @@ function start()
 end
 
 function stop()
+	destroySample(samp)
 end
 
 function deposit()
@@ -33,7 +36,7 @@ end
 
 function launch()
 	setObjectDirection(0, DIRECTION_NORTH)
-	loadPlayDestroy("rocket_launch.ogg")
+	playSample(samp)
 	startRocket(lander)
 	set_solids(false)
 end

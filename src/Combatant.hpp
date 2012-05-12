@@ -5,6 +5,8 @@
 
 class Combatant : public CombatEntity {
 public:
+	AnimationSet *animSet;
+
 	CombatantInfo &getInfo(void) { return info; }
 	int getDirection(void);
 	AnimationSet *getAnimationSet(void);
@@ -32,7 +34,6 @@ protected:
 
 	std::string name;
 	Direction direction;
-	AnimationSet *animSet;
 	AnimationSet *whiteAnimSet;
 	CombatantInfo info;
 	CombatLocation location;

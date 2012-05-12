@@ -955,20 +955,21 @@ Compleet!
 Sla
 deze mini-game?
 Heks: De demo eindigt hier, Missy!^
-xxx {027} Integer scaling
-xxx HQ sound track
-xxx Free HQ soundtrack download
-xxx Status: %s. %s. (%d%%)
-xxx Not started
-xxx Partial
-xxx Complete
-xxx Stopped
-xxx Downloading
-xxx Start/resume download
-xxx Stop/pause download
-xxx Delete downloads
-xxx Done
-xxx Really delete flacs directory
-xxx and all contents?
-xxx Can only download
-xxx over wifi.
+{027} Strikte vergroting
+Vrije soundtrack
+Vrije soundtrack download
+Status: %s. %s. (%d%%)
+Niet gestart
+Gedeeltelijk
+Klaar
+Gestopt
+Download
+Download (her)opstarten
+Download stopzetten/pauzeren
+Downloads verwijderen
+Afgewerkt
+Flacs folder en alle
+bestanden verwijderen?
+Kan alleen via wifi
+downloaden.
+Je kan op ieder moment de les verlaten door de annuleer-knop in te drukken. (rood driehoekje bovenaan rechts van het scherm).^FIXME^

@@ -1683,6 +1683,8 @@ void Area::update(int step)
 	if (this == area) {
 		if (update_count == 0) {
 			update_count = 1;
+		}
+		else {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			auto_save_game(step);
 			auto_save_screenshot(step);

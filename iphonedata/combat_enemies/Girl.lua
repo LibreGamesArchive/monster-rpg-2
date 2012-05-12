@@ -15,6 +15,10 @@ function initId(i)
 end
 
 function start()
+	preloadSpellSFX("Fireball")
+	preloadSpellSFX("Kiss of Death")
+	preloadSpellSFX("Breath of Fire")
+	preloadSpellSFX("Talon")
 end
 
 function get_action()

@@ -13,6 +13,7 @@ function initId(id)
 end
 
 function start()
+	preloadSFX("slime.ogg")
 end
 
 function get_action(step)

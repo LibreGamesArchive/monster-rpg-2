@@ -929,7 +929,7 @@ Obtenu %s!^
 Coup critique!
 Parade!
 Chaque zone de la carte possède plusieurs embranchements.^Utilisez les flèches pour naviguer entre les zones. En appuyant sur 'Action', vous entrerez dans la zone indiquée par une flèche.^Déplacez le curseur jusqu'à la ville de Seaside et appuyez sur le bouton 'Action'.^
-Chaque zone de la carte possède plusieurs embranchements.^Appuyez sur une icône pour vous déplacer dans sa direction. Si vous appuyez sur une icône indiquée par une flèche, vous entrerez dans la zone correspondante.^Déplacez le curseur jusqu'à la ville de Seaside et appuyez sur son icône.^
+Chaque zone de la carte possède plusieurs embranchements.^Appuyez sur une icône pour vous déplacer dans sa direction. Si vous appuyez sur une icône indiquée par une flèche,^vous entrerez dans la zone correspondante.^Déplacez le curseur jusqu'à la ville de Seaside et appuyez sur son icône.^
 Bien, nous en avons presque fini.^Essayons un combat, cela complétera votre formation.^L'attaque fonctionne en déplaçant le curseur jusqu'à la flèche située à côté de l'ennemi de votre choix, et en appuyant sur 'Action'.^Les objets s'utilisent de la manière habituelle.^Vous aurez encore d'autres options en combat... Jouez avec elles pour vous y habituer.^
 Bien, nous en avons presque fini.^Essayons un combat, cela complétera votre formation.^L'attaque fonctionne en appuyant sur la flèche située à côté de l'ennemi de votre choix.^Dessinez ensuite une ligne invisible en direction de la flèche.^Les objets s'utilisent de la manière habituelle.^Vous aurez encore d'autres options en combat... Jouez avec elles pour vous y habituer.^
 Souvenez-vous: dessinez une ligne invisible en direction des flèches pour effectuer une action!^Cela vaut pour l'attaque, l'utilisation d'objets et de sorts, etc.^C'est parti!^
@@ -955,20 +955,21 @@ Terminé!
 Passer
 ce mini-jeu?
 Sorcière: La démo se termine ici, Missy!^
-xxx {027} Integer scaling
-xxx HQ sound track
-xxx Free HQ soundtrack download
-xxx Status: %s. %s. (%d%%)
-xxx Not started
-xxx Partial
-xxx Complete
-xxx Stopped
-xxx Downloading
-xxx Start/resume download
-xxx Stop/pause download
-xxx Delete downloads
-xxx Done
-xxx Really delete flacs directory
-xxx and all contents?
-xxx Can only download
-xxx over wifi.
+{027} Mise à l'échelle exacte
+Télécharger OST
+Téléchargement de l'OST gratuite
+État : %s. %s. (%d%%)
+En attente
+Partiel
+Terminé
+Arrêté
+Téléchargement
+Démarrer/reprendre le téléchargement
+Arrêter le téléchargement
+Effacer les téléchargements
+Terminé
+Supprimer le dossier des flacs
+et tout son contenu?
+Téléchargement par
+wifi uniquement.
+Note: vous pouvez sortir du didacticiel à tout moment en appuyant sur 'Annuler'.^Il s'agit du triangle rouge en haut à droite de l'écran.^FIXME^

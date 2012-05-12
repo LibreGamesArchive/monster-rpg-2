@@ -7,6 +7,9 @@ static std::string nextSpeech = "";
 static std::map<std::string, MSAMPLE> preloaded_samples;
 void preloadSFX(std::string name)
 {
+	if (preloaded_samples.find(name) != preloaded_samples.end()) {
+		return;
+	}
 	preloaded_samples[name] = loadSample(name);
 }
 void preloadSpellSFX(std::string spellName)
@@ -64,9 +67,6 @@ void preloadSpellSFX(std::string spellName)
 	}
 	else if (spellName == "Fire3") {
 		preloadSFX("Fire3.ogg");
-	}
-	else if (spellName == "freeze") {
-		preloadSFX("freeze.ogg");
 	}
 	else if (spellName == "Ice1") {
 		preloadSFX("ice1.ogg");
@@ -1384,10 +1384,6 @@ Battle::Battle(std::string name, bool can_run) :
 
 
 	bg = m_load_bitmap(getResource("combat_bgs/%s.png", area->getTerrain().c_str()));
-
-	// FIXME!!!!!!!!!!!!!!!!!!!!!!
-	//delete area;
-	//area = NULL;
 }
 
 extern bool fairy_used;

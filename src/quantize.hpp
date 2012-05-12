@@ -12,8 +12,8 @@ struct Paletted_Image_Data
 	int size;
 };
 
-void gen_palette(ALLEGRO_BITMAP *bitmap, unsigned char *palette, uint16_t *opt_exact);
-void gen_paletted_image(ALLEGRO_BITMAP *bitmap, unsigned char *image, uint16_t *exact);
+void gen_palette(ALLEGRO_BITMAP *bitmap, unsigned char *palette);
+void gen_paletted_image(ALLEGRO_BITMAP *bitmap, unsigned char *palete, unsigned char *image);
 bool upload_paletted_image(ALLEGRO_BITMAP *bitmap, void *data);
 
 #endif

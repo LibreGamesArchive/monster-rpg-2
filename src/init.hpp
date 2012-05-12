@@ -135,7 +135,6 @@ extern bool had_battle;
 extern MBITMAP *shadow_sheet;
 const int SHADOW_CORNER_SIZE = 10;
 extern MBITMAP *shakeAlternativeBitmap;
-extern ALLEGRO_VERTEX triangle_lines[32];
 extern MBITMAP *dpad_buttons;
 extern bool onscreen_swipe_to_attack;
 extern bool onscreen_drag_to_use;
@@ -237,6 +236,8 @@ void init_big_depth_surface(void);
 
 bool imperfect_aspect(void);
 void create_buffers(void);
+void destroy_fonts(void);
+void load_fonts(void);
 
 extern "C" {
 void connect_external_controls(void);

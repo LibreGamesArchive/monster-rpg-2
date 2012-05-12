@@ -14,6 +14,8 @@ function initId(id)
 end
 
 function start()
+	preloadSpellSFX("Torrent")
+	preloadSpellSFX("Punch")
 end
 
 function get_action(step)

@@ -27,6 +27,8 @@ function numMushrooms()
 end
 
 function start()
+	preloadSpellSFX("Daisy")
+
 	local id = battleGetNextEntity(myId)
 
 	while (not (id == myId)) do

@@ -64,7 +64,7 @@ public:
 				return newHandler;
 			}
 		}
-		if (area->getName() == "tutorial") {
+		if (area && area->getName() == "tutorial") {
 			if (iphone_shaken(0.1)) {
 				iphone_clear_shaken();
 				battle->run(true);

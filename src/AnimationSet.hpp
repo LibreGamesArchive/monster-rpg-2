@@ -27,10 +27,12 @@ public:
 	void displayConvert(void);
 
 	AnimationSet *clone(int type);
+	void post_reset(void);
 
 	AnimationSet(void);
 	AnimationSet(const char *filename, bool alpha = false);
 	~AnimationSet();
+	
 private:
 
 	std::string name;
@@ -38,7 +40,12 @@ private:
 	int currAnim;
 	std::string prefix;
 	bool destroy;
+	MBITMAP *bitmap;
+	std::string filename;
 };
+
+
+void animset_post_reset(void);
 
 
 #endif

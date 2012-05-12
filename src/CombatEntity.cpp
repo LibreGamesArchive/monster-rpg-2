@@ -1794,20 +1794,18 @@ int SludgeEffect::getLifetime(void)
 
 void SludgeEffect::draw()
 {
+	if (target->getAnimationSet()->getCurrentAnimation()->getName() != anim_name) {
+		destroy_info();
+		get_info();
+	}
+
+	int frame = target->getAnimationSet()->getCurrentAnimation()->getCurrentFrameNum();
+
 	MBITMAP *bmp = target->getAnimationSet()->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 
 	int top = m_get_bitmap_height(bmp) * ((float)count / LIFETIME);
 
-	int xx;
-	
-	if (target->getLocation() == LOCATION_RIGHT)
-		xx = target->getX()-target->getAnimationSet()->getWidth()/2;
-	else
-		xx = target->getX()+target->getAnimationSet()->getWidth()/2;
-
 	int yy = target->getY()-target->getAnimationSet()->getHeight();
-
-	m_lock_bitmap(bmp, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
 
 	ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[m_get_bitmap_width(bmp)*m_get_bitmap_height(bmp)];
 	int vcount = 0;
@@ -1822,43 +1820,45 @@ void SludgeEffect::draw()
 		int drawn = 0;
 
 		int startx, endx, xinc;
-		startx = 0;
-		endx = m_get_bitmap_width(bmp);
-		xinc = 1;
 
-		for (int x = startx; x < endx; x += xinc) {
-			MCOLOR c = m_get_pixel(bmp, x, i);
-			if (c.a == 1.0f) {
-				drawn++;
-				if (target->getLocation() == LOCATION_RIGHT) {
-					verts[vcount].x = xx+x;
-					verts[vcount].y = yy+i;
-					verts[vcount].z = 0;
-					verts[vcount].color = color;
-					vcount++;
-				}
-				else {
-					verts[vcount].x = xx-x;
-					verts[vcount].y = yy+i;
-					verts[vcount].z = 0;
-					verts[vcount].color = color;
-					vcount++;
-				}
-			}
-			if (drawn >= size)
-				break;
+		int xx;
+
+		if (target->getLocation() == LOCATION_RIGHT) {
+			if (left_pixels[frame][i] < 0)
+				continue;
+			xx = target->getX() - target->getAnimationSet()->getWidth()/2 + left_pixels[frame][i];
+			xinc = 1;
 		}
+		else {
+			if (right_pixels[frame][i] < 0)
+				continue;
+			xx = target->getX() - target->getAnimationSet()->getWidth()/2 + right_pixels[frame][i];
+			xinc = -1;
+		}
+
+		startx = xx;
+		endx = xx + size*xinc;
+
+		verts[vcount].x = startx;
+		verts[vcount].y = yy+i;
+		verts[vcount].z = 0;
+		verts[vcount].color = color;
+		vcount++;
+		verts[vcount].x = endx;
+		verts[vcount].y = yy+i;
+		verts[vcount].z = 0;
+		verts[vcount].color = color;
+		vcount++;
 	}
 
-#ifdef __linux__
+//#if defined __linux__ && !defined ALLEGRO_ANDROID
+#if 0
 	draw_points_locked(verts, vcount);
 #else
-	m_draw_prim(verts, 0, 0, 0, vcount, ALLEGRO_PRIM_POINT_LIST);
+	m_draw_prim(verts, 0, 0, 0, vcount, ALLEGRO_PRIM_LINE_LIST);
 #endif
 
 	delete[] verts;
-
-	m_unlock_bitmap(bmp);
 
 	int puddle_max = m_get_bitmap_width(bmp) * 1.5f;
 
@@ -1900,14 +1900,69 @@ SludgeEffect::SludgeEffect(Combatant *target, MCOLOR color)
 		depths.push_back(d);
 	}
 
+	get_info();
 }
 
 
 SludgeEffect::~SludgeEffect()
 {
 	depths.clear();
+	destroy_info();
 }
 
+void SludgeEffect::get_info(void)
+{
+	Animation *a = target->getAnimationSet()->getCurrentAnimation();
+	anim_name = a->getName();
+	numFrames = a->getNumFrames();
+	left_pixels = new int*[numFrames];
+	right_pixels = new int*[numFrames];
+
+	for (int i = 0; i < numFrames; i++) {
+		MBITMAP *b = a->getFrame(i)->getImage()->getBitmap();
+		left_pixels[i] = new int[m_get_bitmap_height(b)];
+		right_pixels[i] = new int[m_get_bitmap_height(b)];
+		m_lock_bitmap(b, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
+		for (int y = 0; y < m_get_bitmap_height(b); y++) {
+			int first = INT_MAX;
+			int last = 0;
+			for (int x = 0; x < m_get_bitmap_width(b); x++) {
+				ALLEGRO_COLOR pixel = al_get_pixel(b->bitmap, x, y);
+				if (pixel.a > 0.5) {
+					if (first == INT_MAX) {
+						first = x;
+					}
+					if (x > last) {
+						last = x;
+					}
+				}
+			}
+			if (first == INT_MAX) {
+				left_pixels[i][y] = -1;
+			}
+			else {
+				left_pixels[i][y] = first;
+			}
+			if (last == 0) {
+				right_pixels[i][y] = -1;
+			}
+			else {
+				right_pixels[i][y] = last;
+			}
+		}
+		m_unlock_bitmap(b);
+	}
+}
+
+void SludgeEffect::destroy_info(void)
+{
+	for (int i = 0; i < numFrames; i++) {
+		delete[] left_pixels[i];
+		delete[] right_pixels[i];
+	}
+	delete[] left_pixels;
+	delete[] right_pixels;
+}
 
 int RendEffect::getLifetime(void)
 {
@@ -3294,7 +3349,7 @@ void WhipEffect::draw(void)
 		verts[i].z = 0;
 		verts[i].color = curr[i].color;
 	}
-#ifdef __linux__
+#if defined __linux__ && !defined ALLEGRO_ANDROID
 	draw_points_locked(verts, POINTS);
 #else
 	m_draw_prim(verts, 0, 0, 0, POINTS, ALLEGRO_PRIM_POINT_LIST);
@@ -3694,7 +3749,7 @@ void BananaEffect::draw(void)
 			verts[i].z = 0;
 			verts[i].color = pixels[i].cp.color;
 		}
-#ifdef __linux__
+#if defined __linux__ && !defined ALLEGRO_ANDROID
 		draw_points_locked(verts, pixels.size());
 #else
 		m_draw_prim(verts, 0, 0, 0, pixels.size(), ALLEGRO_PRIM_POINT_LIST);
@@ -4039,7 +4094,7 @@ void DropEffect::draw(void)
 			verts[i].z = 0;
 			verts[i].color = pixels[i].cp.color;
 		}
-#ifdef __linux__
+#if defined __linux__ && !defined ALLEGRO_ANDROID
 		draw_points_locked(verts, pixels.size());
 #else
 		m_draw_prim(verts, 0, 0, 0, pixels.size(), ALLEGRO_PRIM_POINT_LIST);
@@ -4221,7 +4276,7 @@ void MachineGunEffect::draw(void)
 		verts[i].color = color;
 	}
 
-#ifdef __linux__
+#if defined __linux__ && !defined ALLEGRO_ANDROID
 	draw_points_locked(verts, 25);
 #else
 	m_draw_prim(verts, 0, 0, 0, 25, ALLEGRO_PRIM_POINT_LIST);
@@ -4396,7 +4451,7 @@ void UFOEffect::draw(void)
 		vcount++;
 	}
 
-#ifdef __linux__
+#if defined __linux__ && !defined ALLEGRO_ANDROID
 	draw_points_locked(verts, vcount);
 #else
 	m_draw_prim(verts, 0, 0, 0, vcount, ALLEGRO_PRIM_POINT_LIST);

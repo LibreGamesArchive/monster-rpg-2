@@ -1774,7 +1774,7 @@ protected:
 #endif
 
 
-void loadIcons(MBITMAP *bmp);
+void loadIcons(MBITMAP *bmp, RecreateData *data);
 void destroyIcons(void);
 
 extern MBITMAP *icon_bmp;

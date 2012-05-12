@@ -3691,7 +3691,7 @@ struct SFX {
 static int id_counter = 1;
 static std::vector<SFX> sfx;
 
-int CLoadSample(lua_State *stack)
+static int CLoadSample(lua_State *stack)
 {
 	const char *name = lua_tostring(stack, 1);
 
@@ -3706,7 +3706,7 @@ int CLoadSample(lua_State *stack)
 	return 1;
 }
 
-int CDestroySample(lua_State *stack)
+static int CDestroySample(lua_State *stack)
 {
 	int id = lua_tonumber(stack, 1);
 
@@ -3721,7 +3721,7 @@ int CDestroySample(lua_State *stack)
 	return 0;
 }
 
-int CPlaySample(lua_State *stack)
+static int CPlaySample(lua_State *stack)
 {
 	int id = lua_tonumber(stack, 1);
 
@@ -3735,7 +3735,7 @@ int CPlaySample(lua_State *stack)
 	return 0;
 }
 
-int CPreloadSFX(lua_State *stack)
+static int CPreloadSFX(lua_State *stack)
 {
 	const char *name = lua_tostring(stack, 1);
 
@@ -3744,7 +3744,7 @@ int CPreloadSFX(lua_State *stack)
 	return 0;
 }
 
-int CPreloadSpellSFX(lua_State *stack)
+static int CPreloadSpellSFX(lua_State *stack)
 {
 	const char *name = lua_tostring(stack, 1);
 

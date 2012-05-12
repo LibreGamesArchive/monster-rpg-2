@@ -438,10 +438,17 @@ public:
 	SludgeEffect(Combatant *target, MCOLOR color);
 	virtual ~SludgeEffect();
 private:
+	void get_info(void);
+	void destroy_info(void);
+
 	MCOLOR color;
 	int count;
 	std::vector<int> depths;
 	Combatant *target;
+	int **left_pixels;
+	int **right_pixels;
+	std::string anim_name;
+	int numFrames;
 };
 
 class RendEffect : public CombatEntity {

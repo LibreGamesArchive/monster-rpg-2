@@ -192,12 +192,12 @@ void Animation::wrap(void)
 	}
 }
 
-Animation *Animation::clone(int type)
+Animation *Animation::clone(int type, MBITMAP *bitmap)
 {
 	Animation *a = new Animation();
 
 	for (size_t i = 0; i < frames.size(); i++) {
-		a->frames.push_back(frames[i]->clone(type));
+		a->frames.push_back(frames[i]->clone(type, bitmap));
 	}
 
 	a->nFrames = nFrames;
