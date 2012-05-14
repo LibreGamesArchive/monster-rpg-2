@@ -1330,7 +1330,7 @@ static void *loader_proc(void *arg)
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
 #endif
 #else
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888); HELLO
+	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 #endif
 	
 	config.setUseOnlyMemoryBitmaps(true);
@@ -2054,148 +2054,133 @@ void init_shaders(void)
 		scale2x = al_create_shader(ALLEGRO_SHADER_GLSL);
 #endif
 
-ALLEGRO_DEBUG("1 ass");
 		al_attach_shader_source(
 					default_shader,
 					ALLEGRO_VERTEX_SHADER,
 					main_vertex_source
 					);
 		
-ALLEGRO_DEBUG("2 ass");
 		al_attach_shader_source(
 					cheap_shader,
 					ALLEGRO_VERTEX_SHADER,
 					main_vertex_source
 					);
 		
-ALLEGRO_DEBUG("3 ass");
 		al_attach_shader_source(
 					tinter,
 					ALLEGRO_VERTEX_SHADER,
 					default_vertex_source
 					);
 		
-ALLEGRO_DEBUG("4 ass");
 		al_attach_shader_source(
 					warp,
 					ALLEGRO_VERTEX_SHADER,
 					warp_vertex_source
 					);
 		
-ALLEGRO_DEBUG("5 ass");
 		al_attach_shader_source(
 					shadow_shader,
 					ALLEGRO_VERTEX_SHADER,
 					default_vertex_source
 					);
 		
-ALLEGRO_DEBUG("6 ass");
 		al_attach_shader_source(
 					brighten,
 					ALLEGRO_VERTEX_SHADER,
 					default_vertex_source
 					);
-		
-ALLEGRO_DEBUG("7 ass");
+
+#ifndef A5_D3D
 		al_attach_shader_source(
 					scale2x,
 					ALLEGRO_VERTEX_SHADER,
 					scale2x_vertex_source
 					);
-		
-ALLEGRO_DEBUG("8 ass");
+#endif	
 		al_attach_shader_source(
 					default_shader,
 					ALLEGRO_PIXEL_SHADER,
 					main_pixel_source
 					);
 		
-ALLEGRO_DEBUG("9 ass");
 		al_attach_shader_source(
 					cheap_shader,
 					ALLEGRO_PIXEL_SHADER,
 					cheap_pixel_source
 					);
 		
-ALLEGRO_DEBUG("10 ass");
 		al_attach_shader_source(
 					tinter,
 					ALLEGRO_PIXEL_SHADER,
 					tinter_pixel_source
 					);
 		
-ALLEGRO_DEBUG("11 ass");
 		al_attach_shader_source(
 					warp,
 					ALLEGRO_PIXEL_SHADER,
 					warp2_pixel_source
 					);
 		
-ALLEGRO_DEBUG("12 ass");
 		al_attach_shader_source(
 					shadow_shader,
 					ALLEGRO_PIXEL_SHADER,
 					shadow_pixel_source
 					);
 		
-ALLEGRO_DEBUG("13 ass");
 		al_attach_shader_source(
 					brighten,
 					ALLEGRO_PIXEL_SHADER,
 					brighten_pixel_source
 					);
-		
-ALLEGRO_DEBUG("14 ass");
+
+#ifndef A5_D3D
 		al_attach_shader_source(
 					scale2x,
 					ALLEGRO_PIXEL_SHADER,
 					scale2x_pixel_source
 					);
-ALLEGRO_DEBUG("*** %s ***\n", al_get_shader_log(scale2x));
-		
+#endif
+
 		const char *shader_log;
 
-ALLEGRO_DEBUG("1 link");
 		al_link_shader(default_shader);
 		if ((shader_log = al_get_shader_log(default_shader))[0] != 0) {
 			printf("1. %s\n", shader_log);
 		}
-ALLEGRO_DEBUG("2 link");
 		al_link_shader(cheap_shader);
 		if ((shader_log = al_get_shader_log(cheap_shader))[0] != 0) {
 			printf("2. %s\n", shader_log);
 		}
-ALLEGRO_DEBUG("3 link");
 		al_link_shader(tinter);
 		if ((shader_log = al_get_shader_log(tinter))[0] != 0) {
 			printf("3. %s\n", shader_log);
 		}
-ALLEGRO_DEBUG("4 link");
 		al_link_shader(warp);
 		if ((shader_log = al_get_shader_log(warp))[0] != 0) {
 			printf("4. %s\n", shader_log);
 		}
-ALLEGRO_DEBUG("5 link");
 		al_link_shader(shadow_shader);
 		if ((shader_log = al_get_shader_log(shadow_shader))[0] != 0) {
 			printf("5. %s\n", shader_log);
 		}
-ALLEGRO_DEBUG("6 link");
 		al_link_shader(brighten);
 		if ((shader_log = al_get_shader_log(brighten))[0] != 0) {
 			printf("6. %s\n", shader_log);
 		}
-ALLEGRO_DEBUG("7 link");
+#ifndef A5_D3D
 		al_link_shader(scale2x);
 		if ((shader_log = al_get_shader_log(scale2x))[0] != 0) {
 			printf("7. %s\n", shader_log);
 		}
-ALLEGRO_DEBUG("8 after link");
+#endif
 		
 #ifdef A5_OGL
 		al_set_opengl_program_object(display, al_get_opengl_program_object(default_shader));
 #else
+#ifndef A5_D3D
 		al_set_direct3d_effect(display, al_get_direct3d_effect(default_shader));
+#endif
+
 #endif
 		
 	}
@@ -2689,7 +2674,7 @@ ALLEGRO_DEBUG("boo1");
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
 #endif
 #else
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888); HELLO
+	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 #endif
 
 	create_buffers();

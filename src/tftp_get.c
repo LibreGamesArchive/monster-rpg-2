@@ -1,6 +1,10 @@
 #define _WIN32_WINNT 0x0501
 #include <allegro5/allegro.h>
 
+#ifdef ALLEGRO_WINDOWS
+#define mkdir(a, b) mkdir(a)
+#endif
+
 ALLEGRO_DEBUG_CHANNEL("tftp")
 
 #ifdef ALLEGRO_ANDROID

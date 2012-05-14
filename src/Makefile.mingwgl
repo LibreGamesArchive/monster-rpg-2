@@ -53,15 +53,15 @@ CXX_SRCS=\
 CXX_LIBOBJS=$(CXX_SRCS:.cpp=.o)
 
 ALLEGROLIBS=-lallegro_shader-static -lallegro_acodec-static -lallegro_audio-static -lallegro_native_dialog-static -lallegro_primitives-static -lallegro_ttf-static -lallegro_font-static -lallegro_image-static -lallegro-static -lallegro_main-static -lallegro_memfile-static
-STATIC_LIBS=-lkernel32 -luser32 -lgdi32 -lcomdlg32 -lole32 -lwinmm -lpsapi -ldxguid -lgdiplus -luuid -lshlwapi
+STATIC_LIBS=-lkernel32 -luser32 -lgdi32 -lcomdlg32 -lole32 -lwinmm -lpsapi -ldxguid -lgdiplus -luuid -lshlwapi -lwsock32 -lws2_32
 LIBS=-llua-fixed -ltgui $(ALLEGROLIBS) -lz -lopengl32 -lwinmm -lbass -lfreetype $(STATIC_LIBS)
 
 
 default: monster2
 
 
-monster2: $(CXX_LIBOBJS) init.o atlas.o atlas_accessor.o
-	g++ $(LINKFLAGS) $(CXX_LIBOBJS) init.o atlas.o atlas_accessor.o icon.res $(LIBS) -o monster2.exe
+monster2: $(CXX_LIBOBJS) init.o atlas.o atlas_accessor.o tftp_get.o
+	g++ $(LINKFLAGS) $(CXX_LIBOBJS) init.o atlas.o atlas_accessor.o tftp_get.o icon.res $(LIBS) -o monster2.exe
 
 .cpp.o:
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS) -c $<
@@ -74,6 +74,9 @@ atlas.o: atlas.c
 
 atlas_accessor.o: atlas_accessor.c
 	$(CC) $(CFLAGS) -c atlas_accessor.c
+
+tftp_get.o: tftp_get.c
+	$(CC) $(CFLAGS) -c tftp_get.c
 
 clean:
 	-rm *.o
