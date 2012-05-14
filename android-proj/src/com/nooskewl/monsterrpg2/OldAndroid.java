@@ -62,12 +62,10 @@ public class OldAndroid
 		ByteBuffer buf;
 
 		if (res <= 0) {
-			Log.d("OldAndroid", "Using silence");
 			buf = silence;
 			res = silence.capacity();
 		}
 		else {
-			Log.d("OldAndroid", "Using SOUND");
 			buf = buffer;
 		}
 
@@ -131,9 +129,13 @@ public class OldAndroid
 		m.id = music_ids++;
 
 		if (name.substring(name.lastIndexOf(".")).equals(".flac")) {
-			Log.d("CRAP", "music name = '" + name + "'");
-			int music = BASSFLAC.BASS_FLAC_StreamCreateFile(name, 0, 0, BASS.BASS_STREAM_DECODE);
-			Log.d("CRAP", "um music is " + music);
+			int music = BASSFLAC.BASS_FLAC_StreamCreateFile(name, 0, 0, BASS.BASS_SAMPLE_LOOP | BASS.BASS_STREAM_DECODE);
+			if (music == 0) {
+				Log.e("OldAndroid", "Error loading '" + name + "'");
+				music_ids--;
+				m = null;
+				return 0;
+			}
 			BASS.BASS_ChannelSetSync(music, BASS.BASS_SYNC_END, 0, new Sync(), new Object());
 			m.mp = null;
 			m.hmusic = music;
@@ -185,6 +187,9 @@ public class OldAndroid
 			int hmusic = mps.get(idx).hmusic;
 			BASS.BASS_ChannelSetPosition(hmusic, 0, BASS.BASS_POS_BYTE);
 			BASSmix.BASS_Mixer_StreamAddChannel(mainChannel, hmusic, 0);
+			BASS.BASS_ChannelPlay(mainChannel, true);
+			BASS.BASS_ChannelPlay(hmusic, true);
+			Log.d("OldAndroid", "Add music, numFlacsPlaying=" + numFlacsPlaying);
 		}
 		else {
 			try {
@@ -204,6 +209,7 @@ public class OldAndroid
 		int idx = findMusic(music);
 		MediaPlayer mp = mps.get(idx).mp;
 		if (mp == null) {
+			BASS.BASS_ChannelPlay(mps.get(idx).hmusic, false);
 			BASSmix.BASS_Mixer_ChannelRemove(mps.get(idx).hmusic);
 		}
 		else {
@@ -220,6 +226,7 @@ public class OldAndroid
 			BASS.BASS_StreamFree(m.hmusic);
 			numFlacsPlaying--;
 			if (numFlacsPlaying <= 0) {
+				BASS.BASS_ChannelPlay(mainChannel, false);
 				track.stop();
 				track.release();
 				track = null;
