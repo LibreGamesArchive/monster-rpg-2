@@ -1,3 +1,5 @@
+logic_count = 9
+
 if (get_platform() == "iphone") then
 	music = "jungle_ambience.flac"
 	ambience = "fire.flac"
@@ -55,15 +57,20 @@ function update(step)
 	man:move(step)
 
 	-- Positional audio for the fire
-	local px, py = getObjectPosition(0)
-	local distx = math.fixtoi(math.fixabs(math.itofix(px - 10)))
-	local disty = math.fixtoi(math.fixabs(math.itofix(py - 20)))
-	local dist = math.fixsqrt(math.itofix(distx*distx+disty*disty))
-	if (math.fixtoi(dist) >= 10) then
-		set_ambience_volume(math.itofix(0))
-	else
-		local vol = math.fixsub(math.itofix(1), math.fixdiv(dist, math.itofix(10)))
-		set_ambience_volume(vol)
+	logic_count = logic_count + 1
+	if (logic_count >= 10) then
+		logic_count = 0
+
+		local px, py = getObjectPosition(0)
+		local distx = math.fixtoi(math.fixabs(math.itofix(px - 10)))
+		local disty = math.fixtoi(math.fixabs(math.itofix(py - 20)))
+		local dist = math.fixsqrt(math.itofix(distx*distx+disty*disty))
+		if (math.fixtoi(dist) >= 10) then
+			set_ambience_volume(math.itofix(0))
+		else
+			local vol = math.fixsub(math.itofix(1), math.fixdiv(dist, math.itofix(10)))
+			set_ambience_volume(vol)
+		end
 	end
 end
 

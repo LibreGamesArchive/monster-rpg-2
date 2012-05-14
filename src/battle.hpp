@@ -125,6 +125,7 @@ private:
 	std::list<CombatEntity *>::iterator insertPoint;
 	bool draw_enemy_status;
 	bool draw_player_status;
+	int fade_regulator;
 };
 
 

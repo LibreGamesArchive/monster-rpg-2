@@ -584,11 +584,23 @@ BattleResult Battle::update(int step)
 {
 	if (!manChooser && !(name == "1Golem")) {
 		if (musicFadeCount < 2000) {
+			bool go = false;
 			musicFadeCount += step;
-			if (musicFadeCount > 2000)
+			if (musicFadeCount > 2000) {
 				musicFadeCount = 2000;
-			float vol = musicFadeCount / 2000.0f;
-			setMusicVolume(vol);
+				go = true;
+			}
+			else {
+				fade_regulator++;
+				if (fade_regulator >= 10) {
+					fade_regulator = 0;
+					go = true;
+				}
+			}
+			if (go) {
+				float vol = musicFadeCount / 2000.0f;
+				setMusicVolume(vol);
+			}
 		}
 	}
 
@@ -1330,7 +1342,8 @@ Battle::Battle(std::string name, bool can_run) :
 	nextEntity(-1),
 	deleteIts(false),
 	draw_enemy_status(true),
-	draw_player_status(true)
+	draw_player_status(true),
+	fade_regulator(9)
 {
 	if (area && !player_scripted) {
 		save_memory(true);
