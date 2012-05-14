@@ -135,6 +135,103 @@ static std::string getTimeString(uint32_t runtime)
 	return std::string(s);
 }
 
+#ifdef ALLEGRO_ANDROID
+static void showMusicToggle(void)
+{
+	tguiPush();
+
+	MFrame *frame = new MFrame(SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE,
+		BW-SHADOW_CORNER_SIZE*2, BH-SHADOW_CORNER_SIZE*2);
+
+	int y = SHADOW_CORNER_SIZE+8;
+	
+	std::vector<std::string> toggle_choices;
+	toggle_choices.push_back("{027} Sound on");
+	toggle_choices.push_back("{027} SFX only");
+	toggle_choices.push_back("{027} Silence");
+	MSingleToggle *sound_toggle = new MSingleToggle(SHADOW_CORNER_SIZE+8, y, toggle_choices, false);
+	bool music_on = config.getMusicVolume();
+	bool sound_on = config.getSFXVolume();
+	if (music_on && sound_on) sound_toggle->setSelected(0);
+	else if (sound_on) sound_toggle->setSelected(1);
+	else sound_toggle->setSelected(2);
+
+	tguiSetParent(0);
+	tguiAddWidget(frame);
+	tguiSetParent(frame);
+	tguiAddWidget(sound_toggle);
+	
+	std::string startAmbienceName = ambienceName;
+
+	for (;;) {
+		al_wait_cond(wait_cond, wait_mutex);
+		// Logic
+		int tmp_counter = logic_counter;
+		logic_counter = 0;
+		if (tmp_counter > 10)
+			tmp_counter = 1;
+		while  (tmp_counter > 0) {
+			next_input_event_ready = true;
+
+			tmp_counter--;
+			if (is_close_pressed()) {
+				do_close();
+				close_pressed = false;
+			}
+		
+			int sel = sound_toggle->getSelected();
+			if (sel == 0) {
+				ambienceName = startAmbienceName;
+				config.setMusicVolume(255);
+				config.setSFXVolume(255);
+				setMusicVolume(1);
+			}
+			else if (sel == 1) {
+				config.setMusicVolume(0);
+				config.setSFXVolume(255);
+				setMusicVolume(1);
+			}
+			else {
+				config.setMusicVolume(0);
+				config.setSFXVolume(0);
+				setMusicVolume(1);
+			}
+
+			INPUT_EVENT ie = get_next_input_event();
+
+			if (ie.button2 == DOWN || iphone_shaken(0.1)) {
+				use_input_event();
+				playPreloadedSample("select.ogg");
+				iphone_clear_shaken();
+				goto done;
+			}
+
+			// update gui
+			TGUIWidget *widget = tguiUpdate();
+			if (!widget) {
+				continue;
+			}
+
+		}
+
+		if (draw_counter > 0) {
+			draw_counter = 0;
+			m_set_target_bitmap(buffer);
+			m_clear(black);
+			tguiDraw();
+			drawBufferToScreen();
+			m_flip_display();
+		}
+	}
+done:
+	tguiDeleteWidget(frame);
+
+	delete frame;
+	delete sound_toggle;
+
+	tguiPop();
+}
+#endif
 
 #ifdef ALLEGRO_IPHONE
 static void showIpodControls(void)
@@ -945,16 +1042,13 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 		mainSave = new MLabel(162+m_text_height(game_font)/2+2, yy, "Save", m_map_rgb(128, 128, 128));
 	yy += yinc;
 	MTextButton *mainResume = new MTextButton(162, yy, "Play", false, left_widget);
-#if !defined ALLEGRO_IPHONE
-	#ifdef ALLEGRO_ANDROID
-	if (!use_dpad)
-	#endif
-		yy += yinc;
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	yy += yinc;
 #endif
 	MTextButton *mainQuit = new MTextButton(162, yy, "Quit", false, left_widget);
 	yy += yinc;
 	MTextButton *mainLevelUp = new MTextButton(162, yy, "Cheat", false, left_widget);
-#if defined ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	MTextButton *mainMusic = new MTextButton(162, yy, "Music", false, left_widget);
 #endif
 
@@ -1039,11 +1133,8 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	tguiAddWidget(mainExamine);
 	#endif
 	tguiAddWidget(mainSave);
-#if !defined ALLEGRO_IPHONE
-	#ifdef ALLEGRO_ANDROID
-	if (!use_dpad)
-	#endif
-		tguiAddWidget(mainResume);
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	tguiAddWidget(mainResume);
 #endif
 	tguiAddWidget(mainQuit);
 #ifdef ALLEGRO_IPHONE
@@ -1051,7 +1142,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	tguiAddWidget(mainLevelUp);
 #endif
 #endif
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	tguiAddWidget(mainMusic);
 #endif
 
@@ -1481,10 +1572,14 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				tguiSetFocus(mainLevelUp);
 				section = MAIN;
 			}
-#if defined ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			else if (widget == mainMusic) {
 				getInput()->set(false, false, false, false, false, false, false);
+#ifdef ALLEGRO_IPHONE
 				showIpodControls();
+#else
+				showMusicToggle();
+#endif
 				tguiSetFocus(mainMusic);
 				section = MAIN;
 			}
