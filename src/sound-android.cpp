@@ -162,7 +162,7 @@ void playAmbience_oldandroid(std::string name, float vol)
 	if (is_flac) {
 		al_set_standard_file_interface();
 	}
-	ambience = bass_loadMusic(getResource("music/%s", name.c_str()));
+	ambience = bass_loadMusic(name.c_str());
 	if (is_flac) {
 		al_set_apk_file_interface();
 	}
