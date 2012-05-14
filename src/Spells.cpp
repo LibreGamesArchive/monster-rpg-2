@@ -114,7 +114,7 @@ static Spell *SludgeFactory(void)
 static Spell *RendFactory(void)
 {
 	loadPlayDestroy("Rend.ogg");
-	return new RendSpell(175);
+	return new RendSpell(170);
 }
 
 static Spell *StompFactory(void)
