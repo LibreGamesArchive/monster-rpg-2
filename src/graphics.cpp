@@ -567,7 +567,7 @@ static void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 
 #if defined ALLEGRO_IPHONE
 	if (airplay_connected) {
-		config.setFilterType(FILTER_NONE);
+		//config.setFilterType(FILTER_NONE);
 	}
 #endif
 	

@@ -122,18 +122,22 @@ void connect_second_display(void)
 	al_set_new_display_flags(flags);
 	init_shaders();
 	init2_shaders();
+	ScreenDescriptor *sd = config.getWantedGraphicsMode();
+	sd->width = al_get_display_width(display);
+	sd->height = al_get_display_height(display);
 
 	al_set_new_display_adapter(0);
-	ScreenDescriptor *sd = config.getWantedGraphicsMode();
 	int flgs = al_get_new_display_flags();
-	al_set_new_display_flags(flgs & ~ALLEGRO_USE_PROGRAMMABLE_PIPELINE);
-	controller_display = al_create_display(sd->height, sd->width);
+	al_set_new_display_flags((flgs & ~ALLEGRO_USE_PROGRAMMABLE_PIPELINE) | ALLEGRO_FULLSCREEN_WINDOW);
+	controller_display = al_create_display(1, 1);
 	al_set_new_display_flags(flgs);
 	register_display(controller_display);
 	//init_controller_shader();
+	int w = al_get_display_width(controller_display);
+	int h = al_get_display_height(controller_display);
 	ALLEGRO_TRANSFORM scale;
 	al_identity_transform(&scale);
-	al_scale_transform(&scale, sd->height/960.0, sd->width/640.0);
+	al_scale_transform(&scale, w/960.0, h/640.0);
 	al_use_transform(&scale);
 	int format = al_get_new_bitmap_format();
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
@@ -155,6 +159,8 @@ void connect_second_display(void)
 	setMusicVolume(1);
 
 	airplay_connected = true;
+	
+	glDisable(GL_DITHER);
 #endif
 }
 
@@ -377,11 +383,16 @@ bool is_close_pressed(void)
 			
 			al_set_new_display_adapter(0);
 			al_set_new_display_option(ALLEGRO_AUTO_CONVERT_BITMAPS, 1, ALLEGRO_REQUIRE);
-			ScreenDescriptor *sd = config.getWantedGraphicsMode();
-			display = al_create_display(sd->height, sd->width);
+			int flags = al_get_new_display_flags();
+			al_set_new_display_flags(flags | ALLEGRO_FULLSCREEN_WINDOW);
+			display = al_create_display(1, 1);
+			al_set_new_display_flags(flags);
 			register_display(display);
 			init_shaders();
 			init2_shaders();
+			ScreenDescriptor *sd = config.getWantedGraphicsMode();
+			sd->width = al_get_display_width(display);
+			sd->height = al_get_display_height(display);
 	
 			_reload_loaded_bitmaps();
 			
@@ -392,6 +403,8 @@ bool is_close_pressed(void)
 			setMusicVolume(1);
 			
 			airplay_connected = false;
+			
+			glDisable(GL_DITHER);
 		}
 	}
 #endif

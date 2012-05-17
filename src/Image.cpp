@@ -1,4 +1,4 @@
-	#include "monster2.hpp"
+#include "monster2.hpp"
 
 ALLEGRO_BITMAP *cached_bitmap = NULL;
 std::string cached_bitmap_filename = "";

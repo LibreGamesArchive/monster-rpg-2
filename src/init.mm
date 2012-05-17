@@ -2385,7 +2385,7 @@ bool init(int *argc, char **argv[])
 	al_set_new_display_flags(flags);
 
 #ifdef ALLEGRO_ANDROID
-	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_SUGGEST);
+	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_SUGGEST);
 	/*
 	al_set_new_display_option(ALLEGRO_RED_SIZE, 8, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_GREEN_SIZE, 8, ALLEGRO_REQUIRE);
@@ -2489,6 +2489,7 @@ bool init(int *argc, char **argv[])
 	display = al_create_display(800, 500);
 #else
 	display = al_create_display(sd->width, sd->height);
+#if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE
 	if (!display) {
 		safemode = true;
 		flags &= ~ALLEGRO_FULLSCREEN;
@@ -2499,6 +2500,14 @@ bool init(int *argc, char **argv[])
 			display = al_create_display(480, 320);
 		}
 	}
+#endif
+
+#if defined ALLEGRO_ANDROID
+	if (!display) {
+		al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_SUGGEST);
+		display = al_create_display(sd->width, sd->height);
+	}
+#endif
 	
 #endif
 	if (!display) {

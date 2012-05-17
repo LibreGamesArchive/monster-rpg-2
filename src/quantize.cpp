@@ -4,6 +4,8 @@
 
 #include "monster2.hpp"
 
+#if 0
+
 #include <map>
 #include <vector>
 #include <algorithm>
@@ -314,3 +316,4 @@ bool upload_paletted_image(ALLEGRO_BITMAP *bitmap, void *data)
 	return true;
 }
 
+#endif
