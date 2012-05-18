@@ -204,7 +204,7 @@ bool native_error(const char *msg)
 	char buf[1000];
 	const char *crap = "Error";
 	sprintf(buf, "%s. Continue anyway?", msg);
-	int button = al_show_native_message_box(display, crap, NULL, buf, NULL, ALLEGRO_MESSAGEBOX_YES_NO);
+	int button = al_show_native_message_box(display, crap, ":(", buf, NULL, ALLEGRO_MESSAGEBOX_YES_NO);
 	if (button == 1) return true;
 	else return false;
 #else
