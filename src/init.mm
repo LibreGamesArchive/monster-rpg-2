@@ -2488,6 +2488,7 @@ bool init(int *argc, char **argv[])
 #ifdef EDITOR
 	display = al_create_display(800, 500);
 #else
+
 	display = al_create_display(sd->width, sd->height);
 #if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE
 	if (!display) {
@@ -2509,7 +2510,6 @@ bool init(int *argc, char **argv[])
 	}
 #endif
 	
-#endif
 	if (!display) {
 		if (!native_error("Failed to set gfx mode"))
 			return false;
@@ -3112,7 +3112,10 @@ void toggle_fullscreen(void)
 	sd->fullscreen = !sd->fullscreen;
 #ifdef A5_D3D
 	is_fs_toggle = true;
-	big_depth_surface->Release();
+	bool depth_surface_inited = big_depth_surface != NULL;
+	if (depth_surface_inited) {
+		big_depth_surface->Release();
+	}
 	_destroy_loaded_bitmaps();
 #endif
 	al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, config.getWantedGraphicsMode()->fullscreen);
@@ -3121,7 +3124,9 @@ void toggle_fullscreen(void)
 #endif
 	set_screen_params();
 #ifdef A5_D3D
-	init_big_depth_surface();
+	if (depth_surface_inited) {
+		init_big_depth_surface();
+	}
 	shooter_restoring = true;
 	is_fs_toggle = false;
 #endif
