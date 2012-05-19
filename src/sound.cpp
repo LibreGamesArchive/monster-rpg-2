@@ -236,9 +236,13 @@ old:
 
 	if (!BASS_Init(-1, 44100, 0, NULL, NULL)) {
 		int code = BASS_ErrorGetCode();
-		ALLEGRO_DEBUG("BASS_Init failed (%d). Falling back", code);
+		ALLEGRO_DEBUG("BASS_Init failed (%d). Failing or falling back", code);
+#ifdef ALLEGRO_ANDROID
 		is_android_lessthan_2_3 = true;
 		goto old;
+#else
+		return;
+#endif
 	}
 
 #if defined ALLEGRO_WINDOWS
