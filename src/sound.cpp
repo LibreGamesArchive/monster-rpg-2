@@ -218,6 +218,7 @@ void initSound(void)
 		total_samples++;
 	}
 
+old:
 #ifdef ALLEGRO_ANDROID
 	if (is_android_lessthan_2_3) {
 		initSound_oldandroid();
@@ -232,9 +233,12 @@ void initSound(void)
 	fileprocs.seek = my_seek;
 #endif
 
+
 	if (!BASS_Init(-1, 44100, 0, NULL, NULL)) {
-		sound_inited = false;
-		return;
+		int code = BASS_ErrorGetCode();
+		ALLEGRO_DEBUG("BASS_Init failed (%d). Falling back", code);
+		is_android_lessthan_2_3 = true;
+		goto old;
 	}
 
 #if defined ALLEGRO_WINDOWS
@@ -254,7 +258,7 @@ void initSound(void)
 #endif
 
 	if (!BASSFLACplugin) {
-		printf("Error loading FLAC plugin (%d)\n", BASS_ErrorGetCode());
+		ALLEGRO_DEBUG("Error loading FLAC plugin (%d)\n", BASS_ErrorGetCode());
 	}
 }
 
@@ -338,6 +342,10 @@ MSAMPLE loadSample(std::string name)
 		fn,
 		0, 0, 8,
 		BASS_SAMPLE_MONO|BASS_SAMPLE_OVER_POS);
+	
+	if (s == 0) {
+		ALLEGRO_DEBUG("s=0 error code %d", BASS_ErrorGetCode());
+	}
 #else
 	s = BASS_SampleLoad(false,
 		getResource("sfx/%s", name.c_str()),
@@ -457,6 +465,9 @@ void playMusic(std::string name, float vol, bool force)
 		&fileprocs,
 		(void *)f
 	);
+
+	if (music == 0)
+		ALLEGRO_DEBUG("music == 0 error code=%d", BASS_ErrorGetCode());
 #else
 	music = BASS_StreamCreateFile(false,
 		name.c_str(),

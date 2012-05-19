@@ -2509,7 +2509,9 @@ bool init(int *argc, char **argv[])
 		display = al_create_display(sd->width, sd->height);
 	}
 #endif
-	
+
+#endif
+
 	if (!display) {
 		if (!native_error("Failed to set gfx mode"))
 			return false;
