@@ -1817,7 +1817,6 @@ void SludgeEffect::draw()
 			size = depths[i] * ((float)n / FALLOFF_SIZE);
 		else
 			size = depths[i];
-		int drawn = 0;
 
 		int startx, endx, xinc;
 

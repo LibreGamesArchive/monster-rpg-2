@@ -1,8 +1,8 @@
 music = "underground.ogg"
 
 enemies = {}
-enemies[0] = "1Fiend2Leechs"
-enemies[1] = "2Wolves"
+enemies[0] = "2Wolves"
+enemies[1] = "1Fiend2Leechs"
 enemies[2] = "3Weepers"
 enemies[3] = "1Spider"
 

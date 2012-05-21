@@ -1299,7 +1299,6 @@ void CombatEnemyTode::draw(void)
 			}
 			else {
 				MBITMAP *bmp = whiteAnimSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
-				float brightness = 0.7;
 				m_draw_bitmap(bmp, ox+x-(w/2), oy+y-h, flags);
 			}
 		}

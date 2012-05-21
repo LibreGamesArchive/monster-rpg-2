@@ -675,6 +675,10 @@ void m_destroy_bitmap(MBITMAP *bmp, bool internals_only)
 
 void m_flip_display(void)
 {
+//	al_clear_to_color(al_map_rgb(rand()%255, 0, rand()%255));
+//	al_flip_display();
+//	al_rest(100);
+
 	al_flip_display();
 
 	if (controller_display)

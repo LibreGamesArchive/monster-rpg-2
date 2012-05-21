@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		960260321568CC52006F7CB9 /* data in Resources */ = {isa = PBXBuildFile; fileRef = 960260311568CC52006F7CB9 /* data */; };
+		960260341568CC9B006F7CB9 /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 960260311568CC52006F7CB9 /* data */; };
 		9609BD4D13636DE60068EB38 /* translate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D175A713351F06008462BB /* translate.cpp */; };
 		9609BD4E13636DE60068EB38 /* Area.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9617A2DD11663E3D00E97A78 /* Area.cpp */; };
 		9609BD4F13636DE70068EB38 /* iphone.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9639C4351152D3A900804984 /* iphone.mm */; };
@@ -122,7 +124,6 @@
 		9659CDA4143A42C50007757E /* joypad_handler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA3143A42C50007757E /* joypad_handler.m */; };
 		9659CDB1143A4E570007757E /* libJoypadCocoaTouch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9659CDB0143A4E560007757E /* libJoypadCocoaTouch.a */; };
 		965C7FA71526804800AD9919 /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 965C7FA61526804800AD9919 /* data */; };
-		966E2381148D80030056951D /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 966E2380148D80030056951D /* data */; };
 		967976AC13BE8690006BCE29 /* init.mm in Sources */ = {isa = PBXBuildFile; fileRef = 967976AB13BE8690006BCE29 /* init.mm */; };
 		968BA9351481E98000F768C5 /* init.mm in Sources */ = {isa = PBXBuildFile; fileRef = 967976AB13BE8690006BCE29 /* init.mm */; };
 		968BA9361481E98000F768C5 /* atlas_accessor.c in Sources */ = {isa = PBXBuildFile; fileRef = 968C1E5E13BBE28800615225 /* atlas_accessor.c */; };
@@ -362,13 +363,14 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
-				966E2381148D80030056951D /* data in CopyFiles */,
+				960260341568CC9B006F7CB9 /* data in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		960260311568CC52006F7CB9 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = "../../pc-data/data"; sourceTree = "<group>"; };
 		9609BD2513636B4F0068EB38 /* MoRPG2-lite.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MoRPG2-lite.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9609BD7413636EDE0068EB38 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		9609BD7513636EDE0068EB38 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
@@ -466,7 +468,6 @@
 		9659CDAF143A4E560007757E /* JoypadSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JoypadSDK.h; path = ../../../../Downloads/JoypadSDKs/iOS/JoypadCocoaTouchSDK/JoypadSDK.h; sourceTree = "<group>"; };
 		9659CDB0143A4E560007757E /* libJoypadCocoaTouch.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libJoypadCocoaTouch.a; path = ../../../../Downloads/JoypadSDKs/iOS/JoypadCocoaTouchSDK/libJoypadCocoaTouch.a; sourceTree = "<group>"; };
 		965C7FA61526804800AD9919 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = "../../iphone-data/data"; sourceTree = "<group>"; };
-		966E2380148D80030056951D /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = ../../fulldatapc/data; sourceTree = "<group>"; };
 		96789CB814831C8D003F393D /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = ../../fulldataios/data; sourceTree = "<group>"; };
 		967976AB13BE8690006BCE29 /* init.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = init.mm; path = ../../src/init.mm; sourceTree = "<group>"; };
 		968BA97D1481E98000F768C5 /* Monster RPG 2 Lite.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Monster RPG 2 Lite.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -720,6 +721,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				960260331568CC5C006F7CB9 /* Mac data */,
 				9629BBB81557C5AA009EAD48 /* quantize.cpp */,
 				9629BBB91557C5AA009EAD48 /* quantize.hpp */,
 				960DB4A1154C8341000869BD /* SystemConfiguration.framework */,
@@ -740,7 +742,6 @@
 				965C7FA61526804800AD9919 /* data */,
 				9631BB8F151E220A00CE43D0 /* libphysfs_xcode.a */,
 				96A460A6151D836A001BC99C /* libAllegro.a */,
-				966E2380148D80030056951D /* data */,
 				96789CB714831C72003F393D /* full data ios */,
 				968BA9801481EB9900F768C5 /* lite data pc */,
 				9638490E1481A7BA000F7B07 /* lite data ios */,
@@ -889,6 +890,14 @@
 				96ED3258136349520057B4C7 /* Monster_2-Info.plist */,
 			);
 			name = Resources;
+			sourceTree = "<group>";
+		};
+		960260331568CC5C006F7CB9 /* Mac data */ = {
+			isa = PBXGroup;
+			children = (
+				960260311568CC52006F7CB9 /* data */,
+			);
+			name = "Mac data";
 			sourceTree = "<group>";
 		};
 		960DB487154C82C3000869BD /* NetworkingSupport */ = {
@@ -1193,6 +1202,7 @@
 				9659CD9A143A2A030007757E /* Icon@2x.png in Resources */,
 				9659CD9B143A2A030007757E /* iTunesArtwork in Resources */,
 				960EFA45153697B8008A2033 /* SBGamepad.bundle in Resources */,
+				960260321568CC52006F7CB9 /* data in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
