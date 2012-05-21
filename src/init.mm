@@ -2176,6 +2176,11 @@ void init_shaders(void)
 		
 #ifdef A5_OGL
 		al_set_opengl_program_object(display, al_get_opengl_program_object(default_shader));
+		ALLEGRO_TRANSFORM tr;
+		al_identity_transform(&tr);
+		al_use_transform(&tr);
+		al_ortho_transform(&tr, 0, al_get_display_width(display), al_get_display_height(display), 0, -1, 1);
+		al_set_projection_transform(display, &tr);
 #else
 #ifndef A5_D3D
 		al_set_direct3d_effect(display, al_get_direct3d_effect(default_shader));
@@ -2517,6 +2522,30 @@ bool init(int *argc, char **argv[])
 			return false;
 	}
 
+/*
+// FIXME
+	init_shaders();
+
+	ALLEGRO_BITMAP *b = al_load_bitmap(getResource("media/check.tga"));
+
+	al_set_shader(display, cheap_shader);
+	al_set_shader_sampler(cheap_shader, "tex", b, 0);
+	al_use_shader(cheap_shader, true);
+
+	ALLEGRO_TRANSFORM tr;
+	al_identity_transform(&tr);
+	al_use_transform(&tr);
+	al_ortho_transform(&tr, 0, 240, 160, 0, -1, 1);
+	al_set_projection_transform(display, &tr);
+	
+	al_draw_bitmap(b, 0, 0, 0);
+	
+//	al_clear_to_color(al_map_rgb(0, 0, 255));
+	al_flip_display();
+	al_rest(100);
+*/
+
+	
 #if 0
 // FIXME
 // FIXME
