@@ -1,4 +1,3 @@
-
 #if defined __APPLE__
 #import <Foundation/Foundation.h>
 #endif
@@ -41,12 +40,7 @@ void load_fonts(void)
 {
 	int ttf_flags;
 
-	if (config.getFilterType() == FILTER_SCALE2X) {
-		ttf_flags = 0;
-	}
-	else {
-		ttf_flags = ALLEGRO_TTF_MONOCHROME;
-	}
+	ttf_flags = ALLEGRO_TTF_MONOCHROME;
 
 	ALLEGRO_DEBUG("loading fonts");
 
@@ -1107,8 +1101,16 @@ static void *thread_proc(void *arg)
 				
 				event_mouse_x = this_x;
 				event_mouse_y = this_y;
-				
+
+#ifdef ALLEGRO_IPHONE
+				if (airplay_connected) {
+					this_x = ((float)this_x / al_get_display_width(controller_display)) * 240;
+					this_y = ((float)this_y / al_get_display_height(controller_display)) * 160;
+				}
+				else if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN)
+#else
 				if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN)
+#endif
 					tguiConvertMousePosition(&this_x, &this_y, 0, 0, screen_ratio_x, screen_ratio_y);
 				else
 					tguiConvertMousePosition(&this_x, &this_y, screen_offset_x, screen_offset_y, 1, 1);

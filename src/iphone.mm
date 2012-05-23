@@ -98,6 +98,7 @@ void showIpod(void)
 
 	std::map<std::string, Artist> artists;
 
+//
 	MPMediaQuery *query = [MPMediaQuery albumsQuery];
 	NSArray *array = [query items];
 	int num = [array count];
@@ -108,24 +109,42 @@ void showIpod(void)
 		sprintf(track, "%02d", [track_o intValue]);
 		NSString *album = [m valueForProperty:MPMediaItemPropertyAlbumTitle];
 		const char *album_c = [album UTF8String];
+		char *album_a;
+		if (album_c)
+		   album_a = strdup(album_c);
+		else
+		   album_a = strdup("???");
 		NSString *artist = [m valueForProperty:MPMediaItemPropertyArtist];
 		const char *artist_c = [artist UTF8String];
+		char *artist_a;
+		if (artist_c)
+		   artist_a = strdup(artist_c);
+		else
+		   artist_a = strdup("???");
 		NSString *title = [m valueForProperty:MPMediaItemPropertyTitle];
 		const char *title_c = [title UTF8String];
+		char *title_a;
+		if (title_c)
+		   title_a = strdup(title_c);
+		else
+		   title_a = strdup("???");
 
-		all_names.push_back(std::string(title_c));
+		all_names.push_back(std::string(title_a));
 		all_toggled.push_back(false);
 
-		if (!artists.count(std::string(artist_c))) {
+		if (!artists.count(std::string(artist_a))) {
 			Artist a;
-			artists[std::string(artist_c)] = a;
+			artists[std::string(artist_a)] = a;
 		}
-		if (!artists[std::string(artist_c)].albums.count(std::string(album_c))) {
+		if (!artists[std::string(artist_a)].albums.count(std::string(album_a))) {
 			Album a;
-			artists[std::string(artist_c)].albums[std::string(album_c)] = a;
+			artists[std::string(artist_a)].albums[std::string(album_a)] = a;
 		}
-		artists[std::string(artist_c)].albums[std::string(album_c)].songs.push_back(std::string(track) + " " + std::string(title_c));
-		artists[std::string(artist_c)].albums[std::string(album_c)].song_overall_num.push_back(i);
+		artists[std::string(artist_a)].albums[std::string(album_a)].songs.push_back(std::string(track) + " " + std::string(title_a));
+		artists[std::string(artist_a)].albums[std::string(album_a)].song_overall_num.push_back(i);
+		free(album_a);
+		free(artist_a);
+		free(title_a);
 	}
 	
 	// Sort songs per album

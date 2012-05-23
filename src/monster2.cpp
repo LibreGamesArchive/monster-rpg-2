@@ -105,7 +105,6 @@ void disconnect_airplay_controls(void)
 void connect_second_display(void)
 {
 #ifdef ALLEGRO_IPHONE
-		
 	int mvol = config.getMusicVolume();
 	int svol = config.getSFXVolume();
 
@@ -122,9 +121,12 @@ void connect_second_display(void)
 	al_set_new_display_flags(flags);
 	init_shaders();
 	init2_shaders();
+	/*
 	ScreenDescriptor *sd = config.getWantedGraphicsMode();
 	sd->width = al_get_display_width(display);
 	sd->height = al_get_display_height(display);
+	*/
+	set_screen_params();
 
 	al_set_new_display_adapter(0);
 	int flgs = al_get_new_display_flags();
@@ -379,8 +381,9 @@ bool is_close_pressed(void)
 			controller_display = NULL;
 			
 			destroy_shaders();
+
 			al_destroy_display(display);
-			
+
 			al_set_new_display_adapter(0);
 			al_set_new_display_option(ALLEGRO_AUTO_CONVERT_BITMAPS, 1, ALLEGRO_REQUIRE);
 			int flags = al_get_new_display_flags();
@@ -390,9 +393,12 @@ bool is_close_pressed(void)
 			register_display(display);
 			init_shaders();
 			init2_shaders();
+			/*
 			ScreenDescriptor *sd = config.getWantedGraphicsMode();
 			sd->width = al_get_display_width(display);
 			sd->height = al_get_display_height(display);
+			*/
+			set_screen_params();
 	
 			_reload_loaded_bitmaps();
 			
