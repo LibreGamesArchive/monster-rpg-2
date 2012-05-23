@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		960260321568CC52006F7CB9 /* data in Resources */ = {isa = PBXBuildFile; fileRef = 960260311568CC52006F7CB9 /* data */; };
 		960260341568CC9B006F7CB9 /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 960260311568CC52006F7CB9 /* data */; };
 		9609BD4D13636DE60068EB38 /* translate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D175A713351F06008462BB /* translate.cpp */; };
 		9609BD4E13636DE60068EB38 /* Area.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9617A2DD11663E3D00E97A78 /* Area.cpp */; };
@@ -107,6 +106,7 @@
 		96224298103D96D400756C5B /* xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224274103D96D400756C5B /* xml.cpp */; };
 		9629BBBA1557C5AA009EAD48 /* quantize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9629BBB81557C5AA009EAD48 /* quantize.cpp */; };
 		9629BBBB1557C6E8009EAD48 /* quantize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9629BBB81557C5AA009EAD48 /* quantize.cpp */; };
+		962A7A03156C2C9400AB1B41 /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 962A7A02156C2C9400AB1B41 /* data */; };
 		9631BB90151E220A00CE43D0 /* libphysfs_xcode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9631BB8F151E220A00CE43D0 /* libphysfs_xcode.a */; };
 		9638490A1481A67B000F7B07 /* libJoypadCocoaTouch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9659CDB0143A4E560007757E /* libJoypadCocoaTouch.a */; };
 		9638490B1481A6B9000F7B07 /* joypad.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA0143A426C0007757E /* joypad.mm */; };
@@ -123,7 +123,6 @@
 		9659CDA1143A426C0007757E /* joypad.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA0143A426C0007757E /* joypad.mm */; };
 		9659CDA4143A42C50007757E /* joypad_handler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA3143A42C50007757E /* joypad_handler.m */; };
 		9659CDB1143A4E570007757E /* libJoypadCocoaTouch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9659CDB0143A4E560007757E /* libJoypadCocoaTouch.a */; };
-		965C7FA71526804800AD9919 /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 965C7FA61526804800AD9919 /* data */; };
 		967976AC13BE8690006BCE29 /* init.mm in Sources */ = {isa = PBXBuildFile; fileRef = 967976AB13BE8690006BCE29 /* init.mm */; };
 		968BA9351481E98000F768C5 /* init.mm in Sources */ = {isa = PBXBuildFile; fileRef = 967976AB13BE8690006BCE29 /* init.mm */; };
 		968BA9361481E98000F768C5 /* atlas_accessor.c in Sources */ = {isa = PBXBuildFile; fileRef = 968C1E5E13BBE28800615225 /* atlas_accessor.c */; };
@@ -321,7 +320,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
-				965C7FA71526804800AD9919 /* data in CopyFiles */,
+				962A7A03156C2C9400AB1B41 /* data in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -447,6 +446,7 @@
 		96224274103D96D400756C5B /* xml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = xml.cpp; path = ../../src/xml.cpp; sourceTree = SOURCE_ROOT; };
 		9629BBB81557C5AA009EAD48 /* quantize.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quantize.cpp; path = ../../src/quantize.cpp; sourceTree = "<group>"; };
 		9629BBB91557C5AA009EAD48 /* quantize.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quantize.hpp; path = ../../src/quantize.hpp; sourceTree = "<group>"; };
+		962A7A02156C2C9400AB1B41 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = "../../pc-data/data"; sourceTree = "<group>"; };
 		9631BB8F151E220A00CE43D0 /* libphysfs_xcode.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libphysfs_xcode.a; path = ../../../iphone_libs_r/libphysfs_xcode.a; sourceTree = "<group>"; };
 		9638490F1481A7DC000F7B07 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = ../../litedataios/data; sourceTree = "<group>"; };
 		9639C4351152D3A900804984 /* iphone.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = iphone.mm; path = ../../src/iphone.mm; sourceTree = SOURCE_ROOT; };
@@ -721,6 +721,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				962A7A02156C2C9400AB1B41 /* data */,
 				960260331568CC5C006F7CB9 /* Mac data */,
 				9629BBB81557C5AA009EAD48 /* quantize.cpp */,
 				9629BBB91557C5AA009EAD48 /* quantize.hpp */,
@@ -1202,7 +1203,6 @@
 				9659CD9A143A2A030007757E /* Icon@2x.png in Resources */,
 				9659CD9B143A2A030007757E /* iTunesArtwork in Resources */,
 				960EFA45153697B8008A2033 /* SBGamepad.bundle in Resources */,
-				960260321568CC52006F7CB9 /* data in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
