@@ -82,7 +82,6 @@ void loadIcons(MBITMAP *bmp, RecreateData *data)
 				pos[i*4+2], pos[i*4+3]
 			)
 		);
-		ALLEGRO_DEBUG("icons[%d]=%p", i, icons[i]);
 	}
 }
 

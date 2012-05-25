@@ -170,7 +170,7 @@ void save_memory(bool save_screenshot)
 #endif
 		al_save_bitmap(getUserResource("auto0.bmp"), screenshot->bitmap);
 #ifdef ALLEGRO_ANDROID
-		al_set_apk_file_interface();
+		al_android_set_apk_file_interface();
 #endif
 	}
 #endif

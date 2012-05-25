@@ -54,7 +54,7 @@ void load_fonts(void)
 	al_set_standard_file_interface();
 	//game_font = al_load_ttf_font(boofer, 9, ttf_flags);
 	game_font = al_load_ttf_font("/mnt/sdcard/removable_sdcard/DejaVuSans.ttf", 9, ttf_flags);
-	al_set_apk_file_interface();
+	al_android_set_apk_file_interface();
 #endif
 	if (!game_font) {
 		if (!native_error("Failed to load game_font"))
@@ -753,7 +753,6 @@ static void *thread_proc(void *arg)
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	al_register_event_source(events, al_get_joystick_event_source());
 #endif
-	
 	draw_timer = al_create_timer(1.0/config.getTargetFPS());
 	logic_timer = al_create_timer(1.0/LOGIC_RATE);
 	
@@ -1322,7 +1321,7 @@ static void *loader_proc(void *arg)
 #endif
 
 #ifdef ALLEGRO_ANDROID
-	al_set_apk_file_interface();
+	al_android_set_apk_file_interface();
 #endif
 
 #ifdef A5_OGL
@@ -1430,7 +1429,7 @@ static void *loader_proc(void *arg)
 	switch_mutex = al_create_mutex();
 	
 	joypad_mutex = al_create_mutex_recursive();
-	
+
 	m_push_target_bitmap();
 	m_save_blender();
 	orb_bmp = m_create_alpha_bitmap(80, 80);
@@ -1459,8 +1458,7 @@ static void *loader_proc(void *arg)
 	m_restore_blender();
 	m_pop_target_bitmap();
 
-	show_progress(95);
-
+	// FIXME
 	al_run_detached_thread(thread_proc, NULL);
 	m_rest(0.5);
 
@@ -1477,6 +1475,8 @@ static void *loader_proc(void *arg)
 	loading_done = true;
 
 	m_destroy_bitmap(deter_display_access_bmp);
+	
+	show_progress(95);
 
 	return NULL;
 }
@@ -2265,6 +2265,14 @@ void create_buffers(void)
 	al_set_new_bitmap_flags(flags);
 }
 
+// FIXME FIXME FIXME FIXME FIXME
+#ifdef ALLEGRO_ANDROID
+int my_crap_atexit(void (*crap)(void))
+{
+	return 0;
+}
+#endif
+
 bool init(int *argc, char **argv[])
 {
 	myArgc = *argc;
@@ -2292,9 +2300,11 @@ bool init(int *argc, char **argv[])
 		use_fixed_pipeline = true;
 #endif
 
+#ifdef ALLEGRO_ANDROID
+	al_install_system(ALLEGRO_VERSION_INT, NULL);
+#else
 	al_init();
-
-	debug_message("after al_init 1");
+#endif
 
 #if !defined ALLEGRO_IPHONE
 	al_set_org_name("Nooskewl");
@@ -2307,7 +2317,7 @@ bool init(int *argc, char **argv[])
 
 	debug_message("after set_app/org_name");
 
-	// must be before al_set_apk_file_interface
+	// must be before al_android_set_apk_file_interface
 	try {
 		// FIXME!
 		//debug_message("NOT READING CONFIG!!!!!!!!!!!!!!!!!!!");
@@ -2319,7 +2329,7 @@ bool init(int *argc, char **argv[])
 	debug_message("config read");
 
 #ifdef ALLEGRO_ANDROID
-	al_set_apk_file_interface();
+	al_android_set_apk_file_interface();
 #endif
 
 	debug_message("apk interface set");
@@ -2392,13 +2402,8 @@ bool init(int *argc, char **argv[])
 	al_set_new_display_flags(flags);
 
 #ifdef ALLEGRO_ANDROID
-	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_SUGGEST);
-	/*
-	al_set_new_display_option(ALLEGRO_RED_SIZE, 8, ALLEGRO_REQUIRE);
-	al_set_new_display_option(ALLEGRO_GREEN_SIZE, 8, ALLEGRO_REQUIRE);
-	al_set_new_display_option(ALLEGRO_BLUE_SIZE, 8, ALLEGRO_REQUIRE);
-	al_set_new_display_option(ALLEGRO_ALPHA_SIZE, 0, ALLEGRO_REQUIRE);
-	*/
+	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_REQUIRE);
+	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 0, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_RED_SIZE, 5, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_GREEN_SIZE, 6, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_BLUE_SIZE, 5, ALLEGRO_REQUIRE);
@@ -2512,8 +2517,29 @@ bool init(int *argc, char **argv[])
 
 #if defined ALLEGRO_ANDROID
 	if (!display) {
-		al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_SUGGEST);
-		display = al_create_display(sd->width, sd->height);
+		const int N = 7;
+		const int S = 5;
+		int totry[N][S] = {
+			{ 16, 0, 8, 8, 8 },
+			{ 16, 8, 5, 6, 5 },
+			{ 16, 8, 8, 8, 8 },
+			{ 24, 0, 5, 6, 5 },
+			{ 24, 0, 8, 8, 8 },
+			{ 24, 8, 5, 6, 5 },
+			{ 24, 8, 8, 8, 8 }
+		};
+		for (int i = 0; i < N; i++) {
+			al_set_new_display_option(ALLEGRO_DEPTH_SIZE, totry[i][0], ALLEGRO_REQUIRE);
+			al_set_new_display_option(ALLEGRO_STENCIL_SIZE, totry[i][1], ALLEGRO_REQUIRE);
+			al_set_new_display_option(ALLEGRO_RED_SIZE, totry[i][2], ALLEGRO_REQUIRE);
+			al_set_new_display_option(ALLEGRO_GREEN_SIZE, totry[i][3], ALLEGRO_REQUIRE);
+			al_set_new_display_option(ALLEGRO_BLUE_SIZE, totry[i][4], ALLEGRO_REQUIRE);
+			al_set_new_display_option(ALLEGRO_ALPHA_SIZE, 0, ALLEGRO_REQUIRE);
+			display = al_create_display(sd->width, sd->height);
+			if (display) {
+				break;
+			}
+		}
 	}
 #endif
 
@@ -2657,7 +2683,11 @@ ALLEGRO_DEBUG("boo1");
 		use_programmable_pipeline = al_get_display_flags(display) & ALLEGRO_USE_PROGRAMMABLE_PIPELINE;
 	}
 
+	ALLEGRO_DEBUG("initing shaders");
+
 	init_shaders();
+
+	ALLEGRO_DEBUG("done initing shaders");
 
 	if (al_install_joystick()) {
 		set_user_joystick();
@@ -2732,8 +2762,6 @@ ALLEGRO_DEBUG("boo1");
 
 	init2_shaders();
 	
-	ALLEGRO_DEBUG("format way way before = %d\n", al_get_new_bitmap_format());
-
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGBA_4444);
 #elif defined A5_OGL
@@ -2742,8 +2770,6 @@ ALLEGRO_DEBUG("boo1");
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 #endif
 	
-	ALLEGRO_DEBUG("format way before = %d\n", al_get_new_bitmap_format());
-
 	if (!buffer) {
 		if (!native_error("Failed to create buffer"))
 			return false;
@@ -2769,7 +2795,6 @@ ALLEGRO_DEBUG("boo1");
 	bar_loader = m_load_bitmap(getResource("media/bar-loader.png"));
 	loading_loader = m_load_bitmap(getResource("media/loading-loader.png"));
 
-	ALLEGRO_DEBUG("format before = %d\n", al_get_new_bitmap_format());
 	MBITMAP *tmp = m_create_bitmap(BH, BW); // check
 
 
@@ -2827,8 +2852,6 @@ ALLEGRO_DEBUG("boo1");
 	sb_start();
 #endif
 
-	ALLEGRO_DEBUG("format after = %d\n", al_get_new_bitmap_format());
-
 	al_set_new_bitmap_flags(ALLEGRO_CONVERT_BITMAP);
 
 	shadow_sheet = m_create_alpha_bitmap(4*16, 2*16, create_shadows, NULL, destroy_shadows);
@@ -2873,8 +2896,6 @@ ALLEGRO_DEBUG("boo1");
 
 	m_clear(black);
 	
-	ALLEGRO_DEBUG("end of init al_get_new_bitmap_flags=%x", al_get_new_bitmap_flags());
-
 	return true;
 }
 

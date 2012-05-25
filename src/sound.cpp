@@ -461,7 +461,7 @@ void playMusic(std::string name, float vol, bool force)
 	}
 	ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
 	if (is_flac) {
-		al_set_apk_file_interface();
+		al_android_set_apk_file_interface();
 	}
 	music = BASS_StreamCreateFileUser(
 		STREAMFILE_NOBUFFER,
@@ -543,7 +543,7 @@ void playAmbience(std::string name, float vol)
 	}
 	ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
 	if (is_flac) {
-		al_set_apk_file_interface();
+		al_android_set_apk_file_interface();
 	}
 	ambience = BASS_StreamCreateFileUser(
 		STREAMFILE_NOBUFFER,

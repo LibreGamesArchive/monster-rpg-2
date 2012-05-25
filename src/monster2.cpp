@@ -1459,7 +1459,7 @@ done:
 	al_unlock_mutex(wait_mutex);
 #endif
 
-#if !defined ALLEGRO_IPHONE
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	destroy();
 #endif
 
@@ -1473,6 +1473,11 @@ done:
 #endif
 
 	debug_message("done\n");
+
+#if defined ALLEGRO_ANDROID
+	debug_message("Android exiting");
+	exit(0);
+#endif
 
 	return 0;
 }

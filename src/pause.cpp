@@ -420,7 +420,7 @@ void showSaveStateInfo(const char *basename)
 #endif
 	MBITMAP *ss = new_mbitmap(al_load_bitmap(getUserResource("%s.bmp", basename)));
 #ifdef ALLEGRO_ANDROID
-	al_set_apk_file_interface();
+	al_android_set_apk_file_interface();
 #endif
 
 	char d[100];
@@ -784,7 +784,7 @@ static bool choose_save_slot(int num, bool exists, void *data)
 #endif
 					al_save_bitmap(getUserResource("%d.bmp", num), screenshot->bitmap);
 #ifdef ALLEGRO_ANDROID
-					al_set_apk_file_interface();
+					al_android_set_apk_file_interface();
 #endif
 				}
 				else {
@@ -803,7 +803,7 @@ static bool choose_save_slot(int num, bool exists, void *data)
 #endif
 				al_save_bitmap(getUserResource("%d.bmp", num), screenshot->bitmap);
 #ifdef ALLEGRO_ANDROID
-					al_set_apk_file_interface();
+					al_android_set_apk_file_interface();
 #endif
 			}
 			else {
@@ -2933,7 +2933,7 @@ static bool choose_copy_state(int n, bool exists, void *data)
 			int sz;
 			unsigned char *bytes = slurp_file(getUserResource("%d.save", n), &sz);
 #ifdef ALLEGRO_ANDROID
-			al_set_apk_file_interface();
+			al_android_set_apk_file_interface();
 #endif
 			char *encoded = create_url(bytes, sz);
 			set_clipboard(encoded);

@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.OrientationEventListener;
 import android.view.WindowManager;
+import android.view.Display;
 import android.net.Uri;
 import android.content.Intent;
 import android.text.ClipboardManager;
@@ -215,9 +216,9 @@ public class AllegroActivity extends Activity implements SensorEventListener
    {
       try {
          Log.d("AllegroActivity", "createSurface");
-         if(surface == null) {
-            surface = new AllegroSurface(getApplicationContext());
-         }
+         //if(surface == null) {
+            surface = new AllegroSurface(getApplicationContext(), getWindowManager().getDefaultDisplay());
+         //}
          
          SurfaceHolder holder = surface.getHolder();
          holder.addCallback(surface); 
@@ -247,11 +248,17 @@ public class AllegroActivity extends Activity implements SensorEventListener
       
       return;
    }
+
+   public void nullSurface()
+   {
+      getWindow().setContentView(null);
+      surface = null;
+   }
    
    public void destroySurface()
    {
       Log.d("AllegroActivity", "destroySurface");
-      
+
       ViewGroup vg = (ViewGroup)(surface.getParent());
       vg.removeView(surface);
       surface = null;
@@ -443,12 +450,12 @@ public class AllegroActivity extends Activity implements SensorEventListener
          Log.e("AllegroActivity", "Couldn't load OldAndroid");
       }
 
-      Log.d("CRAP", "heap size=" + Runtime.getRuntime().maxMemory());
-
       nativeOnOrientationChange(0, true);
-
-      requestWindowFeature(Window.FEATURE_NO_TITLE);
-      this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+   
+      if (!android.os.Build.VERSION.RELEASE.substring(0, 3).equals("2.2")) {
+         requestWindowFeature(Window.FEATURE_NO_TITLE);
+         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+      }
       
       Log.d("AllegroActivity", "onCreate end");
    }
@@ -1036,7 +1043,7 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
    
    /** native functions we call */
    public native void nativeOnCreate();
-   public native void nativeOnDestroy();
+   public native boolean nativeOnDestroy();
    public native void nativeOnChange(int format, int width, int height);
    public native void nativeOnKeyDown(int key);
    public native void nativeOnKeyUp(int key);
@@ -1070,7 +1077,7 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
       }
       
       egl_Display = dpy;
-
+      
       Log.d("AllegroSurface", "egl_Init end");
       return true;
    }
@@ -1121,9 +1128,23 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
          /* Allow others to pass right into the array */
       }
 
+      /* Check if it's already in the list, if so change the value */
+      for (int i = 0; i < egl_attribWork.size(); i++) {
+         if (i % 2 == 0) {
+            if (egl_attribWork.get(i) == egl_attr) {
+               egl_attribWork.set(i+1, value);
+               return;
+            }
+         }
+      }
+
+      /* Not in the list, add it */
       egl_attribWork.add(egl_attr);
       egl_attribWork.add(value);
    }
+      
+   private final int EGL_OPENGL_ES_BIT = 1;
+   private final int EGL_OPENGL_ES2_BIT = 4;
 
    private boolean checkGL20Support( Context context )
    {
@@ -1133,7 +1154,6 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
       //int[] version = new int[2];
       //egl.eglInitialize(display, version);
    
-      int EGL_OPENGL_ES2_BIT = 4;
       int[] configAttribs =
       {
          EGL10.EGL_RED_SIZE, 4,
@@ -1170,51 +1190,52 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
       EGL10 egl = (EGL10)EGLContext.getEGL();
       int ret = 1;
 
-      if (egl_Config[0] == null) {
-         if (version == 2) {
-            if (checkGL20Support(context)) {
-               es2_attrib = new int[3];
-               es2_attrib[0] = EGL_CONTEXT_CLIENT_VERSION;
-               es2_attrib[1] = 2;
-               es2_attrib[2] = EGL10.EGL_NONE;
-            }
-            else {
-               es2_attrib = null;
-               ret = 2;
-            }
+      es2_attrib = null;
+   /*
+      if (version == 2) {
+         if (checkGL20Support(context)) {
+            es2_attrib = new int[3];
+            es2_attrib[0] = EGL10.EGL_RENDERABLE_TYPE;
+            es2_attrib[1] = EGL_OPENGL_ES2_BIT;
+            es2_attrib[2] = EGL10.EGL_NONE;
          }
          else {
             es2_attrib = null;
+            ret = 2;
          }
+      }
+      else {
+         es2_attrib = new int[3];
+         es2_attrib[0] = EGL10.EGL_RENDERABLE_TYPE;
+         es2_attrib[1] = EGL_OPENGL_ES_BIT;
+         es2_attrib[2] = EGL10.EGL_NONE;
+      }
+   */
+      
+      egl_setConfigAttrib(EGL10.EGL_RENDERABLE_TYPE, version == 2 ? EGL_OPENGL_ES2_BIT : EGL_OPENGL_ES_BIT);
 
-         boolean color_size_specified = false;
-         for (int i = 0; i < egl_attribWork.size(); i++) {
-            Log.d("AllegroSurface", "egl_attribs[" + i + "] = " + egl_attribWork.get(i));
-            if (i % 2 == 0) {
-               if (egl_attribWork.get(i) == EGL10.EGL_RED_SIZE || egl_attribWork.get(i) == EGL10.EGL_GREEN_SIZE ||
-                     egl_attribWork.get(i) == EGL10.EGL_BLUE_SIZE) {
-                  color_size_specified = true;
-               }
+      boolean color_size_specified = false;
+      for (int i = 0; i < egl_attribWork.size(); i++) {
+         Log.d("AllegroSurface", "egl_attribs[" + i + "] = " + egl_attribWork.get(i));
+         if (i % 2 == 0) {
+            if (egl_attribWork.get(i) == EGL10.EGL_RED_SIZE || egl_attribWork.get(i) == EGL10.EGL_GREEN_SIZE ||
+                  egl_attribWork.get(i) == EGL10.EGL_BLUE_SIZE) {
+               color_size_specified = true;
             }
          }
-         if (!color_size_specified) {
-            egl_setConfigAttrib(ALLEGRO_RED_SIZE, 5);
-            egl_setConfigAttrib(ALLEGRO_GREEN_SIZE, 6);
-            egl_setConfigAttrib(ALLEGRO_BLUE_SIZE, 5);
-         }
+      }
 
-         egl_attribs = new int[egl_attribWork.size()+1];
-         for (int i = 0; i < egl_attribWork.size(); i++) {
-            egl_attribs[i] = egl_attribWork.get(i);
-         }
-         egl_attribs[egl_attribWork.size()] = EGL10.EGL_NONE;
-         
-         int[] num = new int[1];
-         egl.eglChooseConfig(egl_Display, egl_attribs, egl_Config, 1, num);
-         if (num[0] < 1) {
-            Log.e("AllegroSurface", "No matching config");
-            return 0;
-         }
+      egl_attribs = new int[egl_attribWork.size()+1];
+      for (int i = 0; i < egl_attribWork.size(); i++) {
+         egl_attribs[i] = egl_attribWork.get(i);
+      }
+      egl_attribs[egl_attribWork.size()] = EGL10.EGL_NONE;
+      
+      int[] num = new int[1];
+      boolean retval = egl.eglChooseConfig(egl_Display, egl_attribs, egl_Config, 1, num);
+      if (retval == false || num[0] < 1) {
+         Log.e("AllegroSurface", "No matching config");
+         return 0;
       }
 
       EGLContext ctx = egl.eglCreateContext(egl_Display, egl_Config[0], EGL10.EGL_NO_CONTEXT, es2_attrib);
@@ -1246,7 +1267,7 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
       EGL10 egl = (EGL10)EGLContext.getEGL();
       EGLSurface surface = egl.eglCreateWindowSurface(egl_Display, egl_Config[0], this, null);
       if(surface == EGL10.EGL_NO_SURFACE) {
-         Log.d("AllegroSurface", "egl_createSurface can't create surface");
+         Log.d("AllegroSurface", "egl_createSurface can't create surface (" +  egl.eglGetError() + ")");
          return false;
       }
       
@@ -1388,14 +1409,16 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
    }
    
    /** main handlers */
-   
-   public AllegroSurface(Context context)
+
+   public AllegroSurface(Context context, Display display)
    {
       super(context);
 
       this.context = context;
 
-        
+      Log.d("AllegroSurface", "PixelFormat=" + display.getPixelFormat());
+      getHolder().setFormat(display.getPixelFormat());
+
       Log.d("AllegroSurface", "ctor");
 
       getHolder().addCallback(this); 
@@ -1426,7 +1449,10 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
    {
       Log.d("AllegroSurface", "surfaceDestroyed");
 
-      nativeOnDestroy();
+      if (!nativeOnDestroy()) {
+         Log.d("AllegroSurface", "No surface created, returning early");
+         return;
+      }
 
       egl_makeCurrent();
       

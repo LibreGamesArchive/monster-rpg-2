@@ -122,7 +122,7 @@ void playMusic_oldandroid(std::string name, float volume, bool force)
 	}
 	music = bass_loadMusic(name.c_str());
 	if (is_flac) {
-		al_set_apk_file_interface();
+		al_android_set_apk_file_interface();
 	}
 	bass_playMusic(music);
 	setMusicVolume(volume);
@@ -164,7 +164,7 @@ void playAmbience_oldandroid(std::string name, float vol)
 	}
 	ambience = bass_loadMusic(name.c_str());
 	if (is_flac) {
-		al_set_apk_file_interface();
+		al_android_set_apk_file_interface();
 	}
 	bass_playMusic(ambience);
 	setAmbienceVolume(vol);
