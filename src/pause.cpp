@@ -1117,7 +1117,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	CombatantInfo unused;
 	MSpellSelector *spellSelector = new MSpellSelector(73, BH-2, 0, 0, true, partySelectorTop2, unused);
 
-	debug_message("9\n");
 	// Add widgets
 	tguiSetParent(0);
 	tguiAddWidget(fullscreenRect);

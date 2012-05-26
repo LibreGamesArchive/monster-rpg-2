@@ -4,6 +4,8 @@
 
 #include "monster2.hpp"
 
+#include <physfs.h>
+
 #define ASSERT ALLEGRO_ASSERT
 #include <allegro5/internal/aintern_bitmap.h>
 #include <allegro5/internal/aintern_display.h>
@@ -2402,11 +2404,19 @@ bool init(int *argc, char **argv[])
 	al_set_new_display_flags(flags);
 
 #ifdef ALLEGRO_ANDROID
-	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_REQUIRE);
+	/*
+	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 0, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_RED_SIZE, 5, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_GREEN_SIZE, 6, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_BLUE_SIZE, 5, ALLEGRO_REQUIRE);
+	al_set_new_display_option(ALLEGRO_ALPHA_SIZE, 0, ALLEGRO_REQUIRE);
+	*/
+	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_REQUIRE);
+	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 0, ALLEGRO_REQUIRE);
+	al_set_new_display_option(ALLEGRO_RED_SIZE, 8, ALLEGRO_REQUIRE);
+	al_set_new_display_option(ALLEGRO_GREEN_SIZE, 8, ALLEGRO_REQUIRE);
+	al_set_new_display_option(ALLEGRO_BLUE_SIZE, 8, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_ALPHA_SIZE, 0, ALLEGRO_REQUIRE);
 #else
 #ifdef __linux__
@@ -2520,13 +2530,13 @@ bool init(int *argc, char **argv[])
 		const int N = 7;
 		const int S = 5;
 		int totry[N][S] = {
+			{ 24, 0, 5, 6, 5 },
+			{ 24, 8, 5, 6, 5 },
+			{ 24, 8, 8, 8, 8 },
+			{ 16, 0, 5, 6, 5 },
 			{ 16, 0, 8, 8, 8 },
 			{ 16, 8, 5, 6, 5 },
-			{ 16, 8, 8, 8, 8 },
-			{ 24, 0, 5, 6, 5 },
-			{ 24, 0, 8, 8, 8 },
-			{ 24, 8, 5, 6, 5 },
-			{ 24, 8, 8, 8, 8 }
+			{ 16, 8, 8, 8, 8 }
 		};
 		for (int i = 0; i < N; i++) {
 			al_set_new_display_option(ALLEGRO_DEPTH_SIZE, totry[i][0], ALLEGRO_REQUIRE);
@@ -2624,7 +2634,9 @@ ALLEGRO_DEBUG("boo1");
 #endif
 
 #ifdef ALLEGRO_ANDROID
+	debug_message("HERE 111");
 	uint32_t vers1 = parse_version(al_android_get_os_version());
+	debug_message("HERE 222");
 	uint32_t vers2 = parse_version("2.3");
 	if (vers1 < vers2) {
 		is_android_lessthan_2_3 = true;
@@ -2895,7 +2907,22 @@ ALLEGRO_DEBUG("boo1");
 	inited = true;
 
 	m_clear(black);
-	
+
+#ifdef ALLEGRO_ANDROID
+	debug_message("init physfs stuff 1");
+	ALLEGRO_PATH *apkname = al_get_standard_path(ALLEGRO_EXENAME_PATH);
+	debug_message("init physfs stuff 2");
+	debug_message("exename='%s'", al_path_cstr(apkname, '/'));
+	if (!PHYSFS_init(al_path_cstr(apkname, '/'))) {
+		return false;
+	}
+	debug_message("init physfs stuff 3");
+	PHYSFS_addToSearchPath(al_path_cstr(apkname, '/'), 1);
+	debug_message("init physfs stuff 4");
+	al_destroy_path(apkname);
+	debug_message("init physfs stuff 5");
+#endif
+
 	return true;
 }
 

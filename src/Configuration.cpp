@@ -309,14 +309,19 @@ void Configuration::read()
 		buf[strlen(buf)-1] = 0;
 	
 	mkdir(buf, 0755);
+	
 	debug_message("2");
 
 	// load
 
-	XMLData* xml = new XMLData(getUserResource("config"));
-	debug_message("3");
-
 	debug_message("cfgfn='%s'\n", getUserResource("config"));
+	XMLData* xml = new XMLData(getUserResource("config"));
+	if (xml->getFailed()) {
+	   debug_message("couldn't read config");
+	   delete xml;
+	   return;
+	}
+	debug_message("3");
 
 	XMLData* monster = xml->find("monster2");
 	if (!monster) { delete xml; throw ReadError(); }

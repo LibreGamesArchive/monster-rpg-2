@@ -1086,7 +1086,7 @@ void CombatEnemy::mkdeath(void)
 	else {
 		as = animSet;
 	}
-	
+
 	int w = as->getWidth();
 	int h = as->getHeight();
 
@@ -1094,7 +1094,7 @@ void CombatEnemy::mkdeath(void)
 	data->as = as;
 	data->location = location;
 
-	work = m_create_alpha_bitmap(w, h, create_death_blit, data); // check
+	work = m_create_alpha_bitmap(w, h, create_death_blit, data, NULL, true); // check
 }
 
 CombatEnemy::CombatEnemy(std::string name, int x, int y, bool alpha) :

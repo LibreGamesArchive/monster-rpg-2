@@ -14,6 +14,7 @@ public:
 	void write(std::ofstream& out, int tab);
 	void add(XMLData* node);
 	std::string getName(void);
+	bool getFailed(void);
 	XMLData(std::string name, std::string value);
 	XMLData(std::string filename);
 	~XMLData(void);
@@ -32,6 +33,7 @@ private:
 	bool debug;
 	int ungot;
 	bool ungotReady;
+	bool failed;
 };
 
 

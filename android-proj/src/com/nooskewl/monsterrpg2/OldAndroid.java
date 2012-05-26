@@ -145,6 +145,7 @@ public class OldAndroid
 
 			AssetFileDescriptor fd;
 			try {
+				Log.d("OldAndroid", "Loading with MediaPlayer: '" + name + "'");
 				fd = activity.getResources().getAssets().openFd(name);
 				mp.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
 			}

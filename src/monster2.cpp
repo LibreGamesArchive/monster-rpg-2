@@ -300,9 +300,9 @@ bool is_close_pressed(void)
 			}
 			al_unlock_mutex(switch_mutex);
 			// resume
-			al_acknowledge_drawing_resume(display);
+			al_acknowledge_drawing_resume(display, _reload_loaded_bitmaps);
 #ifdef ALLEGRO_ANDROID
-			_reload_loaded_bitmaps();
+			_reload_loaded_bitmaps_delayed();
 			load_fonts();
 			//init_shaders();
 			//init2_shaders();

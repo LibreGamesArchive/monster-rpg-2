@@ -1631,6 +1631,7 @@ void Area::adjustPan(void)
 		
 void Area::update(int step)
 {
+//ALLEGRO_DEBUG("1");
 	std::vector<int> toDelete;
 
 	roaming = tguiCurrentTimeMillis();
@@ -1638,6 +1639,7 @@ void Area::update(int step)
 	shouldDoMap = false;
 
 	totalUpdates++;
+//ALLEGRO_DEBUG("2");
 
 	for (unsigned int i = 0; i < collisions.size(); i++) {
 		callLua(luaState, "collide", "ii>", collisions[i]->id1,
@@ -1645,9 +1647,11 @@ void Area::update(int step)
 		delete collisions[i];
 	}
 	collisions.clear();
+//ALLEGRO_DEBUG("3");
 
 	oldArea = area;
 	callLua(luaState, "update", "i>", step);
+//ALLEGRO_DEBUG("4");
 
 	for (unsigned int i = 0; i < objects.size(); i++) {
 		if (!objects[i]->update(this, step)) {
@@ -1673,12 +1677,14 @@ void Area::update(int step)
 			}
 		}
 	}
+//ALLEGRO_DEBUG("5");
 
 	for (int i = 0; i < (int)toDelete.size(); i++) {
 		int index = toDelete[i] - i;
 		delete objects[index];
 		objects.erase(objects.begin() + index);
 	}
+//ALLEGRO_DEBUG("6");
 
 	if (this == area) {
 		if (update_count == 0) {
@@ -1693,6 +1699,7 @@ void Area::update(int step)
 	}
 	else
 		return;
+//ALLEGRO_DEBUG("7");
 
 	bool adjusted_pan = false;
 
@@ -1902,12 +1909,14 @@ void Area::update(int step)
 			}
 		}
 	}
+//ALLEGRO_DEBUG("8/10");
 
 	// delete for real anything deleted in an activate() callback
 	for (int sz = (int)removedDuringActivate.size(); sz > 0; sz--) {
 		removeObject(removedDuringActivate[0]);
 		removedDuringActivate.erase(removedDuringActivate.begin());
 	}
+//ALLEGRO_DEBUG("11");
 
 	if (shouldDoMap) {
 		draw(BW, BH);
@@ -1916,6 +1925,7 @@ void Area::update(int step)
 		else
 			doMap(mapStartPlace, mapPrefix);
 	}
+//ALLEGRO_DEBUG("12");
 
 	bool smallX = sizex*TILE_SIZE <= BW;
 	bool smallY = sizey*TILE_SIZE <= BH;
@@ -1945,6 +1955,7 @@ void Area::update(int step)
 			 && oldArea == area) {
 		adjustPanX();
 	}
+//ALLEGRO_DEBUG("13");
 
 	if (center_view && !smallY) {
 		for (int i = 0; i < (int)(0.2*step); i++) {
@@ -1970,6 +1981,7 @@ void Area::update(int step)
 			 && oldArea == area) {
 		adjustPanY();
 	}
+//ALLEGRO_DEBUG("14");
 
 	// update animated tiles
 
@@ -1983,10 +1995,12 @@ void Area::update(int step)
 			a.current_frame = (a.current_frame % (int)a.tu.size());
 		}
 	}
+//ALLEGRO_DEBUG("15");
 	
 	for (unsigned int i = 0; i < tileAnimations.size(); i++) {
 		tileAnimations[i]->update(step);
 	}
+//ALLEGRO_DEBUG("16");
 
 	if (tinting) {
 		tintCount += step;
@@ -2001,6 +2015,7 @@ void Area::update(int step)
 			}
 		}
 	}
+//ALLEGRO_DEBUG("17");
 }
 
 void Area::writeTile(int tile, gzFile f)

@@ -8,6 +8,7 @@ extern "C" {
 #include <allegro5/internal/aintern_android.h>
 }
 #include "sound-android.hpp"
+#include <physfs.h>
 #endif
 
 static void destroyMusic(void);
@@ -30,6 +31,7 @@ static QWORD ambience_loop_start = 0;
 static float musicVolume = 1.0f;
 static float ambienceVolume = 1.0f;
 static BASS_FILEPROCS fileprocs;
+static BASS_FILEPROCS physfs_fileprocs;
 	
 
 /*
@@ -169,38 +171,50 @@ static std::string preloaded_names[] = {
 #ifdef ALLEGRO_ANDROID
 static void CALLBACK my_close(void *user)
 {
-	if (_al_android_get_jnienv() == NULL) {
-		_al_android_thread_created();
-	}
 	ALLEGRO_FILE *f = (ALLEGRO_FILE *)user;
 	al_fclose(f);
 }
 static QWORD CALLBACK my_len(void *user)
 {
-	if (_al_android_get_jnienv() == NULL) {
-		_al_android_thread_created();
-	}
 	ALLEGRO_FILE *f = (ALLEGRO_FILE *)user;
 	QWORD sz = al_fsize(f);
 	return sz;
 }
 static DWORD CALLBACK my_read(void *buf, DWORD length, void *user)
 {
-	if (_al_android_get_jnienv() == NULL) {
-		_al_android_thread_created();
-	}
 	ALLEGRO_FILE *f = (ALLEGRO_FILE *)user;
 	DWORD r = al_fread(f, buf, length);
 	return r;
 }
 static BOOL CALLBACK my_seek(QWORD offset, void *user)
 {
-	if (_al_android_get_jnienv() == NULL) {
-		_al_android_thread_created();
-	}
 	ALLEGRO_FILE *f = (ALLEGRO_FILE *)user;
 	BOOL b = al_fseek(f, offset, ALLEGRO_SEEK_SET);
 	return b;
+}
+
+static void CALLBACK physfs_my_close(void *user)
+{
+	PHYSFS_File *f = (PHYSFS_File *)user;
+	PHYSFS_close(f);
+}
+static QWORD CALLBACK physfs_my_len(void *user)
+{
+	PHYSFS_File *f = (PHYSFS_File *)user;
+	PHYSFS_sint64 sz = PHYSFS_fileLength(f);
+	return sz;
+}
+static DWORD CALLBACK physfs_my_read(void *buf, DWORD length, void *user)
+{
+	PHYSFS_File *f = (PHYSFS_File *)user;
+	DWORD r = PHYSFS_read(f, buf, 1, length);
+	return r;
+}
+static BOOL CALLBACK physfs_my_seek(QWORD offset, void *user)
+{
+	PHYSFS_File *f = (PHYSFS_File *)user;
+	bool ret = PHYSFS_seek(f, offset);
+	return ret;
 }
 #endif
 
@@ -231,6 +245,11 @@ old:
 	fileprocs.length = my_len;
 	fileprocs.read = my_read;
 	fileprocs.seek = my_seek;
+
+	physfs_fileprocs.close = physfs_my_close;
+	physfs_fileprocs.length = physfs_my_len;
+	physfs_fileprocs.read = physfs_my_read;
+	physfs_fileprocs.seek = physfs_my_seek;
 #endif
 
 
@@ -424,6 +443,14 @@ std::string check_music_name(std::string name, bool *is_flac)
 	}
 
 	*is_flac = false;
+#ifdef ALLEGRO_ANDROID
+	if (!is_android_lessthan_2_3) {
+		static char n[1000];
+		sprintf(n, "assets/data/music/%s", name.c_str());
+		return n;
+	}
+#endif
+	
 	return getResource("music/%s", name.c_str());
 }
 
@@ -458,17 +485,25 @@ void playMusic(std::string name, float vol, bool force)
 #ifdef ALLEGRO_ANDROID
 	if (is_flac) {
 		al_set_standard_file_interface();
-	}
-	ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
-	if (is_flac) {
+		ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
 		al_android_set_apk_file_interface();
+		music = BASS_StreamCreateFileUser(
+			STREAMFILE_NOBUFFER,
+			BASS_SAMPLE_LOOP,
+			&fileprocs,
+			(void *)f
+		);
 	}
-	music = BASS_StreamCreateFileUser(
-		STREAMFILE_NOBUFFER,
-		BASS_SAMPLE_LOOP,
-		&fileprocs,
-		(void *)f
-	);
+	else {
+		debug_message("name='%s'", name.c_str());
+		PHYSFS_File *f = PHYSFS_openRead(name.c_str());
+		music = BASS_StreamCreateFileUser(
+			STREAMFILE_NOBUFFER,
+			BASS_SAMPLE_LOOP,
+			&physfs_fileprocs,
+			(void *)f
+		);
+	}
 
 	if (music == 0)
 		ALLEGRO_DEBUG("music == 0 error code=%d", BASS_ErrorGetCode());
@@ -540,17 +575,27 @@ void playAmbience(std::string name, float vol)
 #ifdef ALLEGRO_ANDROID
 	if (is_flac) {
 		al_set_standard_file_interface();
-	}
-	ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
-	if (is_flac) {
+		ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
 		al_android_set_apk_file_interface();
+		ambience = BASS_StreamCreateFileUser(
+			STREAMFILE_NOBUFFER,
+			BASS_SAMPLE_LOOP,
+			&fileprocs,
+			(void *)f
+		);
 	}
-	ambience = BASS_StreamCreateFileUser(
-		STREAMFILE_NOBUFFER,
-		BASS_SAMPLE_LOOP,
-		&fileprocs,
-		(void *)f
-	);
+	else {
+		PHYSFS_File *f = PHYSFS_openRead(name.c_str());
+		ambience = BASS_StreamCreateFileUser(
+			STREAMFILE_NOBUFFER,
+			BASS_SAMPLE_LOOP,
+			&physfs_fileprocs,
+			(void *)f
+		);
+	}
+
+	if (ambience == 0)
+		ALLEGRO_DEBUG("ambience == 0 error code=%d", BASS_ErrorGetCode());
 #else
 	ambience = BASS_StreamCreateFile(false,
 		name.c_str(),

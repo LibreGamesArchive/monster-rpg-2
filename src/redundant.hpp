@@ -73,9 +73,9 @@ void m_draw_scaled_bitmap(MBITMAP *bmp, float sx, float sy, float sw, float sh, 
 int m_get_bitmap_width(MBITMAP *bmp);
 int m_get_bitmap_height(MBITMAP *bmp);
 MBITMAP *m_load_bitmap(const char *name, bool force_memory = false);
-MBITMAP *m_load_bitmap_redraw(const char *name, void (*redraw)(MBITMAP *bmp, RecreateData *data), RecreateData *data);
+MBITMAP *m_load_bitmap_redraw(const char *name, void (*redraw)(MBITMAP *bmp, RecreateData *data), RecreateData *data, bool delayed = false);
 MFONT *m_load_font(const char *name);
-MBITMAP *m_create_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateData *data) = NULL, RecreateData *data = NULL, void (*destroy)(MBITMAP *b) = NULL); // check
+MBITMAP *m_create_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateData *data) = NULL, RecreateData *data = NULL, void (*destroy)(MBITMAP *b) = NULL, bool delayed = false); // check
 MBITMAP *m_create_sub_bitmap(MBITMAP *parent, int x, int y, int w, int h); // check
 void m_destroy_bitmap(MBITMAP *bmp, bool internals_only = false);
 void m_flip_display(void);
@@ -107,7 +107,7 @@ void m_draw_trans_bitmap(MBITMAP *b, int x, int y, int alpha);
 void m_destroy_font(MFONT *f);
 void m_draw_alpha_bitmap(MBITMAP *b, int x, int y);
 void m_draw_alpha_bitmap(MBITMAP *b, int x, int y, int flags);
-MBITMAP *m_create_alpha_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateData *data) = NULL, RecreateData *data = NULL, void (*destroy)(MBITMAP *b) = NULL); // check
+MBITMAP *m_create_alpha_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateData *data) = NULL, RecreateData *data = NULL, void (*destroy)(MBITMAP *b) = NULL, bool delayed = false); // check
 MBITMAP *m_load_alpha_bitmap(const char *name, bool force_memory = false);
 
 #ifndef ALLEGRO4
@@ -175,10 +175,14 @@ struct LoadedBitmap {
 	Recreate recreate;
 	MBITMAP *bitmap;
 	int flags, format;
+	bool delayed;
 };
 
 void _destroy_loaded_bitmaps(void);
+extern "C" {
 void _reload_loaded_bitmaps(void);
+}
+void _reload_loaded_bitmaps_delayed(void);
 
 void m_draw_prim (const void* vtxs, const ALLEGRO_VERTEX_DECL* decl, MBITMAP* texture, int start, int end, int type);
 

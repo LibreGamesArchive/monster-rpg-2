@@ -1,5 +1,9 @@
 #include "monster2.hpp"
 
+bool XMLData::getFailed(void)
+{
+	return failed;
+}
 
 std::string XMLData::getName(void)
 {
@@ -17,7 +21,8 @@ XMLData::XMLData(std::string name, ALLEGRO_FILE* f) :
 	file(f),
 	debug(false),
 	ungot(-1),
-	ungotReady(false)
+	ungotReady(false),
+	failed(false)
 {
 	this->name = name;
 }
@@ -26,14 +31,16 @@ XMLData::XMLData(std::string name, ALLEGRO_FILE* f) :
 XMLData::XMLData(std::string filename) :
 	debug(false),
 	ungot(-1),
-	ungotReady(false)
-
+	ungotReady(false),
+	failed(false)
 {
 	name = std::string("main");
 
 	file = al_fopen(filename.c_str(), "r");
 	if (!file) {
-		throw ReadError();
+		al_fclose(file);
+		failed = true;
+		return;
 	}
 
 	read();
@@ -43,7 +50,8 @@ XMLData::XMLData(std::string filename) :
 
 
 XMLData::XMLData(std::string name, std::string value) :
-	debug(false)
+	debug(false),
+	failed(false)
 {
 	this->name = name;
 	this->value = std::string(value);

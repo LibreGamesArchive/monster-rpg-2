@@ -193,7 +193,7 @@ void m_unmap_rgba(MCOLOR c,
 	al_unmap_rgba(c, r, g, b, a);
 }
 
-MBITMAP *m_create_alpha_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateData *), RecreateData *data, void (*destroy)(MBITMAP *b)) // check
+MBITMAP *m_create_alpha_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateData *), RecreateData *data, void (*destroy)(MBITMAP *b), bool delayed) // check
 {
 	int f = al_get_new_bitmap_format();
 	al_set_new_bitmap_format(ALPHA_FMT);
@@ -232,6 +232,7 @@ MBITMAP *m_create_alpha_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, Rec
 		lb.recreate.w = w;
 		lb.recreate.h = h;
 		lb.bitmap = m;
+		lb.delayed = delayed;
 		loaded_bitmaps.push_back(lb);
 	}
 	else {
@@ -483,7 +484,7 @@ MBITMAP *m_load_bitmap(const char *name, bool force_memory)
 }
 
 
-MBITMAP *m_load_bitmap_redraw(const char *name, void (*redraw)(MBITMAP *bmp, RecreateData *data), RecreateData *data)
+MBITMAP *m_load_bitmap_redraw(const char *name, void (*redraw)(MBITMAP *bmp, RecreateData *data), RecreateData *data, bool delayed)
 {
 	ALLEGRO_BITMAP *bitmap = 0;
 
@@ -511,6 +512,7 @@ MBITMAP *m_load_bitmap_redraw(const char *name, void (*redraw)(MBITMAP *bmp, Rec
 		lb.load.redraw = redraw;
 		lb.load.data = data;
 		lb.bitmap = m;
+		lb.delayed = delayed;
 		loaded_bitmaps.push_back(lb);
 	}
 #endif
@@ -595,7 +597,7 @@ void my_clear_bitmap(MBITMAP *b)
 }
 
 
-MBITMAP *m_create_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateData *), RecreateData *data, void (*destroy)(MBITMAP *b)) // check
+MBITMAP *m_create_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateData *), RecreateData *data, void (*destroy)(MBITMAP *b), bool delayed) // check
 {
 	ALLEGRO_BITMAP *bitmap = NULL;
 	int flags = al_get_new_bitmap_flags();
@@ -638,6 +640,7 @@ MBITMAP *m_create_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateD
 		lb.recreate.w = w;
 		lb.recreate.h = h;
 		lb.bitmap = m;
+		lb.delayed = delayed;
 		loaded_bitmaps.push_back(lb);
 	}
 	else {
@@ -1116,7 +1119,37 @@ void _reload_loaded_bitmaps(void)
 
 	for (size_t i = 0; i < loaded_bitmaps.size(); i++) {
 		MBITMAP *m = loaded_bitmaps[i].bitmap;
-		if (loaded_bitmaps[i].flags & ALLEGRO_NO_PRESERVE_TEXTURE) {
+		if ((loaded_bitmaps[i].flags & ALLEGRO_NO_PRESERVE_TEXTURE) && !loaded_bitmaps[i].delayed) {
+			al_set_new_bitmap_flags(loaded_bitmaps[i].flags);
+			al_set_new_bitmap_format(loaded_bitmaps[i].format);
+			if (loaded_bitmaps[i].load_type == LOAD_LOAD) {
+				m->bitmap = my_load_bitmap(loaded_bitmaps[i].load.filename.c_str());
+				if (loaded_bitmaps[i].load.redraw) {
+					loaded_bitmaps[i].load.redraw(m, loaded_bitmaps[i].load.data);
+				}
+			}
+			else { // create
+				Recreate *d = &loaded_bitmaps[i].recreate;
+				m->bitmap = al_create_bitmap(d->w, d->h);
+				if (d->func) { // recreate with func
+					d->func(m, d->data);
+				}
+			}
+		}
+	}
+
+	al_set_new_bitmap_flags(flags);
+	al_set_new_bitmap_format(format);
+}
+
+void _reload_loaded_bitmaps_delayed(void)
+{
+	int flags = al_get_new_bitmap_flags();
+	int format = al_get_new_bitmap_format();
+
+	for (size_t i = 0; i < loaded_bitmaps.size(); i++) {
+		MBITMAP *m = loaded_bitmaps[i].bitmap;
+		if ((loaded_bitmaps[i].flags & ALLEGRO_NO_PRESERVE_TEXTURE) && loaded_bitmaps[i].delayed) {
 			al_set_new_bitmap_flags(loaded_bitmaps[i].flags);
 			al_set_new_bitmap_format(loaded_bitmaps[i].format);
 			if (loaded_bitmaps[i].load_type == LOAD_LOAD) {

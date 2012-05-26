@@ -23,6 +23,7 @@ exceptions = {
 
 function drop_mushrooms(o, e)
 	setObjectAnimationSetPrefix(o.id, "")
+	setObjectSubAnimation(o.id, "stand_s")
 end
 
 function pickup_staff(o, e)
