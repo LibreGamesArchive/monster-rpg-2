@@ -1,0 +1,693 @@
+Index: include/allegro5/display.h
+===================================================================
+--- include/allegro5/display.h	(revision 15685)
++++ include/allegro5/display.h	(working copy)
+@@ -190,7 +190,7 @@
+ AL_FUNC(bool, al_is_bitmap_drawing_held, (void));
+ 
+ AL_FUNC(void, al_acknowledge_drawing_halt, (ALLEGRO_DISPLAY *display));
+-AL_FUNC(void, al_acknowledge_drawing_resume, (ALLEGRO_DISPLAY *display));
++AL_FUNC(void, al_acknowledge_drawing_resume, (ALLEGRO_DISPLAY *display, void (*user_reload)(void)));
+ 
+ #ifdef __cplusplus
+    }
+Index: include/allegro5/internal/aintern_display.h
+===================================================================
+--- include/allegro5/internal/aintern_display.h	(revision 15685)
++++ include/allegro5/internal/aintern_display.h	(working copy)
+@@ -74,7 +74,7 @@
+    void (*shutdown)(void);
+ 
+    void (*acknowledge_drawing_halt)(ALLEGRO_DISPLAY *d);
+-   void (*acknowledge_drawing_resume)(ALLEGRO_DISPLAY *d);
++   void (*acknowledge_drawing_resume)(ALLEGRO_DISPLAY *d, void (*user_reload)(void));
+       
+    void (*change_display_option)(ALLEGRO_DISPLAY *display, int option, int val);
+ 
+Index: include/allegro5/internal/aintern_android.h
+===================================================================
+--- include/allegro5/internal/aintern_android.h	(revision 15685)
++++ include/allegro5/internal/aintern_android.h	(working copy)
+@@ -28,6 +28,7 @@
+    bool resize_acknowledge;
+    bool resize_acknowledge2;
+    bool resumed;
++   bool failed;
+ } ALLEGRO_DISPLAY_ANDROID;
+ 
+ ALLEGRO_SYSTEM_INTERFACE *_al_system_android_interface();
+Index: src/android/android_system.c
+===================================================================
+--- src/android/android_system.c	(revision 15685)
++++ src/android/android_system.c	(working copy)
+@@ -63,6 +63,8 @@
+ static JavaVM* javavm;
+ static JNIEnv *main_env;
+ 
++static const char *_real_al_android_get_os_version(JNIEnv *env);
++
+ bool _al_android_is_paused(void)
+ {
+    return system_data.paused;
+@@ -100,7 +102,7 @@
+    return system_data.activity_object;
+ }
+ 
+-JNIEXPORT int JNICALL Java_org_liballeg_app_AllegroInputStream_nativeRead(JNIEnv *env, jobject obj, int handle, jbyteArray array, int offset, int length)
++JNIEXPORT int JNICALL Java_com_nooskewl_monsterrpg2_AllegroInputStream_nativeRead(JNIEnv *env, jobject obj, int handle, jbyteArray array, int offset, int length)
+ {
+    ALLEGRO_FILE *fp = (ALLEGRO_FILE*)handle;
+    int ret = -1;
+@@ -125,7 +127,7 @@
+    return ret;
+ }
+ 
+-JNIEXPORT void JNICALL Java_org_liballeg_app_AllegroInputStream_nativeClose(JNIEnv *env, jobject obj, int hdnl)
++JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroInputStream_nativeClose(JNIEnv *env, jobject obj, int hdnl)
+ {
+    ALLEGRO_FILE *fp = (ALLEGRO_FILE*)hdnl;
+    (void)env;
+@@ -181,7 +183,7 @@
+    return JNI_VERSION_1_4;
+ }
+ 
+-JNIEXPORT bool Java_org_liballeg_app_AllegroActivity_nativeOnCreate(JNIEnv *env, jobject obj)
++JNIEXPORT bool Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeOnCreate(JNIEnv *env, jobject obj)
+ {
+    ALLEGRO_PATH *lib_path = NULL;
+    ALLEGRO_USTR *lib_fname = NULL;
+@@ -213,10 +215,10 @@
+    iae = (*env)->FindClass(env, "java/lang/IllegalArgumentException");
+    system_data.illegal_argument_exception_class = (*env)->NewGlobalRef(env, iae);
+    
+-   aisc = (*env)->FindClass(env, "org/liballeg/app/AllegroInputStream");
++   aisc = (*env)->FindClass(env, "com/nooskewl/monsterrpg2/AllegroInputStream");
+    system_data.input_stream_class = (*env)->NewGlobalRef(env, aisc);
+    
+-   asc = (*env)->FindClass(env, "org/liballeg/app/AllegroAPKStream");
++   asc = (*env)->FindClass(env, "com/nooskewl/monsterrpg2/AllegroAPKStream");
+    system_data.apk_stream_class = (*env)->NewGlobalRef(env, asc);
+ 
+    ALLEGRO_DEBUG("create mutex and cond objects");
+@@ -261,7 +263,7 @@
+    full_path = al_path_cstr(lib_path, ALLEGRO_NATIVE_PATH_SEP);
+ 
+    // Android 2.1 has a bug with glClear we have to work around
+-   const char *ver = al_android_get_os_version();
++   const char *ver = _real_al_android_get_os_version(env);
+    if (!strncmp(ver, "2.1", 3)) {
+       system_data.is_2_1 = true;
+    }
+@@ -302,7 +304,7 @@
+ }
+ 
+ 
+-JNIEXPORT void JNICALL Java_org_liballeg_app_AllegroActivity_nativeOnPause(JNIEnv *env, jobject obj)
++JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeOnPause(JNIEnv *env, jobject obj)
+ {
+    (void)env; (void)obj;
+    
+@@ -311,7 +313,7 @@
+    system_data.paused = true;
+ }
+ 
+-JNIEXPORT void JNICALL Java_org_liballeg_app_AllegroActivity_nativeOnResume(JNIEnv *env, jobject obj)
++JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeOnResume(JNIEnv *env, jobject obj)
+ {
+    ALLEGRO_SYSTEM *sys = &system_data.system->system;
+    ALLEGRO_DISPLAY *d = NULL;
+@@ -347,7 +349,7 @@
+    // ??
+ }
+ 
+-JNIEXPORT void JNICALL Java_org_liballeg_app_AllegroActivity_nativeOnDestroy(JNIEnv *env, jobject obj)
++JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeOnDestroy(JNIEnv *env, jobject obj)
+ {
+    (void)obj;
+    
+@@ -372,14 +374,14 @@
+    memset(&system_data, 0, sizeof(system_data));
+ }
+ 
+-JNIEXPORT void JNICALL Java_org_liballeg_app_AllegroActivity_nativeOnAccel(JNIEnv *env, jobject obj, jint id, jfloat x, jfloat y, jfloat z)
++JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeOnAccel(JNIEnv *env, jobject obj, jint id, jfloat x, jfloat y, jfloat z)
+ {
+    (void)env; (void)obj; (void)id;
+    //ALLEGRO_DEBUG("got some accelerometer data!");
+    _al_android_generate_joystick_event(x, y, z);
+ }
+ 
+-JNIEXPORT void JNICALL Java_org_liballeg_app_AllegroActivity_nativeOnOrientationChange(JNIEnv *env, jobject obj, int orientation, bool init)
++JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeOnOrientationChange(JNIEnv *env, jobject obj, int orientation, bool init)
+ {
+    ALLEGRO_SYSTEM *sys = &system_data.system->system;
+    ALLEGRO_DISPLAY *d = NULL;
+@@ -420,7 +422,7 @@
+    }
+ }
+ 
+-JNIEXPORT void JNICALL Java_org_liballeg_app_AllegroActivity_nativeCreateDisplay(JNIEnv *env, jobject obj)
++JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeCreateDisplay(JNIEnv *env, jobject obj)
+ {
+    (void)obj;
+    ALLEGRO_DEBUG("nativeCreateDisplay begin");
+@@ -555,7 +557,7 @@
+       return NULL;
+    }
+    
+-   jbitmap = _jni_callObjectMethodV(jnienv, system_data.activity_object, "decodeBitmap_f", "(Lorg/liballeg/app/AllegroInputStream;)Landroid/graphics/Bitmap;", input_stream);
++   jbitmap = _jni_callObjectMethodV(jnienv, system_data.activity_object, "decodeBitmap_f", "(Lcom/nooskewl/monsterrpg2/AllegroInputStream;)Landroid/graphics/Bitmap;", input_stream);
+    ASSERT(jbitmap != NULL);
+    
+    _jni_callv(jnienv, DeleteLocalRef, input_stream);
+@@ -686,15 +688,20 @@
+    return bitmap;
+ }
+ 
+-const char *al_android_get_os_version(void)
++static const char *_real_al_android_get_os_version(JNIEnv *env)
+ {
+    static char buffer[25];
+-   ALLEGRO_USTR *s = _jni_callStringMethod(system_data.env, system_data.activity_object, "getOsVersion", "()Ljava/lang/String;");
++   ALLEGRO_USTR *s = _jni_callStringMethod(env, system_data.activity_object, "getOsVersion", "()Ljava/lang/String;");
+    strncpy(buffer, al_cstr(s), 25);
+    al_ustr_free(s);
+    return buffer;
+ }
+ 
++const char *al_android_get_os_version(void)
++{
++   return _real_al_android_get_os_version(_al_android_get_jnienv());
++}
++
+ bool _al_android_is_os_2_1(void)
+ {
+    return system_data.is_2_1;
+Index: src/android/android_display.c
+===================================================================
+--- src/android/android_display.c	(revision 15685)
++++ src/android/android_display.c	(working copy)
+@@ -45,7 +45,7 @@
+ void  _al_android_make_current(JNIEnv *env, ALLEGRO_DISPLAY_ANDROID *d);
+ void _al_android_clear_current(JNIEnv *env, ALLEGRO_DISPLAY_ANDROID *d);
+ 
+-JNIEXPORT void JNICALL Java_org_liballeg_app_AllegroSurface_nativeOnCreate(JNIEnv *env, jobject obj)
++JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroSurface_nativeOnCreate(JNIEnv *env, jobject obj)
+ {
+    ALLEGRO_DEBUG("nativeOnCreate");
+    (void)env;
+@@ -62,7 +62,7 @@
+    d->recreate = true;
+ }
+ 
+-JNIEXPORT void JNICALL Java_org_liballeg_app_AllegroSurface_nativeOnDestroy(JNIEnv *env, jobject obj)
++JNIEXPORT bool JNICALL Java_com_nooskewl_monsterrpg2_AllegroSurface_nativeOnDestroy(JNIEnv *env, jobject obj)
+ {
+    ALLEGRO_SYSTEM *sys = (void *)al_get_system_driver();
+    ASSERT(system != NULL);
+@@ -77,13 +77,13 @@
+    (void)obj;
+    (void)env;
+ 
++   if (!display->created) {
++      ALLEGRO_DEBUG("Display creation failed, not sending HALT");
++      return false;
++   }
++   
+    display->created = false;
+    
+-   if (!_al_vector_size(&sys->displays)) {
+-      ALLEGRO_DEBUG("no display, not sending HALT event");
+-      return;
+-   }
+-   
+    ALLEGRO_DEBUG("locking display event source: %p %p", d, &d->es);
+    
+    _al_event_source_lock(&d->es);
+@@ -103,10 +103,12 @@
+    al_unlock_mutex(display->mutex);
+ 
+    ALLEGRO_DEBUG("AllegroSurface_nativeOnDestroy end");
++   
++   return true;
+ }
+ 
+ // FIXME: need to loop over the display list looking for the right surface object in the following jni callbacks
+-JNIEXPORT void JNICALL Java_org_liballeg_app_AllegroSurface_nativeOnChange(JNIEnv *env, jobject obj, jint format, jint width, jint height)
++JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroSurface_nativeOnChange(JNIEnv *env, jobject obj, jint format, jint width, jint height)
+ {
+    ALLEGRO_EVENT event;
+ 
+@@ -137,7 +139,11 @@
+    display->w = width;
+    display->h = height;
+    
+-   _al_android_init_display(env, d, d->first_run);
++   if (!_al_android_init_display(env, d, d->first_run) && d->first_run) {
++      al_broadcast_cond(d->cond);
++      al_unlock_mutex(d->mutex);
++      return;
++   }
+ 
+    _al_android_clear_current(env, d);
+ 
+@@ -159,7 +165,7 @@
+       ALLEGRO_DEBUG("unlocking display event source");
+       _al_event_source_unlock(&display->es);
+    }
+-  
++
+    if (d->first_run) {
+       al_broadcast_cond(d->cond);
+       d->first_run = false;
+@@ -175,12 +181,10 @@
+    al_unlock_mutex(d->mutex);
+ }
+ 
+-JNIEXPORT void JNICALL Java_org_liballeg_app_AllegroSurface_nativeOnKeyDown(JNIEnv *env, jobject obj, jint scancode)
++JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroSurface_nativeOnKeyDown(JNIEnv *env, jobject obj, jint scancode)
+ {
+    (void)env; (void)obj;
+    
+-   ALLEGRO_DEBUG("key down");
+-   
+    ALLEGRO_SYSTEM *system = (void *)al_get_system_driver();
+    ASSERT(system != NULL);
+    
+@@ -194,7 +198,7 @@
+    //ALLEGRO_DEBUG("display: %p %ix%i", display, display->w, display->h);
+ }
+ 
+-JNIEXPORT void JNICALL Java_org_liballeg_app_AllegroSurface_nativeOnKeyUp(JNIEnv *env, jobject obj, jint scancode)
++JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroSurface_nativeOnKeyUp(JNIEnv *env, jobject obj, jint scancode)
+ {
+    //ALLEGRO_DEBUG("key up");
+    (void)env; (void)obj;
+@@ -210,7 +214,7 @@
+    //ALLEGRO_DEBUG("display: %p %ix%i", display, display->w, display->h);
+ }
+ 
+-JNIEXPORT void JNICALL Java_org_liballeg_app_AllegroSurface_nativeOnTouch(JNIEnv *env, jobject obj, jint id, jint action, jfloat x, jfloat y, jboolean primary)
++JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroSurface_nativeOnTouch(JNIEnv *env, jobject obj, jint id, jint action, jfloat x, jfloat y, jboolean primary)
+ {
+    //ALLEGRO_DEBUG("touch!");
+    (void)env; (void)obj;
+@@ -315,14 +319,13 @@
+    if(!_jni_callBooleanMethodV(env, display->surface_object, "egl_Init", "()Z")) {
+       // XXX should probably destroy the AllegroSurface here
+       ALLEGRO_ERROR("failed to initialize EGL");
++      display->failed = true;
+       return false;
+    }
+ 
+-   if (first_run) {
+-      ALLEGRO_DEBUG("updating visuals");
+-      _al_android_update_visuals(env, display);
+-      ALLEGRO_DEBUG("done updating visuals");
+-   }
++   ALLEGRO_DEBUG("updating visuals");
++   _al_android_update_visuals(env, display);
++   ALLEGRO_DEBUG("done updating visuals");
+    
+    memcpy(&d->extra_settings, &system->visual, sizeof(ALLEGRO_EXTRA_DISPLAY_SETTINGS));
+ 
+@@ -337,11 +340,11 @@
+    if (!(ret = _jni_callIntMethodV(env, display->surface_object, "egl_createContext", "(I)I", version))) {
+       // XXX should probably destroy the AllegroSurface here
+       ALLEGRO_ERROR("failed to create egl context!");
++      display->failed = true;
+       return false;
+    }
+ 
+    if (ret == 2 && (d->flags & ALLEGRO_USE_PROGRAMMABLE_PIPELINE)) {
+-   	ALLEGRO_DEBUG("DAMNIT");
+    	d->flags &= ~ALLEGRO_USE_PROGRAMMABLE_PIPELINE;
+    }
+    
+@@ -349,6 +352,7 @@
+    if (!_jni_callBooleanMethodV(env, display->surface_object, "egl_createSurface", "()Z")) {
+       // XXX should probably destroy the AllegroSurface here
+       ALLEGRO_ERROR("failed to create egl surface!");
++      display->failed = true;
+       return false;
+    }
+ 
+@@ -527,6 +531,7 @@
+    d->cond = al_create_cond();
+    d->recreate = true;
+    d->first_run = true;
++   d->failed = false;
+    
+    ALLEGRO_SYSTEM *system = (void *)al_get_system_driver();
+    ASSERT(system != NULL);
+@@ -542,12 +547,22 @@
+    
+    // wait for sizing to happen
+    ALLEGRO_DEBUG("waiting for surface onChange");
+-   while (!d->created) {
+-      ALLEGRO_DEBUG("calling al_wait_cond");
++   while (!d->created && !d->failed) {
+       al_wait_cond(d->cond, d->mutex);
+    }
+    al_unlock_mutex(d->mutex);
+    ALLEGRO_DEBUG("done waiting for surface onChange");
++
++   /* nativeOnChange should return, if we don't yield it might not */
++   //al_rest(0.25);
++
++   if (d->failed) {
++      ALLEGRO_DEBUG("Display creation failed");
++      _al_vector_find_and_delete(&system->displays, &d);
++      al_free(ogl);
++      al_free(d);
++      return NULL;
++   }
+    
+    display->flags |= ALLEGRO_OPENGL;
+ 
+@@ -572,7 +587,7 @@
+    _al_android_clear_current(_al_android_get_jnienv(), d);
+    
+    al_lock_mutex(d->mutex);
+-   
++  
+    _al_android_destroy_surface(_al_android_get_jnienv(), d, true);
+ 
+    /* I don't think we can use a condition for this, because there are two possibilities
+@@ -610,13 +625,16 @@
+ 
+ static bool android_set_current_display(ALLEGRO_DISPLAY *dpy)
+ {
+-   ALLEGRO_DEBUG("make current %p", dpy);
+-      
+    if (al_get_current_display() == dpy)
+       return true;
+    
+    _al_android_clear_current(_al_android_get_jnienv(), (ALLEGRO_DISPLAY_ANDROID*)al_get_current_display());
++   
++   ALLEGRO_DEBUG("make current %p", dpy);
+    if (dpy) _al_android_make_current(_al_android_get_jnienv(), (ALLEGRO_DISPLAY_ANDROID*)dpy);
++
++   _al_ogl_update_render_state(dpy);
++
+    return true;
+ }
+ 
+@@ -773,7 +791,7 @@
+    ALLEGRO_DEBUG("acknowledged drawing halt");
+ }
+ 
+-static void android_acknowledge_drawing_resume(ALLEGRO_DISPLAY *dpy)
++static void android_acknowledge_drawing_resume(ALLEGRO_DISPLAY *dpy, void (*user_reload)(void))
+ {
+    int i, size;
+ 
+@@ -790,18 +808,25 @@
+    
+    _al_android_setup_opengl_view(dpy);
+ 
++   // FIXME!
++   if (user_reload) {
++   	(*user_reload)();
++   }
++
+    // Restore bitmaps
+    // have to get this because new bitmaps could be created below
+    size = (int)dpy->bitmaps._size;
+    for (i = 0; i < size; i++) {
+       ALLEGRO_BITMAP **bptr = (ALLEGRO_BITMAP **)_al_vector_ref(&dpy->bitmaps, i);
+       ALLEGRO_BITMAP *bmp = *bptr;
+-      if (bmp->parent) {
++      if (bmp->parent && !(bmp->parent->flags & ALLEGRO_MEMORY_BITMAP) &&
++            !(bmp->parent->flags & ALLEGRO_NO_PRESERVE_TEXTURE)) {
++	 ALLEGRO_DEBUG("BUNCH OF INFO: flags: %d %d. extra: %p %p. parent: %p %p.", bmp->flags, bmp->parent->flags, bmp->extra, bmp->parent->extra, bmp->parent, bmp->parent->parent);
+          ALLEGRO_BITMAP_EXTRA_OPENGL *extra = (ALLEGRO_BITMAP_EXTRA_OPENGL *)bmp->extra;
+-	 extra->texture = al_get_opengl_texture(bmp->parent);
++         extra->texture = al_get_opengl_texture(bmp->parent);
+       }
+       else if (!(bmp->flags & ALLEGRO_MEMORY_BITMAP) &&
+-	       !(bmp->flags & ALLEGRO_NO_PRESERVE_TEXTURE)) {
++            !(bmp->flags & ALLEGRO_NO_PRESERVE_TEXTURE)) {
+          _al_ogl_upload_bitmap_memory(bmp, bmp->format, bmp->memory);
+          bmp->dirty = false;
+       }
+@@ -869,6 +894,8 @@
+    vt->acknowledge_drawing_resume = android_acknowledge_drawing_resume;
+ 
+    vt->change_display_option = android_change_display_option;
++
++   vt->update_render_state = _al_ogl_update_render_state;
+    
+    _al_ogl_add_drawing_functions(vt);
+     
+Index: src/android/android_apk_file.c
+===================================================================
+--- src/android/android_apk_file.c	(revision 15685)
++++ src/android/android_apk_file.c	(working copy)
+@@ -42,7 +42,7 @@
+ {
+    JNIEnv *jnienv = _al_android_get_jnienv();
+ 
+-   jmethodID ctor = _jni_call(jnienv, jclass, GetMethodID, _al_android_apk_stream_class(), "<init>", "(Lorg/liballeg/app/AllegroActivity;Ljava/lang/String;)V");
++   jmethodID ctor = _jni_call(jnienv, jclass, GetMethodID, _al_android_apk_stream_class(), "<init>", "(Lcom/nooskewl/monsterrpg2/AllegroActivity;Ljava/lang/String;)V");
+ 
+    jstring str = (*jnienv)->NewStringUTF(jnienv, filename);
+ 
+@@ -212,8 +212,6 @@
+          return false;
+    }
+ 
+-   ALLEGRO_DEBUG("in allegro, seek to base=%ld ofs=%lld total=%lld", base, offset, base+offset);
+-
+    if (!APK_seek(fp->apk, base + offset)) {
+       apk_set_errno(fp);
+       return false;
+Index: src/display.c
+===================================================================
+--- src/display.c	(revision 15685)
++++ src/display.c	(working copy)
+@@ -624,10 +624,10 @@
+ 
+ /* Function: al_acknowledge_drawing_resume
+  */
+-void al_acknowledge_drawing_resume(ALLEGRO_DISPLAY *display)
++void al_acknowledge_drawing_resume(ALLEGRO_DISPLAY *display, void (*user_reload)(void))
+ {
+    if (display->vt->acknowledge_drawing_resume) {
+-      display->vt->acknowledge_drawing_resume(display);
++      display->vt->acknowledge_drawing_resume(display, user_reload);
+    }
+ }
+ 
+Index: src/opengl/ogl_display.c
+===================================================================
+--- src/opengl/ogl_display.c	(revision 15685)
++++ src/opengl/ogl_display.c	(working copy)
+@@ -75,7 +75,7 @@
+    e = glGetError();
+    if (e) {
+       ALLEGRO_DEBUG("glBindFramebufferEXT failed (%s)",
+-         _al_ogl_error_string(e));
++         _al_gl_error_string(e));
+    }
+    _al_android_set_curr_fbo(fbo);
+    return old_fbo;
+@@ -212,7 +212,7 @@
+ }
+ 
+ 
+-static void setup_fbo(ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *bitmap)
++void setup_fbo(ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *bitmap)
+ {
+    ALLEGRO_BITMAP_EXTRA_OPENGL *ogl_bitmap;
+    GLint e;
+Index: src/opengl/ogl_bitmap.c
+===================================================================
+--- src/opengl/ogl_bitmap.c	(revision 15685)
++++ src/opengl/ogl_bitmap.c	(working copy)
+@@ -40,6 +40,9 @@
+ #define glDeleteFramebuffersEXT glDeleteFramebuffersOES
+ #endif
+ 
++// FIXME
++void setup_fbo(ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *bitmap);
++
+ ALLEGRO_DEBUG_CHANNEL("opengl")
+ 
+ /* OpenGL does not support "locking", i.e. direct access to a memory
+@@ -667,7 +670,7 @@
+       }
+       else {
+          ALLEGRO_DEBUG("Locking non-backbuffer %s\n", flags & ALLEGRO_LOCK_READONLY ? "READONLY" : "READWRITE");
+-      
++
+          /* Create an FBO if there isn't one. */
+          if (!ogl_bitmap->fbo_info) {
+             old_target = al_get_target_bitmap();
+@@ -678,8 +681,9 @@
+ 
+             al_set_target_bitmap(bitmap); // This creates the fbo
+             bitmap->locked = true;
++            //setup_fbo(disp, bitmap);
+          }
+-
++         
+          if (ogl_bitmap->fbo_info) {
+             GLint old_fbo;
+             old_fbo = _al_ogl_bind_framebuffer(ogl_bitmap->fbo_info->fbo);
+@@ -690,6 +694,19 @@
+                   _al_gl_error_string(e));
+             }
+ 
++            /* Some Android devices only want to read POT chunks with glReadPixels.
++             * This adds yet more overhead, but AFAICT it fails any other way.
++             * Test device was gen 1 Galaxy Tab. Also read 16x16 minimum.
++             */
++#if defined ALLEGRO_ANDROID
++            glPixelStorei(GL_PACK_ALIGNMENT, 4);
++            int start_h = h;
++            w = pot(w);
++            while (w < 16) w = pot(w+1);
++            h = pot(h);
++            while (h < 16) h = pot(h+1);
++#endif
++
+             pitch = ogl_pitch(w, pixel_size);
+             /* Allocate a buffer big enough for both purposes. This requires more
+              * memory to be held for the period of the lock, but overall less
+@@ -697,6 +714,7 @@
+              */
+             ogl_bitmap->lock_buffer = al_malloc(_ALLEGRO_MAX(pitch * h, ogl_pitch(w, 4) * h));
+ 
++
+             /* NOTE: GLES (1.1?) can only read 4 byte pixels, we have to convert */
+ #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+             glReadPixels(x, gl_y, w, h,
+@@ -729,7 +747,11 @@
+ #endif
+ 
+             bitmap->locked_region.data = ogl_bitmap->lock_buffer +
++#ifdef ALLEGRO_ANDROID // See comments above about POT chunks
++               pitch * (start_h - 1);
++#else
+                pitch * (h - 1);
++#endif
+       
+             _al_ogl_bind_framebuffer(old_fbo);
+          }
+@@ -795,7 +817,9 @@
+    ALLEGRO_DISPLAY *disp;
+    ALLEGRO_DISPLAY *old_disp = NULL;
+    GLenum e;
+-   GLint gl_y = bitmap->h - bitmap->lock_y - bitmap->lock_h;
++   int w = bitmap->lock_w;
++   int h = bitmap->lock_h;
++   GLint gl_y = bitmap->h - bitmap->lock_y - h;
+    int orig_format;
+    int orig_pixel_size;
+    int pixel_alignment;
+@@ -852,12 +876,12 @@
+          al_identity_transform(&disp->proj_transform);
+          disp->vt->set_projection(disp);
+          glRasterPos2f(bitmap->lock_x,
+-            bitmap->lock_y + bitmap->lock_h - 1e-4f);
++            bitmap->lock_y + h - 1e-4f);
+          popmatrix = true;
+       }
+       glDisable(GL_TEXTURE_2D);
+       glDisable(GL_BLEND);
+-      glDrawPixels(bitmap->lock_w, bitmap->lock_h,
++      glDrawPixels(bitmap->lock_w, h,
+          get_glformat(lock_format, 2),
+          get_glformat(lock_format, 1),
+          ogl_bitmap->lock_buffer);
+@@ -877,7 +901,7 @@
+       GLuint tmp_tex;
+       glGenTextures(1, &tmp_tex);
+       glBindTexture(GL_TEXTURE_2D, tmp_tex);
+-      glTexImage2D(GL_TEXTURE_2D, 0, get_glformat(lock_format, 0), bitmap->lock_w, bitmap->lock_h,
++      glTexImage2D(GL_TEXTURE_2D, 0, get_glformat(lock_format, 0), bitmap->lock_w, h,
+                    0, get_glformat(lock_format, 2), get_glformat(lock_format, 1),
+                    ogl_bitmap->lock_buffer);
+       e = glGetError();
+@@ -885,7 +909,7 @@
+          int printf(const char *, ...);
+          printf("glTexImage2D failed: %d\n", e);
+       }
+-      glDrawTexiOES(bitmap->lock_x, bitmap->lock_y, 0, bitmap->lock_w, bitmap->lock_h);
++      glDrawTexiOES(bitmap->lock_x, bitmap->lock_y, 0, bitmap->lock_w, h);
+       e = glGetError();
+       if (e) {
+          int printf(const char *, ...);
+@@ -908,12 +932,18 @@
+ 
+       glBindTexture(GL_TEXTURE_2D, ogl_bitmap->texture);
+ 
++#ifdef ALLEGRO_ANDROID
++      if (!(bitmap->lock_flags & ALLEGRO_LOCK_WRITEONLY)) {
++         w = pot(w);
++      }
++#endif
++         
+       if (!ogl_bitmap->fbo_info ||
+             (bitmap->locked_region.format != orig_format)) {
+-         
+-         int dst_pitch = bitmap->lock_w * orig_pixel_size;
+-         unsigned char *tmpbuf = al_malloc(dst_pitch * bitmap->lock_h);
+ 
++         int dst_pitch = w * orig_pixel_size;
++         unsigned char *tmpbuf = al_malloc(dst_pitch * h);
++
+          ALLEGRO_DEBUG("Unlocking non-backbuffer with conversion\n");
+          
+          _al_convert_bitmap_data(
+@@ -924,14 +954,14 @@
+             orig_format,
+             dst_pitch,
+             0, 0, 0, 0,
+-            bitmap->lock_w, bitmap->lock_h);
++            w, h);
+ 	    
+          pixel_alignment = ogl_pixel_alignment(orig_pixel_size);
+          glPixelStorei(GL_UNPACK_ALIGNMENT, pixel_alignment);
+ 
+          glTexSubImage2D(GL_TEXTURE_2D, 0,
+             bitmap->lock_x, gl_y,
+-            bitmap->lock_w, bitmap->lock_h,
++            w, h,
+             get_glformat(orig_format, 2),
+             get_glformat(orig_format, 1),
+             tmpbuf);
+@@ -949,7 +979,7 @@
+          glPixelStorei(GL_UNPACK_ALIGNMENT, pixel_alignment);
+ 
+          glTexSubImage2D(GL_TEXTURE_2D, 0, bitmap->lock_x, gl_y,
+-            bitmap->lock_w, bitmap->lock_h,
++            w, h,
+             get_glformat(lock_format, 2),
+             get_glformat(lock_format, 1),
+             ogl_bitmap->lock_buffer);
+@@ -964,7 +994,7 @@
+                GL_TEXTURE_INTERNAL_FORMAT, &tex_internalformat);
+ 
+             ALLEGRO_DEBUG("x/y/w/h: %d/%d/%d/%d, internal format: %d\n",
+-               bitmap->lock_x, gl_y, bitmap->lock_w, bitmap->lock_h,
++               bitmap->lock_x, gl_y, w, h,
+                tex_internalformat);
+ #endif
+          }
+@@ -1099,6 +1129,14 @@
+    if (true_h < 16) true_h = 16;
+ #endif
+ 
++/* glReadPixels requires 32 byte aligned rows */
++#if defined ALLEGRO_ANDROID
++   int mod = true_w % 32;
++   if (mod != 0) {
++      true_w += 32 - mod;
++   }
++#endif
++
+ #if !defined ALLEGRO_GP2XWIZ
+    format = _al_get_real_pixel_format(d, format);
+ #else
