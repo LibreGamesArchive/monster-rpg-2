@@ -362,7 +362,11 @@ static void create_shadows(MBITMAP *bmp, RecreateData *data)
 	}
 
 	m_set_target_bitmap(shadow_corners[2]);
+#ifdef ALLEGRO_ANDROID
+	al_lock_bitmap(shadow_corners[2]->bitmap->parent, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
+#else
 	m_lock_bitmap(shadow_corners[2], ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
+#endif
 	for (int yy = 0; yy < SHADOW_CORNER_SIZE; yy++) {
 		for (int xx = 0; xx < SHADOW_CORNER_SIZE; xx++) {
 			int dx = xx;
@@ -373,7 +377,11 @@ static void create_shadows(MBITMAP *bmp, RecreateData *data)
 			m_put_pixel(xx, yy, m_map_rgba(0, 0, 0, a));
 		}
 	}
+#ifdef ALLEGRO_ANDROID
+	al_unlock_bitmap(shadow_corners[2]->bitmap->parent);
+#else
 	m_unlock_bitmap(shadow_corners[2]);
+#endif
 	_blend_color = white;
 	
 	if (use_programmable_pipeline) {
@@ -1362,8 +1370,6 @@ static void *loader_proc(void *arg)
 	show_progress(60);
 
 	gfx_mode_set = true;
-
-	al_inhibit_screensaver(true);
 
 	// Set an icon
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_MACOSX && !defined ALLEGRO_ANDROID
@@ -2852,6 +2858,8 @@ ALLEGRO_DEBUG("boo1");
 	while (!loading_done) {
 		m_rest(0.001);
 	}
+	
+	al_inhibit_screensaver(true);
 
 	// Must be first thing after thread end or before thread start
 	if (cached_bitmap) {
@@ -2909,18 +2917,13 @@ ALLEGRO_DEBUG("boo1");
 	m_clear(black);
 
 #ifdef ALLEGRO_ANDROID
-	debug_message("init physfs stuff 1");
 	ALLEGRO_PATH *apkname = al_get_standard_path(ALLEGRO_EXENAME_PATH);
-	debug_message("init physfs stuff 2");
 	debug_message("exename='%s'", al_path_cstr(apkname, '/'));
 	if (!PHYSFS_init(al_path_cstr(apkname, '/'))) {
 		return false;
 	}
-	debug_message("init physfs stuff 3");
 	PHYSFS_addToSearchPath(al_path_cstr(apkname, '/'), 1);
-	debug_message("init physfs stuff 4");
 	al_destroy_path(apkname);
-	debug_message("init physfs stuff 5");
 #endif
 
 	return true;

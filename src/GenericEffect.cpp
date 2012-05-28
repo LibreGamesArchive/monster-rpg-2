@@ -4,8 +4,6 @@
 
 const float GenericHolyWaterEffect::RISE_SPEED = 0.1f;
 
-//void draw_points_locked(ALLEGRO_VERTEX *verts, int n);
-
 void GenericCureEffect::finalize(Combatant *target)
 {
 	if (!battle)
@@ -190,11 +188,7 @@ void GenericHolyWaterEffect::draw(void)
 		count++;
 	}
 
-#ifdef __linux__XXX
-	draw_points_locked(verts, count);
-#else
 	m_draw_prim(verts, 0, 0, 0, count, ALLEGRO_PRIM_POINT_LIST);
-#endif
 
 	target->draw();
 
@@ -214,11 +208,7 @@ void GenericHolyWaterEffect::draw(void)
 		count++;
 	}
 
-#ifdef __linux__XXX
-	draw_points_locked(verts, count);
-#else
 	m_draw_prim(verts, 0, 0, 0, count, ALLEGRO_PRIM_POINT_LIST);
-#endif
 }
 
 
@@ -316,11 +306,7 @@ void GenericHealEffect::draw(void)
 		verts[i].color = pixels[i].color;
 	}
 
-#ifdef __linux__XXX
-	draw_points_locked(verts, i);
-#else
 	m_draw_prim(verts, 0, 0, 0, i, ALLEGRO_PRIM_POINT_LIST);
-#endif
 }
 
 

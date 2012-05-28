@@ -1,6 +1,29 @@
 #include "monster2.hpp"
 
-//void draw_points_locked(ALLEGRO_VERTEX *verts, int n);
+/*
+#define SINTABSIZE 100
+static float costable[SINTABSIZE];
+static float sintable[SINTABSIZE];
+
+inline float quicksin(float x)
+{
+	while (x < 0) x += M_PI*2;
+	while (x > M_PI*2) x -= M_PI*2;
+	return sintable[(int)(x/(M_PI*2)*SINTABSIZE)];
+}
+	
+inline float quickcos(float x)
+{
+	while (x < 0) x += M_PI*2;
+	while (x > M_PI*2) x -= M_PI*2;
+	return costable[(int)(x/(M_PI*2)*SINTABSIZE)];
+}
+*/
+
+#define quicksin sin
+#define quickcos cos
+
+#define MAX_PARTICLES 200
 
 class MLanderButton : public TGUIWidget {
 public:
@@ -76,6 +99,14 @@ static float randf(float lo, float hi)
 
 bool do_lander(void)
 {
+	/*
+	for (int i = 0; i < SINTABSIZE; i++) {
+		float f = (float)i / SINTABSIZE * M_PI*2;
+		costable[i] = cos(f);
+		sintable[i] = sin(f);
+	}
+	*/
+
 	// stop set_sets (astar with mouse)
 	getInput()->set(false, false, false, false, false, false, false);
 
@@ -85,10 +116,10 @@ bool do_lander(void)
 	Particle p; \
 	float c = lander_angle+M_PI+(M_PI/6*dir); \
 	float s = lander_angle+M_PI+(M_PI/6*dir); \
-	p.x = lander_x + cos(c) * 9; \
-	p.y = lander_y + sin(s) * 9; \
-	p.dx = cos(-c) * 0.01f + randf(-0.002f, 0.002f); \
-	p.dy = sin(-s) * 0.01f + randf(-0.002f, 0.002f); \
+	p.x = lander_x + quickcos(c) * 9; \
+	p.y = lander_y + quicksin(s) * 9; \
+	p.dx = quickcos(-c) * 0.01f + randf(-0.002f, 0.002f); \
+	p.dy = quicksin(-s) * 0.01f + randf(-0.002f, 0.002f); \
 	p.ground = BH; \
 	p.color = m_map_rgb(255, 0, 0); \
 	particles.push_back(p); \
@@ -105,6 +136,7 @@ top:
 #endif
 
 	setAmbienceVolume(0);
+	float lastVolume = 0;
 
 	MBITMAP *lander_bmp = m_load_alpha_bitmap(getResource("media/lander.png"));
 	MBITMAP *land_bmp = m_load_alpha_bitmap(getResource("media/landing_area.png"));
@@ -119,7 +151,7 @@ top:
 	MBITMAP *lander_tmp = m_create_bitmap(30, 30); // check
 	m_set_target_bitmap(lander_tmp);
 	m_clear(al_map_rgba(0, 0, 0, 0));
-	m_draw_bitmap(land_bmp, 3, 3, 0);
+	m_draw_bitmap(lander_mem, 3, 3, 0);
 	al_restore_state(&state);
 	
 	AnimationSet *explosion = new AnimationSet(getResource("media/explosion.png"));
@@ -182,14 +214,11 @@ top:
 			if (exploding) {
 				explosion->update(LOGIC_MILLIS);
 				explode_count += LOGIC_MILLIS;
-				if (explode_count > 3000) {
-					goto done;
-				}
 			}
 
 			/* apply gravity */
-			lander_x += cos(M_PI/2) * gravity * LOGIC_MILLIS;
-			lander_y += sin(M_PI/2) * gravity * LOGIC_MILLIS;
+			lander_x += quickcos(M_PI/2) * gravity * LOGIC_MILLIS;
+			lander_y += quicksin(M_PI/2) * gravity * LOGIC_MILLIS;
 
 			/* apply jets */
 			bool left = false, right = false;
@@ -212,14 +241,17 @@ top:
 			}
 				
 			if (left) {
-				setAmbienceVolume(1);
+				if (lastVolume != 1) {
+					setAmbienceVolume(1);
+					lastVolume = 1;
+				}
 				lander_vel += lander_vel_delta * LOGIC_MILLIS;
 				if (lander_vel > lander_vel_max)
 					lander_vel = lander_vel_max;
 				lander_angle += lander_angle_delta * LOGIC_MILLIS;
-				lander_x += cos(lander_angle) * lander_vel * LOGIC_MILLIS;
-				lander_y += sin(lander_angle) * lander_vel * LOGIC_MILLIS;
-				if (particles.size() < 200) {
+				lander_x += quickcos(lander_angle) * lander_vel * LOGIC_MILLIS;
+				lander_y += quicksin(lander_angle) * lander_vel * LOGIC_MILLIS;
+				if (particles.size() < MAX_PARTICLES) {
 					int t = tguiCurrentTimeMillis();
 					//int n = t-last_particle_1;
 					last_particle_1 = t;
@@ -229,14 +261,17 @@ top:
 				}
 			}
 			if (right) {
-				setAmbienceVolume(1);
+				if (lastVolume != 1) {
+					setAmbienceVolume(1);
+					lastVolume = 1;
+				}
 				lander_vel += lander_vel_delta * LOGIC_MILLIS;
 				if (lander_vel > lander_vel_max)
 					lander_vel = lander_vel_max;
 				lander_angle -= lander_angle_delta * LOGIC_MILLIS;
-				lander_x += cos(lander_angle) * lander_vel * LOGIC_MILLIS;
-				lander_y += sin(lander_angle) * lander_vel * LOGIC_MILLIS;
-				if (particles.size() < 200) {
+				lander_x += quickcos(lander_angle) * lander_vel * LOGIC_MILLIS;
+				lander_y += quicksin(lander_angle) * lander_vel * LOGIC_MILLIS;
+				if (particles.size() < MAX_PARTICLES) {
 					int t = tguiCurrentTimeMillis();
 					//int n = t-last_particle_2;
 					last_particle_2 = t;
@@ -246,8 +281,10 @@ top:
 				}
 			}
 
-			if (!left && !right)
+			if (!left && !right && lastVolume != 0) {
 				setAmbienceVolume(0);
+				lastVolume = 0;
+			}
 
 			/* Update particles */
 
@@ -274,7 +311,7 @@ top:
 			green = 0;
 			
 			int x1, x2, y1, y2;
-			
+
 			for (y1 = 0, y2 = lander_y - 15; y1 < 30; y1++, y2++) {
 				for (x1 = 0, x2 = lander_x - 15; x1 < 30; x1++, x2++) {
 					MCOLOR c1 = m_get_pixel(lander_tmp, x1, y1);
@@ -283,9 +320,6 @@ top:
 					unsigned char r2, g2, b2, a2;
 					m_unmap_rgba(c1, &r1, &g1, &b1, &a1);
 					m_unmap_rgba(c2, &r2, &g2, &b2, &a2);
-					
-					//printf("1: %d %d %d %d\n", r1, g1, b1, a1);
-					//printf("2: %d %d %d %d\n", r2, g2, b2, a2);
 					
 					bool done = false;
 					
@@ -313,7 +347,7 @@ top:
 					}
 				}
 			}
-			
+
 			if (!dead && green > 3) {
 				draw_counter++;
 				break;
@@ -358,23 +392,22 @@ top:
 				vcount++;
 			}
 
-#ifdef __linux__XXX
-			draw_points_locked(verts, vcount);
-#else
 			m_draw_prim(verts, 0, 0, 0, vcount, ALLEGRO_PRIM_POINT_LIST);
-#endif
 		
 			if (!use_dpad)
 				tguiDraw();
 
 			drawBufferToScreen();
 			m_flip_display();
+		
+			if (!dead && green > 3) {
+				goto done;
+			}
+			else if (explode_count > 3000) {
+				goto done;
+			}
 		}
 
-		if (!dead && green > 3) {
-			goto done;
-		}			
-		
 		if (is_close_pressed()) {
 			do_close();
 			close_pressed = false;
@@ -383,7 +416,9 @@ top:
 
 done:
 
+//debug_message("1");
 	clear_input_events();
+//debug_message("1");
 
 	if (!use_dpad) {
 		tguiDeleteWidget(left_button);
@@ -391,6 +426,7 @@ done:
 		delete left_button;
 		delete right_button;
 	}
+//debug_message("1");
 
 	m_destroy_bitmap(lander_bmp);
 	m_destroy_bitmap(land_bmp);
@@ -399,14 +435,18 @@ done:
 	m_destroy_bitmap(lander_tmp);
 	m_destroy_bitmap(lander_mem);
 	delete explosion;
+//debug_message("1");
 
 	//m_set_target_bitmap(buffer);
+	playAmbience("");
+//debug_message("1");
+
 	fadeOut(black);
 	m_set_target_bitmap(buffer);
 	m_clear(black);
 	m_rest(5);
+//debug_message("1");
 
-	playAmbience("");
 	playMusic("");
 
 	playMusic("underwater_final.ogg");

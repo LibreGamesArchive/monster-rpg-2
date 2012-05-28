@@ -1,14 +1,10 @@
 #include "monster2.hpp"
 
 #define ASSERT ALLEGRO_ASSERT
-#ifdef WIZ
 // ugh FIXME
 #include <allegro5/internal/aintern.h>
 #include <allegro5/internal/aintern_bitmap.h>
 #include <allegro5/internal/aintern_opengl.h>
-#endif
-
-void draw_points_locked(ALLEGRO_VERTEX *verts, int n);
 
 #ifdef ALLEGRO_IPHONE
 extern "C" {
@@ -812,12 +808,7 @@ void m_draw_precise_line(MBITMAP *bitmap, float x1, float y1, float x2, float y2
 	}
 
 	if (vcount > 0) {
-//#if defined __linux__ && !defined ALLEGRO_ANDROID
-#if 0
-		draw_points_locked(verts, vcount);
-#else
 		m_draw_prim(verts, 0, 0, 0, vcount, ALLEGRO_PRIM_POINT_LIST);
-#endif
 	}
 
 	m_restore_blender();
@@ -1213,10 +1204,26 @@ void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flag
 		src_h -= (dy+src_h) - (cy+ch);
 	}
 	
+#ifdef ALLEGRO_ANDROID
+	ALLEGRO_BITMAP *tolock;
+	int ofsx = 0, ofsy = 0;
+	if (al_get_parent_bitmap(src->bitmap)) {
+		tolock = al_get_parent_bitmap(src->bitmap);
+		ofsx += src->bitmap->xofs;
+		ofsx += src->bitmap->yofs;
+	}
+	else {
+		tolock = src->bitmap;
+	}
+	ALLEGRO_LOCKED_REGION *sreg = al_lock_bitmap(tolock, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READONLY);
+	ALLEGRO_LOCKED_REGION *dreg = al_lock_bitmap(target, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READWRITE);
+#else
 	ALLEGRO_LOCKED_REGION *sreg = m_lock_bitmap_region(src, 0, sy, src_w, src_h, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READONLY);
 	if (!sreg) { ALLEGRO_DEBUG("!sreg returning"); return; }
 	ALLEGRO_LOCKED_REGION *dreg = al_lock_bitmap_region(target, dx, dy, src_w, src_h, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READWRITE);
 	if (!dreg) { m_unlock_bitmap(src); ALLEGRO_DEBUG("!dreg returning"); return; }
+	int ofsx = 0, ofsy = 0;
+#endif
 
 	float src_factor = 1 - amount;
 	
@@ -1225,8 +1232,13 @@ void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flag
 	float add_b = (color.b * amount) * 0xf;
 
 	for (int yy = 0; yy < src_h; yy++) {
+#ifdef ALLEGRO_ANDROID
+		unsigned char *sptr = ((unsigned char *)sreg->data + (yy+ofsy) * sreg->pitch + (ofsx * 2));
+		unsigned char *dptr = ((unsigned char *)dreg->data + (yy+dy) * dreg->pitch + (dx * 2));
+#else
 		unsigned char *sptr = ((unsigned char *)sreg->data + yy * sreg->pitch);
 		unsigned char *dptr = ((unsigned char *)dreg->data + yy * dreg->pitch);
+#endif
 		if (flags & M_FLIP_HORIZONTAL) {
 			dptr += src_w*2 - 1;
 		}
@@ -1268,7 +1280,11 @@ void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flag
 		}
 	}
 
+#ifdef ALLEGRO_ANDROID
+	al_unlock_bitmap(tolock);
+#else
 	m_unlock_bitmap(src);
+#endif
 	al_unlock_bitmap(target);
 }
 #else
@@ -1366,12 +1382,31 @@ void death_blit_region(MBITMAP *src, int x, int y, int w, int h, int dx, int dy,
 		h -= (dy+h)-th;
 	}
 
+#ifdef ALLEGRO_ANDROID
+	ALLEGRO_BITMAP *tolock;
+	if (al_get_parent_bitmap(src->bitmap)) {
+		tolock = al_get_parent_bitmap(src->bitmap);
+		x += src->bitmap->xofs;
+		y += src->bitmap->yofs;
+	}
+	else {
+		tolock = src->bitmap;
+	}
+	ALLEGRO_LOCKED_REGION *sreg = al_lock_bitmap(tolock, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READONLY);
+	ALLEGRO_LOCKED_REGION *dreg = al_lock_bitmap(target, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READWRITE);
+#else
 	ALLEGRO_LOCKED_REGION *sreg = m_lock_bitmap_region(src, x, y, w, h, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READONLY);
 	ALLEGRO_LOCKED_REGION *dreg = al_lock_bitmap_region(target, dx, dy, w, h, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READWRITE);
+#endif
 
 	for (int yy = 0; yy < h; yy++) {
+#ifdef ALLEGRO_ANDROID
+		unsigned char *sptr = ((unsigned char *)sreg->data + (yy+y) * sreg->pitch + (x * 2));
+		unsigned char *dptr = ((unsigned char *)dreg->data + (yy+dy) * dreg->pitch + (dx * 2));
+#else
 		unsigned char *sptr = ((unsigned char *)sreg->data + yy * sreg->pitch);
 		unsigned char *dptr = ((unsigned char *)dreg->data + yy * dreg->pitch);
+#endif
 		if (flags & M_FLIP_HORIZONTAL) {
 			dptr += w*2 - 1;
 		}
@@ -1406,8 +1441,12 @@ void death_blit_region(MBITMAP *src, int x, int y, int w, int h, int dx, int dy,
 			}
 		}
 	}
-	
+
+#ifdef ALLEGRO_ANDROID
+	al_unlock_bitmap(tolock);
+#else
 	m_unlock_bitmap(src);
+#endif
 	al_unlock_bitmap(target);
 }
 #else

@@ -2402,7 +2402,6 @@ int MMap::update(int millis)
 		}
 	}
 
-	ALLEGRO_DEBUG("in update, flash=%d", shouldFlash);
 	if (shouldFlash) {
 		if (ie.button1 == DOWN || clicked) {
 			use_input_event();

@@ -1,4 +1,5 @@
 #include "monster2.hpp"
+#include <allegro5/internal/aintern_bitmap.h>
 
 // GOO! FIXME
 //#include <allegro5/internal/aintern_pixels.h>
@@ -24,6 +25,7 @@ extern "C" {
 void _al_blend_memory(ALLEGRO_COLOR *, ALLEGRO_BITMAP *, int, int, ALLEGRO_COLOR *);
 }
 
+#ifndef ALLEGRO_ANDROID
 static void draw_points_locked(ALLEGRO_VERTEX *verts, int n)
 {
 	int minx = INT_MAX, miny = INT_MAX;
@@ -62,6 +64,7 @@ static void draw_points_locked(ALLEGRO_VERTEX *verts, int n)
 
 	al_unlock_bitmap(target);
 }
+#endif
 
 static void get_bolt2_bitmaps(int n, MBITMAP **bmps)
 {
@@ -1850,12 +1853,7 @@ void SludgeEffect::draw()
 		vcount++;
 	}
 
-//#if defined __linux__ && !defined ALLEGRO_ANDROID
-#if 0
-	draw_points_locked(verts, vcount);
-#else
 	m_draw_prim(verts, 0, 0, 0, vcount, ALLEGRO_PRIM_LINE_LIST);
-#endif
 
 	delete[] verts;
 
@@ -1919,9 +1917,13 @@ void SludgeEffect::get_info(void)
 
 	for (int i = 0; i < numFrames; i++) {
 		MBITMAP *b = a->getFrame(i)->getImage()->getBitmap();
+#ifdef ALLEGRO_ANDROID
+		al_lock_bitmap(b->bitmap->parent, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
+#else
+		m_lock_bitmap(b, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
+#endif
 		left_pixels[i] = new int[m_get_bitmap_height(b)];
 		right_pixels[i] = new int[m_get_bitmap_height(b)];
-		m_lock_bitmap(b, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
 		for (int y = 0; y < m_get_bitmap_height(b); y++) {
 			int first = INT_MAX;
 			int last = 0;
@@ -1949,7 +1951,11 @@ void SludgeEffect::get_info(void)
 				right_pixels[i][y] = last;
 			}
 		}
+#ifdef ALLEGRO_ANDROID
+		al_unlock_bitmap(b->bitmap->parent);
+#else
 		m_unlock_bitmap(b);
+#endif
 	}
 }
 
@@ -3795,6 +3801,8 @@ static void getExplodingPixels(MBITMAP *bmp, float dx, float dy, std::vector<Exp
 	float w = m_get_bitmap_width(bmp);
 	float h = m_get_bitmap_height(bmp);
 
+	m_lock_bitmap(bmp, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
+
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
 			MCOLOR color = m_get_pixel(bmp, x, y);
@@ -3814,6 +3822,8 @@ static void getExplodingPixels(MBITMAP *bmp, float dx, float dy, std::vector<Exp
 			v.push_back(p);
 		}
 	}
+
+	m_unlock_bitmap(bmp);
 }
 
 

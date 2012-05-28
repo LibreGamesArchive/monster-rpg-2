@@ -19,7 +19,7 @@ uint32_t runtime;
 int runtime_ms = 0;
 long runtime_start;
 
-static bool dont_draw_now = false;
+bool dont_draw_now = false;
 
 bool break_main_loop = false;
 bool quit_game = false;

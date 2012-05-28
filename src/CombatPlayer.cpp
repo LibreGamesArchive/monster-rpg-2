@@ -1,4 +1,5 @@
 #include "monster2.hpp"
+#include <allegro5/internal/aintern_bitmap.h>
 
 // FIXME?!?!
 #include "allegro5/internal/aintern_pixels.h"
@@ -1560,8 +1561,11 @@ void CombatPlayer::draw(void)
 				int ww = m_get_bitmap_width(work);
 				int wh = m_get_bitmap_height(work);
 				stone_bmp = m_create_bitmap(ww, wh);
-
+#ifdef ALLEGRO_ANDROID
+				al_lock_bitmap(work->bitmap->parent, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
+#else
 				m_lock_bitmap(work, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
+#endif
 				m_lock_bitmap(stoneTexture, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
 
 				ALLEGRO_BITMAP *target = al_get_target_bitmap();
@@ -1586,7 +1590,11 @@ void CombatPlayer::draw(void)
 						m_put_pixel(xx, yy, result);
 					}
 				}
+#ifdef ALLEGRO_ANDROID
+				al_unlock_bitmap(work->bitmap->parent);
+#else
 				m_unlock_bitmap(work);
+#endif
 				m_unlock_bitmap(stoneTexture);
 
 				m_unlock_bitmap(stone_bmp);

@@ -339,5 +339,7 @@ extern int old_control_mode;
 void connect_airplay_controls(void);
 void disconnect_airplay_controls(void);
 
+extern bool dont_draw_now;
+
 #endif
 

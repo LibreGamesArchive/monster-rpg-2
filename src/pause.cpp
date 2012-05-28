@@ -2171,6 +2171,10 @@ void into_the_sun(void)
 	dpad_off();
 
 	MBITMAP *bg = m_load_bitmap(getResource("media/sun.png"));
+
+	MBITMAP *bg_locked = m_load_bitmap(getResource("media/sun.png"));
+	m_lock_bitmap(bg_locked, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
+
 	AnimationSet *explosion = new AnimationSet(getResource("media/explosion.png"));
 
 	m_set_target_bitmap(buffer);
@@ -2218,14 +2222,26 @@ void into_the_sun(void)
 			else {
 				int cx = sx + ((float)count/length)*(dx-sx);
 				int cy = sy + ((float)count/length)*(dy-sy);
-				MCOLOR c = m_get_pixel(bg, cx, cy);
+				MCOLOR c = m_get_pixel(bg_locked, cx, cy);
 				unsigned char r, g, b, a;
 				m_unmap_rgba(c, &r, &g, &b, &a);
+				ALLEGRO_STATE st;
+				al_store_state(&st, ALLEGRO_STATE_BLENDER);
+				al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+				ALLEGRO_VERTEX v[1];
+				v[0].x = cx;
+				v[0].y = cy;
+				v[0].z = 0;
 				if (r+g+b < (255*3)/2) {
-					m_put_pixel(cx, cy, white);
+					v[0].color = white;
+					//al_draw_pixel(cx, cy, al_map_rgb(255, 255, 255));
 				}
-				else
-					m_put_pixel(cx, cy, black);
+				else {
+					//al_draw_pixel(cx, cy, al_map_rgb(0, 0, 0));
+					v[0].color = black;
+				}
+				al_draw_prim(v, NULL, NULL, 0, 1, ALLEGRO_PRIM_POINT_LIST);
+				al_restore_state(&st);
 			}
 
 			drawBufferToScreen();
@@ -2240,6 +2256,8 @@ done:
 	m_rest(5);
 
 	m_destroy_bitmap(bg);
+	m_unlock_bitmap(bg_locked);
+	m_destroy_bitmap(bg_locked);
 	delete explosion;
 
 	dpad_on();

@@ -1137,6 +1137,7 @@ void Battle::start(void)
 #endif
 	std::string musicname;
 
+debug_message("start 1");
 	if (name == "1Tode")
 		musicname = "final_boss.ogg";
 	else if (boss_fight) {
@@ -1145,11 +1146,13 @@ void Battle::start(void)
 	else {
 		musicname = "battle.ogg";
 	}
+debug_message("start 2");
 
 	if (!(name == "1Golem") && !manChooser) {
 		playMusic(musicname, 0.0f);
 		musicFadeCount = 0;
 	}
+debug_message("start 3");
 	// Add players and adjust enemy positions
 	if (attackedFromBehind) {
 		// add players
@@ -1196,9 +1199,11 @@ void Battle::start(void)
 			addEntity(c);
 		}
 	}
+debug_message("start 4");
 
 
 	callLua(luaState, "start", ">");
+debug_message("start 5");
 	
 	std::list<CombatEntity *>::iterator it;
 	for (it = entities.begin(); it != entities.end(); it++) {
@@ -1207,6 +1212,7 @@ void Battle::start(void)
 			((CombatEnemy *)e)->start();
 		}
 	}
+debug_message("start 6");
 
 	// if preemptive, don't change order
 	if (preemptive) {
@@ -1216,6 +1222,7 @@ void Battle::start(void)
 	else if (attackedFromBehind) {
 		entities.reverse();
 	}
+debug_message("start 7");
 
 	// randomize Combatants with equal speed
 	/*

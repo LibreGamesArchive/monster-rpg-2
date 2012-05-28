@@ -721,8 +721,12 @@ static int CDoDialogue(lua_State *stack)
 			}
 			if (timer_on) {
 				timer_time -= LOGIC_MILLIS;
+				if (timer_time <= 0) {
+					dont_draw_now = true;
+					ret = false;
+					goto done;
+				}
 				/*
-				if (timer_time < 0) {
 					tguiDeleteWidget(speechDialog);
 					delete speechDialog;
 					speechDialog = NULL;
@@ -765,13 +769,9 @@ static int CDoDialogue(lua_State *stack)
 			if (timer_on) {
 				int minutes = (timer_time/1000) / 60;
 				int seconds = (timer_time/1000) % 60;
-				if (timer_time < 0) {
-					minutes = 0;
-					seconds = 0;
-				}
 				char text[10];
-				sprintf(text, "%2d:%02d", minutes, seconds);
-				int tw = m_text_length(huge_font, text);
+				sprintf(text, "%d:%02d", minutes, seconds);
+				int tw = m_text_length(huge_font, "5:55") + 10;
 				int th = m_text_height(huge_font);
 				mTextout(huge_font, text, BW-(tw/2)-10, th/2+5,
 					white, black,
@@ -1228,7 +1228,6 @@ static int CStartBattle(lua_State *stack)
 #ifdef DEBUG
 	//return 0;
 #endif
-
 	// FIXME: make sure this works. It's a hack to avoid
 	// activating a chest or person and then immediately
 	// going into battle.
@@ -1250,8 +1249,6 @@ static int CStartBattle(lua_State *stack)
 	else
 		can_run = true;
 	
-	debug_message("StartBattle 2\n");
-
 	Object *obj = area->findObject(0);
 	if (!obj) {
 		printf("findObject(0) FAILED!~\n");
@@ -1275,8 +1272,6 @@ static int CStartBattle(lua_State *stack)
 
 	loadPlayDestroy("battle.ogg");
 	
-	debug_message("can_run=%d must_win=%d\n", can_run, battle_must_win);
-
 	battle = new Battle(name, can_run);
 	debug_message("created battle object\n");
 	battle->start();
