@@ -193,7 +193,13 @@ bool is_android_lessthan_2_3;
 bool achievement_show = false;
 double achievement_time = 0;
 MBITMAP *achievement_bmp;
+#ifdef A5_D3D
+int PRESERVE_TEXTURE = 0;
+int NO_PRESERVE_TEXTURE = ALLEGRO_NO_PRESERVE_TEXTURE;
+#else
 int PRESERVE_TEXTURE = ALLEGRO_NO_PRESERVE_TEXTURE;
+int NO_PRESERVE_TEXTURE = ALLEGRO_NO_PRESERVE_TEXTURE;
+#endif
 bool reload_translation = false;
 static std::string replayMusicName = "";
 
@@ -914,7 +920,7 @@ static void *thread_proc(void *arg)
 					ie.button1 = DOWN;
 					add_input_event(ie);
 				}
-				else if (code == ALLEGRO_KEY_ESCAPE || code == config.getKey2()) {
+				else if (code == ALLEGRO_KEY_ESCAPE || code == ALLEGRO_KEY_FULLSTOP || code == config.getKey2()) {
 					ie.button2 = DOWN;
 					add_input_event(ie);
 				}
@@ -947,7 +953,7 @@ static void *thread_proc(void *arg)
 					ie.button1 = UP;
 					add_input_event(ie);
 				}
-				else if (code == ALLEGRO_KEY_ESCAPE || code == config.getKey2()) {
+				else if (code == ALLEGRO_KEY_ESCAPE || code == ALLEGRO_KEY_FULLSTOP || code == config.getKey2()) {
 					ie.button2 = UP;
 					add_input_event(ie);
 				}
@@ -2268,8 +2274,10 @@ void create_buffers(void)
 		m_destroy_bitmap(overlay);
 	int flags = al_get_new_bitmap_flags();
 	if (config.getFilterType() == FILTER_LINEAR) {
-		al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
+		al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | NO_PRESERVE_TEXTURE);
 	}
+	else
+		al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE);
 	buffer = m_create_bitmap(BW, BH); // check
 	overlay = m_create_bitmap(BW, BH); // check
 	al_set_new_bitmap_flags(flags);
@@ -2777,7 +2785,10 @@ ALLEGRO_DEBUG("boo1");
 	al_set_new_bitmap_flags(flags);
 
 	if (use_programmable_pipeline) {
+		int flags = al_get_new_bitmap_flags();
+		al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE);
 		scaleXX_buffer = m_create_bitmap(BW*2, BH*2); // check
+		al_set_new_bitmap_flags(flags);
 	}
 
 	init2_shaders();
@@ -2815,8 +2826,10 @@ ALLEGRO_DEBUG("boo1");
 	bar_loader = m_load_bitmap(getResource("media/bar-loader.png"));
 	loading_loader = m_load_bitmap(getResource("media/loading-loader.png"));
 
+	int flogs = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags(flogs | NO_PRESERVE_TEXTURE);
 	MBITMAP *tmp = m_create_bitmap(BH, BW); // check
-
+	al_set_new_bitmap_flags(flogs);
 
 	/* ON IPHONE WE LOAD EVERYTHING AS MEMORY BITMAP FIRST THEN
 	 * CONVERT THEM TO DISPLAY BITMAPS SO WE CAN SHOW A SMOOTH
@@ -3207,6 +3220,7 @@ void toggle_fullscreen(void)
 	al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, config.getWantedGraphicsMode()->fullscreen);
 #ifdef A5_D3D
 	_reload_loaded_bitmaps();
+	_reload_loaded_bitmaps_delayed();
 #endif
 	set_screen_params();
 #ifdef A5_D3D

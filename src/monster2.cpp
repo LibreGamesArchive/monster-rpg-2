@@ -211,6 +211,12 @@ bool is_close_pressed(void)
 		}
 #endif
 
+#ifdef A5_D3D_XXX
+		if (event.type == ALLEGRO_EVENT_DISPLAY_FOUND) {
+			should_reset = true;
+		}
+#endif
+
 		if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
 #ifdef ALLEGRO_IPHONE
 			if (!sound_was_playing_at_program_start)
@@ -401,6 +407,7 @@ bool is_close_pressed(void)
 			set_screen_params();
 	
 			_reload_loaded_bitmaps();
+			_reload_loaded_bitmaps_delayed();
 			
 			m_set_target_bitmap(buffer);
 			
@@ -427,6 +434,7 @@ bool is_close_pressed(void)
 		}
 		init_big_depth_surface();
 		_reload_loaded_bitmaps();
+		_reload_loaded_bitmaps_delayed();
 		if (in_shooter) {
 			shooter_restoring = true;
 		}

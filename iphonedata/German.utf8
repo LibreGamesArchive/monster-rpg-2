@@ -707,7 +707,7 @@ Bitte neu starten
 OK drücken
 Bewegung: Pfeiltasten oder Gamepad
 LEERTASTE/ENTER - Aktionsknopf
-ESCAPE - Abbruch, Zurück oder Menü
+ESC/. - Abbruch, Zurück oder Menü
 V - Information zu Gegenständen/Menüoptionen
 (Oder Gamepad Tasten 1, 2, 3)
 S - Einstellungen
@@ -955,21 +955,21 @@ Complete!
 Überspringen
 Sie diesen Mini-Spiel?
 Hexe: Die Demo endet hier, Missy!^
-xxx {027} Integer scaling
-xxx HQ sound track
-xxx Free HQ soundtrack download
-xxx Status: %s. %s. (%d%%)
-xxx Not started
-xxx Partial
-xxx Complete
-xxx Stopped
-xxx Downloading
-xxx Start/resume download
-xxx Stop/pause download
-xxx Delete downloads
-xxx Done
-xxx Really delete flacs directory
-xxx and all contents?
-xxx Can only download
-xxx over wifi.
-Note: you can back out of the tutorial at any time by pressing the cancel button.^It's the red triangle in the top left corner of the screen.^
+{027} Integer-Skalierung
+HQ Soundtrack
+Gratis HQ Soundtrack Download
+Status: %s. %s. (%d%%)
+Nicht begonnen
+Teilweise
+Vollständig
+Unterbrochen
+Wird geladen
+Download starten/fortsetzen
+Download beenden/unterbrechen
+Downloads löschen
+Fertig
+Ordner mit HQ Musik wirklich
+samt Inhalt löschen?
+Download nur über
+WIFI möglich.
+Beachte: Das Tutorial kann jederzeit mit dem Abbruch-Knopf beendet werden.^Das ist das rote Dreieck in der oberen linken Ecke des Bildschirms.^

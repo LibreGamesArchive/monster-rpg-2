@@ -425,7 +425,8 @@ int hqm_get_status(float *percent)
 	int sz;
 	int count = 0;
 	while ((read = al_fread(f, buf, 80)) == 80) {
-		al_fseek(f, 1, ALLEGRO_SEEK_CUR);
+		//al_fseek(f, 1, ALLEGRO_SEEK_CUR);
+		al_fgetc(f);
 		buf[80] = 0;
 		if (sscanf(buf, "%s %d", fn, &sz) != 2) {
 			if (count == 0) {

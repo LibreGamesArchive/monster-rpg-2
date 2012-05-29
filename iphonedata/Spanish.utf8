@@ -707,7 +707,7 @@ Debes reiniciar
 Presiona OK
 Mueves con las flechas, o conecta un mando
 ESPACIO/ENTER - Botones de acción
-ESCAPE - Cancela, regresa, o abre menú
+ESC/. - Cancela, regresa, o abre menú
 V - Examinar artículos/opciones del menú
 (Sustituye los botones del gamepad 1, 2, 3)
 S - Configuración
@@ -943,33 +943,33 @@ Sobran
 Ajustar
 Tendero: ¡Bienvenido!^
 Eny: Ay...^
-Drag�n
+Dragón
 Medalla
-Hada: Veo que est�s de baja en el oro. Me puede ayudar un poco ... ^
-Hada: Parece que est� en la necesidad de suministros ... ^
+Hada: Veo que estás de baja en el oro. Me puede ayudar un poco ... ^
+Hada: Parece que estás en la necesidad de suministros ... ^
 Restablecer los logros
-{027} Bloqueo de la orientaci�n actual
+{027} Bloqueo de la orientación actual
 Realmente eliminar este
 estado de ahorrar?
 Completo!
 Saltar
 este mini juego?
-Bruja: La demo termina aqu�, Missy!^
-xxx {027} Integer scaling
-xxx HQ sound track
-xxx Free HQ soundtrack download
-xxx Status: %s. %s. (%d%%)
-xxx Not started
-xxx Partial
-xxx Complete
-xxx Stopped
-xxx Downloading
-xxx Start/resume download
-xxx Stop/pause download
-xxx Delete downloads
-xxx Done
-xxx Really delete flacs directory
-xxx and all contents?
-xxx Can only download
-xxx over wifi.
-Note: you can back out of the tutorial at any time by pressing the cancel button.^It's the red triangle in the top left corner of the screen.^
+Bruja: La demo termina aquí, Missy!^
+{027} Ampliación usando enteros 
+Sonido HQ
+Descarga gratuita de sonido a alta definición
+Estado: %s. %s. (%d%%)
+Sin iniciar
+Parcial
+Completo
+Detenido
+Descargando
+Iniciar/continuar descarga
+Cancelar/pausar descarga 
+Eliminar Descargas
+Terminado
+¿Realmente desea borrar el directorio flacs
+y todo su contenido?
+Se puede descargar
+usando wifi.
+Nota: Puedes salir del tutorial en cualquier momento presionando la tecla cancelar.^Es el triangulo rojo en la esquina superior izquierda de la pantalla.^

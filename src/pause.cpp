@@ -135,7 +135,7 @@ static std::string getTimeString(uint32_t runtime)
 	return std::string(s);
 }
 
-#ifdef ALLEGRO_ANDROID
+#ifndef ALLEGRO_IPHONE
 static void showMusicToggle(void)
 {
 	tguiPush();
@@ -160,6 +160,7 @@ static void showMusicToggle(void)
 	tguiAddWidget(frame);
 	tguiSetParent(frame);
 	tguiAddWidget(sound_toggle);
+	tguiSetFocus(sound_toggle);
 	
 	std::string startAmbienceName = ambienceName;
 
@@ -1043,15 +1044,18 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	yy += yinc;
 	MTextButton *mainResume = new MTextButton(162, yy, "Play", false, left_widget);
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	yy += yinc;
-#endif
-	MTextButton *mainQuit = new MTextButton(162, yy, "Quit", false, left_widget);
-	yy += yinc;
-	MTextButton *mainLevelUp = new MTextButton(162, yy, "Cheat", false, left_widget);
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	MTextButton *mainMusic = new MTextButton(162, yy, "Music", false, left_widget);
+	//yy += yinc;
 #endif
 
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+	MTextButton *mainMusic = new MTextButton(162, yy, "Music", false, left_widget);
+#else
+	MTextButton *mainMusic = new MTextButton(162, yy, "Help", false, left_widget);
+#endif
+
+	yy += yinc;
+	MTextButton *mainLevelUp = new MTextButton(162, yy, "Cheat", false, left_widget);
+	MTextButton *mainQuit = new MTextButton(162, yy, "Quit", false, left_widget);
 #if defined ALLEGRO_IPHONE
 #ifndef LITE
 	if (game_center)
@@ -1133,17 +1137,15 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	#endif
 	tguiAddWidget(mainSave);
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	tguiAddWidget(mainResume);
+	//tguiAddWidget(mainResume);
 #endif
-	tguiAddWidget(mainQuit);
 #ifdef ALLEGRO_IPHONE
 #ifdef DEBUG
 	tguiAddWidget(mainLevelUp);
 #endif
 #endif
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	tguiAddWidget(mainMusic);
-#endif
+	tguiAddWidget(mainQuit);
 
 #ifdef ALLEGRO_IPHONE
 #ifndef LITE
@@ -1571,18 +1573,18 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				tguiSetFocus(mainLevelUp);
 				section = MAIN;
 			}
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			else if (widget == mainMusic) {
 				getInput()->set(false, false, false, false, false, false, false);
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE
 				showIpodControls();
-#else
+#elif defined ALLEGRO_ANDROID
 				showMusicToggle();
+#else
+				pc_help();
 #endif
 				tguiSetFocus(mainMusic);
 				section = MAIN;
 			}
-#endif
 			else if (widget == formChooser) {
 				std::vector<int> &v = formChooser->getSelected();
 				if (v.size() > 0) {
@@ -1799,9 +1801,7 @@ done:
 	delete mainResume;
 	delete mainQuit;
 	delete mainLevelUp;
-#if defined IPHONE
 	delete mainMusic;
-#endif
 	if (have_mouse || !use_dpad)
 		delete dndForm;
 	delete partyStats;
@@ -3799,7 +3799,7 @@ void pc_help(void)
 		"Arrows move, or plug in a gamepad",
 		" ",
 		"SPACE/ENTER - Action button",
-		"ESCAPE - Cancel, go back, or open menu",
+		"ESC/. - Cancel, go back, or open menu",
 		"V - Examines some items/menu choices",
 		"(Substitute gamepad buttons 1, 2, 3)",
 		" ",
@@ -4030,7 +4030,8 @@ static void hqm_menu(void)
 
 			// top descriptions
 			const char *text = "Free HQ soundtrack download";
-			mTextout_simple(_t(text), (BW-m_text_length(game_font, text))/2, 15, m_map_rgb(255, 255, 0));
+			const char *trans = _t(text);
+			mTextout_simple(trans, (BW-m_text_length(game_font, trans))/2, 15, m_map_rgb(255, 255, 0));
 
 			// draw status
 			float percent;
@@ -4118,8 +4119,8 @@ int title_menu(void)
 	buttons[curr_button++] = new MTextButtonFullShadow(5, oy+30, "Help");
 #endif
 
-	MTextButton *hqm_button = new MTextButtonFullShadow(240-90, oy+30, "HQ sound track");
-	MTextButton *config_button = new MTextButtonFullShadow(240-90, oy+45, "Options");
+	MTextButton *hqm_button = new MTextButtonFullShadow(240-95, oy+30, "HQ sound track");
+	MTextButton *config_button = new MTextButtonFullShadow(240-95, oy+45, "Options");
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	MIcon *joypad = NULL;

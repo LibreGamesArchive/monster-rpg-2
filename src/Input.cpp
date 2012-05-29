@@ -311,7 +311,7 @@ void KeyboardInput::handle_event(ALLEGRO_EVENT *event)
 	if (keycode == ALLEGRO_KEY_ENTER || keycode == ALLEGRO_KEY_SPACE) {
 		 button1 = onoff;
 	}
-	else if (keycode == ALLEGRO_KEY_ESCAPE) {
+	else if (keycode == ALLEGRO_KEY_ESCAPE || keycode == ALLEGRO_KEY_FULLSTOP) {
 		 button2 = onoff;
 	}
 	else if (keycode == ALLEGRO_KEY_V) {

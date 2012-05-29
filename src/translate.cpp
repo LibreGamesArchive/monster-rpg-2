@@ -19,7 +19,6 @@ static std::string translation_languages[][2] = {
 	{ "Portuguese-Brazil", "Portuguese (Brazil)" },
 	{ "Portuguese-Europe", "Portuguese (Europe)" },
 	{ "Spanish", "Español (Spanish)" },
-	{ "Russian", "русский (Russian)" },
 	{ "", "" }
 };
 

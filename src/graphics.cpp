@@ -829,6 +829,8 @@ static void fade(int startAlpha, int endAlpha, int length, MCOLOR color)
 	if (config.getFilterType() == FILTER_LINEAR) {
 		al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
 	}
+	else
+		al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE);
 	MBITMAP *tmpbuf = m_create_bitmap(BW, BH); // check
 	al_set_new_bitmap_flags(flags);
 
@@ -900,8 +902,11 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 	global_draw_red = false;
 	global_draw_controls = false;
 
+	int flags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE);
 	MBITMAP *tmp = m_create_bitmap(BW, BH);
 	MBITMAP *bufdup = m_clone_bitmap(buffer);
+	al_set_new_bitmap_flags(flags);
 
 	unsigned long start = (unsigned long)(al_get_time()*1000);
 	unsigned long now = start;
@@ -1004,7 +1009,7 @@ void battleTransition(void)
 		int format = al_get_new_bitmap_format();
 		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
 		int flags = al_get_new_bitmap_flags();
-		al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
+		al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE);
 		MBITMAP *bufcopy1 = m_create_bitmap(BW, BH); // check
 		MBITMAP *bufcopy2 = m_create_bitmap(BW, BH); // check
 		al_set_new_bitmap_flags(flags);

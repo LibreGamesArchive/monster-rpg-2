@@ -707,7 +707,7 @@ Tem de recomeçar
 Carregue OK
 SETAS- movimento (ou ligue um gamepad)
 SPACE/ENTER - botão de acção
-ESCAPE - Cancelar, voltar atrás, ou abrir menu
+ESC/. - Cancelar, voltar atrás, ou abrir menu
 V - Examina alguns itens/escolhas de menu
 (gamepad 1, 2, 3)
 S - Configurações (settings)
@@ -955,21 +955,21 @@ Completa!
 Ir
 este mini-jogo?
 Bruxa: A demo termina aqui, Missy!^
-xxx {027} Integer scaling
-xxx HQ sound track
-xxx Free HQ soundtrack download
-xxx Status: %s. %s. (%d%%)
-xxx Not started
-xxx Partial
-xxx Complete
-xxx Stopped
-xxx Downloading
-xxx Start/resume download
-xxx Stop/pause download
-xxx Delete downloads
-xxx Done
-xxx Really delete flacs directory
-xxx and all contents?
-xxx Can only download
-xxx over wifi.
-Note: you can back out of the tutorial at any time by pressing the cancel button.^It's the red triangle in the top left corner of the screen.^
+{027} Fator de escala
+Banda sonora HQ
+Transferência grátis da banda sonora HQ
+Progresso: %s. %s. (%d%%)
+Por começar
+Parcial
+Completo
+Parado
+A transferir
+Começar/resumir transferência 
+Parar/pausar transferência
+Apagar transferências
+Feito
+Apagar por completo a diretoria de flacs
+e todos os seus conteúdos?
+Só pode transferir
+via wifi.
+Nota: você poderá sair do tutorial a qualquer altura ao pressionar o botão de cancelar.^É o triângulo vermelho no canto superior esquerdo do ecrã.^

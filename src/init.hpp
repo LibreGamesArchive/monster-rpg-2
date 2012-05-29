@@ -181,6 +181,7 @@ extern bool have_mouse;
 extern bool reload_translation;
 
 extern int PRESERVE_TEXTURE;
+extern int NO_PRESERVE_TEXTURE;
 extern bool achievement_show;
 extern double achievement_time;
 extern MBITMAP *achievement_bmp;
