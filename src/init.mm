@@ -4,7 +4,9 @@
 
 #include "monster2.hpp"
 
+#ifdef ALLEGRO_ANDROID
 #include <physfs.h>
+#endif
 
 #define ASSERT ALLEGRO_ASSERT
 #include <allegro5/internal/aintern_bitmap.h>
