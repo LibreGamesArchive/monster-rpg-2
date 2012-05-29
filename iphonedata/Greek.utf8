@@ -1,4 +1,4 @@
-﻿Goblin: Εκεί είναι! \ Ας τους πιάσουμε!^
+Goblin: Εκεί είναι! \ Ας τους πιάσουμε!^
 Goblin: Γραπ!^Goblin: ...^Goblin: Ένα από τα Troll παραφέρεται!^Goblin: Ας πούμε ότι σου χρωστάω μία!^
 Κλειδωμένο...^
 Goblin: Ειι! Φύγε από εκεί!^
@@ -707,7 +707,7 @@ View
 Πατήστε OK
 Κίνηση με τα πλήκτρα κατεύθηνσης, ή συνδέστε χειριστήριο
 SPACE/ENTER - Πλήκτρο ενέργειας
-ESCAPE - Ακύρωση, επιστροφή, ή ενεργοποίηση μενού
+ESC/. - Ακύρωση, επιστροφή, ή ενεργοποίηση μενού
 V - Έλεγχος μερικών αντικειμένων/επίλογες μενού
 (Substitute gamepad buttons 1, 2, 3)
 S - Ρυθμίσεις
@@ -719,7 +719,7 @@ F3,F4 - Άυξηση/μείωση έντασης ηχητικών εφέ
 Έναρξη/Φόρτωση Παιχνιδιού
 Εκμάθηση
 Δώστε την γνώμη σας & κερδίστε!
-Επισκεφθήτε την Ιστοσελίδα
+WWW site
 Έναρξη
 Εκμάθηση
 Βοήθεια
@@ -955,21 +955,21 @@ Fairy: Μοιάζεις σαν να είσαι σε ανάγκη από προμ
 Μετάβαση αυτό
 το μίνι παιχνίδι;
 Μάγισσα: Η επίδειξη τελειώνει εδώ, δεσποινίς!^
-xxx {027} Integer scaling
-xxx HQ sound track
-xxx Free HQ soundtrack download
-xxx Status: %s. %s. (%d%%)
-xxx Not started
-xxx Partial
-xxx Complete
-xxx Stopped
-xxx Downloading
-xxx Start/resume download
-xxx Stop/pause download
-xxx Delete downloads
-xxx Done
-xxx Really delete flacs directory
-xxx and all contents?
-xxx Can only download
-xxx over wifi.
-Note: you can back out of the tutorial at any time by pressing the cancel button.^It's the red triangle in the top left corner of the screen.^
+{027} Κλιμάκωση
+HQ μουσική
+Δωρεάν λήψη Υψηλής Ποιότητας τραγουδιού
+Κατάσταση: %s. %s. (%d%%)
+Δεν ξεκίνησε
+Μερικός
+Ολοκλήρωση
+Σταμάτησε
+Λήψη
+Εκκίνηση/συνέχιση λήψης
+Σταμάτηση/παύση λήψης
+Διαγραφή Λήψεων
+Ολοκληρώθηκε
+Είστε σίγουροι οτι θέλετε να διαγραφεί ο φάκελος flacs 
+και όλα τα περιεχόμενα του;
+επιτρέπεται η λήψη μόνο
+μέσω wifi.
+Σημείωση: Μπορείτε να εγκαταλείψετε την εκμάθηση ανα πάσα στιγμή πατώντας το πλήκτρο ακύρωση.^Είναι το κόκκινο τρίγωνο στην αριστερή γωνία της οθόνης.^

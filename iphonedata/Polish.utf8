@@ -1,4 +1,4 @@
-﻿Goblin: Są tutaj! \ Na nich!^
+Goblin: Są tutaj! \ Na nich!^
 Goblin: Aghrr!^Goblin: ...^Goblin: Jeden z trolli wpadł \ w szał!^Goblin: Jestem waszym dłużnikiem!^
 Zamknięte...^
 Goblin: Hey! Jazda mi stąd!^
@@ -707,7 +707,7 @@ Uruchom grę ponownie
 Naciśnij OK
 Poruszanie: strzałki lub joystick
 SPACE/ENTER - Akcja
-ESCAPE - Anuluj, Cofnij lub Menu
+ESC/. - Anuluj, Cofnij lub Menu
 V - Szczegóły
 (Alternatywnie przyciski 1, 2 lub 3)
 S - Opcje
@@ -955,21 +955,21 @@ Complete!
 Pomiń
 ten mini gry?
 Wiedźma: Demo kończy się tutaj, Missy!^
-xxx {027} Integer scaling
-xxx HQ sound track
-xxx Free HQ soundtrack download
-xxx Status: %s. %s. (%d%%)
-xxx Not started
-xxx Partial
-xxx Complete
-xxx Stopped
-xxx Downloading
-xxx Start/resume download
-xxx Stop/pause download
-xxx Delete downloads
-xxx Done
-xxx Really delete flacs directory
-xxx and all contents?
-xxx Can only download
-xxx over wifi.
-Note: you can back out of the tutorial at any time by pressing the cancel button.^It's the red triangle in the top left corner of the screen.^
+{027} Skalowanie liczby
+Muzyka HQ
+Pobierz darmową ścieżkę dźwiękową HQ
+Status: %s. %s. (%d%%)
+Nie rozpoczęto
+Częściowo
+Skończone
+Zatrzymano
+Pobieranie
+Rozpocznij/kontynuuj pobieranie
+Zatrzymaj/spauzuj pobieranie
+Skasuj pobrane pliki
+Gotowe
+Naprawdę skasować folder "flacs"
+I całą jego zawartość?
+Możesz pobierać tylko
+przez wifi
+Pamiętaj: możesz wyjść z samouczka kiedy tylko chcesz klikając przycisk anuluj.^To czerwony trójkąt w lewym górnym rogu ekranu.^
