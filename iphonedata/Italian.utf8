@@ -955,21 +955,21 @@ Completa!
 Saltare
 questo mini gioco?
 Strega: La demo finisce qui, Missy!^
-xxx {027} Integer scaling
-xxx HQ sound track
-xxx Free HQ soundtrack download
-xxx Status: %s. %s. (%d%%)
-xxx Not started
-xxx Partial
-xxx Complete
-xxx Stopped
-xxx Downloading
-xxx Start/resume download
-xxx Stop/pause download
-xxx Delete downloads
-xxx Done
-xxx Really delete flacs directory
-xxx and all contents?
-xxx Can only download
-xxx over wifi.
-Note: you can back out of the tutorial at any time by pressing the cancel button.^It's the red triangle in the top left corner of the screen.^
+{027} Fattore di scala
+Musica HQ
+Download gratuito OST HQ
+Stato: %s. %s. (%d%%)
+Non avviato
+Incompleto
+Completato
+Fermato
+In Scaricamento
+Inizia/riprendi download
+Interrompi/sospendi download
+Rimuovi download
+Fatto
+Vuoi davvero cancellare la cartella flacs
+insieme al suo contenuto?
+Download disponibile
+solo su rete wifi.
+Nota: Puoi uscire dal tutoria quando vuoi premendo il tasto Cancel.^E' il triangolo rosso nell'angolo in alto a sinistra dello schermo.^
