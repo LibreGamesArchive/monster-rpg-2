@@ -7,7 +7,7 @@ ifneq (${CFLAGS},)
 	CFLAGS = -Wall -g
 endif
 
-override CFLAGS += -I. -DLINUX_GENERIC
+override CFLAGS += -I. -DLINUX_GENERIC -I../freetype-linux/64/include
 
 ifdef BUILD_EDITOR
 	override CFLAGS += -DA5_OGL -DEDITOR -IEditor -I../bass24
@@ -68,7 +68,7 @@ CXX_LIBOBJS=$(CXX_SRCS:.cpp=.o)
 
 #ALLEGROLIBS=`pkg-config --libs allegro_ttf-static-5.1 allegro_dialog-static-5.1 allegro_primitives-static-5.1 allegro_font-static-5.1 allegro_image-static-5.1` -lallegro_shader-static -lallegro_memfile
 ALLEGROLIBS=`pkg-config --libs allegro_ttf-static-5.1 allegro_primitives-static-5.1 allegro_font-static-5.1 allegro_image-static-5.1` -lallegro_shader-static -lallegro_memfile-static
-LIBS=-lbass -lGL -llua-fixed -ltgui `pkg-config --libs xinerama` $(ALLEGROLIBS) /usr/lib/libfreetype.a /usr/lib/libXrandr.a /usr/lib/libXcursor.a /usr/lib/libXrender.a /usr/lib/libpng.a /usr/lib/libz.a 
+LIBS=-lbass -lGL -llua-fixed -ltgui `pkg-config --libs xinerama` $(ALLEGROLIBS) ../freetype-linux/64/lib/libfreetype.a /usr/lib/libXrandr.a /usr/lib/libXcursor.a /usr/lib/libXrender.a /usr/lib/libpng.a /usr/lib/libz.a 
 
 default: monster2
 
