@@ -193,7 +193,7 @@ bool is_android_lessthan_2_3;
 bool achievement_show = false;
 double achievement_time = 0;
 MBITMAP *achievement_bmp;
-#ifdef A5_D3D
+#if defined A5_D3D || defined KINDLEFIRE
 int PRESERVE_TEXTURE = 0;
 int NO_PRESERVE_TEXTURE = ALLEGRO_NO_PRESERVE_TEXTURE;
 #else
@@ -2513,7 +2513,7 @@ bool init(int *argc, char **argv[])
 #endif
 	}
 
-#if defined ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE || defined KINDLEFIRE
 	al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE, ALLEGRO_REQUIRE);
 #elif defined ALLEGRO_ANDROID
 	al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_270_DEGREES, ALLEGRO_REQUIRE);
@@ -2639,6 +2639,8 @@ ALLEGRO_DEBUG("boo1");
 ALLEGRO_DEBUG("boo1");
 	al_rest(20);
 #endif
+
+	al_rest(1.0);
 
 	set_screen_params();
       
@@ -2873,8 +2875,10 @@ ALLEGRO_DEBUG("boo1");
 	while (!loading_done) {
 		m_rest(0.001);
 	}
-	
+
+#if !defined(KINDLEFIRE)
 	al_inhibit_screensaver(true);
+#endif
 
 	// Must be first thing after thread end or before thread start
 	if (cached_bitmap) {
@@ -3162,6 +3166,7 @@ void set_screen_params(void)
 	ScreenDescriptor *sd = config.getWantedGraphicsMode();
 	sd->width = al_get_display_width(display);
 	sd->height = al_get_display_height(display);
+	ALLEGRO_DEBUG("sd->height=%d", sd->height);
 	if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN) {
 		screenScaleX = (float)sd->width / BW;
 		screenScaleY = (float)sd->height / BH;

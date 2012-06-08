@@ -10,6 +10,7 @@
 #import <UIKit/UIKit.h>
 #import <MediaPlayer/MediaPlayer.h>
 #import <AudioToolbox/AudioToolbox.h>
+#import <AVFoundation/AVAudioSession.h>
 #import "MyUIViewController.h"
 #include <allegro5/allegro_iphone.h>
 
@@ -885,3 +886,7 @@ bool wifiConnected(void)
 	return result;
 }
 
+void disableMic(void)
+{
+	[[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:NULL];
+}

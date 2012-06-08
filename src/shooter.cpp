@@ -13,6 +13,8 @@
 #endif
 
 bool in_shooter = false;
+bool break_shooter_pause = false;
+bool shooter_paused = false;
 
 static void vecXmat(double x, double y, double z, ALLEGRO_TRANSFORM *mat, double *ox, double *oy, double *oz, double *ow)
 {
@@ -1004,6 +1006,8 @@ start:
 					m_flip_display();
 
 					al_stop_timer(logic_timer);
+
+					shooter_paused = true;
 					
 					while (true) {
 						in = getInput()->getDescriptor();
@@ -1012,6 +1016,10 @@ start:
 						if (is_close_pressed()) {
 							do_close();
 							close_pressed = false;
+						}
+						if (break_shooter_pause) {
+							can_pause = true;
+							break;
 						}
 						al_get_mouse_state(&state);
 						if ((state.buttons && can_pause) || in.button2) {
@@ -1041,6 +1049,8 @@ start:
 					}
 
 					al_start_timer(logic_timer);
+
+					shooter_paused = false;
 				}
 			}
 			else if (!state.buttons) {

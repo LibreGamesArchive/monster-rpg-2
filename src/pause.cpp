@@ -2739,7 +2739,7 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 		buttons[i] = new MTextButtonFullShadow(10, 20+i*14, std::string(buf));
 	}
 
-	MLabel *lcaption = new MLabel(0, 0, caption, m_map_rgb(220, 220, 220));
+	MLabel *lcaption = new MLabel(0, 1, caption, m_map_rgb(220, 220, 220));
 
 	tguiPush();
 

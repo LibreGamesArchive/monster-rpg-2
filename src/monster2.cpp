@@ -6,7 +6,28 @@
 #include <allegro5/internal/aintern_display.h>
 #include <allegro5/internal/aintern_opengl.h>
 
+#ifdef KINDLEFIRE
+#include <allegro5/internal/aintern_android.h>
+extern "C" {
+void android_broadcast_resume(ALLEGRO_DISPLAY_ANDROID *d);
+}
+#endif
+
 #include "tftp_get.h"
+
+static void set_transform(ALLEGRO_DISPLAY *dpy)
+{
+   ALLEGRO_TRANSFORM t;
+   int w = al_get_display_width(dpy);
+   int h = al_get_display_height(dpy);
+
+   // XXX we shouldn't need this in user code
+   glViewport(0, 0, w, h);
+
+   al_identity_transform(&t);
+   al_ortho_transform(&t, 0, w, h, 0, -1, 1);
+   al_set_projection_transform(dpy, &t);
+}
 
 #ifdef ALLEGRO_ANDROID
 extern "C" {
@@ -110,9 +131,13 @@ void connect_second_display(void)
 
 	connect_airplay_controls();
 	
+	_destroy_loaded_bitmaps();
+	
 	destroy_shaders();
 	al_destroy_display(display);
 	
+	_reload_loaded_bitmaps();
+
 	al_set_new_display_adapter(1);
 	int flags = al_get_new_display_flags();
 	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_USE_PROGRAMMABLE_PIPELINE | flags);
@@ -121,6 +146,9 @@ void connect_second_display(void)
 	al_set_new_display_flags(flags);
 	init_shaders();
 	init2_shaders();
+	
+	_reload_loaded_bitmaps_delayed();
+	
 	/*
 	ScreenDescriptor *sd = config.getWantedGraphicsMode();
 	sd->width = al_get_display_width(display);
@@ -163,6 +191,8 @@ void connect_second_display(void)
 	airplay_connected = true;
 	
 	glDisable(GL_DITHER);
+	
+	disableMic();
 #endif
 }
 
@@ -175,9 +205,22 @@ static void *wait_for_drawing_resume(void *arg)
 	while (1) {
 		ALLEGRO_EVENT event;
 		al_wait_for_event(queue, &event);
+#if defined KINDLEFIRE_XXX
+		if (event.type == ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING ||
+			event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN) {
+#else
 		if (event.type == ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING) {
+#endif
+			ALLEGRO_DEBUG("--- --- RESUME (%d %x)", event.type, event.type);
 			got_resume = true;
 			break;
+		}
+		else {
+			//ALLEGRO_DEBUG("Unknown event %d %x", event.type, event.type);
+			if (event.type == ALLEGRO_EVENT_DISPLAY_ORIENTATION) {
+	//			al_change_display_option(display, ALLEGRO_SUPPORTED_ORIENTATIONS, event.display.orientation);
+				set_transform(display);
+			}
 		}
 	}
 
@@ -253,16 +296,40 @@ bool is_close_pressed(void)
 			setAmbienceVolume(backup_ambience_volume);
 		}
 #endif
+/*
+#if defined KINDLEFIRE
+		if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT) {
+			//ALLEGRO_DEBUG("--- --- SWITCH_OUT");
+		}
+		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN) {
+			//ALLEGRO_DEBUG("--- --- SWITCH_IN");
+		}
+#endif
+*/
+#if defined KINDLEFIRE
+		if (event.type == ALLEGRO_EVENT_DISPLAY_ORIENTATION) {
+//			al_change_display_option(display, ALLEGRO_SUPPORTED_ORIENTATIONS, event.display.orientation);
+			set_transform(display);
+		}
+#endif
+
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		if (event.type == ALLEGRO_EVENT_DISPLAY_HALT_DRAWING) {
+			if (in_shooter && shooter_paused) {
+				break_shooter_pause = true;
+			}
 			save_memory(false);
+#if defined KINDLEFIRE
+			if (event.type == ALLEGRO_EVENT_DISPLAY_HALT_DRAWING) {
+				//exit(0);
+			}
+#endif
 #if defined ALLEGRO_IPHONE
 			if (!isMultitaskingSupported()) {
 				if (!sound_was_playing_at_program_start)
 					iPodStop();
 				exit(0);
 			}
-			//sb_stop();
 #elif defined ALLEGRO_ANDROID
 			std::string old_music_name;
 			std::string old_ambience_name;
@@ -286,8 +353,10 @@ bool is_close_pressed(void)
 				setMusicVolume(0.0);
 				setAmbienceVolume(0.0);
 			}
+#if !defined(KINDLEFIRE_XXX)
 			_destroy_loaded_bitmaps();
 			destroy_fonts();
+#endif
 			//destroy_shaders();
 #endif
 			config.write();
@@ -295,6 +364,11 @@ bool is_close_pressed(void)
 			al_stop_timer(draw_timer);
 			// halt
 			al_acknowledge_drawing_halt(display);
+#ifdef KINDLEFIRE
+			if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT) {
+				//android_broadcast_resume((ALLEGRO_DISPLAY_ANDROID *)display);
+			}
+#endif
 			got_resume = false;
 			al_run_detached_thread(
 				wait_for_drawing_resume,
@@ -308,16 +382,18 @@ bool is_close_pressed(void)
 			// resume
 			al_acknowledge_drawing_resume(display, _reload_loaded_bitmaps);
 #ifdef ALLEGRO_ANDROID
+#if !defined(KINDLEFIRE_XXX)
 			_reload_loaded_bitmaps_delayed();
 			load_fonts();
+#endif
 			//init_shaders();
 			//init2_shaders();
 			if (in_shooter) {
 				shooter_restoring = true;
 			}
 #endif
-			animset_post_reset();
-      			glDisable(GL_DITHER);
+			//animset_post_reset();
+			glDisable(GL_DITHER);
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 			al_start_timer(logic_timer);
 			al_start_timer(draw_timer);
@@ -374,6 +450,13 @@ bool is_close_pressed(void)
 
 			disconnect_airplay_controls();
 			
+			_destroy_loaded_bitmaps();
+
+			destroy_shaders();
+			al_destroy_display(display);
+
+			_reload_loaded_bitmaps();
+			
 			al_destroy_font(game_font_second_display);
 			for (int i = 0; i < 8; i++) {
 				m_destroy_bitmap(blueblocks[i]);
@@ -386,10 +469,6 @@ bool is_close_pressed(void)
 			al_destroy_display(controller_display);
 			controller_display = NULL;
 			
-			destroy_shaders();
-
-			al_destroy_display(display);
-
 			al_set_new_display_adapter(0);
 			al_set_new_display_option(ALLEGRO_AUTO_CONVERT_BITMAPS, 1, ALLEGRO_REQUIRE);
 			int flags = al_get_new_display_flags();
@@ -399,6 +478,9 @@ bool is_close_pressed(void)
 			register_display(display);
 			init_shaders();
 			init2_shaders();
+
+			_reload_loaded_bitmaps_delayed();
+
 			/*
 			ScreenDescriptor *sd = config.getWantedGraphicsMode();
 			sd->width = al_get_display_width(display);

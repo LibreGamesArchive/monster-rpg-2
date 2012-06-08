@@ -66,6 +66,7 @@ void authenticatePlayer(void);
 void resetAchievements(void);
 void do_milestone(int num);
 void showAchievements(void);
+void disableMic(void);
 
 extern bool modalViewShowing;
 

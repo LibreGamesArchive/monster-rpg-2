@@ -490,7 +490,7 @@ public class AllegroActivity extends Activity implements SensorEventListener
       }
 
       nativeOnOrientationChange(0, true);
-   
+  
       if (!android.os.Build.VERSION.RELEASE.substring(0, 3).equals("2.2")) {
          requestWindowFeature(Window.FEATURE_NO_TITLE);
          this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -1507,7 +1507,7 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
 
    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
    {
-      Log.d("AllegroSurface", "surfaceChanged");
+      Log.d("AllegroSurface", "surfaceChanged (width=" + width + " height=" + height + ")");
       nativeOnChange(0xdeadbeef, width, height);
       Log.d("AllegroSurface", "surfaceChanged end");
    }

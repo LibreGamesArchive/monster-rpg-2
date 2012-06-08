@@ -1,4 +1,4 @@
-Goblin: Są tutaj! \ Na nich!^
+﻿Goblin: Są tutaj! \ Na nich!^
 Goblin: Aghrr!^Goblin: ...^Goblin: Jeden z trolli wpadł \ w szał!^Goblin: Jestem waszym dłużnikiem!^
 Zamknięte...^
 Goblin: Hey! Jazda mi stąd!^
@@ -247,8 +247,8 @@ Witaj w samouczku...^W kilku prostych krokach dowiesz się jak kontrolować swoj
 Witaj w samouczku...^W kilku prostych krokach dowiesz się jak kontrolować swojego bohatera oraz poruszać się po menu.^Zacznijmy od kontroli bohatera...^Naciśnij na miejsce, w które chcesz się udać. \ Przejdź na pole trawy w prawym dolnym rogu.^
 Na pewno chcesz wyjść
 z samouczka?
-Wskazówka: W każdej chwili możesz wyjść z samouczka naciskając przycisk anulowania.^To czerwony trójkąt w lewym górnym rogu ekranu.^
-Wskazówka: W każdej chwili możesz wyjść z samouczka potrząsając urządzeniem...^Możesz również skorzystać z przycisku anulowania. To czerwony trójkąt w lewym górnym rogu ekranu.^
+Pamiętaj: W każdej chwili możesz wyjść z samouczka naciskając przycisk anulowania.^To czerwony trójkąt w lewym górnym rogu ekranu.^
+Pamiętaj: W każdej chwili możesz wyjść z samouczka potrząsając urządzeniem...^Możesz również skorzystać z przycisku anulowania. To czerwony trójkąt w lewym górnym rogu ekranu.^
 Świetnie!^Czasami bohater znajduje się przy krawędzi ekranu. To dobry moment, żeby skorzystać z rozglądania...^Przytrzymaj klawisz akcji (spacja) i korzystając ze strzałek przesuwaj widok.^Spróbuj się rozejrzeć.^
 Świetnie!^Czasami bohater znajduje się przy krawędzi ekranu. To dobry moment, żeby skorzystać z rozglądania...^Można się rozglądać korzystając z gestu przeciągania.^Spróbuj się rozejrzeć.^
 Dobrze!^Pora zapoznać się z mapą świata.^Korzystanie z niej jest intuicyjne. \ Zobaczmy jak działa ona w praktyce.^
@@ -583,7 +583,7 @@ Kup proszę pełną wersję,
 aby kontynuować!
 Na pewno chcesz wyjść
 z samouczka?
-O nie! Ktoś został otruty!^Wskazówka: Otruty bohater będzie tracił zdrowie w każdej turze, dopóki nie zostanie wyleczony.^
+O nie! Ktoś został otruty!^Pamiętaj: Otruty bohater będzie tracił zdrowie w każdej turze, dopóki nie zostanie wyleczony.^
 Nie zapisano!
 Auto-zapis nie został
 jeszcze wykonany...
@@ -933,10 +933,10 @@ Każda lokacja przedstawiona jest za pomocą ikony. \ Połączenia pomiędzy nim
 To już prawie koniec. \ Została ostatnia rzecz, którą musisz wiedzieć.^Walki! Przed każdą z nich dobrze jest się przygotować.^Walki są turowe, to znaczy każdy bohater wykonuje jedną akcje \ w trakcie tury.^W ramach ruchu możesz wykonać jedną z pięciu akcji: atak, użycie magii lub przedmiotu, obrona lub ucieczka.^Większość akcji wymaga wybrania celu. Służą do tego strzałki, takie jak w Inwentarzu.^Wybierz cel i skorzystaj \ z przycisku akcji, aby wykonać ruch.^Pora na ćwiczenia praktyczne! \ Zaczyna się walka.^
 To już prawie koniec. \ Została ostatnia rzecz, którą musisz wiedzieć.^Walki! Przed każdą z nich dobrze jest się przygotować.^Walki są turowe, to znaczy każdy bohater wykonuje jedną akcje \ w trakcie tury.^W ramach ruchu możesz wykonać jedną z pięciu akcji: atak, użycie magii lub przedmiotu, obrona lub ucieczka.^Większość akcji wymaga wybrania celu. Służą do tego strzałki, takie jak w Inwentarzu.^Wybierz cel i narysuj niewidzialną linię w jego stronę, żeby wykonać wybraną akcję.^Pora na ćwiczenia praktyczne! \ Zaczyna się walka.^
 Pamiętaj, aby wykonać akcję, narysuj niewidzialną linię w kierunki wskazywanym przez strzałki!^Dotyczy to atakowania, używania przedmiotów, rzucania czarów, itd.^Zaczynajmy!^
-Dobrze!^Zajmijmy się używaniem przedmiotów...^Podobnie, jak było to \ w przypadku miecza, przeciągnij przedmiot na górny panel, żeby \ z niego skorzystać.^Spróbuj użyć Lekarstwa.^Wskazówka: Każdy przedmiot posiada swój opis. Żeby go zobaczyć przytrzymaj go przez chwilę.^
-Dobrze!^Zajmijmy się używaniem przedmiotów...^Podobnie, jak było to \ w przypadku miecza, przeciągnij przedmiot na górny panel, żeby \ z niego skorzystać.^Spróbuj użyć Lekarstwa.^Wskazówka: Każdy przedmiot posiada swój opis. Naciśnij Przycisk 3 (klawisz 'V'), żeby go zobaczyć.^
-Dobrze!^Zajmijmy się używaniem przedmiotów...^Podobnie, jak było to \ w przypadku miecza, żeby użyć przedmiotu zaznacz go i naciśnij klawisz akcji.^Spróbuj użyć Lekarstwa.^Wskazówka: Każdy przedmiot posiada swój opis. Żeby go zobaczyć przytrzymaj go przez chwilę.^
-Dobrze!^Zajmijmy się używaniem przedmiotów...^Podobnie, jak było to \ w przypadku miecza, żeby użyć przedmiotu zaznacz go i naciśnij klawisz akcji.^Spróbuj użyć Lekarstwa.^Wskazówka: Każdy przedmiot posiada swój opis. Naciśnij Przycisk 3 (klawisz 'V'), żeby go zobaczyć.^
+Dobrze!^Zajmijmy się używaniem przedmiotów...^Podobnie, jak było to \ w przypadku miecza, przeciągnij przedmiot na górny panel, żeby \ z niego skorzystać.^Spróbuj użyć Lekarstwa.^Pamiętaj: Każdy przedmiot posiada swój opis. Żeby go zobaczyć przytrzymaj go przez chwilę.^
+Dobrze!^Zajmijmy się używaniem przedmiotów...^Podobnie, jak było to \ w przypadku miecza, przeciągnij przedmiot na górny panel, żeby \ z niego skorzystać.^Spróbuj użyć Lekarstwa.^Pamiętaj: Każdy przedmiot posiada swój opis. Naciśnij Przycisk 3 (klawisz 'V'), żeby go zobaczyć.^
+Dobrze!^Zajmijmy się używaniem przedmiotów...^Podobnie, jak było to \ w przypadku miecza, żeby użyć przedmiotu zaznacz go i naciśnij klawisz akcji.^Spróbuj użyć Lekarstwa.^Pamiętaj: Każdy przedmiot posiada swój opis. Żeby go zobaczyć przytrzymaj go przez chwilę.^
+Dobrze!^Zajmijmy się używaniem przedmiotów...^Podobnie, jak było to \ w przypadku miecza, żeby użyć przedmiotu zaznacz go i naciśnij klawisz akcji.^Spróbuj użyć Lekarstwa.^Pamiętaj: Każdy przedmiot posiada swój opis. Naciśnij Przycisk 3 (klawisz 'V'), żeby go zobaczyć.^
 Wykonać?
 Statystyka
 Punkty
@@ -945,31 +945,31 @@ Sprzedawca: Witam!^
 Eny: Oh...^
 Smok
 Medalion
-Wróżka: Widzę, że jesteś mało złota. Mogę pomóc trochę ... ^
-Wróżka: Wyglądasz jak jesteś w potrzebie dostaw ... ^
-Resetowanie osiągnięć
-{027} Blokowanie bieżącej orientacji
-Czy na pewno usunąć
-ten stan zapisać?
-Complete!
-Pomiń
-ten mini gry?
-Wiedźma: Demo kończy się tutaj, Missy!^
-{027} Skalowanie liczby
+Wróżka: Widzę, że masz mało złota. Mogę nieco pomóc...^
+Wróżka: Wygląda na to, że musisz uzupełnić zapasy...^
+Zresetuj osiągnięcia
+{027} Zablokuj bieżącą orientację
+Czy na pewno chcesz usunąć
+ten stan gry?
+Zakończone!
+Pominąć
+minigrę?
+Wiedźma: Demo kończy się właśnie tutaj, Panienko!^
+{027} Dopasowanie: Skalowanie liczbami całkowitymi
 Muzyka HQ
 Pobierz darmową ścieżkę dźwiękową HQ
 Status: %s. %s. (%d%%)
 Nie rozpoczęto
-Częściowo
-Skończone
-Zatrzymano
+Częściowe
+Zakończone
+Zatrzymane
 Pobieranie
-Rozpocznij/kontynuuj pobieranie
-Zatrzymaj/spauzuj pobieranie
-Skasuj pobrane pliki
+Rozpocznij/wznów pobieranie
+Zatrzymaj pobieranie
+Usuń pobrane pliki
 Gotowe
-Naprawdę skasować folder "flacs"
-I całą jego zawartość?
-Możesz pobierać tylko
-przez wifi
-Pamiętaj: możesz wyjść z samouczka kiedy tylko chcesz klikając przycisk anuluj.^To czerwony trójkąt w lewym górnym rogu ekranu.^
+Czy na pewno chcesz usunąć
+pobraną muzykę?
+Pobieranie jest możliwe
+jedynie poprzez WiFi.
+Pamiętaj: W każdej chwili możesz wyjść z samouczka naciskając przycisk anulowania.^To czerwony trójkąt w lewym górnym rogu ekranu.^
