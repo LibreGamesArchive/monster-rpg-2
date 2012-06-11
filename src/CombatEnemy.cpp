@@ -1133,7 +1133,9 @@ CombatEnemy::~CombatEnemy(void)
 	lua_close(luaState);
 	if (spell)
 		delete spell;
+#ifndef LITE-
 	delete charmAnim;
+#endif
 	if (explosionCircles)
 		delete[] explosionCircles;
 	if (!use_programmable_pipeline) {

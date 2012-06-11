@@ -2869,7 +2869,9 @@ MMap::~MMap(void)
 	std::map<std::string, MBITMAP *>::iterator it;
 	for (it = bitmaps.begin(); it != bitmaps.end(); it++) {
 		MBITMAP *b = it->second;
-		m_destroy_bitmap(b);
+		if (b) {
+			m_destroy_bitmap(b);
+		}
 	}
 }
 

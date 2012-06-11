@@ -71,11 +71,13 @@ void load_fonts(void)
 			return;
 	}
 	
+#ifndef LITE
 	huge_font = m_load_font(getResource("huge_font.tga"));
 	if (!huge_font) {
 		if (!native_error("Failed to load huge_font"))
 			return;
 	}
+#endif
 
 	ALLEGRO_DEBUG("done loading fonts");
 	
@@ -3001,11 +3003,13 @@ void destroy(void)
 	debug_message("Destroy 6\n");
 	//destroyWeaponAnimations();
 	debug_message("Destroy 7\n");
+#ifndef LITE
 	m_destroy_bitmap(stoneTexture);
 	debug_message("Destroy 8\n");
 	m_destroy_bitmap(mushroom);
 	debug_message("Destroy 9\n");
 	m_destroy_bitmap(webbed);
+#endif
 	m_destroy_bitmap(dpad_buttons);
 	m_destroy_bitmap(batteryIcon);
 	debug_message("Destroy 10\n");
@@ -3025,7 +3029,9 @@ void destroy(void)
 	m_destroy_bitmap(poison_bmp);
 	m_destroy_bitmap(poison_bmp_tmp);
 	m_destroy_bitmap(poison_bmp_tmp2);
+#ifndef LITE
 	m_destroy_bitmap(stomach_circle);
+#endif
 	if (screenshot) {
 		m_destroy_bitmap(screenshot);
 	}

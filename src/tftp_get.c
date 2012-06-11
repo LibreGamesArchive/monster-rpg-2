@@ -5,6 +5,12 @@
 #define mkdir(a, b) mkdir(a)
 #endif
 
+#ifdef LITE
+#define LIST_FILENAME "lite_list.txt"
+#else
+#define LIST_FILENAME "list.txt"
+#endif
+
 ALLEGRO_DEBUG_CHANNEL("tftp")
 
 #ifdef ALLEGRO_ANDROID
@@ -287,7 +293,7 @@ static void download_list(char **filenames, int *lengths)
 static bool download_all(void)
 {
 	char fn[1000];
-	sprintf(fn, "%s/%s", DOWNLOAD_PATH, "list.txt");
+	sprintf(fn, "%s/%s", DOWNLOAD_PATH, LIST_FILENAME);
 	FILE *f = fopen(fn, "r");
 	size_t read;
 	char buf[100];
@@ -356,7 +362,7 @@ static void *hqm_go_thread(void *arg)
 	WSAStartup(MAKEWORD(2, 2), &crap);
 #endif
 
-	int len = download_file("list.txt");
+	int len = download_file(LIST_FILENAME);
 	if (len != EXPECTED_LIST_SIZE) {
 		is_downloading = false;
 		return NULL;

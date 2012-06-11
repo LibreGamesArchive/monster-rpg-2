@@ -111,8 +111,21 @@
 		9638490A1481A67B000F7B07 /* libJoypadCocoaTouch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9659CDB0143A4E560007757E /* libJoypadCocoaTouch.a */; };
 		9638490B1481A6B9000F7B07 /* joypad.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA0143A426C0007757E /* joypad.mm */; };
 		9638490C1481A6BD000F7B07 /* joypad_handler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA3143A42C50007757E /* joypad_handler.m */; };
-		963849111481A7EA000F7B07 /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9638490F1481A7DC000F7B07 /* data */; };
 		9639C4361152D3A900804984 /* iphone.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9639C4351152D3A900804984 /* iphone.mm */; };
+		96581D6F158570A6006BF72E /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 96581D6E158570A6006BF72E /* data */; };
+		96581D721585710D006BF72E /* tftp_get.c in Sources */ = {isa = PBXBuildFile; fileRef = 96581D701585710D006BF72E /* tftp_get.c */; };
+		96581D7715857178006BF72E /* 60beat.m in Sources */ = {isa = PBXBuildFile; fileRef = 96581D7515857178006BF72E /* 60beat.m */; };
+		96581D78158571C0006BF72E /* NetReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB489154C82EA000869BD /* NetReachability.m */; };
+		96581D79158571D4006BF72E /* NetServiceBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB48B154C82EA000869BD /* NetServiceBrowser.m */; };
+		96581D7A158571DA006BF72E /* NetUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB48D154C82EA000869BD /* NetUtilities.m */; };
+		96581D7B158571E0006BF72E /* TCPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB490154C82EA000869BD /* TCPConnection.m */; };
+		96581D7C158571E5006BF72E /* TCPServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB492154C82EA000869BD /* TCPServer.m */; };
+		96581D7D158571EB006BF72E /* TCPService.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB494154C82EA000869BD /* TCPService.m */; };
+		96581D7E158571EF006BF72E /* ThrottledTCPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB496154C82EA000869BD /* ThrottledTCPConnection.m */; };
+		96581D7F158571FF006BF72E /* UDPSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB498154C82EA000869BD /* UDPSocket.m */; };
+		96581D8015857230006BF72E /* SBJoystickLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 960EFA44153697B8008A2033 /* SBJoystickLib.a */; };
+		96581D81158572AA006BF72E /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960DB4A1154C8341000869BD /* SystemConfiguration.framework */; };
+		96581D8615857648006BF72E /* libAllegro.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A460A6151D836A001BC99C /* libAllegro.a */; };
 		9659CD95143A2A030007757E /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 9659CD8E143A2A030007757E /* Icon-72.png */; };
 		9659CD96143A2A030007757E /* Icon-Small-50.png in Resources */ = {isa = PBXBuildFile; fileRef = 9659CD8F143A2A030007757E /* Icon-Small-50.png */; };
 		9659CD97143A2A030007757E /* Icon-Small.png in Resources */ = {isa = PBXBuildFile; fileRef = 9659CD90143A2A030007757E /* Icon-Small.png */; };
@@ -123,6 +136,16 @@
 		9659CDA1143A426C0007757E /* joypad.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA0143A426C0007757E /* joypad.mm */; };
 		9659CDA4143A42C50007757E /* joypad_handler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA3143A42C50007757E /* joypad_handler.m */; };
 		9659CDB1143A4E570007757E /* libJoypadCocoaTouch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9659CDB0143A4E560007757E /* libJoypadCocoaTouch.a */; };
+		965E248915852F4400839861 /* tftp_get.c in Sources */ = {isa = PBXBuildFile; fileRef = 96A4D26E154A7EA0009ECD44 /* tftp_get.c */; };
+		965E248C15852F8500839861 /* liballegro_memfile-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 965E248B15852F8500839861 /* liballegro_memfile-static.a */; };
+		965E24921585309A00839861 /* Monster RPG 2 copy-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 965E24911585309A00839861 /* Monster RPG 2 copy-Info.plist */; };
+		965E24931585319000839861 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D257154A7D55009ECD44 /* OpenGL.framework */; };
+		965E24951585321D00839861 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 965E24941585321C00839861 /* Foundation.framework */; };
+		965E24961585324B00839861 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D256154A7D55009ECD44 /* Cocoa.framework */; };
+		965E2497158532FA00839861 /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B7D08313D09EF7004D7ED6 /* libpng.a */; };
+		965E24991585334500839861 /* liballegro_native_dialog-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 965E24981585334500839861 /* liballegro_native_dialog-static.a */; };
+		965E249A1585335100839861 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D26A154A7E21009ECD44 /* IOKit.framework */; };
+		965E249C158535EF00839861 /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 965E249B158535EF00839861 /* data */; };
 		967976AC13BE8690006BCE29 /* init.mm in Sources */ = {isa = PBXBuildFile; fileRef = 967976AB13BE8690006BCE29 /* init.mm */; };
 		968BA9351481E98000F768C5 /* init.mm in Sources */ = {isa = PBXBuildFile; fileRef = 967976AB13BE8690006BCE29 /* init.mm */; };
 		968BA9361481E98000F768C5 /* atlas_accessor.c in Sources */ = {isa = PBXBuildFile; fileRef = 968C1E5E13BBE28800615225 /* atlas_accessor.c */; };
@@ -172,7 +195,6 @@
 		968BA9661481E98000F768C5 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0D0143BBA8400ACA64C /* libfreetype.a */; };
 		968BA9671481E98000F768C5 /* libtgui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0D2143BBA8400ACA64C /* libtgui.a */; };
 		968BA9681481E98000F768C5 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0D3143BBA8400ACA64C /* libz.a */; };
-		968BA9691481E98000F768C5 /* liballegro_dialog-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0BE143BBA4700ACA64C /* liballegro_dialog-static.a */; };
 		968BA96A1481E98000F768C5 /* liballegro_font-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0BF143BBA4700ACA64C /* liballegro_font-static.a */; };
 		968BA96B1481E98000F768C5 /* liballegro_image-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0C0143BBA4700ACA64C /* liballegro_image-static.a */; };
 		968BA96C1481E98000F768C5 /* liballegro_main-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0C1143BBA4700ACA64C /* liballegro_main-static.a */; };
@@ -183,7 +205,6 @@
 		968BA9731481E98000F768C5 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 96B4B0A9143BB83100ACA64C /* InfoPlist.strings */; };
 		968BA9751481E98000F768C5 /* libbass.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 96B4B0CE143BBA8400ACA64C /* libbass.dylib */; };
 		968BA9761481E98000F768C5 /* libbassflac.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 96B4B0CF143BBA8400ACA64C /* libbassflac.dylib */; };
-		968BA9831481EBD100F768C5 /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 968BA9811481EBBA00F768C5 /* data */; };
 		968BA98814827CDE00F768C5 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 968BA98614827CD600F768C5 /* icon.icns */; };
 		968C1E5B13BBB51D00615225 /* libbass.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 968C1E5A13BBB51D00615225 /* libbass.a */; };
 		968C1E5D13BBB55900615225 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 968C1E5C13BBB55900615225 /* CFNetwork.framework */; };
@@ -278,13 +299,6 @@
 		96BF3FA913DB31C900CE670E /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B7D08413D09EF7004D7ED6 /* libz.a */; };
 		96BF3FAA13DB31CE00CE670E /* libbassflac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 968C1E7913BCED5D00615225 /* libbassflac.a */; };
 		96BF3FAB13DB31D100CE670E /* libbass.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 968C1E5A13BBB51D00615225 /* libbass.a */; };
-		96BF3FAC13DB31FF00CE670E /* liballegro_font-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9695A12C138D706400FB0417 /* liballegro_font-static.a */; };
-		96BF3FAD13DB31FF00CE670E /* liballegro_image-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9695A12D138D706400FB0417 /* liballegro_image-static.a */; };
-		96BF3FAE13DB31FF00CE670E /* liballegro_main-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9695A12E138D706400FB0417 /* liballegro_main-static.a */; };
-		96BF3FAF13DB31FF00CE670E /* liballegro_primitives-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9695A12F138D706400FB0417 /* liballegro_primitives-static.a */; };
-		96BF3FB013DB31FF00CE670E /* liballegro_shader-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9695A130138D706400FB0417 /* liballegro_shader-static.a */; };
-		96BF3FB113DB31FF00CE670E /* liballegro_ttf-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9695A131138D706400FB0417 /* liballegro_ttf-static.a */; };
-		96BF3FB213DB31FF00CE670E /* liballegro-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9695A132138D706400FB0417 /* liballegro-static.a */; };
 		96BF3FB313DB31FF00CE670E /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9695A133138D706400FB0417 /* libfreetype.a */; };
 		96BF3FB413DB31FF00CE670E /* liblua-fixed.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9695A134138D706400FB0417 /* liblua-fixed.a */; };
 		96BF3FB513DB31FF00CE670E /* libtgui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9695A135138D706400FB0417 /* libtgui.a */; };
@@ -310,7 +324,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
-				963849111481A7EA000F7B07 /* data in CopyFiles */,
+				96581D6F158570A6006BF72E /* data in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -341,7 +355,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
-				968BA9831481EBD100F768C5 /* data in CopyFiles */,
+				965E249C158535EF00839861 /* data in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -451,6 +465,11 @@
 		9638490F1481A7DC000F7B07 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = ../../litedataios/data; sourceTree = "<group>"; };
 		9639C4351152D3A900804984 /* iphone.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = iphone.mm; path = ../../src/iphone.mm; sourceTree = SOURCE_ROOT; };
 		96490EB9136368C500B2FBAF /* MoRPG2-DBG.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MoRPG2-DBG.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		96581D6E158570A6006BF72E /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = "../../lite-data/data"; sourceTree = "<group>"; };
+		96581D701585710D006BF72E /* tftp_get.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = tftp_get.c; path = ../../src/tftp_get.c; sourceTree = "<group>"; };
+		96581D711585710D006BF72E /* tftp_get.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = tftp_get.h; path = ../../src/tftp_get.h; sourceTree = "<group>"; };
+		96581D7415857178006BF72E /* 60beat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = 60beat.h; path = ../../src/60beat.h; sourceTree = "<group>"; };
+		96581D7515857178006BF72E /* 60beat.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = 60beat.m; path = ../../src/60beat.m; sourceTree = "<group>"; };
 		9659CD8E143A2A030007757E /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-72.png"; path = "../../icons/full/Icon-72.png"; sourceTree = "<group>"; };
 		9659CD8F143A2A030007757E /* Icon-Small-50.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-Small-50.png"; path = "../../icons/full/Icon-Small-50.png"; sourceTree = "<group>"; };
 		9659CD90143A2A030007757E /* Icon-Small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-Small.png"; path = "../../icons/full/Icon-Small.png"; sourceTree = "<group>"; };
@@ -468,6 +487,13 @@
 		9659CDAF143A4E560007757E /* JoypadSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JoypadSDK.h; path = ../../../../Downloads/JoypadSDKs/iOS/JoypadCocoaTouchSDK/JoypadSDK.h; sourceTree = "<group>"; };
 		9659CDB0143A4E560007757E /* libJoypadCocoaTouch.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libJoypadCocoaTouch.a; path = ../../../../Downloads/JoypadSDKs/iOS/JoypadCocoaTouchSDK/libJoypadCocoaTouch.a; sourceTree = "<group>"; };
 		965C7FA61526804800AD9919 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = "../../iphone-data/data"; sourceTree = "<group>"; };
+		965E248B15852F8500839861 /* liballegro_memfile-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_memfile-static.a"; path = "../../../iphone_libs_r/liballegro_memfile-static.a"; sourceTree = "<group>"; };
+		965E248D15852FC100839861 /* litedata */ = {isa = PBXFileReference; lastKnownFileType = folder; name = litedata; path = ../../litedata; sourceTree = "<group>"; };
+		965E248F1585300200839861 /* lite-data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "lite-data"; path = "../../lite-data"; sourceTree = "<group>"; };
+		965E24911585309A00839861 /* Monster RPG 2 copy-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Monster RPG 2 copy-Info.plist"; sourceTree = "<group>"; };
+		965E24941585321C00839861 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		965E24981585334500839861 /* liballegro_native_dialog-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_native_dialog-static.a"; path = "../../../iphone_libs_r/liballegro_native_dialog-static.a"; sourceTree = "<group>"; };
+		965E249B158535EF00839861 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = "../../lite-data/data"; sourceTree = "<group>"; };
 		96789CB814831C8D003F393D /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = ../../fulldataios/data; sourceTree = "<group>"; };
 		967976AB13BE8690006BCE29 /* init.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = init.mm; path = ../../src/init.mm; sourceTree = "<group>"; };
 		968BA97D1481E98000F768C5 /* Monster RPG 2 Lite.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Monster RPG 2 Lite.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -619,17 +645,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96581D8615857648006BF72E /* libAllegro.a in Frameworks */,
+				96581D81158572AA006BF72E /* SystemConfiguration.framework in Frameworks */,
 				96BF3FA713DB31AC00CE670E /* CFNetwork.framework in Frameworks */,
 				96BF3FAA13DB31CE00CE670E /* libbassflac.a in Frameworks */,
 				96BF3FAB13DB31D100CE670E /* libbass.a in Frameworks */,
 				96BF3FA813DB31C700CE670E /* libpng.a in Frameworks */,
-				96BF3FAC13DB31FF00CE670E /* liballegro_font-static.a in Frameworks */,
-				96BF3FAD13DB31FF00CE670E /* liballegro_image-static.a in Frameworks */,
-				96BF3FAE13DB31FF00CE670E /* liballegro_main-static.a in Frameworks */,
-				96BF3FAF13DB31FF00CE670E /* liballegro_primitives-static.a in Frameworks */,
-				96BF3FB013DB31FF00CE670E /* liballegro_shader-static.a in Frameworks */,
-				96BF3FB113DB31FF00CE670E /* liballegro_ttf-static.a in Frameworks */,
-				96BF3FB213DB31FF00CE670E /* liballegro-static.a in Frameworks */,
 				96BF3FB313DB31FF00CE670E /* libfreetype.a in Frameworks */,
 				96BF3FB413DB31FF00CE670E /* liblua-fixed.a in Frameworks */,
 				96BF3FB513DB31FF00CE670E /* libtgui.a in Frameworks */,
@@ -640,6 +661,7 @@
 				96BF3FB913DB321200CE670E /* CoreGraphics.framework in Frameworks */,
 				96BF3FBA13DB321200CE670E /* Foundation.framework in Frameworks */,
 				96BF3FBB13DB321200CE670E /* MediaPlayer.framework in Frameworks */,
+				96581D8015857230006BF72E /* SBJoystickLib.a in Frameworks */,
 				96BF3FBC13DB321200CE670E /* MobileCoreServices.framework in Frameworks */,
 				96BF3FBD13DB321300CE670E /* OpenGLES.framework in Frameworks */,
 				96BF3FBE13DB321300CE670E /* QuartzCore.framework in Frameworks */,
@@ -652,6 +674,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				965E249A1585335100839861 /* IOKit.framework in Frameworks */,
+				965E24991585334500839861 /* liballegro_native_dialog-static.a in Frameworks */,
+				965E2497158532FA00839861 /* libpng.a in Frameworks */,
+				965E24961585324B00839861 /* Cocoa.framework in Frameworks */,
+				965E24951585321D00839861 /* Foundation.framework in Frameworks */,
+				965E24931585319000839861 /* OpenGL.framework in Frameworks */,
+				965E248C15852F8500839861 /* liballegro_memfile-static.a in Frameworks */,
 				968BA9621481E98000F768C5 /* liblua-fixed.a in Frameworks */,
 				968BA9631481E98000F768C5 /* libJoypadCocoa.a in Frameworks */,
 				968BA9641481E98000F768C5 /* libbass.dylib in Frameworks */,
@@ -659,7 +688,6 @@
 				968BA9661481E98000F768C5 /* libfreetype.a in Frameworks */,
 				968BA9671481E98000F768C5 /* libtgui.a in Frameworks */,
 				968BA9681481E98000F768C5 /* libz.a in Frameworks */,
-				968BA9691481E98000F768C5 /* liballegro_dialog-static.a in Frameworks */,
 				968BA96A1481E98000F768C5 /* liballegro_font-static.a in Frameworks */,
 				968BA96B1481E98000F768C5 /* liballegro_image-static.a in Frameworks */,
 				968BA96C1481E98000F768C5 /* liballegro_main-static.a in Frameworks */,
@@ -721,6 +749,18 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				96581D7415857178006BF72E /* 60beat.h */,
+				96581D7515857178006BF72E /* 60beat.m */,
+				96581D701585710D006BF72E /* tftp_get.c */,
+				96581D711585710D006BF72E /* tftp_get.h */,
+				96581D6E158570A6006BF72E /* data */,
+				965E249B158535EF00839861 /* data */,
+				965E24981585334500839861 /* liballegro_native_dialog-static.a */,
+				965E24941585321C00839861 /* Foundation.framework */,
+				965E24911585309A00839861 /* Monster RPG 2 copy-Info.plist */,
+				965E248F1585300200839861 /* lite-data */,
+				965E248D15852FC100839861 /* litedata */,
+				965E248B15852F8500839861 /* liballegro_memfile-static.a */,
 				962A7A02156C2C9400AB1B41 /* data */,
 				960260331568CC5C006F7CB9 /* Mac data */,
 				9629BBB81557C5AA009EAD48 /* quantize.cpp */,
@@ -1203,6 +1243,7 @@
 				9659CD9A143A2A030007757E /* Icon@2x.png in Resources */,
 				9659CD9B143A2A030007757E /* iTunesArtwork in Resources */,
 				960EFA45153697B8008A2033 /* SBGamepad.bundle in Resources */,
+				965E24921585309A00839861 /* Monster RPG 2 copy-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1274,6 +1315,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96581D7715857178006BF72E /* 60beat.m in Sources */,
+				96581D721585710D006BF72E /* tftp_get.c in Sources */,
 				9638490C1481A6BD000F7B07 /* joypad_handler.m in Sources */,
 				9638490B1481A6B9000F7B07 /* joypad.mm in Sources */,
 				96BF3FA413DB314300CE670E /* init.mm in Sources */,
@@ -1282,6 +1325,14 @@
 				9609BD4D13636DE60068EB38 /* translate.cpp in Sources */,
 				9609BD4E13636DE60068EB38 /* Area.cpp in Sources */,
 				9609BD4F13636DE70068EB38 /* iphone.mm in Sources */,
+				96581D78158571C0006BF72E /* NetReachability.m in Sources */,
+				96581D79158571D4006BF72E /* NetServiceBrowser.m in Sources */,
+				96581D7A158571DA006BF72E /* NetUtilities.m in Sources */,
+				96581D7B158571E0006BF72E /* TCPConnection.m in Sources */,
+				96581D7C158571E5006BF72E /* TCPServer.m in Sources */,
+				96581D7D158571EB006BF72E /* TCPService.m in Sources */,
+				96581D7E158571EF006BF72E /* ThrottledTCPConnection.m in Sources */,
+				96581D7F158571FF006BF72E /* UDPSocket.m in Sources */,
 				9609BD5113636DE70068EB38 /* 3d.cpp in Sources */,
 				9609BD5213636DE70068EB38 /* Animation.cpp in Sources */,
 				9609BD5313636DE70068EB38 /* AnimationSet.cpp in Sources */,
@@ -1323,6 +1374,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				965E248915852F4400839861 /* tftp_get.c in Sources */,
 				968BA9351481E98000F768C5 /* init.mm in Sources */,
 				968BA9361481E98000F768C5 /* atlas_accessor.c in Sources */,
 				968BA9371481E98000F768C5 /* atlas.c in Sources */,
@@ -1499,6 +1551,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../iphone_libs_r\"",
 					"\"$(SRCROOT)/../../../../Downloads/JoypadSDKs/iOS/JoypadCocoaTouchSDK\"",
+					"\"$(SRCROOT)/../../../../Downloads/SBGamepad_SDK_1_1/lib\"",
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
@@ -1542,6 +1595,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../iphone_libs_r\"",
 					"\"$(SRCROOT)/../../../../Downloads/JoypadSDKs/iOS/JoypadCocoaTouchSDK\"",
+					"\"$(SRCROOT)/../../../../Downloads/SBGamepad_SDK_1_1/lib\"",
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
@@ -1580,6 +1634,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../iphone_libs_r\"",
 					"\"$(SRCROOT)/../../../../Downloads/JoypadSDKs/iOS/JoypadCocoaTouchSDK\"",
+					"\"$(SRCROOT)/../../../../Downloads/SBGamepad_SDK_1_1/lib\"",
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
@@ -1620,6 +1675,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../iphone_libs_r\"",
 					"\"$(SRCROOT)/../../../../Downloads/JoypadSDKs/iOS/JoypadCocoaTouchSDK\"",
+					"\"$(SRCROOT)/../../../../Downloads/SBGamepad_SDK_1_1/lib\"",
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
@@ -1913,6 +1969,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../../../local/lib\"",
 					"\"$(SRCROOT)/../../../../Downloads/JoypadSDKs/Mac/JoypadCocoaSDK\"",
+					"\"$(SRCROOT)/../../../iphone_libs_r\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "Monster RPG 2 Lite";
@@ -1956,6 +2013,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../../../local/lib\"",
 					"\"$(SRCROOT)/../../../../Downloads/JoypadSDKs/Mac/JoypadCocoaSDK\"",
+					"\"$(SRCROOT)/../../../iphone_libs_r\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
@@ -1998,6 +2056,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../../../local/lib\"",
 					"\"$(SRCROOT)/../../../../Downloads/JoypadSDKs/Mac/JoypadCocoaSDK\"",
+					"\"$(SRCROOT)/../../../iphone_libs_r\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "Monster RPG 2 Lite";
@@ -2039,6 +2098,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../../../local/lib\"",
 					"\"$(SRCROOT)/../../../../Downloads/JoypadSDKs/Mac/JoypadCocoaSDK\"",
+					"\"$(SRCROOT)/../../../iphone_libs_r\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "Monster RPG 2 Lite";
