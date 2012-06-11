@@ -45,7 +45,12 @@ ALLEGRO_DEBUG_CHANNEL("tftp")
 #define BLKSIZE 32768
 #define BLKSIZE_S "32768"
 
+#ifdef LITE
+#define NUM_FILES 14 // FIXME: change this as needed
+#else
 #define NUM_FILES 42 // FIXME: change this as needed
+#endif
+
 #define EXPECTED_LIST_SIZE (NUM_FILES * 81) // 60 chars filename 20 chars length + 1 \n
 
 static char DOWNLOAD_PATH[1000];
@@ -413,7 +418,7 @@ int hqm_get_status(float *percent)
 		*percent = 0.0f;
 
 	char fn[1000];
-	sprintf(fn, "%s/%s", DOWNLOAD_PATH, "list.txt");
+	sprintf(fn, "%s/%s", DOWNLOAD_PATH, LIST_FILENAME);
 
 #ifdef ALLEGRO_ANDROID
 	al_set_standard_file_interface();
