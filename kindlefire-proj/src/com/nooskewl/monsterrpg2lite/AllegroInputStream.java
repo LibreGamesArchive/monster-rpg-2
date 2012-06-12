@@ -1,4 +1,4 @@
-package com.nooskewl.monsterrpg2;
+package com.nooskewl.monsterrpg2lite;
 
 import java.io.InputStream;
 import android.util.Log;
