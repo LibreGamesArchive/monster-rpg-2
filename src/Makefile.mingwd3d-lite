@@ -7,9 +7,9 @@ CFLAGS=-DA5_D3D -DEDITOR -I. -IEditor -I"c:/users/trent/code/include"
 else
 CFLAGS=-DA5_D3D -O2 -I. -I"c:/users/trent/code/include" -I"C:\a5_d3d\include" -I"c:\Program Files (x86)\Microsoft DirectX SDK (August 2007)\include" -g -static-libgcc -static-libstdc++ -DLITE
 endif
+CXXFLAGS=$(CFLAGS) -fcheck-new
 
-
-LINKFLAGS=-L"c:/a5_d3d/lib" -L"c:/users/trent/code/lib" -mwindows -static-libgcc -static-libstdc++
+LINKFLAGS=-L"c:/a5_d3d/lib" -L"c:/users/trent/code/lib" -static-libgcc -static-libstdc++ -mwindows
 
 
 CXX_SRCS=\
@@ -35,6 +35,7 @@ CXX_SRCS=\
 	io.cpp\
 	Items.cpp\
 	lander.cpp\
+	monster2.cpp\
 	Object.cpp\
 	pause.cpp\
 	Player.cpp\
@@ -49,42 +50,36 @@ CXX_SRCS=\
 	widgets.cpp\
 	xml.cpp
 
-
-C_SRCS=\
-	atlas.c\
-	atlas_accessor.c
-
-
 CXX_LIBOBJS=$(CXX_SRCS:.cpp=.o)
-OBJCXX_LIBOBJS=init.o
-C_LIBOBJS=$(C_SRCS:.c=.o)
 
-
-
-ALLEGROLIBS=-L"c:\a5_d3d\lib" -lallegro_shader-static -lallegro_acodec-static -lallegro_audio-static -lallegro_dialog-static -lallegro_primitives-static -lallegro_ttf-static -lallegro_font-static -lallegro_image-static -lallegro-static -lallegro_main-static
-STATIC_LIBS=-lkernel32 -luser32 -lgdi32 -lcomdlg32 -lole32 -lwinmm -lpsapi -ldxguid -lgdiplus -luuid -lshlwapi
+ALLEGROLIBS=-L"c:\a5_d3d\lib" -lallegro_shader-static -lallegro_native_dialog-static -lallegro_primitives-static -lallegro_ttf-static -lallegro_font-static -lallegro_image-static -lallegro-static -lallegro_main-static -lallegro_memfile-static
+STATIC_LIBS=-lkernel32 -luser32 -lgdi32 -lcomdlg32 -lole32 -lwinmm -lpsapi -ldxguid -lgdiplus -luuid -lshlwapi -lwsock32 -lws2_32
 LIBS=-llua-fixed -ltgui $(ALLEGROLIBS) -lz -lopengl32 -lwinmm -lbass -lfreetype $(STATIC_LIBS) "c:\program files (x86)\microsoft directx sdk (august 2007)\lib\x86\d3dx9.lib"
 
 
 default: monster2
 
 
-monster2: $(CXX_LIBOBJS) $(OBJCXX_LIBOBJS) $(C_LIBOBJS) monster2.o
-	g++ $(LINKFLAGS) -o monster2-d3d \
-		$(CXX_LIBOBJS) $(OBJCXX_LIBOBJS) $(C_LIBOBJS) icon-lite.res \
-		monster2.o $(LIBS)
+monster2: $(CXX_LIBOBJS) init.o atlas.o atlas_accessor.o tftp_get.o
+	g++ $(LINKFLAGS) $(CXX_LIBOBJS) init.o atlas.o atlas_accessor.o tftp_get.o icon-lite.res $(LIBS) -o monster2-d3d.exe
 
 .cpp.o:
-	$(CXX) $(CXXFLAGS) $(CFLAGS) -c $<
-
-.c.o:
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) $(CXXFLAGS) -c $<
 
 init.o: init.mm
-	$(CXX) -x c++ $(CXXFLAGS) $(CFLAGS) -c init.mm
+	$(CXX) -x c++ $(CXXFLAGS) -c init.mm
+
+atlas.o: atlas.c
+	$(CC) $(CFLAGS) -c atlas.c
+
+atlas_accessor.o: atlas_accessor.c
+	$(CC) $(CFLAGS) -c atlas_accessor.c
+
+tftp_get.o: tftp_get.c
+	$(CC) $(CFLAGS) -c tftp_get.c
 
 clean:
 	-rm *.o
-	-rm meditor2
-	-rm monster2 monster2-quickdraw
+	-rm meditor2.exe
+	-rm monster2-d3d.exe
 
