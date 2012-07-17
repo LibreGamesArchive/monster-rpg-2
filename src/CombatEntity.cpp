@@ -318,7 +318,7 @@ bool AttackSwoosh::update(int step)
 }
 
 
-AttackSwoosh::AttackSwoosh(int dx, int dy, Direction dir, Combatant *attacked, Combatant *attacker)
+AttackSwoosh::AttackSwoosh(int dx, int dy, int dir, Combatant *attacked, Combatant *attacker)
 {
 	type = COMBATENTITY_TYPE_FRILL;
 

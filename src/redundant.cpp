@@ -819,7 +819,7 @@ void m_draw_triangle(int x1, int y1, int x2, int y2, int x3, int y3, MCOLOR c)
 	al_draw_filled_triangle(x1, y1, x2, y2, x3, y3, c);
 }
 
-MBITMAP *create_trapezoid(Direction dir, int topw, int bottomw, int length, MCOLOR color)
+MBITMAP *create_trapezoid(int dir, int topw, int bottomw, int length, MCOLOR color)
 {
 	MBITMAP *b;
 

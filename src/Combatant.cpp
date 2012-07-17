@@ -43,7 +43,7 @@ std::string Combatant::getPrintableName(void)
 }
 
 
-void Combatant::setDirection(Direction dir)
+void Combatant::setDirection(int dir)
 {
 	direction = dir;
 }

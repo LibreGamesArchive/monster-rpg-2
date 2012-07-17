@@ -296,6 +296,16 @@ void Configuration::setLanguage(int l)
 	language = l;
 }
 
+bool Configuration::getAutoconnectToZeemote(void)
+{
+	return autoconnect_to_zeemote;
+}
+
+void Configuration::setAutoconnectToZeemote(bool ac)
+{
+	autoconnect_to_zeemote = ac;
+}
+
 void Configuration::read()
 {
 	char buf[1000];
@@ -330,6 +340,13 @@ void Configuration::read()
 
 	XMLData* game = monster->find("game");
 	if (!game) { delete xml; throw ReadError(); }
+	XMLData* auto_zeemote = game->find("autoconnect_to_zeemote");
+	if (auto_zeemote) {
+		setAutoconnectToZeemote(atoi(auto_zeemote->getValue().c_str()));
+	}
+	else {
+		setAutoconnectToZeemote(0);
+	}
 	XMLData* joyb1 = game->find("joyb1");
 	if (!joyb1) { delete xml; throw ReadError(); }
 	XMLData* joyb2 = game->find("joyb2");
@@ -453,6 +470,7 @@ void Configuration::write()
 	XMLData* monster = new XMLData("monster2", "");
 
 	XMLData* game = new XMLData("game", "");
+	XMLData* auto_zeemote = new XMLData("autoconnect_to_zeemote", my_itoa(getAutoconnectToZeemote()));
 	XMLData* joyb1 = new XMLData("joyb1", my_itoa(getJoyButton1()));
 	XMLData* joyb2 = new XMLData("joyb2", my_itoa(getJoyButton2()));
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -468,6 +486,7 @@ void Configuration::write()
 #endif
 	XMLData* xml_lang = new XMLData("language", my_itoa(getLanguage()));
 
+	game->add(auto_zeemote);
 	game->add(joyb1);
 	game->add(joyb2);
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -584,6 +603,9 @@ Configuration::Configuration() :
 #ifdef ALLEGRO_IPHONE
 	,cfg_shake_action(CFG_SHAKE_CANCEL)
 	,cfg_auto_rotation(2)
+#endif
+#ifdef ALLEGRO_ANDROID
+	,autoconnect_to_zeemote(false)
 #endif
 {
 #ifdef EDITOR

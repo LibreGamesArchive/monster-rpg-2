@@ -3,16 +3,7 @@
 
 #include "monster2.hpp"
 
-struct InputDescriptor {
-	bool left;
-	bool right;
-	bool up;
-	bool down;
-	bool button1;
-	bool button2;
-	bool button3;
-	Direction direction;
-};
+#include <input_descriptor.h>
 
 class Input {
 public:
@@ -20,8 +11,8 @@ public:
 	void set(bool b1, bool b2, bool b3, int set_sets = true, bool clear_on_false = true);
 	void set(bool l, bool r, bool u, bool d, bool b1, bool b2, bool b3, int set_sets = true, bool clear_on_false = true);
 	InputDescriptor getDescriptor();
-	void setDirection(Direction direction);
-	Direction getDirection(void) { return descriptor.direction; }
+	void setDirection(int direction);
+	int getDirection(void) { return descriptor.direction; }
 	bool isPlayerControlled() { return playerControlled; }
 	void setTimeTillNextNotification(int t);
 	unsigned long getTimeOfNextNotification(void);
@@ -66,7 +57,7 @@ protected:
 	InputDescriptor descriptor;
 	InputDescriptor sets;
 	bool playerControlled;
-	Direction startDirection;
+	int startDirection;
 	unsigned long timeOfNextNotification;
 	int orRelease;
 	ALLEGRO_MUTEX *mutex;

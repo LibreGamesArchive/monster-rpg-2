@@ -33,6 +33,10 @@ extern "C" {
 }
 #endif
 
+#ifdef ALLEGRO_ANDROID
+#include "java.h"
+#endif
+
 void destroy_fonts(void)
 {
 	m_destroy_font(game_font);
@@ -195,7 +199,7 @@ bool is_android_lessthan_2_3;
 bool achievement_show = false;
 double achievement_time = 0;
 MBITMAP *achievement_bmp;
-#if defined A5_D3D || defined KINDLEFIRE
+#if defined A5_D3D //|| defined KINDLEFIRE
 int PRESERVE_TEXTURE = 0;
 int NO_PRESERVE_TEXTURE = ALLEGRO_NO_PRESERVE_TEXTURE;
 #else
@@ -641,7 +645,7 @@ void myTguiIgnore(int type)
 		curr_touches = 0;
 		al_unlock_mutex(touch_mutex);
 	}
-	#endif
+#endif
 }
 
 static int find_touch(int touch_id)
@@ -748,7 +752,7 @@ static void set_user_joystick(void)
 		j = al_get_joystick(k);
 		int nb = al_get_joystick_num_buttons(j);
 		if (nb > 0) {
-			user_joystick = al_get_joystick(k);
+			user_joystick = j;
 			break;
 		}
 	}
@@ -1098,6 +1102,8 @@ static void *thread_proc(void *arg)
 			bool jp_conn = joypad_connected() || is_sb_connected();
 #elif defined ALLEGRO_MACOSX
 			bool jp_conn = joypad_connected();
+#elif defined ALLEGRO_ANDROID
+			bool jp_conn = zeemote_connected;
 #else
 			bool jp_conn = false;
 #endif
@@ -2389,6 +2395,7 @@ bool init(int *argc, char **argv[])
 
 
 	al_install_mouse();
+	
 #if !defined ALLEGRO_IPHONE
 	al_install_keyboard();
 #endif
@@ -2578,6 +2585,9 @@ bool init(int *argc, char **argv[])
 			return false;
 	}
 
+	//al_set_system_mouse_cursor(display, ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);	
+
+
 /*
 // FIXME
 	init_shaders();
@@ -2738,7 +2748,6 @@ ALLEGRO_DEBUG("boo1");
 //		al_get_joystick(0); // needed?
 	}
 
-
 	events_minor = al_create_event_queue();
 	al_register_event_source(events_minor, (ALLEGRO_EVENT_SOURCE *)display);
 #ifdef ALLEGRO_IPHONE
@@ -2878,7 +2887,7 @@ ALLEGRO_DEBUG("boo1");
 		m_rest(0.001);
 	}
 
-#if !defined(KINDLEFIRE)
+#if !defined(ALLEGRO_ANDROID)
 	al_inhibit_screensaver(true);
 #endif
 
@@ -3112,8 +3121,10 @@ void dpad_off(bool count)
 	if (dpad_count > 0 || !count) {
 		al_lock_mutex(dpad_mutex);
 		use_dpad = (dpad_type == DPAD_TOTAL_1 || dpad_type == DPAD_TOTAL_2);
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE
 		if (!joypad_connected() && !is_sb_connected()) {
+#elif defined ALLEGRO_ANDROID
+		if (!zeemote_connected) {
 #else
 		if (true) {
 #endif
@@ -3152,8 +3163,10 @@ void dpad_on(bool count)
 	if (dpad_count <= 0 || !count) {
 		al_lock_mutex(dpad_mutex);
 		use_dpad = dpad_type != DPAD_NONE;
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE
 		if (!joypad_connected() && !is_sb_connected()) {
+#elif defined ALLEGRO_ANDROID
+		if (!zeemote_connected) {
 #else
 		if (true) {
 #endif

@@ -41,4 +41,3 @@ extern MBITMAP *white_button;
 extern MBITMAP *black_button;
 extern MBITMAP *airplay_logo;
 extern double blueblock_times[7];
-

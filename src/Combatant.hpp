@@ -20,7 +20,7 @@ public:
 
 	virtual void attacked(void) { };
 
-	void setDirection(Direction dir);
+	void setDirection(int dir);
 	void setInfo(CombatantInfo &inf);
 	void setLocation(CombatLocation l);
 	void setLoyalty(CombatLoyalty l);
@@ -33,7 +33,7 @@ protected:
 	void construct(std::string name, bool alpha);
 
 	std::string name;
-	Direction direction;
+	int direction;
 	AnimationSet *whiteAnimSet;
 	CombatantInfo info;
 	CombatLocation location;

@@ -1,6 +1,10 @@
 #include "monster2.hpp"
 #include <algorithm>
 
+#ifdef ALLEGRO_ANDROID
+#include "java.h"
+#endif
+
 extern bool joypad_connected(void);
 
 #ifdef EDITOR
@@ -2134,7 +2138,7 @@ void MMap::mouseUp(int x, int y, int b)
 			int dx = x - px;
 			int dy = y - py;
 			if (sqrtf(dx*dx + dy*dy) < 10) {
-				switch ((Direction)i) {
+				switch (i) {
 					case DIRECTION_NORTH:
 						u_pressed = true;
 						break;
@@ -2212,6 +2216,8 @@ void MMap::draw()
 	
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 			bool jp_conn = joypad_connected();
+#elif defined ALLEGRO_ANDROID
+			bool jp_conn = zeemote_connected;
 #else
 			bool jp_conn = false;
 #endif
@@ -2702,7 +2708,7 @@ void MMap::load_map_data(void)
 
 		lua_pushstring(luaState, "dest_dir");
 		lua_gettable(luaState, -2);
-		p.dest_dir = (Direction)((int)(lua_tonumber(luaState, -1)-1));
+		p.dest_dir = ((int)(lua_tonumber(luaState, -1)-1));
 		lua_pop(luaState, 1);
 
 

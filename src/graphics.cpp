@@ -16,6 +16,10 @@ extern "C" {
 #include "joypad.hpp"
 #endif
 
+#ifdef ALLEGRO_ANDROID
+#include "java.h"
+#endif
+
 #ifdef ALLEGRO4 // need a lookup table for tinting
 #define NUM_TINTER_SHADES 8
 uint16_t *tinter_table[NUM_TINTER_SHADES];
@@ -154,8 +158,10 @@ static void draw_the_controls(bool draw_controls, ALLEGRO_COLOR tint)
 			}
 		}
 		else
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE
 		if (!joypad_connected() && !is_sb_connected() && (dpad_type == DPAD_TOTAL_2 || dpad_type == DPAD_HYBRID_2)) {
+#elif defined ALLEGRO_ANDROID
+		if (!zeemote_connected && (dpad_type == DPAD_TOTAL_2 || dpad_type == DPAD_HYBRID_2)) {
 #else
 		if ((dpad_type == DPAD_TOTAL_2 || dpad_type == DPAD_HYBRID_2)) {
 #endif
@@ -218,8 +224,10 @@ static void draw_the_controls(bool draw_controls, ALLEGRO_COLOR tint)
 				x+BUTTON_SIZE/2, y+BUTTON_SIZE-4,
 				x+BUTTON_SIZE-4, y+4, dark, 1);
 		}
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE
 		else if (!joypad_connected() && !is_sb_connected()) {
+#elif defined ALLEGRO_ANDROID
+		else if (!zeemote_connected) {
 #else
 		else if (true) {
 #endif

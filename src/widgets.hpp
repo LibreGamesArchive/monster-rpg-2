@@ -1427,7 +1427,7 @@ struct MapPoint {
 	std::string dest_area;
 	int dest_x;
 	int dest_y;
-	Direction dest_dir;
+	int dest_dir;
 	int index;
 };
 

@@ -120,7 +120,7 @@ static void *thread_proc(void *arg)
    	JavaVMAttachArgs attach_args = { JNI_VERSION_1_4, "java_audio_thread", NULL };
       	(*javavm)->AttachCurrentThread(javavm, &thread_env, &attach_args);
 	
-	jmethodID meth_initSound = (*thread_env)->GetStaticMethodID(thread_env, bpc, "initSound", "(Lcom/nooskewl/monsterrpg2/AllegroActivity;)V");
+	jmethodID meth_initSound = (*thread_env)->GetStaticMethodID(thread_env, bpc, "initSound", "(Lcom/nooskewl/monsterrpg2lite/AllegroActivity;)V");
 	jmethodID meth_update = (*thread_env)->GetStaticMethodID(thread_env, bpc, "update", "()V");
 	jmethodID meth_loadSample = (*thread_env)->GetStaticMethodID(thread_env, bpc, "loadSample", "(Ljava/lang/String;)I");
 	jmethodID meth_loadSampleLoop = (*thread_env)->GetStaticMethodID(thread_env, bpc, "loadSampleLoop", "(Ljava/lang/String;)I");
@@ -218,7 +218,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 	javavm = vm;
 	(*javavm)->GetEnv(javavm, (void **)&java_env, JNI_VERSION_1_4);
 
-	jclass cls = (*java_env)->FindClass(java_env, "com/nooskewl/monsterrpg2/OldAndroid");
+	jclass cls = (*java_env)->FindClass(java_env, "com/nooskewl/monsterrpg2lite/OldAndroid");
 	bpc = (*java_env)->NewGlobalRef(java_env, cls);
 	
 	return JNI_VERSION_1_4;
@@ -378,3 +378,191 @@ bool wifiConnected(void)
 	return ret;
 }
 
+void joy_b1_down(void);
+void joy_b2_down(void);
+void joy_b3_down(void);
+void joy_b1_up(void);
+void joy_b2_up(void);
+void joy_b3_up(void);
+void joy_l_down(void);
+void joy_r_down(void);
+void joy_u_down(void);
+void joy_d_down(void);
+void joy_l_up(void);
+void joy_r_up(void);
+void joy_u_up(void);
+void joy_d_up(void);
+
+void connect_external_controls(void);
+void disconnect_external_controls(void);
+	
+static bool left, right, up, down, ba, bb, bc, bd;
+
+void zeemote_axis(float x, float y)
+{
+	if (x <= -0.5) {
+		if (right)
+			joy_r_up();
+		if (!left)
+			joy_l_down();
+		left = true;
+	}
+	else if (x >= 0.5) {
+		if (left)
+			joy_l_up();
+		if (!right)
+			joy_r_down();
+		right = true;
+	}
+	else {
+		if (left)
+			joy_l_up();
+		else if (right)
+			joy_r_up();
+		left = right = false;
+	}
+
+	if (y <= -0.5) {
+		if (down)
+			joy_d_up();
+		if (!up)
+			joy_u_down();
+		up = true;
+	}
+	else if (y >= 0.5) {
+		if (up)
+			joy_u_up();
+		if (!down)
+			joy_d_down();
+		down = true;
+	}
+	else {
+		if (up)
+			joy_u_up();
+		else if (down)
+			joy_d_up();
+		up = down = false;
+	}
+}
+
+void zeemote_button_down(int b)
+{
+	switch (b) {
+		case 0:
+			ba = true;
+			joy_b1_down();
+			break;
+		case 1:
+			bb = true;
+			joy_b2_down();
+			break;
+		case 3:
+			bd = true;
+			joy_b3_down();
+			break;
+	}
+}
+
+void zeemote_button_up(int b)
+{
+	switch (b) {
+		case 0:
+			ba = false;
+			joy_b1_up();
+			break;
+		case 1:
+			bb = false;
+			joy_b2_up();
+			break;
+		case 3:
+			bd = false;
+			joy_b3_up();
+			break;
+	}
+}
+
+struct InputDescriptor get_zeemote_state(void)
+{
+	struct InputDescriptor id;
+	id.left = left;
+	id.right = right;
+	id.up = up;
+	id.down = down;
+	id.button1 = ba;
+	id.button2 = bb;
+	id.button3 = bd;
+	return id;
+}
+
+bool zeemote_connected = false;
+
+void zeemote_connect(void)
+{
+	zeemote_connected = true;
+	connect_external_controls();
+}
+
+void zeemote_disconnect(void)
+{
+	zeemote_connected = false;
+	left = right = up = down = ba = bb = bc = bd = false;
+	disconnect_external_controls();
+}
+
+JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2lite_AllegroActivity_nativeZeemoteConnect(JNIEnv *env, jobject obj)
+{
+	(void)env;
+	(void)obj;
+
+	zeemote_connect();
+}
+
+JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2lite_AllegroActivity_nativeZeemoteDisconnect(JNIEnv *env, jobject obj)
+{
+	(void)env;
+	(void)obj;
+
+	zeemote_disconnect();
+}
+
+JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2lite_AllegroActivity_nativeZeemoteAxis(JNIEnv *env, jobject obj, float x, float y)
+{
+	(void)env;
+	(void)obj;
+
+	zeemote_axis(x, y);
+}
+
+JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2lite_AllegroActivity_nativeZeemoteButtonDown(JNIEnv *env, jobject obj, int button)
+{
+	(void)env;
+	(void)obj;
+	zeemote_button_down(button);
+}
+
+JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2lite_AllegroActivity_nativeZeemoteButtonUp(JNIEnv *env, jobject obj, int button)
+{
+	(void)env;
+	(void)obj;
+	zeemote_button_up(button);
+}
+
+void find_zeemotes(void)
+{
+	_jni_callVoidMethodV(
+		_al_android_get_jnienv(),
+		_al_android_activity_object(),
+		"find_zeemotes",
+		"()V"
+	);
+}
+
+void autoconnect_zeemote(void)
+{
+	_jni_callVoidMethodV(
+		_al_android_get_jnienv(),
+		_al_android_activity_object(),
+		"autoconnect_zeemote",
+		"()V"
+	);
+}

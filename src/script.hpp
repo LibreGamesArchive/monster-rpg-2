@@ -15,7 +15,7 @@ std::string getScriptExtension(void);
 void startNewGame(const char *name = "start");
 int getNumberFromScript(lua_State *state, std::string name);
 void runGlobalScript(lua_State *luaState);
-void setObjectDirection(Object *o, Direction direction);
+void setObjectDirection(Object *o, int direction);
 bool anotherDoDialogue(const char *text, bool clearbuf = true, bool top = false);
 
 extern bool player_scripted;
@@ -23,6 +23,6 @@ extern bool player_scripted;
 extern bool shouldDoMap;
 extern std::string mapStartPlace;
 extern std::string mapPrefix;
-extern Direction battleStartDirection;
+extern int battleStartDirection;
 
 #endif

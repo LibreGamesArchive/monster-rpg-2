@@ -216,14 +216,6 @@ struct MBITMAP {
 
 typedef ALLEGRO_COLOR MCOLOR;
 
-enum Direction {
-	DIRECTION_NONE = -1,
-	DIRECTION_NORTH,
-	DIRECTION_EAST,
-	DIRECTION_SOUTH,
-	DIRECTION_WEST
-};
-
 struct MPoint {
 	float x, y;
 };
@@ -248,6 +240,8 @@ enum CloneType
 	CLONE_FULL,
 };
 
+
+#include "input_descriptor.h"
 
 
 #include "translate.hpp"
@@ -340,6 +334,11 @@ void connect_airplay_controls(void);
 void disconnect_airplay_controls(void);
 
 extern bool dont_draw_now;
+
+#ifdef ALLEGRO_ANDROID
+extern bool halted;
+extern bool switched_in;
+#endif
 
 #endif
 

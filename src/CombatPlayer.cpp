@@ -415,7 +415,7 @@ public:
 	void shutdown(void) {
 	}
 
-	WalkHandler(CombatPlayer *p, Direction dir, WalkReason reason) :
+	WalkHandler(CombatPlayer *p, int dir, WalkReason reason) :
 		ActionHandler(p)
 	{
 		playerInput = false;
@@ -443,7 +443,7 @@ public:
 		}
 	}
 protected:
-	Direction dir;
+	int dir;
 	WalkReason reason;
 	float x;
 	float dx;
@@ -834,7 +834,7 @@ ActionHandler *AttackHandler::act(int step, Battle *b)
 	attacked.clear();
 
 	// walk back
-	Direction dir;
+	int dir;
 	if (player->getLocation() == LOCATION_RIGHT) {
 		dir = DIRECTION_EAST;
 	}
@@ -1006,7 +1006,7 @@ ActionHandler *UseMagicHandler::act(int step, Battle *b)
 		spellComplete = true;
 	}
 	if (spellComplete && player->getAnimationSet()->getCurrentAnimation()->isFinished()) {
-		Direction dir;
+		int dir;
 		if (battle->getAttackedFromBehind()) {
 			dir = DIRECTION_WEST;
 		}
@@ -1063,7 +1063,7 @@ ActionHandler *UseItemHandler::act(int step, Battle *b)
 	count += step;
 
 	if (count >= lifetime && player->getAnimationSet()->getCurrentAnimation()->isFinished()) {
-		Direction dir;
+		int dir;
 		if (battle->getAttackedFromBehind()) {
 			dir = DIRECTION_WEST;
 		}
@@ -1121,7 +1121,7 @@ ActionHandler *RunHandler::act(int step, Battle *b)
 {
 	if (!success) {
 		// walk back
-		Direction dir;
+		int dir;
 		if (player->getLocation() == LOCATION_RIGHT) {
 			dir = DIRECTION_EAST;
 		}
@@ -1225,7 +1225,7 @@ ActionHandler *ConfirmHandler::act(int step, Battle *b)
 				player->getWhiteAnimationSet()->setSubAnimation("defend");
 			}
 			// walk back
-			Direction dir;
+			int dir;
 			if (player->getLocation() == LOCATION_RIGHT) {
 				dir = DIRECTION_EAST;
 			}
@@ -1266,7 +1266,7 @@ ActionHandler *ConfirmHandler::act(int step, Battle *b)
 				player->setX(x);
 			}
 			// walk back
-			Direction dir;
+			int dir;
 			if (player->getLocation() == LOCATION_RIGHT) {
 				dir = DIRECTION_EAST;
 			}
@@ -1365,7 +1365,7 @@ bool CombatPlayer::act(int step, Battle *b)
 			return true;
 		}
 		defending = false;
-		Direction d;
+		int d;
 		if (getLocation() == LOCATION_RIGHT) {
 			d = DIRECTION_WEST;
 		}

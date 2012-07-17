@@ -20,6 +20,8 @@
 
 #include "tftp_get.h"
 
+bool on_title_screen = false;
+
 bool fairy_used = false;
 
 bool in_map = false;
@@ -922,7 +924,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 		can_save = false;
 
 	Input *input = getInput();
-	Direction dir = input->getDirection();
+	int dir = input->getDirection();
 
 	tguiPush();
 
@@ -961,12 +963,17 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	}
 #endif
 	
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 	MIcon *joypad = NULL;
+#ifdef ALLEGRO_ANDROID
+	joypad = new MIcon(128, yyy, getResource("zeemote.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
+	yyy += 26;
+#else
 	if (is_32_or_later()) {
 		joypad = new MIcon(128, yyy, getResource("joypad_icon.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
 		yyy += 26;
 	}
+#endif
 #endif
 	MIcon *fairy = new MIcon(128, yyy, getResource("fairy.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
 
@@ -1017,7 +1024,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 
 #if defined(ALLEGRO_IPHONE) && !defined(LITE)
 	TGUIWidget *left_widget = game_center;
-#elif defined(ALLEGRO_IPHONE) || defined(ALLEGRO_MACOSX)
+#elif defined(ALLEGRO_IPHONE) || defined(ALLEGRO_MACOSX) || defined(ALLEGRO_ANDROID)
 	TGUIWidget *left_widget = joypad;
 #else
 	TGUIWidget *left_widget = NULL;
@@ -1063,7 +1070,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 #endif
 #endif
 
-#if defined IPHONE || defined ALLEGRO_MACOSX
+#if defined IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 	if (joypad)
 		joypad->set_right_widget(mainItem);
 #endif
@@ -1154,7 +1161,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 #endif
 #endif
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 	if (joypad)
 		tguiAddWidget(joypad);
 #endif
@@ -1690,10 +1697,15 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				section = MAIN;
 			}
 		
-#if defined IPHONE || defined ALLEGRO_MACOSX
+#if defined IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 			else if (joypad && widget == joypad)
 			{
+#ifdef ALLEGRO_ANDROID
+				find_zeemotes();
+				tguiSetFocus(mainItem);
+#else
 				find_joypads();
+#endif
 			}
 #endif
 
@@ -1834,7 +1846,7 @@ done:
 #endif
 #endif
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 	delete joypad;
 #endif
 
@@ -1863,7 +1875,7 @@ void doMap(std::string startPlace, std::string prefix)
 	}
 
 	Input *input = getInput();
-	Direction dir = input->getDirection();
+	int dir = input->getDirection();
 
 	in_map = true;
 	
@@ -1973,7 +1985,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 	Inventory shop_inventory[MAX_INVENTORY];
 
 	Input *input = getInput();
-	Direction dir = input->getDirection();
+	int dir = input->getDirection();
 
 	setMusicVolume(0.5f);
 
@@ -3296,8 +3308,6 @@ bool config_menu(bool start_on_fullscreen)
 
 	tguiPush();
 
-//	MIcon *bg = new MIcon(0, 0, std::string(getResource("media/options_bg.png")), al_map_rgba(64, 64, 64, 255), false, NULL, false, //false, false, false);
-	
 	MBITMAP *bg = m_load_bitmap(getResource("media/options_bg.png"));
 
 	int xx = 10;
@@ -3317,7 +3327,7 @@ bool config_menu(bool start_on_fullscreen)
 	
 	y += 13;
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX ||  defined ALLEGRO_ANDROID
 	std::vector<std::string> input_choices;
 	input_choices.push_back("{027} Tap-and-go");
 	input_choices.push_back("{027} Hybrid input 1");
@@ -3326,18 +3336,33 @@ bool config_menu(bool start_on_fullscreen)
 	input_choices.push_back("{027} Total D-Pad 2");
 	MSingleToggle *input_toggle;
 
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE
 	if (airplay_connected || joypad_connected() || is_sb_connected()) {
+#elif defined ALLEGRO_MACOSX
+	if (joypad_connected()) {
+#elif defined ALLEGRO_ANDROID
+	if (zeemote_connected) {
+#endif
 		input_toggle = NULL;
 	}
 	else {
-#endif
 		input_toggle = new MSingleToggle(xx, y, input_choices);
 		input_toggle->setSelected(config.getDpadType());
 		y += 13;
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 	}
 #endif
+#endif
+
+#if defined ALLEGRO_ANDROID
+	std::vector<std::string> zeemote_choices;
+	zeemote_choices.push_back("{027} Do not autoconnect to Zeemote");
+	zeemote_choices.push_back("{027} Autoconnect to Zeemote");
+	MSingleToggle *zeemote_toggle;
+
+	zeemote_toggle = new MSingleToggle(xx, y, zeemote_choices);
+	zeemote_toggle->setSelected(config.getAutoconnectToZeemote());
+	y += 13;
 #endif
 
 	std::vector<std::string> difficulty_choices;
@@ -3478,6 +3503,9 @@ bool config_menu(bool start_on_fullscreen)
 		tguiAddWidget(input_toggle);
 	}
 #endif
+#if defined ALLEGRO_ANDROID
+	tguiAddWidget(zeemote_toggle);
+#endif
 	tguiAddWidget(difficulty_toggle);
 #ifdef ALLEGRO_IPHONE
 	tguiAddWidget(shake_toggle);
@@ -3528,7 +3556,7 @@ bool config_menu(bool start_on_fullscreen)
 	int fps = 0;
 
 	bool first_frame = true;
-	
+
 	for (;;) {
 		
 		al_wait_cond(wait_cond, wait_mutex);
@@ -3608,13 +3636,15 @@ bool config_menu(bool start_on_fullscreen)
 		if (input_toggle) {
 			sel = input_toggle->getSelected();
 			if (config.getDpadType() != sel) {
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE
 				if (joypad_connected() || airplay_connected || is_sb_connected()) {
+#elif defined ALLEGRO_ANDROID
+				if (zeemote_connected) {
+#endif
 					playPreloadedSample("error.ogg");
 					input_toggle->setSelected((int)config.getDpadType());
 				}
 				else {
-#endif
 					al_lock_mutex(dpad_mutex);
 					getInput()->reset();
 					config.setDpadType(sel);
@@ -3638,12 +3668,15 @@ bool config_menu(bool start_on_fullscreen)
 							config.setTellUserToUseDpad(false);
 						}
 					}
-#ifdef ALLEGRO_IPHONE
 				}
-#endif
 			}
 		}
 #endif
+
+		sel = zeemote_toggle->getSelected();
+		if (config.getAutoconnectToZeemote() != sel) {
+			config.setAutoconnectToZeemote(sel);
+		}
 
 		sel = difficulty_toggle->getSelected();
 		if (sel != curr_difficulty) {
@@ -4085,6 +4118,8 @@ done:
 
 int title_menu(void)
 {
+	on_title_screen = true;
+
 	dpad_off();
 	
 	tguiEnableHotZone(false);
@@ -4122,17 +4157,16 @@ int title_menu(void)
 	MTextButton *hqm_button = new MTextButtonFullShadow(240-95, oy+30, "HQ sound track");
 	MTextButton *config_button = new MTextButtonFullShadow(240-95, oy+45, "Options");
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 	MIcon *joypad = NULL;
-	
+#ifdef ALLEGRO_ANDROID
+	joypad = new MIcon(BW-32-5, 5, getResource("zeemote.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
+#else
 	if (is_32_or_later())
 	{
-		joypad = new MIcon(2, 2, getResource("joypad_icon.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
+		joypad = new MIcon(5, 5, getResource("joypad_icon.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
 	}
-	/*
-	MIcon(int x, int y, std::string filename, MCOLOR tint,
-		bool accFocus = false, const char *name = NULL, bool show_name = false, bool alpha_image = false, bool show_focus = true, bool return_on_mouse_down = false, bool generate_repeat_presses = false);
-		*/
+#endif
 #endif
 
 	tguiPush();
@@ -4144,7 +4178,7 @@ int title_menu(void)
 	tguiAddWidget(hqm_button);
 	tguiAddWidget(config_button);
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 	if (joypad)
 		tguiAddWidget(joypad);
 #endif
@@ -4200,16 +4234,21 @@ int title_menu(void)
 				}
 			}
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 			if (joypad && widget == joypad)
 			{
+#ifdef ALLEGRO_ANDROID
+				find_zeemotes();
+				tguiSetFocus(buttons[0]);
+#else
 				find_joypads();
+#endif
 			}
 #endif
 
 			INPUT_EVENT ie = get_next_input_event();
 #ifdef ALLEGRO_ANDROID
-			if (ie.button2 == DOWN || iphone_shaken(0.1)) {
+			if ((!zeemote_connected && ie.button2 == DOWN) || iphone_shaken(0.1)) {
 #else
 			if (ie.button2 == DOWN) {
 #endif
@@ -4257,7 +4296,7 @@ done:
 	tguiDeleteWidget(config_button);
 	delete config_button;
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 	if (joypad) {
 		tguiDeleteWidget(joypad);
 		delete joypad;
@@ -4275,6 +4314,8 @@ done:
 	tguiEnableHotZone(true);
 
 	global_draw_red = gdr;
+
+	on_title_screen = false;
 
 	return selected;
 }

@@ -20,6 +20,6 @@ void debug_message(const char *fmt, ...)
 	}
 	*/
 
-//	printf("%s", msg);
+//	printf("%s\n", msg);
 	ALLEGRO_DEBUG("%s", msg);
 }

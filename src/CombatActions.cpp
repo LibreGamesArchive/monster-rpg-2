@@ -215,7 +215,7 @@ void doAttack(Combatant *attacker, Combatant *attacked, bool swoosh)
 	battle->addEntity(tt);
 
 	getCenter(attacked, &x, &y);
-	Direction dir = attacked->getLocation() == LOCATION_LEFT ?
+	int dir = attacked->getLocation() == LOCATION_LEFT ?
 		DIRECTION_WEST : DIRECTION_EAST;
 	if (swoosh) {
 		AttackSwoosh *as = new AttackSwoosh(x, y, dir, attacked, attacker);

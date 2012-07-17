@@ -29,7 +29,7 @@ public:
 	// objId is id of object checking for collisions
 	bool isOccupied(uint objId, int x, int y, bool doCollide = true, bool check_objs = true, bool check_tiles = true);
 	bool onAnyObject(uint objId, int x, int y);
-	bool activate(uint id, Direction direction);
+	bool activate(uint id, int direction);
 	void addObject(Object* obj);
 	void removeObject(uint id);
 	bool alreadyCollided(int o1, int o2);

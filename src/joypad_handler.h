@@ -8,7 +8,7 @@
 
 #import "JoypadSDK.h"
 
-@interface joypad_handler : NSObject
+@interface joypad_handler : NSObject<JoypadManagerDelegate, JoypadDeviceDelegate>
 {
 	JoypadManager *joypadManager;
 

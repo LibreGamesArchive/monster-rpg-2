@@ -32,5 +32,7 @@ extern bool in_map;
 extern MMap *mapWidget;
 extern bool in_pause;
 
+extern bool on_title_screen;
+
 #endif
 

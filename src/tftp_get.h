@@ -2,6 +2,8 @@
 #define HQM_STATUS_PARTIAL    1
 #define HQM_STATUS_NOTSTARTED 2
 
+#include "debug.hpp"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

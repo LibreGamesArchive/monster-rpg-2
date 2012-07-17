@@ -45,7 +45,10 @@ void disconnect_external_controls(void);
 {
 	joypadManager = [[JoypadManager alloc] init];
 	[joypadManager setDelegate:self];
-	[joypadManager usePreInstalledLayout:kJoyControllerSNES];
+	[joypadManager setMaxPlayerCount:1];
+	JoypadControllerLayout *l = [JoypadControllerLayout snesLayout];
+	[l setName:@"Monster RPG 2"];
+        [joypadManager setControllerLayout:l];
 
 	connected = left = right = up = down = ba = bb = bx = by = bl = br = false;
 }
@@ -58,7 +61,7 @@ void disconnect_external_controls(void);
 -(void)joypadManager:(JoypadManager *)manager didFindDevice:(JoypadDevice *)device previouslyConnected:(BOOL)prev
 {
 	[manager stopFindingDevices];
-	[manager connectToDevice:device asPlayer:1];
+	[device setDelegate:self];
 }
 
 -(void)joypadManager:(JoypadManager *)manager didLoseDevice:(JoypadDevice *)device;
@@ -71,6 +74,12 @@ void disconnect_external_controls(void);
 	connected = true;
 	connect_external_controls();
 }
+
+-(BOOL)joypadManager:(JoypadManager *)manager deviceShouldConnect:(JoypadDevice *)device
+{
+  return YES;
+}
+
 
 -(void)joypadManager:(JoypadManager *)manager deviceDidDisconnect:(JoypadDevice *)device player:(unsigned int)player
 {

@@ -8,12 +8,24 @@
 
 #ifdef KINDLEFIRE
 #include <allegro5/internal/aintern_android.h>
-extern "C" {
-void android_broadcast_resume(ALLEGRO_DISPLAY_ANDROID *d);
-}
 #endif
 
 #include "tftp_get.h"
+
+#ifdef ALLEGRO_ANDROID
+#include "java.h"
+static bool zeemote_enabled = false;
+#endif
+
+#ifdef ALLEGRO_ANDROID
+bool halted = false;
+static std::string old_music_name;
+static std::string old_ambience_name;
+static float old_music_volume;
+static float old_ambience_volume;
+bool switched_in = true;
+static bool music_replayed = true;
+#endif
 
 static void set_transform(ALLEGRO_DISPLAY *dpy)
 {
@@ -84,7 +96,7 @@ int old_control_mode = -1;
 
 void connect_airplay_controls(void)
 {
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	old_control_mode = config.getDpadType();
 	al_lock_mutex(dpad_mutex);
 	getInput()->reset();
@@ -102,7 +114,7 @@ void connect_airplay_controls(void)
 
 void disconnect_airplay_controls(void)
 {
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_lock_mutex(dpad_mutex);
 	getInput()->reset();
 	config.setDpadType(old_control_mode);
@@ -211,15 +223,29 @@ static void *wait_for_drawing_resume(void *arg)
 #else
 		if (event.type == ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING) {
 #endif
-			ALLEGRO_DEBUG("--- --- RESUME (%d %x)", event.type, event.type);
 			got_resume = true;
 			break;
 		}
 		else {
-			//ALLEGRO_DEBUG("Unknown event %d %x", event.type, event.type);
 			if (event.type == ALLEGRO_EVENT_DISPLAY_ORIENTATION) {
-	//			al_change_display_option(display, ALLEGRO_SUPPORTED_ORIENTATIONS, event.display.orientation);
 				set_transform(display);
+			}
+			else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN) {
+				al_start_timer(logic_timer);
+				al_start_timer(draw_timer);
+				switched_in = true;
+			}
+			else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT) {
+				old_music_name = musicName;
+				old_ambience_name = ambienceName;
+				old_music_volume = getMusicVolume();
+				old_ambience_volume = getAmbienceVolume();
+				playMusic("");
+				playAmbience("");
+				al_stop_timer(logic_timer);
+				al_stop_timer(draw_timer);
+				switched_in = false;
+				music_replayed = false;
 			}
 		}
 	}
@@ -241,8 +267,18 @@ static float backup_ambience_volume = 1.0f;
 // called from everywhere
 bool is_close_pressed(void)
 {
+top:
+
+#ifdef ALLEGRO_ANDROID
+	if (zeemote_enabled != zeemote_connected) {
+		zeemote_enabled = zeemote_connected;
+		al_inhibit_screensaver(zeemote_enabled);
+	}
+#endif
+
 	// random tasks
 	while (!al_event_queue_is_empty(events_minor)) {
+
 		ALLEGRO_EVENT event;
 		al_get_next_event(events_minor, &event);
 #ifdef ALLEGRO_IPHONE
@@ -260,7 +296,7 @@ bool is_close_pressed(void)
 		}
 #endif
 
-		if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+		if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE && !shooter_paused) {
 #ifdef ALLEGRO_IPHONE
 			if (!sound_was_playing_at_program_start)
 				iPodStop();
@@ -296,20 +332,29 @@ bool is_close_pressed(void)
 			setAmbienceVolume(backup_ambience_volume);
 		}
 #endif
-/*
-#if defined KINDLEFIRE
-		if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT) {
-			//ALLEGRO_DEBUG("--- --- SWITCH_OUT");
-		}
-		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN) {
-			//ALLEGRO_DEBUG("--- --- SWITCH_IN");
-		}
-#endif
-*/
 #if defined KINDLEFIRE
 		if (event.type == ALLEGRO_EVENT_DISPLAY_ORIENTATION) {
-//			al_change_display_option(display, ALLEGRO_SUPPORTED_ORIENTATIONS, event.display.orientation);
 			set_transform(display);
+		}
+#endif
+
+#ifdef ALLEGRO_ANDROID
+		if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN) {
+			al_start_timer(logic_timer);
+			al_start_timer(draw_timer);
+			switched_in = true;
+		}
+		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT) {
+			old_music_name = musicName;
+			old_ambience_name = ambienceName;
+			old_music_volume = getMusicVolume();
+			old_ambience_volume = getAmbienceVolume();
+			playMusic("");
+			playAmbience("");
+			al_stop_timer(logic_timer);
+			al_stop_timer(draw_timer);
+			switched_in = false;
+			music_replayed = false;
 		}
 #endif
 
@@ -319,11 +364,6 @@ bool is_close_pressed(void)
 				break_shooter_pause = true;
 			}
 			save_memory(false);
-#if defined KINDLEFIRE
-			if (event.type == ALLEGRO_EVENT_DISPLAY_HALT_DRAWING) {
-				//exit(0);
-			}
-#endif
 #if defined ALLEGRO_IPHONE
 			if (!isMultitaskingSupported()) {
 				if (!sound_was_playing_at_program_start)
@@ -331,85 +371,67 @@ bool is_close_pressed(void)
 				exit(0);
 			}
 #elif defined ALLEGRO_ANDROID
-			std::string old_music_name;
-			std::string old_ambience_name;
-			float old_music_volume;
-			float old_ambience_volume;
-			if (is_android_lessthan_2_3) {
-				old_music_name = musicName;
-				old_ambience_name = ambienceName;
-				old_music_volume = getMusicVolume();
-				old_ambience_volume = getAmbienceVolume();
-				playMusic("");
-				playAmbience("");
-			}
-			else {
-				(void)old_music_name;
-				(void)old_ambience_name;
-				(void)old_music_volume;
-				(void)old_ambience_volume;
-				backup_music_volume = getMusicVolume();
-				backup_ambience_volume = getAmbienceVolume();
-				setMusicVolume(0.0);
-				setAmbienceVolume(0.0);
-			}
-#if !defined(KINDLEFIRE_XXX)
 			_destroy_loaded_bitmaps();
 			destroy_fonts();
 #endif
-			//destroy_shaders();
-#endif
 			config.write();
+#ifndef ALLEGRO_ANDROID
 			al_stop_timer(logic_timer);
 			al_stop_timer(draw_timer);
+#endif
 			// halt
 			al_acknowledge_drawing_halt(display);
-#ifdef KINDLEFIRE
-			if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT) {
-				//android_broadcast_resume((ALLEGRO_DISPLAY_ANDROID *)display);
-			}
-#endif
 			got_resume = false;
 			al_run_detached_thread(
 				wait_for_drawing_resume,
 				events_minor
 			);
+#ifdef ALLEGRO_ANDROID
+			halted = true;
+#endif
 			al_lock_mutex(switch_mutex);
 			while (!got_resume) {
 				al_wait_cond(switch_cond, switch_mutex);
 			}
 			al_unlock_mutex(switch_mutex);
+#ifdef ALLEGRO_ANDROID
+			halted = false;
+#endif
 			// resume
 			al_acknowledge_drawing_resume(display, _reload_loaded_bitmaps);
 #ifdef ALLEGRO_ANDROID
-#if !defined(KINDLEFIRE_XXX)
 			_reload_loaded_bitmaps_delayed();
 			load_fonts();
-#endif
-			//init_shaders();
-			//init2_shaders();
 			if (in_shooter) {
 				shooter_restoring = true;
 			}
 #endif
-			//animset_post_reset();
 			glDisable(GL_DITHER);
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
+#ifndef ALLEGRO_ANDROID
 			al_start_timer(logic_timer);
 			al_start_timer(draw_timer);
-#ifdef ALLEGRO_ANDROID
-			if (is_android_lessthan_2_3) {
-				playMusic(old_music_name, old_music_volume, true);
-				playAmbience(old_ambience_name, old_ambience_volume);
-			}
-			else {
-				setMusicVolume(backup_music_volume);
-				setAmbienceVolume(backup_ambience_volume);
-			}
+#else
+			//if (!halt_was_because_of_zeemote && config.getAutoconnectToZeemote()) {
+				//ALLEGRO_DEBUG("AUTOCONNECT 2");
+				//autoconnect_zeemote();
+			//}
+			// this MUST be after autoconnect_zeemote() above
+			//halt_was_because_of_zeemote = false;
+			//ALLEGRO_DEBUG(" SETT FALSE ");
 #endif
 		}
 #endif
 	}
+
+#ifdef ALLEGRO_ANDROID
+	if (switched_in && !music_replayed) {
+		music_replayed = true;
+		playMusic(old_music_name, old_music_volume, true);
+		playAmbience(old_ambience_name, old_ambience_volume);
+	}
+#endif
+
 #ifdef ALLEGRO_IPHONE
 	double shake = al_iphone_get_last_shake_time();
 	if (shake > allegro_iphone_shaken) {
@@ -531,6 +553,13 @@ bool is_close_pressed(void)
 		do_toggle_fullscreen = false;
 		toggle_fullscreen();
 	}
+
+#ifdef ALLEGRO_ANDROID	
+	if (!switched_in) {
+		al_rest(0.005);
+		goto top;
+	}
+#endif
 	
 	return close_pressed;
 }
@@ -1268,6 +1297,11 @@ int main(int argc, char *argv[])
 	}
 #endif
 
+#ifdef ALLEGRO_ANDROID
+	if (config.getAutoconnectToZeemote()) {
+		autoconnect_zeemote();
+	}
+#endif
 
 	// FIXME
 	//volcano_scene();
@@ -1400,7 +1434,6 @@ int main(int argc, char *argv[])
 				runtime_start = 0;
 				debug_message("started new game\n");
 			}
-
 			int n;
 			if ((n = check_arg(argc, argv, "-warp")) != -1) {
 				if (area) delete area;

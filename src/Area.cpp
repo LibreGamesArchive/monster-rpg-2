@@ -491,13 +491,13 @@ void set_player_path(int x, int y)
 			if ((!battle) && i && abs(x-o->getX()) <= 1 && abs(y-o->getY()) <= 1) {
 				int dx = x - o->getX();
 				int dy = y - o->getY();
-				const Direction dirs[3][3] = {
-					{  (Direction)-1,  DIRECTION_NORTH,  (Direction)-1 },
-					{ DIRECTION_WEST,  (Direction)(-1), DIRECTION_EAST },
-					{  (Direction)-1,  DIRECTION_SOUTH,  (Direction)-1 }
+				const int dirs[3][3] = {
+					{  -1,  DIRECTION_NORTH,  -1 },
+					{ DIRECTION_WEST,  -1, DIRECTION_EAST },
+					{  -1,  DIRECTION_SOUTH,  -1 }
 				};
-				Direction d = dirs[dy+1][dx+1];
-				if (d != (Direction)-1) {
+				int d = dirs[dy+1][dx+1];
+				if (d != -1) {
 					was_a_click = true;
 					activated = area->activate(0, d);
 					was_a_click = false;
@@ -698,7 +698,7 @@ void Area::drawObject(Object *o)
 	}
 }
 
-bool Area::activate(uint id, Direction direction)
+bool Area::activate(uint id, int direction)
 {
 	in_activate = true;
 
@@ -1885,7 +1885,7 @@ void Area::update(int step)
 							path_head = path_head->child;
 							GET_DIRECTIONS(path_head)
 							InputDescriptor ie = i->getDescriptor();
-							Direction nextdir;
+							int nextdir;
 							if (l) nextdir = DIRECTION_WEST;
 							else if (r) nextdir = DIRECTION_EAST;
 							else if (u) nextdir = DIRECTION_NORTH;

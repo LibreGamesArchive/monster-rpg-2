@@ -12,7 +12,7 @@ static bool lander_success = false;
 bool shouldDoMap = false;
 std::string mapStartPlace;
 std::string mapPrefix;
-Direction battleStartDirection;
+int battleStartDirection;
 
 
 // Note: lua starts counting at 1, in C++ we start at 0, that's why you
@@ -357,11 +357,11 @@ static int CSetObjectPosition(lua_State *stack)
 }
 
 
-void setObjectDirection(Object *o, Direction direction)
+void setObjectDirection(Object *o, int direction)
 {
 	try {
 		Input *i = o->getInput();
-		i->setDirection((Direction)direction);
+		i->setDirection(direction);
 		InputDescriptor in = i->getDescriptor();
 		AnimationSet *as = o->getAnimationSet();
 		if (as) {
@@ -396,7 +396,7 @@ static int CSetObjectDirection(lua_State *stack)
 
 	Object *o = area->findObject(id);
 	if (o) {
-		setObjectDirection(o, (Direction)direction);
+		setObjectDirection(o, direction);
 	}
 
 	return 0;
@@ -2172,7 +2172,7 @@ static int CAddLight(lua_State *stack)
 {
 	int x = (int)lua_tonumber(stack, 1);
 	int y = (int)lua_tonumber(stack, 2);
-	Direction dir = (Direction)((int)(lua_tonumber(stack, 3)-1));
+	int dir = (int)(lua_tonumber(stack, 3)-1);
 	int topw = (int)lua_tonumber(stack, 4);
 	int bottomw = (int)lua_tonumber(stack, 5);
 	int length = (int)lua_tonumber(stack, 6);
@@ -3126,7 +3126,7 @@ static int CDoMapTutorial(lua_State *stack)
 	gameInfo.milestones[MS_MET_HORSE] = true;
 
 	Input *input = getInput();
-	Direction dir = input->getDirection();
+	int dir = input->getDirection();
 
 	MMap *mapWidget = new MMap("forest", "map");
 

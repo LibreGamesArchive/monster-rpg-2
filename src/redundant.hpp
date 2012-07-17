@@ -102,7 +102,7 @@ void m_draw_triangle(int x1, int y1,
 	int x2, int y2,
 	int x3, int y3,
 	MCOLOR c);
-MBITMAP *create_trapezoid(Direction dir, int topw, int bottomw, int length, MCOLOR c);
+MBITMAP *create_trapezoid(int dir, int topw, int bottomw, int length, MCOLOR c);
 void m_draw_trans_bitmap(MBITMAP *b, int x, int y, int alpha);
 void m_destroy_font(MFONT *f);
 void m_draw_alpha_bitmap(MBITMAP *b, int x, int y);

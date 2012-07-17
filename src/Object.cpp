@@ -192,7 +192,7 @@ bool Object::isMoving(void)
 }
 
 
-Direction Object::getMoveDirection(void)
+int Object::getMoveDirection(void)
 {
 	return moveDirection;
 }
@@ -796,7 +796,7 @@ void Light::draw(void)
 	m_restore_blender();
 }
 
-Light::Light(float x, float y, Direction dir, int topw, int bottomw, int length, MCOLOR color) :
+Light::Light(float x, float y, int dir, int topw, int bottomw, int length, MCOLOR color) :
 	Object(),
 	x(x),
 	y(y)

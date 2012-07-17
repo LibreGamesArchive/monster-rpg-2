@@ -7,6 +7,8 @@ extern "C" {
 
 #include <bass.h>
 
+#include "input_descriptor.h"
+
 void bass_initSound(void);
 HSAMPLE bass_loadSample(const char *name);;
 HSAMPLE bass_loadSampleLoop(const char *name);
@@ -28,6 +30,11 @@ bool get_clipboard(char *buf, int len);
 void set_clipboard(char *buf);
 
 bool wifiConnected(void);
+
+struct InputDescriptor get_zeemote_state(void);
+extern bool zeemote_connected;
+void find_zeemotes(void);
+void autoconnect_zeemote(void);
 
 #ifdef __cplusplus
 }

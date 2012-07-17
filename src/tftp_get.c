@@ -42,8 +42,8 @@ ALLEGRO_DEBUG_CHANNEL("tftp")
 
 #define SERVER "nooskewl.com"
 #define PORT "69"
-#define BLKSIZE 32768
-#define BLKSIZE_S "32768"
+#define BLKSIZE 512
+#define BLKSIZE_S "512"
 
 #ifdef LITE
 #define NUM_FILES 14 // FIXME: change this as needed
@@ -106,7 +106,7 @@ static bool connect_to_server(void)
 	int r;
 
 	if ((r = getaddrinfo(SERVER, PORT, &hints, &res)) != 0) {
-		ALLEGRO_DEBUG("getaddrinfo failed: r=%d, errno=%d", r, errno);
+		debug_message("getaddrinfo failed: r=%d, errno=%d", r, errno);
 		return false;
 	}
 	
@@ -114,7 +114,7 @@ static bool connect_to_server(void)
 	sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if (sock == INVALID_SOCKET) {
 		freeaddrinfo(res);
-		ALLEGRO_DEBUG("socket failed");
+		debug_message("socket failed");
 		return false;
 	}
 
@@ -139,7 +139,7 @@ static bool connect_to_server(void)
 
 	freeaddrinfo(res);
 
-	ALLEGRO_DEBUG("Connected?");
+	debug_message("Connected?");
 
 	return true;
 }
@@ -197,7 +197,7 @@ static int download_file(const char *filename)
 
 	sz = get_rrq(buf, filename);
 	if (put(buf, sz) != sz) {
-		ALLEGRO_DEBUG("put != sz rrq");
+		debug_message("put != sz rrq");
 		shutdown_connection();
 		return -1;
 	}
@@ -206,7 +206,7 @@ static int download_file(const char *filename)
 	sz = get(buf, 2+strlen("blksize")+1+strlen(BLKSIZE_S)+1);
 	if ((sz != (2+strlen("blksize")+1+strlen(BLKSIZE_S)+1)) || get16bits(buf) != 6) {
 		shutdown_connection();
-		ALLEGRO_DEBUG("no option ack");
+		debug_message("no option ack");
 		return -1;
 	}
 
@@ -216,7 +216,7 @@ static int download_file(const char *filename)
 	buf[3] = 0;
 	if (put(buf, 4) != 4) {
 		shutdown_connection();
-		ALLEGRO_DEBUG("put ack fail");
+		debug_message("put ack fail");
 		return -1;
 	}
 
@@ -227,7 +227,7 @@ static int download_file(const char *filename)
 		if (stop) {
 			fclose(f);
 			shutdown_connection();
-			ALLEGRO_DEBUG("told to stop");
+			debug_message("told to stop");
 			return -1;
 		}
 		fd_set fdset;
@@ -239,7 +239,7 @@ static int download_file(const char *filename)
 		if (select(sock+1, &fdset, 0, 0, &tv) == 0) {
 			fclose(f);
 			shutdown_connection();
-			ALLEGRO_DEBUG("select returned 0");
+			debug_message("select returned 0");
 			return -1;
 		}
 		sz = get(buf, 4+BLKSIZE);
@@ -256,7 +256,7 @@ static int download_file(const char *filename)
 		if (put(buf, 4) != 4) {
 			fclose(f);
 			shutdown_connection();
-			ALLEGRO_DEBUG("loop ack fail");
+			debug_message("loop ack fail");
 			return -1;
 		}
 	}
@@ -268,7 +268,7 @@ static int download_file(const char *filename)
 		if (put(buf, 4) != 4) {
 			fclose(f);
 			shutdown_connection();
-			ALLEGRO_DEBUG("end ack fail");
+			debug_message("end ack fail");
 			return -1;
 		}
 	}
@@ -408,6 +408,10 @@ const char *hqm_status_string(int status)
 		"Partial",
 		"Not started"
 	};
+
+	if (status == 2 && hqm_is_downloading()) {
+		return "..";
+	}
 
 	return strs[status];
 }

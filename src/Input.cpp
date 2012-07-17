@@ -4,6 +4,10 @@
 #include "joypad.hpp"
 #endif
 
+#ifdef ALLEGRO_ANDROID
+#include "java.h"
+#endif
+
 extern "C" {
 void lock_joypad_mutex(void);
 void unlock_joypad_mutex(void);
@@ -129,7 +133,7 @@ void Input::set(bool l, bool r, bool u, bool d, int set_sets, bool clear_on_fals
 	al_lock_mutex(mutex);
 	
 	if (!l && !r && !u && !d) {
-		startDirection = (Direction)DIRECTION_NONE;
+		startDirection = DIRECTION_NONE;
 		descriptor.left = false;
 		descriptor.right = false;
 		descriptor.up = false;
@@ -144,7 +148,7 @@ void Input::set(bool l, bool r, bool u, bool d, int set_sets, bool clear_on_fals
 			startDirectionStillPressed = true;
 		}
 		else {
-			startDirection = (Direction)DIRECTION_NONE;
+			startDirection = DIRECTION_NONE;
 		}
 		if (startDirectionStillPressed)
 			descriptor.direction = startDirection;
@@ -250,7 +254,7 @@ InputDescriptor Input::getDescriptor()
 	return i;
 }
 
-void Input::setDirection(Direction direction)
+void Input::setDirection(int direction)
 {
 	descriptor.direction = direction;
 }
@@ -290,7 +294,7 @@ Input::Input()
 	descriptor.button3 = false;
 	sets = descriptor;
 	descriptor.direction = DIRECTION_SOUTH;
-	startDirection = (Direction)DIRECTION_NONE;
+	startDirection = DIRECTION_NONE;
 	timeOfNextNotification = tguiCurrentTimeMillis();
 	orRelease = -1;
 	mutex = al_create_mutex_recursive();
@@ -453,7 +457,7 @@ void TripleInput::update()
 			false;
 
 	InputDescriptor id3;
-#ifdef ALLEGRO_MACOSX
+#if defined ALLEGRO_MACOSX
 	if (joypad_connected())
 		id3 = get_joypad_state();
 	else
@@ -492,6 +496,24 @@ void TripleInput::update()
 	    sets.button1 || id3.button1 || id4.button1,
 	    sets.button2 || id3.button2 || id4.button2,
 	    sets.button3 || id3.button3 || id4.button3,
+	    false
+	    );
+#elif defined ALLEGRO_ANDROID
+	InputDescriptor id3;
+	if (zeemote_connected)
+		id3 = get_zeemote_state();
+	else
+		id3.left = id3.right = id3.up = id3.down =
+			id3.button1 = id3.button2 = id3.button3 =
+			false;
+	set(
+	    sets.left || id3.left,
+	    sets.right || id3.right,
+	    sets.up || id3.up,
+	    sets.down || id3.down,
+	    sets.button1 || id3.button1,
+	    sets.button2 || id3.button2,
+	    sets.button3 || id3.button3,
 	    false
 	    );
 #endif

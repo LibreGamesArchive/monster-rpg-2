@@ -48,7 +48,7 @@ public:
 	std::vector<int *> &getOccupied(void);
 	bool isSolid(void);
 	bool isMoving(void);
-	Direction getMoveDirection(void);
+	int getMoveDirection(void);
 	void getDimensions(int *x, int *y);
 	bool isPoisoned(void);
 
@@ -80,7 +80,7 @@ protected:
 	int moveCount;
 	int pixelsMoved;
 	uint moveDelay;
-	Direction moveDirection;
+	int moveDirection;
 	std::vector<int *> occupied;
 	bool solid;
 	bool person;
@@ -150,7 +150,7 @@ public:
 	bool update(Area *area, int step);
 	void draw(void);
 
-	Light(float x, float y, Direction dir, int topw, int bottomw, int length, MCOLOR color);
+	Light(float x, float y, int dir, int topw, int bottomw, int length, MCOLOR color);
 	virtual ~Light(void);
 
 protected:

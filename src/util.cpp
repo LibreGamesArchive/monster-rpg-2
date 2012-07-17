@@ -244,8 +244,11 @@ bool iphone_line(IPHONE_LINE_DIR dir, double since)
 
 bool iphone_shaken(double since)
 {
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE
 	if (use_dpad) return false;
+#endif
+#if defined ALLEGRO_ANDROID
+	if (!on_title_screen && use_dpad) return false;
 #endif
 
 	last_shake_check = tguiCurrentTimeMillis();

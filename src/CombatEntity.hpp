@@ -79,12 +79,12 @@ public:
 
 
 	// c"enter"x, c"enter"y
-	AttackSwoosh(int dx, int dy, Direction dir, Combatant *attacked, Combatant *attacker);
+	AttackSwoosh(int dx, int dy, int dir, Combatant *attacked, Combatant *attacker);
 	virtual ~AttackSwoosh();
 
 protected:
 	int dx, dy;
-	Direction dir;
+	int dir;
 	MBITMAP *bitmaps[NUM];
 	float currX[NUM];
 	float speed;
