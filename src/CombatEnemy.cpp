@@ -536,7 +536,7 @@ static void dragon_players(AnimationSet *a, AnimationSet *a2)
 		m_set_target_bitmap(buffer);
 		m_clear(black);
 		a->draw(dragon_x, dragon_y-a->getHeight(), dragon_flags);
-		int elapsed = tguiCurrentTimeMillis()-start;
+		int elapsed = (int)(tguiCurrentTimeMillis()-start);
 		if (elapsed > 2000) elapsed = 2000;
 		elapsed /= 100;
 		if (elapsed % 2 == 1) {

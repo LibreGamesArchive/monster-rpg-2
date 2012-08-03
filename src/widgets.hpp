@@ -48,7 +48,7 @@ private:
 	{
 		for (size_t i = 0; i < touches.size(); i++) {
 			if (touches[i].id == id) {
-				return i;
+				return (int)i;
 			}
 		}
 	

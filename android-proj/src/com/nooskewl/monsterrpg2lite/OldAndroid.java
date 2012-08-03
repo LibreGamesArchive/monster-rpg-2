@@ -1,4 +1,4 @@
-package com.nooskewl.monsterrpg2;
+package com.nooskewl.monsterrpg2lite;
 
 import android.media.AudioTrack;
 import android.media.AudioFormat;

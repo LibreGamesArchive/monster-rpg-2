@@ -107,7 +107,7 @@ public:
 			y = BH-45;
 		else
 #endif
-			y = BH - 47;
+			y = BH - 46;
 		memset(buttons, 0, sizeof(buttons));
 		for (int i = 0; i < 5 && actions[i]; i++) {
 			bool disabled = false;
@@ -502,7 +502,7 @@ public:
 					return new UseItemHandler(player);
 				}
 				else if (reason == CHOOSE_MAGIC) {
-					numSpellTargets = c.size();
+					numSpellTargets = (int)c.size();
 					spellTargets = new Combatant *[numSpellTargets];
 					for (int i = 0; i < numSpellTargets; i++) {
 						spellTargets[i] = (Combatant *)points[c[i]].data;

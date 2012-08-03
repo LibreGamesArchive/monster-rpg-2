@@ -213,9 +213,7 @@ private:
 	int cfg_shake_action;
 	int cfg_auto_rotation;
 #endif
-#ifdef ALLEGRO_ANDROID
 	bool autoconnect_to_zeemote;
-#endif
 };
 
 extern Configuration config;

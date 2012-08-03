@@ -40,6 +40,8 @@ ALLEGRO_DEBUG_CHANNEL("tftp")
 
 #include <sys/stat.h>
 
+#include "ftpget.h"
+
 #define SERVER "nooskewl.com"
 #define PORT "69"
 #define BLKSIZE 512
@@ -279,12 +281,22 @@ static int download_file(const char *filename)
 	return total_size;
 }
 
+static int download_file_curl(const char *filename)
+{
+	char outfilename[1000];
+	sprintf(outfilename, "%s/%s", DOWNLOAD_PATH, filename);
+	char url[1000];
+	sprintf(url, "ftp://nooskewl.com/%s", filename);
+
+	return getfile(url, outfilename);
+}
+
 static void download_list(char **filenames, int *lengths)
 {
 	int i = 0;
 
 	while (filenames[i]) {
-		int len = download_file(filenames[i]);
+		int len = download_file_curl(filenames[i]);
 		if (stop) {
 			stop = false;
 			return;
@@ -386,6 +398,33 @@ static void *hqm_go_thread(void *arg)
 	return NULL;
 }
 
+static void *hqm_go_thread_curl(void *arg)
+{
+	(void)arg;
+
+#ifdef ALLEGRO_ANDROID
+	al_set_standard_file_interface();
+#endif
+
+	is_downloading = true;
+
+	mkdir(DOWNLOAD_PATH, 0755);
+
+	int len = download_file_curl(LIST_FILENAME);
+	if (len != EXPECTED_LIST_SIZE) {
+		is_downloading = false;
+		return NULL;
+	}
+
+	hqm_get_status(NULL);
+
+	download_all();
+
+	is_downloading = false;
+
+	return NULL;
+}
+
 bool hqm_is_downloading(void)
 {
 	return is_downloading;
@@ -393,7 +432,8 @@ bool hqm_is_downloading(void)
 
 void hqm_go(void)
 {
-	al_run_detached_thread(hqm_go_thread, NULL);
+	//al_run_detached_thread(hqm_go_thread, NULL); // Old, slow tftp
+	al_run_detached_thread(hqm_go_thread_curl, NULL); // new, fast libcurl
 }
 
 void hqm_stop(void)

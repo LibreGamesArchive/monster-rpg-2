@@ -3327,7 +3327,7 @@ bool config_menu(bool start_on_fullscreen)
 	
 	y += 13;
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX ||  defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE ||  defined ALLEGRO_ANDROID
 	std::vector<std::string> input_choices;
 	input_choices.push_back("{027} Tap-and-go");
 	input_choices.push_back("{027} Hybrid input 1");
@@ -3338,8 +3338,6 @@ bool config_menu(bool start_on_fullscreen)
 
 #if defined ALLEGRO_IPHONE
 	if (airplay_connected || joypad_connected() || is_sb_connected()) {
-#elif defined ALLEGRO_MACOSX
-	if (joypad_connected()) {
 #elif defined ALLEGRO_ANDROID
 	if (zeemote_connected) {
 #endif
@@ -3349,7 +3347,7 @@ bool config_menu(bool start_on_fullscreen)
 		input_toggle = new MSingleToggle(xx, y, input_choices);
 		input_toggle->setSelected(config.getDpadType());
 		y += 13;
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	}
 #endif
 #endif
@@ -3673,10 +3671,12 @@ bool config_menu(bool start_on_fullscreen)
 		}
 #endif
 
+#ifdef ALLEGRO_ANDROID
 		sel = zeemote_toggle->getSelected();
 		if (config.getAutoconnectToZeemote() != sel) {
 			config.setAutoconnectToZeemote(sel);
 		}
+#endif
 
 		sel = difficulty_toggle->getSelected();
 		if (sel != curr_difficulty) {

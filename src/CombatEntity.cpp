@@ -2067,7 +2067,7 @@ void StompEffect::draw(void)
 		}
 		int index = (float)(count-LIFETIME/2)/(LIFETIME/2) * puffs.size();
 		if (index >= (int)puffs.size())
-			index = puffs.size()-1;
+			index = (int)puffs.size()-1;
 		for (int i = 0; i < (int)puffData.size(); i++) {
 #ifdef ALLEGRO4
 			set_alpha_blender();
@@ -3757,7 +3757,7 @@ void BananaEffect::draw(void)
 #if defined __linux__ && !defined ALLEGRO_ANDROID
 		draw_points_locked(verts, pixels.size());
 #else
-		m_draw_prim(verts, 0, 0, 0, pixels.size(), ALLEGRO_PRIM_POINT_LIST);
+		m_draw_prim(verts, 0, 0, 0, (int)pixels.size(), ALLEGRO_PRIM_POINT_LIST);
 #endif
 		delete[] verts;
 	}
@@ -4106,7 +4106,7 @@ void DropEffect::draw(void)
 #if defined __linux__ && !defined ALLEGRO_ANDROID
 		draw_points_locked(verts, pixels.size());
 #else
-		m_draw_prim(verts, 0, 0, 0, pixels.size(), ALLEGRO_PRIM_POINT_LIST);
+		m_draw_prim(verts, 0, 0, 0, (int)pixels.size(), ALLEGRO_PRIM_POINT_LIST);
 #endif
 		delete[] verts;
 	}
@@ -4871,7 +4871,7 @@ void PukeEffect::draw(void)
 		verts[i*2+1].z = 0;
 		verts[i*2+1].color = lines[i].color;
 	}
-	m_draw_prim(verts, NULL, NULL, 0, lines.size()*2, ALLEGRO_PRIM_LINE_LIST);
+	m_draw_prim(verts, NULL, NULL, 0, (int)lines.size()*2, ALLEGRO_PRIM_LINE_LIST);
 }
 
 

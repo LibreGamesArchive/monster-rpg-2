@@ -1,4 +1,4 @@
-package com.nooskewl.monsterrpg2;
+package com.nooskewl.monsterrpg2lite;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -54,13 +54,13 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.egl.*;
 
-import com.nooskewl.monsterrpg2.AllegroInputStream;
+import com.nooskewl.monsterrpg2lite.AllegroInputStream;
 import android.media.AudioManager;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.nooskewl.monsterrpg2.OldAndroid;
+import com.nooskewl.monsterrpg2lite.OldAndroid;
 
 //import com.zeemote.zc.Configuration;
 import com.zeemote.zc.Controller;
@@ -148,7 +148,7 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
       System.loadLibrary("bass");
       System.loadLibrary("bassflac");
       System.loadLibrary("bassmix");
-      System.loadLibrary("monsterrpg2");
+      System.loadLibrary("monsterrpg2lite");
    }
 	
         
@@ -505,7 +505,7 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
 
       // init bass addon
       try {
-         Class.forName("com.nooskewl.monsterrpg2.OldAndroid");
+         Class.forName("com.nooskewl.monsterrpg2lite.OldAndroid");
       }
       catch (ClassNotFoundException e) {
          Log.e("AllegroActivity", "Couldn't load OldAndroid");

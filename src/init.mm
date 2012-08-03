@@ -105,7 +105,7 @@ static uint32_t parse_version(const char *s)
       l = strtol(p, &end, 10);
       if (errno)
          break;
-      v[n] = ((l < 0) ? 0 : ((l > 255) ? 255 : l));
+      v[n] = ((l < 0) ? 0 : ((l > 255) ? 255 : (int)l));
       if (*end != '.')
          break;
       p = end + 1; /* skip dot */
