@@ -8,6 +8,7 @@
 
 #import "joypad_handler.h"
 #import "JoypadSDK.h"
+#import "JoypadControllerLayout.h"
 
 void lock_joypad_mutex(void);
 void unlock_joypad_mutex(void);

@@ -17,14 +17,14 @@
 static bool zeemote_enabled = false;
 #endif
 
-#ifdef ALLEGRO_ANDROID
+#if defined ALLEGRO_ANDROID || defined ALLEGRO_IPHONE
 bool halted = false;
 static std::string old_music_name;
 static std::string old_ambience_name;
 static float old_music_volume;
 static float old_ambience_volume;
-bool switched_in = true;
 static bool music_replayed = true;
+bool switched_in = true;
 #endif
 
 static void set_transform(ALLEGRO_DISPLAY *dpy)
