@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <curl/curl.h>
 
+#include "ftpget.h"
+
 struct FtpFile {
   const char *filename;
   FILE *stream;
