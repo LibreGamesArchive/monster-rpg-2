@@ -1,0 +1,180 @@
+<stand_n>
+	<x>0</x>
+	<y>0</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>1</frames>
+</stand_n>
+
+<stand_e>
+	<x>16</x>
+	<y>0</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>1</frames>
+</stand_e>
+
+<stand_s>
+	<x>32</x>
+	<y>0</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>1</frames>
+</stand_s>
+
+<stand_w>
+	<x>48</x>
+	<y>0</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>1</frames>
+</stand_w>
+
+<walk_n>
+	<x>0</x>
+	<y>16</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>2</frames>
+	<delays>
+		<0>250</0>
+		<1>250</1>
+	</delays>
+</walk_n>
+
+<walk_e>
+	<x>0</x>
+	<y>32</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>2</frames>
+	<delays>
+		<0>250</0>
+		<1>250</1>
+	</delays>
+</walk_e>
+
+<walk_s>
+	<x>0</x>
+	<y>48</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>2</frames>
+	<delays>
+		<0>250</0>
+		<1>250</1>
+	</delays>
+</walk_s>
+
+<walk_w>
+	<x>0</x>
+	<y>64</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>2</frames>
+	<delays>
+		<0>250</0>
+		<1>250</1>
+	</delays>
+</walk_w>
+
+<staff_stand_n>
+	<x>0</x>
+	<y>80</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>1</frames>
+</staff_stand_n>
+
+<staff_stand_e>
+	<x>16</x>
+	<y>80</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>1</frames>
+</staff_stand_e>
+
+<staff_stand_s>
+	<x>32</x>
+	<y>80</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>1</frames>
+</staff_stand_s>
+
+<staff_stand_w>
+	<x>48</x>
+	<y>80</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>1</frames>
+</staff_stand_w>
+
+<staff_walk_n>
+	<x>0</x>
+	<y>96</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>2</frames>
+	<delays>
+		<0>250</0>
+		<1>250</1>
+	</delays>
+</staff_walk_n>
+
+<staff_walk_e>
+	<x>0</x>
+	<y>112</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>2</frames>
+	<delays>
+		<0>250</0>
+		<1>250</1>
+	</delays>
+</staff_walk_e>
+
+<staff_walk_s>
+	<x>0</x>
+	<y>128</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>2</frames>
+	<delays>
+		<0>250</0>
+		<1>250</1>
+	</delays>
+</staff_walk_s>
+
+<staff_walk_w>
+	<x>0</x>
+	<y>144</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>2</frames>
+	<delays>
+		<0>250</0>
+		<1>250</1>
+	</delays>
+</staff_walk_w>
+
+<staff_cast>
+	<x>0</x>
+	<y>160</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>1</frames>
+</staff_cast>
+
+<blink>
+	<x>0</x>
+	<y>176</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>2</frames>
+	<delays>
+		<0>500</0>
+		<1>500</1>
+	</delays>
+</blink>
+

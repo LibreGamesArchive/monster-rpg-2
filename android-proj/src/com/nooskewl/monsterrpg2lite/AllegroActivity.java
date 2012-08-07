@@ -134,6 +134,7 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
    public native void nativeZeemoteAxis(float x, float y);
    public native void nativeZeemoteButtonDown(int num);
    public native void nativeZeemoteButtonUp(int num);
+   public native boolean nativeZeemoteShouldAutoconnect();
    
    /* load allegro */
    static {
@@ -586,6 +587,7 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
       // when an unexpected disconnect occurs display the disconnected warning
       // dialog and go into the controller menu
       if (event.isUnexpected()) {
+         controllerUi.showControllerMenuForUnexpectedDisconnect();
       }
       nativeZeemoteDisconnect();
    }
@@ -657,6 +659,10 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
       
       nativeOnResume();
      
+      //if (nativeZeemoteShouldAutoconnect()) {
+      //   controllerUi.startConnectionProcess();
+      //}
+
       Log.d("AllegroActivity", "onResume end");
    }
    

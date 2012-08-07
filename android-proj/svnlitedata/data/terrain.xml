@@ -1,0 +1,192 @@
+<grass>
+	<x>15</x>
+	<y>9</y>
+	<width>1</width>
+	<height>2</height>
+</grass>
+
+<grass>
+	<x>3</x>
+	<y>0</y>
+	<width>6</width>
+	<height>12</height>
+</grass>
+
+<grass>
+	<x>15</x>
+	<y>0</y>
+	<width>2</width>
+	<height>2</height>
+</grass>
+
+<grass>
+	<x>17</x>
+	<y>1</y>
+	<width>2</width>
+	<height>1</height>
+</grass>
+
+<bridge>
+	<x>10</x>
+	<y>4</y>
+	<width>2</width>
+	<height>2</height>
+</bridge>
+
+<underground>
+	<x>23</x>
+	<y>5</y>
+	<width>3</width>
+	<height>3</height>
+</underground>
+
+
+<underground>
+	<x>1</x>
+	<y>4</y>
+	<width>1</width>
+	<height>1</height>
+</underground>
+
+
+<rope_bridge>
+	<x>26</x>
+	<y>5</y>
+	<width>1</width>
+	<height>2</height>
+</rope_bridge>
+
+
+<water>
+	<x>11</x>
+	<y>6</y>
+	<width>4</width>
+	<height>2</height>
+</water>
+
+<water>
+	<x>19</x>
+	<y>0</y>
+	<width>4</width>
+	<height>1</height>
+</water>
+
+<mountains>
+	<x>16</x>
+	<y>21</y>
+	<width>1</width>
+	<height>2</height>
+</mountains>
+
+<mountains_bridge>
+	<x>25</x>
+	<y>13</y>
+	<width>1</width>
+	<height>1</height>
+</mountains_bridge>
+
+<sand>
+	<x>0</x>
+	<y>30</y>
+	<width>2</width>
+	<height>2</height>
+</sand>
+
+<fort>
+	<x>10</x>
+	<y>42</y>44
+	<width>1</width>
+	<height>1</height>
+</fort>
+
+<fort>
+	<x>10</x>
+	<y>46</y>
+	<width>2</width>
+	<height>2</height>
+</fort>
+
+<fort>
+	<x>15</x>
+	<y>44</y>
+	<width>1</width>
+	<height>1</height>
+</fort>
+
+<keep>
+	<x>15</x>
+	<y>2</y>
+	<width>2</width>
+	<height>1</height>
+</keep>
+
+<keep_outer>
+	<x>10</x>
+	<y>53</y>
+	<width>3</width>
+	<height>3</height>
+</keep_outer>
+
+
+<jungle>
+	<x>19</x>
+	<y>74</y>
+	<width>2</width>
+	<height>2</height>
+</jungle>
+
+<volcano>
+	<x>28</x>
+	<y>50</y>
+	<width>1</width>
+	<height>1</height>
+</volcano>
+
+<volcano>
+	<x>27</x>
+	<y>51</y>
+	<width>1</width>
+	<height>1</height>
+</volcano>
+
+<volcano>
+	<x>30</x>
+	<y>50</y>
+	<width>1</width>
+	<height>1</height>
+</volcano>
+
+<volcano>
+	<x>25</x>
+	<y>53</y>
+	<width>1</width>
+	<height>1</height>
+</volcano>
+
+<volcano>
+	<x>26</x>
+	<y>54</y>
+	<width>3</width>
+	<height>1</height>
+</volcano>
+
+<volc_bridge>
+	<x>31</x>
+	<y>53</y>
+	<width>1</width>
+	<height>1</height>
+</volc_bridge>
+
+<moon>
+	<x>28</x>
+	<y>87</y>
+	<width>2</width>
+	<height>1</height>
+</moon>
+
+<moon>
+	<x>19</x>
+	<y>90</y>
+	<width>2</width>
+	<height>1</height>
+</moon>

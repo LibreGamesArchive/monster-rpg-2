@@ -220,4 +220,8 @@ extern Configuration config;
 
 bool do_config(void);
 
+extern "C" {
+bool zeemote_should_autoconnect(void);
+}
+
 #endif

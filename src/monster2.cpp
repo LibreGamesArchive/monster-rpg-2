@@ -1211,6 +1211,12 @@ int main(int argc, char *argv[])
 	// Setup HQM (High Quality Music) download path
 	hqm_set_download_path(getUserResource("flacs"));
 
+#ifdef ALLEGRO_ANDROID
+	if (config.getAutoconnectToZeemote()) {
+		autoconnect_zeemote();
+	}
+#endif
+
 	
 	MBITMAP *nooskewl = m_load_bitmap(getResource("media/nooskewl.png"));
 
@@ -1294,12 +1300,6 @@ int main(int argc, char *argv[])
 #if defined ALLEGRO_IPHONE
 	if (al_get_num_video_adapters() > 1) {
 		connect_second_display();
-	}
-#endif
-
-#ifdef ALLEGRO_ANDROID
-	if (config.getAutoconnectToZeemote()) {
-		autoconnect_zeemote();
 	}
 #endif
 

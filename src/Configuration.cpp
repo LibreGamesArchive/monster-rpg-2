@@ -8,6 +8,13 @@
 
 Configuration config;
 
+#ifdef ALLEGRO_ANDROID
+bool zeemote_should_autoconnect(void)
+{
+	return config.getAutoconnectToZeemote();
+}
+#endif
+
 bool Configuration::getLowCpuUsage(void)
 {
 	return lowCpuUsage;

@@ -82,24 +82,33 @@
     <!-- version-tag: 1 -->
 
 	<!-- tmg -->
-<target name="-package-resources">
-    <echo>Packaging resources</echo>
-    <aapt executable="${aapt}"
-        command="package"
-        versioncode="${version.code}"
-        debug="${build.packaging.debug}"
-        manifest="AndroidManifest.xml"
-        assets="${asset.absolute.dir}"
-        androidjar="${android.jar}"
-        apkfolder="${out.absolute.dir}"
-        resourcefilename="${resource.package.file.name}"
-	projectLibrariesResName="project.libraries.res"
-	projectLibrariesPackageName="project.libraries.package" 
-        resourcefilter="${aapt.resource.filter}">
-    <res path="${resource.absolute.dir}" />
-    <nocompress />
-    </aapt>
-</target>
+    <target name="-package-resources" depends="-crunch">
+        <!-- only package resources if *not* a library project -->
+        <do-only-if-not-library elseText="Library project: do not package resources..." >
+            <aapt executable="${aapt}"
+                    command="package"
+                    versioncode="${version.code}"
+                    versionname="${version.name}"
+                    debug="${build.is.packaging.debug}"
+                    manifest="${out.manifest.abs.file}"
+                    assets="${asset.absolute.dir}"
+                    androidjar="${project.target.android.jar}"
+                    apkfolder="${out.absolute.dir}"
+                    nocrunch="${build.packaging.nocrunch}"
+                    resourcefilename="${resource.package.file.name}"
+                    resourcefilter="${aapt.resource.filter}"
+                    libraryResFolderPathRefid="project.library.res.folder.path"
+                    libraryPackagesRefid="project.library.packages"
+                    previousBuildType="${build.last.target}"
+                    buildType="${build.target}"
+                    ignoreAssets="${aapt.ignore.assets}">
+                <res path="${out.res.absolute.dir}" />
+                <res path="${resource.absolute.dir}" />
+                <nocompress />
+                <!-- <nocompress extension="xml" /> forces no compression on specific file extensions in assets and res/raw -->
+            </aapt>
+        </do-only-if-not-library>
+    </target>
 
     <import file="${sdk.dir}/tools/ant/build.xml" />
 

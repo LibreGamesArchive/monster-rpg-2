@@ -1,0 +1,188 @@
+<stand>
+	<loop_mode>pingpong</loop_mode>
+	<x>0</x>
+	<y>0</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>4</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+		<3>120</3>
+	</delays>
+</stand>
+
+<hit>
+	<x>180</x>
+	<y>0</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>1</frames>
+</hit>
+
+<hurt>
+	<x>0</x>
+	<y>40</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>3</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+	</delays>
+</hurt>
+
+<dead>
+	<x>180</x>
+	<y>40</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>1</frames>
+</dead>
+
+<walk>
+	<x>0</x>
+	<y>80</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>3</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+	</delays>
+</walk>
+
+<poisoned>
+	<x>0</x>
+	<y>120</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>3</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+	</delays>
+</poisoned>
+
+<paralyzed>
+	<x>0</x>
+	<y>160</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>4</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+		<3>120</3>
+	</delays>
+</paralyzed>
+
+<noweapon_attack>
+	<loop_mode>pingpong</loop_mode>
+	<looping>false</looping>
+	<x>0</x>
+	<y>200</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>4</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+		<3>120</3>
+	</delays>
+</noweapon_attack>
+
+<stand2>
+	<x>0</x>
+	<y>240</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>4</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+		<3>500</3>
+	</delays>
+</stand2>
+
+<noweapon_stand>
+	<loop_mode>pingpong</loop_mode>
+	<x>0</x>
+	<y>280</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>4</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+		<3>120</3>
+	</delays>
+</noweapon_stand>
+
+<noweapon_walk>
+	<x>0</x>
+	<y>320</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>3</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+	</delays>
+</noweapon_walk>
+
+<attack>
+	<loop_mode>pingpong</loop_mode>
+	<looping>false</looping>
+	<x>0</x>
+	<y>360</y>
+	<width>45</width>
+	<height>50</height>
+	<frames>4</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+		<3>120</3>
+	</delays>
+</attack>
+
+<use>
+	<looping>false</looping>
+	<x>0</x>
+	<y>410</y>
+	<width>45</width>
+	<height>50</height>
+	<frames>4</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+		<3>350</3>
+	</delays>
+</use>
+
+<noweapon_use>
+	<looping>false</looping>
+	<x>0</x>
+	<y>460</y>
+	<width>45</width>
+	<height>50</height>
+	<frames>4</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+		<3>350</3>
+	</delays>
+</noweapon_use>
+
