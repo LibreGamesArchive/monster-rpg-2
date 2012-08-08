@@ -42,7 +42,7 @@ function do_package {
 
 	if [ "$DO_EXTRA" == "1" ] ; then
 		echo Resizing pcicon.png
-		sips -z 32 32 ${BASEDIR}/pcicon.png --out monster-rpg2.png
+		convert ${BASEDIR}/pcicon.png -resize 32x32 monster-rpg2.png
 
 		echo Copying monster-rpg-2.desktop
 		cp -a ${BASEDIR}/monster-rpg2.desktop monster-rpg2.desktop
