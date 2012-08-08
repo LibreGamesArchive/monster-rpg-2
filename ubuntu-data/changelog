@@ -1,3 +1,19 @@
+monster-rpg-2-data (1.12.0-1ubuntu1) maverick; urgency=low
+
+  * Various minor asset updates.
+
+ -- Trent Gamblin <trent@nooskewl.com>  Wed, 8 Aug 2012 11:18:00 -0700
+
+monster-rpg-2-data (1.11.0-1ubuntu1) maverick; urgency=low
+
+  * Smaller file size for quicker downloads
+  * All new player battle sprites 
+  * All new item icons 
+  * Massive scripting and area editing overhaul to make NPCs face you when
+    you talk to them and make high walls "above" the player 
+ 
+ -- Trent Gamblin <trent@nooskewl.com>  Sun, 3 Jun 2012 08:37:00 -0700
+
 monster-rpg-2-data (1.10.0-1ubuntu1) maverick; urgency=low
 
   * Travelling fairy helps you out when you're low on supplies

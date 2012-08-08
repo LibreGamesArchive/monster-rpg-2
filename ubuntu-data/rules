@@ -48,7 +48,7 @@ install: build
 	dh_testroot
 	dh_prep
 	dh_installdirs
-	dh_install bin/data opt/${MONSTER2_BASENAME}
+	dh_install ubdata/data opt/${MONSTER2_BASENAME}
 	${INSTALL_FILE} -D overrides/monster-rpg-2-data debian/monster-rpg-2-data/usr/share/lintian/overrides/monster-rpg-2-data
 	
 binary-indep: build install
