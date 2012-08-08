@@ -67,14 +67,14 @@ CXX_SRCS=\
 CXX_LIBOBJS=$(CXX_SRCS:.cpp=.o)
 
 #ALLEGROLIBS=`pkg-config --libs allegro_ttf-static-5.1 allegro_dialog-static-5.1 allegro_primitives-static-5.1 allegro_font-static-5.1 allegro_image-static-5.1` -lallegro_shader-static
-ALLEGROLIBS=`pkg-config --libs allegro_ttf-static-5.1 allegro_primitives-static-5.1 allegro_font-static-5.1 allegro_image-static-5.1` -lallegro_shader-static
+ALLEGROLIBS=`pkg-config --libs allegro_ttf-static-5.1 allegro_primitives-static-5.1 allegro_font-static-5.1 allegro_image-static-5.1` -lallegro_shader-static -lallegro_memfile-static
 LIBS=-lbass -lGL -llua-fixed -ltgui `pkg-config --libs xinerama` $(ALLEGROLIBS) /usr/lib/libfreetype.a /usr/lib/libXrandr.a /usr/lib/libXcursor.a /usr/lib/libXrender.a /usr/lib/libpng.a /usr/lib/libz.a /usr/local/lib/libcurl.a
 
 default: monster2
 
 
-monster2: $(CXX_LIBOBJS) init.o atlas.o atlas_accessor.o monster2.o
-	g++ $(LDFLAGS) $(CXX_LIBOBJS) init.o atlas.o atlas_accessor.o monster2.o $(LIBS) -o monster2
+monster2: $(CXX_LIBOBJS) init.o atlas.o atlas_accessor.o monster2.o tftp_get.o
+	g++ $(LDFLAGS) $(CXX_LIBOBJS) init.o atlas.o atlas_accessor.o tftp_get.o monster2.o $(LIBS) -o monster2
 
 ex: ex_fs_window.c common.c
 	g++ $(LDFLAGS) ex_fs_window.c $(LIBS) -o ex_fs_window
@@ -90,6 +90,9 @@ atlas.o: atlas.c
 
 atlas_accessor.o: atlas_accessor.c
 	$(CC) $(CFLAGS) -c atlas_accessor.c
+
+tftp_get.o: tftp_get.c
+	$(CC) $(CFLAGS) -c tftp_get.c
 
 clean:
 	-rm -f *.o
