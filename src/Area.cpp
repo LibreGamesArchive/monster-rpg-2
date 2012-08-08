@@ -2219,8 +2219,8 @@ void Area::loadAnimation(int index, bool addIndex)
 	ALLEGRO_STATE st;
 	al_store_state(&st, ALLEGRO_STATE_BLENDER | ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
 	char nm[100];
-	sprintf(nm, "data/tiles/%d-%d.png", subx, suby);
-	MBITMAP *tmp = m_load_bitmap(nm);
+	sprintf(nm, "tiles/%d-%d.png", subx, suby);
+	MBITMAP *tmp = m_load_bitmap(getResource(nm));
 	int xx = tm_used % tm_w;
 	int yy = tm_used / tm_w;
 	tm_used++;
@@ -2299,8 +2299,8 @@ void Area::loadAnimation(int index, bool addIndex)
 
 		ALLEGRO_STATE st;
 		al_store_state(&st, ALLEGRO_STATE_BLENDER | ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
-		sprintf(nm, "data/tiles/%d-%d.png", subx, suby);
-		MBITMAP *tmp = m_load_bitmap(nm);
+		sprintf(nm, "tiles/%d-%d.png", subx, suby);
+		MBITMAP *tmp = m_load_bitmap(getResource(nm));
 		int xx = tm_used % tm_w;
 		int yy = tm_used / tm_w;
 		tm_used++;
