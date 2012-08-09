@@ -1493,6 +1493,7 @@ int main(int argc, char *argv[])
 			config.write();
 			throw QuitError();
 		}
+#if 0
 		else if (choice == 0xDEAD) {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			do_close(true);
@@ -1521,6 +1522,7 @@ int main(int argc, char *argv[])
 #endif
 #endif
 		}
+#endif
 		else {
 			break;
 		}
