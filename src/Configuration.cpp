@@ -15,8 +15,15 @@ static int keyname_to_keycode(const char *name)
 {
 	if (!keynames_gotten) {
 		keynames_gotten = true;
+		std::string phony = ".";
 		for (int i = 0; i < ALLEGRO_KEY_MAX; i++) {
-			keyname_to_keycode_map[al_keycode_to_name(i)] = i;
+			std::string s = al_keycode_to_name(i);
+			if (keyname_to_keycode_map.find(s) != keyname_to_keycode_map.end()) {
+				s = phony;
+				phony += ".";
+			}
+			keyname_to_keycode_map[s] = i;
+			//printf("%s=%d\n", s.c_str(), i);
 		}
 
 	}

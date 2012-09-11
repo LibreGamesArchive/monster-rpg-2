@@ -41,7 +41,7 @@ CXX_SRCS=\
 	debug.cpp\
 	equipment.cpp\
 	Frame.cpp\
-	ftpget.c\
+	ftpget.cpp\
 	GenericEffect.cpp\
 	graphics.cpp\
 	Image.cpp\

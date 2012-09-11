@@ -37,6 +37,23 @@ extern "C" {
 #include "java.h"
 #endif
 
+static bool is_modifier(int c)
+{
+	switch (c) {
+		case ALLEGRO_KEY_LSHIFT:
+		case ALLEGRO_KEY_RSHIFT:
+		case ALLEGRO_KEY_LCTRL:
+		case ALLEGRO_KEY_RCTRL:
+		case ALLEGRO_KEY_ALT:
+		case ALLEGRO_KEY_ALTGR:
+		case ALLEGRO_KEY_LWIN:
+		case ALLEGRO_KEY_RWIN:
+			return true;
+	}
+
+	return false;
+}
+
 void destroy_fonts(void)
 {
 	m_destroy_font(game_font);
@@ -854,6 +871,7 @@ static void *thread_proc(void *arg)
 			}
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 			else if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+
 				if (event.keyboard.keycode == config.getKeyFullscreen()) {
 					if (!pause_f_to_toggle_fullscreen) {
 						do_toggle_fullscreen = true;
@@ -901,6 +919,23 @@ static void *thread_proc(void *arg)
 				}
 				else if (event.keyboard.keycode == ALLEGRO_KEY_F12) {
 					reload_translation = true;
+				}
+				else {
+					INPUT_EVENT ie = EMPTY_INPUT_EVENT;
+					int c = event.keyboard.keycode;
+					bool m = is_modifier(c);
+					if (m && c == config.getKey1()) {
+						ie.button1 = DOWN;
+						add_input_event(ie);
+					}
+					else if (m && c == config.getKey2()) {
+						ie.button2 = DOWN;
+						add_input_event(ie);
+					}
+					else if (m && c == config.getKey3()) {
+						ie.button3 = DOWN;
+						add_input_event(ie);
+					}
 				}
 			}
 			else if (event.type == ALLEGRO_EVENT_KEY_CHAR) {
@@ -974,6 +1009,23 @@ static void *thread_proc(void *arg)
 				else if (event.keyboard.keycode == ALLEGRO_KEY_F6) {
 					f6_time = -1;
 					f6_cheated = false;
+				}
+				else {
+					INPUT_EVENT ie = EMPTY_INPUT_EVENT;
+					int c = event.keyboard.keycode;
+					bool m = is_modifier(c);
+					if (m && c == config.getKey1()) {
+						ie.button1 = UP;
+						add_input_event(ie);
+					}
+					else if (m && c == config.getKey2()) {
+						ie.button2 = UP;
+						add_input_event(ie);
+					}
+					else if (m && c == config.getKey3()) {
+						ie.button3 = UP;
+						add_input_event(ie);
+					}
 				}
 			}
 			else if (event.type == ALLEGRO_EVENT_JOYSTICK_CONFIGURATION) {
