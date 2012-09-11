@@ -1,7 +1,7 @@
 Source: monster-rpg-2-data
 Section: games
 Priority: extra
-Maintainer: Trent Gamblin <trent@gamblin.ca>
+Maintainer: Trent Gamblin <trent@nooskewl.com>
 Build-Depends: debhelper (>= 7.0.50~)
 Standards-Version: 3.9.1
 Homepage: http://www.monster-rpg.com/

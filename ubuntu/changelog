@@ -1,3 +1,25 @@
+monster-rpg2 (1.12.0-1ubuntu1) maverick; urgency=low
+
+  * Greatly improved speed and reliability of HQ music download.
+
+ -- Trent Gamblin <trent@nooskewl.com>  Wed, 8 Aug 2012 11:13:00 -0700
+
+monster-rpg2 (1.11.0-1ubuntu1) maverick; urgency=low
+
+  * Smaller file size for quicker downloads
+  * High quality music can still be downloaded at users leisure for free from
+    within the game and will play automatically when the download finishes 
+  * All new player battle sprites 
+  * All new item icons 
+  * Preserve aspect ratio mode that fills as much of the screen as it can
+    while preserving aspect 
+  * Change filtering modes without restarting the game 
+  * Massive scripting and area editing overhaul to make NPCs face you when
+    you talk to them and make high walls "above" the player 
+  * Dozens of other tweaks and fixes to improve the look and flow of the game
+ 
+ -- Trent Gamblin <trent@nooskewl.com>  Sun, 3 Jun 2012 08:37:00 -0700
+
 monster-rpg2 (1.10.0-1ubuntu1) maverick; urgency=low
 
   * Travelling fairy helps you out when you're low on supplies

@@ -19,7 +19,7 @@ ifneq (${LDFLAGS},)
 	LDFLAGS = -L${HOME}/libs
 endif
 
-override LDFLAGS += -Wl,-rpath,. -L../bass24/x64
+override LDFLAGS += -Wl,-rpath,. -L../bass24/x86
 
 INSTALL = install
 INSTALL_FILE    = $(INSTALL) -p    -o root -g root  -m  644

@@ -1,4 +1,4 @@
-FLAGS=-I"C:/documents and settings/trent gamblin/local/include" -DMONSTER2 -I"C:/a5_d3d/include"
+FLAGS=-I"C:/Users/trent/code/local/include" -DMONSTER2
 LINKOPTS=-L.
 
 all: lib

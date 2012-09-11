@@ -41,8 +41,8 @@ function do_package {
 	copy_dirs $DIRS
 
 	if [ "$DO_EXTRA" == "1" ] ; then
-		echo Resizing pcicon-rounded.png
-		convert ${BASEDIR}/pcicon-rounded.png -resize 32x32 monster-rpg2.png
+		echo Resizing pcicon.png
+		convert ${BASEDIR}/pcicon.png -resize 32x32 monster-rpg2.png
 
 		echo Copying monster-rpg-2.desktop
 		cp -a ${BASEDIR}/monster-rpg2.desktop monster-rpg2.desktop
@@ -153,7 +153,7 @@ fi
 
 cd .debian-package
 
-BASEDIR=../../../monster2
+BASEDIR=../../../monster-rpg-2
 
 
 

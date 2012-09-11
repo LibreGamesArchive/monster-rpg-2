@@ -1,5 +1,8 @@
 #include <stdio.h>
+#define CURL_STATICLIB
 #include <curl/curl.h>
+
+#include "ftpget.h"
 
 struct FtpFile {
   const char *filename;
