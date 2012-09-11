@@ -2352,6 +2352,7 @@ void credits(void)
 			"TRENT GAMBLIN",
 			"JOAO GONCALVES",
 			"TONY HUISMAN",
+			"SERGEY LATYSHEV",
 			"FABIO NOBREGA",
 			"ELIAS PSCHERNIG",
 			NULL
@@ -2377,6 +2378,7 @@ void credits(void)
 			" ",
 			"CANTIDIO O FONTES",
 			"JOAO GONCALVES",
+			"SERGEY LATYSHEV",
 			"ELIAS PSCHERNIG",
 			"SAMUEL VAN DER WAA",
 			NULL

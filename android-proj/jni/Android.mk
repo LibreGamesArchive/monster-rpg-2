@@ -1,1 +1,1 @@
-Android-lite.mk
+Android-full.mk

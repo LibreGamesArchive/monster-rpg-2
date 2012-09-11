@@ -1,1 +1,1 @@
-Application-lite.mk
+Application-full.mk

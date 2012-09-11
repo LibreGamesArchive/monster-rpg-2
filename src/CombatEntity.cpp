@@ -3998,7 +3998,7 @@ void BoFEffect::draw(void)
 	if (count < LIFETIME/3) {
 		int w1 = w - line;
 		int w2 = w - w1;
-		float height = h * ((float)count/lt);
+		float height = (h/3) * ((float)count/lt);
 		if (w1)
 			m_draw_scaled_bitmap(bitmap, line, 0, w1, h, BW/2, 110/2-height/2,
 				w1, height, 0, 255);
@@ -4010,18 +4010,18 @@ void BoFEffect::draw(void)
 		int w1 = w - line;
 		int w2 = w - w1;
 		if (w1)
-			m_draw_scaled_bitmap(bitmap, line, 0, w1, h, BW/2, 110/2-h/2,
-				w1, h, 0, 255);
+			m_draw_scaled_bitmap(bitmap, line, 0, w1, h, BW/2, 110/2-(h/3)/2,
+				w1, h/3, 0, 255);
 		if (w2)
-			m_draw_scaled_bitmap(bitmap, 0, 0, w2, h, BW/2+(w-line), 110/2-h/2,
-				w2, h, 0, 255);
+			m_draw_scaled_bitmap(bitmap, 0, 0, w2, h, BW/2+(w-line), 110/2-(h/3)/2,
+				w2, h/3, 0, 255);
 	}
 	else {
 		int c = count - (count/3*2);
 		float extra = ((110-h) * ((float)c/lt));
 		ALLEGRO_VERTEX verts[w*2];
 		for (int i = 0; i < w; i++) {
-			float height = h + (1-cos(((float)i/w)*M_PI/2)) * extra;
+			float height = (h/3) + (1-cos(((float)i/w)*M_PI/2)) * extra;
 			int dy = 110/2 - height/2;
 			verts[i*2+0].x = BW/2+i+0.5;
 			verts[i*2+0].y = dy+0.5;

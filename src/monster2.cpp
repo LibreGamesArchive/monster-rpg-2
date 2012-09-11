@@ -1434,17 +1434,22 @@ int main(int argc, char *argv[])
 				runtime_start = 0;
 				debug_message("started new game\n");
 			}
-			int n;
-			if ((n = check_arg(argc, argv, "-warp")) != -1) {
+			/*
+			// FIXME
+			
+			//if ((n = check_arg(argc, argv, "-warp")) != -1) {
 				if (area) delete area;
-				startArea(argv[n+1]);
+				//startArea(argv[n+1]);
+				startArea("volcano");
 				// FIXME! xcode bug!
 				//int x = atoi(argv[n+2]);
 				//int y = atoi(argv[n+3]);
-				int x = 5;
-				int y = 5;
+				int x = 34;
+				int y = 12;
 				party[heroSpot]->getObject()->setPosition(x, y);
-			}
+			//}
+			*/
+			
 		}
 		else if (choice == 2) {
 		// FIXME!

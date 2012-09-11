@@ -312,25 +312,25 @@ void KeyboardInput::handle_event(ALLEGRO_EVENT *event)
 	int keycode = event->keyboard.keycode;
 	bool onoff = event->type == ALLEGRO_EVENT_KEY_DOWN;
 
-	if (keycode == ALLEGRO_KEY_ENTER || keycode == ALLEGRO_KEY_SPACE) {
+	if (keycode == config.getKey1()) {
 		 button1 = onoff;
 	}
-	else if (keycode == ALLEGRO_KEY_ESCAPE || keycode == ALLEGRO_KEY_FULLSTOP) {
+	else if (keycode == config.getKey2()) {
 		 button2 = onoff;
 	}
-	else if (keycode == ALLEGRO_KEY_V) {
+	else if (keycode == config.getKey3()) {
 		 button3 = onoff;
 	}
-	else if (keycode == ALLEGRO_KEY_LEFT) {
+	else if (keycode == config.getKeyLeft()) {
 		 left = onoff;
 	}
-	else if (keycode == ALLEGRO_KEY_RIGHT) {
+	else if (keycode == config.getKeyRight()) {
 		 right = onoff;
 	}
-	else if (keycode == ALLEGRO_KEY_UP) {
+	else if (keycode == config.getKeyUp()) {
 		 up = onoff;
 	}
-	else if (keycode == ALLEGRO_KEY_DOWN) {
+	else if (keycode == config.getKeyDown()) {
 		 down = onoff;
 	}
 	/* X does weird crap with my macbook keyboard. Holding space

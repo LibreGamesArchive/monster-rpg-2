@@ -8,6 +8,26 @@
 
 Configuration config;
 
+static bool keynames_gotten = false;
+std::map<std::string, int> keyname_to_keycode_map;
+
+static int keyname_to_keycode(const char *name)
+{
+	if (!keynames_gotten) {
+		keynames_gotten = true;
+		for (int i = 0; i < ALLEGRO_KEY_MAX; i++) {
+			keyname_to_keycode_map[al_keycode_to_name(i)] = i;
+		}
+
+	}
+
+	if (keyname_to_keycode_map.find(name) != keyname_to_keycode_map.end()) {
+		return keyname_to_keycode_map[name];
+	}
+
+	return 0;
+}
+
 #ifdef ALLEGRO_ANDROID
 bool zeemote_should_autoconnect(void)
 {
@@ -215,6 +235,66 @@ void Configuration::setKeyDown(int k)
 	keyDown = k;
 }
 
+int Configuration::getKeySettings(void)
+{
+	return keySettings;
+}
+
+void Configuration::setKeySettings(int k)
+{
+	keySettings = k;
+}
+
+int Configuration::getKeyFullscreen(void)
+{
+	return keyFullscreen;
+}
+
+void Configuration::setKeyFullscreen(int k)
+{
+	keyFullscreen = k;
+}
+
+int Configuration::getKeySFXUp(void)
+{
+	return keySFXUp;
+}
+
+void Configuration::setKeySFXUp(int k)
+{
+	keySFXUp = k;
+}
+
+int Configuration::getKeySFXDown(void)
+{
+	return keySFXDown;
+}
+
+void Configuration::setKeySFXDown(int k)
+{
+	keySFXDown = k;
+}
+
+int Configuration::getKeyMusicUp(void)
+{
+	return keyMusicUp;
+}
+
+void Configuration::setKeyMusicUp(int k)
+{
+	keyMusicUp = k;
+}
+
+int Configuration::getKeyMusicDown(void)
+{
+	return keyMusicDown;
+}
+
+void Configuration::setKeyMusicDown(int k)
+{
+	keyMusicDown = k;
+}
+
 int Configuration::getTargetFPS(void)
 {
 	switch (getTuning()) {
@@ -355,9 +435,22 @@ void Configuration::read()
 		setAutoconnectToZeemote(0);
 	}
 	XMLData* joyb1 = game->find("joyb1");
-	if (!joyb1) { delete xml; throw ReadError(); }
 	XMLData* joyb2 = game->find("joyb2");
-	if (!joyb2) { delete xml; throw ReadError(); }
+	XMLData* joyb3 = game->find("joyb3");
+	XMLData *key1 = game->find("key1");
+	XMLData *key2 = game->find("key2");
+	XMLData *key3 = game->find("key3");
+	XMLData *keyLeft = game->find("keyLeft");
+	XMLData *keyRight = game->find("keyRight");
+	XMLData *keyUp = game->find("keyUp");
+	XMLData *keyDown = game->find("keyDown");
+	XMLData *keySettings = game->find("keySettings");
+	XMLData *keyFullscreen = game->find("keyFullscreen");
+	XMLData *keySFXUp = game->find("keySFXUp");
+	XMLData *keySFXDown = game->find("keySFXDown");
+	XMLData *keyMusicUp = game->find("keyMusicUp");
+	XMLData *keyMusicDown = game->find("keyMusicDown");
+
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	XMLData *xml_dpad_type = game->find("dpad_type");
 	if (xml_dpad_type) {
@@ -442,9 +535,6 @@ void Configuration::read()
 	if (xml_aspect) {
 		setMaintainAspectRatio(atoi(xml_aspect->getValue().c_str()));
 	}
-#ifdef WIZ
-	XMLData *gfxdrv = gfx->find("gfxDriver");
-#endif
 
 	XMLData* sound = monster->find("sound");
 	if (!sound) { delete xml; throw ReadError(); }
@@ -453,8 +543,23 @@ void Configuration::read()
 	XMLData* sfx_volume = sound->find("sfx_volume");
 	if (!sfx_volume) { delete xml; throw ReadError(); }
 
-	setJoyButton1(atoi(joyb1->getValue().c_str()));
-	setJoyButton2(atoi(joyb2->getValue().c_str()));
+	if (joyb1) setJoyButton1(atoi(joyb1->getValue().c_str()));
+	if (joyb2) setJoyButton2(atoi(joyb2->getValue().c_str()));
+	if (joyb3) setJoyButton3(atoi(joyb3->getValue().c_str()));
+	if (key1) setKey1(keyname_to_keycode(key1->getValue().c_str()));
+	if (key2) setKey2(keyname_to_keycode(key2->getValue().c_str()));
+	if (key3) setKey3(keyname_to_keycode(key3->getValue().c_str()));
+	if (keyLeft) setKeyLeft(keyname_to_keycode(keyLeft->getValue().c_str()));
+	if (keyRight) setKeyRight(keyname_to_keycode(keyRight->getValue().c_str()));
+	if (keyUp) setKeyUp(keyname_to_keycode(keyUp->getValue().c_str()));
+	if (keyDown) setKeyDown(keyname_to_keycode(keyDown->getValue().c_str()));
+	if (keySettings) setKeySettings(keyname_to_keycode(keySettings->getValue().c_str()));
+	if (keyFullscreen) setKeyFullscreen(keyname_to_keycode(keyFullscreen->getValue().c_str()));
+	if (keySFXUp) setKeySFXUp(keyname_to_keycode(keySFXUp->getValue().c_str()));
+	if (keySFXDown) setKeySFXDown(keyname_to_keycode(keySFXDown->getValue().c_str()));
+	if (keyMusicUp) setKeyMusicUp(keyname_to_keycode(keyMusicUp->getValue().c_str()));
+	if (keyMusicDown) setKeyMusicDown(keyname_to_keycode(keyMusicDown->getValue().c_str()));
+
 	ScreenDescriptor sd;
 	sd.width = atoi(width->getValue().c_str());
 	sd.height = atoi(height->getValue().c_str());
@@ -478,8 +583,37 @@ void Configuration::write()
 
 	XMLData* game = new XMLData("game", "");
 	XMLData* auto_zeemote = new XMLData("autoconnect_to_zeemote", my_itoa(getAutoconnectToZeemote()));
+
 	XMLData* joyb1 = new XMLData("joyb1", my_itoa(getJoyButton1()));
 	XMLData* joyb2 = new XMLData("joyb2", my_itoa(getJoyButton2()));
+	XMLData* joyb3 = new XMLData("joyb3", my_itoa(getJoyButton3()));
+	XMLData* key1 = new XMLData(
+		"key1", al_keycode_to_name(getKey1()));
+	XMLData* key2 = new XMLData(
+		"key2", al_keycode_to_name(getKey2()));
+	XMLData* key3 = new XMLData(
+		"key3", al_keycode_to_name(getKey3()));
+	XMLData* keyLeft = new XMLData(
+		"keyLeft", al_keycode_to_name(getKeyLeft()));
+	XMLData* keyRight = new XMLData(
+		"keyRight", al_keycode_to_name(getKeyRight()));
+	XMLData* keyUp = new XMLData(
+		"keyUp", al_keycode_to_name(getKeyUp()));
+	XMLData* keyDown = new XMLData(
+		"keyDown", al_keycode_to_name(getKeyDown()));
+	XMLData* keySettings = new XMLData(
+		"keySettings", al_keycode_to_name(getKeySettings()));
+	XMLData* keyFullscreen = new XMLData(
+		"keyFullscreen", al_keycode_to_name(getKeyFullscreen()));
+	XMLData* keySFXUp = new XMLData(
+		"keySFXUp", al_keycode_to_name(getKeySFXUp()));
+	XMLData* keySFXDown = new XMLData(
+		"keySFXDown", al_keycode_to_name(getKeySFXDown()));
+	XMLData* keyMusicUp = new XMLData(
+		"keyMusicUp", al_keycode_to_name(getKeyMusicUp()));
+	XMLData* keyMusicDown = new XMLData(
+		"keyMusicDown", al_keycode_to_name(getKeyMusicDown()));
+
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	XMLData* xml_dpad_type = new XMLData("dpad_type", old_control_mode < 0 ? my_itoa(getDpadType()) : my_itoa(old_control_mode));
 	XMLData* xml_tellusertousedpad = new XMLData("tell_user_to_use_dpad", my_itoa(getTellUserToUseDpad()));
@@ -494,8 +628,24 @@ void Configuration::write()
 	XMLData* xml_lang = new XMLData("language", my_itoa(getLanguage()));
 
 	game->add(auto_zeemote);
+
 	game->add(joyb1);
 	game->add(joyb2);
+	game->add(joyb3);
+	game->add(key1);
+	game->add(key2);
+	game->add(key3);
+	game->add(keyLeft);
+	game->add(keyRight);
+	game->add(keyUp);
+	game->add(keyDown);
+	game->add(keySettings);
+	game->add(keyFullscreen);
+	game->add(keySFXUp);
+	game->add(keySFXDown);
+	game->add(keyMusicUp);
+	game->add(keyMusicDown);
+
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	game->add(xml_dpad_type);
 	game->add(xml_tellusertousedpad);
@@ -561,17 +711,11 @@ Configuration::Configuration() :
 	smoothScaling(false), 
 	sfxVolume(255),
 	musicVolume(255),
+
 	joyB1(0),
 	joyB2(1),
 	joyB3(2),
-#ifdef ALLEGRO4
-	key1(KEY_SPACE),
-	key2(KEY_ESC),
-	keyLeft(KEY_LEFT),
-	keyRight(KEY_RIGHT),
-	keyUp(KEY_UP),
-	keyDown(KEY_DOWN),
-#else
+
 	key1(ALLEGRO_KEY_SPACE),
 	key2(ALLEGRO_KEY_ESCAPE),
 	key3(ALLEGRO_KEY_V),
@@ -579,13 +723,13 @@ Configuration::Configuration() :
 	keyRight(ALLEGRO_KEY_RIGHT),
 	keyUp(ALLEGRO_KEY_UP),
 	keyDown(ALLEGRO_KEY_DOWN),
-	/*
-	keyLeft(ALLEGRO_KEY_H),
-	keyRight(ALLEGRO_KEY_L),
-	keyUp(ALLEGRO_KEY_K),
-	keyDown(ALLEGRO_KEY_J),
-	*/
-#endif
+	keySettings(ALLEGRO_KEY_S),
+	keyFullscreen(ALLEGRO_KEY_F),
+	keySFXUp(ALLEGRO_KEY_F4),
+	keySFXDown(ALLEGRO_KEY_F3),
+	keyMusicUp(ALLEGRO_KEY_F2),
+	keyMusicDown(ALLEGRO_KEY_F1),
+
 	gamepadAvailable(true),
 #ifndef WIZ
 	onlyMemoryBitmaps(false),

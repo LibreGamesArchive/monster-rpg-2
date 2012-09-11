@@ -33,11 +33,10 @@
 	<y>218</y>
 	<width>116</width>
 	<height>109</height>
-	<frames>3</frames>
+	<frames>2</frames>
 	<delays>
-		<0>125</0>
-		<1>125</1>
-		<2>125</2>
+		<0>175</0>
+		<1>175</1>
 	</delays>
 </bof>
 

@@ -120,7 +120,7 @@ static void *thread_proc(void *arg)
    	JavaVMAttachArgs attach_args = { JNI_VERSION_1_4, "java_audio_thread", NULL };
       	(*javavm)->AttachCurrentThread(javavm, &thread_env, &attach_args);
 	
-	jmethodID meth_initSound = (*thread_env)->GetStaticMethodID(thread_env, bpc, "initSound", "(Lcom/nooskewl/monsterrpg2lite/AllegroActivity;)V");
+	jmethodID meth_initSound = (*thread_env)->GetStaticMethodID(thread_env, bpc, "initSound", "(Lcom/nooskewl/monsterrpg2/AllegroActivity;)V");
 	jmethodID meth_update = (*thread_env)->GetStaticMethodID(thread_env, bpc, "update", "()V");
 	jmethodID meth_loadSample = (*thread_env)->GetStaticMethodID(thread_env, bpc, "loadSample", "(Ljava/lang/String;)I");
 	jmethodID meth_loadSampleLoop = (*thread_env)->GetStaticMethodID(thread_env, bpc, "loadSampleLoop", "(Ljava/lang/String;)I");
@@ -218,7 +218,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 	javavm = vm;
 	(*javavm)->GetEnv(javavm, (void **)&java_env, JNI_VERSION_1_4);
 
-	jclass cls = (*java_env)->FindClass(java_env, "com/nooskewl/monsterrpg2lite/OldAndroid");
+	jclass cls = (*java_env)->FindClass(java_env, "com/nooskewl/monsterrpg2/OldAndroid");
 	bpc = (*java_env)->NewGlobalRef(java_env, cls);
 	
 	return JNI_VERSION_1_4;
@@ -509,7 +509,7 @@ void zeemote_disconnect(void)
 	disconnect_external_controls();
 }
 
-JNIEXPORT bool JNICALL Java_com_nooskewl_monsterrpg2lite_AllegroActivity_nativeZeemoteShouldAutoconnect(JNIEnv *env, jobject obj)
+JNIEXPORT bool JNICALL Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeZeemoteShouldAutoconnect(JNIEnv *env, jobject obj)
 {
 	(void)env;
 	(void)obj;
@@ -517,7 +517,7 @@ JNIEXPORT bool JNICALL Java_com_nooskewl_monsterrpg2lite_AllegroActivity_nativeZ
 	return zeemote_should_autoconnect();
 }
 
-JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2lite_AllegroActivity_nativeZeemoteConnect(JNIEnv *env, jobject obj)
+JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeZeemoteConnect(JNIEnv *env, jobject obj)
 {
 	(void)env;
 	(void)obj;
@@ -525,7 +525,7 @@ JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2lite_AllegroActivity_nativeZ
 	zeemote_connect();
 }
 
-JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2lite_AllegroActivity_nativeZeemoteDisconnect(JNIEnv *env, jobject obj)
+JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeZeemoteDisconnect(JNIEnv *env, jobject obj)
 {
 	(void)env;
 	(void)obj;
@@ -533,7 +533,7 @@ JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2lite_AllegroActivity_nativeZ
 	zeemote_disconnect();
 }
 
-JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2lite_AllegroActivity_nativeZeemoteAxis(JNIEnv *env, jobject obj, float x, float y)
+JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeZeemoteAxis(JNIEnv *env, jobject obj, float x, float y)
 {
 	(void)env;
 	(void)obj;
@@ -541,14 +541,14 @@ JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2lite_AllegroActivity_nativeZ
 	zeemote_axis(x, y);
 }
 
-JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2lite_AllegroActivity_nativeZeemoteButtonDown(JNIEnv *env, jobject obj, int button)
+JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeZeemoteButtonDown(JNIEnv *env, jobject obj, int button)
 {
 	(void)env;
 	(void)obj;
 	zeemote_button_down(button);
 }
 
-JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2lite_AllegroActivity_nativeZeemoteButtonUp(JNIEnv *env, jobject obj, int button)
+JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeZeemoteButtonUp(JNIEnv *env, jobject obj, int button)
 {
 	(void)env;
 	(void)obj;

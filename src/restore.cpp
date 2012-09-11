@@ -36,6 +36,7 @@ int main(int argc, char **argv)
 	char buf[10000];
 	fgets(buf, 10000, in);
 	buf[strlen(buf)-1] = 0; // chop newline
+	printf("%d\n", buf[strlen(buf)-1]);
 	save_url(out, buf);
 
 	fclose(in);

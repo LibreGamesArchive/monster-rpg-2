@@ -854,18 +854,18 @@ static void *thread_proc(void *arg)
 			}
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 			else if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
-				if (event.keyboard.keycode == ALLEGRO_KEY_F) {
+				if (event.keyboard.keycode == config.getKeyFullscreen()) {
 					if (!pause_f_to_toggle_fullscreen) {
 						do_toggle_fullscreen = true;
 					}
 				}
-				else if (event.keyboard.keycode == ALLEGRO_KEY_S) {
+				else if (event.keyboard.keycode == config.getKeySettings()) {
 					if (!pause_f_to_toggle_fullscreen) {
 						close_pressed_for_configure = true;
 						close_pressed = true;
 					}
 				}
-				else if (event.keyboard.keycode == ALLEGRO_KEY_F1) {
+				else if (event.keyboard.keycode == config.getKeyMusicDown()) {
 					int v = config.getMusicVolume();
 					if (v <= 26) v = 0;
 					else v = v - 26; 
@@ -873,7 +873,7 @@ static void *thread_proc(void *arg)
 					setMusicVolume(getMusicVolume());
 					setAmbienceVolume(getAmbienceVolume());
 				}
-				else if (event.keyboard.keycode == ALLEGRO_KEY_F2) {
+				else if (event.keyboard.keycode == config.getKeyMusicUp()) {
 					int v = config.getMusicVolume();
 					if (v >= 230) v = 255;
 					else v = v + 26; 
@@ -881,13 +881,13 @@ static void *thread_proc(void *arg)
 					setMusicVolume(getMusicVolume());
 					setAmbienceVolume(getAmbienceVolume());
 				}
-				else if (event.keyboard.keycode == ALLEGRO_KEY_F3) {
+				else if (event.keyboard.keycode == config.getKeySFXDown()) {
 					int v = config.getSFXVolume();
 					if (v <= 26) v = 0;
 					else v = v - 26; 
 					config.setSFXVolume(v);
 				}
-				else if (event.keyboard.keycode == ALLEGRO_KEY_F4) {
+				else if (event.keyboard.keycode == config.getKeySFXUp()) {
 					int v = config.getSFXVolume();
 					if (v >= 230) v = 255;
 					else v = v + 26; 
@@ -906,31 +906,31 @@ static void *thread_proc(void *arg)
 			else if (event.type == ALLEGRO_EVENT_KEY_CHAR) {
 				INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 				int code = event.keyboard.keycode;
-				if (code == ALLEGRO_KEY_LEFT || code == config.getKeyLeft()) {
+				if (code == config.getKeyLeft()) {
 					ie.left = DOWN;
 					add_input_event(ie);
 				}
-				else if (code == ALLEGRO_KEY_RIGHT || code == config.getKeyRight()) {
+				else if (code == config.getKeyRight()) {
 					ie.right = DOWN;
 					add_input_event(ie);
 				}
-				else if (code == ALLEGRO_KEY_UP || code == config.getKeyUp()) {
+				else if (code == config.getKeyUp()) {
 					ie.up = DOWN;
 					add_input_event(ie);
 				}
-				else if (code == ALLEGRO_KEY_DOWN || code == config.getKeyDown()) {
+				else if (code == config.getKeyDown()) {
 					ie.down = DOWN;
 					add_input_event(ie);
 				}
-				else if (code == ALLEGRO_KEY_ENTER || code == config.getKey1()) {
+				else if (code == config.getKey1()) {
 					ie.button1 = DOWN;
 					add_input_event(ie);
 				}
-				else if (code == ALLEGRO_KEY_ESCAPE || code == ALLEGRO_KEY_FULLSTOP || code == config.getKey2()) {
+				else if (code == config.getKey2()) {
 					ie.button2 = DOWN;
 					add_input_event(ie);
 				}
-				else if (code == ALLEGRO_KEY_V || code == config.getKey3()) {
+				else if (code == config.getKey3()) {
 					ie.button3 = DOWN;
 					add_input_event(ie);
 				}
@@ -938,32 +938,32 @@ static void *thread_proc(void *arg)
 			else if (event.type == ALLEGRO_EVENT_KEY_UP) {
 				INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 				int code = event.keyboard.keycode;
-				if (code == ALLEGRO_KEY_LEFT || code == config.getKeyLeft()) {
+				if (code == config.getKeyLeft()) {
 					ie.left = UP;
 					add_input_event(ie);
 				}
-				else if (code == ALLEGRO_KEY_RIGHT || code == config.getKeyRight()) {
+				else if (code == config.getKeyRight()) {
 					ie.right = UP;
 					add_input_event(ie);
 				}
-				else if (code == ALLEGRO_KEY_UP || code == config.getKeyUp()) {
+				else if (code == config.getKeyUp()) {
 					ie.up = UP;
 					add_input_event(ie);
 				}
-				else if (code == ALLEGRO_KEY_DOWN || code == config.getKeyDown()) {
+				else if (code == config.getKeyDown()) {
 					ie.down = UP;
 					add_input_event(ie);
 				}
-				else if (code == ALLEGRO_KEY_ENTER || code == config.getKey1()) {
+				else if (code == config.getKey1()) {
 					dpad_panning = false;
 					ie.button1 = UP;
 					add_input_event(ie);
 				}
-				else if (code == ALLEGRO_KEY_ESCAPE || code == ALLEGRO_KEY_FULLSTOP || code == config.getKey2()) {
+				else if (code == config.getKey2()) {
 					ie.button2 = UP;
 					add_input_event(ie);
 				}
-				else if (code == ALLEGRO_KEY_V || code == config.getKey3()) {
+				else if (code == config.getKey3()) {
 					ie.button3 = UP;
 					add_input_event(ie);
 				}
@@ -2330,6 +2330,9 @@ bool init(int *argc, char **argv[])
 	al_install_system(ALLEGRO_VERSION_INT, NULL);
 #else
 	al_init();
+#if !defined ALLEGRO_IPHONE
+	al_install_keyboard();
+#endif
 #endif
 
 #if !defined ALLEGRO_IPHONE
@@ -2396,9 +2399,6 @@ bool init(int *argc, char **argv[])
 
 	al_install_mouse();
 	
-#if !defined ALLEGRO_IPHONE
-	al_install_keyboard();
-#endif
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_install_touch_input();
 	al_set_mouse_emulation_mode(ALLEGRO_MOUSE_EMULATION_5_0_x);

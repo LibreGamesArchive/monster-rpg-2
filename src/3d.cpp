@@ -334,6 +334,116 @@ void mesa_translate(float *mat, float x, float y, float z)
 	m[15] = m[3] * x + m[7] * y + m[11] * z + m[15];
 }
 
+struct VERT {
+	float x, y, z;
+};
+struct TEXCOORD {
+	float u, v;
+};
+struct FACE {
+	int v[4];
+	int t[4];
+	int n;
+};
+
+static MODEL *load_model2(const char *filename)
+{
+	int sz;
+	unsigned char *bytes = slurp_file(filename, &sz);
+
+	ALLEGRO_FILE *file = al_open_memfile(bytes, sz, "rb");
+	if (!file)
+		return NULL;
+
+	VERT v;
+	TEXCOORD t;
+	FACE f;
+
+	std::vector<VERT> verts;
+	std::vector<TEXCOORD> texcoords;
+	std::vector<FACE> faces;
+
+	char line[1000];
+
+	int ntris = 0; // num triangles
+
+	while ((al_fgets(file, line, 1000))) {
+		if (line[0] == 'v' && line[1] == ' ') {
+			sscanf(line, "v %f %f %f", &v.x, &v.y, &v.z);
+			verts.push_back(v);
+		}
+		else if (line[0] == 'v') {
+			sscanf(line, "vt %f %f", &t.u, &t.v);
+			t.u *= 1024; // FIXME: textures are NOW 1024 maybe not later
+			t.v *= 1024;
+			t.v = 1024 - t.v;
+			texcoords.push_back(t);
+		}
+		else if (line[0] == 'f') {
+			f.n = sscanf(line, "f %d/%d %d/%d %d/%d %d/%d",
+				&f.v[0], &f.t[0],
+				&f.v[1], &f.t[1],
+				&f.v[2], &f.t[2],
+				&f.v[3], &f.t[3]
+			) / 2;
+			for (int i = 0; i < 4; i++) {
+				f.v[i]--;
+				f.t[i]--;
+			}
+			faces.push_back(f);
+			if (f.n == 4) {
+				ntris += 2;
+			}
+			else {
+				ntris++;
+			}
+		}
+	}
+
+	MODEL *m = new MODEL;
+	m->num_verts = ntris * 3;
+	m->verts = new ALLEGRO_VERTEX[m->num_verts];
+
+	int cv = 0; // current vertex
+
+	for (size_t i = 0; i < faces.size(); i++) {
+		FACE &face = faces[i];
+		ALLEGRO_VERTEX *vert;
+		if (face.n == 4) {
+			int order[] = { 0, 1, 2, 0, 2, 3 };
+			for (int j = 0; j < 6; j++) {
+				vert = &m->verts[cv];
+				cv++;
+				int o = order[j];
+				vert->x = verts[face.v[o]].x;
+				vert->y = verts[face.v[o]].y;
+				vert->z = verts[face.v[o]].z;
+				vert->u = texcoords[face.t[o]].u;
+				vert->v = texcoords[face.t[o]].v;
+				vert->color = al_map_rgb_f(1, 1, 1);
+			}
+		}
+		else {
+			for (int j = 0; j < 3; j++) {
+				vert = &m->verts[cv];
+				cv++;
+				vert->x = verts[face.v[j]].x;
+				vert->y = verts[face.v[j]].y;
+				vert->z = verts[face.v[j]].z;
+				vert->u = texcoords[face.t[j]].u;
+				vert->v = texcoords[face.t[j]].v;
+				vert->color = al_map_rgb_f(1, 1, 1);
+			}
+		}
+	}
+
+	al_fclose(file);
+
+	delete[] bytes;
+
+	return m;
+}
+
 static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_size = 0)
 {
 	MODEL *m = new MODEL;
@@ -497,11 +607,13 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 			cv.clear();
 		}
 
+/*
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		if (strstr(filename, "bow.raw")) {
 			qsort(&m->verts[0], vcount/3, sizeof(ALLEGRO_VERTEX)*3, vert_compare);
 		}
 #endif
+*/
 
 
 		if (is_volcano) {
@@ -540,6 +652,11 @@ static void draw_model(MODEL *m)
 	al_draw_prim(m->verts, 0, 0, 0, m->num_verts, ALLEGRO_PRIM_TRIANGLE_LIST);
 }
 
+
+static void draw_model_tex(MODEL *m, MBITMAP *texture)
+{
+	m_draw_prim(m->verts, 0, texture, 0, m->num_verts, ALLEGRO_PRIM_TRIANGLE_LIST);
+}
 
 static void draw_model(MODEL *m, MBITMAP *texture)
 {
@@ -723,8 +840,15 @@ static bool real_archery(int *accuracy_pts)
 	float target_x = BW/2;
 	float target_y = BH/2;
 
-	MODEL *bow_model = load_model(getResource("models/bow.raw"));
-	MODEL *arrow_model = load_model(getResource("models/arrow.raw"));
+	MODEL *bow_model = load_model2(getResource("models/bow.vtx"));
+	MODEL *arrow_model = load_model2(getResource("models/arrow.vtx"));
+
+	int flags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
+	MBITMAP *bow_tex = m_load_bitmap(getResource("models/bow.png"));
+	MBITMAP *arrow_tex =
+		m_load_bitmap(getResource("models/arrow.png"));
+	al_set_new_bitmap_flags(flags);
 
 	MBITMAP *grass, *tower;
 
@@ -1017,8 +1141,8 @@ static bool real_archery(int *accuracy_pts)
     mesa_translate((float *)view_transform.m, 0, 0, bow_z); \
     mesa_rotate((float *)view_transform.m, R2D(xrot), 1, 0, 0); \
     mesa_rotate((float *)view_transform.m, R2D(yrot), 0, 1, 0); \
+    mesa_rotate((float *)view_transform.m, R2D(M_PI/2), 0, 0, 1); \
     mesa_rotate((float *)view_transform.m, -R2D(M_PI/2), 0, 1, 0); \
-    mesa_translate((float *)view_transform.m, 0, 0, 0); \
     OTHER1 \
     al_use_transform(&view_transform);
 
@@ -1031,16 +1155,11 @@ static bool real_archery(int *accuracy_pts)
     mesa_rotate((float *)view_transform.m, R2D(xrot), 1, 0, 0); \
     mesa_rotate((float *)view_transform.m, R2D(yrot), 0, 1, 0); \
     mesa_translate((float *)view_transform.m, 0, 0, 0.5); \
+    mesa_rotate((float *)view_transform.m, -R2D(M_PI/2), 1, 0, 0); \
     mesa_rotate((float *)view_transform.m, R2D(M_PI), 0, 1, 0); \
     OTHER2 \
     al_use_transform(&view_transform);
 
-		MODEL *a = arrow_model;
-		MODEL *b = bow_model;
-
-		//enable_zbuffer();
-		//clear_zbuffer();
-	
 	#ifdef A5_D3D
 	D3DVIEWPORT9 backup_vp;
 	al_get_d3d_device(display)->GetViewport(&backup_vp);
@@ -1054,23 +1173,21 @@ static bool real_archery(int *accuracy_pts)
 	al_get_d3d_device(display)->SetViewport(&vp);
 	#endif
 
+	// without this the feathers sometimes go invisible
+	float old_xrot = xrot;
+	float old_yrot = yrot;
+	if (fabs(xrot) < 0.001) xrot = 0.001;
+	if (fabs(yrot) < 0.001) yrot = 0.001;
 		
-	if (target_x < BW/2) {
-		if (!hiddenCount) {
-			SETUP_ARROW_ES2;
-			draw_model(a);
-		}
-		SETUP_BOW_ES2;
-		draw_model(b);
+	if (!hiddenCount) {
+		SETUP_ARROW_ES2;
+		draw_model_tex(arrow_model, arrow_tex);
 	}
-	else {
-		SETUP_BOW_ES2;
-		draw_model(b);
-		if (!hiddenCount) {
-			SETUP_ARROW_ES2;
-			draw_model(a);
-		}
-	}
+	SETUP_BOW_ES2;
+	draw_model_tex(bow_model, bow_tex);
+
+	xrot = old_xrot;
+	yrot = old_yrot;
 
 	#ifdef A5_D3D
 	al_get_d3d_device(display)->SetViewport(&backup_vp);

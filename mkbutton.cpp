@@ -14,6 +14,8 @@ int main(int argc, char **argv)
 	al_init_font_addon();
 	al_init_ttf_addon();
 
+	al_create_display(200, 200);
+
 	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
 
 	ALLEGRO_FONT *font = al_load_ttf_font("DejaVuSans.ttf", 9, ALLEGRO_TTF_MONOCHROME);
@@ -28,7 +30,7 @@ int main(int argc, char **argv)
 	al_set_target_bitmap(bmp);
 	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
 
-	al_draw_text(font, al_map_rgb(255, 255, 255), al_get_bitmap_width(cursor)+3, 0, 0, text);
+	al_draw_text(font, al_map_rgb(255, 255, 255), al_get_bitmap_width(cursor)+3, 1, 0, text);
 
 	for (int y = 0; y < h/2-2; y++) {
 		for (int x = 0; x < len; x++) {
@@ -48,9 +50,9 @@ int main(int argc, char **argv)
 	ALLEGRO_BITMAP *bmp2 = al_create_bitmap(len, h);
 	al_set_target_bitmap(bmp2);
 	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
+	al_draw_text(font, al_map_rgb(0, 0, 0), al_get_bitmap_width(cursor)+3+1, 2, 0, text);
+	al_draw_text(font, al_map_rgb(0, 0, 0), al_get_bitmap_width(cursor)+3, 2, 0, text);
 	al_draw_text(font, al_map_rgb(0, 0, 0), al_get_bitmap_width(cursor)+3+1, 1, 0, text);
-	al_draw_text(font, al_map_rgb(0, 0, 0), al_get_bitmap_width(cursor)+3, 1, 0, text);
-	al_draw_text(font, al_map_rgb(0, 0, 0), al_get_bitmap_width(cursor)+3+1, 0, 0, text);
 	al_draw_bitmap(bmp, 0, 0, 0);
 
 	char buf[1000];
