@@ -92,7 +92,7 @@ LOCAL_SRC_FILES := \
 	debug.cpp\
 	equipment.cpp\
 	Frame.cpp\
-	ftpget.c\
+	ftpget.cpp\
 	GenericEffect.cpp\
 	graphics.cpp\
 	tftp_get.c\

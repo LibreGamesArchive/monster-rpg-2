@@ -62,31 +62,9 @@ static const char *strings[] = {
 char *create_url(unsigned char *bytes, int len)
 {
 	static char store[5000*3];
-	/*
-	char acceptable[] = {
-		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-		'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
-		'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-		'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D',
-		'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-		'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
-		'Y', 'Z', '$', '-', '_', '.', '+', '!', '*', '\'',
-		'(', ')', ',', 0
-	};
-	*/
 	
 	int j = 0;
 	for (int i = 0; i < len; i++) {
-	/*
-		if (contains(acceptable, bytes[i])) {
-			store[j++] = bytes[i];
-		}
-		else {
-			store[j++] = '%';
-			store[j++] = strings[bytes[i]][0];
-			store[j++] = strings[bytes[i]][1];
-		}
-		*/
 		store[j++] = strings[bytes[i]][0];
 		store[j++] = strings[bytes[i]][1];
 	}
@@ -3026,59 +3004,92 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 	const int LIST_H = 100;
 
 	MBITMAP *trashcan = m_load_bitmap(getResource("media/trashcan.png"));
+	ALLEGRO_DEBUG("WOW0");
 	MIcon *trash_icon = new MIcon(
 		BW-m_get_bitmap_width(trashcan)-5,
 		BH-m_get_bitmap_height(trashcan)-5,
 		std::string(getResource("media/trashcan.png")),
 		white, false, "", false, false, false);
 
+	ALLEGRO_DEBUG("WOW0");
 	MFrame *frame = new MFrame(10, 35, 220, 110);
+	ALLEGRO_DEBUG("WOW0");
 	save_list = new MScrollingList(20, 45, 200, LIST_H, trash_save, BW-m_get_bitmap_width(trashcan)/2-5, BH-m_get_bitmap_height(trashcan)/2-5, show_savestate_info_callback, "");
+	ALLEGRO_DEBUG("WOW0");
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	auto_list = new MScrollingList(20, 45, 200, LIST_H, trash_auto, BW-m_get_bitmap_width(trashcan)/2-5, BH-m_get_bitmap_height(trashcan)/2-5, show_savestate_info_callback, "auto");
+	ALLEGRO_DEBUG("WOW0");
 #endif
+	ALLEGRO_DEBUG("WOW0");
 	MTab *save_tab = new MTab("Save", 10, 20);
+	ALLEGRO_DEBUG("WOW0");
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	int xx2 = 10 + m_text_length(game_font, _t("Save")) + 6;
 	int xx3 = xx2 + m_text_length(game_font, _t("Auto")) + 6;
 	MTab *auto_tab = new MTab("Auto", xx2, 20);
+	ALLEGRO_DEBUG("WOW0");
 	MTab *copypaste_tab = new MTab("Copy & Paste", xx3, 20);
+	ALLEGRO_DEBUG("WOW0");
 #endif
+	ALLEGRO_DEBUG("WOW0");
 	MTextButton *new_game_button = new MTextButton(BW-m_text_length(game_font, _t("New Game..."))-20, 12-m_text_height(game_font)/2, "New Game...");
 
+	ALLEGRO_DEBUG("WOW0");
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	MTextButton *copy_button = new MTextButton(30, 50, "Copy Save");
+	ALLEGRO_DEBUG("WOW0");
 	MTextButton *paste_button = new MTextButton(30, 70, "Paste Save");
+	ALLEGRO_DEBUG("WOW0");
 #endif
+	ALLEGRO_DEBUG("WOW0");
 
 	load_save_info();
+	ALLEGRO_DEBUG("WOW0");
 
 	tguiSetParent(0);
+	ALLEGRO_DEBUG("WOW0");
 	tguiAddWidget(frame);
+	ALLEGRO_DEBUG("WOW0");
 	tguiAddWidget(save_list);
+	ALLEGRO_DEBUG("WOW0");
 	tguiAddWidget(save_tab);
+	ALLEGRO_DEBUG("WOW0");
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	tguiAddWidget(auto_tab);
+	ALLEGRO_DEBUG("WOW0");
 	tguiAddWidget(copypaste_tab);
+	ALLEGRO_DEBUG("WOW0");
 #endif
 	tguiAddWidget(new_game_button);
+	ALLEGRO_DEBUG("WOW0");
 	tguiAddWidget(trash_icon);
+	ALLEGRO_DEBUG("WOW0");
 	tguiSetFocus(new_game_button);
+	ALLEGRO_DEBUG("WOW0");
 
 	save_tab->setSelected(true);
+	ALLEGRO_DEBUG("WOW0");
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	auto_tab->setSelected(false);
+	ALLEGRO_DEBUG("WOW0");
 	copypaste_tab->setSelected(false);
+	ALLEGRO_DEBUG("WOW0");
 	int on = 0;
 #endif
 
 	tguiLowerWidget(save_tab);
+	ALLEGRO_DEBUG("WOW0");
 	tguiLowerWidget(frame);
 
+	ALLEGRO_DEBUG("WOW0");
 	bool first_frame = true;
 
+	ALLEGRO_DEBUG("WOW1");
+
 	for (;;) {
+	ALLEGRO_DEBUG("WOW2");
 		al_wait_cond(wait_cond, wait_mutex);
+	ALLEGRO_DEBUG("WOW3");
 		int tmp_counter = logic_counter;
 		logic_counter = 0;
 		if (tmp_counter > 10)
@@ -3092,7 +3103,9 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 				close_pressed = false;
 			}
 
+	ALLEGRO_DEBUG("WOW4");
 			TGUIWidget *widget = tguiUpdate();
+	ALLEGRO_DEBUG("WOW5");
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			if (widget == save_tab) {
@@ -3231,7 +3244,10 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 #endif
 
 			//INPUT_EVENT ie = get_next_input_event();
+	ALLEGRO_DEBUG("WOW6");
+
 			InputDescriptor id = getInput()->getDescriptor();
+	ALLEGRO_DEBUG("WOW7");
 
 			if (iphone_shaken(0.1) || id.button2 == DOWN) {
 				if (id.button2) {
@@ -3242,7 +3258,9 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 				*num = -1;
 				goto done;
 			}
+	ALLEGRO_DEBUG("WOW8");
 		}
+	ALLEGRO_DEBUG("WOW9");
 
 
 		if (draw_counter > 0) {
@@ -3262,6 +3280,7 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 				m_flip_display();
 			}
 		}
+	ALLEGRO_DEBUG("WOW10");
 	}
 done:
 
@@ -4132,12 +4151,12 @@ int title_menu(void)
 	debug_message("starting title menu\n");
 	int selected = -1;
 
-	debug_message("title bg loaded\n");
-	
 	int curr_button = 0;
 	const int MAX_BUTTONS = 10;
 
 	MBITMAP *bg = m_load_bitmap(getResource("media/title.png"));
+	
+	debug_message("title bg loaded\n");
 	
 	MTextButtonFullShadow *buttons[MAX_BUTTONS];
 	int oy = 100;

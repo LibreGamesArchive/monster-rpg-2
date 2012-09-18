@@ -61,27 +61,32 @@ static int vert_compare_z(const void *a, const void *b)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 #define glFrustum glFrustumf
 #define glOrtho glOrthof
-#define glClearDepth glClearDepthf
 #endif
 
 void disable_zbuffer(void)
 {
-#if defined A5_OGL
-	glDisable(GL_DEPTH_TEST);
-#else
-	LPDIRECT3DDEVICE9 dev = al_get_d3d_device(display);
-	dev->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
-#endif
+	al_set_render_state(ALLEGRO_DEPTH_TEST, 0);
+	al_set_render_state(ALLEGRO_WRITE_MASK, ALLEGRO_MASK_RGBA);
 }
 
-void enable_zbuffer(void)
+void enable_zbuffer(bool less_equal)
 {
-#if defined A5_OGL
-	glEnable(GL_DEPTH_TEST);
-#else
-	LPDIRECT3DDEVICE9 dev = al_get_d3d_device(display);
-	dev->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
-#endif
+	al_set_render_state(ALLEGRO_DEPTH_TEST, 1);
+	al_set_render_state(ALLEGRO_WRITE_MASK,
+		ALLEGRO_MASK_RGBA | ALLEGRO_MASK_DEPTH);
+	if (less_equal) {
+		al_set_render_state(ALLEGRO_DEPTH_FUNCTION,
+			ALLEGRO_RENDER_LESS_EQUAL);
+	}
+	else {
+		al_set_render_state(ALLEGRO_DEPTH_FUNCTION,
+			ALLEGRO_RENDER_LESS);
+	}
+}
+
+static void clear_zbuffer(void)
+{
+	al_clear_depth_buffer(1.0f);
 }
 
 #define A(row,col)  a[(col<<2)+row]
@@ -374,9 +379,11 @@ static MODEL *load_model2(const char *filename)
 		}
 		else if (line[0] == 'v') {
 			sscanf(line, "vt %f %f", &t.u, &t.v);
-			t.u *= 1024; // FIXME: textures are NOW 1024 maybe not later
-			t.v *= 1024;
-			t.v = 1024 - t.v;
+			t.u *= 512; // FIXME: textures are NOW 512 maybe not later
+			t.v *= 512;
+#ifdef A5_OGL // FIXME: Is this right for D3D?
+			t.v = 512 - t.v;
+#endif
 			texcoords.push_back(t);
 		}
 		else if (line[0] == 'f') {
@@ -411,6 +418,7 @@ static MODEL *load_model2(const char *filename)
 		ALLEGRO_VERTEX *vert;
 		if (face.n == 4) {
 			int order[] = { 0, 1, 2, 0, 2, 3 };
+			//int order[] = { 2, 1, 0, 3, 2, 0 };
 			for (int j = 0; j < 6; j++) {
 				vert = &m->verts[cv];
 				cv++;
@@ -664,16 +672,6 @@ static void draw_model(MODEL *m, MBITMAP *texture)
 	m_draw_prim(m->verts, 0, texture, 0, m->num_verts, ALLEGRO_PRIM_TRIANGLE_LIST);
 }
 
-static void clear_zbuffer(void)
-{
-#if defined A5_D3D
-	LPDIRECT3DDEVICE9 device = al_get_d3d_device(display);
-	device->Clear(0, NULL, D3DCLEAR_ZBUFFER, 0, 1, 0);
-#elif defined A5_OGL
-	glClear(GL_DEPTH_BUFFER_BIT);
-#endif
-}
-
 void set_projection(float neer, float farr, bool reverse_y, bool rotate)
 {
 	ALLEGRO_DISPLAY *display = al_get_current_display();
@@ -871,8 +869,8 @@ static bool real_archery(int *accuracy_pts)
 #else
 	const float aim_speed = 0.22f;
 #endif
-	const float arrow_start_z = -250.0;
-	const float bow_z = -250.0;
+	const float arrow_start_z = -250.2;
+	const float bow_z = -250;
 	float bow_scale = 1;
 	float arrow_scale = 1;
 
@@ -883,8 +881,6 @@ static bool real_archery(int *accuracy_pts)
 	bool dead = false;
 
 	playPreloadedSample("bow_draw.ogg");
-
-	//clear_zbuffer();
 
 	while  (1) {
 		al_wait_cond(wait_cond, wait_mutex);
@@ -897,14 +893,8 @@ static bool real_archery(int *accuracy_pts)
 
 			tmp_counter--;
 			if (is_close_pressed()) {
-#ifdef A5_OGL
-//				glDisable(GL_DEPTH_TEST);
-#endif
 				do_close();
 				close_pressed = false;
-#ifdef A5_OGL
-//				glEnable(GL_DEPTH_TEST);
-#endif
 			}
 
 			runtime_ms += LOGIC_MILLIS;
@@ -951,8 +941,8 @@ static bool real_archery(int *accuracy_pts)
 					it++;
 			}
 
-			const float draw_speed = 0.001f*100;
-			const float max_draw = 0.5f*100;
+			const float draw_speed = -0.001f*0.5;
+			const float max_draw = -0.5f*0.5;
 
 			if (drawing) {
 				arrow_z -= draw_speed * LOGIC_MILLIS;
@@ -1048,85 +1038,81 @@ static bool real_archery(int *accuracy_pts)
 
 		if (draw_counter > 0)
 			draw_counter = 0;
+
+			disable_zbuffer();
 			
 			m_set_target_bitmap(buffer);
 
-		float yrot = (target_x / BW - 0.5f) * max_xrot;
-		float xrot = (target_y / BH - 0.5f) * max_yrot;
+			float yrot = (target_x / BW - 0.5f) * max_xrot;
+			float xrot = (target_y / BH - 0.5f) * max_yrot;
 
 #ifdef A5_OGL
-		float arrow_dist = 0.1;
-		xrot = -xrot;
+				float arrow_dist = 0.175;
+			//xrot = -xrot;
+			//yrot = -yrot;
 #else
-		float arrow_dist = -0.1;
-		xrot = -xrot;
-		yrot = -yrot;
-#endif
-#if defined A5_OGL
-		yrot = -yrot;
+			float arrow_dist = -0.1;
+			xrot = -xrot;
+			yrot = -yrot;
 #endif
 
-		m_set_blender(M_ONE, M_ZERO, white);
+			m_set_blender(M_ONE, M_ZERO, white);
 
-		m_draw_bitmap(grass, 0, 0, 0);
+			m_draw_bitmap(grass, 0, 0, 0);
 
-		m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
+			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
-		// Need 3 passes to draw goblins
-		for (unsigned int i = 0; i < goblins.size(); i++) {
-			if (!goblins[i].climbCount && !goblins[i].restCount && !goblins[i].swipeCount) {
-				if (goblins[i].deadCount > 0)
-					goblin_dead->draw(goblins[i].x-TILE_SIZE/2, goblins[i].y-TILE_SIZE, 0);
-				else
-					goblin_animSet->draw(goblins[i].x-TILE_SIZE/2, goblins[i].y-TILE_SIZE, 0);
-			}
-		}
-		for (unsigned int i = 0; i < goblins.size(); i++) {
-			if (goblins[i].swipeCount || goblins[i].restCount) {
-				goblin_animSet->drawScaled(goblins[i].x-25, goblins[i].y-25, 100, 100);
-			}
-		}
-		for (unsigned int i = 0; i < goblins.size(); i++) {
-			if (goblins[i].swipeCount) {
-				float x = (1-(float)goblins[i].swipeCount / 500) * BW;
-				if (x < BW/2) {
-					goblin_swipe->setSubAnimation("left");
+			// Need 3 passes to draw goblins
+			for (unsigned int i = 0; i < goblins.size(); i++) {
+				if (!goblins[i].climbCount && !goblins[i].restCount && !goblins[i].swipeCount) {
+					if (goblins[i].deadCount > 0)
+						goblin_dead->draw(goblins[i].x-TILE_SIZE/2, goblins[i].y-TILE_SIZE, 0);
+					else
+						goblin_animSet->draw(goblins[i].x-TILE_SIZE/2, goblins[i].y-TILE_SIZE, 0);
 				}
-				else
-					goblin_swipe->setSubAnimation("right");
-				goblin_swipe->drawScaled(x-50, BH/2-50, 100, 100);
 			}
-		}
+			for (unsigned int i = 0; i < goblins.size(); i++) {
+				if (goblins[i].swipeCount || goblins[i].restCount) {
+					goblin_animSet->drawScaled(goblins[i].x-25, goblins[i].y-25, 100, 100);
+				}
+			}
+			for (unsigned int i = 0; i < goblins.size(); i++) {
+				if (goblins[i].swipeCount) {
+					float x = (1-(float)goblins[i].swipeCount / 500) * BW;
+					if (x < BW/2) {
+						goblin_swipe->setSubAnimation("left");
+					}
+					else
+						goblin_swipe->setSubAnimation("right");
+					goblin_swipe->drawScaled(x-50, BH/2-50, 100, 100);
+				}
+			}
 
-		m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-		m_draw_bitmap(tower, 0, 0, 0);
+			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
+			m_draw_bitmap(tower, 0, 0, 0);
 
-		m_draw_line(target_x-4, target_y, target_x+4, target_y, m_map_rgb(255, 0, 0));
-		m_draw_line(target_x, target_y-4, target_x, target_y+4, m_map_rgb(255, 0, 0));
+			m_draw_line(target_x-4, target_y, target_x+4, target_y, m_map_rgb(255, 0, 0));
+			m_draw_line(target_x, target_y-4, target_x, target_y+4, m_map_rgb(255, 0, 0));
 
-		/* Draw progress meter */
-		m_draw_rectangle(3, 3, 9, 51, white, M_FILLED);
-		int meter_height;
-		if (really_done) meter_height = 48;
-		else meter_height = 47 * (float)dead_goblins/NUM_GOBLINS;
-		m_draw_rectangle(3, 51, 9, 51-meter_height,
-		                 m_map_rgb(255, 0, 0), M_FILLED);
-		m_draw_bitmap(progress, 2, 2, 0);
+			/* Draw progress meter */
+			m_draw_rectangle(3, 3, 9, 51, white, M_FILLED);
+			int meter_height;
+			if (really_done) meter_height = 48;
+			else meter_height = 47 * (float)dead_goblins/NUM_GOBLINS;
+			m_draw_rectangle(3, 51, 9, 51-meter_height,
+					 m_map_rgb(255, 0, 0), M_FILLED);
+			m_draw_bitmap(progress, 2, 2, 0);
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-		drawBufferToScreen();
-		al_set_target_backbuffer(display);
-#endif
+			drawBufferToScreen();
+			al_set_target_backbuffer(display);
 
-		//clear_zbuffer();
+			ALLEGRO_TRANSFORM proj_push;
+			ALLEGRO_TRANSFORM view_push;
+			ALLEGRO_TRANSFORM view_transform;
+			al_copy_transform(&view_push, al_get_current_transform());
+			al_copy_transform(&proj_push, al_get_projection_transform(display));
 
-		ALLEGRO_TRANSFORM proj_push;
-		ALLEGRO_TRANSFORM view_push;
-		ALLEGRO_TRANSFORM view_transform;
-		al_copy_transform(&view_push, al_get_current_transform());
-		al_copy_transform(&proj_push, al_get_projection_transform(display));
-
-		set_projection(1, 1000);
+			set_projection(1, 1000);
 
 #ifdef A5_D3D
 #define OTHER1 mesa_translate((float *)view_transform.m, 0, 0.5, -0.4);
@@ -1139,8 +1125,8 @@ static bool real_archery(int *accuracy_pts)
     al_identity_transform(&view_transform); \
     mesa_scale((float *)view_transform.m, bow_scale, bow_scale, bow_scale); \
     mesa_translate((float *)view_transform.m, 0, 0, bow_z); \
-    mesa_rotate((float *)view_transform.m, R2D(xrot), 1, 0, 0); \
-    mesa_rotate((float *)view_transform.m, R2D(yrot), 0, 1, 0); \
+    mesa_rotate((float *)view_transform.m, -R2D(xrot), 1, 0, 0); \
+    mesa_rotate((float *)view_transform.m, -R2D(yrot), 0, 1, 0); \
     mesa_rotate((float *)view_transform.m, R2D(M_PI/2), 0, 0, 1); \
     mesa_rotate((float *)view_transform.m, -R2D(M_PI/2), 0, 1, 0); \
     OTHER1 \
@@ -1150,13 +1136,13 @@ static bool real_archery(int *accuracy_pts)
     al_identity_transform(&view_transform); \
     mesa_scale((float *)view_transform.m, arrow_scale, arrow_scale, arrow_scale); \
     mesa_translate((float *)view_transform.m, 0, 0, arrow_start_z); \
-    mesa_translate((float *)view_transform.m, 0, 0, arrow_start_z-arrow_z); \
-    mesa_translate((float *)view_transform.m, arrow_dist, 0, 0); \
-    mesa_rotate((float *)view_transform.m, R2D(xrot), 1, 0, 0); \
-    mesa_rotate((float *)view_transform.m, R2D(yrot), 0, 1, 0); \
-    mesa_translate((float *)view_transform.m, 0, 0, 0.5); \
+    mesa_rotate((float *)view_transform.m, -R2D(xrot), 1, 0, 0); \
+    mesa_rotate((float *)view_transform.m, -R2D(yrot), 0, 1, 0); \
+    /*mesa_translate((float *)view_transform.m, 0, 0, -0.75);*/ \
     mesa_rotate((float *)view_transform.m, -R2D(M_PI/2), 1, 0, 0); \
-    mesa_rotate((float *)view_transform.m, R2D(M_PI), 0, 1, 0); \
+    /*mesa_rotate((float *)view_transform.m, -R2D(M_PI), 0, 1, 0);*/ \
+    mesa_translate((float *)view_transform.m, 0, arrow_start_z-arrow_z, 0); \
+    mesa_translate((float *)view_transform.m, arrow_dist, 0, 0); \
     OTHER2 \
     al_use_transform(&view_transform);
 
@@ -1179,12 +1165,18 @@ static bool real_archery(int *accuracy_pts)
 	if (fabs(xrot) < 0.001) xrot = 0.001;
 	if (fabs(yrot) < 0.001) yrot = 0.001;
 		
+	enable_zbuffer(false);
+	clear_zbuffer();
+	enable_cull_face(false);
+	SETUP_BOW_ES2;
+	draw_model_tex(bow_model, bow_tex);
 	if (!hiddenCount) {
 		SETUP_ARROW_ES2;
 		draw_model_tex(arrow_model, arrow_tex);
 	}
-	SETUP_BOW_ES2;
-	draw_model_tex(bow_model, bow_tex);
+
+	disable_cull_face();
+	disable_zbuffer();
 
 	xrot = old_xrot;
 	yrot = old_yrot;
@@ -1193,15 +1185,9 @@ static bool real_archery(int *accuracy_pts)
 	al_get_d3d_device(display)->SetViewport(&backup_vp);
 	#endif
 
-	//disable_zbuffer();
 
 		al_use_transform(&view_push);
 		al_set_projection_transform(display, &proj_push);
-		//m_set_target_bitmap(buffer);
-
-#if !defined(IPHONE) && !defined(ALLEGRO_ANDROID)
-		drawBufferToScreen();
-#endif
 
 		m_flip_display();
 
@@ -1212,6 +1198,8 @@ static bool real_archery(int *accuracy_pts)
 	}
 
 done:
+
+	disable_zbuffer();
 	
 	clear_input_events();
 
@@ -1234,8 +1222,6 @@ done:
 	playMusic("underwater_final.ogg");
 
 	*accuracy_pts = ((float)NUM_GOBLINS/num_shots) * 30 + 2;
-
-//	glClearDepth(1); // restore default
 
 	dpad_on();
 

@@ -430,11 +430,15 @@ TripleInput::TripleInput() :
 {
 	playerControlled = true;
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	kb = new KeyboardInput();
 	js = new GamepadInput();
 #else
-	kb = NULL;
 	js = NULL;
+#endif
+
+#if !defined ALLEGRO_IPHONE
+	kb = new KeyboardInput();
+#else
+	kb = NULL;
 #endif
 }
 
@@ -499,6 +503,10 @@ void TripleInput::update()
 	    false
 	    );
 #elif defined ALLEGRO_ANDROID
+	kb->update();
+	
+	InputDescriptor id1 = kb->getDescriptor();
+
 	InputDescriptor id3;
 	if (zeemote_connected)
 		id3 = get_zeemote_state();
@@ -507,13 +515,13 @@ void TripleInput::update()
 			id3.button1 = id3.button2 = id3.button3 =
 			false;
 	set(
-	    sets.left || id3.left,
-	    sets.right || id3.right,
-	    sets.up || id3.up,
-	    sets.down || id3.down,
-	    sets.button1 || id3.button1,
-	    sets.button2 || id3.button2,
-	    sets.button3 || id3.button3,
+	    sets.left || id1.left || id3.left,
+	    sets.right || id1.right || id3.right,
+	    sets.up || id1.up || id3.up,
+	    sets.down || id1.down || id3.down,
+	    sets.button1 || id1.button1 || id3.button1,
+	    sets.button2 || id1.button2 || id3.button2,
+	    sets.button3 || id1.button3 || id3.button3,
 	    false
 	    );
 #endif

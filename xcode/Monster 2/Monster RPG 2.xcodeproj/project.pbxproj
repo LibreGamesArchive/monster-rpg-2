@@ -109,7 +109,6 @@
 		9639C4361152D3A900804984 /* iphone.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9639C4351152D3A900804984 /* iphone.mm */; };
 		963AF9041585AA80007E85D5 /* MoRPG2-lite-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 963AF9031585AA80007E85D5 /* MoRPG2-lite-Info.plist */; };
 		963BB32A15CC5C5E002AD872 /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 963BB32915CC5C5E002AD872 /* data */; };
-		9647905015CE2F1100B779B6 /* ftpget.c in Sources */ = {isa = PBXBuildFile; fileRef = 968D3EFC15CAD4E40080197D /* ftpget.c */; };
 		9647905215CE2F2F00B779B6 /* SBJoystickLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 967C33F915CC5ACF003FD960 /* SBJoystickLib.a */; };
 		9647905315CE2F5400B779B6 /* libJoypadCocoaTouch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 967C33ED15CC56A0003FD960 /* libJoypadCocoaTouch.a */; };
 		9647905515CE301500B779B6 /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9647905415CE301500B779B6 /* data */; };
@@ -148,7 +147,6 @@
 		967976AC13BE8690006BCE29 /* init.mm in Sources */ = {isa = PBXBuildFile; fileRef = 967976AB13BE8690006BCE29 /* init.mm */; };
 		967C33C815CBA720003FD960 /* libJoypadCocoa.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 969A7CE7159F7293001BE047 /* libJoypadCocoa.a */; };
 		967C33C915CBA726003FD960 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 968D3F8A15CAE0EE0080197D /* libcurl.a */; };
-		967C33CA15CBA734003FD960 /* ftpget.c in Sources */ = {isa = PBXBuildFile; fileRef = 968D3EFC15CAD4E40080197D /* ftpget.c */; };
 		967C33CC15CBA7B9003FD960 /* libjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96CB82621596A89100AD6979 /* libjpeg.a */; };
 		967C33CE15CBA9EB003FD960 /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 967C33CD15CBA9EB003FD960 /* data */; };
 		967C33D015CC4A1A003FD960 /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 967C33CF15CC4A1A003FD960 /* Default-Landscape~ipad.png */; };
@@ -214,9 +212,7 @@
 		968C1E6213BBE28800615225 /* atlas_accessor.c in Sources */ = {isa = PBXBuildFile; fileRef = 968C1E5E13BBE28800615225 /* atlas_accessor.c */; };
 		968C1E6313BBE28800615225 /* atlas.c in Sources */ = {isa = PBXBuildFile; fileRef = 968C1E6013BBE28800615225 /* atlas.c */; };
 		968C1E7A13BCED5E00615225 /* libbassflac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 968C1E7913BCED5D00615225 /* libbassflac.a */; };
-		968D3EFD15CAD4E40080197D /* ftpget.c in Sources */ = {isa = PBXBuildFile; fileRef = 968D3EFC15CAD4E40080197D /* ftpget.c */; };
 		968D3EFE15CAD4FE0080197D /* libjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96CB82621596A89100AD6979 /* libjpeg.a */; };
-		968D3EFF15CAD55D0080197D /* ftpget.c in Sources */ = {isa = PBXBuildFile; fileRef = 968D3EFC15CAD4E40080197D /* ftpget.c */; };
 		968D3F8B15CAE0EE0080197D /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 968D3F8A15CAE0EE0080197D /* libcurl.a */; };
 		968D3F8D15CAE4B30080197D /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 968D3F8C15CAE4B30080197D /* data */; };
 		968D3F8E15CAE4E50080197D /* libJoypadCocoa.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 969A7CE7159F7293001BE047 /* libJoypadCocoa.a */; };
@@ -235,6 +231,10 @@
 		9699CA37159E3C27002DF7DC /* liballegro_shader-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D25F154A7DFA009ECD44 /* liballegro_shader-static.a */; };
 		9699CA38159E3C27002DF7DC /* liballegro_ttf-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D260154A7DFA009ECD44 /* liballegro_ttf-static.a */; };
 		9699CA39159E3C27002DF7DC /* liballegro-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D261154A7DFA009ECD44 /* liballegro-static.a */; };
+		969A9E3D16083E3000F4DBE2 /* ftpget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 969A9E3C16083E3000F4DBE2 /* ftpget.cpp */; };
+		969A9E3E16083F6700F4DBE2 /* ftpget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 969A9E3C16083E3000F4DBE2 /* ftpget.cpp */; };
+		969A9E3F16083F6D00F4DBE2 /* ftpget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 969A9E3C16083E3000F4DBE2 /* ftpget.cpp */; };
+		969A9E4016083F7600F4DBE2 /* ftpget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 969A9E3C16083E3000F4DBE2 /* ftpget.cpp */; };
 		969D9A5F159DAC780063280C /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D26C154A7E66009ECD44 /* libpng.a */; };
 		969D9A60159DAC920063280C /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D26C154A7E66009ECD44 /* libpng.a */; };
 		96A460A7151D836A001BC99C /* libAllegro.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A460A6151D836A001BC99C /* libAllegro.a */; };
@@ -526,7 +526,6 @@
 		968C1E6113BBE28800615225 /* atlas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atlas.h; path = ../../src/atlas.h; sourceTree = "<group>"; };
 		968C1E7913BCED5D00615225 /* libbassflac.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbassflac.a; path = ../../../iphone_libs_r/libbassflac.a; sourceTree = "<group>"; };
 		968D3EFA15CAD2900080197D /* Monster RPG 2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Monster RPG 2.entitlements"; sourceTree = "<group>"; };
-		968D3EFC15CAD4E40080197D /* ftpget.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ftpget.c; path = ../../src/ftpget.c; sourceTree = "<group>"; };
 		968D3F8A15CAE0EE0080197D /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcurl.a; path = ../../../local/lib/libcurl.a; sourceTree = "<group>"; };
 		968D3F8C15CAE4B30080197D /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = ../../pcdata/data; sourceTree = "<group>"; };
 		9695A12C138D706400FB0417 /* liballegro_font-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_font-static.a"; path = "../../../iphone_libs_r/liballegro_font-static.a"; sourceTree = "<group>"; };
@@ -588,6 +587,7 @@
 		969A7CE5159F7293001BE047 /* JoypadManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JoypadManager.h; path = ../../../JoypadSDKs/Cocoa/Mac/JoypadMac/JoypadManager.h; sourceTree = "<group>"; };
 		969A7CE6159F7293001BE047 /* JoypadSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JoypadSDK.h; path = ../../../JoypadSDKs/Cocoa/Mac/JoypadMac/JoypadSDK.h; sourceTree = "<group>"; };
 		969A7CE7159F7293001BE047 /* libJoypadCocoa.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libJoypadCocoa.a; path = ../../../JoypadSDKs/Cocoa/Mac/JoypadMac/libJoypadCocoa.a; sourceTree = "<group>"; };
+		969A9E3C16083E3000F4DBE2 /* ftpget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ftpget.cpp; path = ../../src/ftpget.cpp; sourceTree = "<group>"; };
 		96A460A6151D836A001BC99C /* libAllegro.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAllegro.a; path = ../../../iphone_libs_r/libAllegro.a; sourceTree = "<group>"; };
 		96A4D256154A7D55009ECD44 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
 		96A4D257154A7D55009ECD44 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/OpenGL.framework; sourceTree = DEVELOPER_DIR; };
@@ -792,6 +792,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				969A9E3C16083E3000F4DBE2 /* ftpget.cpp */,
 				9647905415CE301500B779B6 /* data */,
 				963BB32915CC5C5E002AD872 /* data */,
 				967C33F915CC5ACF003FD960 /* SBJoystickLib.a */,
@@ -810,7 +811,6 @@
 				960A8B3315CB90AE0073CF82 /* Monster RPG 2.entitlements */,
 				968D3F8C15CAE4B30080197D /* data */,
 				968D3F8A15CAE0EE0080197D /* libcurl.a */,
-				968D3EFC15CAD4E40080197D /* ftpget.c */,
 				969A7CE2159F7293001BE047 /* JoypadConstants.h */,
 				969A7CE3159F7293001BE047 /* JoypadControllerLayout.h */,
 				969A7CE4159F7293001BE047 /* JoypadDevice.h */,
@@ -1331,6 +1331,7 @@
 				96224275103D96D400756C5B /* 3d.cpp in Sources */,
 				96224276103D96D400756C5B /* Animation.cpp in Sources */,
 				96224277103D96D400756C5B /* AnimationSet.cpp in Sources */,
+				969A9E3D16083E3000F4DBE2 /* ftpget.cpp in Sources */,
 				96224279103D96D400756C5B /* battle.cpp in Sources */,
 				9622427A103D96D400756C5B /* CombatActions.cpp in Sources */,
 				9622427B103D96D400756C5B /* Combatant.cpp in Sources */,
@@ -1382,7 +1383,6 @@
 				960DB49F154C82EA000869BD /* ThrottledTCPConnection.m in Sources */,
 				960DB4A0154C82EA000869BD /* UDPSocket.m in Sources */,
 				9629BBBA1557C5AA009EAD48 /* quantize.cpp in Sources */,
-				968D3EFD15CAD4E40080197D /* ftpget.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1392,6 +1392,7 @@
 			files = (
 				96581D7715857178006BF72E /* 60beat.m in Sources */,
 				96581D721585710D006BF72E /* tftp_get.c in Sources */,
+				969A9E4016083F7600F4DBE2 /* ftpget.cpp in Sources */,
 				9638490C1481A6BD000F7B07 /* joypad_handler.m in Sources */,
 				9638490B1481A6B9000F7B07 /* joypad.mm in Sources */,
 				96BF3FA413DB314300CE670E /* init.mm in Sources */,
@@ -1399,7 +1400,6 @@
 				96BF3FA613DB314300CE670E /* atlas.c in Sources */,
 				9609BD4D13636DE60068EB38 /* translate.cpp in Sources */,
 				9609BD4E13636DE60068EB38 /* Area.cpp in Sources */,
-				9647905015CE2F1100B779B6 /* ftpget.c in Sources */,
 				9609BD4F13636DE70068EB38 /* iphone.mm in Sources */,
 				96581D78158571C0006BF72E /* NetReachability.m in Sources */,
 				96581D79158571D4006BF72E /* NetServiceBrowser.m in Sources */,
@@ -1450,8 +1450,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				967C33CA15CBA734003FD960 /* ftpget.c in Sources */,
 				965E248915852F4400839861 /* tftp_get.c in Sources */,
+				969A9E3F16083F6D00F4DBE2 /* ftpget.cpp in Sources */,
 				968BA9351481E98000F768C5 /* init.mm in Sources */,
 				968BA9361481E98000F768C5 /* atlas_accessor.c in Sources */,
 				968BA9371481E98000F768C5 /* atlas.c in Sources */,
@@ -1502,9 +1502,9 @@
 			files = (
 				96B4B144143BC0A000ACA64C /* init.mm in Sources */,
 				96B4B145143BC0A000ACA64C /* atlas_accessor.c in Sources */,
+				969A9E3E16083F6700F4DBE2 /* ftpget.cpp in Sources */,
 				96B4B146143BC0A000ACA64C /* atlas.c in Sources */,
 				96B4B0E2143BBBF300ACA64C /* joypad_handler.m in Sources */,
-				968D3EFF15CAD55D0080197D /* ftpget.c in Sources */,
 				96B4B0E3143BBBF300ACA64C /* joypad.mm in Sources */,
 				96B4B0E4143BBBF300ACA64C /* translate.cpp in Sources */,
 				96B4B0E5143BBBF300ACA64C /* Area.cpp in Sources */,

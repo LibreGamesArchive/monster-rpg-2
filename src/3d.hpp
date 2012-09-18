@@ -18,7 +18,7 @@ void mesa_translate(float *mat, float x, float y, float z);
 
 void enable_cull_face(bool ccw = false);
 void disable_cull_face(void);
-void enable_zbuffer(void);
+void enable_zbuffer(bool less_equal = true);
 void disable_zbuffer(void);
 
 struct TMPMODEL {

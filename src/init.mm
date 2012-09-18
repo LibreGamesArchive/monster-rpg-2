@@ -833,7 +833,7 @@ static void *thread_proc(void *arg)
 		
 		if (al_wait_for_event_timed(events, &event, 1.0f/LOGIC_RATE)) {
 
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE
 			al_lock_mutex(input_mutex);
 			if (getInput())
 				getInput()->handle_event(&event);
@@ -869,7 +869,7 @@ static void *thread_proc(void *arg)
 				}
 				al_signal_cond(wait_cond);
 			}
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE
 			else if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
 
 				if (event.keyboard.keycode == config.getKeyFullscreen()) {
@@ -933,6 +933,34 @@ static void *thread_proc(void *arg)
 						add_input_event(ie);
 					}
 					else if (m && c == config.getKey3()) {
+						ie.button3 = DOWN;
+						add_input_event(ie);
+					}
+					else if (c == config.getKeyLeft()) {
+						ie.left = DOWN;
+						add_input_event(ie);
+					}
+					else if (c == config.getKeyRight()) {
+						ie.right = DOWN;
+						add_input_event(ie);
+					}
+					else if (c == config.getKeyUp()) {
+						ie.up = DOWN;
+						add_input_event(ie);
+					}
+					else if (c == config.getKeyDown()) {
+						ie.down = DOWN;
+						add_input_event(ie);
+					}
+					else if (c == config.getKey1()) {
+						ie.button1 = DOWN;
+						add_input_event(ie);
+					}
+					else if (c == config.getKey2()) {
+						ie.button2 = DOWN;
+						add_input_event(ie);
+					}
+					else if (c == config.getKey3()) {
 						ie.button3 = DOWN;
 						add_input_event(ie);
 					}
@@ -1028,6 +1056,7 @@ static void *thread_proc(void *arg)
 					}
 				}
 			}
+#if !defined ALLEGRO_ANDROID
 			else if (event.type == ALLEGRO_EVENT_JOYSTICK_CONFIGURATION) {
 				al_reconfigure_joysticks();
 				int nj = al_get_num_joysticks();
@@ -1129,6 +1158,7 @@ static void *thread_proc(void *arg)
 				}
 			}
 #endif
+#endif
 
 #ifdef ALLEGRO_ANDROID
 			if (event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_BACK) {
@@ -1214,6 +1244,7 @@ static void *thread_proc(void *arg)
 				al_lock_mutex(dpad_mutex);
 					
 				bool _l = false, _r = false, _u = false, _d = false, _b1 = false, _b2 = false, _b3 = false;
+
 				for (int i = 0; i < curr_touches; i++) {
 					bool __l = false, __r = false, __u = false, __d = false, __b1 = false, __b2 = false, __b3 = false;
 					get_inputs(touches[i].x, touches[i].y,
@@ -1231,6 +1262,7 @@ static void *thread_proc(void *arg)
 				process_touch(this_x, this_y, touch_id, type);
 				
 				bool l = false, r = false, u = false, d = false, b1 = false, b2 = false, b3 = false;
+
 				for (int i = 0; i < curr_touches; i++) {
 					bool __l = false, __r = false, __u = false, __d = false, __b1 = false, __b2 = false, __b3 = false;
 					get_inputs(touches[i].x, touches[i].y,
@@ -2349,6 +2381,12 @@ int my_crap_atexit(void (*crap)(void))
 {
 	return 0;
 }
+
+void android_assert_handler(char const *expr,
+	char const *file, int line, char const *func)
+{
+	ALLEGRO_DEBUG("BOOYA %s %s:%d", func, file, line);
+}
 #endif
 
 bool init(int *argc, char **argv[])
@@ -2382,9 +2420,14 @@ bool init(int *argc, char **argv[])
 	al_install_system(ALLEGRO_VERSION_INT, NULL);
 #else
 	al_init();
+#endif
+
 #if !defined ALLEGRO_IPHONE
 	al_install_keyboard();
 #endif
+
+#ifdef ALLEGRO_ANDROID
+	al_register_assert_handler(android_assert_handler);
 #endif
 
 #if !defined ALLEGRO_IPHONE
@@ -2499,7 +2542,7 @@ bool init(int *argc, char **argv[])
 #ifdef __linux__
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_SUGGEST);
 #else
-	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_SUGGEST);
+	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_SUGGEST);
 #endif
 	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 32, ALLEGRO_REQUIRE);
 #endif
@@ -2939,16 +2982,16 @@ ALLEGRO_DEBUG("boo1");
 		m_rest(0.001);
 	}
 
-#if !defined(ALLEGRO_ANDROID)
-	al_inhibit_screensaver(true);
-#endif
-
 	// Must be first thing after thread end or before thread start
 	if (cached_bitmap) {
 		al_destroy_bitmap(cached_bitmap);
 		cached_bitmap = NULL;
 		cached_bitmap_filename = "";
 	}
+
+#if !defined(ALLEGRO_ANDROID)
+	al_inhibit_screensaver(true);
+#endif
 
 #if defined ALLEGRO_IPHONE
 	sb_start();
@@ -2958,7 +3001,7 @@ ALLEGRO_DEBUG("boo1");
 
 	shadow_sheet = m_create_alpha_bitmap(4*16, 2*16, create_shadows, NULL, destroy_shadows);
 	draw_loading_screen(tmp, 100, sd);
-	
+
 	m_destroy_bitmap(tmp);
 	delete eny_loader;
 	delete dot_loader;

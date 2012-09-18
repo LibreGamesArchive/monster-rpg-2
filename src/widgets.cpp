@@ -1446,20 +1446,24 @@ int MTextButton::update(int millis)
 		m_text_height(game_font) + 2;
 
 	INPUT_EVENT ie;
+#ifdef ALLEGRO_IPHONE
+	if (this != tguiActiveWidget || !use_dpad) {
+#else
 	if (this != tguiActiveWidget) {
+#endif
 		ie = EMPTY_INPUT_EVENT;
 	}
 	else {
 		ie = get_next_input_event();
 	}
 
-	if (!disabled && ((use_dpad && ie.button1 == DOWN) || clicked)) {
+	if (!disabled && (ie.button1 == DOWN) || clicked) {
 		use_input_event();
 		clicked = false;
 		playPreloadedSample("select.ogg");
 		return TGUI_RETURN;
 	}
-	else if (use_dpad && (ie.left == DOWN)) {
+	else if (ie.left == DOWN) {
 		use_input_event();
 		playPreloadedSample("blip.ogg");
 		if (left_widget)
@@ -1467,12 +1471,12 @@ int MTextButton::update(int millis)
 		else
 			tguiFocusPrevious();
 	}
-	else if (use_dpad && (ie.up == DOWN)) {
+	else if (ie.up == DOWN) {
 		use_input_event();
 		playPreloadedSample("blip.ogg");
 		tguiFocusPrevious();
 	}
-	else if (use_dpad && (ie.right == DOWN)) {
+	else if (ie.right == DOWN) {
 		use_input_event();
 		playPreloadedSample("blip.ogg");
 		if (right_widget)
@@ -1480,7 +1484,7 @@ int MTextButton::update(int millis)
 		else
 			tguiFocusNext();
 	}
-	else if (use_dpad && (ie.down == DOWN)) {
+	else if (ie.down == DOWN) {
 		use_input_event();
 		playPreloadedSample("blip.ogg");
 		tguiFocusNext();

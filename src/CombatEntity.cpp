@@ -565,37 +565,18 @@ void Ice1Effect::draw(void)
 	}
 
 #ifdef ALLEGRO_ANDROID
-	ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[particles.size()*6];
-	for (int i = 0; i < (int)particles.size(); i++) {
-		Particle &part = particles[i];
-		verts[i*6+0].x = part.x;
-		verts[i*6+0].y = part.y;
-		verts[i*6+0].z = 0;
-		verts[i*6+0].color = part.color;
-		verts[i*6+1].x = part.x+1;
-		verts[i*6+1].y = part.y;
-		verts[i*6+1].z = 0;
-		verts[i*6+1].color = part.color;
-		verts[i*6+2].x = part.x;
-		verts[i*6+2].y = part.y+1;
-		verts[i*6+2].z = 0;
-		verts[i*6+2].color = part.color;
-		verts[i*6+3].x = part.x+1;
-		verts[i*6+3].y = part.y;
-		verts[i*6+3].z = 0;
-		verts[i*6+3].color = part.color;
-		verts[i*6+4].x = part.x;
-		verts[i*6+4].y = part.y+1;
-		verts[i*6+4].z = 0;
-		verts[i*6+4].color = part.color;
-		verts[i*6+5].x = part.x+1;
-		verts[i*6+5].y = part.y+1;
-		verts[i*6+5].z = 0;
-		verts[i*6+5].color = part.color;
+	if (particles.size() > 0) {
+		ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[particles.size()];
+		for (int i = 0; i < (int)particles.size(); i++) {
+			Particle &part = particles[i];
+			verts[i].x = part.x;
+			verts[i].y = part.y;
+			verts[i].z = 0;
+			verts[i].color = part.color;
+		}
+		al_draw_prim(verts, 0, NULL, 0, particles.size(), ALLEGRO_PRIM_POINT_LIST);
+		delete[] verts;
 	}
-	//m_draw_prim(verts, 0, NULL, 0, particles.size()*6, ALLEGRO_PRIM_TRIANGLE_LIST);
-	al_draw_prim(verts, 0, NULL, 0, particles.size()*6, ALLEGRO_PRIM_TRIANGLE_LIST);
-	delete[] verts;
 #else
 	for (int i = 0; i < (int)particles.size(); i++) {
 		Particle &part = particles[i];
@@ -624,6 +605,9 @@ bool Ice1Effect::update(int step)
 			icicle.y = y;
 		if (icicle.y >= y) {
 			it = icicles.erase(it);
+			if (particles.size() > 256) {
+				particles.erase(particles.begin(), particles.begin()+10);
+			}
 			for (int i = 0; i < 10; i++) {
 				Particle part;
 				part.x = icicle.x;
