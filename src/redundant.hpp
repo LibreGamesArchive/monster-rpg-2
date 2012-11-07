@@ -15,17 +15,10 @@ public:
 };
 
 
-#ifdef ALLEGRO4
-const int M_ZERO = 0;
-const int M_ONE = 1;
-const int M_ALPHA = 2;
-const int M_INVERSE_ALPHA = 3;
-#else
 const int M_ZERO = ALLEGRO_ZERO;
 const int M_ONE = ALLEGRO_ONE;
 const int M_ALPHA = ALLEGRO_ALPHA;
 const int M_INVERSE_ALPHA = ALLEGRO_INVERSE_ALPHA;
-#endif
 
 const int M_FLIP_HORIZONTAL = 1;
 const int M_FLIP_VERTICAL = 2;
@@ -110,7 +103,6 @@ void m_draw_alpha_bitmap(MBITMAP *b, int x, int y, int flags);
 MBITMAP *m_create_alpha_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateData *data) = NULL, RecreateData *data = NULL, void (*destroy)(MBITMAP *b) = NULL, bool delayed = false); // check
 MBITMAP *m_load_alpha_bitmap(const char *name, bool force_memory = false);
 
-#ifndef ALLEGRO4
 MBITMAP *m_make_display_bitmap(MBITMAP *b);
 MBITMAP *m_make_alpha_display_bitmap(MBITMAP *b);
 
@@ -131,18 +123,7 @@ void m_restore_blender(void);
 void set_linear_mag_filter(MBITMAP *bitmap, bool on);
 
 #define m_get_pixel(b, x, y) al_get_pixel(b->bitmap, x, y)
-
-
 #define m_draw_pixel m_draw_trans_pixel
-
-#else
-#define m_save_blender()
-#define m_restore_blender()
-#define m_draw_pixel m_put_pixel
-#endif
-
-
-#endif
 
 MBITMAP *new_mbitmap(ALLEGRO_BITMAP *bitmap);
 

@@ -1,6 +1,0 @@
-monster-rpg2: extended-description-line-too-long
-monster-rpg2: dir-or-file-in-opt opt/monster-rpg-2/
-monster-rpg2: dir-or-file-in-opt opt/monster-rpg-2/libbass.so
-monster-rpg2: dir-or-file-in-opt opt/monster-rpg-2/libbassflac.so
-monster-rpg2: dir-or-file-in-opt opt/monster-rpg-2/monster2
-monster-rpg2: menu-command-not-in-package /usr/share/menu/monster-rpg2:3 /opt/monster-rpg2/monster2

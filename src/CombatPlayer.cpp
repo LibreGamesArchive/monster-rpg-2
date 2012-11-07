@@ -59,7 +59,6 @@ public:
 			return createMainHandler(player, "Attack");
 		for (int i = 0; i < 5 && buttons[i]; i++) {
 			if (mainWidget == buttons[i]) {
-				//playPreloadedSample("select.ogg");
 				ActionHandler *newHandler =
 					createMainHandler(player, std::string(actions[i]));
 				return newHandler;
@@ -141,7 +140,6 @@ public:
 			if (use_dpad) {
 				MTextButton *b = new MTextButton(x, y, std::string(actions[i]), disabled);
 				buttons[i] = b;
-				//y += m_text_height(game_font);
 				y += 9;
 			}
 			else {
@@ -565,7 +563,7 @@ public:
 					player->getInfo().spells[spellIndex])
 					== SPELL_BLACK;
 				if (black) {
-					if (/*e->getType() == COMBATENTITY_TYPE_PLAYER ||*/
+					if (
 							e->getType() == COMBATENTITY_TYPE_ENEMY) {
 						Combatant *c = (Combatant *)e;
 						if (c->getInfo().abilities.hp > 0)
@@ -577,7 +575,6 @@ public:
 						add = true;
 					}
 				}
-				//add = true;
 			}
 			if (add) {
 				Combatant *c = (Combatant *)e;
@@ -737,11 +734,6 @@ public:
 			applyFrame = new MFrame(BW/3-20, 110+(50/2)-6-5, 112, 22, true);
 			applyButton = new MTextButton(BW/3-20+6, 110+(50/2)-6+2,
 									 "Apply");
-				/*
-			applyFrame = new MFrame(BW/3-20, 110+7, 112, 18, true);
-			applyButton = new MTextButton(BW/3-20+6, 121,
-				"Apply");
-				 */
 		}
 
 		tguiSetParent(0);
@@ -775,19 +767,10 @@ protected:
 
 ActionHandler *AttackHandler::act(int step, Battle *b)
 {
-	/*
-	AnimationSet *wAnim = getWeaponAnimation(player->getInfo());
-	if (wAnim) {
-		wAnim->update(step);
-	}
-	*/
-
 	count += step;
 	if (count < player->getAnimationSet()->getCurrentAnimation()->getLength())
 		return NULL;
 	
-	//player->setDrawWeapon(false);
-
 	if (attacked.size() == 1 && attacked[0]->getName() == "EvilTig_ending") {
 		MBITMAP *bmp;
 		bool win;
@@ -812,18 +795,13 @@ ActionHandler *AttackHandler::act(int step, Battle *b)
 		m_rest(5);
 		dpad_on();
 		clear_input_events();
-		//fadeOut(black);
 		if (win) {
 			attacked[0]->getAnimationSet()->setSubAnimation("broken");
 			if (!use_programmable_pipeline) {
 				attacked[0]->getWhiteAnimationSet()->setSubAnimation("broken");
 			}
 		}
-		//m_set_target_bitmap(buffer);
-		//battle->draw();
-		//fadeIn(black);
 		m_destroy_bitmap(bmp);
-		//return new EndHandler(player);
 	}
 	else {
 		for (int i = 0; i < (int)attacked.size(); i++) {
@@ -1028,8 +1006,6 @@ void UseMagicHandler::init(void)
 	player->getAnimationSet()->reset();
 	
 	spell = createSpell(player->getInfo().spells[spellIndex]);
-	//battle->addEntity(spell);
-	//lifetime = spell->getLifetime();
 
 	std::string msg = "{008}" + std::string(_t(player->getInfo().spells[spellIndex].c_str()));
 	MessageLocation loc;
@@ -1395,7 +1371,6 @@ bool CombatPlayer::act(int step, Battle *b)
 				delete handler;
 				handler = NULL;
 				acting = false;
-				//tguiMakeFresh();
 				if (end_this_battle) {
 					end_this_battle = false;
 					battle->end(battleResult);
@@ -1612,10 +1587,6 @@ void CombatPlayer::draw(void)
 			int amountF = -1.0f;
 			(void)amount;
 			(void)amountF;
-#ifdef ALLEGRO4
-			MBITMAP *bmp = animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
-			brightened_blit(bmp, x-(w/2), y-h, amount, flags);
-#else
 			{
 			m_save_blender();
 			float  r, g, b;
@@ -1627,7 +1598,6 @@ void CombatPlayer::draw(void)
 			m_draw_tinted_bitmap(sb, m_map_rgb(r, g, b), x-(w/2), y-h, flags);
 			m_restore_blender();
 			}
-#endif
 		}
 		else {
 			if (battle->isInWater())

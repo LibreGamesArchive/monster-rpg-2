@@ -33,7 +33,6 @@ static void set_transform(ALLEGRO_DISPLAY *dpy)
    int w = al_get_display_width(dpy);
    int h = al_get_display_height(dpy);
 
-   // XXX we shouldn't need this in user code
    glViewport(0, 0, w, h);
 
    al_identity_transform(&t);
@@ -161,11 +160,6 @@ void connect_second_display(void)
 	
 	_reload_loaded_bitmaps_delayed();
 	
-	/*
-	ScreenDescriptor *sd = config.getWantedGraphicsMode();
-	sd->width = al_get_display_width(display);
-	sd->height = al_get_display_height(display);
-	*/
 	set_screen_params();
 
 	al_set_new_display_adapter(0);
@@ -174,7 +168,6 @@ void connect_second_display(void)
 	controller_display = al_create_display(1, 1);
 	al_set_new_display_flags(flgs);
 	register_display(controller_display);
-	//init_controller_shader();
 	int w = al_get_display_width(controller_display);
 	int h = al_get_display_height(controller_display);
 	ALLEGRO_TRANSFORM scale;
@@ -412,13 +405,6 @@ top:
 			al_start_timer(logic_timer);
 			al_start_timer(draw_timer);
 #else
-			//if (!halt_was_because_of_zeemote && config.getAutoconnectToZeemote()) {
-				//ALLEGRO_DEBUG("AUTOCONNECT 2");
-				//autoconnect_zeemote();
-			//}
-			// this MUST be after autoconnect_zeemote() above
-			//halt_was_because_of_zeemote = false;
-			//ALLEGRO_DEBUG(" SETT FALSE ");
 #endif
 		}
 #endif
@@ -487,7 +473,6 @@ top:
 			m_destroy_bitmap(white_button);
 			m_destroy_bitmap(black_button);
 			m_destroy_bitmap(airplay_logo);
-			//destroy_controller_shader();
 			al_destroy_display(controller_display);
 			controller_display = NULL;
 			
@@ -503,11 +488,6 @@ top:
 
 			_reload_loaded_bitmaps_delayed();
 
-			/*
-			ScreenDescriptor *sd = config.getWantedGraphicsMode();
-			sd->width = al_get_display_width(display);
-			sd->height = al_get_display_height(display);
-			*/
 			set_screen_params();
 	
 			_reload_loaded_bitmaps();
@@ -615,9 +595,6 @@ static bool playerCanLevel(std::string name)
 
 static void run(void)
 {
-	// FIXME!.
-	//levelUp(party[heroSpot], 10);
-
 	// Fix because Eny used to be only CLASS_WARRIOR, some save
 	// states are missing CLASS_ENY
 	party[heroSpot]->getInfo().characterClass |= CLASS_ENY;
@@ -817,14 +794,6 @@ static void run(void)
 					delete battle;
 					battle = NULL;
 				
-/*
-#ifdef LITE
-					if (battle->getName() == "Monster") {
-						notify("You have reached the end of", "the lite version. Please purchase", "the full version to continue!");
-						return;
-					}
-#endif
-*/
 					if (result == BATTLE_ENEMY_WIN && battle_must_win) {
 						m_rest(5);
 						if (saveFilename) saveTime(saveFilename);
@@ -948,17 +917,6 @@ static void run(void)
 					}
 				}
 			}
-			
-			/* For testing
-			if (battle && area) {
-				// FIXME!!!!!!!!!!!!!!!!!!!!!!
-				ALLEGRO_DEBUG("DELETING AREA");
-				delete area;
-				ALLEGRO_DEBUG("DELETED AREA");
-				area = NULL;
-				ALLEGRO_DEBUG("area = NULL");
-			}
-			*/
 		}
 
 		if (break_main_loop) {
@@ -967,7 +925,6 @@ static void run(void)
 		}
 
 		if (draw_counter > 0 && !dont_draw_now) {
-			// FIXME:
 			frames++;
 			draw_counter = 0;
 			m_set_target_bitmap(buffer);
@@ -1016,8 +973,6 @@ static void run(void)
 			gameInfo.milestones[MS_FIRST_POISON] = true;
 			anotherDoDialogue("Oh, no! Someone is poisoned. They'll lose health every turn until they're healed.\n", false, true);
 		}
-
-		//m_rest(0.001);
 
 #ifdef ALLEGRO4
 	if (gameInfo.milestones[MS_CELL_SCENE]) {
@@ -1070,54 +1025,6 @@ static void run(void)
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		ALLEGRO_KEYBOARD_STATE state;
 		al_get_keyboard_state(&state);
-#elif defined IPHONELKFDJSLKFJDSKFLDS
-	ALLEGRO_JOYSTICK_STATE joystate;
-	al_get_joystick_state(al_get_joystick(0), &joystate);
-	if (gameInfo.milestones[MS_CELL_SCENE]) {
-		if (joystate.button[7] && !battle) {
-			if (prompt("Really save? This can", "cause problems!!", 0, 0)) {
-				char tmp[1000];
-				strcpy(tmp, saveFilename);
-				saveGame(tmp, "");
-			}
-		}
-	}
-      if (joystate.button[9]) {
-         m_rest(0.15);
-         int v = config.getMusicVolume();
-         if (v <= 26) v = 0;
-         else v = v - 26; 
-         config.setMusicVolume(v);
-         setMusicVolume(getMusicVolume());
-         setAmbienceVolume(getAmbienceVolume());
-      }
-      if (joystate.button[8]) {
-         m_rest(0.15);
-         int v = config.getMusicVolume();
-         if (v >= 230) v = 255;
-         else v = v + 26; 
-         config.setMusicVolume(v);
-         setMusicVolume(getMusicVolume());
-         setAmbienceVolume(getAmbienceVolume());
-      }
-      if (joystate.button[4]) {
-         m_rest(0.15);
-         int v = config.getSFXVolume();
-         if (v <= 26) v = 0;
-         else v = v - 26; 
-         config.setSFXVolume(v);
-      }
-      if (joystate.button[5]) {
-         m_rest(0.15);
-         int v = config.getSFXVolume();
-         if (v >= 230) v = 255;
-         else v = v + 26; 
-         config.setSFXVolume(v);
-      }
-      else if (joystate.button[6]) {
-      	fps_on = !fps_on;
-	m_rest(0.15);
-      }
 #endif
 
 #endif
@@ -1306,7 +1213,7 @@ int main(int argc, char *argv[])
 	// FIXME
 	//volcano_scene();
 	//do_lander(); 
-	archery(false);
+	//archery(false);
 	//shooter(false);
 	//credits();
 
@@ -1427,39 +1334,14 @@ int main(int argc, char *argv[])
 				startNewGame();
 				if (saveFilename) free(saveFilename);
 				saveFilename = NULL;
-				//saveFilename = strdup(getUserResource("%d.save", num));
 				runtime = 0;
 				gold = 0;
 				runtime_ms = 0;
 				runtime_start = 0;
 				debug_message("started new game\n");
 			}
-			/*
-			// FIXME
-			
-			//if ((n = check_arg(argc, argv, "-warp")) != -1) {
-				if (area) delete area;
-				//startArea(argv[n+1]);
-				startArea("volcano");
-				// FIXME! xcode bug!
-				//int x = atoi(argv[n+2]);
-				//int y = atoi(argv[n+3]);
-				int x = 34;
-				int y = 12;
-				party[heroSpot]->getObject()->setPosition(x, y);
-			//}
-			*/
-			
 		}
 		else if (choice == 2) {
-		// FIXME!
-		#if 0
-			if (do_config()) {
-				notify("You must restart the program", "for the changes to take effect", "... Exiting.");
-				break;
-			}
-			continue;
-		#endif
 		}
 		else if (choice == 5) {
 			pc_help();
@@ -1498,36 +1380,6 @@ int main(int argc, char *argv[])
 			config.write();
 			throw QuitError();
 		}
-#if 0
-		else if (choice == 0xDEAD) {
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-			do_close(true);
-#elif defined ALLEGRO_MACOSX
-			destroy();
-			//char const *exe = [[[NSBundle mainBundle] executablePath] fileSystemRepresentation];
-			//int r = execl(exe, exe, NULL);
-			/*
-			if (fork()) {
-				exit(0);
-			}
-			*/
-			/*
-			CFURLRef url = CFBundleCopyExecutableURL(CFBundleGetMainBundle());
-			FSRef fsref;
-			CFURLGetFSRef(url, &fsref);
-			char exe[1024]; 
-			FSRefMakePath(&fsref, (UInt8*)exe, 1024);
-			execl(exe, exe, NULL);
-			*/
-#else
-#ifndef _MSC_VER // FIXME!
-			char exe[1024];
-			sprintf(exe, "%s", argv[0]);
-			execl(exe, exe, NULL);
-#endif
-#endif
-		}
-#endif
 		else {
 			break;
 		}
@@ -1536,7 +1388,6 @@ int main(int argc, char *argv[])
 
 		save_memory(true);
 
-		/* tguiDeleteWidget(manChooser)? */
 		if (manChooser) {
 			delete manChooser;
 			manChooser = NULL;
@@ -1553,7 +1404,6 @@ int main(int argc, char *argv[])
 
 		if (area) {
 			delete area;
-	//		dpad_on();
 		}
 		area = NULL;
 

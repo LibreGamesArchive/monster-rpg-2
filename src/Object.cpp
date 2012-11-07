@@ -265,7 +265,7 @@ void Object::drawUpper(void)
 			verts[i*2+1].color = white;
 			verts[i*2+1].u = i;
 			verts[i*2+1].v = h;
-			//m_draw_bitmap_region(poison_bmp, i, 0, 1, m_get_bitmap_height(poison_bmp), i, 5+5*sin((float)i/m_get_bitmap_width(poison_bmp)*M_PI*4+poison_x), 0);
+
 		}
 		m_draw_prim(verts, NULL, poison_bmp, 0, w*2, ALLEGRO_PRIM_LINE_LIST);
 		m_set_target_bitmap(poison_bmp_tmp2);
@@ -283,7 +283,6 @@ void Object::drawUpper(void)
 			verts[i*2+1].color = white;
 			verts[i*2+1].u = w2;
 			verts[i*2+1].v = i;
-			//m_draw_bitmap_region(poison_bmp_tmp, 0, i, m_get_bitmap_width(poison_bmp_tmp), 1, 5+5*cos((float)i/m_get_bitmap_height(poison_bmp_tmp)*M_PI*4+poison_x), i, 0);
 		}
 		m_draw_prim(verts, NULL, poison_bmp_tmp, 0, h2*2, ALLEGRO_PRIM_LINE_LIST);
 		m_pop_target_bitmap();
@@ -741,13 +740,7 @@ void Smoke::draw(void)
 		dy = y - puffs[i].height;
 		dx -= area->getOriginX();
 		dy -= area->getOriginY();
-#ifdef ALLEGRO4
-		set_alpha_blender();
-		draw_trans_sprite(m_get_target_bitmap(), bitmap,
-			dx-half_w, dy-half_h);
-#else
 		m_draw_bitmap(bitmap, dx-half_w, dy-half_h, 0);
-#endif
 	}
 }
 
@@ -823,11 +816,7 @@ void Fish::draw(void)
 
 	m_set_target_bitmap(tmpbmp);
 
-#ifdef ALLEGRO4
-	m_clear(m_map_rgb(255, 0, 255));
-#else
 	m_clear(m_map_rgba(0, 0, 0, 0));
-#endif
 
 	for (int i = 0; i < w; i++) {
 		int a = wiggle;

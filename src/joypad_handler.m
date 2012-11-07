@@ -1,11 +1,3 @@
-//
-//  joypad_handler.m
-//  Ballz
-//
-//  Created by Trent Gamblin on 11-09-28.
-//  Copyright 2011 Nooskewl. All rights reserved.
-//
-
 #import "joypad_handler.h"
 #import "JoypadSDK.h"
 #import "JoypadControllerLayout.h"

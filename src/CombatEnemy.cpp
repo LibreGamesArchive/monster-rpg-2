@@ -334,7 +334,6 @@ bool CombatEnemy::act(int step, Battle *b)
 			}
 			status.attacking.who.clear();
 			status.type = COMBAT_WAITING;
-			//animSet->reset();
 			return true;
 		}
 	}
@@ -793,7 +792,6 @@ void CombatEnemy::draw(void)
 					m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, al_map_rgb_f(r, g, b));
 					if (angle == 0) {
 						MBITMAP *bmp = animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
-						//m_draw_tinted_bitmap(bmp, al_map_rgb_f(r, g, b), x-(w/2), y-h, flags);
 						m_draw_bitmap(bmp, x-(w/2), y-h, flags);
 					}
 					else
@@ -891,11 +889,6 @@ void CombatEnemy::initLua(void)
 		throw ScriptError();
 	}
 
-#ifdef WIZ
-	// Wiz has a bug - anything named UPPER.ext gets seen as
-	// upper.ext
-	if (name == "UFO") name = "ufo";
-#endif
 	debug_message("Loading enemy script...\n");
 	bytes = slurp_file(getResource("combat_enemies/%s.%s", name.c_str(), getScriptExtension().c_str()), &file_size);
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
@@ -903,9 +896,6 @@ void CombatEnemy::initLua(void)
 		throw ReadError();
 	}
 	delete[] bytes;
-#ifdef WIZ
-	if (name == "ufo") name = "UFO";
-#endif
 
 	debug_message("Running enemy script...\n");
 	if (lua_pcall(luaState, 0, 0, 0)) {
@@ -1360,7 +1350,6 @@ bool CombatEnemyTode::act(int step, Battle *b)
 
 	if (pukenext) {
 		spell = createSpell(std::string("Puke"));
-		//Combatant **targets = new Combatant*[1]; // unused
 		spell->init(this, NULL, 0);
 		battle->addMessage(MESSAGE_LEFT, "{008} Puke", 1500);
 		pukenext = false;

@@ -277,5 +277,3 @@ MeatballsEffect::~MeatballsEffect(void)
 	}
 }
 
-
-

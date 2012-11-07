@@ -417,9 +417,6 @@ bool loadGame(const char* filename)
 	free(areaName);
 	
 	
-	// FIXME!
-	//party[3]->getInfo().spells[8] = "Charm";
-
 	return ret;
 }
 

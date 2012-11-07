@@ -1,28 +1,5 @@
 #include "monster2.hpp"
 
-/*
-#define SINTABSIZE 100
-static float costable[SINTABSIZE];
-static float sintable[SINTABSIZE];
-
-inline float quicksin(float x)
-{
-	while (x < 0) x += M_PI*2;
-	while (x > M_PI*2) x -= M_PI*2;
-	return sintable[(int)(x/(M_PI*2)*SINTABSIZE)];
-}
-	
-inline float quickcos(float x)
-{
-	while (x < 0) x += M_PI*2;
-	while (x > M_PI*2) x -= M_PI*2;
-	return costable[(int)(x/(M_PI*2)*SINTABSIZE)];
-}
-*/
-
-#define quicksin sin
-#define quickcos cos
-
 #define MAX_PARTICLES 200
 
 class MLanderButton : public TGUIWidget {
@@ -99,14 +76,6 @@ static float randf(float lo, float hi)
 
 bool do_lander(void)
 {
-	/*
-	for (int i = 0; i < SINTABSIZE; i++) {
-		float f = (float)i / SINTABSIZE * M_PI*2;
-		costable[i] = cos(f);
-		sintable[i] = sin(f);
-	}
-	*/
-
 	// stop set_sets (astar with mouse)
 	getInput()->set(false, false, false, false, false, false, false);
 
@@ -116,10 +85,10 @@ bool do_lander(void)
 	Particle p; \
 	float c = lander_angle+M_PI+(M_PI/6*dir); \
 	float s = lander_angle+M_PI+(M_PI/6*dir); \
-	p.x = lander_x + quickcos(c) * 9; \
-	p.y = lander_y + quicksin(s) * 9; \
-	p.dx = quickcos(-c) * 0.01f + randf(-0.002f, 0.002f); \
-	p.dy = quicksin(-s) * 0.01f + randf(-0.002f, 0.002f); \
+	p.x = lander_x + (c) * 9; \
+	p.y = lander_y + (s) * 9; \
+	p.dx = (-c) * 0.01f + randf(-0.002f, 0.002f); \
+	p.dy = (-s) * 0.01f + randf(-0.002f, 0.002f); \
 	p.ground = BH; \
 	p.color = m_map_rgb(255, 0, 0); \
 	particles.push_back(p); \
@@ -170,8 +139,6 @@ top:
 	std::list<Particle> particles;
 
 	float lander_angle = M_PI*3/2;
-	//float lander_w = m_get_bitmap_width(lander_bmp);
-	//float lander_h = m_get_bitmap_height(lander_bmp);
 	float lander_x = 15; // center
 	float lander_y = 15; // center
 	float lander_vel = 0;
@@ -217,8 +184,8 @@ top:
 			}
 
 			/* apply gravity */
-			lander_x += quickcos(M_PI/2) * gravity * LOGIC_MILLIS;
-			lander_y += quicksin(M_PI/2) * gravity * LOGIC_MILLIS;
+			lander_x += (M_PI/2) * gravity * LOGIC_MILLIS;
+			lander_y += (M_PI/2) * gravity * LOGIC_MILLIS;
 
 			/* apply jets */
 			bool left = false, right = false;
@@ -249,8 +216,8 @@ top:
 				if (lander_vel > lander_vel_max)
 					lander_vel = lander_vel_max;
 				lander_angle += lander_angle_delta * LOGIC_MILLIS;
-				lander_x += quickcos(lander_angle) * lander_vel * LOGIC_MILLIS;
-				lander_y += quicksin(lander_angle) * lander_vel * LOGIC_MILLIS;
+				lander_x += (lander_angle) * lander_vel * LOGIC_MILLIS;
+				lander_y += (lander_angle) * lander_vel * LOGIC_MILLIS;
 				if (particles.size() < MAX_PARTICLES) {
 					int t = tguiCurrentTimeMillis();
 					//int n = t-last_particle_1;
@@ -269,8 +236,8 @@ top:
 				if (lander_vel > lander_vel_max)
 					lander_vel = lander_vel_max;
 				lander_angle -= lander_angle_delta * LOGIC_MILLIS;
-				lander_x += quickcos(lander_angle) * lander_vel * LOGIC_MILLIS;
-				lander_y += quicksin(lander_angle) * lander_vel * LOGIC_MILLIS;
+				lander_x += (lander_angle) * lander_vel * LOGIC_MILLIS;
+				lander_y += (lander_angle) * lander_vel * LOGIC_MILLIS;
 				if (particles.size() < MAX_PARTICLES) {
 					int t = tguiCurrentTimeMillis();
 					//int n = t-last_particle_2;
@@ -416,9 +383,7 @@ top:
 
 done:
 
-//debug_message("1");
 	clear_input_events();
-//debug_message("1");
 
 	if (!use_dpad) {
 		tguiDeleteWidget(left_button);
@@ -426,7 +391,6 @@ done:
 		delete left_button;
 		delete right_button;
 	}
-//debug_message("1");
 
 	m_destroy_bitmap(lander_bmp);
 	m_destroy_bitmap(land_bmp);
@@ -435,17 +399,13 @@ done:
 	m_destroy_bitmap(lander_tmp);
 	m_destroy_bitmap(lander_mem);
 	delete explosion;
-//debug_message("1");
 
-	//m_set_target_bitmap(buffer);
 	playAmbience("");
-//debug_message("1");
 
 	fadeOut(black);
 	m_set_target_bitmap(buffer);
 	m_clear(black);
 	m_rest(5);
-//debug_message("1");
 
 	playMusic("");
 

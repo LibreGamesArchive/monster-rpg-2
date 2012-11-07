@@ -1105,8 +1105,6 @@ void battleTransition(void)
 	MBITMAP *xfade_buf = m_create_bitmap(BW, BH); // check
 	MBITMAP *battle_buf = m_create_bitmap(BW, BH); // check
 
-	//set_linear_mag_filter(xfade_buf, config.getFilterType() == FILTER_LINEAR);
-
 	m_set_target_bitmap(battle_buf);
 	battle->draw();
 

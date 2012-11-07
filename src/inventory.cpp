@@ -1,12 +1,5 @@
 #include "monster2.hpp"
 
-/*
-	std::string name;
-	ItemType type;
-	int id;
-	int icon;
-*/
-
 Item items[] = {
 	{ "Bone", ITEM_TYPE_WEAPON, 0,  0 },		// 0
 	{ "Bone", ITEM_TYPE_HEAD_ARMOR, 0, 1 },		// 1
@@ -218,57 +211,6 @@ static std::string getItemSound(std::string name)
 }
 
 Inventory inventory[MAX_INVENTORY];
-
-
-/*
-bool initWeaponAnimations(void)
-{
-	for (int i = 0; weaponAnimations[i].name != ""; i++) {
-		if (weaponAnimations[i].name == "ignore")
-			continue;
-		weaponAnimations[i].anim = new AnimationSet(getResource("combat_media/%s", weaponAnimations[i].name.c_str()));
-		if (weaponAnimations[i].anim == NULL)
-			return false;
-	}
-
-	return true;
-}
-
-
-void destroyWeaponAnimations(void)
-{
-	for (int i = 0; weaponAnimations[i].name != ""; i++) {
-		delete weaponAnimations[i].anim;
-	}
-}
-
-
-AnimationSet *getWeaponAnimation(CombatantInfo &info)
-{
-	int index = -1;
-	int lhand = info.equipment.lhand;
-	int rhand = info.equipment.rhand;
-	if ((lhand >= 0 && weapons[items[lhand].id].needs >= 0) ||
-		(rhand >= 0 && weapons[items[rhand].id].needs >= 0)) {
-		if ((lhand >= 0) && !weapons[items[lhand].id].ammo) {
-			index = lhand;
-		}
-		else if ((rhand >= 0) && !weapons[items[rhand].id].ammo) {
-			index = rhand;
-		}
-	}
-	else if (lhand >= 0)
-		index = lhand;
-	else if (rhand >= 0)
-		index = rhand;
-	if (index >= 0) {
-		int animIndex = items[index].id;
-		return weaponAnimations[animIndex].anim;
-	}
-
-	return NULL;
-}
-*/
 
 
 std::string getWeaponSound(CombatantInfo &info)
@@ -697,7 +639,6 @@ void use(Combatant *c, int index, bool can_equip, int numTargets)
 						}
 					}
 					else {
-						//notify("Weapons do", "not combine...", "");
 						if (inventory[index].quantity > 1) {
 							int slot = findEmptyInventorySlot();
 							if (slot < 0) {

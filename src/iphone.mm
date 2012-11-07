@@ -3,7 +3,6 @@
 #include <allegro5/platform/aintiphone.h>
 #include <allegro5/allegro_opengl.h>
 #include <zlib.h>
-//#import "MyMusicPlayer.h"
 #include "iphone.h"
 #import <Foundation/Foundation.h>
 #import <MobileCoreServices/MobileCoreServices.h>
@@ -60,14 +59,6 @@ MPMusicPlayerController *getMusicPlayer(void)
 	return musicPlayer;
 }
 
-/*
-bool isIpodPresented(void)
-{
-	if (the_controller == nil) return false;
-	return the_controller.iPodIsPresented;
-}
- */
-
 struct Album {
 	std::vector<std::string> songs;
 	std::vector<int> song_overall_num;
@@ -99,7 +90,6 @@ void showIpod(void)
 
 	std::map<std::string, Artist> artists;
 
-//
 	MPMediaQuery *query = [MPMediaQuery albumsQuery];
 	NSArray *array = [query items];
 	int num = [array count];
@@ -170,28 +160,6 @@ void showIpod(void)
 			}
 		}
 	}
-
-	// The full list is already sorted
-	/*
-	std::vector<int> order;
-
-	for (int i = 0; i < num; i++) {
-		order.push_back(i);
-	}
-
-	for (int i = 0; i < num; i++) {
-		for (int j = i+1; j < num; j++) {
-			if (all_names[i] > all_names[j]) {
-				std::string tmp_s = all_names[i];
-				int tmp_i = order[i];
-				all_names[i] = all_names[j];
-				order[i] = order[j];
-				all_names[j] = tmp_s;
-				order[j] = tmp_i;
-			}
-		}
-	}
-	*/
 
 	std::vector< std::vector<bool> > bools;
 	std::string curr_artist = "";
@@ -430,8 +398,6 @@ void showIpod(void)
 
 			m_set_target_bitmap(buffer);
 
-//			m_clear(m_map_rgb(0, 0, 0));
-			
 			al_draw_tinted_bitmap(bg->bitmap, al_map_rgba(64, 64, 64, 255), 0, 0, 0);
 
 			if (section >= 1) {
@@ -469,7 +435,6 @@ done:
 							std::vector<int> &vi = artists[(*it).first].albums[(*it2).first].song_overall_num;
 							for (int l = 0; l < (int)vs.size(); l++) {
 								if (n == k) {
-									//printf("l=%d vi[l]=%d n=%d k=%d\n", l, vi[l], n, k);
 									[picked addObject:[array objectAtIndex:vi[l]]];
 									count++;
 								}
@@ -521,26 +486,10 @@ superdone:
 	global_draw_red = true;
 	
 	[p drain];
-	
-/*
-	if (the_controller == nil) {
-		the_controller = [[myController2 alloc] init];
-	}
-	else if (the_controller.iPodIsPresented) {
-		return;
-	}
-	[[UIApplication sharedApplication] setStatusBarHidden:NO animated:NO];
-	the_controller.iPodIsPresented = true;
-	[[the_delegate window] addSubview:the_controller.view];
-	[the_controller performSelectorOnMainThread: @selector(runPicker)
-		withObject:nil waitUntilDone:YES];
-		*/
 }
 
 void shutdownIpod(void)
 {
-	/*if (the_controller != nil)
-		[the_controller release];*/
 	if (musicPlayer != nil)
 		[musicPlayer release];
 }
@@ -591,7 +540,6 @@ void iPodStop(void)
 bool get_clipboard(char *buf, int len)
 {
 	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
-	//NSData *d = [[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeUTF8PlainText];
 	NSString *d = [[UIPasteboard generalPasteboard] string];
 	if (d == nil)
 		return false;
@@ -624,13 +572,8 @@ bool isMultitaskingSupported(void)
 	return b;
 }
 
-//extern bool is_muted(void);
-
 void vibrate(void)
 {
-//	if (is_muted())
-//		return;
-
 	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
 	AudioServicesPlaySystemSound (kSystemSoundID_Vibrate);
 	[p drain];

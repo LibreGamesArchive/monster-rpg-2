@@ -23,6 +23,7 @@ static float get_trap_peak(int topw, int bottomw, int length)
 
 /* my_do_line: copied from Allegro
  */
+#if 0
 void my_do_line(int x1, int y1, int x2, int y2, void *data, void (*proc)(int, int, void *))
 {
    int dx = x2-x1;
@@ -107,6 +108,7 @@ void my_do_line(int x1, int y1, int x2, int y2, void *data, void (*proc)(int, in
 
    #undef DO_LINE
 }
+#endif
 
 
 /* Copied from do_circle
@@ -116,6 +118,7 @@ void my_do_line(int x1, int y1, int x2, int y2, void *data, void (*proc)(int, in
  *  the bmp parameter, then the x, y point, then a copy of the d parameter
  *  (so putpixel() can be used as the callback).
  */
+#if 0
 void my_do_circle(int x, int y, int radius, MCOLOR d,
 	void (*proc)(int, int, MCOLOR))
 {
@@ -166,6 +169,7 @@ void my_do_circle(int x, int y, int radius, MCOLOR d,
 
    } while (cx <= cy);
 }
+#endif
 
 
 MCOLOR m_map_rgba(int r, int g, int b, int a)
@@ -258,87 +262,6 @@ void m_draw_alpha_bitmap(MBITMAP *b, int x, int y)
 void m_draw_alpha_bitmap(MBITMAP *b, int x, int y, int flags)
 {
 	m_draw_bitmap(b, x, y, flags);
-}
-
-// cache string bitmaps for 1 second
-struct StringBitmap {
-	uint64_t _id;
-	ALLEGRO_COLOR color;
-	MBITMAP *bitmap;
-};
-static std::map<std::string, std::vector<StringBitmap *> > string_bitmaps;
-static uint64_t string_bitmap_id = 0;
-
-static void destroy_string_bitmaps(uint64_t keep)
-{
-	std::map<std::string, std::vector<StringBitmap *> >::iterator it;
-	for (it = string_bitmaps.begin(); it != string_bitmaps.end();) {
-		bool erased = false;
-		std::pair<std::string const, std::vector<StringBitmap *> > &p = *it;
-		std::vector<StringBitmap *> &v = p.second;
-		for (unsigned int i = 0; i < v.size(); i++) {
-			StringBitmap *sb = v[i];
-			if (string_bitmap_id > keep && sb->_id < string_bitmap_id-keep) {
-				m_destroy_bitmap(sb->bitmap);
-				delete sb;
-				v.erase(v.begin() + i);
-				i--;
-				if (v.size() == 0) {
-					std::map<std::string, std::vector<StringBitmap *> >::iterator tmp;
-					tmp = it;
-					it++;
-					string_bitmaps.erase(tmp);
-					erased = true;
-					break;
-				}
-			}
-		}
-		if (!erased)
-			it++;
-	}
-}
-
-void destroy_string_bitmaps(void)
-{
-	destroy_string_bitmaps((uint64_t)powf(2, 64));
-}
-
-static MBITMAP *get_string_bitmap(const MFONT *font, std::string s, ALLEGRO_COLOR c)
-{
-	MBITMAP *ret = NULL;
-	
-	std::vector<StringBitmap *> &v = string_bitmaps[s];
-	for (unsigned int i = 0; i < v.size(); i++) {
-		StringBitmap *sb = v[i];
-		if (!memcmp(&sb->color, &c, sizeof(ALLEGRO_COLOR))) {
-			ret = sb->bitmap;
-			break;
-		}
-	}
-	
-	if (!ret) {
-		MBITMAP *bmp;
-		int flgs = al_get_new_bitmap_flags();
-		al_set_new_bitmap_flags(flgs & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-		bmp = m_create_bitmap(m_text_length(font, s.c_str()), m_text_height(font)+2); // check
-		al_set_new_bitmap_flags(flgs);
-		ALLEGRO_STATE state;
-		al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
-		m_set_target_bitmap(bmp);
-		m_clear(al_map_rgba(0, 0, 0, 0));
-		al_draw_text(font, c, 0, 0, 0, s.c_str());
-		al_restore_state(&state);
-		StringBitmap *sb = new StringBitmap;
-		sb->color = c;
-		sb->bitmap = bmp;
-		sb->_id = string_bitmap_id++;
-		v.push_back(sb);
-		ret = bmp;
-	}
-	
-	destroy_string_bitmaps(500);
-	
-	return ret;
 }
 
 void m_textout(const MFONT *font, const char *text, int x, int y, MCOLOR color)
@@ -678,10 +601,6 @@ void m_destroy_bitmap(MBITMAP *bmp, bool internals_only)
 
 void m_flip_display(void)
 {
-//	al_clear_to_color(al_map_rgb(rand()%255, 0, rand()%255));
-//	al_flip_display();
-//	al_rest(100);
-
 	al_flip_display();
 
 	if (controller_display)
@@ -697,11 +616,9 @@ void m_draw_circle(int x, int y, int radius, MCOLOR color,
 	int flags)
 {
 	if (flags & M_FILLED) {
-	//	draw_circle_filled( (int)x, (int)y, (int)radius, color);
 		al_draw_filled_circle(x, y, radius, color);
 	}
 	else {
-		//draw_circle_outline( (int)x, (int)y, (int)radius, color);
 		al_draw_circle(x, y, radius, color, 1);
 	}
 }
@@ -726,36 +643,19 @@ void m_rest(double seconds)
 
 int m_get_display_width(void)
 {
-#ifdef WIZ
-	return 320;
-#else
 	return al_get_display_width(display);
-#endif
 }
 
 
 int m_get_display_height(void)
 {
-#ifdef WIZ
-	return 240;
-#else
 	return al_get_display_height(display);
-#endif
 }
 
 
 void m_clear(MCOLOR color)
 {
 	al_clear_to_color(color);
-	/*
-	ALLEGRO_BITMAP *target = al_get_target_bitmap();
-	int w = al_get_bitmap_width(target);
-	int h = al_get_bitmap_height(target);
-	m_save_blender();
-	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
-	al_draw_filled_rectangle(0, 0, w, h, color);
-	m_restore_blender();
-	*/
 }
 
 
@@ -766,15 +666,6 @@ static int m_text_length_real(const MFONT *font, const char *text)
 
 void m_set_target_bitmap(MBITMAP *bmp)
 {
-#ifdef A5_D3D_XXX
-	LPDIRECT3DDEVICE9 dev = al_get_d3d_device(display);
-	LPDIRECT3DSURFACE9 curr_surf;
-	dev->GetDepthStencilSurface(&curr_surf);
-	if (curr_surf != big_depth_surface)
-		dev->SetDepthStencilSurface(big_depth_surface);
-	if (curr_surf)
-		curr_surf->Release();
-#endif
 	al_set_target_bitmap(bmp->bitmap);
 }
 
@@ -851,19 +742,15 @@ MBITMAP *create_trapezoid(int dir, int topw, int bottomw, int length, MCOLOR col
 	float y = get_trap_peak(topw, bottomw, length);
 
 	if (dir == DIRECTION_NORTH) {
-		//int y = ((float)topw/bottomw*length);
 		m_draw_triangle(bottomw/2, length+y-1, 0, 0, bottomw-1, 0, color);
 	}
 	else if (dir == DIRECTION_EAST) {
-		//int x = ((float)topw/bottomw*length);
 		m_draw_triangle(-y, bottomw/2, length-1, 0, length-1, bottomw-1, color);
 	}
 	else if (dir == DIRECTION_SOUTH) {
-		//int y = ((float)topw/bottomw*length);
 		m_draw_triangle(bottomw/2, -y, bottomw-1, length-1, 0, length-1, color);
 	}
 	else if (dir == DIRECTION_WEST) {
-		//int x = ((float)topw/bottomw*length);
 		m_draw_triangle(length+y-1, bottomw/2, 0, 0, 0, bottomw-1, color);
 	}
 
@@ -1185,7 +1072,6 @@ static MBITMAP *clone_sub_bitmap(MBITMAP *b)
 	m_set_target_bitmap(clone);
 	m_clear(al_map_rgba_f(0, 0, 0, 0));
 
-	//al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
 	m_draw_bitmap(b, 0, 0, 0);
 
 	al_restore_state(&st);

@@ -69,18 +69,13 @@ void load_fonts(void)
 
 	ALLEGRO_DEBUG("loading fonts");
 
-#ifndef ALLEGRO_ANDROID_XXX // always do this!
-	game_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 9, ttf_flags);
-#else
 	ALLEGRO_PATH *res_dir = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
 	char boofer[1000];
 	sprintf(boofer, "%s/unpack/DejaVuSans.ttf", al_path_cstr(res_dir, '/'));
 	al_destroy_path(res_dir);
 	al_set_standard_file_interface();
-	//game_font = al_load_ttf_font(boofer, 9, ttf_flags);
 	game_font = al_load_ttf_font("/mnt/sdcard/removable_sdcard/DejaVuSans.ttf", 9, ttf_flags);
 	al_android_set_apk_file_interface();
-#endif
 	if (!game_font) {
 		if (!native_error("Failed to load game_font"))
 			return;
@@ -254,7 +249,6 @@ ALLEGRO_COND *wait_cond;
 ALLEGRO_MUTEX *wait_mutex;
 ALLEGRO_MUTEX *joypad_mutex;
 int exit_event_thread = 0;
-//ALLEGRO_SHADER *controller_shader;
 ALLEGRO_SHADER *default_shader;
 ALLEGRO_SHADER *cheap_shader;
 ALLEGRO_SHADER *tinter;
@@ -288,7 +282,6 @@ bool delete_airplay_mirror = false;
 bool airplay_connected = false;
 #endif
 
-//MBITMAP *profileBg;
 MBITMAP *cursor;
 MFONT *huge_font;
 MFONT *medium_font;
@@ -309,14 +302,6 @@ volatile int draw_counter = 0;
 volatile int logic_counter = 0;
 
 bool gfx_mode_set = false;
-
-#ifdef WIZ
-MBITMAP *tmp_texture;
-unsigned char *tmp_buffer;
-//float sintab[SIN_TAB_SIZE+1];
-//float costab[COS_TAB_SIZE+1];
-int startGFXDriver;
-#endif
 
 bool egl_workaround = false;
 bool inited = false;
@@ -1446,8 +1431,6 @@ static void *loader_proc(void *arg)
 	
 	config.setUseOnlyMemoryBitmaps(true);
 
-	//(void)arg;
-	//m_set_target_bitmap(al_get_backbuffer(display));
 	show_progress(55);
 
 	MBITMAP *deter_display_access_bmp;
@@ -1614,18 +1597,7 @@ bool loadTilemap(void)
 {
 	destroyTilemap();
 
-	/*
-	tilemap = m_load_alpha_bitmap(getResource("packed.png"));
-
-	if (!native_error("Failed to load tilemap"))
-			return false;
-	}
-	*/
-
-	numTiles = (1024/16) * (1024/16);//(m_get_bitmap_width(tilemap)/TILE_SIZE) *
-		//(m_get_bitmap_height(tilemap)/TILE_SIZE);
-
-	//findAlphaTiles();
+	numTiles = (1024/16) * (1024/16);
 
 	tilemap_data = new XMLData(getResource("tilemap.png.xml"));
 	trans_data = new XMLData(getResource("trans.xml"));
@@ -2443,8 +2415,6 @@ bool init(int *argc, char **argv[])
 
 	// must be before al_android_set_apk_file_interface
 	try {
-		// FIXME!
-		//debug_message("NOT READING CONFIG!!!!!!!!!!!!!!!!!!!");
 		config.read();
 	}
 	catch (ReadError e) {
@@ -2524,14 +2494,6 @@ bool init(int *argc, char **argv[])
 	al_set_new_display_flags(flags);
 
 #ifdef ALLEGRO_ANDROID
-	/*
-	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_REQUIRE);
-	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 0, ALLEGRO_REQUIRE);
-	al_set_new_display_option(ALLEGRO_RED_SIZE, 5, ALLEGRO_REQUIRE);
-	al_set_new_display_option(ALLEGRO_GREEN_SIZE, 6, ALLEGRO_REQUIRE);
-	al_set_new_display_option(ALLEGRO_BLUE_SIZE, 5, ALLEGRO_REQUIRE);
-	al_set_new_display_option(ALLEGRO_ALPHA_SIZE, 0, ALLEGRO_REQUIRE);
-	*/
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 0, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_RED_SIZE, 8, ALLEGRO_REQUIRE);
@@ -2605,11 +2567,6 @@ bool init(int *argc, char **argv[])
 		if (osVersionSupported) {
 			al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_USE_PROGRAMMABLE_PIPELINE);
 		}
-		/*
-		else {
-			// No programmable pipeline
-		}
-		*/
 
 		[p drain];
 #else
@@ -2680,73 +2637,6 @@ bool init(int *argc, char **argv[])
 			return false;
 	}
 
-	//al_set_system_mouse_cursor(display, ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);	
-
-
-/*
-// FIXME
-	init_shaders();
-
-	ALLEGRO_BITMAP *b = al_load_bitmap(getResource("media/check.tga"));
-
-	al_set_shader(display, cheap_shader);
-	al_set_shader_sampler(cheap_shader, "tex", b, 0);
-	al_use_shader(cheap_shader, true);
-
-	ALLEGRO_TRANSFORM tr;
-	al_identity_transform(&tr);
-	al_use_transform(&tr);
-	al_ortho_transform(&tr, 0, 240, 160, 0, -1, 1);
-	al_set_projection_transform(display, &tr);
-	
-	al_draw_bitmap(b, 0, 0, 0);
-	
-//	al_clear_to_color(al_map_rgb(0, 0, 255));
-	al_flip_display();
-	al_rest(100);
-*/
-
-	
-#if 0
-// FIXME
-// FIXME
-// FIXME
-	ALLEGRO_BITMAP *crap = al_load_bitmap(getResource("8urcat.tga"));
-ALLEGRO_DEBUG("boo1");
-	double start_time = al_get_time();
-	// Convert to an 8 bit paletted texture
-	int w = al_get_bitmap_width(crap);
-	int h = al_get_bitmap_height(crap);
-	int true_w, true_h;
-	al_get_opengl_texture_size(crap, &true_w, &true_h);
-ALLEGRO_DEBUG("boo1");
-	int sz = (256*4) + (true_w * true_h);
-	unsigned char *imgdata = new unsigned char[sz];
-ALLEGRO_DEBUG("boo1");
-	gen_palette(crap, imgdata);
-ALLEGRO_DEBUG("boo1");
-	double mid = al_get_time();
-	ALLEGRO_DEBUG("EMITEMIT = %f", mid - start_time);
-	gen_paletted_image(crap, imgdata, imgdata+(256*4));
-	double end_time = al_get_time();
-	ALLEGRO_DEBUG("TIMETIME = %f", end_time - start_time);
-ALLEGRO_DEBUG("boo1");
-	Paletted_Image_Data p;
-	p.data = imgdata;
-	p.size = sz;
-ALLEGRO_DEBUG("boo1");
-	ALLEGRO_BITMAP *pal = al_create_custom_bitmap(w, h, upload_paletted_image, &p);
-ALLEGRO_DEBUG("boo1");
-	delete[] imgdata;
-ALLEGRO_DEBUG("boo1");
-	al_set_target_backbuffer(display);
-	al_clear_to_color(al_map_rgb(0, 0, 0));
-	al_draw_bitmap(pal, 0, 0, 0);
-	al_flip_display();
-ALLEGRO_DEBUG("boo1");
-	al_rest(20);
-#endif
-
 	al_rest(1.0);
 
 	set_screen_params();
@@ -2801,16 +2691,8 @@ ALLEGRO_DEBUG("boo1");
 		my_opengl_version = al_get_opengl_version();
 	}
 #else
-	//my_opengl_version = 0x02000000;
 	my_opengl_version = 0x0;
 
-	#ifdef A5_D3D
-	/*
-	al_get_d3d_device(display)->SetRenderState(D3DRS_ALPHAREF, 1);
-	al_get_d3d_device(display)->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-	al_get_d3d_device(display)->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
-	*/
-	#endif
 #endif
 
 	if (use_fixed_pipeline) {
@@ -2837,10 +2719,6 @@ ALLEGRO_DEBUG("boo1");
 	}
 	else {
 		config.setGamepadAvailable(false);
-	}
-
-	if (config.getGamepadAvailable()) {
-//		al_get_joystick(0); // needed?
 	}
 
 	events_minor = al_create_event_queue();
@@ -2960,8 +2838,6 @@ ALLEGRO_DEBUG("boo1");
 			}
 		}
 		
-		//is_close_pressed();
-
  		int percent = progress_percent;
 		draw_loading_screen(tmp, percent, sd);
 		if (percent >= 95) {
@@ -3083,9 +2959,7 @@ void destroy(void)
 	else
 		destroyInput();
 
-	debug_message("Destroy 1\n");
 	destroyTilemap();
-	debug_message("Destroy 2\n");
 	
 	if (cached_bitmap) {
 		al_destroy_bitmap(cached_bitmap);
@@ -3099,36 +2973,21 @@ void destroy(void)
 		m_destroy_bitmap(scaleXX_buffer);
 	}
 
-	debug_message("Destroy 3\n");
 	m_destroy_bitmap(tile);
-	debug_message("Destroy 4\n");
-	debug_message("Destroy 5\n");
 	destroyIcons();
-	debug_message("Destroy 6\n");
-	//destroyWeaponAnimations();
-	debug_message("Destroy 7\n");
 #ifndef LITE
 	m_destroy_bitmap(stoneTexture);
-	debug_message("Destroy 8\n");
 	m_destroy_bitmap(mushroom);
-	debug_message("Destroy 9\n");
 	m_destroy_bitmap(webbed);
 #endif
 	m_destroy_bitmap(dpad_buttons);
 	m_destroy_bitmap(batteryIcon);
-	debug_message("Destroy 10\n");
 	delete terrain;
-	debug_message("Destroy 11\n");
-	debug_message("Destroy 12\n");
-	//m_destroy_bitmap(profileBg);
-	debug_message("Destroy 13\n");
 	m_destroy_bitmap(cursor);
-	debug_message("Destroy 14\n");
 	m_destroy_bitmap(guiAnims.corner_sub);
 	m_destroy_bitmap(guiAnims.wide_sub);
 	m_destroy_bitmap(guiAnims.tall_sub);
 	m_destroy_bitmap(guiAnims.bitmap);
-	debug_message("Destroy 15\n");
 	m_destroy_bitmap(orb_bmp);
 	m_destroy_bitmap(poison_bmp);
 	m_destroy_bitmap(poison_bmp_tmp);
@@ -3155,11 +3014,9 @@ void destroy(void)
 			party[i] = NULL;
 		}
 	}
-	debug_message("Destroy 16\n");
 
 	if (area)
 		delete area;
-	debug_message("Destroy 17\n");
 
 	#if !defined A5_D3D
 	destroy_shaders();
@@ -3171,10 +3028,8 @@ void destroy(void)
 
 	al_destroy_display(display);
 
-	debug_message("Destroy 18\n");
 	if (saveFilename)
 		free(saveFilename);
-	debug_message("Destroy 19\n");
 
 	cleanup_astar();
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -3280,7 +3135,6 @@ void set_screen_params(void)
 	ScreenDescriptor *sd = config.getWantedGraphicsMode();
 	sd->width = al_get_display_width(display);
 	sd->height = al_get_display_height(display);
-	ALLEGRO_DEBUG("sd->height=%d", sd->height);
 	if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN) {
 		screenScaleX = (float)sd->width / BW;
 		screenScaleY = (float)sd->height / BH;

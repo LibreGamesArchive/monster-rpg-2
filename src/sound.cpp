@@ -33,61 +33,6 @@ static float ambienceVolume = 1.0f;
 static BASS_FILEPROCS fileprocs;
 static BASS_FILEPROCS physfs_fileprocs;
 	
-
-/*
-	"Darkness1.ogg",
-	"Wave.ogg",
-	"Weep.ogg",
-	"Whirlpool.ogg",
-	"fall.ogg",
-	"jump.ogg",
-	"slime.ogg",
-	"spin.ogg",
-	"suck.ogg",
-
-
-	"Acorns.ogg", x
-	"Arc.ogg", x
-	"Banana.ogg", x
-	"Beam.ogg", x
-	"BoF.ogg", x
-	"Daisy.ogg", x
-	"Darkness1.ogg", x
-	"Darkness2.ogg", x
-	"Darkness3.ogg", x
-	"Fireball.ogg", x
-	"Laser.ogg", x
-	"Machine_Gun.ogg", x
-	"Meow.ogg", x
-	"Mmm.ogg", x
-	"Orbit.ogg", x
-	"Puke.ogg", x
-	"Punch.ogg", x
-	"Rend.ogg", x
-	"Spray.ogg", x
-	"Stomp.ogg", x
-	"Stone.ogg", x
-	"Swallow.ogg", x
-	"Thud.ogg",
-	"TouchofDeath.ogg", x
-	"Twister.ogg", x
-	"UFO.ogg", x
-	"Wave.ogg", x
-	"Web.ogg", x
-	"Weep.ogg", x
-	"Whip.ogg", x
-	"Whirlpool.ogg", x
-	"buzz.ogg",
-	"chomp.ogg",
-	"fall.ogg",
-	"freeze.ogg", x
-	"high_cackle.ogg", x
-	"jump.ogg", x
-	"slime.ogg", x
-	"spin.ogg",
-	"suck.ogg",
-*/
-
 static std::string preloaded_names[] = {
 #ifdef LITE
 	"bolt.ogg",
@@ -360,12 +305,6 @@ MSAMPLE loadSample(std::string name)
 	char fn[1000];
 	sprintf(fn, "%s/unpack/sfx/%s", al_path_cstr(p, '/'), name.c_str());
 	al_destroy_path(p);
-
-	/*
-	// FIXME!
-	char *pos = strrchr(fn, '.');
-	strcpy(pos, ".wav");
-	*/
 
 	s = BASS_SampleLoad(false,
 		fn,

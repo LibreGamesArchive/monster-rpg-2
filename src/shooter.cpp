@@ -1137,34 +1137,6 @@ start:
 			m_clear(m_map_rgb(105, 115, 145));
 	
 			if (shooter_restoring) {
-				/*
-				al_stop_timer(logic_timer);
-				m_set_target_bitmap(buffer);
-				m_clear(black);
-				mTextout(
-					medium_font,
-					"Loading...",
-					BW/2,
-					BH/2,
-					white,
-					black,
-					WGT_TEXT_NORMAL,
-					true
-				);
-				drawBufferToScreen();
-				m_flip_display();
-				double d = o;
-				o = (h*TILE_SIZE)-starty;
-				draw_all();
-				while (fabs(d-o) > 0.1) {
-					o -= LOGIC_MILLIS * 0.3;
-					py = o - 64;
-					start_render = (o - 2048) / TILE_SIZE;
-					draw(x, o, false);
-				}
-				shooter_restoring = false;
-				al_start_timer(logic_timer);
-				*/
 				shooter_restoring = false;
 				replay = true;
 				goto done;

@@ -179,21 +179,6 @@ public:
 		height = 50;
 		hotkeys = NULL;
 
-		/*
-		for (int i = 0; i < SHADOW_CORNER_SIZE; i++) {
-			float a = (float)((1.0f-(float)sin(((float)i/(SHADOW_CORNER_SIZE-1))*(M_PI/2))) * 255);
-			a /= 1.6f;
-			verts[i*2].x = (BW*2)/3+i + 0.5;
-			verts[i*2].y = BH-50 + 0.5;
-			verts[i*2].z = 0;
-			verts[i*2].color = m_map_rgba(0, 0, 0, a);
-			verts[i*2+1].x = (BW*2)/3+i + 0.5;
-			verts[i*2+1].y = BH + 0.5;
-			verts[i*2+1].z = 0;
-			verts[i*2+1].color = m_map_rgba(0, 0, 0, a);
-		}
-		*/
-
 		verts[0].x = BW*2/3;
 		verts[0].y = BH;
 		verts[0].z = 0;
@@ -509,7 +494,7 @@ public:
 
 	void draw(void) {
 		if (who >= 0) {
-			// FIXME: / 2 here for current_mouse_x should use a SCALE_X/SCALE_Y constant 
+			// FIXME: I think this comment is out of date FIXME: / 2 here for current_mouse_x should use a SCALE_X/SCALE_Y constant 
 			ALLEGRO_MOUSE_STATE state;
 			m_get_mouse_state(&state);
 			int w = m_get_bitmap_width(icon);
@@ -1189,7 +1174,6 @@ protected:
 	MBITMAP *arrow;
 	bool left_half_clicked;
 	bool right_half_clicked;
-	//bool center_clicked;
 	bool just_focused;
 	bool started;
 	int growing;
@@ -1233,7 +1217,6 @@ protected:
 
 
 struct MMan {
-	//Player *p;
 	int x, y;
 	bool go;
 	bool used;
@@ -1503,7 +1486,6 @@ public:
 	int update(int millis);
 	void mouseDown(int mx, int my, int mb);
 	void mouseUp(int x, int y, int b);
-	//bool acceptsFocus(void);
 	WgtFrame(int x, int y, int width, int height,
 			bool moveable, bool closeable, MCOLOR color,
 			TGUIWidget *homeWidget);

@@ -521,23 +521,6 @@ static void applyAttackSpell(int damage, Combatant *caster,
 
 		work -= mdefense;
 
-		/* Spells should not be degraded based on formation
-		if (caster->getType() == COMBATENTITY_TYPE_PLAYER ||
-				c->getType() == COMBATENTITY_TYPE_PLAYER) {
-			CombatPlayer *p;
-			if (caster->getType() == COMBATENTITY_TYPE_PLAYER) {
-				p = (CombatPlayer *)caster;
-			}
-			else {
-				p = (CombatPlayer *)c;
-			}
-			if (p->getFormation() == FORMATION_BACK) {
-				int reduction = (int)(work * 0.2f);
-				work = work - reduction;
-			}
-		}
-		*/
-
 		// If attacking multiple people, damage is less per person
 		// but higher overall
 		if (numTargets > 1) {
@@ -2976,11 +2959,7 @@ void UFOSpell::init(Combatant *caster, Combatant **targets, int numTargets)
 {
 	Spell::init(caster, targets, numTargets);
 
-	#ifdef WIZ
-	loadPlayDestroy("ufo.ogg");
-	#else
 	loadPlayDestroy("UFO.ogg");
-	#endif
 
 	for (int i = 0; i < numTargets; i++) {
 		targets[i]->getAnimationSet()->setSubAnimation("hit");
@@ -3200,11 +3179,7 @@ void SwallowSpell::apply(void)
 	al_set_new_bitmap_flags(flags);
 	ALLEGRO_BITMAP *oldTarget = al_get_target_bitmap();
 	m_set_target_bitmap(bitmap);
-#ifdef ALLEGRO4
-	clear_to_color(bitmap, makecol(255, 0, 255));
-#else
 	my_clear_bitmap(bitmap);
-#endif
 	a->draw(0, 0, 0);
 
 	m_draw_bitmap(stomach_circle, 0, 0, 0);
@@ -3289,5 +3264,4 @@ PukeSpell::PukeSpell(void) :
 PukeSpell::~PukeSpell(void)
 {
 }
-
 

@@ -68,15 +68,3 @@ int getfile(const char *url, const char *outfilename)
 
   return ftpfile.written;
 }
-
-/*
-int main(void)
-{
-	printf(
-		"%d\n",
-		getfile("ftp://nooskewl.com/underwater_final.flac", "crap.flac")
-	);
-
-	return 0;
-}
-*/

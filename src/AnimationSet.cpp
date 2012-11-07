@@ -9,47 +9,7 @@ static std::vector<AnimationSet *> all_animsets;
 
 void animset_post_reset(void)
 {
-/*
-	for (size_t i = 0; i < all_animsets.size(); i++) {
-		all_animsets[i]->post_reset();
-	}
-*/
 }
-
-/*
-ALLEGRO_BITMAP *make_paletted(ALLEGRO_BITMAP *bitmap)
-{
-#ifdef ALLEGRO_ANDROID
-	// Convert to an 8 bit paletted texture
-	int w = al_get_bitmap_width(bitmap);
-	int h = al_get_bitmap_height(bitmap);
-	int true_w, true_h;
-	al_get_opengl_texture_size(bitmap, &true_w, &true_h);
-	int sz = (256*4) + (true_w * true_h);
-	unsigned char *imgdata = new unsigned char[sz];
-	ALLEGRO_DEBUG("Trying palette stuff 2");
-	ALLEGRO_DEBUG("Trying palette stuff 3");
-	gen_palette(bitmap, imgdata);
-	ALLEGRO_DEBUG("Trying palette stuff 4");
-	gen_paletted_image(bitmap, imgdata, imgdata+(256*4));
-	ALLEGRO_DEBUG("Trying palette stuff 5");
-	ALLEGRO_DEBUG("Trying palette stuff 6");
-	Paletted_Image_Data p;
-	p.data = imgdata;
-	p.size = sz;
-	ALLEGRO_DEBUG("Trying palette stuff 7");
-	ALLEGRO_BITMAP *pal = al_create_custom_bitmap(w, h, upload_paletted_image, &p);
-	ALLEGRO_DEBUG("Trying palette stuff 8");
-	ALLEGRO_DEBUG("pal=%p", pal);
-	delete[] imgdata;
-
-	al_destroy_bitmap(bitmap);
-	return pal;
-#else
-	return bitmap;
-#endif
-}
-*/
 
 void AnimationSet::displayConvert(void)
 {
@@ -159,13 +119,6 @@ void AnimationSet::drawScaled(int x, int y, int w, int h, int flags)
 int AnimationSet::update(int step)
 {
 	return anims[currAnim]->update(step);
-	/*
-	if (anims[currAnim]->getName() == "Dragon_transform") {
-		if ((int)anims[currAnim]->getCurrentFrameNum() == (int)anims[currAnim]->getLength()-1) {
-			setSubAnimation("stand");
-		}
-	}
-	*/
 }
 
 
@@ -200,112 +153,8 @@ void AnimationSet::setPrefix(std::string prefix)
 
 void AnimationSet::reset(void)
 {
-	//currAnim = 0;
 	anims[currAnim]->reset();
 }
-
-/*
-void redrawAnimSet(MBITMAP *bitmap, RecreateData *d)
-{
-	ALLEGRO_DEBUG("redrawAnimSet bitmap=%p d=%p", bitmap, d);
-
-	RedrawData *data = (RedrawData *)d;
-
-	ALLEGRO_DEBUG("data=%p", data);
-	
-	bitmap->bitmap = make_paletted(bitmap->bitmap);
-
-	data->call_count++;
-	ALLEGRO_DEBUG("After inc, call count = %d", data->call_count);
-	if (data->call_count == 1) {
-		ALLEGRO_DEBUG("Call count = 1, returning");
-		return;
-	}
-
-	AnimationSet *animSet = data->animSet;
-
-	ALLEGRO_DEBUG("animSet=%p size=%d", animSet, animSet->anims.size());
-
-	for (size_t i = 0; i < animSet->anims.size(); i++) {
-		ALLEGRO_DEBUG("i=%d", i);
-		Animation *a = animSet->anims[i];
-		ALLEGRO_DEBUG("Animation = %p", a);
-		int n = a->getNumFrames();
-		ALLEGRO_DEBUG("n = %d", n);
-		for (int j = 0; j < n; j++) {
-			ALLEGRO_DEBUG("j=%d", j);
-			Frame *f = a->getFrame(j);
-			ALLEGRO_DEBUG("f=%p", f);
-			Image *img = f->getImage();
-			ALLEGRO_DEBUG("refreshing frame %d of animation %d", j, i);
-			img->refresh();
-			ALLEGRO_DEBUG("done refreshing (%d %d)", j, i);
-		}
-	}
-
-	ALLEGRO_DEBUG("Done redrawAnimSet");
-}
-
-void redrawAnimSetWhite(MBITMAP *bitmap, RecreateData *d)
-{
-	ALLEGRO_DEBUG("redrawAnimSet bitmap=%p d=%p", bitmap, d);
-
-	RedrawData *data = (RedrawData *)d;
-
-	ALLEGRO_DEBUG("data=%p", data);
-	
-	ALLEGRO_BITMAP *target = al_get_target_bitmap();
-	ALLEGRO_DEBUG("-1");
-	m_set_target_bitmap(bitmap);
-	ALLEGRO_DEBUG("-2");
-	int flags = al_get_new_bitmap_flags();
-	ALLEGRO_DEBUG("-3");
-	//al_set_new_bitmap_flags(flags | ALLEGRO_MEMORY_BITMAP);
-	ALLEGRO_DEBUG("-4");
-	MBITMAP *tmpbmp = m_clone_bitmap(bitmap);
-	ALLEGRO_DEBUG("-5 tmpbmp=%p", tmpbmp);
-	add_blit(tmpbmp, 0, 0, white, 0.7, 0);
-	ALLEGRO_DEBUG("-6");
-	al_set_target_bitmap(target);
-	ALLEGRO_DEBUG("-7");
-	al_set_new_bitmap_flags(flags);
-	ALLEGRO_DEBUG("-8");
-	m_destroy_bitmap(tmpbmp);
-	ALLEGRO_DEBUG("-9");
-	bitmap->bitmap = make_paletted(bitmap->bitmap);
-	ALLEGRO_DEBUG("-10");
-
-	data->call_count++;
-	ALLEGRO_DEBUG("After inc, call count = %d", data->call_count);
-	if (data->call_count == 1) {
-		ALLEGRO_DEBUG("Call count = 1, returning");
-		return;
-	}
-
-	AnimationSet *animSet = data->animSet;
-
-	ALLEGRO_DEBUG("animSet=%p size=%d", animSet, animSet->anims.size());
-
-	for (size_t i = 0; i < animSet->anims.size(); i++) {
-		ALLEGRO_DEBUG("i=%d", i);
-		Animation *a = animSet->anims[i];
-		ALLEGRO_DEBUG("Animation = %p", a);
-		int n = a->getNumFrames();
-		ALLEGRO_DEBUG("n = %d", n);
-		for (int j = 0; j < n; j++) {
-			ALLEGRO_DEBUG("j=%d", j);
-			Frame *f = a->getFrame(j);
-			ALLEGRO_DEBUG("f=%p", f);
-			Image *img = f->getImage();
-			ALLEGRO_DEBUG("refreshing frame %d of animation %d", j, i);
-			img->refresh();
-			ALLEGRO_DEBUG("done refreshing (%d %d)", j, i);
-		}
-	}
-
-	ALLEGRO_DEBUG("Done redrawAnimSet");
-}
-*/
 
 AnimationSet::AnimationSet(const char *filename, bool alpha) :
 	currAnim(0),
@@ -315,19 +164,11 @@ AnimationSet::AnimationSet(const char *filename, bool alpha) :
 
 	all_animsets.push_back(this);
 
-	//RedrawData *data = new RedrawData();
-	//data->animSet = this;
-	//data->call_count = 0;
-	//ALLEGRO_DEBUG("filename='%s'", filename);
-	//bitmap = m_load_bitmap_redraw(filename, redrawAnimSet, data);
-
 	int flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 	bitmap = m_load_bitmap(filename);
 	al_set_new_bitmap_flags(flags);
 	
-	//bitmap->bitmap = make_paletted(bitmap->bitmap);
-
 	std::vector<int> delays;
 	XMLData *xml;
 	std::string filenameS = std::string(filename);
@@ -459,9 +300,6 @@ AnimationSet *AnimationSet::clone(int type)
 {
 	AnimationSet *a = new AnimationSet();
 
-	//RedrawData *data = new RedrawData();
-	//data->animSet = a;
-	//data->call_count = 0;
 	a->filename = filename;
 	
 	int flags = al_get_new_bitmap_flags();
@@ -478,8 +316,6 @@ AnimationSet *AnimationSet::clone(int type)
 		al_set_target_bitmap(target);
 	}
 	
-	//a->bitmap->bitmap = make_paletted(a->bitmap->bitmap);
-
 	a->name = name;
 
 	for (size_t i = 0; i < anims.size(); i++) {
@@ -495,8 +331,6 @@ AnimationSet *AnimationSet::clone(int type)
 
 void AnimationSet::post_reset(void)
 {
-	//bitmap->bitmap = make_paletted(bitmap->bitmap);
-
 	for (size_t i = 0; i < anims.size(); i++) {
 		int n = anims[i]->getNumFrames();
 		for (int j = 0; j < n; j++) {
@@ -506,3 +340,4 @@ void AnimationSet::post_reset(void)
 		}
 	}
 }
+

@@ -28,35 +28,6 @@ static int vert_compare(const void *a, const void *b)
 	return ac - bc;
 }
 
-#if 0
-static int vert_compare_z(const void *a, const void *b)
-{
-	ALLEGRO_VERTEX *av = (ALLEGRO_VERTEX *)a;
-	ALLEGRO_VERTEX *bv = (ALLEGRO_VERTEX *)b;
-
-	/*
-	float a_min;
-	if (av[0].z < av[1].z)
-		a_min = MIN(av[0].z, av[2].z);
-	else
-		a_min = MIN(av[1].z, av[2].z);
-	float b_min;
-	if (bv[0].z < bv[1].z)
-		b_min = MIN(bv[0].z, bv[2].z);
-	else
-		b_min = MIN(bv[1].z, bv[2].z);
-	*/
-
-	float a_min = (av[0].z + av[1].z + av[2].z) / 3;
-	float b_min = (bv[0].z + bv[1].z + bv[2].z) / 3;
-
-	if (a_min <= b_min)
-		return -1;
-	return 1;
-}
-#endif
-
-
 // stuff allegro doesn't have yet
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 #define glFrustum glFrustumf
@@ -615,15 +586,6 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 			cv.clear();
 		}
 
-/*
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-		if (strstr(filename, "bow.raw")) {
-			qsort(&m->verts[0], vcount/3, sizeof(ALLEGRO_VERTEX)*3, vert_compare);
-		}
-#endif
-*/
-
-
 		if (is_volcano) {
 			for (int i = 0; i < vcount; i += 6) {
 				float inc = tex_size / 50;
@@ -977,11 +939,6 @@ static bool real_archery(int *accuracy_pts)
 				clicked = false;
 				drawn = false;
 				hiddenCount = 500;
-				/*
-				if (played_draw_and_release) {
-					al_stop_sample(&release_id);
-				}
-				*/
 				playPreloadedSample("bow_release_and_draw.ogg");
 				played_draw_and_release = true;
 				// check for hit on goblin, set dead count, set sub anim
@@ -1047,9 +1004,7 @@ static bool real_archery(int *accuracy_pts)
 			float xrot = (target_y / BH - 0.5f) * max_yrot;
 
 #ifdef A5_OGL
-				float arrow_dist = 0.175;
-			//xrot = -xrot;
-			//yrot = -yrot;
+			float arrow_dist = 0.175;
 #else
 			float arrow_dist = -0.1;
 			xrot = -xrot;
@@ -1138,9 +1093,7 @@ static bool real_archery(int *accuracy_pts)
     mesa_translate((float *)view_transform.m, 0, 0, arrow_start_z); \
     mesa_rotate((float *)view_transform.m, -R2D(xrot), 1, 0, 0); \
     mesa_rotate((float *)view_transform.m, -R2D(yrot), 0, 1, 0); \
-    /*mesa_translate((float *)view_transform.m, 0, 0, -0.75);*/ \
     mesa_rotate((float *)view_transform.m, -R2D(M_PI/2), 1, 0, 0); \
-    /*mesa_rotate((float *)view_transform.m, -R2D(M_PI), 0, 1, 0);*/ \
     mesa_translate((float *)view_transform.m, 0, arrow_start_z-arrow_z, 0); \
     mesa_translate((float *)view_transform.m, arrow_dist, 0, 0); \
     OTHER2 \
@@ -1556,7 +1509,6 @@ void volcano_scene(void)
 				al_identity_transform(&view_transform);
 				mesa_scale((float *)view_transform.m, 50, 50, 50);
 
-				//mesa_translate((float *)view_transform.m, 1, 0.1+staff_oy, -0.3);
 				mesa_translate((float *)view_transform.m, 0.01, 0.1+staff_oy, -0.3);
 				mesa_rotate((float *)view_transform.m, R2D(land_angle), 0, 1, 0);
 				mesa_rotate((float *)view_transform.m, 90, 1, 0, 0);
@@ -1598,8 +1550,6 @@ void volcano_scene(void)
 			device->SetViewport(&old);
 #endif
 			
-			//drawBufferToScreen(false);
-
 			m_flip_display();
 		}
 	}
@@ -1623,7 +1573,6 @@ done:
 	if (true /*use_programmable_pipeline*/)
 	{
 		al_set_projection_transform(display, &orig_proj);
-		//al_iphone_set_es2_matrices(display);
 	}
 
 	dpad_on();

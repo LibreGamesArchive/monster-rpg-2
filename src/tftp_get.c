@@ -120,22 +120,6 @@ static bool connect_to_server(void)
 		return false;
 	}
 
-#if 0
-#ifdef ALLEGRO_WINDOWS
-	DWORD nonBlocking = 1;
-	if (ioctlsocket(sock, FIONBIO, &nonBlocking) != 0) {
-		printf("failed to set non-blocking socket\n");
-		return false;
-	}
-#else
-	int nonBlocking = 1;
-	if (fcntl(sock, F_SETFL, O_NONBLOCK, nonBlocking) == -1) {
-		printf("failed to set non-blocking socket\n");
-		return false;
-	}
-#endif
-#endif
-
 	saddr_len = sizeof(struct sockaddr);
 	memcpy(&saddr, res->ai_addr, saddr_len);
 
@@ -480,7 +464,6 @@ int hqm_get_status(float *percent)
 	int sz;
 	int count = 0;
 	while ((read = al_fread(f, buf, 80)) == 80) {
-		//al_fseek(f, 1, ALLEGRO_SEEK_CUR);
 		al_fgetc(f);
 		buf[80] = 0;
 		if (sscanf(buf, "%s %d", fn, &sz) != 2) {

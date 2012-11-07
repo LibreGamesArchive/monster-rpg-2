@@ -76,11 +76,8 @@ int armorMagicDefense(ItemType type, int num);
 int weaponDamage(int num);
 std::string getItemIcon(int index);
 void use(Combatant *c, int index, bool can_equip, int numTargets = 1);
-//bool initWeaponAnimations(void);
-//AnimationSet *getWeaponAnimation(CombatantInfo &info);
 std::string getWeaponSound(CombatantInfo &info);
 int getResaleValue(int itemIndex);
-//void destroyWeaponAnimations(void);
 
 
 

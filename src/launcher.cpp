@@ -300,14 +300,6 @@ int main(int argc, char **argv)
 	replace_filename(cmd, argv[0], tmp, 1000);
 #endif
 
-
-//#ifdef ALLEGRO_LINUX
-//	sprintf(tmp, "/bin/sh -c \"LD_LIBRARY_PATH=lib %s\"", cmd);
-//	printf("tmp=%s\n", tmp);
-//	if (fork() == 0)
-//		execlp(tmp, tmp, 0);
-//#else
-
 #ifdef ALLEGRO_WINDOWS
 	char full[1000];
 	char tmp2[1000];
@@ -352,7 +344,6 @@ int main(int argc, char **argv)
 	if (fork() == 0)
 		execvp(cmd, args);
 #endif
-//#endif
 }
 END_OF_MAIN()
 

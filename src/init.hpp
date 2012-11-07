@@ -40,7 +40,6 @@ extern ALLEGRO_DISPLAY *controller_display;
 extern ALLEGRO_COND *wait_cond;
 extern ALLEGRO_MUTEX *wait_mutex;
 extern int exit_event_thread;
-//extern ALLEGRO_SHADER *controller_shader;
 extern ALLEGRO_SHADER *default_shader;
 extern ALLEGRO_SHADER *cheap_shader;
 extern ALLEGRO_SHADER *tinter;
@@ -83,7 +82,6 @@ struct GuiAnims
 extern GuiAnims guiAnims;
 
 extern GameInfo gameInfo;
-//extern MBITMAP *profileBg;
 extern MBITMAP *cursor;
 extern MFONT *huge_font;
 extern MFONT *medium_font;
@@ -103,8 +101,6 @@ extern bool gfx_mode_set;
 #ifdef WIZ
 extern MBITMAP *tmp_texture;
 extern unsigned char *tmp_buffer;
-//extern float sintab[SIN_TAB_SIZE+1];
-//extern float costab[COS_TAB_SIZE+1];
 extern MBITMAP *screen;
 extern int startGFXDriver;
 void *thread_proc(ALLEGRO_THREAD *thread, void *arg);
@@ -126,8 +122,6 @@ extern ALLEGRO_MUTEX *input_mutex;
 extern ALLEGRO_MUTEX *dpad_mutex;
 extern ALLEGRO_MUTEX *orient_mutex;
 extern float bright_ticker;
-//extern int area_panned_x;
-//extern int area_panned_y;
 extern float area_panned_x;
 extern float area_panned_y;
 extern MBITMAP *corner_bmp;
@@ -203,8 +197,6 @@ extern bool airplay_connected;
 void init2_shaders();
 
 void register_display(ALLEGRO_DISPLAY *display);
-//void init_controller_shader(void);
-//void destroy_controller_shader(void);
 
 extern volatile int curr_touches;
 

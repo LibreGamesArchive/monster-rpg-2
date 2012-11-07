@@ -442,16 +442,12 @@ void Player::setName(std::string name)
 Combatant *Player::makeCombatant(int number)
 {
 	AnimationSet *banim = findBattleAnim(name, this);
-ALLEGRO_DEBUG("1derp");
 	CombatPlayer *c = new CombatPlayer(name, number, banim);
-ALLEGRO_DEBUG("2derp");
 
 	copyInfo(c->getInfo(), info);
-ALLEGRO_DEBUG("3derp");
 
 	c->setLoyalty(LOYALTY_GOOD);
 	c->setFormation(formation);
-ALLEGRO_DEBUG("4derp");
 
 	int lid = info.equipment.lhand;
 	int rid = info.equipment.rhand;
@@ -944,15 +940,6 @@ bool levelUp(Player *player, int bonus)
 	tguiAddWidget(multiChooser);
 	tguiSetFocus(multiChooser);
 
-	/*
-	m_set_target_bitmap(buffer);
-	tguiDraw();
-	fadeIn(black);
-	*/
-
-
-//	int *last_set;
-
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
 		// Logic
@@ -1004,14 +991,7 @@ bool levelUp(Player *player, int bonus)
 				// Draw the GUI
 				tguiDraw();
 				drawBufferToScreen();
-				 // FIXME
 				m_flip_display();
-
-				/*
-				while (!released) {
-					m_rest(0.001);
-				}
-				*/
 
 				levelUpCallback(multiChooser->getTapped(), &levelUpData);
 				multiChooser->setTapped(false);
@@ -1029,7 +1009,6 @@ bool levelUp(Player *player, int bonus)
 			// Draw the GUI
 			tguiDraw();
 			drawBufferToScreen();
-			 // FIXME
 			m_flip_display();
 		}
 	}
@@ -1041,11 +1020,9 @@ done:
 	// Draw the GUI
 	tguiDraw();
 	drawBufferToScreen();
-	 // FIXME
 	m_flip_display();
 
 	bool ret;
-//	bool cancelled = false;
 	bool prompt_ret;
 	prompt_ret = prompt("Keep changes?", "Select no to reset...", 0, 0);
 	if (prompt_ret) {

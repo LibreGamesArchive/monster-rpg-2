@@ -570,17 +570,13 @@ void showItemInfo(int index, bool preserve_buffer)
 		}
 	}
 
-	//AnimationSet *partyAnims[MAX_PARTY];
 	MBITMAP *partyBmps[MAX_PARTY];
 
 	for (int i = 0; i < MAX_PARTY; i++) {
 		if (party[i]) {
-			//partyAnims[i] = new AnimationSet(getResource("objects/%s.png", party[i]->getName().c_str()));
-			//partyAnims[i]->setSubAnimation("stand_s");
 			partyBmps[i] = m_load_bitmap(getResource("objects/%s_front.png", party[i]->getName().c_str()));
 		}
 		else {
-			//partyAnims[i] = NULL;
 			partyBmps[i] = NULL;
 		}
 	}
@@ -693,8 +689,6 @@ void showItemInfo(int index, bool preserve_buffer)
 			}
 			for (int i = 0; i < MAX_PARTY; i++) {
 				if (can_use[i] && partyBmps[i]) {
-				//if (can_use[i] && partyAnims[i]) {
-					//partyAnims[i]->draw(BW/2+(i-2)*20, 105, 0);
 					m_draw_bitmap(partyBmps[i], BW/2+(i-2)*20, 95, 0);
 				}
 			}
@@ -728,8 +722,6 @@ done:
 	dpad_on();
 	
 	for (int i = 0; i < MAX_PARTY; i++) {
-		//if (partyAnims[i])
-		//	delete partyAnims[i];
 		if (partyBmps[i])
 			m_destroy_bitmap(partyBmps[i]);
 	}
@@ -793,94 +785,6 @@ static bool choose_save_slot(int num, bool exists, void *data)
 			}
 			notify("Your game", "has been saved...", "");
 		}
-
-		
-		// FIXME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		// Save save state to web server for backup, DELETE THIS!
-		/*
-		FILE *f = fopen(getUserResource("%d.save", num), "rb");
-		unsigned char buf[5000];
-		int bytes = 0;
-		while (1) {
-			int i = fgetc(f);
-			if (i < 0)
-				break;
-			buf[bytes++] = i;
-		}
-		fclose(f);
-		*/
-		
-		//char *body = "body";
-		//CFDataRef bodyData = CFDataCreate(kCFAllocatorDefault, (UInt8 *)body, 4);
-		
-		//char *u = create_url(buf, bytes);
-		
-		//char full[10000];
-		//sprintf(full, "http://www.nooskewl.com/cgi-bin/_m2_save.cgi?POSTDATA=%s", u);
-		//sprintf(full, "%s", u);
-	
-		// ************************
-		// This is a good way to get a save
-		// state copy, then use recover and
-		// save2h
-		// ************************
-#ifdef DEBUG
-		//printf("full=\n%s\n", full);
-#endif
-	
-		/*
-		CFStringRef headerFieldName = CFSTR("Content-Length");
-		char len[10];
-		sprintf(len, "%d", bytes);
-		CFStringRef headerFieldValue =
-			CFStringCreateWithCString (
-				kCFAllocatorDefault,
-				len,
-				kCFStringEncodingASCII
-			);
-		
-		CFStringRef url = 
-			CFStringCreateWithCString (
-				kCFAllocatorDefault,
-				full,
-				kCFStringEncodingASCII
-			);
-		
-		CFURLRef myURL = CFURLCreateWithString(kCFAllocatorDefault, url, NULL);
-		
-		CFStringRef requestMethod = CFSTR("GET");
-		CFHTTPMessageRef myRequest =
-			CFHTTPMessageCreateRequest(
-				kCFAllocatorDefault,
-				requestMethod,
-				myURL,
-				kCFHTTPVersion1_1
-			);
-		
-		CFHTTPMessageSetBody(myRequest, bodyData);
-		CFHTTPMessageSetHeaderFieldValue(myRequest, headerFieldName, headerFieldValue);
-		CFDataRef mySerializedRequest = CFHTTPMessageCopySerializedMessage(myRequest);
-		
-		CFReadStreamRef myReadStream = CFReadStreamCreateForHTTPRequest(kCFAllocatorDefault, myRequest);
-		CFReadStreamOpen(myReadStream);
-
-		CFIndex i;
-		int tot = 0;
-		UInt8 buffer[5000];
-		while ((i = CFReadStreamRead(myReadStream, buffer+tot, 5000-tot)) > 0)
-			tot += i;
-		buffer[tot] = 0;
-		printf("tot=%d\n", tot);
-
-		CFReadStreamClose(myReadStream);
-		CFRelease(myReadStream);
-		CFRelease(mySerializedRequest);
-		CFRelease(myRequest);
-		CFRelease(myURL);
-		CFRelease(url);
-		CFRelease(headerFieldValue);
-		CFRelease(bodyData);
-		*/
 	}
 	
 	return true;
@@ -910,9 +814,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 		setMusicVolume(0.5f);
 		setAmbienceVolume(0.5f);
 	}
-
-	// FIXME:
-	//can_save = true;
 
 	bool ret = true;
 
@@ -1028,9 +929,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 		mainSave = new MLabel(162+m_text_height(game_font)/2+2, yy, "Save", m_map_rgb(128, 128, 128));
 	yy += yinc;
 	MTextButton *mainResume = new MTextButton(162, yy, "Play", false, left_widget);
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	//yy += yinc;
-#endif
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	MTextButton *mainMusic = new MTextButton(162, yy, "Music", false, left_widget);
@@ -1197,7 +1095,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 			// update gui
 			TGUIWidget *widget = tguiUpdate();
 			if (widget == mainItem) {
-				//tguiTranslateWidget(fullscreenRect, 1000, 1000);
 				tguiPush();
 				tguiSetParent(0);
 				tguiAddWidget(fullscreenRect2);
@@ -1221,7 +1118,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				}
 			}
 			if (widget == mainExamine) {
-				//tguiTranslateWidget(fullscreenRect, 1000, 1000);
 				tguiPush();
 				tguiSetParent(0);
 				tguiAddWidget(fullscreenRect2);
@@ -1242,7 +1138,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				int sel = itemSelector->getSelected();
 				if (sel < 0) {
 					tguiDeleteWidget(fullscreenRect2);
-					//tguiTranslateWidget(fullscreenRect, -1000, -1000);
 					tguiPop();
 					tguiSetFocus(mainItem);
 					section = MAIN;
@@ -1279,7 +1174,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				if (who < 0) {
 					onscreen_drag_to_use = false;
 					tguiDeleteWidget(fullscreenRect2);
-					//tguiTranslateWidget(fullscreenRect, -1000, -1000);
 					tguiPop();
 					tguiSetFocus(mainItem);
 					section = MAIN;
@@ -1359,7 +1253,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 			}
 			else if (widget == partySelectorTop2) {
 				tguiDeleteWidget(fullscreenRect3);
-				//tguiTranslateWidget(fullscreenRect, -1000, -1000);
 				tguiPop();
 				tguiSetFocus(mainMagic);
 				section = MAIN;
@@ -1429,7 +1322,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				}
 			}
 			else if (widget == mainMagic) {
-				//tguiTranslateWidget(fullscreenRect, 1000, 1000);
 				tguiPush();
 				tguiSetParent(0);
 				tguiAddWidget(fullscreenRect3);
@@ -1439,10 +1331,8 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				spellSelector->setSelected(0);
 				spellSelector->setTop(0);
 				tguiAddWidget(spellSelector);
-				// FIXME: add topinfo
 				m_set_target_bitmap(buffer);
 				tguiDraw();
-				// FIXME: add item chooser stuff
 				// draw
 				tguiSetFocus(partySelectorTop2);
 				section = MAGIC;
@@ -1451,7 +1341,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				int sel = spellSelector->getSelected();
 				if (sel < 0) {
 					tguiDeleteWidget(fullscreenRect3);
-					//tguiTranslateWidget(fullscreenRect, -1000, -1000);
 					tguiPop();
 					tguiSetFocus(mainMagic);
 					section = MAIN;
@@ -1478,7 +1367,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 								formChooser_target = new MMultiChooser(formPoints_target, true);
 								// FIXME: choose target and cast
 								tguiDeleteWidget(fullscreenRect3);
-								//tguiTranslateWidget(fullscreenRect, -1000, -1000);
 								tguiPop();
 								tguiSetFocus(mainMagic);
 								section = CHOOSER;
@@ -1511,7 +1399,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 			}
 			else if (widget == mainStats) {
 				stats->setSelected(0);
-				//tguiTranslateWidget(fullscreenRect, 1000, 1000);
 				tguiPush();
 				tguiSetParent(0);
 				tguiAddWidget(stats);
@@ -1669,7 +1556,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 
 			else if (widget == stats) {
 				tguiDeleteWidget(stats);
-				//tguiTranslateWidget(fullscreenRect, -1000, -1000);
 				tguiPop();
 				tguiSetFocus(mainStats);
 				section = MAIN;
@@ -1912,7 +1798,6 @@ void doMap(std::string startPlace, std::string prefix)
 			// Draw the GUI
 			tguiDraw();
 			drawBufferToScreen();
-			 // FIXME
 			m_flip_display();
 		}
 	}
@@ -2130,7 +2015,6 @@ void doShop(std::string name, const char *imageName, int nItems,
 			draw_counter = 0;
 			DRAW
 			drawBufferToScreen();
-			 // FIXME (?)
 			m_flip_display();
 		}
 	}
@@ -2224,10 +2108,8 @@ void into_the_sun(void)
 				v[0].z = 0;
 				if (r+g+b < (255*3)/2) {
 					v[0].color = white;
-					//al_draw_pixel(cx, cy, al_map_rgb(255, 255, 255));
 				}
 				else {
-					//al_draw_pixel(cx, cy, al_map_rgb(0, 0, 0));
 					v[0].color = black;
 				}
 				al_draw_prim(v, NULL, NULL, 0, 1, ALLEGRO_PRIM_POINT_LIST);
@@ -2519,9 +2401,7 @@ void credits(void)
 					}
 				}
 
-				//glEnable(GL_TEXTURE_2D);
 				m_draw_prim(verts, 0, font, 0, vcount, ALLEGRO_PRIM_TRIANGLE_LIST);
-				//glDisable(GL_TEXTURE_2D);
 				if (count >= times[0]) {
 					state = (SECTION_STATE)((int)state+1);
 					count = 0;
@@ -3004,92 +2884,60 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 	const int LIST_H = 100;
 
 	MBITMAP *trashcan = m_load_bitmap(getResource("media/trashcan.png"));
-	ALLEGRO_DEBUG("WOW0");
 	MIcon *trash_icon = new MIcon(
 		BW-m_get_bitmap_width(trashcan)-5,
 		BH-m_get_bitmap_height(trashcan)-5,
 		std::string(getResource("media/trashcan.png")),
 		white, false, "", false, false, false);
 
-	ALLEGRO_DEBUG("WOW0");
 	MFrame *frame = new MFrame(10, 35, 220, 110);
-	ALLEGRO_DEBUG("WOW0");
 	save_list = new MScrollingList(20, 45, 200, LIST_H, trash_save, BW-m_get_bitmap_width(trashcan)/2-5, BH-m_get_bitmap_height(trashcan)/2-5, show_savestate_info_callback, "");
-	ALLEGRO_DEBUG("WOW0");
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	auto_list = new MScrollingList(20, 45, 200, LIST_H, trash_auto, BW-m_get_bitmap_width(trashcan)/2-5, BH-m_get_bitmap_height(trashcan)/2-5, show_savestate_info_callback, "auto");
-	ALLEGRO_DEBUG("WOW0");
 #endif
-	ALLEGRO_DEBUG("WOW0");
 	MTab *save_tab = new MTab("Save", 10, 20);
-	ALLEGRO_DEBUG("WOW0");
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	int xx2 = 10 + m_text_length(game_font, _t("Save")) + 6;
 	int xx3 = xx2 + m_text_length(game_font, _t("Auto")) + 6;
 	MTab *auto_tab = new MTab("Auto", xx2, 20);
-	ALLEGRO_DEBUG("WOW0");
 	MTab *copypaste_tab = new MTab("Copy & Paste", xx3, 20);
-	ALLEGRO_DEBUG("WOW0");
 #endif
-	ALLEGRO_DEBUG("WOW0");
 	MTextButton *new_game_button = new MTextButton(BW-m_text_length(game_font, _t("New Game..."))-20, 12-m_text_height(game_font)/2, "New Game...");
 
-	ALLEGRO_DEBUG("WOW0");
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	MTextButton *copy_button = new MTextButton(30, 50, "Copy Save");
-	ALLEGRO_DEBUG("WOW0");
 	MTextButton *paste_button = new MTextButton(30, 70, "Paste Save");
-	ALLEGRO_DEBUG("WOW0");
 #endif
-	ALLEGRO_DEBUG("WOW0");
 
 	load_save_info();
-	ALLEGRO_DEBUG("WOW0");
 
 	tguiSetParent(0);
-	ALLEGRO_DEBUG("WOW0");
 	tguiAddWidget(frame);
-	ALLEGRO_DEBUG("WOW0");
 	tguiAddWidget(save_list);
-	ALLEGRO_DEBUG("WOW0");
 	tguiAddWidget(save_tab);
-	ALLEGRO_DEBUG("WOW0");
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	tguiAddWidget(auto_tab);
-	ALLEGRO_DEBUG("WOW0");
 	tguiAddWidget(copypaste_tab);
-	ALLEGRO_DEBUG("WOW0");
 #endif
 	tguiAddWidget(new_game_button);
-	ALLEGRO_DEBUG("WOW0");
 	tguiAddWidget(trash_icon);
-	ALLEGRO_DEBUG("WOW0");
 	tguiSetFocus(new_game_button);
-	ALLEGRO_DEBUG("WOW0");
 
 	save_tab->setSelected(true);
-	ALLEGRO_DEBUG("WOW0");
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	auto_tab->setSelected(false);
-	ALLEGRO_DEBUG("WOW0");
 	copypaste_tab->setSelected(false);
-	ALLEGRO_DEBUG("WOW0");
 	int on = 0;
 #endif
 
 	tguiLowerWidget(save_tab);
-	ALLEGRO_DEBUG("WOW0");
 	tguiLowerWidget(frame);
 
-	ALLEGRO_DEBUG("WOW0");
 	bool first_frame = true;
 
-	ALLEGRO_DEBUG("WOW1");
 
 	for (;;) {
-	ALLEGRO_DEBUG("WOW2");
 		al_wait_cond(wait_cond, wait_mutex);
-	ALLEGRO_DEBUG("WOW3");
 		int tmp_counter = logic_counter;
 		logic_counter = 0;
 		if (tmp_counter > 10)
@@ -3103,9 +2951,7 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 				close_pressed = false;
 			}
 
-	ALLEGRO_DEBUG("WOW4");
 			TGUIWidget *widget = tguiUpdate();
-	ALLEGRO_DEBUG("WOW5");
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			if (widget == save_tab) {
@@ -3244,10 +3090,8 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 #endif
 
 			//INPUT_EVENT ie = get_next_input_event();
-	ALLEGRO_DEBUG("WOW6");
 
 			InputDescriptor id = getInput()->getDescriptor();
-	ALLEGRO_DEBUG("WOW7");
 
 			if (iphone_shaken(0.1) || id.button2 == DOWN) {
 				if (id.button2) {
@@ -3258,9 +3102,7 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 				*num = -1;
 				goto done;
 			}
-	ALLEGRO_DEBUG("WOW8");
 		}
-	ALLEGRO_DEBUG("WOW9");
 
 
 		if (draw_counter > 0) {
@@ -3280,7 +3122,6 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 				m_flip_display();
 			}
 		}
-	ALLEGRO_DEBUG("WOW10");
 	}
 done:
 
@@ -3808,8 +3649,6 @@ bool config_menu(bool start_on_fullscreen)
 		}
 	}
 done:
-//	config.setMaintainAspectRatio(!sel1);
-
 	tguiDeleteWidget(parent);
 
 	delete parent;
@@ -4535,15 +4374,8 @@ void debug_start(DEBUG_DATA *d)
 	tguiAddWidget(area_list);
 	tguiSetFocus(area_list);
 
-	//long start = tguiCurrentTimeMillis();
-
 	while (1) {
 		next_input_event_ready = true;
-
-	/*
-		long now = tguiCurrentTimeMillis();
-		int elapsed = now - start;
-		start = now;*/
 		TGUIWidget *w = tguiUpdate();
 		if (w == area_list) {
 			d->area = std::string(area_names[area_list->getSelected()]);
@@ -4575,15 +4407,9 @@ void debug_start(DEBUG_DATA *d)
 	tguiAddWidget(button);
 	tguiSetFocus(button);
 
-	//long start = tguiCurrentTimeMillis();
-
 	while (1) {
 		next_input_event_ready = true;
 
-	/*
-		long now = tguiCurrentTimeMillis();
-		int elapsed = now - start;
-		start = now;*/
 		TGUIWidget *w = tguiUpdate();
 		if (w == button) {
 			break;

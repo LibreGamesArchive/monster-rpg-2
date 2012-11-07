@@ -1,6 +1,5 @@
 #include "monster2.hpp"
 
-
 // Get position of "damage" text and stuff
 void getTextPos(Combatant *attacked, int *x, int *y)
 {

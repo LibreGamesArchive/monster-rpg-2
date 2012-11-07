@@ -726,19 +726,6 @@ static int CDoDialogue(lua_State *stack)
 					ret = false;
 					goto done;
 				}
-				/*
-					tguiDeleteWidget(speechDialog);
-					delete speechDialog;
-					speechDialog = NULL;
-					goto done;
-					*/
-					/*
-					timer_time = 0;
-					if (saveFilename) saveTime(saveFilename);
-					// do menu
-					exit(0);
-					*/
-				//}
 			}
 			// update gui
 			mainWidget = tguiUpdate();
@@ -808,8 +795,6 @@ static int CDoShakeDialogue(lua_State *stack)
 
 	if (!wait) { lua_pushboolean(stack, false); return 1; }
 
-	//1int ox = area->getOffsetX();
-	//1int oy = area->getOffsetY();
 	int sx = area_panned_x;
 	int sy = area_panned_y;
 	
@@ -858,14 +843,6 @@ static int CDoShakeDialogue(lua_State *stack)
 			area_panned_y = sy+1;
 		else
 			area_panned_y = sy-1;
-		/*
-		if (area->getOffsetY() < 0) {
-			area->setOffset(ox, oy+1);
-		}
-		else {
-			area->setOffset(ox, oy-1);
-		}
-		*/
 		
 		if (draw_counter > 0) {
 			draw_counter = 0;
@@ -1225,9 +1202,6 @@ static int CBattleLost(lua_State *stack)
 
 static int CStartBattle(lua_State *stack)
 {
-#ifdef DEBUG
-	//return 0;
-#endif
 	// FIXME: make sure this works. It's a hack to avoid
 	// activating a chest or person and then immediately
 	// going into battle.
@@ -3082,7 +3056,6 @@ static int CDoItemTutorial(lua_State *stack)
 
 done:
 
-//	tguiInit();
 	tguiDeleteWidget(fullscreenRect);
 	tguiDeleteWidget(partySelectorTop);
 	tguiDeleteWidget(itemSelector);
@@ -3801,14 +3774,6 @@ void registerCFunctions(lua_State* luaState)
 
 	lua_pushcfunction(luaState, CFollowPlayer);
 	lua_setglobal(luaState, "followPlayer");
-
-/*
-	lua_pushcfunction(luaState, CSetAreaOffsets);
-	lua_setglobal(luaState, "setAreaOffsets");
-
-	lua_pushcfunction(luaState, CGetAreaOffsets);
-	lua_setglobal(luaState, "getAreaOffsets");
-*/
 
 	lua_pushcfunction(luaState, CAddManChooser);
 	lua_setglobal(luaState, "addManChooser");

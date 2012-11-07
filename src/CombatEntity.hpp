@@ -110,7 +110,6 @@ protected:
 	int count;
 	Combatant *target;
 	MBITMAP *bitmaps[NUM_BITMAPS];
-	//MSAMPLE sample;
 };
 
 
@@ -231,7 +230,6 @@ protected:
 	Combatant *target;
 	AnimationSet *animSet;
 	int count;
-	//MSAMPLE sample;
 };
 
 

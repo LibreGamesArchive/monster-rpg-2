@@ -11,15 +11,6 @@ Area* area = 0;
 long roaming = 0;
 bool dpad_panning = false;
 
-#if 0
-#include "mapping.h"
-#ifdef EDITOR
-#include "coord_map_editor.h"
-#else
-#include "coord_map.h"
-#endif
-#endif
-
 const float ORB_RADIUS = 40.0f;
 
 #if !defined ALLEGRO_IPHONE
@@ -189,10 +180,8 @@ static int sign(float f)
 
 // A* stuff
 
-//static double last_astar = 0;
 static int astar_next_x = -1, astar_next_y = -1;
 static int astar_next_immediate_x = -1, astar_next_immediate_y = -1;
-//static bool can_immediate = true;
 
 static bool astar_is_solid(int x, int y, int px, int py, int dest_x, int dest_y, bool check_objs = true)
 {
@@ -295,8 +284,6 @@ static Node *astar(int start_x, int start_y, int dest_x, int dest_y)
 		return NULL;
 	}
 	
-	//cleanup_astar(); // leak!
-
 #define AS_ESTIMATE(sx, sy, dx, dy) \
 (abs(sx-dx) + abs(sy-dy))
 	
@@ -319,11 +306,6 @@ static Node *astar(int start_x, int start_y, int dest_x, int dest_y)
 	as_open.insert(StartNode);
 
 	while (as_open.size()) {
-		
-		//print_state();
-		
-		//Node *n = as_open.front();
-		//as_open.pop_front();
 		Node *n = *(as_open.begin());
 		as_open.erase(as_open.begin());
 		
@@ -336,20 +318,6 @@ static Node *astar(int start_x, int start_y, int dest_x, int dest_y)
 				int y = n->y + offsets[i][1];
 			
 				if (!(x == dest_x && y == dest_y) && astar_is_solid(x, y, start_x, start_y, dest_x, dest_y)) {
-					/*
-					std::list<Node *>::iterator closed_it;
-					closed_it =
-					astar_find(
-								  as_closed,
-								  x,
-								  y
-								  );
-					if (closed_it != as_closed.end()) {
-						delete *closed_it;
-						as_closed.erase(closed_it);
-						count--;
-					}
-					*/
 					Node *NewNode = new Node;
 					NewNode->x = x;
 					NewNode->y = y;
@@ -357,23 +325,6 @@ static Node *astar(int start_x, int start_y, int dest_x, int dest_y)
 
 					continue;
 				}
-				/*
-				if (!(x == dest_x && y == dest_y) && astar_is_solid(x, y, start_x, start_y, dest_x, dest_y)) {
-					std::list<Node *>::iterator closed_it;
-					closed_it =
-					astar_find(
-								  as_closed,
-								  x,
-								  y
-								  );
-					if (closed_it != as_closed.end()) {
-						delete *closed_it;
-						as_closed.erase(closed_it);
-						count--;
-					}
-					continue;
-				}
-				*/
 				
 				// cost always 1
 				int NewCost = n->CostFromStart + 1;
@@ -454,7 +405,6 @@ static Node *astar(int start_x, int start_y, int dest_x, int dest_y)
 					}
 					else {
 						as_open.insert(NewNode);
-						//as_open.sort();
 					}
 				}
 			}
@@ -530,8 +480,6 @@ void set_player_path(int x, int y)
 	}
 }
 
-//static bool initial = false;
-
 void astar_stop(void)
 {
 	if (!have_mouse && use_dpad)
@@ -551,7 +499,6 @@ void astar_stop(void)
 			o->stop();
 		}
 	}
-//	initial = false;
 	astar_next_x = astar_next_y = -1;
 	astar_next_immediate_x = astar_next_immediate_y = -1;
 }
@@ -669,7 +616,6 @@ void Area::drawObject(int index)
 					depth, dx, dy, 0);
 				m_restore_blender();
 				}
-//				}
 #if defined ALLEGRO4
 				tinted_blit_region(bmp, 0, TILE_SIZE-depth, TILE_SIZE,
 					depth, dx, dy, 0, 1.0f);
@@ -682,7 +628,6 @@ void Area::drawObject(int index)
 		}
 	}
 
-//drawUpper:
 	objects[index]->drawUpper();
 }
 
@@ -741,19 +686,9 @@ bool Area::activate(uint id, int direction)
 				if (v[j][0] == x1 && v[j][1] == y1) {
 					activated = true;
 					setObjectDirection(o, direction);
-					//printf("---\nActivating\n");
-					//dumpLuaStack(luaState);
-					
 					// HERE
 					if (use_dpad) {
 						getInput()->waitForReleaseOr(4, 5000);
-						/*
-						InputDescriptor ie = getInput()->getDescriptor();
-						while (ie.button1) {
-							ie = getInput()->getDescriptor();
-							al_rest(0.001);
-						}
-						*/
 					}
 					
 					clear_input_events();
@@ -788,7 +723,6 @@ bool Area::alreadyCollided(int id1, int id2)
 void Area::addObject(Object* obj)
 {
 	objects.push_back(obj);
-//	sObjects.push_back(obj);
 }
 
 /*
@@ -897,15 +831,11 @@ void Area::initLua()
 	debug_message("in initLua for Area\n");
 	luaState = lua_open();
 
-	debug_message("...\n");
 	openLuaLibs(luaState);
-	debug_message("...\n");
 
 	registerCFunctions(luaState);
-	debug_message("...\n");
 
 	runGlobalScript(luaState);
-	debug_message("...\n");
 
 	unsigned char *bytes;
 	int file_size;
@@ -1067,11 +997,6 @@ std::string Area::getTerrain(void)
 		int yi = atoi(nodeY->getValue().c_str());
 		int wi = atoi(nodeW->getValue().c_str());
 		int hi = atoi(nodeH->getValue().c_str());
-		/* wrong
-		if (x >= xi && x < (xi+wi) && y >= yi && y < (yi+hi)) {
-			return name;
-		}
-		*/
 		Tile *tile = tiles[x+y*sizex];
 		for (int i = 0; i < TILE_LAYERS; i++) {
 			int tx, ty;
@@ -1161,19 +1086,6 @@ void Area::drawLayer(int i, int bw, int bh)
 		d = targetTint.b - 1;
 		b = 1+(tint_ratio*d);
 		c = al_map_rgb_f(r, g, b);
-		/*
-		ALLEGRO_COLOR bc = targetTint;
-		bc.r *= tint_ratio;
-		bc.g *= tint_ratio;
-		bc.b *= tint_ratio;
-		bc.a = 1.0;
-		c = al_map_rgba_f(
-			bc.r,
-			bc.g,
-			bc.b,
-			bc.a
-		);
-		*/
 	}
 	else {
 		c = white;
@@ -1193,14 +1105,8 @@ void Area::drawLayer(int i, int bw, int bh)
 			if (n >= 0 && n < (int)tileAnimations.size() && tileAnimationNums[n]) {
 				int mapped = tileAnimationNums[n];
 #else
-			/*
-			if (n >= 0 && n < (int)tileAnimationNums.size()) {
-				int mapped = newmap[tileAnimationNums[n]];
-			*/
-			// TEST
 			if (n >= 0 && n < (int)tileAnimations.size() && tileAnimationNums[n]) {
 				int mapped = newmap[tileAnimationNums[n]];
-				//int mapped = tileAnimationNums[n];
 #endif
 				std::map<int, anim_data>::iterator it  = anim_info.find(mapped);
 				float tu;
@@ -1307,7 +1213,6 @@ void Area::draw(int bw, int bh)
 		int bgoy = (float)getOriginY() / (sizey*TILE_SIZE) * (m_get_bitmap_height(bg)-BH);
 		m_save_blender();
 		m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, white);
-		//m_draw_bitmap(bg, -bgox, -bgoy, 0);
 		m_draw_bitmap_region(bg, bgox, bgoy, BW, BH, 0, 0, 0);
 		m_restore_blender();
 	}
@@ -1631,7 +1536,6 @@ void Area::adjustPan(void)
 		
 void Area::update(int step)
 {
-//ALLEGRO_DEBUG("1");
 	std::vector<int> toDelete;
 
 	roaming = tguiCurrentTimeMillis();
@@ -1639,7 +1543,6 @@ void Area::update(int step)
 	shouldDoMap = false;
 
 	totalUpdates++;
-//ALLEGRO_DEBUG("2");
 
 	for (unsigned int i = 0; i < collisions.size(); i++) {
 		callLua(luaState, "collide", "ii>", collisions[i]->id1,
@@ -1647,11 +1550,9 @@ void Area::update(int step)
 		delete collisions[i];
 	}
 	collisions.clear();
-//ALLEGRO_DEBUG("3");
 
 	oldArea = area;
 	callLua(luaState, "update", "i>", step);
-//ALLEGRO_DEBUG("4");
 
 	for (unsigned int i = 0; i < objects.size(); i++) {
 		if (!objects[i]->update(this, step)) {
@@ -1677,14 +1578,12 @@ void Area::update(int step)
 			}
 		}
 	}
-//ALLEGRO_DEBUG("5");
 
 	for (int i = 0; i < (int)toDelete.size(); i++) {
 		int index = toDelete[i] - i;
 		delete objects[index];
 		objects.erase(objects.begin() + index);
 	}
-//ALLEGRO_DEBUG("6");
 
 	if (this == area) {
 		if (update_count == 0) {
@@ -1699,7 +1598,6 @@ void Area::update(int step)
 	}
 	else
 		return;
-//ALLEGRO_DEBUG("7");
 
 	bool adjusted_pan = false;
 
@@ -1909,14 +1807,12 @@ void Area::update(int step)
 			}
 		}
 	}
-//ALLEGRO_DEBUG("8/10");
 
 	// delete for real anything deleted in an activate() callback
 	for (int sz = (int)removedDuringActivate.size(); sz > 0; sz--) {
 		removeObject(removedDuringActivate[0]);
 		removedDuringActivate.erase(removedDuringActivate.begin());
 	}
-//ALLEGRO_DEBUG("11");
 
 	if (shouldDoMap) {
 		draw(BW, BH);
@@ -1925,7 +1821,6 @@ void Area::update(int step)
 		else
 			doMap(mapStartPlace, mapPrefix);
 	}
-//ALLEGRO_DEBUG("12");
 
 	bool smallX = sizex*TILE_SIZE <= BW;
 	bool smallY = sizey*TILE_SIZE <= BH;
@@ -1955,7 +1850,6 @@ void Area::update(int step)
 			 && oldArea == area) {
 		adjustPanX();
 	}
-//ALLEGRO_DEBUG("13");
 
 	if (center_view && !smallY) {
 		for (int i = 0; i < (int)(0.2*step); i++) {
@@ -1981,7 +1875,6 @@ void Area::update(int step)
 			 && oldArea == area) {
 		adjustPanY();
 	}
-//ALLEGRO_DEBUG("14");
 
 	// update animated tiles
 
@@ -1995,12 +1888,10 @@ void Area::update(int step)
 			a.current_frame = (a.current_frame % (int)a.tu.size());
 		}
 	}
-//ALLEGRO_DEBUG("15");
 	
 	for (unsigned int i = 0; i < tileAnimations.size(); i++) {
 		tileAnimations[i]->update(step);
 	}
-//ALLEGRO_DEBUG("16");
 
 	if (tinting) {
 		tintCount += step;
@@ -2015,7 +1906,6 @@ void Area::update(int step)
 			}
 		}
 	}
-//ALLEGRO_DEBUG("17");
 }
 
 void Area::writeTile(int tile, gzFile f)
@@ -2037,16 +1927,6 @@ Tile* Area::loadTile(ALLEGRO_FILE *f)
 		for (int i = 0; i < TILE_LAYERS; i++) {
 			anims[i] = al_fread32le(f);
 			if (anims[i] >= 0) {
-#if 0
-#ifdef EDITOR
-				int n = tileAnimationNums[anims[i]];
-#else
-				int n = mapping[tileAnimationNums[anims[i]]];
-#endif
-				/* FIXME HARDCODED :(( */
-				tu[i] = coord_map_x[n];
-				tv[i] = coord_map_y[n];
-#endif
 				int n = newmap[tileAnimationNums[anims[i]]];
 				tu[i] = (n % tm_w) * TILE_SIZE;
 				tv[i] = (n / tm_w) * TILE_SIZE;
@@ -2089,47 +1969,6 @@ void Area::save(std::string filename)
 
 	gzclose(f);
 }
-
-#if 0
-/*
- * Sort objects by the Y positions,
- * lowest (top of the screen) first.
- */
-void Area::sortObjects(int beg, int end)
-{
-	Object* tmp;
-	
-	if (end > beg + 1) {
-		int piv = sObjects[beg]->getY(), l = beg + 1, r = end;
-		while (l < r) {
-			if (sObjects[l]->getY() <= piv) {
-				l++;
-			}
-			else {
-				--r;
-				tmp = sObjects[l];
-				sObjects[l] = sObjects[r];
-				sObjects[r] = tmp;
-			}
-		}
-		--l;
-		tmp = sObjects[l];
-		sObjects[l] = sObjects[beg];
-		sObjects[beg] = tmp;
-		sortObjects(beg, l);
-		sortObjects(r, end);
-	}
-}
-#endif
-
-/*
-bool Area::checkCollision(Object* obj)
-{
-	// FIXME:
-	return false;
-}
-*/
-
 
 std::string Area::getName()
 {
@@ -2204,15 +2043,6 @@ void Area::loadAnimation(int index, bool addIndex)
 	Frame *frame;
 	Animation *animation;
 	Image *image;
-	/*
-#ifdef EDITOR
-	int subx = coord_map_x[index];
-	int suby = coord_map_y[index];
-#else
-	int subx = coord_map_x[mapping[index]];
-	int suby = coord_map_y[mapping[index]];
-#endif
-*/
 	int subx = index % (512/TILE_SIZE);
 	int suby = index / (512/TILE_SIZE);
 
@@ -2234,11 +2064,6 @@ void Area::loadAnimation(int index, bool addIndex)
 	int flags = al_get_new_bitmap_flags();
 	image->set(subbmp);
 	al_set_new_bitmap_flags(flags);
-#ifdef EDITOR
-	//image->setTransparent(tileTransparent[index] || (alpha < 255));
-#else
-	//image->setTransparent(tileTransparent[mapping[index]] || (alpha < 255));
-#endif
 	frame = new Frame(image, delay);
 	animation = new Animation("hmm", alpha);
 	animation->addFrame(frame);
@@ -2265,15 +2090,6 @@ void Area::loadAnimation(int index, bool addIndex)
 	tu.push_back(xx*TILE_SIZE);
 	tv.push_back(yy*TILE_SIZE);
 
-	/*
-#ifdef EDITOR
-	tu.push_back(coord_map_x[index]);
-	tv.push_back(coord_map_y[index]);
-#else
-	tu.push_back(coord_map_x[mapping[index]]);
-	tv.push_back(coord_map_y[mapping[index]]);
-#endif
-*/
 	int i = 2;
 
 	for (;;) {
@@ -2284,15 +2100,6 @@ void Area::loadAnimation(int index, bool addIndex)
 			break;
 		std::string index_string = index_xml->getValue();
 		int index = atoi(index_string.c_str());
-		/*
-#ifdef EDITOR
-		int subx = coord_map_x[index];
-		int suby = coord_map_y[index];
-#else
-		int subx = coord_map_x[mapping[index]];
-		int suby = coord_map_y[mapping[index]];
-#endif
-*/
 		subx = index % (512/TILE_SIZE);
 		suby = index / (512/TILE_SIZE);
 
@@ -2314,22 +2121,8 @@ void Area::loadAnimation(int index, bool addIndex)
 		flags = al_get_new_bitmap_flags();
 		image->set(subbmp);
 		al_set_new_bitmap_flags(flags);
-#ifdef EDITOR
-		//image->setTransparent(tileTransparent[index] || (alpha < 255));
-#else
-		//image->setTransparent(tileTransparent[mapping[index]] || (alpha < 255));
-#endif
 		frame = new Frame(image, delay);
 		animation->addFrame(frame);
-		/*
-#ifdef EDITOR
-		tu.push_back(coord_map_x[index]);
-		tv.push_back(coord_map_y[index]);
-#else
-		tu.push_back(coord_map_x[mapping[index]]);
-		tv.push_back(coord_map_y[mapping[index]]);
-#endif
-*/
 		tu.push_back(xx*TILE_SIZE);
 		tv.push_back(yy*TILE_SIZE);
 
@@ -2341,7 +2134,6 @@ void Area::loadAnimation(int index, bool addIndex)
 #ifdef EDITOR
 	anim_info[index] = ad;
 #else
-	//anim_info[mapping[index]] = ad;
 	anim_info[newmap[index]] = ad;
 #endif
 }
@@ -2565,16 +2357,13 @@ Area::Area(void)
 	ss_save_counter = 1000;
 #endif
 	down = false;
-	//initial = false;
 	panned = false;
-	//moved = false;
 	start_mx = 0;
 	start_my = 0;
 	astar_next_x = -1;
 	astar_next_immediate_x = -1;
 	area_panned_x = -BW/2;
 	area_panned_y = -BH/2;
-	//can_immediate = true;
 	center_view = false;
 	totalUpdates = 0;
 	oldArea = 0;
@@ -2582,8 +2371,6 @@ Area::Area(void)
 	dpad_on();
 	pan_centered_x = false;
 	pan_centered_y = false;
-	//offs_centered_x = false;
-	//offs_centered_y = false;
 	for (int i = 0; i < MAX_TILES*6*(TILE_LAYERS/2); i++)
 		verts[i].z = 0;
 	
@@ -2612,9 +2399,6 @@ Area::~Area()
 		Animation *a = tileAnimations[i];
 		delete a;
 	}
-//	tileAnimations.clear();
-
-//	tileAnimationNums.clear();
 
 	for (unsigned int i = 1; i < objects.size(); i++) {
 		delete objects[i];
@@ -2630,6 +2414,4 @@ Area::~Area()
 		m_destroy_bitmap(bg);
 	dpad_off();
 }
-
-
 

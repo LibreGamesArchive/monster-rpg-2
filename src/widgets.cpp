@@ -91,13 +91,6 @@ void loadIcons(MBITMAP *bmp, RecreateData *data)
 
 void destroyIcons(void)
 {
-	/*
-	for (int i = 0; i < (int)icons.size(); i++) {
-		MBITMAP *b = icons[i];
-		m_destroy_bitmap(b);
-	}
-	 */
-
 	for (size_t i = 0; i < icons.size(); i++) {
 		m_destroy_bitmap(icons[i]);
 	}
@@ -153,11 +146,6 @@ static void mTextout_real(MFONT *font, const char *text, int x, int y,
 			break;
 		case WGT_TEXT_DROP_SHADOW:
 			to(font, ctext, x+inc, y+inc, shadow_color);
-			/*
-			to(font, ctext, x+inc, y, shadow_color);
-			to(font, ctext, x, y+inc, shadow_color);
-			to(font, ctext, x+inc, y+inc, shadow_color);
-			*/
 			break;
 		case WGT_TEXT_BORDER:
 			to(font, ctext, x-inc, y, shadow_color);
@@ -453,7 +441,6 @@ static void _drawSimpleStatus_real(Player *p, int x, int y, CombatantInfo info)
 {
 	MBITMAP *icon = p->getIcon();
 	
-	//m_draw_bitmap(profileBg, x, y, 0);
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 	m_draw_bitmap(icon, x, y, 0);
 	int w = m_get_bitmap_width(icon);
@@ -931,8 +918,6 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
 			// Draw messages
-			//printf("msg1='%s' msg2='%s'\n", msg1.c_str(), msg2.c_str());
-			//printf("trans msg1='%s' msg2='%s'\n", _t(msg1.c_str()), _t(msg2.c_str()));
 			mTextout(game_font, _t(msg1.c_str()), BW/2, y+5+m_text_height(game_font)/2,
 				grey, black,
 				WGT_TEXT_DROP_SHADOW, true);
@@ -961,15 +946,6 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 				else if (w2->getFocus()) {
 					rx = BW/2+w/4-m_text_length(game_font, _t("Yes"))/2-size;
 				}
-	/*
-				bool sel = tguiActiveWidget == w1 ? false : true;
-				if (sel) {
-					rx = BW/2-w/4-m_text_length(game_font, "No")/2-size;
-				}
-				else {
-					rx = BW/2+w/4-m_text_length(game_font, "Yes")/2-size;
-				}
-	*/
 #else
 				bool sel = tguiActiveWidget == w1 ? true : false;
 				if (sel) {
@@ -1066,24 +1042,6 @@ void doDialogue(std::string text, bool top, int rows, int offset, bool bottom)
 					y = offset;
 				}
 			}
-/*
-#else
-			int h = area->getHeight()*TILE_SIZE;
-			int py = area->findObject(0)->getY();
-			if (py < BH/2+5) {
-				y = BH-offset-54;
-			}
-			else if (py > h-BH/2-5) {
-				y = offset;
-			}
-			else {
-				if (ie.direction == DIRECTION_NORTH)
-					y = BH-offset-54;
-				else
-					y = offset;
-			}
-#endif
-*/
 		}
 		x = 16;
 		w = BW-TILE_SIZE*2;
@@ -1888,7 +1846,6 @@ void MStats::draw()
 	CombatantInfo &info = p->getInfo();
 
 	MBITMAP *icon = p->getIcon();
-	//m_draw_bitmap(profileBg, x+2, y+2, 0);
 	m_draw_bitmap(icon, x+2, y+2, 0);
 
 	char text[100];
@@ -2104,10 +2061,6 @@ void MMap::flash(void) { shouldFlash = true; }
 void MMap::mouseDown(int xx, int yy, int b)
 {
 	mouse_down = true;
-	/*
-	downX = x + xx;
-	downY = y + yy;
-	*/
 	ALLEGRO_MOUSE_STATE s;
 	m_get_mouse_state(&s);
 	downX = s.x;
@@ -2210,7 +2163,6 @@ void MMap::draw()
 			p = &points[selected];
 			m_draw_bitmap(down_arrow,
 				p->x-top_x-offset_x-m_get_bitmap_width(down_arrow)/2,
-				//p->y-top_y-m_get_bitmap_height(down_arrow)-10+ay, 0);
 				p->y-top_y-offset_y-m_get_bitmap_height(down_arrow)-ay, 0);
 		}
 
@@ -2261,32 +2213,6 @@ void MMap::draw()
 		mTextout_simple(_t(points[selected].display_name.c_str()), 5, BH-m_text_height(game_font)-5,  m_map_rgb(255, 255, 0));
 	}
 
-	/*
-	if (shouldFlash) {
-		int i = crap_map_quadrant_global_count % 2000;
-		MCOLOR color = m_map_rgb(255, 255, 0);
-		if (i < 500) {
-			m_draw_line(0, 0, BW-1, 0, color);
-			m_draw_line(0, 0, BW/2, BH/2, color);
-			m_draw_line(BW/2, BH/2, BW-1, 0, color);
-		}
-		else if (i <  1000) {
-			m_draw_line(0, 0, 0, BH-1, color);
-			m_draw_line(0, 0, BW/2, BH/2, color);
-			m_draw_line(0, BH-1, BW/2, BH/2, color);
-		}
-		else if (i < 1500) {
-			m_draw_line(0, BH-1, BW, BH-1, color);
-			m_draw_line(0, BH-1, BW/2, BH/2, color);
-			m_draw_line(BW/2, BH/2, BW-1, BH-1, color);
-		}
-		else {
-			m_draw_line(BW-1, 0, BW-1, BH-1, color);
-			m_draw_line(BW/2, BH/2, BW-1, 0, color);
-			m_draw_line(BW/2, BH/2, BW-1, BH-1, color);
-		}
-	}
-	*/
 }
 
 void MMap::auto_save(int millis, bool force)
@@ -2899,12 +2825,6 @@ bool MSpellSelector::spellsBelow(void)
 
 void MSpellSelector::setFocus(bool f)
 {
-	/*
-	if ((!focus) && f)
-		just_focused = true;
-	else if (focus && (!f))
-		started = false;
-		*/
 	if (!f) {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		if (dragging) {
@@ -2974,12 +2894,6 @@ void MSpellSelector::mouseDownAbs(int xx, int yy, int b)
 		}
 		return;
 	}
-/*
-	if (just_focused) {
-		just_focused = false;
-		return;
-	}
-*/
 
 	int aw = m_get_bitmap_width(up_arrow)/2;
 	int ah = m_get_bitmap_height(up_arrow)/2;
@@ -2997,8 +2911,6 @@ void MSpellSelector::mouseDownAbs(int xx, int yy, int b)
 		if (top > 0) {
 			playPreloadedSample("blip.ogg");
 			top -= 2;
-			//if (selected > 2)
-			//	selected -= 2;
 		}
 	}
 	else if (spellsBelow() && sqrtf(ddx*ddx+ddy*ddy) < arrow_radius) {
@@ -3040,7 +2952,6 @@ void MSpellSelector::mouseDownAbs(int xx, int yy, int b)
 		else if (!use_dpad) {
 			maybe_scrolling = true;
 			selected = -1;
-			//down = false;
 		}
 	}
 }
@@ -3290,13 +3201,6 @@ int MSpellSelector::update(int millis)
 			who = w;
 		}
 	}
-	//if (selected > top+rows*2) top+=2;
-/*
-	if (!started) {
-		just_focused = false;
-		started = true;
-	}
-	*/
 
 	if (scrolling) {
 		int d = scroll_offs / 12;
@@ -3382,9 +3286,6 @@ int MSpellSelector::update(int millis)
 					if (scrollCount > 300) {
 						playPreloadedSample("blip.ogg");
 						top += 2;
-						//if (selected+2 < MAX_INVENTORY) {
-						//	selected += 2;
-						//}
 						scrollCount = 0;
 					}
 				}
@@ -3561,8 +3462,6 @@ MSpellSelector::MSpellSelector(int y1, int y2, int top, int selected,
 	arrow = m_load_bitmap(getResource("media/arrow.png"));
 	up_arrow = m_load_bitmap(getResource("media/up.png"));
 	clicked = false;
-	//started = false;
-	//just_focused = false;
 	down = false;
 	downX = -1;
 	downY = -1;
@@ -3572,7 +3471,6 @@ MSpellSelector::MSpellSelector(int y1, int y2, int top, int selected,
 	down2Y = -1;
 	scrolling = false;
 	scroll_offs = 0;
-	//up_selected = -1;
 	first_finger_x = -1;
 	first_finger_y = -1;
 	if (partySelector) {
@@ -3637,7 +3535,6 @@ void MToggleList::mouseMove(int xx, int yy)
 		int rows_down = (yy-y) / 15;
 		if (rows_down < rows) {
 			int n = top + rows_down;
-	//		int tmpx = xx - initial_down_x;
 			int tmpy = yy - initial_down_y;
 			if (n < (int)items.size()/* && abs(tmpy) > 6*/) {
 				if (abs(tmpy) >= 3 && !moved)
@@ -3682,13 +3579,6 @@ void MToggleList::mouseDownAbs(int xx, int yy, int b)
 
 	downCount = 0;
 
-	/*
-	if (just_focused) {
-		just_focused = false;
-		return;
-	}
-	*/
-	
 	int aw = m_get_bitmap_width(up_arrow)/2;
 	int ah = m_get_bitmap_height(up_arrow)/2;
 			
@@ -3740,9 +3630,6 @@ void MToggleList::mouseDownAbs(int xx, int yy, int b)
 
 void MToggleList::mouseUpAbs(int xx, int yy, int b)
 {
-//	int mx = xx;
-//	int my = yy;
-
 	bool clicked_on = xx >= this->x && yy >= this->y &&
 		xx < (this->x+this->width) && yy < (this->y+this->height);
 
@@ -3756,13 +3643,6 @@ void MToggleList::mouseUpAbs(int xx, int yy, int b)
 
 	if (scrolling) {
 		scrolling = false;
-		/*
-		int n = top + (scroll_offs/12);
-		if (n < 0) n = 0;
-		else if (n+rows > items.size()) n = items.size() - rows;
-		top = selected = n;
-		scroll_offs = 0;
-		*/
 		down = false;
 		last_clicked = -1;
 		selected = -1;
@@ -3796,9 +3676,6 @@ void MToggleList::mouseUpAbs(int xx, int yy, int b)
 
 void MToggleList::draw()
 {
-	//m_set_clip(x, y, x+width, y+height);
-	
-	//int yy = y+scroll_offs;
 	int yy = y;
 
 	for (int i = 0; i < rows; i++) {
@@ -3840,17 +3717,9 @@ void MToggleList::draw()
 				grey,
 				black,
 				WGT_TEXT_DROP_SHADOW, false);
-			/*
-		if (r == selected)
-			mTextout_simple(items[r].c_str(), x, yy, white);
-		else
-			mTextout_simple(items[r].c_str(), x, yy, grey);
-			*/
 		yy += 15;
 	}
 	
-	//m_set_clip(0, 0, m_get_display_width(), m_get_display_height());
-
 	if (dragging) {
 		ALLEGRO_MOUSE_STATE state;
 		m_get_mouse_state(&state);
@@ -3880,13 +3749,6 @@ void MToggleList::draw()
 					
 int MToggleList::update(int millis)
 {
-	/*
-	if (!started) {
-		just_focused = false;
-		started = true;
-	}
-	*/
-
 	if (scrolling) {
 		int d = scroll_offs / 15;
 		if (d) {
@@ -3935,7 +3797,6 @@ int MToggleList::update(int millis)
 			toggled[cursor] = !toggled[cursor];
 		}
 	}
-	//if (have_mouse || !use_dpad) {
 	else {
 		if (clicked && ((last_clicked != selected) || (selected == up_selected))) {
 			clicked = false;
@@ -3999,8 +3860,6 @@ MToggleList::MToggleList(int x, int y, int w, int h, bool onoff)
 	rows = height / 15;
 	up_arrow = m_load_bitmap(getResource("media/up.png"));
 	clicked = false;
-	//started = false;
-	//just_focused = false;
 	down = false;
 	downX = -1;
 	downY = -1;
@@ -4099,13 +3958,6 @@ void MScrollingList::mouseDownAbs(int xx, int yy, int b)
 	}
 	downCount = 0;
 
-	/*
-	if (just_focused) {
-		just_focused = false;
-		return;
-	}
-	*/
-	
 	int aw = m_get_bitmap_width(up_arrow)/2;
 	int ah = m_get_bitmap_height(up_arrow)/2;
 			
@@ -4171,13 +4023,6 @@ void MScrollingList::mouseUpAbs(int xx, int yy, int b)
 
 	if (scrolling) {
 		scrolling = false;
-		/*
-		int n = top + (scroll_offs/12);
-		if (n < 0) n = 0;
-		else if (n+rows > items.size()) n = items.size() - rows;
-		top = selected = n;
-		scroll_offs = 0;
-		*/
 		down = false;
 		return;
 	}
@@ -4281,12 +4126,6 @@ int MScrollingList::update(int millis)
 		return TGUI_CONTINUE;
 	else
 		was_down = false;
-	/*
-	if (!started) {
-		just_focused = false;
-		started = true;
-	}
-	*/
 
 	if (scrolling) {
 		int d = scroll_offs / 15;
@@ -4322,12 +4161,10 @@ int MScrollingList::update(int millis)
 				if (downCount >= 600 && hold_callback) {
 					playPreloadedSample("select.ogg");
 					hold_callback(selected, hold_data);
-					//pressed = -1;
 					down = false;
 					downX = -1;
 					downY = -1;
 					downCount = 0;
-					//dragging = false;
 					clicked = false;
 				}
 			}
@@ -4495,8 +4332,6 @@ MScrollingList::MScrollingList(int x, int y, int w, int h, void (*drop_callback)
 	rows = height / 15;
 	up_arrow = m_load_bitmap(getResource("media/up.png"));
 	clicked = false;
-	//started = false;
-	//just_focused = false;
 	down = false;
 	downX = -1;
 	downY = -1;
@@ -4736,7 +4571,6 @@ void MItemSelector::mouseUpAbs(int xx, int yy, int b)
 				if (n >= MAX_INVENTORY)
 					n = top + (rows_down-1)*2 + col;
 				if (n == selected) {
-					//playPreloadedSample("select.ogg");
 					pressed = selected;
 					clicked = true;
 				}
@@ -4747,7 +4581,6 @@ void MItemSelector::mouseUpAbs(int xx, int yy, int b)
 	}
 	else {
 		if (canArrange || (have_mouse && isShop)) {
-			//playPreloadedSample("select.ogg");
 			pressed = selected;
 			clicked = true;
 			drop_x = upx;
@@ -5267,8 +5100,6 @@ MItemSelector::MItemSelector(int y1, int y2, int top, int selected,
 	arrow = m_load_bitmap(getResource("media/arrow.png"));
 	up_arrow = m_load_bitmap(getResource("media/up.png"));
 	clicked = false;
-	//started = false;
-	//just_focused = false;
 	growing = 0;
 	grow_count = 0;
 	start_height = this->height;
@@ -5283,7 +5114,6 @@ MItemSelector::MItemSelector(int y1, int y2, int top, int selected,
 	down2Y = -1;
 	scrolling = false;
 	scroll_offs = 0;
-	//up_selected = -1;
 	first_finger_x = -1;
 	first_finger_y = -1;
 	isShop = false;
@@ -5695,7 +5525,6 @@ void MMultiChooser::mouseUp(int xx, int yy, int b)
 	if (xx >= 0 && yy >= 0) {
 		for (int i = 0; i < (int)points.size(); i++) {
 			int w = m_get_bitmap_width(arrow)/2;
-//			int h = m_get_bitmap_height(arrow)/2;
 			int dx = (x+xx) - (points[i].x + ((points[i].west) ? w : -w));
 			int dy = (y+yy) - points[i].y;
 			int d = sqrtf(dx*dx + dy*dy);
@@ -5930,7 +5759,6 @@ int MMultiChooser::update(int millis)
 					int dx = points[possibilities[i]].x - points[curr].x;
 					int dy = points[possibilities[i]].y - points[curr].y;
 					int dist = (int)fabs(sqrt((float)(dx*dx + dy*dy)));
-					//int dist = (int)fabs(points[possibilities[i]].x - points[curr].x);
 					if (dist < closest_dist) {
 						closest = possibilities[i];
 						closest_dist = dist;
@@ -6028,12 +5856,6 @@ MMultiChooser::~MMultiChooser(void)
 
 void MPartySelector::setFocus(bool f)
 {
-	/*
-	if ((!focus) && f)
-		just_focused = true;
-	else if (focus && (!f))
-		started = false;
-		*/
 	TGUIWidget::setFocus(f);
 }
 
@@ -6053,13 +5875,6 @@ void MPartySelector::mouseUp(int x, int y, int b)
 	if (!down) return;
 
 	down = false;
-
-	/*
-	if (just_focused) {
-		just_focused = false;
-		return;
-	}
-	*/
 
 	if (x >= 0 && y >= 0) {
 		if (x < 20)
@@ -6157,13 +5972,6 @@ void MPartySelector::next(void)
 
 int MPartySelector::update(int millis)
 {
-	/*
-	if (!started) {
-		just_focused = false;
-		started = true;
-	}
-	*/
-
 	if (growing) {
 		grow_count += millis;
 		if (grow_count >= 1000) {
@@ -6367,9 +6175,6 @@ MPartySelector::MPartySelector(int y, int index, bool show_trash)
 	debug_message("arrow = %p\n", arrow);
 	left_half_clicked = false;
 	right_half_clicked = false;
-	//center_clicked = false;
-	//started = false;
-	//just_focused = false;
 	growing = 0;
 	grow_count = 0;
 	dragging = false;
@@ -6463,26 +6268,6 @@ MParty::~MParty(void)
 
 void MIcon::pre_draw()
 {
-		// FIXME!
-		/*
-	if (this == tguiActiveWidget && show_focus) {
-		m_save_blender();
-		m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-		float w = m_get_bitmap_width(bitmap);
-		float h = m_get_bitmap_height(bitmap);
-		float radius = w/2+6;
-		float dx = x+(w+1)/2;
-		float dy = y+(h+1)/2;
-		int t = (unsigned)tguiCurrentTimeMillis() % 500;
-		int t2 = (unsigned)tguiCurrentTimeMillis() % 500;
-		float r = (sin((float)t/500*M_PI/2)+1)/4+0.5;
-		float r2 = (sin((float)t2/500*M_PI*2)+1)/2;
-		m_draw_circle(dx, dy, radius*r2+1,
-			m_map_rgba(255*r, 255*r, 0, 255*r),
-			M_FILLED);
-		m_restore_blender();
-	}
-	*/
 }
 
 void MIcon::draw()
@@ -7245,14 +7030,6 @@ void WgtFrame::mouseUp(int x, int y, int b)
 }
 
 
-/*
-bool WgtFrame::acceptsFocus(void)
-{
-	return true;
-}
-*/
-
-
 WgtFrame::WgtFrame(int x, int y, int width, int height, bool moveable,
 	bool closeable, MCOLOR color, TGUIWidget *homeWidget)
 {
@@ -7724,7 +7501,6 @@ void Menu::show(void)
 Menu::Menu(std::string name) :
 	name(name)
 {
-	//hotkeys = 0;
 }
 
 Menu::~Menu(void)
@@ -8543,5 +8319,3 @@ bool WgtCrappyWidget::keyPassesFilter(int key)
 
 #endif // EDITOR
 
-
-	

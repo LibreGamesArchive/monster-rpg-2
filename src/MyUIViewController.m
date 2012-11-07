@@ -56,22 +56,6 @@ UIWindow *al_iphone_get_window(ALLEGRO_DISPLAY *display);
 }
 
 
-/*
-// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-	printf("viewDidLoad1\n");
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-	[super viewDidAppear:animated];
-	printf("viewDidAppear1\n");
-}
- */
-
-
 - (void)viewDidUnload
 {
     [super viewDidUnload];
@@ -147,8 +131,6 @@ int CreateModalDialog(NSString *title,
 	while ((!lpAlertView.hidden) && (lpAlertView.superview!=nil))  
 	{  
 		al_rest(0.001);
-		//[[NSRunLoop currentRunLoop] limitDateForMode:NSDefaultRunLoopMode];  
-		//Sleep(10);  
 	}  
 	
 	// Grab the result from our delegate (via a custom property)  

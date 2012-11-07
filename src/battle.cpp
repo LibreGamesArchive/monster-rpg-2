@@ -604,15 +604,6 @@ BattleResult Battle::update(int step)
 		}
 	}
 
-	/*
-	if (shortcircuit != BATTLE_CONTINUE) {
-		int r = shortcircuit == BATTLE_ENEMY_WIN ? 255 : 0;
-		fadeOut(m_map_rgb(r, 0, 0));
-		return shortcircuit;
-	}
-	*/
-
-
 	// Check for a win
 	if (!playersAllDead && allDead(COMBATENTITY_TYPE_PLAYER)) {
 		playersAllDead = true;
@@ -771,12 +762,6 @@ BattleResult Battle::update(int step)
 			it++;
 		}
 	}
-
-/*
-	if (allDead(COMBATENTITY_TYPE_ENEMY) || allDead(COMBATENTITY_TYPE_PLAYER)) {
-		return BATTLE_CONTINUE;
-	}
-*/
 
 	if (!speechDialog && acting_entities.size() <= 0 &&
 			!allDead(COMBATENTITY_TYPE_PLAYER) &&
@@ -1137,7 +1122,6 @@ void Battle::start(void)
 #endif
 	std::string musicname;
 
-debug_message("start 1");
 	if (name == "1Tode")
 		musicname = "final_boss.ogg";
 	else if (boss_fight) {
@@ -1146,13 +1130,11 @@ debug_message("start 1");
 	else {
 		musicname = "battle.ogg";
 	}
-debug_message("start 2");
 
 	if (!(name == "1Golem") && !manChooser) {
 		playMusic(musicname, 0.0f);
 		musicFadeCount = 0;
 	}
-debug_message("start 3");
 	// Add players and adjust enemy positions
 	if (attackedFromBehind) {
 		// add players
@@ -1199,11 +1181,9 @@ debug_message("start 3");
 			addEntity(c);
 		}
 	}
-debug_message("start 4");
 
 
 	callLua(luaState, "start", ">");
-debug_message("start 5");
 	
 	std::list<CombatEntity *>::iterator it;
 	for (it = entities.begin(); it != entities.end(); it++) {
@@ -1212,7 +1192,6 @@ debug_message("start 5");
 			((CombatEnemy *)e)->start();
 		}
 	}
-debug_message("start 6");
 
 	// if preemptive, don't change order
 	if (preemptive) {
@@ -1222,44 +1201,6 @@ debug_message("start 6");
 	else if (attackedFromBehind) {
 		entities.reverse();
 	}
-debug_message("start 7");
-
-	// randomize Combatants with equal speed
-	/*
-	int firstValue;
-	int firstEq = 0;
-	int numEq = 0;
-	int speed;
-
-	Combatant *c = (Combatant *)entities[0];
- 	firstValue = c->getInfo().abilities.speed;
-
-	for (int i = 0; i < (int)entities.size(); i++) {
-		CombatEntity *currEntity = entities[i];
-		Combatant *c = (Combatant *)currEntity;
-		CombatantInfo &info = c->getInfo();
-		speed = info.abilities.speed;
-		if (speed == firstValue) {
-			numEq++;
-		}
-		if ((speed != firstValue) || (i == (int)entities.size()-1)) {
-			if (numEq > 1) {
-				// randomize (shuffle)
-				for (int j = 0; j < (2*numEq); j++) {
-					int r1 = (rand() % numEq) + firstEq;
-					int r2 = (rand() % numEq) + firstEq;
-					CombatEntity *tmp;
-					tmp = entities[r1];
-					entities[r1] = entities[r2];
-					entities[r2] = tmp;
-				}
-			}
-			firstValue = speed;
-			firstEq = i;
-			numEq = 1;
-		}
-	}
-	*/
 }
 
 

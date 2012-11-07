@@ -1,9 +1,6 @@
 #include "monster2.hpp"
 #include <allegro5/internal/aintern_bitmap.h>
 
-// GOO! FIXME
-//#include <allegro5/internal/aintern_pixels.h>
-
 const float Ice1Effect::VELOCITY = 0.5f;
 const float WaveEffect::SPEED = 0.16f;
 const float WhirlpoolEffect::SPEED = 0.007f;
@@ -453,7 +450,6 @@ int LightningEffect::getLifetime(void)
 void LightningEffect::draw(void)
 {
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-//	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
 	int bmpIndex = count / (LIFETIME/(NUM_BITMAPS+1));
 	if (bmpIndex >= NUM_BITMAPS)
@@ -491,16 +487,9 @@ LightningEffect::LightningEffect(Combatant *target) :
 		char name[100];
 		sprintf(name, "bolt1_%d.png", i);
 		bitmaps[i] = m_load_alpha_bitmap(getResource("combat_media/%s", name));
-		ALLEGRO_DEBUG("************* bitmaps[%d] = %p **************************", i, bitmaps[i]);
-		// FIXME!!!!!!!!!!!!!!
-		//al_save_bitmap(name, bitmaps[i]);
-
 	}
 
 	ALLEGRO_DEBUG("after loading lightning bitmaps");
-
-	//sample = loadSample("bolt.ogg");
-	//playSample(sample);
 }
 
 
@@ -509,7 +498,6 @@ LightningEffect::~LightningEffect(void)
 	for (int i = 0; i < NUM_BITMAPS; i++) {
 		m_destroy_bitmap(bitmaps[i]);
 	}
-	//destroySample(sample);
 }
 
 
@@ -521,19 +509,6 @@ bool updateParticle(Particle &part, int step)
 		// dead
 		return true;
 	}
-	/*
-	if (part.dx < 0) {
-		part.dx += 0.001f * step;
-		if (part.dx > 0)
-			part.dx = 0;
-	}
-	else if (part.dx > 0) {
-		part.dx -= 0.001f * step;
-		if (part.dx < 0)
-			part.dx = 0;
-	}
-	part.dy += 0.01f * step;
-	*/
 	return false;
 }
 
@@ -734,7 +709,7 @@ void Ice2Effect::draw(void)
 	if (count < 1000) {
 		float w = m_get_bitmap_width(icecube) * scale;
 		float h = m_get_bitmap_height(icecube) * scale;
-		float yy = 0; //(1.0f - r) * m_get_bitmap_height(icecube) - 1;
+		float yy = 0;
 		int sh = m_get_bitmap_height(icecube)-yy;
 		if (sh <= 0) sh = 1;
 		int dh = h - (yy*scale);
@@ -751,7 +726,6 @@ void Ice2Effect::draw(void)
 	else {
 		if (!shattered) {
 			shattered = true;
-			//playSample(shatter);
 		}
 
 		for (int i = 0; i < numshards; i++) {
@@ -824,8 +798,6 @@ Ice2Effect::Ice2Effect(Combatant *target) :
 
 	icecube = m_load_bitmap(getResource("combat_media/Ice2.png"));
 	snowflake = m_load_bitmap(getResource("combat_media/snowflake.png"));
-
-	//shatter = loadSample("shatter.ogg");
 
 	ysize = 0.0f;
 	
@@ -920,36 +892,13 @@ Fire1Effect::Fire1Effect(Combatant *target) :
 	this->target = target;
 
 	animSet = new AnimationSet(getResource("combat_media/fire1.png"));
-
-	//sample = loadSample("fire1.ogg");
-	//playSample(sample);
 }
 
 
 Fire1Effect::~Fire1Effect(void)
 {
 	delete animSet;
-
-	//destroySample(sample);
 }
-
-
-
-#if 0
-static void darknessScale(MBITMAP *buffer, MBITMAP *sprite, float scale)
-{
-	float skip = 1.0f / scale;
-
-	clear_to_color(buffer, makeacol32(0, 0, 0, 0));
-
-	for (float fy = 0.0f, iy = 0; fy < sprite->h; fy += skip, iy++) {
-		for (float fx = 0.0f, ix = 0; fx < sprite->w; fx += skip, ix++) {
-			int p = _getpixel32(sprite, (int)fx, (int)fy);
-			_putpixel32(buffer, ix, iy, p);
-		}
-	}
-}
-#endif
 
 
 int Darkness1Effect::getLifetime(void)
@@ -981,18 +930,10 @@ void Darkness1Effect::draw(void)
 		pivot_scaled_sprite(buffer, bitmaps[blobs[i].bmpIndex],
 			buffer->w/2, buffer->h/2, buffer->w/2, buffer->h/2,
 			ftofix(-blobs[i].angle/(M_PI*2)*256), ftofix(blobs[i].scale));
-		//darknessScale(buffer, bitmaps[blobs[i].bmpIndex], blobs[i].scale);
 
 		set_alpha_blender();
 
 		draw_trans_sprite(m_get_target_bitmap(), buffer, dx, dy);
-
-		/*
-		pivot_scaled_sprite(m_get_target_bitmap(),
-			bitmaps[blobs[i].bmpIndex], dx, dy,
-			half_w, half_h, ftofix(blobs[i].angle),
-			ftofix(blobs[i].scale));
-		*/
 #endif
 	}
 }
@@ -1155,20 +1096,6 @@ WeepEffect::WeepEffect(Combatant *target) :
 	this->target = target;
 
 	for (int i = 0; i < NUM_DROPS; i++) {
-		/*
-		int n = rand() % 10;
-		if (n < 5) {
-			// fading drop
-			drops[i].length = y;
-			drops[i].alpha = (rand() % 1000) / 1000.0f;
-		}
-		else {
-			// falling drop
-			drops[i].x = x + ((rand() % 30) - 15);
-			drops[i].length = rand() % (int)y;
-			drops[i].alpha = 1.0f;
-		}
-		*/
 		drops[i].x = x + ((rand() % 30) - 15);
 		drops[i].length = -(rand() % (int)y);
 		drops[i].alpha = 1.0f;
@@ -1265,11 +1192,7 @@ int WhirlpoolEffect::getLifetime(void)
 
 void WhirlpoolEffect::draw(void)
 {
-#ifdef ALLEGRO_ANDROID_XX
-	int mult = 6;
-#else
 	int mult = 1;
-#endif
 
 	ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[w*h*mult];
 	
@@ -1299,11 +1222,7 @@ void WhirlpoolEffect::draw(void)
 #if defined __linux__ && !defined ALLEGRO_ANDROID
 	draw_points_locked(verts, i);
 #else
-#ifdef ALLEGRO_ANDROID_XX
-	m_draw_prim(verts, 0, 0, 0, i*mult, ALLEGRO_PRIM_TRIANGLE_LIST);
-#else
 	m_draw_prim(verts, 0, 0, 0, i*mult, ALLEGRO_PRIM_POINT_LIST);
-#endif
 #endif
 
 	delete[] verts;
@@ -2047,18 +1966,12 @@ void StompEffect::draw(void)
 	if (count >= LIFETIME/2) {
 		if (!puffed) {
 			puffed = true;
-			//playSample(sample);
 		}
 		int index = (float)(count-LIFETIME/2)/(LIFETIME/2) * puffs.size();
 		if (index >= (int)puffs.size())
 			index = (int)puffs.size()-1;
 		for (int i = 0; i < (int)puffData.size(); i++) {
-#ifdef ALLEGRO4
-			set_alpha_blender();
-			draw_trans_sprite(m_get_target_bitmap(), puffs[index], puffData[i].x-8, puffData[i].y-8);
-#else
 			m_draw_rotated_bitmap(puffs[index], 8, 8, puffData[i].x, puffData[i].y, 0, 0);
-#endif
 		}
 	}
 }
@@ -2134,7 +2047,6 @@ StompEffect::~StompEffect(void)
 	}
 	puffs.clear();
 	puffData.clear();
-	//destroySample(sample);
 }
 
 
@@ -2145,10 +2057,6 @@ int SprayEffect::getLifetime(void)
 
 void SprayEffect::draw(void)
 {
-#ifdef ALLEGRO4
-	drawing_mode(DRAW_MODE_TRANS, 0, 0, 0);
-	set_add_blender(255, 255, 255, 255);
-#else
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (use_programmable_pipeline) {
 		_blend_color = white;
@@ -2160,7 +2068,6 @@ void SprayEffect::draw(void)
 	m_set_blender(ALLEGRO_ALPHA, ALLEGRO_ALPHA, white);
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	}
-#endif
 #endif
 	
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -2249,11 +2156,7 @@ void SprayEffect::draw(void)
 	al_draw_prim(verts, 0, 0, 0, count, ALLEGRO_PRIM_LINE_LIST);
 #endif
 	
-#ifdef ALLEGRO4
-	solid_mode();
-#else
 	m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, white);
-#endif
 }
 
 
@@ -2781,8 +2684,6 @@ void Fire3Effect::draw(void)
 		verts[y*2+1].color = c;
 		verts[y*2+1].u = W;
 		verts[y*2+1].v = y+sy;
-		//al_draw_tinted_bitmap_region(fire_bmp->bitmap, c, 0, y+sy, W, 1,
-		//	dx, dy-dest+y, 0);
 	}
 
 	m_draw_prim(verts, NULL, fire_bmp, 0, min*2, ALLEGRO_PRIM_LINE_LIST);
@@ -2840,10 +2741,6 @@ void Ice3Effect::draw(void)
 		m_draw_bitmap(icicle, x-m_get_bitmap_width(icicle)/2, yy-m_get_bitmap_height(icicle), 0);
 	}
 	else {
-		//m_draw_bitmap(icicle, 0, BELOW_GROUND-(dy - yy), 0);
-
-		//m_draw_trans_bitmap(tmp, x-m_get_bitmap_width(icicle)/2, y-m_get_bitmap_height(icicle), alpha*255);
-	
 		int cx, cy, cw, ch;
 		al_get_clipping_rectangle(&cx, &cy, &cw, &ch);
 		al_set_clipping_rectangle(x-m_get_bitmap_width(icicle)/2, y-m_get_bitmap_height(icicle),
@@ -2857,10 +2754,6 @@ void Ice3Effect::draw(void)
 		for (int i = 0; i < NUM_PARTICLES; i++) {
 			particles[i].color.a = alpha;
 			ALLEGRO_COLOR c = particles[i].color;
-			/*
-			m_draw_trans_pixel(particles[i].x, particles[i].y,
-				al_map_rgba_f(c.r*c.a, c.g*c.a, c.b*c.a, c.a));
-			*/
 			verts[i].x = particles[i].x;
 			verts[i].y = particles[i].y;
 			verts[i].z = 0;
@@ -3000,7 +2893,6 @@ static void draw_bolt_arc_worker1(MPoint &p1, MPoint &p2, MBITMAP *bmp)
 		verts[vcount].u = w;
 		verts[vcount].v = h;
 		vcount++;
-		//m_draw_alpha_bitmap(bmp, x-m_get_bitmap_width(bmp)/2, y-m_get_bitmap_height(bmp)/2);
 #endif
 	}
 
@@ -3111,7 +3003,6 @@ bool Bolt3Effect::update(int step)
 	}
 
 	amp += 0.001f * step;
-	//#endif
 
 	return false;
 }
@@ -3151,11 +3042,7 @@ Bolt3Effect::Bolt3Effect(Combatant *target) :
 {
 	type = COMBATENTITY_TYPE_FRILL;
 
-#if defined WIZ
-	alpha_sprite = m_load_bitmap(getResource("combat_media/Bolt3_wiz.png"));
-#else
 	alpha_sprite = m_load_alpha_bitmap(getResource("combat_media/Bolt3_alpha.png"));
-#endif
 
 	ring = m_load_bitmap(getResource("media/ring.png"));
 
@@ -3205,10 +3092,9 @@ int Darkness2Effect::getLifetime(void)
 
 void Darkness2Effect::draw(void)
 {
-	float amplitude;//, amplitude2;
+	float amplitude;
 
 	amplitude = sin((float)count/LIFETIME*M_PI*6) * BW / 4;;
-	//amplitude2 = ((fmod((float)count, 1500.0) - 750.0) / 750.0) * BW/4;
 
 	for (int y = 0; y < 110; y++) {
 		float r = (float)y/110 * M_PI * 2;
@@ -3249,7 +3135,6 @@ Darkness2Effect::Darkness2Effect(CombatLocation loc) :
 	loadPlayDestroy("Darkness2.ogg");
 
 	f = 0.0f;
-	//f2 = M_PI/2;
 }
 
 
@@ -3415,9 +3300,6 @@ void AcornsEffect::draw(void)
 		if (acorns[i].y >= target->getY()) {
 			for (int j = 0; j < CIRCLES; j++) {
 				int r = explosions[i][j].radius * ((float)(explosions[i][j].count%500)/500);
-				#ifndef WIZ
-				explosions[i][j].color.a = 255 * (1 - ((float)(explosions[i][j].count%200)/200));
-				#endif
 				m_draw_circle(explosions[i][j].x, explosions[i][j].y,
 					r, explosions[i][j].color, M_FILLED);
 			}
@@ -4019,7 +3901,6 @@ void BoFEffect::draw(void)
 			verts[i*2+1].color = white;
 			verts[i*2+1].u = line;
 			verts[i*2+1].v = h;
-			//m_draw_scaled_bitmap(bitmap, line, 0, 1, h, BW/2+i, dy, 1, height, 0, 255);
 			line++;
 			line %= w;
 		}
@@ -4683,9 +4564,6 @@ bool Darkness3Effect::update(int step)
 		return true;
 	}
 
-//	int bps = pow(2.0f, ((count / 500)+1));
-//	int mod = count % 500;
-//	if (mod % bps < (bps/2))
 	if ((unsigned)tguiCurrentTimeMillis() % 100 < 50)
 		dark = true;
 	else
@@ -4845,7 +4723,6 @@ void PukeEffect::draw(void)
 		y1 = -sin(lines[i].angle) * 10 + lines[i].cy;
 		x2 = cos(lines[i].angle) * 10 + lines[i].cx;
 		y2 = sin(lines[i].angle) * 10 + lines[i].cy;
-		//m_draw_line(x1, y1, x2, y2, lines[i].color);
 		verts[i*2+0].x = x1;
 		verts[i*2+0].y = y1;
 		verts[i*2+0].z = 0;
@@ -4927,5 +4804,4 @@ PukeEffect::PukeEffect(Combatant *caster) :
 PukeEffect::~PukeEffect(void)
 {
 }
-
 

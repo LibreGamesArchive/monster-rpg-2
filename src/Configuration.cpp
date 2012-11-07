@@ -23,7 +23,6 @@ static int keyname_to_keycode(const char *name)
 				phony += ".";
 			}
 			keyname_to_keycode_map[s] = i;
-			//printf("%s=%d\n", s.c_str(), i);
 		}
 
 	}
@@ -368,18 +367,6 @@ void Configuration::setAdapter(int a)
 	adapter = a;
 }
 
-#ifdef WIZ
-int Configuration::getGFXDriver(void)
-{
-	return gfxDriver;
-}
-
-void Configuration::setGFXDriver(int gd)
-{
-	gfxDriver = gd;
-}
-#endif
-
 int Configuration::getLanguage(void)
 {
 	return language;
@@ -573,9 +560,6 @@ void Configuration::read()
 	sd.fullscreen = atoi(fullscreen->getValue().c_str());
 	setWantedGraphicsMode(sd);
 	setWaitForVsync(atoi(vsync->getValue().c_str()));
-#ifdef WIZ
-	setGFXDriver(atoi(gfxdrv->getValue().c_str()));
-#endif
 	setSFXVolume(atoi(sfx_volume->getValue().c_str()));
 	setMusicVolume(atoi(music_volume->getValue().c_str()));
 
@@ -674,10 +658,6 @@ void Configuration::write()
 	XMLData* vsync = new XMLData("vsync", my_itoa(getWaitForVsync()));
 	XMLData *xml_filter_type = new XMLData("filter_type", my_itoa(getFilterType()));
 	XMLData *xml_aspect = new XMLData("maintain_aspect_ratio", my_itoa(getMaintainAspectRatio()));
-#ifdef WIZ
-	XMLData *gfxdrv = new XMLData("gfxDriver", my_itoa(getGFXDriver()));
-	gfx->add(gfxdrv);
-#endif
 	gfx->add(width);
 	gfx->add(height);
 	gfx->add(fullscreen);
@@ -738,11 +718,7 @@ Configuration::Configuration() :
 	keyMusicDown(ALLEGRO_KEY_F1),
 
 	gamepadAvailable(true),
-#ifndef WIZ
-	onlyMemoryBitmaps(false),
-#else
 	onlyMemoryBitmaps(true),
-#endif
 	lowCpuUsage(false),
 	stick(0),
 	adapter(0),

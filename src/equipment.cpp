@@ -7,7 +7,6 @@ int applyStrengthsAndWeaknesses(CombatEnemy *enemy, int damage, Element element)
 		damage *= 2;
 	}
 	else if (enemy->getStrength() == ELEMENT_ALL || enemy->getStrength() == element) {
-		//damage /= 2;
 		damage = -damage;
 	}
 	

@@ -55,10 +55,6 @@
 
 ALLEGRO_DEBUG_CHANNEL("morpg2")
 
-#ifdef ALLEGRO_MACOSX
-//#include <objc/objc.h>
-#endif
-
 #ifdef ALLEGRO_IPHONE
 #include <allegro5/allegro_iphone.h>
 #endif
