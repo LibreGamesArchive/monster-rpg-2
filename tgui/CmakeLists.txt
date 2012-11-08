@@ -1,7 +1,0 @@
-cmake_minimum_required(VERSION 2.6)
-project(tgui CXX)
-add_library(tgui STATIC tgui.cpp)
-set_target_properties(tgui
-	PROPERTIES
-	OUTPUT_NAME tgui
-	)

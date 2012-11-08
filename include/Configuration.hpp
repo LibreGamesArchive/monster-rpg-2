@@ -132,6 +132,7 @@ public:
 		cfg_filter_type = t;
 		if (!display)
 			return;
+		//set_linear_mag_filter(buffer, t == FILTER_LINEAR);
 	}
 #ifdef ALLEGRO_IPHONE
 	int getAutoRotation(void) {

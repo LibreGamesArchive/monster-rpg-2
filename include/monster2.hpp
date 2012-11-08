@@ -55,6 +55,10 @@
 
 ALLEGRO_DEBUG_CHANNEL("morpg2")
 
+#ifdef ALLEGRO_MACOSX
+//#include <objc/objc.h>
+#endif
+
 #ifdef ALLEGRO_IPHONE
 #include <allegro5/allegro_iphone.h>
 #endif
@@ -133,12 +137,7 @@ const int LOGIC_RATE = 60;
 
 const int LOGIC_MILLIS = (1000/LOGIC_RATE);
 
-
-#ifdef ALLEGRO_ANDROID
-#include "../../tgui/tgui.hpp"
-#else
-#include "../tgui/tgui.hpp"
-#endif
+#include "tgui.hpp"
 
 extern "C" {
 #include <lua-fixed/lua.h>

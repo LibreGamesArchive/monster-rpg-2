@@ -108,12 +108,15 @@ private:
 	uint16_t tint_r, tint_g, tint_b;
 #endif
         
+	//int offsetx, offsety;
+	//float offsetx, offsety;
 	int sizex, sizey;
 	std::string name;
     	
 	void drawLayer(int layer, int bw, int bh);
 
 	std::vector<Tile *> tiles;
+	//std::vector<Object*> sObjects;	// sorted objects
 	bool follow;
 #ifdef EDITOR
 	ALLEGRO_VERTEX verts[6*(240/16)*(160/16)*1000];
@@ -131,9 +134,12 @@ private:
 	std::map<int, anim_data> anim_info;
 	bool down;
 	double down_time;
+	//bool moved;
 	bool panned;
 	int start_mx;
 	int start_my;
+	//int saved_start_mx;
+	//int saved_start_my;
 	int totalUpdates;
 	Area *oldArea;
 	float focusX, focusY;
@@ -218,6 +224,8 @@ extern bool pan_centered_x;
 extern bool pan_centered_y;
 extern short coord_map_x[4096];
 extern short coord_map_y[4096];
+//extern bool offs_centered_x;
+//extern bool offs_centered_y;
 
 extern int mapping[4096];
 

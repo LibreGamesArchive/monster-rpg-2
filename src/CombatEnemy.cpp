@@ -1217,7 +1217,6 @@ void CombatEnemyTode::draw(void)
 		Image *i = f->getImage();
 		MBITMAP *bmp = i->getBitmap();
 		float fl = ((float)deadCount / DIE_TIME) * (M_PI*2);
-#if (defined A5_OGL || defined A5_D3D)
 		if (use_programmable_pipeline) {
 			al_set_shader(display, tinter);
 			al_set_shader_float(tinter, "ratio", 1);
@@ -1247,7 +1246,6 @@ void CombatEnemyTode::draw(void)
 			al_set_shader(display, default_shader);
 		}
 		else {
-#endif
 			{
 			m_save_blender();
 			float  r, g, b;

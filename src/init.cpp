@@ -69,6 +69,7 @@ void load_fonts(void)
 
 	ALLEGRO_DEBUG("loading fonts");
 
+#ifdef ALLEGRO_ANDROID
 	ALLEGRO_PATH *res_dir = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
 	char boofer[1000];
 	sprintf(boofer, "%s/unpack/DejaVuSans.ttf", al_path_cstr(res_dir, '/'));
@@ -80,9 +81,16 @@ void load_fonts(void)
 		if (!native_error("Failed to load game_font"))
 			return;
 	}
+#else
+	game_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 9, ttf_flags);
+	if (!game_font) {
+		if (!native_error("Failed to load medium_font"))
+			return;
+	}
+#endif
 
 	medium_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 32, 0);
-	if (!game_font) {
+	if (!medium_font) {
 		if (!native_error("Failed to load medium_font"))
 			return;
 	}
@@ -3050,8 +3058,6 @@ void destroy(void)
 
 	destroy_translation();
 	
-	destroy_string_bitmaps();
-
 #ifdef ALLEGRO_WINDOWS
 	al_uninstall_system();
 #endif
