@@ -27,19 +27,6 @@ static bool music_replayed = true;
 bool switched_in = true;
 #endif
 
-static void set_transform(ALLEGRO_DISPLAY *dpy)
-{
-   ALLEGRO_TRANSFORM t;
-   int w = al_get_display_width(dpy);
-   int h = al_get_display_height(dpy);
-
-   glViewport(0, 0, w, h);
-
-   al_identity_transform(&t);
-   al_ortho_transform(&t, 0, w, h, 0, -1, 1);
-   al_set_projection_transform(dpy, &t);
-}
-
 #ifdef ALLEGRO_ANDROID
 extern "C" {
 void openURL(const char *url);
@@ -260,7 +247,6 @@ static float backup_ambience_volume = 1.0f;
 // called from everywhere
 bool is_close_pressed(void)
 {
-top:
 
 #ifdef ALLEGRO_ANDROID
 	if (zeemote_enabled != zeemote_connected) {
@@ -1276,6 +1262,7 @@ int main(int argc, char *argv[])
 				player = party[heroSpot];
 			}
 			catch (ReadError e) {
+				(void)e;
 				notify("No auto-save", "yet recorded...", "");
 				continue;
 			}
@@ -1315,6 +1302,7 @@ int main(int argc, char *argv[])
 					debug_message("loaded\n");
 				}
 				catch (ReadError e) {
+					(void)e;
 					notify("Error loading...", "", "");
 					continue;
 				}
@@ -1424,6 +1412,7 @@ int main(int argc, char *argv[])
 	}
 		
 	} catch (QuitError e) {
+		(void)e;
 		al_set_target_bitmap(al_get_backbuffer(display));
 		m_clear(al_map_rgb(0, 0, 0));
 		m_flip_display();

@@ -151,9 +151,6 @@ top:
 	int explode_count = 0;
 	int expl_x = 0, expl_y = 0;
 
-	long last_particle_1 = tguiCurrentTimeMillis();
-	long last_particle_2 = tguiCurrentTimeMillis();
-
 	while  (1) {
 		int green = 0;
 		
@@ -219,9 +216,6 @@ top:
 				lander_x += (lander_angle) * lander_vel * LOGIC_MILLIS;
 				lander_y += (lander_angle) * lander_vel * LOGIC_MILLIS;
 				if (particles.size() < MAX_PARTICLES) {
-					int t = tguiCurrentTimeMillis();
-					//int n = t-last_particle_1;
-					last_particle_1 = t;
 					for (int i = 0; i < 1; i++) {
 						ADD_PARTICLE(1)
 					}
@@ -239,9 +233,6 @@ top:
 				lander_x += (lander_angle) * lander_vel * LOGIC_MILLIS;
 				lander_y += (lander_angle) * lander_vel * LOGIC_MILLIS;
 				if (particles.size() < MAX_PARTICLES) {
-					int t = tguiCurrentTimeMillis();
-					//int n = t-last_particle_2;
-					last_particle_2 = t;
 					for (int i = 0; i < 1; i++) {
 						ADD_PARTICLE(-1)
 					}
@@ -341,7 +332,7 @@ top:
 			
 			/* draw particles */
 
-			ALLEGRO_VERTEX verts[particles.size()];
+			ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[particles.size()];
 			int vcount = 0;
 
 			std::list<Particle>::iterator it;
@@ -360,6 +351,8 @@ top:
 			}
 
 			m_draw_prim(verts, 0, 0, 0, vcount, ALLEGRO_PRIM_POINT_LIST);
+
+			delete[] verts;
 		
 			if (!use_dpad)
 				tguiDraw();

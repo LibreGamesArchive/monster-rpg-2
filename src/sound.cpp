@@ -30,8 +30,6 @@ static QWORD music_loop_start = 0;
 static QWORD ambience_loop_start = 0;
 static float musicVolume = 1.0f;
 static float ambienceVolume = 1.0f;
-static BASS_FILEPROCS fileprocs;
-static BASS_FILEPROCS physfs_fileprocs;
 	
 static std::string preloaded_names[] = {
 #ifdef LITE
@@ -183,7 +181,6 @@ void initSound(void)
 		total_samples++;
 	}
 
-old:
 #ifdef ALLEGRO_ANDROID
 	if (is_android_lessthan_2_3) {
 		initSound_oldandroid();

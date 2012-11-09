@@ -829,16 +829,6 @@ AttackHandler::AttackHandler(CombatPlayer *p) :
 	playerInput = false;
 	count = 0;
 
-	CombatantInfo &info = p->getInfo();
-
-	int lid = -1;
-	int rid = -1;
-
-	if (info.equipment.lhand >= 0)
-		lid = items[info.equipment.lhand].id;
-	if (info.equipment.rhand >= 0)
-		rid = items[info.equipment.rhand].id;
-
 	player->getAnimationSet()->setSubAnimation("attack");
 	if (!use_programmable_pipeline) {
 		player->getWhiteAnimationSet()->setSubAnimation("attack");
@@ -1477,17 +1467,14 @@ void CombatPlayer::draw(void)
 	bool bright;
 	bright = ((unsigned)tguiCurrentTimeMillis() % 500 < 250);
 	if (choosing && bright) {
-		int amount;
 		float amountF;
 		ALLEGRO_COLOR vcol;
 		if (info.condition == CONDITION_SHADOW) {
 			amountF = -1.0f;
-			amount = 255*amountF;
 			vcol = black;
 		}
 		else {
 			amountF = 0.7f;
-			amount = 255*0.7;
 			vcol = white;
 		}
 
@@ -1583,9 +1570,7 @@ void CombatPlayer::draw(void)
 			m_draw_bitmap(mushroom, x-TILE_SIZE/2, y-TILE_SIZE, 0);
 		}
 		else if (info.condition == CONDITION_SHADOW) {
-			int amount = -255;
 			int amountF = -1.0f;
-			(void)amount;
 			(void)amountF;
 			{
 			m_save_blender();

@@ -1306,15 +1306,11 @@ void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flag
 	ALLEGRO_BITMAP *target = al_get_target_bitmap();
 	int tw = al_get_bitmap_width(target);
 	int th = al_get_bitmap_height(target);
-	int sx, sy;
+	int sy;
 
 	if (dx < 0) {
-		sx = -dx;
 		src_w += dx;
 		dx = 0;
-	}
-	else {
-		sx = 0;
 	}
 	if (dx + src_w > tw) {
 		src_w -= (dx + src_w) - tw;

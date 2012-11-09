@@ -77,7 +77,6 @@ void load_translation(const char *filename)
 	unsigned char *bytes = slurp_file(getResource("%s.utf8", filename), &sz);
 
 	int pos = 0;
-	int prev = 0;
 	int32_t ch;
 	ALLEGRO_USTR *fullstr = al_ustr_new((const char *)bytes);
 	ALLEGRO_USTR *newstr = al_ustr_new("");
@@ -87,7 +86,6 @@ void load_translation(const char *filename)
 				al_ustr_append_chr(newstr, ch);
 			}
 		}
-		prev = pos;
 	}
 	for (int i = 0; i < 10; i++) {
 		al_ustr_append_chr(newstr, '0'+i);

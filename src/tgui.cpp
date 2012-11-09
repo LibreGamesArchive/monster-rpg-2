@@ -1,11 +1,11 @@
 #include <vector>
 #include <algorithm>
 
+#include <allegro5/allegro5.h>
+
 #ifndef ALLEGRO_WINDOWS
 #include <sys/time.h>
 #endif
-
-#include <allegro5/allegro5.h>
 
 #include "tgui.hpp"
 
@@ -423,7 +423,7 @@ void tguiSetFocus(int widget)
 	tgui_force_set_focus = false;
 	activeGUI->widgets[widget]->setFocus(true);
 	if (widget != activeGUI->focus
-		&& activeGUI->focus >= 0 && activeGUI->focus < activeGUI->widgets.size())
+		&& activeGUI->focus >= 0 && activeGUI->focus < (int)activeGUI->widgets.size())
 		activeGUI->widgets[activeGUI->focus]->setFocus(false);
 	tguiActiveWidget = activeGUI->widgets[widget];
 	activeGUI->focus = widget;
@@ -447,12 +447,12 @@ void tguiSetFocus(TGUIWidget* widget)
 
 //	TGUIWidget *oldActive = tguiActiveWidget;
 
-	for (unsigned int i = 0; i < activeGUI->widgets.size(); i++) {
+	for (size_t i = 0; i < activeGUI->widgets.size(); i++) {
 		TGUIWidget* w = activeGUI->widgets[i];
 		if (w == widget) {
 			w->setFocus(true);
 			if (w != activeGUI->widgets[activeGUI->focus]
-				&& activeGUI->focus >= 0 && activeGUI->focus < activeGUI->widgets.size())
+				&& activeGUI->focus >= 0 && activeGUI->focus < (int)activeGUI->widgets.size())
 				activeGUI->widgets[activeGUI->focus]->setFocus(false);
 //			if (oldActive) {
 //				oldActive->setFocus(false);
@@ -570,30 +570,10 @@ void tguiDeleteActive()
  */
 void tguiTranslateAll(int x, int y)
 {
-	for (unsigned int i = 0; i < activeGUI->widgets.size(); i++) {
+	for (size_t i = 0; i < activeGUI->widgets.size(); i++) {
 		TGUIWidget* w = activeGUI->widgets[i];
 		w->setX(w->getX() + x);
 		w->setY(w->getY() + y);
-		int minx;
-		int maxx;
-		int miny;
-		int maxy;
-		if (x < 0) {
-			minx = w->getX() + x;
-			maxx = w->getX() + w->getWidth() - 1;
-		}
-		else {
-			minx = w->getX();
-			maxx = w->getX() + x + w->getWidth() - 1;
-		}
-		if (y < 0) {
-			miny = w->getY() + y;
-			maxy = w->getY() + w->getHeight() - 1;
-		}
-		else {
-			miny = w->getY();
-			maxy = w->getY() + y + w->getHeight() - 1;
-		}
 	}
 }
 
@@ -603,7 +583,7 @@ void tguiTranslateAll(int x, int y)
  */
 void tguiTranslateWidget(TGUIWidget* parent, int x, int y)
 {
-	for (unsigned int i = 0; i < activeGUI->widgets.size(); i++) {
+	for (size_t i = 0; i < activeGUI->widgets.size(); i++) {
 		TGUIWidget* w = activeGUI->widgets[i];
 		if ((parent == w) || (w->getParent() == parent)) {
 			int newx;
@@ -786,7 +766,7 @@ TGUIWidget* tguiUpdate()
 #endif
 #endif
 
-	for (unsigned int i = 0; i < activeGUI->widgets.size(); i++) {
+	for (size_t i = 0; i < activeGUI->widgets.size(); i++) {
 		TGUIWidget* widget = activeGUI->widgets[i];
 		if (tguiIsDisabled(widget))
 			continue;
@@ -962,7 +942,7 @@ void tguiDraw()
  */
 void tguiDrawRect(int x1, int y1, int x2, int y2)
 {
-	for (unsigned int i = 0; i < activeGUI->widgets.size(); i++) {
+	for (size_t i = 0; i < activeGUI->widgets.size(); i++) {
 		TGUIWidget* widget = activeGUI->widgets[i];
 		/*
 		int wx1 = widget->getX();
@@ -974,7 +954,7 @@ void tguiDrawRect(int x1, int y1, int x2, int y2)
 			widget->pre_draw();
 		//}
 	}
-	for (unsigned int i = 0; i < activeGUI->widgets.size(); i++) {
+	for (size_t i = 0; i < activeGUI->widgets.size(); i++) {
 		TGUIWidget* widget = activeGUI->widgets[i];
 		/*
 		int wx1 = widget->getX();
@@ -994,7 +974,7 @@ void tguiDrawRect(int x1, int y1, int x2, int y2)
 void tguiPush()
 {
 	if (activeGUI && activeGUI->focus >= 0 &&
-	activeGUI->focus < activeGUI->widgets.size() &&
+	activeGUI->focus < (int)activeGUI->widgets.size() &&
 	activeGUI->widgets[activeGUI->focus]) {
 		activeGUI->widgets[activeGUI->focus]->setFocus(false);
 	}
@@ -1054,7 +1034,7 @@ void tguiRaiseChildren(TGUIWidget* parent)
 {
 	std::vector<TGUIWidget*> targetWidgets;
 
-	for (unsigned int i = 0; i < activeGUI->widgets.size(); i++) {
+	for (size_t i = 0; i < activeGUI->widgets.size(); i++) {
 		TGUIWidget* widget = activeGUI->widgets[i];
 		if (widget->getParent() == parent) {
 			targetWidgets.push_back(widget);
@@ -1062,7 +1042,7 @@ void tguiRaiseChildren(TGUIWidget* parent)
 	}
 
 	int currIndex = 0;
-	unsigned int i;
+	size_t i;
 
 	for (i = 0; i < activeGUI->widgets.size(); i++) {
 		TGUIWidget* widget = activeGUI->widgets[i];
@@ -1088,7 +1068,7 @@ void tguiLowerChildren(TGUIWidget* parent)
 	std::vector<TGUIWidget*> lowerWidgets;
 	std::vector<TGUIWidget*> upperWidgets;
 
-	for (unsigned int i = 0; i < activeGUI->widgets.size(); i++) {
+	for (size_t i = 0; i < activeGUI->widgets.size(); i++) {
 		TGUIWidget* widget = activeGUI->widgets[i];
 		if (widget->getParent() == parent) {
 			lowerWidgets.push_back(widget);
@@ -1123,7 +1103,7 @@ void tguiRaiseSingleWidget(TGUIWidget* widgetToRaise)
 {
 	std::vector<TGUIWidget*> targetWidgets;
 
-	for (unsigned int i = 0; i < activeGUI->widgets.size(); i++) {
+	for (size_t i = 0; i < activeGUI->widgets.size(); i++) {
 		TGUIWidget* widget = activeGUI->widgets[i];
 		if (widget == widgetToRaise) {
 			targetWidgets.push_back(widget);
@@ -1131,7 +1111,7 @@ void tguiRaiseSingleWidget(TGUIWidget* widgetToRaise)
 	}
 
 	int currIndex = 0;
-	unsigned int i;
+	size_t i;
 
 	for (i = 0; i < activeGUI->widgets.size(); i++) {
 		TGUIWidget* widget = activeGUI->widgets[i];
@@ -1158,7 +1138,7 @@ void tguiLowerSingleWidget(TGUIWidget* widgetToLower)
 	std::vector<TGUIWidget*> lowerWidgets;
 	std::vector<TGUIWidget*> upperWidgets;
 
-	for (unsigned int i = 0; i < activeGUI->widgets.size(); i++) {
+	for (size_t i = 0; i < activeGUI->widgets.size(); i++) {
 		TGUIWidget* widget = activeGUI->widgets[i];
 		if (widget == widgetToLower) {
 			lowerWidgets.push_back(widget);
@@ -1194,7 +1174,7 @@ void tguiLowerSingleWidgetBelow(TGUIWidget* widgetToLower,
 {
 	std::vector<TGUIWidget*> widgets;
 
-	for (unsigned int i = 0; i < activeGUI->widgets.size(); i++) {
+	for (size_t i = 0; i < activeGUI->widgets.size(); i++) {
 		TGUIWidget* widget = activeGUI->widgets[i];
 		if (widget == widgetAbove) {
 			widgets.push_back(widgetToLower);
@@ -1224,7 +1204,7 @@ void tguiRaiseWidget(TGUIWidget* widgetToRaise)
 {
 	std::vector<TGUIWidget*> targetWidgets;
 
-	for (unsigned int i = 0; i < activeGUI->widgets.size(); i++) {
+	for (size_t i = 0; i < activeGUI->widgets.size(); i++) {
 		TGUIWidget* widget = activeGUI->widgets[i];
 		if ((widget == widgetToRaise) ||
 				(widget->getParent() == widgetToRaise)) {
@@ -1233,7 +1213,7 @@ void tguiRaiseWidget(TGUIWidget* widgetToRaise)
 	}
 
 	int currIndex = 0;
-	unsigned int i;
+	size_t i;
 
 	for (i = 0; i < activeGUI->widgets.size(); i++) {
 		TGUIWidget* widget = activeGUI->widgets[i];
@@ -1260,7 +1240,7 @@ void tguiLowerWidget(TGUIWidget* widgetToLower)
 	std::vector<TGUIWidget*> lowerWidgets;
 	std::vector<TGUIWidget*> upperWidgets;
 
-	for (unsigned int i = 0; i < activeGUI->widgets.size(); i++) {
+	for (size_t i = 0; i < activeGUI->widgets.size(); i++) {
 		TGUIWidget* widget = activeGUI->widgets[i];
 		if ((widget == widgetToLower) ||
 				(widget->getParent() == widgetToLower)) {
@@ -1295,7 +1275,7 @@ void tguiLowerWidget(TGUIWidget* widgetToLower)
 void tguiDeleteWidget(TGUIWidget* widgetToDelete)
 {
 	std::vector<TGUIWidget*> widgetsToKeep;
-	unsigned int i;
+	size_t i;
 
 	for (i = 0; i < activeGUI->widgets.size(); i++) {
 		TGUIWidget* widget = activeGUI->widgets[i];
@@ -1335,7 +1315,7 @@ void tguiSetParent(TGUIWidget* parent)
  */
 bool tguiWidgetIsActive(TGUIWidget* widget)
 {
-	for (unsigned int i = 0; i < activeGUI->widgets.size(); i++) {
+	for (size_t i = 0; i < activeGUI->widgets.size(); i++) {
 		if (activeGUI->widgets[i] == widget)
 			return true;
 	}
@@ -1424,15 +1404,15 @@ void tguiSetTolerance(int pixels)
 
 void tguiClearMouseEvents(void)
 {
-	for (int i = 0; i < mouseMoveEvents.size(); i++) {
+	for (size_t i = 0; i < mouseMoveEvents.size(); i++) {
 		delete mouseMoveEvents[i];
 	}
 	mouseMoveEvents.clear();
-	for (int i = 0; i < mouseUpEvents.size(); i++) {
+	for (size_t i = 0; i < mouseUpEvents.size(); i++) {
 		delete mouseUpEvents[i];
 	}
 	mouseUpEvents.clear();
-	for (int i = 0; i < mouseDownEvents.size(); i++) {
+	for (size_t i = 0; i < mouseDownEvents.size(); i++) {
 		delete mouseDownEvents[i];
 	}
 	mouseDownEvents.clear();

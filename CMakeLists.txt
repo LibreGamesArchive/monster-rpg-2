@@ -18,10 +18,17 @@ endfunction(copy_file_to_build)
 set(ALLEG_SUFFIX "-static")
 	
 if(WIN32)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -fcheck-new -Wno-unknown-pragmas -Wno-comment -Wno-strict-aliasing")
-	# you must define one of A5_OGL (all platforms) or A5_D3D
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL")
+	if(MINGW)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -fcheck-new -Wno-unknown-pragmas -Wno-comment -Wno-strict-aliasing")
+		# you must define one of A5_OGL (all platforms) or A5_D3D
+		#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DA5_D3D")
+	else(MINGW)
+		#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DA5_OGL")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DA5_D3D")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
+	endif(MINGW)
 endif(WIN32)
 
 include_directories("${CMAKE_SOURCE_DIR}/include")

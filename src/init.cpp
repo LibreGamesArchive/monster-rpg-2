@@ -109,33 +109,6 @@ void load_fonts(void)
 	load_translation(get_language_name(config.getLanguage()).c_str());
 }
 
-static uint32_t parse_version(const char *s)
-{
-   char *p = (char *) s;
-   int v[4] = {0, 0, 0, 0};
-   int n;
-   uint32_t ver;
-
-   /* e.g. "4.0.0 Vendor blah blah" */
-   for (n = 0; n < 4; n++) {
-      char *end;
-      long l;
-
-      errno = 0;
-      l = strtol(p, &end, 10);
-      if (errno)
-         break;
-      v[n] = ((l < 0) ? 0 : ((l > 255) ? 255 : (int)l));
-      if (*end != '.')
-         break;
-      p = end + 1; /* skip dot */
-   }
-
-   ver = (v[0] << 24) | (v[1] << 16) | (v[2] << 8) | v[3];
-   ALLEGRO_DEBUG("Parsed '%s' as 0x%08x\n", s, ver);
-   return ver;
-}
-
 void get_buffer_true_size(int *buffer_true_w, int *buffer_true_h)
 {
 #ifdef A5_OGL
@@ -491,20 +464,6 @@ bool is_ipad(void)
 	
 	return value;
 }
-
-#ifdef ALLEGRO_WINDOWS
-static void print_windows_error(void)
-{
-#ifdef ALLEGRO_WINDOWS
-	DWORD err = GetLastError();
-	LPTSTR *buffer = NULL;
-	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-		NULL, err, 0, (LPTSTR)&buffer, 0, NULL);
-	printf("%s\n", buffer);
-	LocalFree(buffer);
-#endif
-}
-#endif
 
 static int progress_percent = 0;
 
@@ -2426,6 +2385,7 @@ bool init(int *argc, char **argv[])
 		config.read();
 	}
 	catch (ReadError e) {
+		(void)e;
 	}
 
 	debug_message("config read");

@@ -73,7 +73,7 @@ void loadIcons(MBITMAP *bmp, RecreateData *data)
 		0, 54, 9, 9
 	};
 
-	for (int i = 0; i < icons.size(); i++) {
+	for (size_t i = 0; i < icons.size(); i++) {
 		m_destroy_bitmap(icons[i]);
 	}
 	icons.clear();
@@ -1005,20 +1005,17 @@ void doDialogue(std::string text, bool top, int rows, int offset, bool bottom)
 		else {
 			i = getInput();
 		}
+	
 		InputDescriptor ie = i->getDescriptor();
-
-		Object *o = NULL;
 
 		if (!bottom && (!party[heroSpot] || (party[heroSpot]->getName() != "Eny"))) {
 			top = true;
 		}
 		else {
-         if (party[heroSpot] && party[heroSpot]->getObject())
-			   o = party[heroSpot]->getObject();
-         else {
-            bottom = true;
-	   }
-   	}
+			if (!(party[heroSpot] && party[heroSpot]->getObject())) {
+				bottom = true;
+			}
+		}
 
 		if (top) {
 			y = offset;
@@ -1415,7 +1412,7 @@ int MTextButton::update(int millis)
 		ie = get_next_input_event();
 	}
 
-	if (!disabled && (ie.button1 == DOWN) || clicked) {
+	if ((!disabled && (ie.button1 == DOWN)) || clicked) {
 		use_input_event();
 		clicked = false;
 		playPreloadedSample("select.ogg");
@@ -5638,11 +5635,8 @@ int MMultiChooser::update(int millis)
 		else
 			ie = get_next_input_event();
 
-		int to_delay = -1;
-
 		if (ie.up == DOWN && current.size() <= 1) {
 			use_input_event();
-			to_delay = 2;
 			playPreloadedSample("blip.ogg");
 			// reverse order hack
 			if (points.size() >= 1) {
@@ -5656,7 +5650,6 @@ int MMultiChooser::update(int millis)
 		}
 		else if (ie.down == DOWN && current.size() <= 1) {
 			use_input_event();
-			to_delay = 3;
 			playPreloadedSample("blip.ogg");
 			for (int i = 0; i < (int)points.size(); i++) {
 				if (points[i].y > points[current[0]].y &&
@@ -5667,7 +5660,6 @@ int MMultiChooser::update(int millis)
 		}
 		else if (ie.left == DOWN) {
 			use_input_event();
-			to_delay = 0;
 			playPreloadedSample("blip.ogg");
 			if (current.size() <= 1) {
 				for (int i = 0; i < (int)points.size(); i++) {
@@ -5699,7 +5691,6 @@ int MMultiChooser::update(int millis)
 		}
 		else if (ie.right == DOWN) {
 			use_input_event();
-			to_delay = 1;
 			playPreloadedSample("blip.ogg");
 			if (current.size() <= 1) {
 				for (int i = 0; i < (int)points.size(); i++) {

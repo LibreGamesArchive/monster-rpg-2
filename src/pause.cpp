@@ -115,105 +115,6 @@ static std::string getTimeString(uint32_t runtime)
 	return std::string(s);
 }
 
-#ifndef ALLEGRO_IPHONE
-static void showMusicToggle(void)
-{
-	tguiPush();
-
-	MFrame *frame = new MFrame(SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE,
-		BW-SHADOW_CORNER_SIZE*2, BH-SHADOW_CORNER_SIZE*2);
-
-	int y = SHADOW_CORNER_SIZE+8;
-	
-	std::vector<std::string> toggle_choices;
-	toggle_choices.push_back("{027} Sound on");
-	toggle_choices.push_back("{027} SFX only");
-	toggle_choices.push_back("{027} Silence");
-	MSingleToggle *sound_toggle = new MSingleToggle(SHADOW_CORNER_SIZE+8, y, toggle_choices, false);
-	bool music_on = config.getMusicVolume();
-	bool sound_on = config.getSFXVolume();
-	if (music_on && sound_on) sound_toggle->setSelected(0);
-	else if (sound_on) sound_toggle->setSelected(1);
-	else sound_toggle->setSelected(2);
-
-	tguiSetParent(0);
-	tguiAddWidget(frame);
-	tguiSetParent(frame);
-	tguiAddWidget(sound_toggle);
-	tguiSetFocus(sound_toggle);
-	
-	std::string startAmbienceName = ambienceName;
-
-	for (;;) {
-		al_wait_cond(wait_cond, wait_mutex);
-		// Logic
-		int tmp_counter = logic_counter;
-		logic_counter = 0;
-		if (tmp_counter > 10)
-			tmp_counter = 1;
-		while  (tmp_counter > 0) {
-			next_input_event_ready = true;
-
-			tmp_counter--;
-			if (is_close_pressed()) {
-				do_close();
-				close_pressed = false;
-			}
-		
-			int sel = sound_toggle->getSelected();
-			if (sel == 0) {
-				ambienceName = startAmbienceName;
-				config.setMusicVolume(255);
-				config.setSFXVolume(255);
-				setMusicVolume(1);
-			}
-			else if (sel == 1) {
-				config.setMusicVolume(0);
-				config.setSFXVolume(255);
-				setMusicVolume(1);
-			}
-			else {
-				config.setMusicVolume(0);
-				config.setSFXVolume(0);
-				setMusicVolume(1);
-			}
-
-			INPUT_EVENT ie = get_next_input_event();
-
-			if (ie.button2 == DOWN || iphone_shaken(0.1)) {
-				use_input_event();
-				playPreloadedSample("select.ogg");
-				iphone_clear_shaken();
-				goto done;
-			}
-
-			// update gui
-			TGUIWidget *widget = tguiUpdate();
-			if (!widget) {
-				continue;
-			}
-
-		}
-
-		if (draw_counter > 0) {
-			draw_counter = 0;
-			m_set_target_bitmap(buffer);
-			m_clear(black);
-			tguiDraw();
-			drawBufferToScreen();
-			m_flip_display();
-		}
-	}
-done:
-	tguiDeleteWidget(frame);
-
-	delete frame;
-	delete sound_toggle;
-
-	tguiPop();
-}
-#endif
-
 #ifdef ALLEGRO_IPHONE
 static void showIpodControls(void)
 {
@@ -2588,6 +2489,7 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 		}
 	}
 	catch (ReadError e) {
+		(void)e;
 		notify("Corrupt save state found.", "Delete it and", "Try again...");
 		callback(-1, false, data);
 		return;
@@ -3610,7 +3512,7 @@ bool config_menu(bool start_on_fullscreen)
 
 #if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE
 		bool fs = fullscreen_toggle->getSelected();
-		if (fs != start_fullscreen) {
+		if (fs != (bool)start_fullscreen) {
 			toggle_fullscreen();
 			start_fullscreen = fs;
 		}

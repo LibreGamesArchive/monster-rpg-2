@@ -36,7 +36,7 @@ unsigned char *slurp_file(std::string filename, int *ret_size)
 		}
 		size = v.size();
 		bytes = new unsigned char[size+1];
-		for (unsigned int i = 0; i < size; i++) {
+		for (int i = 0; i < size; i++) {
 			bytes[i] = v[i];
 		}
 	}
@@ -1982,15 +1982,6 @@ static int CBattleGetNextEntity(lua_State *stack)
 	return 1;
 }
 
-static int CBattleGetNextEntityId(lua_State *stack)
-{
-	int id = (int)lua_tonumber(stack, 1);
-
-	lua_pushnumber(stack, battle->getNextEntity(id));
-
-	return 1;
-}
-
 static int CBattleMoveEntity(lua_State *stack)
 {
 	int which = (int)lua_tonumber(stack, 1);
@@ -3464,7 +3455,7 @@ done:
 static int CSetPlayerFormation(lua_State *stack)
 {
 	int spot = lua_tonumber(stack, 1);
-	CombatFormation form = (CombatFormation)lua_tonumber(stack, 2);
+	CombatFormation form = (CombatFormation)((int)lua_tonumber(stack, 2));
 
 	party[spot]->setFormation(form);
 
@@ -3678,7 +3669,7 @@ static int CDestroySample(lua_State *stack)
 {
 	int id = lua_tonumber(stack, 1);
 
-	for (int i = 0; i < sfx.size(); i++) {
+	for (size_t i = 0; i < sfx.size(); i++) {
 		if (sfx[i].id == id) {
 			destroySample(sfx[i].sample);
 			sfx.erase(sfx.begin() + i);
@@ -3693,7 +3684,7 @@ static int CPlaySample(lua_State *stack)
 {
 	int id = lua_tonumber(stack, 1);
 
-	for (int i = 0; i < sfx.size(); i++) {
+	for (size_t i = 0; i < sfx.size(); i++) {
 		if (sfx[i].id == id) {
 			playSample(sfx[i].sample);
 			break;

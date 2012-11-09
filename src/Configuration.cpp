@@ -3,7 +3,7 @@
 #include <sys/stat.h>
 
 #ifdef ALLEGRO_WINDOWS
-#define mkdir(a, b) mkdir(a)
+#define mkdir(a, b) _mkdir(a)
 #endif
 
 Configuration config;

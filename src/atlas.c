@@ -46,6 +46,7 @@ static ABMP *create_bmp(ALLEGRO_BITMAP *bmp, int id)
 
 static void insert_sheet(ATLAS *atlas, _AL_LIST *rect_list)
 {
+	int flags;
 	int sheet = atlas->num_sheets;
 	ARECT *rect = create_rect(0, 0, atlas->width, atlas->height, sheet);
 	_al_list_item_set_dtor(_al_list_push_back(rect_list, rect), my_free);
@@ -61,7 +62,7 @@ static void insert_sheet(ATLAS *atlas, _AL_LIST *rect_list)
 		);
 	}
 
-	int flags = al_get_new_bitmap_flags();
+	flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 	atlas->sheets[sheet] = al_create_bitmap(atlas->width, atlas->height);
 	al_set_new_bitmap_flags(flags);
@@ -92,6 +93,8 @@ ATLAS *atlas_create(int width, int height, int border, bool destroy_bmps)
 
 bool atlas_add(ATLAS *atlas, ALLEGRO_BITMAP *bitmap, int id)
 {
+	ABMP *b;
+
 	/* Add bitmaps from largest to smallest */
 	int add_w = al_get_bitmap_width(bitmap);
 	int add_h = al_get_bitmap_height(bitmap);
@@ -115,7 +118,7 @@ bool atlas_add(ATLAS *atlas, ALLEGRO_BITMAP *bitmap, int id)
 		item = _al_list_next(atlas->bmp_list, item);
 	}
 
-	ABMP *b = create_bmp(bitmap, id);
+	b = create_bmp(bitmap, id);
 
 	if (item) {
 		_al_list_insert_before(
@@ -134,9 +137,16 @@ bool atlas_add(ATLAS *atlas, ALLEGRO_BITMAP *bitmap, int id)
 /* Return number of bitmaps added to atlas */
 int atlas_finish(ATLAS *atlas)
 {
+	ALLEGRO_STATE orig_state;
+	_AL_LIST *rect_list;
+	_AL_LIST_ITEM *item;
+	int count;
+	bool found;
+	_AL_LIST_ITEM *rect_item;
+	ATLAS_ITEM *atlas_item;
+
 	assert(_al_list_size(atlas->bmp_list) > 0);
 
-	ALLEGRO_STATE orig_state;
 	al_store_state(&orig_state,
 		ALLEGRO_STATE_BLENDER |
 		ALLEGRO_STATE_TARGET_BITMAP);
@@ -145,11 +155,11 @@ int atlas_finish(ATLAS *atlas)
 	atlas->num_items = 0;
 	atlas->num_sheets = 0;
 
-	_AL_LIST *rect_list = _al_list_create();
+	rect_list = _al_list_create();
 	insert_sheet(atlas, rect_list);
 
-	_AL_LIST_ITEM *item = _al_list_front(atlas->bmp_list);
-	int count = 0;
+	item = _al_list_front(atlas->bmp_list);
+	count = 0;
 
 	do {
 		ABMP *b = (ABMP *)_al_list_item_data(item);
@@ -162,13 +172,13 @@ int atlas_finish(ATLAS *atlas)
 			item = _al_list_next(atlas->bmp_list, item);
 			continue;
 		}
-		bool found = false;
-		_AL_LIST_ITEM *rect_item = _al_list_front(rect_list);
+		found = false;
+		rect_item = _al_list_front(rect_list);
 		while (rect_item) {
 			ARECT *rect = (ARECT *)_al_list_item_data(rect_item);
 			if (rect->w >= req_w && rect->h >= req_h) {
 				found = true;
-				ATLAS_ITEM *atlas_item =
+				atlas_item =
 					(ATLAS_ITEM *)
 					al_malloc(sizeof(ATLAS_ITEM));
 				al_set_target_bitmap(atlas->sheets[rect->sheet]);

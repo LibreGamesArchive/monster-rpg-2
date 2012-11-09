@@ -251,7 +251,7 @@ void Object::drawUpper(void)
 		int h = m_get_bitmap_height(poison_bmp);
 		int w2 = m_get_bitmap_width(poison_bmp_tmp);
 		int h2 = m_get_bitmap_height(poison_bmp_tmp);
-		ALLEGRO_VERTEX verts[MAX(w, MAX(h, MAX(w2, h2))) * 2];
+		ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[MAX(w, MAX(h, MAX(w2, h2))) * 2];
 		for (int i = 0; i < w; i++) {
 			verts[i*2+0].x = i;
 			verts[i*2+0].y = 5+5*sin((float)i/w*M_PI*4+poison_x);
@@ -285,6 +285,7 @@ void Object::drawUpper(void)
 			verts[i*2+1].v = i;
 		}
 		m_draw_prim(verts, NULL, poison_bmp_tmp, 0, h2*2, ALLEGRO_PRIM_LINE_LIST);
+		delete[] verts;
 		m_pop_target_bitmap();
 		ALLEGRO_COLOR col, tmp = poisonBlocks[0].color;
 		col.r = tmp.r * tmp.a;

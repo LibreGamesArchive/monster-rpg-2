@@ -4,9 +4,6 @@
 #include <allegro5/allegro_iphone.h>
 #endif
 #include <allegro5/internal/aintern_opengl.h>
-#ifdef A5_D3D
-#include <allegro5/internal/aintern_direct3d.h>
-#endif
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 #define glFrustum glFrustumf

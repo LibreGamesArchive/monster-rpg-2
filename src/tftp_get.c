@@ -1,4 +1,5 @@
 #define _WIN32_WINNT 0x0501
+#define _WINSOCKAPI_
 #include <allegro5/allegro.h>
 
 #ifdef ALLEGRO_WINDOWS
@@ -98,6 +99,7 @@ static int put(const char *buf, int len)
 static bool connect_to_server(void)
 {
 	struct addrinfo hints, *res;
+	int r;
 
 	// first, load up address structs with getaddrinfo():
 	memset(&hints, 0, sizeof hints);
@@ -105,7 +107,7 @@ static bool connect_to_server(void)
 	hints.ai_socktype = SOCK_DGRAM;
 	hints.ai_protocol = IPPROTO_UDP;
 
-	int r;
+	r;
 
 	if ((r = getaddrinfo(SERVER, PORT, &hints, &res)) != 0) {
 		debug_message("getaddrinfo failed: r=%d, errno=%d", r, errno);
@@ -138,6 +140,8 @@ static void shutdown_connection(void)
 // return size
 static int get_rrq(char *buf, const char *filename)
 {
+	char *bsize;
+
 	buf[0] = 0;
 	buf[1] = 1;
 	buf += 2;
@@ -150,7 +154,7 @@ static int get_rrq(char *buf, const char *filename)
 	strcpy(buf, "blksize");
 	buf[strlen("blksize")] = 0;
 	buf += strlen("blksize")+1;
-	char *bsize = BLKSIZE_S;
+	bsize = BLKSIZE_S;
 	strcpy(buf, bsize);
 	buf[strlen(bsize)] = 0;
 
@@ -176,6 +180,10 @@ static int download_file(const char *filename)
 	char buf[4+BLKSIZE];
 	int sz, total_size = 0;
 	int last_blocknum = -1;
+	FILE *f;
+	struct timeval tv;
+	fd_set fdset;
+	int blocknum;
 	
 	if (!connect_to_server()) {
 		return -1;
@@ -207,7 +215,7 @@ static int download_file(const char *filename)
 	}
 
 	sprintf(fn, "%s/%s", DOWNLOAD_PATH, filename);
-	FILE *f = fopen(fn, "wb");
+	f = fopen(fn, "wb");
 
 	while (1) {
 		if (stop) {
@@ -216,10 +224,8 @@ static int download_file(const char *filename)
 			debug_message("told to stop");
 			return -1;
 		}
-		fd_set fdset;
 		FD_ZERO(&fdset);
 		FD_SET(sock, &fdset);
-		struct timeval tv;
 		tv.tv_sec = 60;
 		tv.tv_usec = 0;
 		if (select(sock+1, &fdset, 0, 0, &tv) == 0) {
@@ -232,7 +238,7 @@ static int download_file(const char *filename)
 		if (sz != 4+BLKSIZE) {
 			break;
 		}
-		int blocknum = get16bits(buf+2);
+		blocknum = get16bits(buf+2);
 		if (last_blocknum == -1 || blocknum != last_blocknum) {
 			fwrite(buf+4, BLKSIZE, 1, f);
 			total_size += BLKSIZE;
@@ -268,8 +274,8 @@ static int download_file(const char *filename)
 static int download_file_curl(const char *filename)
 {
 	char outfilename[1000];
-	sprintf(outfilename, "%s/%s", DOWNLOAD_PATH, filename);
 	char url[1000];
+	sprintf(outfilename, "%s/%s", DOWNLOAD_PATH, filename);
 	sprintf(url, "ftp://nooskewl.com/%s", filename);
 
 	return getfile(url, outfilename);
@@ -294,14 +300,18 @@ static void download_list(char **filenames, int *lengths)
 static bool download_all(void)
 {
 	char fn[1000];
-	sprintf(fn, "%s/%s", DOWNLOAD_PATH, LIST_FILENAME);
-	FILE *f = fopen(fn, "r");
+	FILE *f;
 	size_t read;
 	char buf[100];
 	int sz;
 	char **filenames = NULL;
 	int *lengths = NULL;
 	int count = 0;
+	char fn2[1000];
+	ALLEGRO_FILE *f2;
+
+	sprintf(fn, "%s/%s", DOWNLOAD_PATH, LIST_FILENAME);
+	f = fopen(fn, "r");
 	while ((read = fread(buf, 1, 80, f)) == 80) {
 		fgetc(f); // skip, fseek malfunctioning on windows oO
 		buf[80] = 0;
@@ -309,9 +319,8 @@ static bool download_all(void)
 			fclose(f);
 			return false;
 		}
-		char fn2[1000];
 		sprintf(fn2, "%s/%s", DOWNLOAD_PATH, fn);
-		ALLEGRO_FILE *f2 = al_fopen(fn2, "rb");
+		f2 = al_fopen(fn2, "rb");
 		if (f2) {
 			int sz2 = al_fsize(f2);
 			al_fclose(f2);
@@ -348,6 +357,11 @@ static bool download_all(void)
 
 static void *hqm_go_thread(void *arg)
 {
+	int len;
+#ifdef ALLEGRO_WINDOWS
+	WSADATA crap;
+#endif
+
 	(void)arg;
 
 #ifdef ALLEGRO_ANDROID
@@ -359,11 +373,10 @@ static void *hqm_go_thread(void *arg)
 	mkdir(DOWNLOAD_PATH, 0755);
 
 #ifdef ALLEGRO_WINDOWS
-	WSADATA crap;
 	WSAStartup(MAKEWORD(2, 2), &crap);
 #endif
 
-	int len = download_file(LIST_FILENAME);
+	len = download_file(LIST_FILENAME);
 	if (len != EXPECTED_LIST_SIZE) {
 		is_downloading = false;
 		return NULL;
@@ -384,6 +397,8 @@ static void *hqm_go_thread(void *arg)
 
 static void *hqm_go_thread_curl(void *arg)
 {
+	int len;
+
 	(void)arg;
 
 #ifdef ALLEGRO_ANDROID
@@ -394,7 +409,7 @@ static void *hqm_go_thread_curl(void *arg)
 
 	mkdir(DOWNLOAD_PATH, 0755);
 
-	int len = download_file_curl(LIST_FILENAME);
+	len = download_file_curl(LIST_FILENAME);
 	if (len != EXPECTED_LIST_SIZE) {
 		is_downloading = false;
 		return NULL;
@@ -442,28 +457,33 @@ const char *hqm_status_string(int status)
 
 int hqm_get_status(float *percent)
 {
+	char fn[1000];
+	ALLEGRO_FILE *f;
+	size_t read;
+	char buf[100];
+	int sz;
+	int count = 0;
+
 	if (percent)
 		*percent = 0.0f;
 
-	char fn[1000];
 	sprintf(fn, "%s/%s", DOWNLOAD_PATH, LIST_FILENAME);
 
 #ifdef ALLEGRO_ANDROID
 	al_set_standard_file_interface();
 #endif
 
-	ALLEGRO_FILE *f = al_fopen(fn, "r");
+	f = al_fopen(fn, "r");
 
 	if (f == NULL || al_fsize(f) != EXPECTED_LIST_SIZE) {
 		if (f) al_fclose(f);
 		goto nuthin;
 	}
 
-	size_t read;
-	char buf[100];
-	int sz;
-	int count = 0;
 	while ((read = al_fread(f, buf, 80)) == 80) {
+		char fn2[1000];
+		ALLEGRO_FILE *f2;
+
 		al_fgetc(f);
 		buf[80] = 0;
 		if (sscanf(buf, "%s %d", fn, &sz) != 2) {
@@ -474,9 +494,8 @@ int hqm_get_status(float *percent)
 			al_fclose(f);
 			goto partial;
 		}
-		char fn2[1000];
 		sprintf(fn2, "%s/%s", DOWNLOAD_PATH, fn);
-		ALLEGRO_FILE *f2 = al_fopen(fn2, "rb");
+		f2 = al_fopen(fn2, "rb");
 		if (f2) {
 			int sz2 = al_fsize(f2);
 			al_fclose(f2);
@@ -539,6 +558,8 @@ void hqm_set_download_path(const char *path)
 
 void hqm_delete(void)
 {
+	ALLEGRO_FS_ENTRY *file;
+
 #ifdef ALLEGRO_ANDROID
 	al_set_standard_file_interface();
 #endif
@@ -556,7 +577,6 @@ void hqm_delete(void)
 		return;
 	}
 
-	ALLEGRO_FS_ENTRY *file;
 	while ((file = al_read_directory(dir)) != NULL) {
 		al_remove_fs_entry(file);
 		al_destroy_fs_entry(file);

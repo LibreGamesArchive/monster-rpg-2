@@ -22,47 +22,6 @@ extern "C" {
 void _al_blend_memory(ALLEGRO_COLOR *, ALLEGRO_BITMAP *, int, int, ALLEGRO_COLOR *);
 }
 
-#ifndef ALLEGRO_ANDROID
-static void draw_points_locked(ALLEGRO_VERTEX *verts, int n)
-{
-	int minx = INT_MAX, miny = INT_MAX;
-	int maxx = INT_MIN, maxy = INT_MIN;
-
-	for (int i = 0; i < n; i++) {
-		int xmin = verts[i].x;
-		int ymin = verts[i].y;
-		int xmax = verts[i].x + 1;
-		int ymax = verts[i].y + 1;
-		if (xmin < minx) minx = xmin;
-		if (ymin < miny) miny = ymin;
-		if (xmax > maxx) maxx = xmax;
-		if (ymax > maxy) maxy = ymax;
-	}
-
-	ALLEGRO_BITMAP *target = al_get_target_bitmap();
-	int w = al_get_bitmap_width(target);
-	int h = al_get_bitmap_height(target);
-
-	if (minx < 0) minx = 0;
-	if (miny < 0) miny = 0;
-	if (maxx >= w-1) maxx = w-1;
-	if (maxy >= h-1) maxy = h-1;
-
-	al_lock_bitmap_region(target, minx, miny, maxx-minx, maxy-miny,
-		ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READWRITE);
-	
-	ALLEGRO_COLOR c;
-
-	for (int i = 0; i < n; i++) {
-		_al_blend_memory(&verts[i].color, target, verts[i].x, verts[i].y, &c);
-		al_put_pixel(verts[i].x, verts[i].y, c);
-		
-	}
-
-	al_unlock_bitmap(target);
-}
-#endif
-
 static void get_bolt2_bitmaps(int n, MBITMAP **bmps)
 {
 	num_bolt2_bmps = n;
@@ -2667,7 +2626,7 @@ void Fire3Effect::draw(void)
 	}
 
 	int min = MIN(H, offs);
-	ALLEGRO_VERTEX verts[min * 2];
+	ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[min * 2];
 
 	for (int y = 0; y < min; y++) {
 		float alpha = (float)y/min;
@@ -2687,6 +2646,8 @@ void Fire3Effect::draw(void)
 	}
 
 	m_draw_prim(verts, NULL, fire_bmp, 0, min*2, ALLEGRO_PRIM_LINE_LIST);
+
+	delete[] verts;
 }
 
 
@@ -3566,10 +3527,6 @@ ArcEffect::ArcEffect(Combatant *caster, Combatant *target) :
 	int total = 0;
 	float angle = atan2((float)dy-sy, (float)dx-sx);
 	
-	MPoint p;
-	p.x = cx;
-	p.y = cy;
-
 	for (;;) {
 		total += (rand() % (MAXDIST-MINDIST)) + MINDIST;
 		cx = sx + cos(angle) * total;
@@ -3885,7 +3842,7 @@ void BoFEffect::draw(void)
 	else {
 		int c = count - (count/3*2);
 		float extra = ((110-h) * ((float)c/lt));
-		ALLEGRO_VERTEX verts[w*2];
+		ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[w*2];
 		for (int i = 0; i < w; i++) {
 			float height = (h/3) + (1-cos(((float)i/w)*M_PI/2)) * extra;
 			int dy = 110/2 - height/2;
@@ -3905,6 +3862,7 @@ void BoFEffect::draw(void)
 			line %= w;
 		}
 		m_draw_prim(verts, NULL, bitmap, 0, w*2, ALLEGRO_PRIM_LINE_LIST);
+		delete[] verts;
 	}
 }
 
@@ -4716,7 +4674,7 @@ void PukeEffect::draw(void)
 		puke_sound = true;
 	}
 
-	ALLEGRO_VERTEX verts[lines.size()*2];
+	ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[lines.size()*2];
 	for (int i = 0; i < (int)lines.size(); i++) {
 		int x1, y1, x2, y2;
 		x1 = -cos(lines[i].angle) * 10 + lines[i].cx;
@@ -4733,6 +4691,7 @@ void PukeEffect::draw(void)
 		verts[i*2+1].color = lines[i].color;
 	}
 	m_draw_prim(verts, NULL, NULL, 0, (int)lines.size()*2, ALLEGRO_PRIM_LINE_LIST);
+	delete[] verts;
 }
 
 

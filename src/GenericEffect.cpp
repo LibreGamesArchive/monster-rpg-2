@@ -170,7 +170,7 @@ bool GenericHolyWaterEffect::update(int step)
 void GenericHolyWaterEffect::draw(void)
 {
 	int i, count;
-	ALLEGRO_VERTEX verts[numPixels];
+	ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[numPixels];
 
 	// draw pixels behind target
 	for (i = 0, count = 0; i < numPixels; i++) {
@@ -189,6 +189,8 @@ void GenericHolyWaterEffect::draw(void)
 	}
 
 	m_draw_prim(verts, 0, 0, 0, count, ALLEGRO_PRIM_POINT_LIST);
+
+	delete[] verts;
 
 	target->draw();
 

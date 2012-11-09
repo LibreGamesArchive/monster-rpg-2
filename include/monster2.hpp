@@ -38,10 +38,7 @@
 #define MS_SWIPE_TO_ATTACK 190
 #define MS_DRAG_TO_USE 191
 
-#ifdef ALLEGRO4
-#include <allegro.h>
-#include <loadpng.h>
-#else
+#define ALLEGRO_STATICLINK
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
@@ -51,7 +48,6 @@
 #include <allegro5/allegro_shader.h>
 #include <allegro5/allegro_shader_glsl.h>
 #include <allegro5/allegro_memfile.h>
-#endif
 
 ALLEGRO_DEBUG_CHANNEL("morpg2")
 

@@ -2,31 +2,10 @@
 
 #define NO_SIN
 #include "monster2.hpp"
-#define ASSERT ALLEGRO_ASSERT
-#include <allegro5/internal/aintern_opengl.h>
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 #include "joypad.hpp"
 #endif
-
-static int vert_compare(const void *a, const void *b)
-{
-	ALLEGRO_VERTEX *av = (ALLEGRO_VERTEX *)a;
-	ALLEGRO_VERTEX *bv = (ALLEGRO_VERTEX *)b;
-
-	float ac = 0, bc = 0;
-	
-	for (int i = 0; i < 3; i++) {
-		ac += av[i].color.r;
-		ac += av[i].color.g;
-		ac += av[i].color.b;
-		bc += bv[i].color.r;
-		bc += bv[i].color.g;
-		bc += bv[i].color.b;
-	}
-	
-	return ac - bc;
-}
 
 // stuff allegro doesn't have yet
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -779,7 +758,6 @@ static bool real_archery(int *accuracy_pts)
 	int num_shots = 0;
 
 	bool really_done = false;
-	bool played_draw_and_release = false;
 	bool clicked = false;
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	current_mouse_x = BW/2;
@@ -940,7 +918,6 @@ static bool real_archery(int *accuracy_pts)
 				drawn = false;
 				hiddenCount = 500;
 				playPreloadedSample("bow_release_and_draw.ogg");
-				played_draw_and_release = true;
 				// check for hit on goblin, set dead count, set sub anim
 				std::vector<Goblin>::iterator it;
 				for (it = goblins.begin(); it != goblins.end();) {
