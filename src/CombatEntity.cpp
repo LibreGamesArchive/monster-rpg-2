@@ -1178,11 +1178,7 @@ void WhirlpoolEffect::draw(void)
 		}
 	}
 
-#if defined __linux__ && !defined ALLEGRO_ANDROID
-	draw_points_locked(verts, i);
-#else
 	m_draw_prim(verts, 0, 0, 0, i*mult, ALLEGRO_PRIM_POINT_LIST);
-#endif
 
 	delete[] verts;
 }
@@ -3184,11 +3180,7 @@ void WhipEffect::draw(void)
 		verts[i].z = 0;
 		verts[i].color = curr[i].color;
 	}
-#if defined __linux__ && !defined ALLEGRO_ANDROID
-	draw_points_locked(verts, POINTS);
-#else
 	m_draw_prim(verts, 0, 0, 0, POINTS, ALLEGRO_PRIM_POINT_LIST);
-#endif
 	delete[] verts;
 }
 
@@ -3577,11 +3569,7 @@ void BananaEffect::draw(void)
 			verts[i].z = 0;
 			verts[i].color = pixels[i].cp.color;
 		}
-#if defined __linux__ && !defined ALLEGRO_ANDROID
-		draw_points_locked(verts, pixels.size());
-#else
 		m_draw_prim(verts, 0, 0, 0, (int)pixels.size(), ALLEGRO_PRIM_POINT_LIST);
-#endif
 		delete[] verts;
 	}
 }
@@ -3926,11 +3914,7 @@ void DropEffect::draw(void)
 			verts[i].z = 0;
 			verts[i].color = pixels[i].cp.color;
 		}
-#if defined __linux__ && !defined ALLEGRO_ANDROID
-		draw_points_locked(verts, pixels.size());
-#else
 		m_draw_prim(verts, 0, 0, 0, (int)pixels.size(), ALLEGRO_PRIM_POINT_LIST);
-#endif
 		delete[] verts;
 	}
 }
@@ -4108,11 +4092,7 @@ void MachineGunEffect::draw(void)
 		verts[i].color = color;
 	}
 
-#if defined __linux__ && !defined ALLEGRO_ANDROID
-	draw_points_locked(verts, 25);
-#else
 	m_draw_prim(verts, 0, 0, 0, 25, ALLEGRO_PRIM_POINT_LIST);
-#endif
 
 	delete[] verts;
 }
@@ -4283,11 +4263,7 @@ void UFOEffect::draw(void)
 		vcount++;
 	}
 
-#if defined __linux__ && !defined ALLEGRO_ANDROID
-	draw_points_locked(verts, vcount);
-#else
 	m_draw_prim(verts, 0, 0, 0, vcount, ALLEGRO_PRIM_POINT_LIST);
-#endif
 
 	delete[] verts;
 }
