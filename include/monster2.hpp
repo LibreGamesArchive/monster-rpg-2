@@ -65,18 +65,10 @@ ALLEGRO_DEBUG_CHANNEL("morpg2")
 #ifndef ALLEGRO_WINDOWS
 #define MAX_PATH 5000
 #else
-#ifdef ALLEGRO4
-#include <winalleg.h>
-#else
 #include <allegro5/allegro_direct3d.h>
-#endif
 #undef _WIN32_IE
 #define _WIN32_IE 0x400
 #include <shlobj.h>
-#endif
-
-#if (defined ALLEGRO_MACOSX) && (defined ALLEGRO4)
-#include "osx.h"
 #endif
 
 #if defined KCM_AUDIO
@@ -121,13 +113,9 @@ const int MAX_SPELLS = 32;
  * limit it for this game but keep it at 256 for save state compatibility ...edit: keep compatibility another way */
 const int MAX_SPELLS_IN_THIS_GAME = 32;
 
-#ifdef ALLEGRO4
-typedef FONT MFONT;
-#else
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
 typedef ALLEGRO_FONT MFONT;
-#endif
 
 const int LOGIC_RATE = 60;
 
@@ -285,9 +273,6 @@ enum CloneType
 
 #include "my_load_bitmap.h"
 
-#ifdef EDITOR
-#include "editor.hpp"
-#endif
 extern uint32_t runtime;
 extern int runtime_ms;
 extern bool break_main_loop;

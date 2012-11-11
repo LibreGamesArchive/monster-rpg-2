@@ -62,8 +62,6 @@ set(COMMON_SRCS
 	src/Player.cpp
 	src/Spells.cpp
 	src/Tile.cpp
-	src/atlas.c
-	src/atlas_accessor.c
 	src/battle.cpp
 	src/debug.cpp
 	src/equipment.cpp

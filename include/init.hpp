@@ -31,16 +31,38 @@ bool is_ipad(void);
 void toggle_fullscreen(void);
 bool is_ipad(void);
 
+void init_shaders(void);
+void destroy_shaders(void);
+
+ScreenSize small_screen(void);
+void get_buffer_true_size(int *buffer_true_w, int *buffer_true_h);
+
+void init_big_depth_surface(void);
+
+bool imperfect_aspect(void);
+void create_buffers(void);
+void destroy_fonts(void);
+void load_fonts(void);
+
+void init2_shaders();
+void register_display(ALLEGRO_DISPLAY *display);
+
+extern "C" {
+	void connect_external_controls(void);
+	void disconnect_external_controls(void);
+	void lock_joypad_mutex(void);
+	void unlock_joypad_mutex(void);
+}
+
+// FIXME: TONNES OF GLOBALS
 
 extern ALLEGRO_TIMER *logic_timer, *draw_timer;
 extern float initial_screen_scale;
-#ifndef ALLEGRO4
 extern ALLEGRO_DISPLAY *display;
 extern ALLEGRO_DISPLAY *controller_display;
 extern ALLEGRO_COND *wait_cond;
 extern ALLEGRO_MUTEX *wait_mutex;
 extern int exit_event_thread;
-//extern ALLEGRO_SHADER *controller_shader;
 extern ALLEGRO_SHADER *default_shader;
 extern ALLEGRO_SHADER *cheap_shader;
 extern ALLEGRO_SHADER *tinter;
@@ -55,7 +77,6 @@ extern ALLEGRO_SHADER *scale2x_linear;
 extern ALLEGRO_SHADER *scale2x_linear_flipped;
 extern ALLEGRO_SHADER *scale3x_linear;
 extern ALLEGRO_SHADER *scale3x_linear_flipped;
-#endif
 extern MBITMAP *buffer;
 extern MBITMAP *overlay;
 extern MBITMAP *scaleXX_buffer;
@@ -83,7 +104,6 @@ struct GuiAnims
 extern GuiAnims guiAnims;
 
 extern GameInfo gameInfo;
-//extern MBITMAP *profileBg;
 extern MBITMAP *cursor;
 extern MFONT *huge_font;
 extern MFONT *medium_font;
@@ -100,17 +120,6 @@ extern volatile int logic_counter;
 
 extern bool gfx_mode_set;
 
-#ifdef WIZ
-extern MBITMAP *tmp_texture;
-extern unsigned char *tmp_buffer;
-//extern float sintab[SIN_TAB_SIZE+1];
-//extern float costab[COS_TAB_SIZE+1];
-extern MBITMAP *screen;
-extern int startGFXDriver;
-void *thread_proc(ALLEGRO_THREAD *thread, void *arg);
-extern ALLEGRO_THREAD *thread;
-#endif
-
 extern bool egl_workaround;
 extern bool inited;
 
@@ -126,8 +135,6 @@ extern ALLEGRO_MUTEX *input_mutex;
 extern ALLEGRO_MUTEX *dpad_mutex;
 extern ALLEGRO_MUTEX *orient_mutex;
 extern float bright_ticker;
-//extern int area_panned_x;
-//extern int area_panned_y;
 extern float area_panned_x;
 extern float area_panned_y;
 extern MBITMAP *corner_bmp;
@@ -172,8 +179,6 @@ enum ScreenSize {
 	ScreenSize_Small
 };
 
-ScreenSize small_screen(void);
-void get_buffer_true_size(int *buffer_true_w, int *buffer_true_h);
 // cheats
 extern bool superpower, healall;
 
@@ -186,25 +191,14 @@ extern bool achievement_show;
 extern double achievement_time;
 extern MBITMAP *achievement_bmp;
 
-void init_shaders(void);
-void destroy_shaders(void);
-
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 extern bool do_pause_game;
-void init_shaders();
-void destroy_shaders();
 #endif
 #ifdef ALLEGRO_IPHONE
-void check_orientation(void);
 extern bool create_airplay_mirror;
 extern bool delete_airplay_mirror;
 extern bool airplay_connected;
 #endif
-void init2_shaders();
-
-void register_display(ALLEGRO_DISPLAY *display);
-//void init_controller_shader(void);
-//void destroy_controller_shader(void);
 
 extern volatile int curr_touches;
 
@@ -233,19 +227,5 @@ extern bool main_halted;
 extern bool d3d_halted;
 extern bool should_reset;
 extern bool is_fs_toggle;
-void init_big_depth_surface(void);
-
-bool imperfect_aspect(void);
-void create_buffers(void);
-void destroy_fonts(void);
-void load_fonts(void);
-
-extern "C" {
-void connect_external_controls(void);
-void disconnect_external_controls(void);
-void lock_joypad_mutex(void);
-void unlock_joypad_mutex(void);
-}
 
 #endif
-

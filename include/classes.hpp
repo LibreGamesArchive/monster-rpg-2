@@ -7,6 +7,5 @@ const int CLASS_CLERIC = 4;
 const int CLASS_STEAMPUNK = 8;
 const int CLASS_ENY = 16;
 
-
 #endif
 

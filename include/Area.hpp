@@ -3,15 +3,12 @@
 
 #include "monster2.hpp"
 
-
 struct Collision {
 	int id1;
 	int id2;
 };
 
-
 const int MAX_TILES = (BW/TILE_SIZE+2)*(BH/TILE_SIZE+2);
-
 
 class Area {
 public:
@@ -68,11 +65,6 @@ public:
 
 	void writeTile(int tile, gzFile f);
 
-#ifdef EDITOR
-	Area(int w, int h) throw (std::bad_alloc);	// create empty area for editor
-	void saveBmp(std::string filename);
-#endif
-	
 	void followPlayer(bool follow);
 	void setFocus(int x, int y);
 	int getFocusX(void);
@@ -104,25 +96,15 @@ private:
 	float tint_ratio;
 	bool reverseTint;
 	MBITMAP *bg;
-#ifdef ALLEGRO4
-	uint16_t tint_r, tint_g, tint_b;
-#endif
         
-	//int offsetx, offsety;
-	//float offsetx, offsety;
 	int sizex, sizey;
 	std::string name;
     	
 	void drawLayer(int layer, int bw, int bh);
 
 	std::vector<Tile *> tiles;
-	//std::vector<Object*> sObjects;	// sorted objects
 	bool follow;
-#ifdef EDITOR
-	ALLEGRO_VERTEX verts[6*(240/16)*(160/16)*1000];
-#else
 	ALLEGRO_VERTEX verts[MAX_TILES*6*(TILE_LAYERS/2)];
-#endif
 	int num_quads;
 	struct anim_data {
 		int delay;

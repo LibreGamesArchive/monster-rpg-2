@@ -5,31 +5,17 @@
 
 #include "quantize.hpp"
 
-static std::vector<AnimationSet *> all_animsets;
-
-void animset_post_reset(void)
-{
-}
-
-void AnimationSet::displayConvert(void)
-{
-	for (int i = 0; i < (int)anims.size(); i++) {
-		anims[i]->displayConvert();
-	}
-}
-
 void AnimationSet::setSubAnimation(int anim)
 {
 	currAnim = anim;
 }
-
-
 
 /*
  * Returns true if an animation by this name exists
  */
 bool AnimationSet::setSubAnimation(std::string subName)
 {
+	/* MORPG2: this small hack makes Eny hold her hands up in the first battle */
 	if (battle && battle->getName() == "first_battle" && subName == "stand" && !checkSubAnimationExists("cast"))
 		subName = "stand2";
 

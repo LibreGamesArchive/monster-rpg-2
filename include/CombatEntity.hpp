@@ -660,9 +660,6 @@ public:
 
 		for (int i = 0; i < numExplosionCircles; i++) {
 			explosionCircles[i].count += step;
-			#ifndef WIZ
-			explosionCircles[i].color.a = 255 * (1 - (float)explosionCircles[i].count / explosionCircles[i].lifetime);
-			#endif
 			if (explosionCircles[i].count > explosionCircles[i].lifetime) {
 				explosionCircles[i].count = 0;
 				explosionCircles[i].x = x + ((rand() % w) - (w/2));

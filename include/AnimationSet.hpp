@@ -1,7 +1,6 @@
 #ifndef ANIMSET_H
 #define ANIMSET_H
 
-
 #include "monster2.hpp"
 
 class AnimationSet {
@@ -24,8 +23,6 @@ public:
 	void drawScaled(int x, int y, int w, int h, int flags = 0);
 	int update(int step);
 
-	void displayConvert(void);
-
 	AnimationSet *clone(int type);
 	void post_reset(void);
 
@@ -43,9 +40,5 @@ private:
 	MBITMAP *bitmap;
 	std::string filename;
 };
-
-
-void animset_post_reset(void);
-
 
 #endif

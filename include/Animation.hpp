@@ -114,7 +114,7 @@ protected:
 	int currentFrame;
 	int count;
 	std::string name;
-	int alpha; // only respected when draw with draw(...)
+	int alpha; // only respected when drawn with draw(...)
 	bool looping;
 	LoopMode loopMode;
 	int increment;

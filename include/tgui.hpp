@@ -3,11 +3,7 @@
 
 #include <vector>
 
-#ifdef ALLEGRO4
-#include <allegro.h>
-#else
 #include <allegro5/allegro5.h>
-#endif
 
 #ifndef MIN
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
