@@ -961,59 +961,9 @@ static void run(void)
 			anotherDoDialogue("Oh, no! Someone is poisoned. They'll lose health every turn until they're healed.\n", false, true);
 		}
 
-#ifdef ALLEGRO4
-	if (gameInfo.milestones[MS_CELL_SCENE]) {
-		if (key[KEY_S] && !battle) {
-			if (prompt("Really save? This can", "cause problems!!", 0, 0)) {
-				if (saveFilename) {
-					char tmp[1000];
-					strcpy(tmp, saveFilename);
-					saveGame(tmp, "");
-				}
-				else
-					notify("", "Not saved!", "");
-			}
-		}
-	}
-      if (key[KEY_F1]) {
-         rest(150);
-         int v = config.getMusicVolume();
-         if (v <= 26) v = 0;
-         else v = v - 26; 
-         config.setMusicVolume(v);
-         setMusicVolume(getMusicVolume());
-         setAmbienceVolume(getAmbienceVolume());
-      }
-      if (key[KEY_F2]) {
-         rest(150);
-         int v = config.getMusicVolume();
-         if (v >= 230) v = 255;
-         else v = v + 26; 
-         config.setMusicVolume(v);
-         setMusicVolume(getMusicVolume());
-         setAmbienceVolume(getAmbienceVolume());
-      }
-      if (key[KEY_F3]) {
-         rest(150);
-         int v = config.getSFXVolume();
-         if (v <= 26) v = 0;
-         else v = v - 26; 
-         config.setSFXVolume(v);
-      }
-      if (key[KEY_F4]) {
-         rest(150);
-         int v = config.getSFXVolume();
-         if (v >= 230) v = 255;
-         else v = v + 26; 
-         config.setSFXVolume(v);
-      }
-#else
-
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		ALLEGRO_KEYBOARD_STATE state;
 		al_get_keyboard_state(&state);
-#endif
-
 #endif
 	}
 

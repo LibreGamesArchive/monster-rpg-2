@@ -20,13 +20,6 @@ extern "C" {
 #include "java.h"
 #endif
 
-#ifdef ALLEGRO4 // need a lookup table for tinting
-#define NUM_TINTER_SHADES 8
-uint16_t *tinter_table[NUM_TINTER_SHADES];
-uint16_t variable_table[NUM_TINTER_SHADES*65536];
-uint16_t purple_table[65536];
-#endif
-
 bool global_draw_controls = true;
 static TemporaryTextWidget omnipotentTexts[MAX_PARTY];
 static double current_time = -1;
@@ -764,15 +757,6 @@ void draw_clock(int cx, int cy, int r, bool reverse)
 
 void m_put_alpha_pixel(MBITMAP *bmp, int x, int y, MCOLOR c)
 {
-#ifdef ALLEGRO4
-	MCOLOR bg = m_get_pixel(bmp, x, y);
-
-	putpixel(bmp, x, y, m_makecol(m_map_rgb_f(
-		MIN(1.0f, c.r*c.a+bg.r*(1-c.a)),
-		MIN(1.0f, c.g*c.a+bg.g*(1-c.a)),
-		MIN(1.0f, c.b*c.a+bg.b*(1-c.a))
-	)));
-#else
 	MCOLOR bg = m_get_pixel(bmp, x, y);
 	
 	_al_put_pixel(bmp->bitmap, x, y, m_map_rgb_f(
@@ -780,7 +764,6 @@ void m_put_alpha_pixel(MBITMAP *bmp, int x, int y, MCOLOR c)
 		MIN(1.0f, c.g*c.a+bg.g*(1-c.a)),
 		MIN(1.0f, c.b*c.a+bg.b*(1-c.a))
 	));
-#endif
 }
 
 void m_draw_precise_line(MBITMAP *bitmap, float x1, float y1, float x2, float y2, MCOLOR color)

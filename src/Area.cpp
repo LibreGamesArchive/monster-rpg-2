@@ -936,10 +936,6 @@ void Area::tint(MCOLOR *target, bool reverse)
 	reverseTint = reverse;
 
 	targetTint = *target;
-
-#ifdef ALLEGRO4
-	generateTinterTable((int)(255 * target->r), (int)(255 * target->g), (int)(255 * target->b));
-#endif
 }
 
 void startArea(std::string name)

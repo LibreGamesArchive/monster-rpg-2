@@ -358,15 +358,7 @@ void Bolt2Effect::draw(void)
 	int dx = (int)(target->getX() - (m_get_bitmap_width(bitmaps[0])/2));
 	int dy = (int)(target->getY() - m_get_bitmap_height(bitmaps[0]));
 
-#ifndef ALLEGRO4
-
 	m_draw_bitmap(bitmaps[bmpIndex], dx, dy, 0);
-#else
-
-	set_alpha_blender();
-	draw_trans_sprite(m_get_target_bitmap(), bitmaps[bmpIndex], dx, dy);
-
-#endif
 }
 
 
@@ -870,7 +862,6 @@ void Darkness1Effect::draw(void)
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
 	for (int i = 0; i < NUM_BLOBS; i++) {
-#ifndef ALLEGRO4
 		float dx = blobs[i].x;
 		float dy = blobs[i].y;
 		int half_w = m_get_bitmap_width(bitmaps[0])/2;
@@ -880,20 +871,6 @@ void Darkness1Effect::draw(void)
 			half_w, half_h, dx, dy,
 			blobs[i].scale, blobs[i].scale,
 			-blobs[i].angle, 0);
-#else
-		float dx = blobs[i].x - (buffer->w*blobs[i].scale)/2;
-		float dy = blobs[i].y - (buffer->h*blobs[i].scale)/2;
-
-		clear_to_color(buffer, makeacol32(0,0,0,0));
-
-		pivot_scaled_sprite(buffer, bitmaps[blobs[i].bmpIndex],
-			buffer->w/2, buffer->h/2, buffer->w/2, buffer->h/2,
-			ftofix(-blobs[i].angle/(M_PI*2)*256), ftofix(blobs[i].scale));
-
-		set_alpha_blender();
-
-		draw_trans_sprite(m_get_target_bitmap(), buffer, dx, dy);
-#endif
 	}
 }
 
@@ -954,11 +931,6 @@ Darkness1Effect::Darkness1Effect(Combatant *target) :
 		bitmaps[i] = m_load_alpha_bitmap(getResource("combat_media/%s", name));
 	}
 
-#ifdef ALLEGRO4
-	buffer = create_bitmap_ex(32, bitmaps[0]->w, bitmaps[0]->h);
-	clear(buffer);
-#endif
-
 	for (int i = 0; i < NUM_BLOBS; i++) {
 		createBlob(blobs, i);
 	}
@@ -970,10 +942,6 @@ Darkness1Effect::~Darkness1Effect(void)
 	for (int i = 0; i < 3; i++) {
 		m_destroy_bitmap(bitmaps[i]);
 	}
-
-#ifdef ALLEGRO4
-	destroy_bitmap(buffer);
-#endif
 
 	loadPlayDestroy("Darkness1.ogg");
 }
@@ -997,16 +965,8 @@ void WeepEffect::draw(void)
 			drops[i].color.g*drops[i].alpha*255,
 			drops[i].color.b*drops[i].alpha*255,
 			drops[i].alpha*255);
-#ifndef ALLEGRO4
 		m_draw_line(drops[i].x, 0, drops[i].x, drops[i].length,
 			color);
-#else
-		drawing_mode(DRAW_MODE_TRANS, NULL, 0, 0);
-		set_trans_blender(0, 0, 0, drops[i].alpha*255);
-		m_draw_line(drops[i].x, 0, drops[i].x, drops[i].length,
-			color);
-		drawing_mode(DRAW_MODE_SOLID, NULL, 0, 0);
-#endif
 	}
 }
 
@@ -2296,12 +2256,7 @@ void TorrentEffect::draw(void)
 		const int len = 20;
 		tx = drops[i].x + (cos(angle) * len);
 		ty = drops[i].y + (sin(angle) * len);
-#ifdef ALLEGRO4
-		drawing_mode(DRAW_MODE_TRANS, NULL, 0, 0);
-		set_trans_blender(0, 0, 0, drops[i].color.a * 255);
-		m_draw_line(drops[i].x, drops[i].y, tx, ty, drops[i].color);
-		solid_mode();
-#elif defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		verts[i*2].x = drops[i].x;
 		verts[i*2].y = drops[i].y;
 		float a = drops[i].color.a;

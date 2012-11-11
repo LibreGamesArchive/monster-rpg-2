@@ -2386,12 +2386,8 @@ int MMap::update(int millis)
 				 * sets an alpha blender, and I don't want to
 				 * find out why.
 				 */
-				#ifndef ALLEGRO4
 				m_set_blender(M_ONE, M_ZERO, white);
 				m_draw_scaled_bitmap(bmp, curr_x, curr_y, curr_w, curr_h, 0, 0, BW, BH, 0);
-				#else
-				m_draw_scaled_bitmap(bmp, curr_x, curr_y, curr_w, curr_h, 0, 0, BW, BH, 0, 255);
-				#endif
 				m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 				drawBufferToScreen();
 				m_flip_display();
@@ -2402,9 +2398,7 @@ int MMap::update(int millis)
 				totalElapsed += elapsed;
 			}
 			dpad_on();
-			#ifndef ALLEGRO4
 			m_restore_blender();
-			#endif
 			m_destroy_bitmap(bmp);
 			m_rest(2);
 			fadeOut(black);

@@ -37,87 +37,6 @@ extern "C" {
 #include "java.h"
 #endif
 
-static bool is_modifier(int c)
-{
-	switch (c) {
-		case ALLEGRO_KEY_LSHIFT:
-		case ALLEGRO_KEY_RSHIFT:
-		case ALLEGRO_KEY_LCTRL:
-		case ALLEGRO_KEY_RCTRL:
-		case ALLEGRO_KEY_ALT:
-		case ALLEGRO_KEY_ALTGR:
-		case ALLEGRO_KEY_LWIN:
-		case ALLEGRO_KEY_RWIN:
-			return true;
-	}
-
-	return false;
-}
-
-void destroy_fonts(void)
-{
-	m_destroy_font(game_font);
-	m_destroy_font(medium_font);
-	m_destroy_font(huge_font);
-}
-
-void load_fonts(void)
-{
-	int ttf_flags;
-
-	ttf_flags = ALLEGRO_TTF_MONOCHROME;
-
-	ALLEGRO_DEBUG("loading fonts");
-
-#ifdef ALLEGRO_ANDROID
-	ALLEGRO_PATH *res_dir = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
-	char boofer[1000];
-	sprintf(boofer, "%s/unpack/DejaVuSans.ttf", al_path_cstr(res_dir, '/'));
-	al_destroy_path(res_dir);
-	al_set_standard_file_interface();
-	game_font = al_load_ttf_font("/mnt/sdcard/removable_sdcard/DejaVuSans.ttf", 9, ttf_flags);
-	al_android_set_apk_file_interface();
-	if (!game_font) {
-		if (!native_error("Failed to load game_font"))
-			return;
-	}
-#else
-	game_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 9, ttf_flags);
-	if (!game_font) {
-		if (!native_error("Failed to load medium_font"))
-			return;
-	}
-#endif
-
-	medium_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 32, 0);
-	if (!medium_font) {
-		if (!native_error("Failed to load medium_font"))
-			return;
-	}
-	
-#ifndef LITE
-	huge_font = m_load_font(getResource("huge_font.tga"));
-	if (!huge_font) {
-		if (!native_error("Failed to load huge_font"))
-			return;
-	}
-#endif
-
-	ALLEGRO_DEBUG("done loading fonts");
-	
-	// NOTE: This has to be after display creation and loading of fonts
-	load_translation(get_language_name(config.getLanguage()).c_str());
-}
-
-void get_buffer_true_size(int *buffer_true_w, int *buffer_true_h)
-{
-#ifdef A5_OGL
-	al_get_opengl_texture_size(buffer->bitmap, buffer_true_w, buffer_true_h);
-#else
-	al_get_d3d_texture_size(buffer->bitmap, buffer_true_w, buffer_true_h);
-#endif
-}
-
 #ifdef A5_D3D
 LPDIRECT3DSURFACE9 big_depth_surface = NULL;
 
@@ -223,7 +142,6 @@ double allegro_iphone_shaken = DBL_MIN;
 #endif
 float initial_screen_scale = 0.0f;
 bool sound_was_playing_at_program_start;
-#ifndef ALLEGRO4
 ALLEGRO_DISPLAY *display = 0;
 ALLEGRO_DISPLAY *controller_display = 0;
 ALLEGRO_COND *wait_cond;
@@ -237,7 +155,6 @@ ALLEGRO_SHADER *warp;
 ALLEGRO_SHADER *shadow_shader;
 ALLEGRO_SHADER *brighten;
 ALLEGRO_SHADER *scale2x;
-#endif
 MBITMAP *buffer = 0;
 MBITMAP *overlay = 0;
 MBITMAP *scaleXX_buffer = 0;
@@ -337,6 +254,87 @@ bool switched_out = false;
 ALLEGRO_MUTEX *switch_mutex;
 ALLEGRO_COND *switch_cond;
 uint32_t my_opengl_version;
+
+static bool is_modifier(int c)
+{
+	switch (c) {
+		case ALLEGRO_KEY_LSHIFT:
+		case ALLEGRO_KEY_RSHIFT:
+		case ALLEGRO_KEY_LCTRL:
+		case ALLEGRO_KEY_RCTRL:
+		case ALLEGRO_KEY_ALT:
+		case ALLEGRO_KEY_ALTGR:
+		case ALLEGRO_KEY_LWIN:
+		case ALLEGRO_KEY_RWIN:
+			return true;
+	}
+
+	return false;
+}
+
+void destroy_fonts(void)
+{
+	m_destroy_font(game_font);
+	m_destroy_font(medium_font);
+	m_destroy_font(huge_font);
+}
+
+void load_fonts(void)
+{
+	int ttf_flags;
+
+	ttf_flags = ALLEGRO_TTF_MONOCHROME;
+
+	ALLEGRO_DEBUG("loading fonts");
+
+#ifdef ALLEGRO_ANDROID
+	ALLEGRO_PATH *res_dir = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+	char boofer[1000];
+	sprintf(boofer, "%s/unpack/DejaVuSans.ttf", al_path_cstr(res_dir, '/'));
+	al_destroy_path(res_dir);
+	al_set_standard_file_interface();
+	game_font = al_load_ttf_font("/mnt/sdcard/removable_sdcard/DejaVuSans.ttf", 9, ttf_flags);
+	al_android_set_apk_file_interface();
+	if (!game_font) {
+		if (!native_error("Failed to load game_font"))
+			return;
+	}
+#else
+	game_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 9, ttf_flags);
+	if (!game_font) {
+		if (!native_error("Failed to load medium_font"))
+			return;
+	}
+#endif
+
+	medium_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 32, 0);
+	if (!medium_font) {
+		if (!native_error("Failed to load medium_font"))
+			return;
+	}
+	
+#ifndef LITE
+	huge_font = m_load_font(getResource("huge_font.tga"));
+	if (!huge_font) {
+		if (!native_error("Failed to load huge_font"))
+			return;
+	}
+#endif
+
+	ALLEGRO_DEBUG("done loading fonts");
+	
+	// NOTE: This has to be after display creation and loading of fonts
+	load_translation(get_language_name(config.getLanguage()).c_str());
+}
+
+void get_buffer_true_size(int *buffer_true_w, int *buffer_true_h)
+{
+#ifdef A5_OGL
+	al_get_opengl_texture_size(buffer->bitmap, buffer_true_w, buffer_true_h);
+#else
+	al_get_d3d_texture_size(buffer->bitmap, buffer_true_w, buffer_true_h);
+#endif
+}
 
 static void create_shadows(MBITMAP *bmp, RecreateData *data)
 {

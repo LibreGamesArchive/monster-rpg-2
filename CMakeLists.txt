@@ -67,7 +67,6 @@ set(COMMON_SRCS
 	src/equipment.cpp
 	src/ftpget.cpp
 	src/graphics.cpp
-	src/init.cpp
 	src/inventory.cpp
 	src/io.cpp
 	src/lander.cpp
@@ -83,6 +82,16 @@ set(COMMON_SRCS
 	src/widgets.cpp
 	src/xml.cpp
 )
+
+if(WIN32)
+	set(COMMON_SRCS ${COMMON_SRCS} src/init.cpp)
+else(WIN32)
+if(APPLE)
+	set(COMMON_SRCS ${COMMON_SRCS} src/init.mm src/joypad.mm src/joypad_handler.m)
+else(APPLE)
+	set(COMMON_SRCS ${COMMON_SRCS} src/init.cpp)
+endif(APPLE)
+endif(WIN32)
 
 add_library(mo2-engine
 	STATIC
@@ -159,6 +168,8 @@ if(APPLE)
 		allegro${ALLEG_SUFFIX} ${ALLEGRO_MAIN_LIB}
 		${EXTRA_LIBS}
 		lua-fixed
+		JoypadCocoa
+		curl
 	)
 else(APPLE)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,.")
