@@ -517,6 +517,7 @@ bool is_close_pressed(void)
 	
 	if (do_toggle_fullscreen) {
 		do_toggle_fullscreen = false;
+		al_set_target_bitmap(al_get_backbuffer(display));
 		toggle_fullscreen();
 	}
 
@@ -1383,8 +1384,7 @@ int main(int argc, char *argv[])
 		}
 		al_lock_mutex(input_mutex);
 		if (player_scripted) {
-			player_scripted = false;
-			dpad_on();
+			CDeScriptifyPlayer(NULL);
 		}
 		astar_stop();
 		al_unlock_mutex(input_mutex);

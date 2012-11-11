@@ -49,7 +49,7 @@ public:
 	void setRunning(bool r) { running = r; }
 	
 
-	CombatPlayer(std::string name, int number, AnimationSet *animSet, std::string prefix = "");
+	CombatPlayer(std::string name, int number, /*AnimationSet *animSet,*/ std::string prefix = "");
 	virtual ~CombatPlayer(void);
 
 private:

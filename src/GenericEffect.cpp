@@ -190,8 +190,6 @@ void GenericHolyWaterEffect::draw(void)
 
 	m_draw_prim(verts, 0, 0, 0, count, ALLEGRO_PRIM_POINT_LIST);
 
-	delete[] verts;
-
 	target->draw();
 
 	// draw pixels in front of target
@@ -211,6 +209,8 @@ void GenericHolyWaterEffect::draw(void)
 	}
 
 	m_draw_prim(verts, 0, 0, 0, count, ALLEGRO_PRIM_POINT_LIST);
+
+	delete[] verts;
 }
 
 

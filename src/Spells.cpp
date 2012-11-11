@@ -1636,7 +1636,7 @@ void StunSpell::apply(void)
 		}
 	}
 	targets[0]->getInfo().condition = CONDITION_PARALYZED;
-	targets[0]->getInfo().u.paralyzeCount = 3;
+	targets[0]->getInfo().paralyzeCount = 3;
 }
 
 
@@ -1677,7 +1677,7 @@ void SlowSpell::apply(void)
 		}
 	}
 	targets[0]->getInfo().condition = CONDITION_SLOW;
-	targets[0]->getInfo().u.missed_extra = false;
+	targets[0]->getInfo().missed_extra = false;
 }
 
 
@@ -1712,7 +1712,7 @@ void QuickSpell::init(Combatant *caster, Combatant **targets, int numTargets)
 void QuickSpell::apply(void)
 {
 	targets[0]->getInfo().condition = CONDITION_QUICK;
-	targets[0]->getInfo().u.missed_extra = false;
+	targets[0]->getInfo().missed_extra = false;
 	if (targets[0]->getType() == COMBATENTITY_TYPE_PLAYER) {
 		if (caster != targets[0]) {
 			targets[0]->getAnimationSet()->setSubAnimation("stand");
@@ -2134,7 +2134,7 @@ void CharmSpell::apply(void)
 	}
 	if (targets[0]->getName() == "Minion" || targets[0]->getType() == COMBATENTITY_TYPE_PLAYER) {
 		targets[0]->getInfo().condition = CONDITION_CHARMED;
-		targets[0]->getInfo().u.charmedCount = 3;
+		targets[0]->getInfo().charmedCount = 3;
 	}
 }
 
@@ -3074,7 +3074,7 @@ void WebSpell::apply(void)
 {
 	for (int i = 0; i < numTargets; i++) {
 		targets[i]->getInfo().condition = CONDITION_WEBBED;
-		targets[i]->getInfo().u.paralyzeCount = 3;
+		targets[i]->getInfo().paralyzeCount = 3;
 	}
 }
 

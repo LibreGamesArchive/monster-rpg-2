@@ -1,5 +1,6 @@
 #include "monster2.hpp"
 
+/*
 struct BattleAnim
 {
 	std::string name;
@@ -87,6 +88,7 @@ AnimationSet *findBattleAnim(std::string name, void *this_ptr)
 
 	return NULL;
 }
+*/
 
 
 Player *party[MAX_PARTY] = {
@@ -441,8 +443,8 @@ void Player::setName(std::string name)
 
 Combatant *Player::makeCombatant(int number)
 {
-	AnimationSet *banim = findBattleAnim(name, this);
-	CombatPlayer *c = new CombatPlayer(name, number, banim);
+	//AnimationSet *banim = findBattleAnim(name, this);
+	CombatPlayer *c = new CombatPlayer(name, number/*, banim*/);
 
 	copyInfo(c->getInfo(), info);
 
@@ -501,14 +503,14 @@ Player::Player(std::string name, bool putInParty) :
 
 	formation = FORMATION_FRONT;
 
-	referenceBattleAnim(name, this);
+	//referenceBattleAnim(name, this);
 }
 
 
-Player::~Player()
+Player::~Player(void)
 {
 	m_destroy_bitmap(icon);
-	unreferenceBattleAnim(name, this);
+	//unreferenceBattleAnim(name, this);
 }
 
 
@@ -548,6 +550,10 @@ int getExperience(int level)
 static std::vector<std::string> getLearnedSpells(std::string who, int newLevel)
 {
 	std::vector<std::string> spells;
+
+	// FIXME:!
+	//spells.push_back("Fire2");
+	//return spells;
 
 	if (who == "Rider") {
 		if (newLevel == 3) {
@@ -1058,7 +1064,7 @@ void copyInfo(CombatantInfo &info, CombatantInfo &newinfo)
 	memcpy(&info.abilities, &newinfo.abilities, sizeof(CombatantAbilities));
 	memcpy(&info.equipment, &newinfo.equipment, sizeof(CombatantEquipment));
 	bool done = false;
-	for (int i = 0; i < MAX_SPELLS_IN_THIS_GAME; i++) {
+	for (int i = 0; i < MAX_SPELLS; i++) {
 		if (done || newinfo.spells[i] == "<nil>") {
 			done = true;
 			info.spells[i] = "";

@@ -17,6 +17,7 @@ int getNumberFromScript(lua_State *state, std::string name);
 void runGlobalScript(lua_State *luaState);
 void setObjectDirection(Object *o, int direction);
 bool anotherDoDialogue(const char *text, bool clearbuf = true, bool top = false);
+int CDeScriptifyPlayer(lua_State *stack); // doesn't use stack
 
 extern bool player_scripted;
 

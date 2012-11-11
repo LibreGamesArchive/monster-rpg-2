@@ -1,14 +1,14 @@
 #ifndef M2_HPP
 #define M2_HPP
 
+#define _CRT_SECURE_NO_WARNINGS
+
 #ifdef _MSC_VER
 #define snprintf _snprintf
 #define M_PI 3.141592654
 #endif
 
 #define R2D(a) ((a)*180/M_PI)
-
-#include "config.h"
 
 #include <cstdio>
 #include <cstring>
@@ -116,9 +116,9 @@ const int CURE3_INDEX = 43;
 const int M_OUTLINED = 0;
 const int M_FILLED = 1;
 
-const int MAX_SPELLS = 256;
+const int MAX_SPELLS = 32;
 /* MAX_SPELLS is huge, so the list scrolls on forever practically..
- * limit it for this game but keep it at 256 for save state compatibility */
+ * limit it for this game but keep it at 256 for save state compatibility ...edit: keep compatibility another way */
 const int MAX_SPELLS_IN_THIS_GAME = 32;
 
 #ifdef ALLEGRO4

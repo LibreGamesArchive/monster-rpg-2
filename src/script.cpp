@@ -668,7 +668,7 @@ static int CScriptifyPlayer(lua_State *stack)
 }
 
 
-static int CDeScriptifyPlayer(lua_State *stack)
+int CDeScriptifyPlayer(lua_State *stack)
 {
 	dpad_on();
 	al_lock_mutex(input_mutex);
@@ -2096,7 +2096,7 @@ static int CBattleSetInfoUnionI(lua_State *stack)
 		return 0;
 	}
 
-	c->getInfo().u.i = n;
+	c->getInfo().i = n;
 
 	return 0;
 }
@@ -2614,7 +2614,12 @@ static int CAreaTileToTilemap(lua_State *stack)
 
 	std::vector<int> &animNums = area->getAnimationNums();
 
-	lua_pushnumber(stack, animNums[tileNum]);
+	if (tileNum < (int)animNums.size()) {
+		lua_pushnumber(stack, -1);
+	}
+	else {
+		lua_pushnumber(stack, animNums[tileNum]);
+	}
 
 	return 1;
 }

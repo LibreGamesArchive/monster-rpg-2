@@ -718,7 +718,7 @@ Configuration::Configuration() :
 	keyMusicDown(ALLEGRO_KEY_F1),
 
 	gamepadAvailable(true),
-	onlyMemoryBitmaps(true),
+	onlyMemoryBitmaps(false),
 	lowCpuUsage(false),
 	stick(0),
 	adapter(0),

@@ -15,6 +15,7 @@ public:
 		x = target->getX();
 		y = target->getY()+1;
 	}
+	virtual ~GenericEffect() {}
 protected:
 	Combatant *user;
 	Combatant *target;
@@ -30,7 +31,7 @@ public:
 	void finalize(Combatant *target);
 
 	GenericCureEffect(Combatant *user, Combatant *target, int amount, std::string name, bool finish = false);
-	~GenericCureEffect();
+	virtual ~GenericCureEffect();
 protected:
 	AnimationSet *animation;
 	int count;
@@ -60,7 +61,7 @@ public:
 	void finalize(Combatant *target);
 
 	GenericHolyWaterEffect(Combatant *user, Combatant *target, bool finish = false);
-	~GenericHolyWaterEffect();
+	virtual ~GenericHolyWaterEffect();
 protected:
 	int count;
 	GenericHolyWaterPixel *pixels;
@@ -90,7 +91,7 @@ public:
 	void finalize(Combatant *target);
 
 	GenericHealEffect(Combatant *user, Combatant *target, bool finish = false);
-	~GenericHealEffect();
+	virtual ~GenericHealEffect();
 protected:
 	int count;
 	GenericHealPixel pixels[NUM_PIXELS];
@@ -110,7 +111,7 @@ public:
 	void finalize(Combatant *target);
 
 	GenericElixirEffect(Combatant *user, Combatant *target);
-	~GenericElixirEffect();
+	virtual ~GenericElixirEffect();
 protected:
 	int count;
 	MBITMAP *bitmap;

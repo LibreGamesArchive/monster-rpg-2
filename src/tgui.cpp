@@ -451,8 +451,9 @@ void tguiSetFocus(TGUIWidget* widget)
 		TGUIWidget* w = activeGUI->widgets[i];
 		if (w == widget) {
 			w->setFocus(true);
-			if (w != activeGUI->widgets[activeGUI->focus]
-				&& activeGUI->focus >= 0 && activeGUI->focus < (int)activeGUI->widgets.size())
+			if (activeGUI->focus < (int)activeGUI->widgets.size() &&
+				w != activeGUI->widgets[activeGUI->focus] &&
+				activeGUI->focus >= 0)
 				activeGUI->widgets[activeGUI->focus]->setFocus(false);
 //			if (oldActive) {
 //				oldActive->setFocus(false);
@@ -555,12 +556,10 @@ void tguiFocusNext(void)
  */
 void tguiDeleteActive()
 {
-	activeGUI->widgets.clear();
 	delete activeGUI;
 	activeGUI = 0;
 	tguiActiveWidget = 0;
 	tguiCurrentParent = 0;
-	//tguiHoverWidget = 0;
 }
 
 /*
@@ -999,8 +998,6 @@ bool tguiPop()
 	activeGUI = tguiStack[tguiStack.size()-1];
 	std::vector<TGUI*>::iterator it = tguiStack.begin() + tguiStack.size() - 1;
 	tguiStack.erase(it);
-//	tgui_force_set_focus = true;
-	//tguiActiveWidget = NULL;
 	tguiSetFocus(activeGUI->focus);
 	tguiClearMouseEvents();
 	tguiClearKeybuffer();

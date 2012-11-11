@@ -324,7 +324,7 @@ bool CombatEnemy::act(int step, Battle *b)
 						battle->addMessage(loc, getConditionName(cc),
 							3000);
 						if (cc == CONDITION_SHADOW) {
-							info.u.charmedCount = 3;
+							info.charmedCount = 3;
 						}
 					}
 				}
@@ -1095,8 +1095,9 @@ CombatEnemy::CombatEnemy(std::string name, int x, int y, bool alpha) :
 	loc = s.find("_", 0);
 	s = s.substr(0, loc);
 
-	referenceBattleAnim(s, this);
-	animSet = findBattleAnim(s, this);
+	//referenceBattleAnim(s, this);
+	//animSet = findBattleAnim(s, this);
+	animSet = new AnimationSet(getResource("combat_media/%s.png", s.c_str()));
 	animSet->setSubAnimation("stand");
 
 	construct(name, x, y, alpha);
@@ -1110,8 +1111,9 @@ CombatEnemy::CombatEnemy(std::string name, int x, int y) :
 	loc = s.find("_", 0);
 	s = s.substr(0, loc);
 
-	referenceBattleAnim(s, this);
-	animSet = findBattleAnim(s, this);
+	//referenceBattleAnim(s, this);
+	//animSet = findBattleAnim(s, this);
+	animSet = new AnimationSet(getResource("combat_media/%s.png", s.c_str()));
 	animSet->setSubAnimation("stand");
 
 	construct(name, x, y, false);
@@ -1145,7 +1147,8 @@ CombatEnemy::~CombatEnemy(void)
 	loc = s.find("_", 0);
 	s = s.substr(0, loc);
 
-	unreferenceBattleAnim(s, this);
+	//unreferenceBattleAnim(s, this);
+	delete animSet;
 	if (!use_programmable_pipeline) {
 		delete whiteAnimSet;
 	}

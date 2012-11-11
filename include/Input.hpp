@@ -73,7 +73,7 @@ public:
 		left = right = up = down = button1 = button2 = button3 = false;
 		set(false, false, false, false, false, false, false);
 	}
-	~KeyboardInput() {}
+	virtual ~KeyboardInput() {}
 protected:
 	void update();
 	bool left, right, up, down, button1, button2, button3;
@@ -97,7 +97,7 @@ public:
 		reconfig();
 		left = right = up = down = button1 = button2 = button3 = false;
 	}
-	~GamepadInput() {}
+	virtual ~GamepadInput() {}
 protected:
 	void update();
 	ALLEGRO_JOYSTICK *joystick;
@@ -119,7 +119,7 @@ public:
 	}
 
 	TripleInput();
-	~TripleInput() {
+	virtual ~TripleInput() {
 		if (kb)
 			delete kb;
 		if (js)

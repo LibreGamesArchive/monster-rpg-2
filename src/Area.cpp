@@ -7,6 +7,11 @@
 
 #include <set>
 
+static bool compare_node_pointer(Node *n1, Node *n2)
+{
+	return n1->TotalCost < n2->TotalCost;
+}
+
 Area* area = 0;
 long roaming = 0;
 bool dpad_panning = false;
@@ -215,33 +220,18 @@ static bool astar_is_solid(int x, int y, int px, int py, int dest_x, int dest_y,
 	return area->isOccupied(0, x, y, false, check_objs, true);
 }
 
-std::set<Node *, Node> as_open;
+std::list<Node *> as_open;
 std::list<Node *> as_closed;
 
-static std::set<Node *, Node>::iterator astar_find(std::set<Node *, Node> &nodes, int x, int y)
+static std::list<Node *>::iterator astar_find(std::list<Node *> &nodes, int x, int y)
 {
-	std::set<Node *, Node>::iterator it;
+	std::list<Node *>::iterator it;
 	for (it = nodes.begin(); 
 		  it != nodes.end();
 		  it++) {
 		Node *current = *it;
 		if (current->x == x &&
 			 current->y == y) {
-			return it;
-		}
-	}
-	return nodes.end();
-}
-
-static std::list<Node *>::iterator astar_find(std::list<Node *> &nodes, int x, int y)
-{
-	std::list<Node *>::iterator it;
-	for (it = nodes.begin(); 
-	     it != nodes.end();
-	     it++) {
-		Node *current = *it;
-		if (current->x == x &&
-		    current->y == y) {
 			return it;
 		}
 	}
@@ -258,7 +248,7 @@ void cleanup_astar(void)
 		path_tail = NULL;
 	}
 
-	std::set<Node *>::iterator it;
+	std::list<Node *>::iterator it;
 	
 	for (it = as_open.begin(); it != as_open.end(); it++) {
 		delete *it;
@@ -303,7 +293,7 @@ static Node *astar(int start_x, int start_y, int dest_x, int dest_y)
 	StartNode->CostToGoal = AS_ESTIMATE(start_x, start_y, dest_x, dest_y);
 	StartNode->TotalCost = StartNode->CostToGoal;
 	StartNode->parent = NULL;
-	as_open.insert(StartNode);
+	as_open.insert(as_open.begin(), StartNode);
 
 	while (as_open.size()) {
 		Node *n = *(as_open.begin());
@@ -332,7 +322,7 @@ static Node *astar(int start_x, int start_y, int dest_x, int dest_y)
 				bool in_open = false;
 				bool in_closed = false;
 				
-				std::set<Node *, Node>::iterator open_it;
+				std::list<Node *>::iterator open_it;
 				open_it = astar_find(as_open, x, y);
 				if (open_it != as_open.end()) {
 					in_open = true;
@@ -398,13 +388,12 @@ static Node *astar(int start_x, int start_y, int dest_x, int dest_y)
 						count--;
 					}
 					if (in_open) {
-						// FIXME?
-						//as_open.sort();
 						delete NewNode;
 						count--;
 					}
 					else {
-						as_open.insert(NewNode);
+						as_open.insert(as_open.begin(), NewNode);
+						as_open.sort(compare_node_pointer);
 					}
 				}
 			}
@@ -446,7 +435,13 @@ void set_player_path(int x, int y)
 					{ DIRECTION_WEST,  -1, DIRECTION_EAST },
 					{  -1,  DIRECTION_SOUTH,  -1 }
 				};
-				int d = dirs[dy+1][dx+1];
+				int d;
+				if (dx < -1 || dy < -1 || dx > 1 || dy > 1) {
+					d = -1;
+				}
+				else {
+					d = dirs[dy+1][dx+1];
+				}
 				if (d != -1) {
 					was_a_click = true;
 					activated = area->activate(0, d);
@@ -473,6 +468,7 @@ void set_player_path(int x, int y)
 				path_head = tmp;
 			}
 			else {
+				printf("NO PATH\n");
 				path_head = NULL;
 				astar_stop();
 			}
@@ -2414,4 +2410,3 @@ Area::~Area()
 		m_destroy_bitmap(bg);
 	dpad_off();
 }
-

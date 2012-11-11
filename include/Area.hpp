@@ -177,36 +177,8 @@ struct Node {
 	int CostFromStart;
 	int CostToGoal;
 	int TotalCost;
-	bool operator==(const Node &n) {
-		return this->TotalCost == n.TotalCost;
-	}
-	bool operator<(const Node &n) {
-		return this->TotalCost < n.TotalCost;
-	}
-	bool operator()(const Node *a, const Node *b) const {
-		return a->TotalCost <= b->TotalCost;
-	}
-	Node(void) {
-	}
-	Node &operator=(const Node &rhs) {
-		parent = rhs.parent;
-		child = rhs.child;
-		x = rhs.x;
-		y = rhs.y;
-		CostFromStart = rhs.CostFromStart;
-		CostToGoal = rhs.CostToGoal;
-		TotalCost = rhs.TotalCost;
-		return *this;
-	}
-	Node(const Node &rhs) {
-		parent = rhs.parent;
-		child = rhs.child;
-		x = rhs.x;
-		y = rhs.y;
-		CostFromStart = rhs.CostFromStart;
-		CostToGoal = rhs.CostToGoal;
-		TotalCost = rhs.TotalCost;
-	}
+	Node(void) {}
+	~Node(void) {}
 };
 
 void set_player_path(int x, int y);

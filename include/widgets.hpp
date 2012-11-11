@@ -430,7 +430,7 @@ public:
 		selected = false;
 	}
 
-	~MTab()
+	virtual ~MTab()
 	{
 		m_destroy_bitmap(bmp);
 	}

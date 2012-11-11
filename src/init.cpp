@@ -872,6 +872,7 @@ static void *thread_proc(void *arg)
 				else if (event.keyboard.keycode == ALLEGRO_KEY_F12) {
 					reload_translation = true;
 				}
+				/*
 				else {
 					INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 					int c = event.keyboard.keycode;
@@ -917,6 +918,7 @@ static void *thread_proc(void *arg)
 						add_input_event(ie);
 					}
 				}
+				*/
 			}
 			else if (event.type == ALLEGRO_EVENT_KEY_CHAR) {
 				INPUT_EVENT ie = EMPTY_INPUT_EVENT;

@@ -7,9 +7,14 @@ static inline CombatEntity *nth(std::list<CombatEntity *> &l, int n)
 {
 	int i = 0;
 	std::list<CombatEntity *>::iterator it = l.begin();
-	for (i = 0; i < n; i++) {
+	for (i = 0; i < n && i < (int)l.size(); i++) {
 		it++;
 	}
+
+	if (i < n || it == l.end()) {
+		return NULL;
+	}
+
 	return *it;
 }
 

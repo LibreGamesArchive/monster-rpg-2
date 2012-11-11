@@ -66,13 +66,12 @@ struct CombatantInfo {
 	int experience;
 	int characterClass;
 	CombatCondition condition;
-	// Nothing in this union is saved or kept after battle
-	union {
-		int paralyzeCount;
-		int i;
-		bool missed_extra; // for slow/quick
-		int charmedCount;
-	} u;
+
+	// Nothing here is saved or kept after battle
+	int paralyzeCount;
+	int i;
+	bool missed_extra; // for slow/quick
+	int charmedCount;
 };
 
 

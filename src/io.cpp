@@ -260,10 +260,11 @@ static void readStats(int who, gzFile f)
 
 	for (int i = 0; i < num_spells; i++) {
 		int exists = my_pack_getc(f);
+		std::string n = "";
 		if (exists) {
-			info.spells[i] = std::string(readString(f));
+			n = std::string(readString(f));
 		}
-		else {
+		if (i < MAX_SPELLS_IN_THIS_GAME) {
 			info.spells[i] = "";
 		}
 	}

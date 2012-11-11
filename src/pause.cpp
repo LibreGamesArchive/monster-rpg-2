@@ -3513,6 +3513,7 @@ bool config_menu(bool start_on_fullscreen)
 #if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE
 		bool fs = fullscreen_toggle->getSelected();
 		if (fs != (bool)start_fullscreen) {
+			al_set_target_backbuffer(display);
 			toggle_fullscreen();
 			start_fullscreen = fs;
 		}
@@ -4138,7 +4139,7 @@ public:
 		count = 0;
 	}
 
-	~MNumGetter(void)
+	virtual ~MNumGetter(void)
 	{
 		m_destroy_bitmap(up_arrow);
 	}

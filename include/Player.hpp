@@ -26,7 +26,7 @@ public:
 	Combatant *makeCombatant(int number);
 
 	Player(std::string name, bool putInParty = true);
-	~Player();
+	~Player(void);
 
 	// FIXME: free stuff in destructor
 protected:

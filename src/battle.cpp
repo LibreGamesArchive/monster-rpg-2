@@ -608,6 +608,14 @@ BattleResult Battle::update(int step)
 	if (!playersAllDead && allDead(COMBATENTITY_TYPE_PLAYER)) {
 		playersAllDead = true;
 		playersAllDeadCount = 0;
+		if (speechDialog) {
+			dpad_on();
+			tguiDeleteWidget(speechDialog);
+			delete speechDialog;
+			speechDialog = NULL;
+		}
+		messages.clear();
+		storeStats(false);
 	}
 	else if (!enemiesAllDead && allDead(COMBATENTITY_TYPE_ENEMY)) {
 		enemiesAllDead = true;
@@ -616,6 +624,8 @@ BattleResult Battle::update(int step)
 		lua_getglobal(luaState, "experience");
 		int exp = (int)lua_tonumber(luaState, -1);
 		lua_pop(luaState, 1);
+		// FIXME FIXME FIXME:
+		//exp = 1500;
 		for (int i = 0; i < MAX_PARTY; i++) {
 			CombatPlayer *p = findPlayer(i);
 			if (p && p->getInfo().abilities.hp > 0) {
@@ -637,15 +647,7 @@ BattleResult Battle::update(int step)
 	}
 
 	if (playersAllDead) {
-		if (speechDialog) {
-			dpad_on();
-			tguiDeleteWidget(speechDialog);
-			delete speechDialog;
-			speechDialog = NULL;
-		}
-		messages.clear();
 		playersAllDeadCount += step;
-		storeStats(false);
 		if (playersAllDeadCount > 2000) {
 			debug_message("player loses\n");
 			fadeOut(m_map_rgb(255, 0, 0));
@@ -822,9 +824,9 @@ BattleResult Battle::update(int step)
 		if (ce->getType() == COMBATENTITY_TYPE_PLAYER || ce->getType() == COMBATENTITY_TYPE_ENEMY) {
 			Combatant *c = (Combatant *)ce;
 			if (c->getInfo().condition == CONDITION_PARALYZED || c->getInfo().condition == CONDITION_WEBBED) {
-				c->getInfo().u.paralyzeCount--;
-				if (c->getInfo().u.paralyzeCount <= 0) {
-					c->getInfo().u.paralyzeCount = 0;
+				c->getInfo().paralyzeCount--;
+				if (c->getInfo().paralyzeCount <= 0) {
+					c->getInfo().paralyzeCount = 0;
 					c->getInfo().condition = CONDITION_NORMAL;
 				}
 				it = acting_entities.erase(it);
@@ -835,8 +837,8 @@ BattleResult Battle::update(int step)
 				continue;
 			}
 			else if (c->getInfo().condition == CONDITION_SLOW) {
-				if (c->getInfo().u.missed_extra == false) {
-					c->getInfo().u.missed_extra = true;
+				if (c->getInfo().missed_extra == false) {
+					c->getInfo().missed_extra = true;
 					it = acting_entities.erase(it);
 					continue;
 				}
@@ -873,21 +875,21 @@ quick_label:
 			if (ce->getType() == COMBATENTITY_TYPE_PLAYER || ce->getType() == COMBATENTITY_TYPE_ENEMY) {
 				Combatant *c = (Combatant *)ce;
 				if (c->getInfo().condition == CONDITION_QUICK) {
-					if (c->getInfo().u.missed_extra == false && !allDead(COMBATENTITY_TYPE_ENEMY)) {
-						c->getInfo().u.missed_extra = true;
+					if (c->getInfo().missed_extra == false && !allDead(COMBATENTITY_TYPE_ENEMY)) {
+						c->getInfo().missed_extra = true;
 						goto quick_label;
 					}
 					else {
-						c->getInfo().u.missed_extra = false;
+						c->getInfo().missed_extra = false;
 					}
 				}
 				else if (c->getInfo().condition == CONDITION_SLOW) {
-					c->getInfo().u.missed_extra = false;
+					c->getInfo().missed_extra = false;
 				}
 				else if (c->getInfo().condition == CONDITION_CHARMED || c->getInfo().condition == CONDITION_SHADOW) {
-					c->getInfo().u.charmedCount--;
-					if (c->getInfo().u.charmedCount <= 0) {
-						c->getInfo().u.charmedCount = 0;
+					c->getInfo().charmedCount--;
+					if (c->getInfo().charmedCount <= 0) {
+						c->getInfo().charmedCount = 0;
 						c->getInfo().condition = CONDITION_NORMAL;
 					}
 				}

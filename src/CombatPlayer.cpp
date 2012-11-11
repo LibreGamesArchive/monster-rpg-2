@@ -1646,7 +1646,7 @@ bool CombatPlayer::isActing(void)
 }
 
 
-CombatPlayer::CombatPlayer(std::string name, int number, AnimationSet *animSet, std::string prefix) :
+CombatPlayer::CombatPlayer(std::string name, int number, /*AnimationSet *animSet,*/ std::string prefix) :
 	Combatant(name),
 	number(number),
 	handler(NULL),
@@ -1656,7 +1656,7 @@ CombatPlayer::CombatPlayer(std::string name, int number, AnimationSet *animSet, 
 	running(false),
 	stone_bmp(NULL)
 {
-	this->animSet = animSet;
+	animSet = new AnimationSet(getResource("combat_media/%s.png", name.c_str()));
 
 	if (!use_programmable_pipeline) {
 		whiteAnimSet = animSet->clone(CLONE_PLAYER);
@@ -1693,7 +1693,9 @@ CombatPlayer::~CombatPlayer(void)
 #ifndef LITE
 	delete charmAnim;
 #endif
-	
+
+	delete animSet;
+
 	if (!use_programmable_pipeline) {
 		delete whiteAnimSet;
 	}
