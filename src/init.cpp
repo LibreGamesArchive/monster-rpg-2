@@ -2383,8 +2383,9 @@ bool init(int *argc, char **argv[])
 	debug_message("after set_app/org_name");
 
 	// must be before al_android_set_apk_file_interface
+	bool config_read = false;
 	try {
-		config.read();
+		config_read = config.read();
 	}
 	catch (ReadError e) {
 		(void)e;
@@ -2483,22 +2484,24 @@ bool init(int *argc, char **argv[])
 	al_set_new_display_adapter(config.getAdapter());
 	
 	// set screenScale *for loading screen only*
-	ScreenSize scr_sz = small_screen();
-	if (scr_sz == ScreenSize_Tiny) {
-		sd->width = 240;
-		sd->height = 160;
-	}
-	else if (scr_sz == ScreenSize_Smaller) {
-		sd->width = 480;
-		sd->height = 320;
-	}
-	else if (scr_sz == ScreenSize_Small) {
-		sd->width = 720;
-		sd->height = 480;
-	}
-	else {
-		sd->width = 960;
-		sd->height = 640;
+	if (!config_read) {
+		ScreenSize scr_sz = small_screen();
+		if (scr_sz == ScreenSize_Tiny) {
+			sd->width = 240;
+			sd->height = 160;
+		}
+		else if (scr_sz == ScreenSize_Smaller) {
+			sd->width = 480;
+			sd->height = 320;
+		}
+		else if (scr_sz == ScreenSize_Small) {
+			sd->width = 720;
+			sd->height = 480;
+		}
+		else {
+			sd->width = 960;
+			sd->height = 640;
+		}
 	}
 #else
 	#ifndef ALLEGRO_ANDROID

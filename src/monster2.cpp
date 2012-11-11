@@ -1382,10 +1382,10 @@ int main(int argc, char *argv[])
 			manChooser = NULL;
 			dpad_on();
 		}
-		al_lock_mutex(input_mutex);
 		if (player_scripted) {
 			CDeScriptifyPlayer(NULL);
 		}
+		al_lock_mutex(input_mutex);
 		astar_stop();
 		al_unlock_mutex(input_mutex);
 

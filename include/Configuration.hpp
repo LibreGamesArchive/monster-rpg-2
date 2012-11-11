@@ -180,7 +180,8 @@ public:
 	int getLanguage(void);
 	bool getAutoconnectToZeemote(void);
 	void setAutoconnectToZeemote(bool ac);
-	void read();
+	// returns true if there was a config file
+	bool read();
 	void write();
 	Configuration();
 private:

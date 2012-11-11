@@ -387,7 +387,7 @@ void Configuration::setAutoconnectToZeemote(bool ac)
 	autoconnect_to_zeemote = ac;
 }
 
-void Configuration::read()
+bool Configuration::read()
 {
 	char buf[1000];
 	sprintf(buf, "%s", getUserResource(""));
@@ -410,7 +410,7 @@ void Configuration::read()
 	if (xml->getFailed()) {
 	   debug_message("couldn't read config");
 	   delete xml;
-	   return;
+	   return false;
 	}
 	debug_message("3");
 
@@ -566,6 +566,8 @@ void Configuration::read()
 	delete xml;
 
 	loaded = true;
+
+	return true;
 }
 
 void Configuration::write()
