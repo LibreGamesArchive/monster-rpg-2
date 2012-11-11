@@ -43,16 +43,10 @@ static int screen_offset_y = 0;
 static float screen_ratio_x = 1.0;
 static float screen_ratio_y = 1.0;
 
-#if defined ALLEGRO4
-static int saved_mx, saved_my, saved_mb;
-#else
-#if !defined WIZ && !defined IPHONE && !defined ALLEGRO_ANDROID
+#if !defined IPHONE && !defined ALLEGRO_ANDROID
 static ALLEGRO_EVENT_QUEUE *key_events;
 #endif
-#if !defined WIZ
 static ALLEGRO_EVENT_QUEUE *mouse_events;
-#endif
-#endif
 struct MSESTATE {
 	int x, y, buttons;
 };
@@ -69,10 +63,7 @@ static std::vector<MouseEvent *> mouseDownEvents;
 static std::vector<MouseEvent *> mouseUpEvents;
 static std::vector<MouseEvent *> mouseMoveEvents;
 
-#ifndef ALLEGRO4
 static bool event_queues_created = false;
-#endif
-
 
 static float x_scale = 1;
 static float y_scale = 1;
@@ -91,52 +82,8 @@ static std::vector<TGUIWidget *> disabledWidgets;
 #define ALLEGRO_EVENT_MOUSE_AXES ALLEGRO_EVENT_TOUCH_MOVE
 #endif
 
-#ifdef ALLEGRO4
-/* FIXME: add mouse move events here! */
-void mouse_cb(int flags)
-{
-	if (flags & MOUSE_FLAG_MOVE) {
-		tguiMouseState.x = mouse_x;
-		tguiMouseState.y = mouse_y;
-	}
-	if (flags & MOUSE_FLAG_LEFT_DOWN) {
-		MouseEvent *e = new MouseEvent;
-		e->x = mouse_x;
-		e->y = mouse_y;
-		e->b = 1;
-		mouseDownEvents.push_back(e);
-		tguiMouseState.buttons |= 1;
-	}
-	if (flags & MOUSE_FLAG_LEFT_UP) {
-		MouseEvent *e = new MouseEvent;
-		e->x = mouse_x;
-		e->y = mouse_y;
-		e->b = 1;
-		mouseUpEvents.push_back(e);
-		tguiMouseState.buttons &= ~1;
-	}
-	if (flags & MOUSE_FLAG_RIGHT_DOWN) {
-		MouseEvent *e = new MouseEvent;
-		e->x = mouse_x;
-		e->y = mouse_y;
-		e->b = 2;
-		mouseDownEvents.push_back(e);
-		tguiMouseState.buttons |= 2;
-	}
-	if (flags & MOUSE_FLAG_RIGHT_UP) {
-		MouseEvent *e = new MouseEvent;
-		e->x = mouse_x;
-		e->y = mouse_y;
-		e->b = 2;
-		mouseUpEvents.push_back(e);
-		tguiMouseState.buttons &= ~2;
-	}
-}
-#endif
-
 #define KEEP_TIME 1.0
 
-#ifndef ALLEGRO4
 void *queue_emptier(void *crap)
 {
 	int own_mouse_downs = 0;
@@ -173,7 +120,6 @@ void *queue_emptier(void *crap)
 
 	return NULL;
 }
-#endif
 
 static void tguiFindFocus()
 {
@@ -186,19 +132,12 @@ static void tguiFindFocus()
 }
 
 
-#ifdef ALLEGRO4
-static bool tguiShiftsPressed(int shifts)
-{
-	// FIXME:
-	return false;
-}
-#else
 /*
  * Returns true if the shift keys are pressed, otherwise false.
  */
 static bool tguiShiftsPressed(ALLEGRO_KEYBOARD_STATE *kbdstate, int shifts)
 {
-#if !defined WIZ && !defined IPHONE && !defined ALLEGRO_ANDROID
+#if !defined IPHONE && !defined ALLEGRO_ANDROID
 	if (shifts & TGUI_KEYFLAG_SHIFT) {
 		if (!al_key_down(kbdstate, ALLEGRO_KEY_LSHIFT) &&
 				!al_key_down(kbdstate, ALLEGRO_KEY_RSHIFT))
@@ -250,28 +189,22 @@ static bool tguiShiftsPressed(ALLEGRO_KEYBOARD_STATE *kbdstate, int shifts)
 	return false;
 #endif
 }
-#endif
 
 /*
  * Returns true if a hotkey is pressed, otherwise false.
  */
 static bool tguiHotkeyPressed(int hotkey)
 {
-#if !defined WIZ && !defined IPHONE && !defined ALLEGRO_ANDROID
+#if !defined IPHONE && !defined ALLEGRO_ANDROID
 	int shifts = tguiGetHotkeyFlags(hotkey);
 	int k = tguiGetHotkeyKey(hotkey);
 
-#ifdef ALLEGRO4
-	if (tguiShiftsPressed(shifts) && key[k])
-		return true;
-#else
 	ALLEGRO_KEYBOARD_STATE kbdstate;
 
 	al_get_keyboard_state(&kbdstate);
 
 	if (tguiShiftsPressed(&kbdstate, shifts) && al_key_down(&kbdstate, k))
 		return true;
-#endif
 #endif
 	return false;
 }
@@ -316,11 +249,6 @@ bool tguiPointOnWidget(TGUIWidget* widget, int *x, int *y)
 
 unsigned long tguiCurrentTimeMillis()
 {
-/*
-#ifndef ALLEGRO4
-	return (unsigned long)(al_current_time() * 1000);
-#else
-*/
 #ifndef ALLEGRO_WINDOWS
 	struct timeval tv;
 	gettimeofday(&tv, 0);
@@ -391,15 +319,13 @@ void tguiShutdown()
 		delete activeGUI;
 	}
 	tguiStack.clear();
-#if !defined ALLEGRO4 && !defined WIZ && !defined IPHONE && !defined ALLEGRO_ANDROID
+#if !defined IPHONE && !defined ALLEGRO_ANDROID
 	al_unregister_event_source(key_events, al_get_keyboard_event_source());
 	al_destroy_event_queue(key_events);
 #endif
-#if !defined ALLEGRO4 && !defined WIZ
 	al_unregister_event_source(mouse_events, al_get_mouse_event_source());
 	al_destroy_event_queue(mouse_events);
 	event_queues_created = false;
-#endif
 	pressedHotkeys.clear();
 }
 
@@ -648,18 +574,6 @@ TGUIWidget* tguiUpdate()
 	}
 	tguiLastUpdate = currTime;
 
-#ifdef ALLEGRO4
-	if (tguiActiveWidget) {
-		while (keypressed()) {
-			int k = readkey();
-			if (!tguiActiveWidget->handleKey(k >> 8, k & 0xff)) {
-				// simulate keypress?
-			}
-		}
-	}
-
-#else
-
 #if defined ALLEGRO_ANDROID || defined ALLEGRO_IPHONE
 #define EV event.touch
 #define BUTTON id
@@ -668,7 +582,6 @@ TGUIWidget* tguiUpdate()
 #define BUTTON button
 #endif
 
-#if !defined WIZ
 	while (!al_event_queue_is_empty(mouse_events)) {
 		ALLEGRO_EVENT event;
 		al_get_next_event(mouse_events, &event);
@@ -706,8 +619,6 @@ TGUIWidget* tguiUpdate()
 				#ifdef MONSTER2
 				if (ignore_hot_zone || !(EV.x < 16 && EV.y < 16)) {
 				#endif
-						//&& EV.y < (32-EV.x)))
-				//{
 					MouseEvent *e = new MouseEvent;
 					e->x = EV.x;
 					e->y = EV.y;
@@ -762,7 +673,6 @@ TGUIWidget* tguiUpdate()
 			}
 		}
 	}
-#endif
 #endif
 
 	for (size_t i = 0; i < activeGUI->widgets.size(); i++) {
@@ -914,7 +824,6 @@ TGUIWidget* tguiUpdate()
 			tguiMouseReleased = true;
 		}
 	}
-#endif
 
 	return 0;
 }
@@ -1357,29 +1266,17 @@ bool tguiWidgetIsChildOf(TGUIWidget* widget, TGUIWidget* parent)
 
 int tguiGetMouseX(void)
 {
-#ifdef ALLEGRO4
-	return mouse_x;
-#else
 	return tguiMouseState.x;
-#endif
 }
 
 int tguiGetMouseY(void)
 {
-#ifdef ALLEGRO4
-	return mouse_y;
-#else
 	return tguiMouseState.y;
-#endif
 }
 
 int tguiGetMouseButtons(void)
 {
-#ifdef ALLEGRO4
-	return mouse_b;
-#else
 	return tguiMouseState.buttons;
-#endif
 }
 
 void tguiClearKeybuffer(void)

@@ -187,7 +187,7 @@ int check_arg(int argc, char **argv, const char *s)
 // returns true to continue
 bool native_error(const char *msg)
 {
-#if defined WIZ || defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	return true;
 #endif
 #ifdef EDITOR

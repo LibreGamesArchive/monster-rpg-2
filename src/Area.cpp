@@ -582,7 +582,6 @@ void Area::drawObject(int index)
 			dy += dimy;
 			dy -= depth;
 			if (tinting) {
-#if (defined A5_OGL || defined A5_D3D) && !defined WIZ && !defined NO_SHADERS
 				if (use_programmable_pipeline) {
 				al_set_shader(display, tinter);
 				al_set_shader_sampler(tinter, "tex", bmp->bitmap, 0);
@@ -597,7 +596,6 @@ void Area::drawObject(int index)
 				al_set_shader(display, default_shader);
 				}
 				else
-#endif
 				{
 				m_save_blender();
 				float d, r, g, b;
@@ -612,10 +610,6 @@ void Area::drawObject(int index)
 					depth, dx, dy, 0);
 				m_restore_blender();
 				}
-#if defined ALLEGRO4
-				tinted_blit_region(bmp, 0, TILE_SIZE-depth, TILE_SIZE,
-					depth, dx, dy, 0, 1.0f);
-#endif
 			}
 			else {
 				m_draw_bitmap_region(bmp, 0, TILE_SIZE-depth, TILE_SIZE,

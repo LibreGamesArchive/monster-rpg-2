@@ -1478,8 +1478,6 @@ void CombatPlayer::draw(void)
 			vcol = white;
 		}
 
-#if (defined A5_OGL || defined A5_D3D) && !defined WIZ && !defined NO_SHADERS
-
 		if (battle->isInWater())
 			al_set_clipping_rectangle(cx, cy, cw, ch);
 
@@ -1507,7 +1505,6 @@ void CombatPlayer::draw(void)
 		if (battle->isInWater())
 			al_set_clipping_rectangle(savex, savey, savew, saveh);
 
-#endif
 	}
 	else {
 		if (info.condition != CONDITION_STONED) {

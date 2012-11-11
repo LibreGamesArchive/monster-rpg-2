@@ -2793,17 +2793,10 @@ static void draw_bolt_arc_worker1(MPoint &p1, MPoint &p2, MBITMAP *bmp)
 	ALLEGRO_VERTEX verts[11*6];
 	int vcount = 0;
 
-#if defined WIZ
-	for (float p = 0.0f; p < 1.0f; p += 0.25f) {
-#else
 	for (float p = 0.0f; p < 1.0f; p += 0.1f) {
-#endif
 		float angle = M_PI*2*p*2;
 		float x = interpolate(p1.x, p2.x, p);
 		float y = interpolate(p1.y, p2.y, p) - sin(angle)*amplitude;
-#if defined WIZ
-		m_draw_bitmap(bmp, x-m_get_bitmap_width(bmp)/2, y-m_get_bitmap_height(bmp)/2, 0);
-#else
 		int w = m_get_bitmap_width(bmp);
 		int h = m_get_bitmap_height(bmp);
 		float xx = x-w/2.0;
@@ -2850,7 +2843,6 @@ static void draw_bolt_arc_worker1(MPoint &p1, MPoint &p2, MBITMAP *bmp)
 		verts[vcount].u = w;
 		verts[vcount].v = h;
 		vcount++;
-#endif
 	}
 
 	m_draw_prim(verts, 0, bmp, 0, vcount, ALLEGRO_PRIM_TRIANGLE_LIST);

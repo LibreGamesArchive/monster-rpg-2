@@ -148,8 +148,6 @@ AnimationSet::AnimationSet(const char *filename, bool alpha) :
 {
 	this->filename = filename;
 
-	all_animsets.push_back(this);
-
 	int flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 	bitmap = m_load_bitmap(filename);
@@ -262,18 +260,10 @@ AnimationSet::AnimationSet(const char *filename, bool alpha) :
 
 AnimationSet::AnimationSet()
 {
-	all_animsets.push_back(this);
 }
 
 AnimationSet::~AnimationSet()
 {
-	for (size_t i = 0; i < all_animsets.size(); i++) {
-		if (all_animsets[i] == this) {
-			all_animsets.erase(all_animsets.begin() + i);
-			break;
-		}
-	}
-
 	for (uint i = 0; i < anims.size(); i++) {
 		delete anims[i];
 	}

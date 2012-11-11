@@ -173,3 +173,4 @@ MBITMAP *m_clone_bitmap(MBITMAP *b);
 void m_draw_bitmap_to_self(MBITMAP *b, int x, int y, int flags);
 void m_draw_bitmap_region_to_self(MBITMAP *b, int sx, int sy, int sw, int sh, int dx, int dy, int flags);
 
+#endif

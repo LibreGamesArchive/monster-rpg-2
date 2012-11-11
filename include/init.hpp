@@ -1,8 +1,14 @@
 #ifndef INIT_HPP
-
 #define INIT_HPP
 
 #include <setjmp.h>
+
+enum ScreenSize {
+	ScreenSize_Normal = 0,
+	ScreenSize_Tiny,
+	ScreenSize_Smaller,
+	ScreenSize_Small
+};
 
 typedef std::pair< std::pair<int, int>, std::pair<int, int> > ZONE;
 bool zone_defined(int x, int y);
@@ -171,13 +177,6 @@ extern bool d3d_device_lost;
 extern LPDIRECT3DSURFACE9 big_depth_surface;
 #endif
 extern bool use_digital_joystick;
-
-enum ScreenSize {
-	ScreenSize_Normal = 0,
-	ScreenSize_Tiny,
-	ScreenSize_Smaller,
-	ScreenSize_Small
-};
 
 // cheats
 extern bool superpower, healall;
