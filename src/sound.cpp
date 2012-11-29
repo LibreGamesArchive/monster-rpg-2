@@ -200,8 +200,12 @@ void initSound(void)
 	physfs_fileprocs.seek = physfs_my_seek;
 #endif
 
-
+#ifdef ALLEGRO_RASPBERRYPI
+	BASS_SetConfig(BASS_CONFIG_BUFFER, 3000);
+	if (!BASS_Init(-1, 22050, 0, NULL, NULL)) {
+#else
 	if (!BASS_Init(-1, 44100, 0, NULL, NULL)) {
+#endif
 		int code = BASS_ErrorGetCode();
 		ALLEGRO_DEBUG("BASS_Init failed (%d). Failing or falling back", code);
 #ifdef ALLEGRO_ANDROID

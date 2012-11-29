@@ -297,8 +297,9 @@ void tguiInit(void)
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		key_events = al_create_event_queue();
 		al_register_event_source(key_events, al_get_keyboard_event_source());
-		al_register_event_source(mouse_events, al_get_mouse_event_source());
-		//al_register_event_source(events, al_get_touch_input_mouse_emulation_event_source());
+		if (al_is_mouse_installed()) {
+			al_register_event_source(mouse_events, al_get_mouse_event_source());
+		}
 #else
 		al_register_event_source(mouse_events, al_get_touch_input_event_source());
 #endif
@@ -323,7 +324,9 @@ void tguiShutdown()
 	al_unregister_event_source(key_events, al_get_keyboard_event_source());
 	al_destroy_event_queue(key_events);
 #endif
-	al_unregister_event_source(mouse_events, al_get_mouse_event_source());
+	if (al_is_mouse_installed()) {
+		al_unregister_event_source(mouse_events, al_get_mouse_event_source());
+	}
 	al_destroy_event_queue(mouse_events);
 	event_queues_created = false;
 	pressedHotkeys.clear();

@@ -5304,7 +5304,7 @@ int MManSelector::update(int millis)
 					need_release = false;
 				}
 			}
-			else 
+			else if (al_is_mouse_installed()) {
 #endif
 			{
 				ALLEGRO_MOUSE_STATE s;
@@ -5976,12 +5976,12 @@ int MPartySelector::update(int millis)
 		}
 	}
 
-	ALLEGRO_MOUSE_STATE mstate;
-	m_get_mouse_state(&mstate);
-
 	if (dragging) {
 	}
 	else if (down && show_trash) {
+		ALLEGRO_MOUSE_STATE mstate;
+		m_get_mouse_state(&mstate);
+
 		if ((abs(mstate.x-downX) >= 10 || abs(mstate.y-downY) >= 10) && index != MAX_PARTY) {
 			int tmp = (downY - 3 - y) / ((69/*height-5*/)/5);
 			if (tmp >= 0 && tmp < 5) {

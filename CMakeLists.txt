@@ -30,7 +30,12 @@ if(WIN32)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
 	endif(MINGW)
 else(WIN32)
+	if(RASPBERRYPI)
+		set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL -march=armv6 -mfpu=vfp -mfloat-abi=hard")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL -march=armv6 -mfpu=vfp -mfloat-abi=hard")
+	else(RASPBERRYPI)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL")
+	endif(RASPBERRYPI)
 endif(WIN32)
 
 include_directories("${CMAKE_SOURCE_DIR}/include")
@@ -185,12 +190,17 @@ else(APPLE)
 		allegro${ALLEG_SUFFIX}
 		${ALLEGRO_MAIN_LIB}
 		lua-fixed
-		m pthread SM ICE X11 Xext Xcursor Xinerama Xrandr Xpm GL GLU
+		m pthread SM ICE X11 Xext Xcursor Xinerama Xrandr Xpm
 		freetype
 		z
 		bass
 		png jpeg curl
-	) 
+	)
+	if(RASPBERRYPI)
+		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host)
+	else(RASPBERYPI)
+		LIST(APPEND MAIN_LIBS GL GLU)
+	endif(RASPBERRYPI)
 endif(APPLE)
 endif(WIN32)
 

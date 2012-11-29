@@ -4,6 +4,10 @@
 
 #include "monster2.hpp"
 
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
+#define OPENGLES
+#endif
+
 #ifdef ALLEGRO_ANDROID
 #include <physfs.h>
 #endif
@@ -91,6 +95,7 @@ static void d3d_resource_restore(void)
 }
 #endif
 
+bool have_mouse;
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 bool do_pause_game = false;
@@ -129,11 +134,6 @@ bool superpower = false, healall = false;
 static bool pause_joystick_repeat_events = false;
 bool pause_f_to_toggle_fullscreen = false;
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-bool have_mouse = false;
-#else
-bool have_mouse = true;
-#endif
 bool use_digital_joystick = false;
 int screen_offset_x, screen_offset_y;
 float screen_ratio_x, screen_ratio_y;
@@ -756,7 +756,9 @@ static void *thread_proc(void *arg)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_register_event_source(events, al_get_touch_input_event_source());
 #else
-	al_register_event_source(events, al_get_mouse_event_source());
+	if (have_mouse) {
+		al_register_event_source(events, al_get_mouse_event_source());
+	}
 #endif
 
 	double next_shake = al_current_time();
@@ -1581,19 +1583,24 @@ bool loadTilemap(void)
 void init_shaders(void)
 {
 	if (use_programmable_pipeline) {
-		
-#ifdef A5_OGL
 		static const char *main_vertex_source =
 		"attribute vec4 pos;\n"
 		"attribute vec4 color;\n"
 		"attribute vec2 texcoord;\n"
 		"uniform mat4 projview_matrix;\n"
+		"uniform mat4 tex_matrix;\n"
+                "uniform bool use_tex_matrix;\n"
 		"varying vec4 varying_color;\n"
 		"varying vec2 varying_texcoord;\n"
 		"void main()\n"
 		"{\n"
-		"   varying_color = color;\n"
-		"   varying_texcoord = texcoord;\n"
+	 	"   varying_color = color;\n"
+		"   if (use_tex_matrix) {\n"
+		"     vec4 uv = tex_matrix * vec4(texcoord, 0, 1);\n"
+		"     varying_texcoord = vec2(uv.x, uv.y);\n"
+		"   }\n"
+		"   else\n"
+		"     varying_texcoord = texcoord;\n"
 #ifndef __linux__
 		"   gl_PointSize = 1.0;\n"
 #endif
@@ -1604,10 +1611,17 @@ void init_shaders(void)
 		"attribute vec4 pos;\n"
 		"attribute vec2 texcoord;\n"
 		"uniform mat4 projview_matrix;\n"
+		"uniform mat4 tex_matrix;\n"
+                "uniform bool use_tex_matrix;\n"
 		"varying vec2 varying_texcoord;\n"
 		"void main()\n"
 		"{\n"
-		"   varying_texcoord = texcoord;\n"
+		"   if (use_tex_matrix) {\n"
+		"     vec4 uv = tex_matrix * vec4(texcoord, 0, 1);\n"
+		"     varying_texcoord = vec2(uv.x, uv.y);\n"
+		"   }\n"
+		"   else\n"
+		"     varying_texcoord = texcoord;\n"
 #ifndef __linux__
 		"   gl_PointSize = 1.0;\n"
 #endif
@@ -1619,12 +1633,19 @@ void init_shaders(void)
 		"attribute vec4 color;\n"
 		"attribute vec2 texcoord;\n"
 		"uniform mat4 projview_matrix;\n"
+		"uniform mat4 tex_matrix;\n"
+                "uniform bool use_tex_matrix;\n"
 		"varying vec4 varying_color;\n"
 		"varying vec2 varying_texcoord;\n"
 		"void main()\n"
 		"{\n"
 		"   varying_color = color;\n"
-		"   varying_texcoord = texcoord;\n"
+		"   if (use_tex_matrix) {\n"
+		"     vec4 uv = tex_matrix * vec4(texcoord, 0, 1);\n"
+		"     varying_texcoord = vec2(uv.x, uv.y);\n"
+		"   }\n"
+		"   else\n"
+		"     varying_texcoord = texcoord;\n"
 #ifndef __linux__
 		"   gl_PointSize = 1.0;\n"
 #endif
@@ -1635,6 +1656,8 @@ void init_shaders(void)
 		"attribute vec4 pos;\n"
 		"attribute vec2 texcoord;\n"
 		"uniform mat4 projview_matrix;\n"
+		"uniform mat4 tex_matrix;\n"
+                "uniform bool use_tex_matrix;\n"
 		"uniform float hstep;\n"
 		"uniform float vstep;\n"
 		"varying vec2 varying_texcoord;\n"
@@ -1644,7 +1667,12 @@ void init_shaders(void)
 		"varying vec2 tH;\n"
 		"void main()\n"
 		"{\n"
-		"   varying_texcoord = texcoord;\n"
+		"   if (use_tex_matrix) {\n"
+		"     vec4 uv = tex_matrix * vec4(texcoord, 0, 1);\n"
+		"     varying_texcoord = vec2(uv.x, uv.y);\n"
+		"   }\n"
+		"   else\n"
+		"     varying_texcoord = texcoord;\n"
 		"   tB = vec2(texcoord.s,       texcoord.t+vstep);\n"
 		"   tD = vec2(texcoord.s-hstep, texcoord.t);\n"
 		"   tF = vec2(texcoord.s+hstep, texcoord.t);\n"
@@ -1656,33 +1684,26 @@ void init_shaders(void)
 		"}\n";
 		
 		static const char *main_pixel_source =
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined OPENGLES
 		"precision mediump float;\n"
 #endif
 		"uniform bool use_tex;\n"
 		"uniform sampler2D tex;\n"
-		"uniform bool use_tex_matrix;\n"
-		"uniform mat4 tex_matrix;\n"
 		"varying " LOWP " vec4 varying_color;\n"
 		"varying vec2 varying_texcoord;\n"
 		"void main()\n"
 		"{\n"
 		"  " LOWP " vec4 tmp = varying_color;\n"
-		"  vec4 coord = vec4(varying_texcoord, 0.0, 1.0);\n"
-		"  if (use_tex_matrix) {\n"
-		"     coord = coord * tex_matrix;\n"
+		"  if (use_tex) {\n"
+		"     vec4 coord = vec4(varying_texcoord, 0.0, 1.0);\n"
 		"     " LOWP " vec4 sample = texture2D(tex, coord.st);\n"
 		"     tmp *= sample;\n"
-		"  }\n"
-		"  else if (use_tex) {\n"
-		"     " LOWP " vec4 sample = texture2D(tex, coord.st);\n"
-		"     tmp *= sample;\n"
-		"  }\n"
+                "  }\n"
 		"  gl_FragColor = tmp;\n"
 		"}\n";
 		
 		static const char *cheap_pixel_source =
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined OPENGLES
 		"precision mediump float;\n"
 #endif
 		"uniform sampler2D tex;\n"
@@ -1694,13 +1715,11 @@ void init_shaders(void)
 		"}\n";
 		
 		const char *tinter_pixel_source =
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined OPENGLES
 		"precision mediump float;\n"
 #endif
 		"uniform bool use_tex;\n"
 		"uniform sampler2D tex;\n"
-		"uniform bool use_tex_matrix;\n"
-		"uniform mat4 tex_matrix;\n"
 		"varying vec4 varying_color;\n"
 		"varying vec2 varying_texcoord;\n"
 		"uniform float r;\n"
@@ -1711,9 +1730,6 @@ void init_shaders(void)
 		"   float avg, dr, dg, db;\n"
 		"   vec4 color = varying_color;\n"
 		"   vec4 coord = vec4(varying_texcoord, 0.0, 1.0);\n"
-		"   if (use_tex_matrix) {\n"
-		"      coord = coord * tex_matrix;\n"
-		"   }\n"
 		"   color *= texture2D(tex, coord.st);\n"
 		"   avg = (color.r + color.g + color.b) / 3.0;\n"
 		"   dr = avg * r;\n"
@@ -1726,7 +1742,7 @@ void init_shaders(void)
 		"}";
 		
 		const char *warp2_pixel_source =
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined OPENGLES
 		"precision mediump float;\n"
 #endif
 		"uniform sampler2D tex;\n"
@@ -1747,7 +1763,7 @@ void init_shaders(void)
 		"}\n";
 		
 		const char *shadow_pixel_source =
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined OPENGLES
 		"precision mediump float;\n"
 #endif
 		"varying vec4 varying_color;\n"
@@ -1771,7 +1787,7 @@ void init_shaders(void)
 		"}\n";
 		
 		const char *brighten_pixel_source =
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined OPENGLES
 		"precision mediump float;\n"
 #endif
 		"uniform sampler2D tex;\n"
@@ -1779,13 +1795,8 @@ void init_shaders(void)
 		"varying vec2 varying_texcoord;\n"
 		"uniform float brightness;\n"
 		"uniform bool use_tex;\n"
-		"uniform bool use_tex_matrix;\n"
-		"uniform mat4 tex_matrix;\n"
 		"void main() {\n"
 		"   vec4 coord = vec4(varying_texcoord, 0.0, 1.0);\n"
-		"   if (use_tex_matrix) {\n"
-		"      coord = coord * tex_matrix;\n"
-		"   }\n"
 		"   vec4 color = varying_color;\n"
 		"   if (use_tex) {\n"
 		"      color *= texture2D(tex, coord.st);\n"
@@ -1806,7 +1817,7 @@ void init_shaders(void)
 		"}";
 		
 		const char *scale2x_pixel_source =
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined OPENGLES
 		"precision mediump float;\n"
 #endif
 		"uniform sampler2D tex;\n"
@@ -1865,235 +1876,6 @@ void init_shaders(void)
 		"	}\n"
 		"}\n";
 		
-#else
-		static const char *main_vertex_source =
-		"struct VS_INPUT\n"
-		"{\n"
-		"   float4 Position  : POSITION0;\n"
-		"   float2 TexCoord  : TEXCOORD0;\n"
-		"   float4 Color     : TEXCOORD1;\n"
-		"};\n"
-		"struct VS_OUTPUT\n"
-		"{\n"
-		"   float4 Position  : POSITION0;\n"
-		"   float4 Color     : COLOR0;\n"
-		"   float2 TexCoord  : TEXCOORD0;\n"
-		"};\n"
-		"\n"
-		"float4x4 projview_matrix;\n"
-		"\n"
-		"VS_OUTPUT vs_main(VS_INPUT Input)\n"
-		"{\n"
-		"   VS_OUTPUT Output;\n"
-		"   Output.Position = mul(Input.Position, projview_matrix);\n"
-		"   Output.Color = Input.Color;\n"
-		"   Output.TexCoord = Input.TexCoord;\n"
-		"   return Output;\n"
-		"}\n";
-		
-		static const char *warp_vertex_source =
-		"struct VS_INPUT\n"
-		"{\n"
-		"   float4 Position  : POSITION0;\n"
-		"   float2 TexCoord  : TEXCOORD0;\n"
-		"};\n"
-		"struct VS_OUTPUT\n"
-		"{\n"
-		"   float4 Position  : POSITION0;\n"
-		"   float2 TexCoord  : TEXCOORD0;\n"
-		"};\n"
-		"\n"
-		"float4x4 projview_matrix;\n"
-		"\n"
-		"VS_OUTPUT vs_main(VS_INPUT Input)\n"
-		"{\n"
-		"   VS_OUTPUT Output;\n"
-		"   Output.Position = mul(Input.Position, projview_matrix);\n"
-		"   Output.TexCoord = Input.TexCoord;\n"
-		"   return Output;\n"
-		"}\n";
-		
-		static const char *default_vertex_source =
-		"struct VS_INPUT\n"
-		"{\n"
-		"   float4 Position  : POSITION0;\n"
-		"   float2 TexCoord  : TEXCOORD0;\n"
-		"   float4 Color     : TEXCOORD1;\n"
-		"};\n"
-		"struct VS_OUTPUT\n"
-		"{\n"
-		"   float4 Position  : POSITION0;\n"
-		"   float4 Color     : COLOR0;\n"
-		"   float2 TexCoord  : TEXCOORD0;\n"
-		"   float4 ClipPos   : TEXCOORD1;\n"
-		"};\n"
-		"\n"
-		"float4x4 projview_matrix;\n"
-		"\n"
-		"VS_OUTPUT vs_main(VS_INPUT Input)\n"
-		"{\n"
-		"   VS_OUTPUT Output;\n"
-		"   Output.Position = mul(Input.Position, projview_matrix);\n"
-		"   Output.ClipPos = Output.Position;\n"
-		"   Output.Color = Input.Color;\n"
-		"   Output.TexCoord = Input.TexCoord;\n"
-		"   return Output;\n"
-		"}\n";
-		
-		static const char *main_pixel_source =
-		"bool use_tex;\n"
-		"texture tex;\n"
-		"bool use_tex_matrix;\n"
-		"float4x4 tex_matrix;\n"
-		"sampler2D s = sampler_state {\n"
-		"   texture = <tex>;\n"
-		"};\n"
-		"float4 ps_main(VS_OUTPUT Input) : COLOR0\n"
-		"{\n"
-		"   float4 tmp = Input.Color;\n"
-		"   if (use_tex) {\n"
-		"      float4 coord = float4(Input.TexCoord.x, Input.TexCoord.y, 0.0f, 1.0f);\n"
-		"      if (use_tex_matrix) {\n"
-		"         coord = mul(tex_matrix, coord);\n"
-		"      }\n"
-		"      float4 sample = tex2D(s, coord.xy);\n"
-		"      tmp *= sample;\n"
-		"   }\n"
-		"   return tmp;\n"
-		"}\n";
-		
-		static const char *cheap_pixel_source =
-		"texture tex;\n"
-		"sampler2D s = sampler_state {\n"
-		"   texture = <tex>;\n"
-		"};\n"
-		"float4 ps_main(VS_OUTPUT Input) : COLOR0\n"
-		"{\n"
-		"   return tex2D(s, Input.TexCoord.xy) * Input.Color;\n"
-		"}\n";
-		
-		static const char *tinter_pixel_source =
-		"bool use_tex;\n"
-		"texture tex;\n"
-		"bool use_tex_matrix;\n"
-		"float4x4 tex_matrix;\n"
-		"float r;\n"
-		"float g;\n"
-		"float b;\n"
-		"float ratio;\n"
-		"sampler2D s = sampler_state {\n"
-		"   texture = <tex>;\n"
-		"};\n"
-		"float4 ps_main(VS_OUTPUT Input) : COLOR0\n"
-		"{\n"
-		"   float avg, dr, dg, db;\n"
-		"   float4 color = Input.Color;\n"
-		"   if (use_tex) {\n"
-		"      float4 coord = float4(Input.TexCoord.x, Input.TexCoord.y, 0.0f, 1.0f);\n"
-		"      if (use_tex_matrix) {\n"
-		"         coord = mul(tex_matrix, coord);\n"
-		"      }\n"
-		"      color *= tex2D(s, coord.xy);\n"
-		"      avg = (color.r + color.g + color.b) / 3.0f;\n"
-		"      dr = avg * r;\n"
-		"      dg = avg * g;\n"
-		"      db = avg * b;\n"
-		"      color.r = color.r - (ratio * (color.r - dr));\n"
-		"      color.g = color.g - (ratio * (color.g - dg));\n"
-		"      color.b = color.b - (ratio * (color.b - db));\n"
-		"   }\n"
-		"   return color;\n"
-		"}\n";
-		
-		const char *warp2_pixel_source =
-		"texture tex;\n"
-		"sampler2D s = sampler_state {\n"
-		"   texture = <tex>;\n"
-		"};\n"
-		"float angle;\n"
-		"float tex_bot;\n"
-		"float4 ps_main(VS_OUTPUT Input) : COLOR0\n"
-		"{\n"
-		"   float div;\n"
-		"   div = angle / (3.14159*2.0);\n"
-		"   if (div > 0.5)\n"
-		"      div = 1.0 - div;\n"
-		"   div = (0.5 - div) * 25.0 + 5.0;\n"
-		"   float o = (sin((angle+(Input.TexCoord.x-0.5))*4.0) / div) + Input.TexCoord.y;\n"
-		"   if (o < 0.0 || o > tex_bot)\n"
-		"      return float4(0, 0, 0, 1);\n"
-		"   else\n"
-		"      return tex2D(s, float2(Input.TexCoord.x, o));\n"
-		"}\n";
-		
-		const char *shadow_pixel_source =
-		"float x1;\n"
-		"float y1;\n"
-		"float x2;\n"
-		"float y2;\n"
-		"float BW;\n"
-		"float BH;\n"
-		"float4 ps_main(VS_OUTPUT Input) : COLOR0\n"
-		"{\n"
-		"   float4 homo = Input.ClipPos / Input.ClipPos.w;\n"
-		"   float2 gl_FragCoord;\n"
-		"   gl_FragCoord.x = (homo.x + 1.0) * (BW/2.0);\n"
-		"   gl_FragCoord.y = (homo.y + 1.0) * (BH/2.0);\n"
-		"   gl_FragCoord.y = (BH-1.0) - gl_FragCoord.y;\n"
-		"   float rx, ry;\n"
-		"   float dx, dy;\n"
-		"   rx = clamp(gl_FragCoord.x, x1, x2);\n"
-		"   ry = clamp(gl_FragCoord.y, y1, y2);\n"
-		"   dx = gl_FragCoord.x - rx;\n"
-		"   dy = gl_FragCoord.y - ry;\n"
-		"   float dist = clamp(sqrt(dx*dx + dy*dy), 0.0, 10.0);\n"
-		"   float alpha = 1.0 - (dist / 10.0);\n"
-		"   return float4(0.0, 0.0, 0.0, alpha);\n"
-		"}\n";
-		
-		static const char *brighten_pixel_source =
-		"bool use_tex;\n"
-		"texture tex;\n"
-		"bool use_tex_matrix;\n"
-		"float4x4 tex_matrix;\n"
-		"float brightness;\n"
-		"sampler2D s = sampler_state {\n"
-		"   texture = <tex>;\n"
-		"};\n"
-		"float4 ps_main(VS_OUTPUT Input) : COLOR0\n"
-		"{\n"
-		"   float4 coord = float4(Input.TexCoord.x, Input.TexCoord.y, 0.0f, 1.0f);\n"
-		"   if (use_tex_matrix) {\n"
-		"      coord = mul(tex_matrix, coord);\n"
-		"   }\n"
-		"   float4 color = Input.Color;\n"
-		"   if (use_tex) {\n"
-		"      color *= tex2D(s, coord.xy);\n"
-		"   }\n"
-		"   if (color.a == 0.0f) {\n"
-		"      return float4(0.0f, 0.0f, 0.0f, 0.0f);\n"
-		"   }\n"
-		"   else {\n"
-		"      float src_factor = 1.0f - brightness;\n"
-		"      color.r *= src_factor;\n"
-		"      color.r = color.r + brightness;\n"
-		"      color.g *= src_factor;\n"
-		"      color.g = color.g + brightness;\n"
-		"      color.b *= src_factor;\n"
-		"      color.b = color.b + brightness;\n"
-		"      return color;\n"
-		"   }\n"
-		"}\n";
-#endif
-		
-#ifdef A5_D3D
-		default_shader = al_create_shader(ALLEGRO_SHADER_HLSL);
-		cheap_shader = al_create_shader(ALLEGRO_SHADER_HLSL);
-		tinter = al_create_shader(ALLEGRO_SHADER_HLSL);
-		warp = al_create_shader(ALLEGRO_SHADER_HLSL);
-		shadow_shader = al_create_shader(ALLEGRO_SHADER_HLSL);
-		brighten = al_create_shader(ALLEGRO_SHADER_HLSL);
-#else
 		default_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
 		cheap_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
 		tinter = al_create_shader(ALLEGRO_SHADER_GLSL);
@@ -2101,7 +1883,6 @@ void init_shaders(void)
 		shadow_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
 		brighten = al_create_shader(ALLEGRO_SHADER_GLSL);
 		scale2x = al_create_shader(ALLEGRO_SHADER_GLSL);
-#endif
 
 		al_attach_shader_source(
 					default_shader,
@@ -2253,8 +2034,12 @@ void init2_shaders(void)
 		al_set_shader_sampler(scale2x, "tex", scaleXX_buffer->bitmap, 0);
 		
 		al_set_shader_bool(default_shader, "use_tex_matrix", false);
+		al_set_shader_bool(cheap_shader, "use_tex_matrix", false);
 		al_set_shader_bool(tinter, "use_tex_matrix", false);
+		al_set_shader_bool(warp, "use_tex_matrix", false);
+		al_set_shader_bool(shadow_shader, "use_tex_matrix", false);
 		al_set_shader_bool(brighten, "use_tex_matrix", false);
+		al_set_shader_bool(scale2x, "use_tex_matrix", false);
 		
 #ifndef A5_OGL
 		al_set_shader_float(warp, "cx", ((float)BW/buffer_true_w)/2);
@@ -2431,7 +2216,10 @@ bool init(int *argc, char **argv[])
 	debug_message("al_init success\n");
 
 
-	al_install_mouse();
+	have_mouse = al_install_mouse();
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+	have_mouse = false;
+#endif
 	
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_install_touch_input();
@@ -2497,8 +2285,13 @@ bool init(int *argc, char **argv[])
 			sd->height = 480;
 		}
 		else {
+#ifdef ALLEGRO_RASPBERRYPI
+			sd->width = 240;
+			sd->height = 160;
+#else
 			sd->width = 960;
 			sd->height = 640;
+#endif
 		}
 	}
 #else
@@ -2652,6 +2445,7 @@ bool init(int *argc, char **argv[])
 	if (use_fixed_pipeline) {
 		my_opengl_version = 0x01;
 	}
+#ifndef ALLEGRO_RASPBERRYPI
 	else {
 		if (!al_have_opengl_extension("GL_EXT_framebuffer_object")
 		 && !al_have_opengl_extension("GL_ARB_framebuffer_object")) {
@@ -2661,6 +2455,9 @@ bool init(int *argc, char **argv[])
 
 		my_opengl_version = al_get_opengl_version();
 	}
+#else
+	my_opengl_version = al_get_opengl_version();
+#endif
 #else
 	my_opengl_version = 0x0;
 

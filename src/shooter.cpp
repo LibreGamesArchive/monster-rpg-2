@@ -5,7 +5,7 @@
 #endif
 #include <allegro5/internal/aintern_opengl.h>
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 #define glFrustum glFrustumf
 #endif
 
@@ -974,7 +974,12 @@ start:
 			}
 
 			ALLEGRO_MOUSE_STATE state;
-			al_get_mouse_state(&state);
+			if (al_is_mouse_installed()) {
+				al_get_mouse_state(&state);
+			}
+			else {
+				state.buttons = 0;
+			}
 			InputDescriptor in = getInput()->getDescriptor();
 			if ((state.buttons && can_pause) || in.button2) {
 				int press_x = state.x;
@@ -1018,7 +1023,12 @@ start:
 							can_pause = true;
 							break;
 						}
-						al_get_mouse_state(&state);
+						if (al_is_mouse_installed()) {
+							al_get_mouse_state(&state);
+						}
+						else {
+							state.buttons = 0;
+						}
 						if ((state.buttons && can_pause) || in.button2) {
 							press_x = state.x;
 							press_y = state.y;
