@@ -1,4 +1,5 @@
 #include "monster2.hpp"
+#include "Spells.hpp"
 
 
 typedef Spell *(*SpellFactory)(void);

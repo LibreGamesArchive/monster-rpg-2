@@ -1,7 +1,7 @@
 #ifndef COMBAT_SPELLS_HPP
 #define COMBAT_SPELLS_HPP
 
-
+#include "Combatant.hpp"
 
 
 enum SpellAlignment {

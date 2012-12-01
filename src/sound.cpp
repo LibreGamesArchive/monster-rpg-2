@@ -200,8 +200,9 @@ void initSound(void)
 	physfs_fileprocs.seek = physfs_my_seek;
 #endif
 
+// Lots of crackling on RPi @ 44.1KHz
 #ifdef ALLEGRO_RASPBERRYPI
-	BASS_SetConfig(BASS_CONFIG_BUFFER, 3000);
+	BASS_SetConfig(BASS_CONFIG_BUFFER, 5000);
 	if (!BASS_Init(-1, 22050, 0, NULL, NULL)) {
 #else
 	if (!BASS_Init(-1, 44100, 0, NULL, NULL)) {

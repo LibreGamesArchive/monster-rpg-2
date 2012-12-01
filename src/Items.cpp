@@ -1,4 +1,5 @@
 #include "monster2.hpp"
+#include "Items.hpp"
 
 
 ItemEffect *createItemEffect(int itemIndex)

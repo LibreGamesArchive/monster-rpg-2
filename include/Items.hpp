@@ -1,6 +1,8 @@
 #ifndef COMBAT_ITEMS_HPP
 #define COMBAT_ITEMS_HPP
 
+#include "Combatant.hpp"
+
 
 class ItemEffect : public CombatEntity {
 public:

@@ -265,7 +265,7 @@ static void readStats(int who, gzFile f)
 			n = std::string(readString(f));
 		}
 		if (i < MAX_SPELLS_IN_THIS_GAME) {
-			info.spells[i] = "";
+			info.spells[i] = n;
 		}
 	}
 

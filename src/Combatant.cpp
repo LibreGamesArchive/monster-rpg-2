@@ -1,4 +1,5 @@
 #include "monster2.hpp"
+#include "Combatant.hpp"
 
 
 int Combatant::getDirection(void)

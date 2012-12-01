@@ -1,6 +1,7 @@
 #ifndef COMBAT_ENTITY
 #define COMBAT_ENTITY
 
+class Combatant;
 
 enum CombatEntityType {
 	COMBATENTITY_TYPE_PLAYER = 0,
@@ -247,7 +248,7 @@ struct Darkness1Blob {
 
 class Darkness1Effect : public CombatEntity {
 public:
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	static const int NUM_BLOBS = 10;
 #else
 	static const int NUM_BLOBS = 15;
@@ -333,6 +334,7 @@ protected:
 	ALLEGRO_COLOR *colors;
 	float *atans;
 	float *roots;
+        ALLEGRO_VERTEX *verts;
 };
 
 
@@ -345,7 +347,7 @@ struct SlimeBlob {
 
 class SlimeEffect : public CombatEntity {
 public:
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	static const int NUM_BLOBS = 5;
 #else
 	static const int NUM_BLOBS = 20;
@@ -363,7 +365,7 @@ protected:
 	Combatant *target;
 	int count;
 	SlimeBlob blobs[NUM_BLOBS];
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	ALLEGRO_VERTEX verts[NUM_BLOBS*6];
 	MBITMAP *blob;
 #endif
@@ -397,7 +399,7 @@ protected:
 	int maxDepth;
 	AnimationSet *animSet;
 	Combatant *target;
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	ALLEGRO_VERTEX *verts;
 #endif
 };

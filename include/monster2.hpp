@@ -204,7 +204,6 @@ extern TGUIWidget *mainWidget;
 
 
 class Battle;
-class Combatant;
 
 #ifndef MIN
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -258,10 +257,8 @@ enum CloneType
 #include "inventory.hpp"
 #include "CombatInfo.hpp"
 #include "CombatStatus.hpp"
-#include "CombatEntity.hpp"
 #include "lander.hpp"
 #include "CombatActions.hpp"
-#include "Combatant.hpp"
 #include "CombatPlayer.hpp"
 #include "CombatEnemy.hpp"
 #include "battle.hpp"

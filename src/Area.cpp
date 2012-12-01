@@ -468,7 +468,6 @@ void set_player_path(int x, int y)
 				path_head = tmp;
 			}
 			else {
-				printf("NO PATH\n");
 				path_head = NULL;
 				astar_stop();
 			}

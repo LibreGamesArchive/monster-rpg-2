@@ -190,16 +190,16 @@ else(APPLE)
 		allegro${ALLEG_SUFFIX}
 		${ALLEGRO_MAIN_LIB}
 		lua-fixed
+		bass curl
 		m pthread SM ICE X11 Xext Xcursor Xinerama Xrandr Xpm
-		freetype
-		z
-		bass
-		png jpeg curl
 	)
 	if(RASPBERRYPI)
-		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host)
+	else(RASPBERRYPI)
+	endif(RASPBERRYPI)
+	if(RASPBERRYPI)
+		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host /usr/lib/arm-linux-gnueabihf/libfreetype.a /usr/lib/arm-linux-gnueabihf/libz.a /usr/lib/arm-linux-gnueabihf/libpng.a /usr/lib/arm-linux-gnueabihf/libjpeg.a)
 	else(RASPBERYPI)
-		LIST(APPEND MAIN_LIBS GL GLU)
+		LIST(APPEND MAIN_LIBS GL GLU freetype z png jpeg)
 	endif(RASPBERRYPI)
 endif(APPLE)
 endif(WIN32)

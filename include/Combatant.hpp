@@ -1,7 +1,7 @@
 #ifndef COMBATANT_HPP
 #define COMBATANT_HPP
 
-
+#include "CombatEntity.hpp"
 
 class Combatant : public CombatEntity {
 public:

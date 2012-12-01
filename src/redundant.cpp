@@ -940,8 +940,8 @@ void m_restore_blender(void)
 
 void m_draw_prim (const void* vtxs, const ALLEGRO_VERTEX_DECL* decl, MBITMAP* texture, int start, int end, int type)
 {
-#ifndef ALLEGRO_ANDROID
-#ifdef __linux__
+#if !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
+#if defined __linux__
 	// work around for nvidia+gallium
 	if (!is_intel_gpu_on_desktop_linux && type == ALLEGRO_PRIM_POINT_LIST) {
 		ALLEGRO_VERTEX *verts = (ALLEGRO_VERTEX *)vtxs;
@@ -951,6 +951,42 @@ void m_draw_prim (const void* vtxs, const ALLEGRO_VERTEX_DECL* decl, MBITMAP* te
 		return;
 	}
 #endif
+#endif
+#ifdef ALLEGRO_RASPBERRYPI
+	if (type == ALLEGRO_PRIM_POINT_LIST) {
+		int n = end-start;
+		ALLEGRO_VERTEX *v = new ALLEGRO_VERTEX[n*6];
+		ALLEGRO_VERTEX *verts = (ALLEGRO_VERTEX *)vtxs;
+		for (int i = 0; i < n; i++) {
+			v[i*6+0].x = verts[i+start].x;
+			v[i*6+0].y = verts[i+start].y;
+			v[i*6+0].z = 0;
+			v[i*6+0].color = verts[i+start].color;
+			v[i*6+1].x = verts[i+start].x+1;
+			v[i*6+1].y = verts[i+start].y;
+			v[i*6+1].z = 0;
+			v[i*6+1].color = verts[i+start].color;
+			v[i*6+2].x = verts[i+start].x+1;
+			v[i*6+2].y = verts[i+start].y+1;
+			v[i*6+2].z = 0;
+			v[i*6+2].color = verts[i+start].color;
+			v[i*6+3].x = verts[i+start].x;
+			v[i*6+3].y = verts[i+start].y+1;
+			v[i*6+3].z = 0;
+			v[i*6+3].color = verts[i+start].color;
+			v[i*6+4].x = verts[i+start].x;
+			v[i*6+4].y = verts[i+start].y;
+			v[i*6+4].z = 0;
+			v[i*6+4].color = verts[i+start].color;
+			v[i*6+5].x = verts[i+start].x+1;
+			v[i*6+5].y = verts[i+start].y+1;
+			v[i*6+5].z = 0;
+			v[i*6+5].color = verts[i+start].color;
+		}
+		al_draw_prim(v, 0, 0, 0, n*6, ALLEGRO_PRIM_TRIANGLE_LIST);
+		delete[] v;
+	}
+	else
 #endif
 	al_draw_prim(vtxs, decl, (texture ? texture->bitmap : NULL), start, end, type);
 }

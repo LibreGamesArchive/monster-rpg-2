@@ -2317,7 +2317,7 @@ bool init(int *argc, char **argv[])
 	tguiSetRotation(0);
 
 	// Android because it's very slow switching back in on some devices
-#if defined A5_D3D || defined ALLEGRO_ANDROID
+#if defined A5_D3D || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	use_fixed_pipeline = true;
 #endif
 

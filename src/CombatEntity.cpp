@@ -1,4 +1,5 @@
 #include "monster2.hpp"
+#include "CombatEntity.hpp"
 #include <allegro5/internal/aintern_bitmap.h>
 
 const float Ice1Effect::VELOCITY = 0.5f;
@@ -490,7 +491,7 @@ void Ice1Effect::draw(void)
 		}
 	}
 
-#ifdef ALLEGRO_ANDROID
+#if defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	if (particles.size() > 0) {
 		ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[particles.size()];
 		for (int i = 0; i < (int)particles.size(); i++) {
@@ -500,7 +501,7 @@ void Ice1Effect::draw(void)
 			verts[i].z = 0;
 			verts[i].color = part.color;
 		}
-		al_draw_prim(verts, 0, NULL, 0, particles.size(), ALLEGRO_PRIM_POINT_LIST);
+		m_draw_prim(verts, 0, NULL, 0, particles.size(), ALLEGRO_PRIM_POINT_LIST);
 		delete[] verts;
 	}
 #else
@@ -1111,10 +1112,6 @@ int WhirlpoolEffect::getLifetime(void)
 
 void WhirlpoolEffect::draw(void)
 {
-	int mult = 1;
-
-	ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[w*h*mult];
-	
 	int i = 0;
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
@@ -1129,18 +1126,16 @@ void WhirlpoolEffect::draw(void)
 			xx = w/2 + costable[(int)(a/(M_PI*2)*SINTABSIZE)] * radius;
 			yy = h/2 + sintable[(int)(a/(M_PI*2)*SINTABSIZE)] * radius;
 			if (xx >= 0 && yy >= 0 && xx < w && yy < h) {
-				verts[i*mult].x = ((target->getX()-w/2+(x*s)) + o) + 0.5;
-				verts[i*mult].y = (target->getY()-8-(h/6)+(y/3)) + 0.5;
-				verts[i*mult].z = 0;
-				verts[i*mult].color = colors[xx+yy*w];
+				verts[i].x = ((target->getX()-w/2+(x*s)) + o) + 0.5;
+				verts[i].y = (target->getY()-8-(h/6)+(y/3)) + 0.5;
+				verts[i].z = 0;
+				verts[i].color = colors[xx+yy*w];
 				i++;
 			}
 		}
 	}
 
-	m_draw_prim(verts, 0, 0, 0, i*mult, ALLEGRO_PRIM_POINT_LIST);
-
-	delete[] verts;
+	m_draw_prim(verts, 0, 0, 0, i, ALLEGRO_PRIM_POINT_LIST);
 }
 
 
@@ -1193,6 +1188,8 @@ WhirlpoolEffect::WhirlpoolEffect(Combatant *target) :
 	}
 	m_unlock_bitmap(spiral);
 	m_destroy_bitmap(spiral);
+	
+	verts = new ALLEGRO_VERTEX[w*h];
 }
 
 
@@ -1201,12 +1198,13 @@ WhirlpoolEffect::~WhirlpoolEffect(void)
 	delete[] colors;
 	delete[] atans;
 	delete[] roots;
+	delete[] verts;
 }
 
 
 void SlimeEffect::draw(void)
 {
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	m_draw_prim(verts, 0, blob, 0, NUM_BLOBS*6, ALLEGRO_PRIM_TRIANGLE_LIST);
 #else
 	for (int i = 0; i < NUM_BLOBS; i++) {
@@ -1234,7 +1232,7 @@ bool SlimeEffect::update(int step)
 		return true;
 
 	for (int i = 0; i < NUM_BLOBS; i++) {
-		#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+		#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 		int j = i*6;
 		int end = j + 6;
 		for (; j < end; j++) {
@@ -1274,7 +1272,7 @@ SlimeEffect::SlimeEffect(Combatant *target) :
 		blobs[i].color = m_map_rgb(r, 0, 0);
 	}
 
-	#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+	#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	blob = m_create_bitmap(10, 10); // check
 	ALLEGRO_BITMAP *t = al_get_target_bitmap();
 	m_set_target_bitmap(blob);
@@ -1332,7 +1330,7 @@ SlimeEffect::SlimeEffect(Combatant *target) :
 
 SlimeEffect::~SlimeEffect()
 {
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	m_destroy_bitmap(blob);
 #endif
 }
@@ -1345,7 +1343,7 @@ int Fire2Effect::getLifetime(void)
 
 bool Fire2Effect::update(int step)
 {
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	animSet->update(step);
 #else
 	for (int i = 0; i < 4; i++) {
@@ -1374,7 +1372,7 @@ bool Fire2Effect::update(int step)
 
 void Fire2Effect::draw(void)
 {
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	int n = 0;
 	const int w = animSet->getWidth();
 	const int h = animSet->getHeight();
@@ -1397,7 +1395,7 @@ void Fire2Effect::draw(void)
 		else {
 			yy = y-p->y+p->offset;
 		}
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 		const int xx = x+p->x;
 		verts[n*6].x = xx;
 		verts[n*6].y = yy;
@@ -1423,7 +1421,7 @@ void Fire2Effect::draw(void)
 #endif
 	}
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	m_draw_prim(verts, 0, animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap(), 0, n*6, ALLEGRO_PRIM_TRIANGLE_LIST);
 	n = 0;
 #endif
@@ -1447,7 +1445,7 @@ void Fire2Effect::draw(void)
 		else {
 			yy = y-p->y+p->offset;
 		}
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 		const int xx = x+p->x;
 		verts[n*6].x = xx;
 		verts[n*6].y = yy;
@@ -1473,7 +1471,7 @@ void Fire2Effect::draw(void)
 #endif
 	}
 	
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	m_draw_prim(verts, 0, animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap(), 0, n*6, ALLEGRO_PRIM_TRIANGLE_LIST);
 #endif
 	
@@ -1506,7 +1504,7 @@ Fire2Effect::Fire2Effect(Combatant *target)
 	}
 
 	animSet = new AnimationSet(getResource("combat_media/Fire2.png"));
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	verts = new ALLEGRO_VERTEX[numPixels*6];
 	
 	const int w = animSet->getWidth();
@@ -1541,7 +1539,7 @@ Fire2Effect::~Fire2Effect(void)
 {
 	delete[] pixels;
 	delete animSet;
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	delete[] verts;
 #endif
 }
@@ -1972,7 +1970,7 @@ int SprayEffect::getLifetime(void)
 
 void SprayEffect::draw(void)
 {
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	if (use_programmable_pipeline) {
 		_blend_color = white;
 		al_set_separate_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_ALPHA,
@@ -1981,11 +1979,11 @@ void SprayEffect::draw(void)
 	else {
 #endif
 	m_set_blender(ALLEGRO_ALPHA, ALLEGRO_ALPHA, white);
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	}
 #endif
 	
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	int count = 0;
 	for (int yy = 0; yy < HEIGHT; yy++) {
 		int dx = lx+ox;
@@ -2016,7 +2014,7 @@ void SprayEffect::draw(void)
 		int dx = lx+ox;
 		for (int l = 0; l < (int)points[y].size(); l++) {
 			SprayPoint &p = points[y][l];
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 			if (dx+p.length >= rx) {
 				int l = rx - dx;
 				verts[count].x = dx;
@@ -2067,7 +2065,7 @@ void SprayEffect::draw(void)
 		}
 	}
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	al_draw_prim(verts, 0, 0, 0, count, ALLEGRO_PRIM_LINE_LIST);
 #endif
 	
@@ -2239,7 +2237,7 @@ int TorrentEffect::getLifetime(void)
 
 void TorrentEffect::draw(void)
 {
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	ALLEGRO_VERTEX verts[NUM_DROPS*2];
 	
 	for (int i = 0; i < NUM_DROPS*2; i++)
@@ -2256,7 +2254,7 @@ void TorrentEffect::draw(void)
 		const int len = 20;
 		tx = drops[i].x + (cos(angle) * len);
 		ty = drops[i].y + (sin(angle) * len);
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 		verts[i*2].x = drops[i].x;
 		verts[i*2].y = drops[i].y;
 		float a = drops[i].color.a;
@@ -2283,7 +2281,7 @@ void TorrentEffect::draw(void)
 #endif
 	}
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	al_draw_prim(verts, 0, 0, 0, NUM_DROPS*2, ALLEGRO_PRIM_LINE_LIST);
 #endif
 }
@@ -3093,7 +3091,7 @@ TwisterEffect::TwisterEffect(Combatant *target) :
 	x = target->getX();
 	y = target->getY()+1;
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	bmp = m_load_alpha_bitmap(getResource("combat_media/Twister.png"));
 #else
 	bmp = m_load_bitmap(getResource("combat_media/Twister.png"));

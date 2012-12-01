@@ -85,10 +85,10 @@ bool do_lander(void)
 	Particle p; \
 	float c = lander_angle+M_PI+(M_PI/6*dir); \
 	float s = lander_angle+M_PI+(M_PI/6*dir); \
-	p.x = lander_x + (c) * 9; \
-	p.y = lander_y + (s) * 9; \
-	p.dx = (-c) * 0.01f + randf(-0.002f, 0.002f); \
-	p.dy = (-s) * 0.01f + randf(-0.002f, 0.002f); \
+	p.x = lander_x + cos(c) * 9; \
+	p.y = lander_y + sin(s) * 9; \
+	p.dx = cos(-c) * 0.01f + randf(-0.002f, 0.002f); \
+	p.dy = sin(-s) * 0.01f + randf(-0.002f, 0.002f); \
 	p.ground = BH; \
 	p.color = m_map_rgb(255, 0, 0); \
 	particles.push_back(p); \
@@ -181,8 +181,8 @@ top:
 			}
 
 			/* apply gravity */
-			lander_x += (M_PI/2) * gravity * LOGIC_MILLIS;
-			lander_y += (M_PI/2) * gravity * LOGIC_MILLIS;
+			lander_x += cos(M_PI/2) * gravity * LOGIC_MILLIS;
+			lander_y += sin(M_PI/2) * gravity * LOGIC_MILLIS;
 
 			/* apply jets */
 			bool left = false, right = false;
@@ -213,8 +213,8 @@ top:
 				if (lander_vel > lander_vel_max)
 					lander_vel = lander_vel_max;
 				lander_angle += lander_angle_delta * LOGIC_MILLIS;
-				lander_x += (lander_angle) * lander_vel * LOGIC_MILLIS;
-				lander_y += (lander_angle) * lander_vel * LOGIC_MILLIS;
+				lander_x += cos(lander_angle) * lander_vel * LOGIC_MILLIS;
+				lander_y += sin(lander_angle) * lander_vel * LOGIC_MILLIS;
 				if (particles.size() < MAX_PARTICLES) {
 					for (int i = 0; i < 1; i++) {
 						ADD_PARTICLE(1)
@@ -230,8 +230,8 @@ top:
 				if (lander_vel > lander_vel_max)
 					lander_vel = lander_vel_max;
 				lander_angle -= lander_angle_delta * LOGIC_MILLIS;
-				lander_x += (lander_angle) * lander_vel * LOGIC_MILLIS;
-				lander_y += (lander_angle) * lander_vel * LOGIC_MILLIS;
+				lander_x += cos(lander_angle) * lander_vel * LOGIC_MILLIS;
+				lander_y += sin(lander_angle) * lander_vel * LOGIC_MILLIS;
 				if (particles.size() < MAX_PARTICLES) {
 					for (int i = 0; i < 1; i++) {
 						ADD_PARTICLE(-1)

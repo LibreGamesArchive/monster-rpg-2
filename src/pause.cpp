@@ -3213,15 +3213,17 @@ bool config_menu(bool start_on_fullscreen)
 	MSingleToggle *aspect_toggle = new MSingleToggle(xx, y, aspect_choices);
 	int curr_aspect = config.getMaintainAspectRatio();
 	aspect_toggle->setSelected(aspect_real_to_option(curr_aspect));
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE
 	if (is_ipad()) {
+#elif defined ALLEGRO_RASPBERRYPI
+	if (false) {
 #endif
 		y += 13;
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_RASPBERRYPI
 	}
 #endif
 
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
 	std::vector<std::string> fullscreen_choices;
 	fullscreen_choices.push_back("{027} Draw in a window");
 	fullscreen_choices.push_back("{027} Draw fullscreen");
@@ -3283,15 +3285,17 @@ bool config_menu(bool start_on_fullscreen)
 
 	tguiAddWidget(filter_type_toggle);
 
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE
 	if (is_ipad()) {
+#elif defined ALLEGRO_RASPBERRYPI
+	if (false) {
 #endif
 	tguiAddWidget(aspect_toggle);
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_RASPBERRYPI
 	}
 #endif
 
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
 	tguiAddWidget(fullscreen_toggle);
 #endif
 	
@@ -3301,14 +3305,14 @@ bool config_menu(bool start_on_fullscreen)
 		tguiAddWidget(reset_game_center);
 	}
 
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
 	if (start_on_fullscreen) {
 		tguiSetFocus(fullscreen_toggle);
 	}
 	else {
 #endif
 		tguiSetFocus(sound_toggle);
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
 	}
 #endif
 
@@ -3492,15 +3496,17 @@ bool config_menu(bool start_on_fullscreen)
 		}
 #endif
 
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE
 		if (is_ipad()) {
+#elif defined ALLEGRO_RASPBERRYPI
+		if (false) {
 #endif
 		sel = aspect_toggle->getSelected();
 		if (aspect_real_to_option(config.getMaintainAspectRatio()) != sel) {
 			config.setMaintainAspectRatio(aspect_option_to_real(sel));
 			set_screen_params();
 		}
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_RASPBERRYPI
 		}
 #endif
 
@@ -3510,7 +3516,7 @@ bool config_menu(bool start_on_fullscreen)
 			create_buffers();
 		}
 
-#if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE
+#if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE && !defined ALLEGRO_RASPBERRYPI
 		bool fs = fullscreen_toggle->getSelected();
 		if (fs != (bool)start_fullscreen) {
 			al_set_target_backbuffer(display);
@@ -3571,7 +3577,7 @@ done:
 	if (reset_game_center)
 		delete reset_game_center;	
 #endif
-#else
+#elif !defined ALLEGRO_RASPBERRYPI
 	delete fullscreen_toggle;
 #endif
 	delete language_toggle;
