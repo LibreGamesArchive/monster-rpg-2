@@ -183,7 +183,7 @@ if(APPLE)
 		allegro_shader${ALLEG_SUFFIX}
 		allegro${ALLEG_SUFFIX} ${ALLEGRO_MAIN_LIB}
 		${EXTRA_LIBS}
-		lua
+		lua5.2
 		JoypadCocoa
 		curl
 	)
@@ -200,7 +200,7 @@ else(APPLE)
 		allegro_shader${ALLEG_SUFFIX}
 		allegro${ALLEG_SUFFIX}
 		${ALLEGRO_MAIN_LIB}
-		lua
+		lua5.2
 		bass curl
 		m pthread SM ICE X11 Xext Xcursor Xinerama Xrandr Xpm
 	)
