@@ -1383,7 +1383,7 @@ Battle::~Battle(void)
 	
 	std::map<std::string, MSAMPLE>::iterator it2;
 	for (it2 = preloaded_samples.begin(); it2 != preloaded_samples.end(); it2++) {
-		HSAMPLE s = (HSAMPLE)it2->second;
+		MSAMPLE s = (MSAMPLE)it2->second;
 		destroySample(s);
 	}
 	preloaded_samples.clear();

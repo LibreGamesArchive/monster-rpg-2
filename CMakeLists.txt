@@ -1,6 +1,13 @@
 project(monster-rpg-2)
 cmake_minimum_required(VERSION 2.6)
 
+OPTION(KCM_AUDIO "Use Allegro audio instead of BASS" off)
+
+if(KCM_AUDIO)
+	set(CMAKE_C_FLAGS "-DKCM_AUDIO")
+	set(CMAKE_CXX_FLAGS "-DKCM_AUDIO")
+endif(KCM_AUDIO)
+
 # function to copy files to build dir:
 function(copy_file_to_build target file dest)
    add_custom_target(${target} ALL DEPENDS ${dest})
@@ -24,6 +31,7 @@ if(WIN32)
 		# you must define one of A5_OGL (all platforms) or A5_D3D
 		#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DA5_D3D")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows")
 	else(MINGW)
 		#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DA5_OGL")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DA5_D3D")
@@ -144,9 +152,12 @@ if(WIN32)
 		allegro${ALLEG_SUFFIX}
 		${ALLEGRO_MAIN_LIB}
 		${EXTRA_LIBS}
-		lua
+		lua5.2
 		d3dx9
 	)
+	if(KCM_AUDIO)
+		LIST(APPEND MAIN_LIBS "ws2_32" "dsound")
+	endif(KCM_AUDIO)
 else(WIN32)
 if(APPLE)
 	set(ALLEGRO_MAIN_LIB "allegro_main${ALLEG_SUFFIX}")
@@ -203,6 +214,10 @@ else(APPLE)
 	endif(RASPBERRYPI)
 endif(APPLE)
 endif(WIN32)
+
+if(KCM_AUDIO)
+	LIST(APPEND MAIN_LIBS "allegro_audio${ALLEG_SUFFIX}" "allegro_acodec${ALLEG_SUFFIX}" "FLAC" "vorbisfile" "vorbis" "ogg")
+endif(KCM_AUDIO)
 
 target_link_libraries(
 	monster2

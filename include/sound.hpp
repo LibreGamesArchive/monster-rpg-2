@@ -9,7 +9,7 @@ typedef int MSAMPLE_ID;
 typedef HSAMPLE MSAMPLE;
 typedef int MSAMPLE_ID;
 #else
-typedef ALLEGRO_SAMPLE * MSAMPLE;
+typedef ALLEGRO_SAMPLE *MSAMPLE;
 typedef ALLEGRO_SAMPLE_ID MSAMPLE_ID;
 #endif
 #endif

@@ -268,7 +268,7 @@ void dumpLuaStack(lua_State *l)
                         break;
 
                 case LUA_TNUMBER:  /* numbers */
-                        printf("%d", lua_tonumber(l, i));
+                        printf("%f", lua_tonumber(l, i));
                         break;
 
                 case LUA_TTABLE:   /* table */
@@ -3655,7 +3655,7 @@ static int C_BonusPoints(lua_State *stack)
 
 struct SFX {
 	int id;
-	int sample;
+	MSAMPLE sample;
 };
 static int id_counter = 1;
 static std::vector<SFX> sfx;
