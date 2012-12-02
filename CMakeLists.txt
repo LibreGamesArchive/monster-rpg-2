@@ -115,6 +115,13 @@ add_executable(monster2
 	src/monster2.cpp
 )
 
+set(MAIN_LIBS "mo2-engine")
+
+if(KCM_AUDIO)
+	LIST(APPEND MAIN_LIBS "allegro_audio${ALLEG_SUFFIX}" "allegro_acodec${ALLEG_SUFFIX}" "FLAC" "vorbisfile" "vorbis" "ogg")
+endif(KCM_AUDIO)
+
+
 if(WIN32)
 	set(ALLEGRO_MAIN_LIB "")
 	set(EXTRA_LIBS
@@ -139,8 +146,7 @@ if(WIN32)
 		"freetype"
 		"z"
 	)
-	set(MAIN_LIBS 
-		mo2-engine
+	LIST(APPEND MAIN_LIBS 
 		allegro_ttf${ALLEG_SUFFIX}
 		allegro_font${ALLEG_SUFFIX}
 		allegro_primitives${ALLEG_SUFFIX}
@@ -173,7 +179,7 @@ if(APPLE)
 	MARK_AS_ADVANCED(APPSERVICES_LIBRARY)
 	MARK_AS_ADVANCED(IOKIT_LIBRARY)
 	SET(EXTRA_LIBS ${IOKIT_LIBRARY} ${OPENGL_LIBRARY} ${FOUNDATION_LIBRARY} ${APPSERVICES_LIBRARY} ${APPKIT_LIBRARY} ${AUDIOTOOLBOX_LIBRARY} freetype z)
-	set(MAIN_LIBS
+	LIST(APPEND MAIN_LIBS 
 		mo2-engine
 		allegro_ttf${ALLEG_SUFFIX}
 		allegro_font${ALLEG_SUFFIX}
@@ -196,7 +202,7 @@ if(APPLE)
 	endif(KCM_AUDIO)
 else(APPLE)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,.")
-	set(MAIN_LIBS
+	LIST(APPEND MAIN_LIBS 
 		mo2-engine
 		allegro_ttf${ALLEG_SUFFIX}
 		allegro_font${ALLEG_SUFFIX}
@@ -208,12 +214,14 @@ else(APPLE)
 		allegro${ALLEG_SUFFIX}
 		${ALLEGRO_MAIN_LIB}
 		lua5.2
-		bass curl
+		curl
 		m pthread SM ICE X11 Xext Xcursor Xinerama Xrandr Xpm
 	)
-	if(RASPBERRYPI)
-	else(RASPBERRYPI)
-	endif(RASPBERRYPI)
+        if(KCM_AUDIO)
+		LIST(APPEND MAIN_LIBS "pulse-simple" "pulse" "asound")
+	else(KCM_AUDIO)
+		LIST(APPEND MAIN_LIBS "bass")
+	endif(KCM_AUDIO)
 	if(RASPBERRYPI)
 		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host /usr/lib/arm-linux-gnueabihf/libfreetype.a /usr/lib/arm-linux-gnueabihf/libz.a /usr/lib/arm-linux-gnueabihf/libpng.a /usr/lib/arm-linux-gnueabihf/libjpeg.a)
 	else(RASPBERYPI)
@@ -221,10 +229,6 @@ else(APPLE)
 	endif(RASPBERRYPI)
 endif(APPLE)
 endif(WIN32)
-
-if(KCM_AUDIO)
-	LIST(APPEND MAIN_LIBS "allegro_audio${ALLEG_SUFFIX}" "allegro_acodec${ALLEG_SUFFIX}" "FLAC" "vorbisfile" "vorbis" "ogg")
-endif(KCM_AUDIO)
 
 target_link_libraries(
 	monster2
