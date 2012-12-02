@@ -144,7 +144,7 @@ if(WIN32)
 		allegro${ALLEG_SUFFIX}
 		${ALLEGRO_MAIN_LIB}
 		${EXTRA_LIBS}
-		lua-fixed
+		lua
 		d3dx9
 	)
 else(WIN32)
@@ -172,7 +172,7 @@ if(APPLE)
 		allegro_shader${ALLEG_SUFFIX}
 		allegro${ALLEG_SUFFIX} ${ALLEGRO_MAIN_LIB}
 		${EXTRA_LIBS}
-		lua-fixed
+		lua
 		JoypadCocoa
 		curl
 	)
@@ -189,7 +189,7 @@ else(APPLE)
 		allegro_shader${ALLEG_SUFFIX}
 		allegro${ALLEG_SUFFIX}
 		${ALLEGRO_MAIN_LIB}
-		lua-fixed
+		lua
 		bass curl
 		m pthread SM ICE X11 Xext Xcursor Xinerama Xrandr Xpm
 	)

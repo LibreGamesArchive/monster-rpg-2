@@ -202,7 +202,7 @@ void initSound(void)
 
 // Lots of crackling on RPi @ 44.1KHz
 #ifdef ALLEGRO_RASPBERRYPI
-	BASS_SetConfig(BASS_CONFIG_BUFFER, 5000);
+	BASS_SetConfig(BASS_CONFIG_BUFFER, 4000);
 	if (!BASS_Init(-1, 22050, 0, NULL, NULL)) {
 #else
 	if (!BASS_Init(-1, 44100, 0, NULL, NULL)) {

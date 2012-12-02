@@ -20,8 +20,8 @@ public:
 	bool isSpecialWalkable(void);
 	void setSpecialWalkable(bool s);
 	void setDest(int dx, int dy);
-        void setPosition(al_fixed x, al_fixed y);
-	void setOffset(al_fixed x, al_fixed y);
+        void setPosition(int x, int y);
+	void setOffset(int x, int y);
 	void setAnimationSet(std::string name);
 	void setInput(Input *i);
 	void setHigh(bool high);
@@ -35,7 +35,7 @@ public:
 	bool getPoisoned(void);
 	void setDimensions(int x, int y);
         
-        void getPosition(al_fixed *x, al_fixed *y);
+        void getPosition(int *x, int *y);
 	void getOffset(int *x, int *y);
 	int getX(void);
 	int getY(void);

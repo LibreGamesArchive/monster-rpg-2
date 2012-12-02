@@ -128,6 +128,7 @@ const char *getResource(const char *fmt, ...)
 	va_start(ap, fmt);
 	vsnprintf(name+strlen(name), (sizeof(name)/sizeof(*name))-1, fmt, ap);
 	va_end(ap);
+
 	return name;
 }
 

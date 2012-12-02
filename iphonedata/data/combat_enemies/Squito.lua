@@ -15,7 +15,7 @@ STAGE_INIT     = 0
 STAGE_FORWARD  = 1
 STAGE_BACKWARD = 2
 
-SPEED = math.frac2fix(3, 10)
+SPEED = 3 / 10
 sucked = false
 
 function initId(i)
@@ -44,47 +44,47 @@ function get_action(step)
 			loadPlayDestroy("buzz.ogg")
 			stage = stage + 1
 			delay = 0
-			start_x = math.itofix(battleGetX(id))
-			start_y = math.itofix(battleGetY(id))
+			start_x = battleGetX(id)
+			start_y = battleGetY(id)
 			target = getRandomPlayer()
 			loc = battleGetLocation(id)
 			battleSetSubAnimation(id, "forward")
 			if (loc == LOCATION_LEFT) then
-				dest_x = math.itofix(battleGetX(target)-battleGetWidth(id)/2)
+				dest_x = battleGetX(target)-battleGetWidth(id)/2
 			else
-				dest_x = math.itofix(battleGetX(target)+battleGetWidth(id)/2)
+				dest_x = battleGetX(target)+battleGetWidth(id)/2
 			end
-			dest_y = math.itofix(battleGetY(target)+battleGetHeight(target)/2)
+			dest_y = battleGetY(target)+battleGetHeight(target)/2
 		end
 	elseif (stage == STAGE_FORWARD) then
-		cx = math.itofix(battleGetX(id))
-		cy = math.itofix(battleGetY(id))
+		cx = battleGetX(id)
+		cy = battleGetY(id)
 
 		if (cx < dest_x) then
-			cx = math.fixadd(cx, math.fixmul(SPEED, math.itofix(step)))
+			cx = fixadd(cx, fixmul(SPEED, step))
 			if (cx > dest_x) then
 				cx = dest_x
 			end
 		elseif (cx > dest_x) then
-			cx = math.fixsub(cx, math.fixmul(SPEED, math.itofix(step)))
+			cx = fixsub(cx, fixmul(SPEED, step))
 			if (cx < dest_x) then
 				cx = dest_x
 			end
 		end
 		if (cy < dest_y) then
-			cy = math.fixadd(cy, math.fixmul(SPEED, math.itofix(step)))
+			cy = fixadd(cy, fixmul(SPEED, step))
 			if (cy > dest_y) then
 				cy = dest_y
 			end
 		elseif (cy > dest_y) then
-			cy = math.fixsub(cy, math.fixmul(SPEED, math.itofix(step)))
+			cy = fixsub(cy, fixmul(SPEED, step))
 			if (cy < dest_y) then
 				cy = dest_y
 			end
 		end
 
-		battleSetX(id, math.fixtoi(cx))
-		battleSetY(id, math.fixtoi(cy))
+		battleSetX(id, fixtoi(cx))
+		battleSetY(id, fixtoi(cy))
 
 		battleResortEntity(id)
 
@@ -108,34 +108,34 @@ function get_action(step)
 			end
 		end
 	elseif (stage == STAGE_BACKWARD) then
-		cx = math.itofix(battleGetX(id))
-		cy = math.itofix(battleGetY(id))
+		cx = battleGetX(id)
+		cy = battleGetY(id)
 
 		if (cx < start_x) then
-			cx = math.fixadd(cx, math.fixmul(SPEED, math.itofix(step)))
+			cx = fixadd(cx, fixmul(SPEED, step))
 			if (cx > start_x) then
 				cx = start_x
 			end
 		elseif (cx > start_x) then
-			cx = math.fixsub(cx, math.fixmul(SPEED, math.itofix(step)))
+			cx = fixsub(cx, fixmul(SPEED, step))
 			if (cx < start_x) then
 				cx = start_x
 			end
 		end
 		if (cy < start_y) then
-			cy = math.fixadd(cy, math.fixmul(SPEED, math.itofix(step)))
+			cy = fixadd(cy, fixmul(SPEED, step))
 			if (cy > start_y) then
 				cy = start_y
 			end
 		elseif (cy > start_y) then
-			cy = math.fixsub(cy, math.fixmul(SPEED, math.itofix(step)))
+			cy = fixsub(cy, fixmul(SPEED, step))
 			if (cy < start_y) then
 				cy = start_y
 			end
 		end
 
-		battleSetX(id, math.fixtoi(cx))
-		battleSetY(id, math.fixtoi(cy))
+		battleSetX(id, fixtoi(cx))
+		battleSetY(id, fixtoi(cy))
 
 		battleResortEntity(id)
 

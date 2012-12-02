@@ -124,9 +124,10 @@ const int LOGIC_MILLIS = (1000/LOGIC_RATE);
 #include "tgui.hpp"
 
 extern "C" {
-#include <lua-fixed/lua.h>
-#include <lua-fixed/lauxlib.h>
-#include <lua-fixed/lualib.h>
+#include <lua5.2/lua.h>
+#include <lua5.2/lauxlib.h>
+#include <lua5.2/lualib.h>
+#define lua_open luaL_newstate
 }
 
 #ifdef A5_D3D

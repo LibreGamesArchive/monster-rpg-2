@@ -14,7 +14,7 @@ STAGE_BACKWARD = 2
 
 stage = STAGE_INIT
 
-SPIN_SPEED = math.frac2fix(5, 100)
+SPIN_SPEED = 5 / 100
 FORWARD_TIME = 250
 BACKWARD_TIME = 300
 PEAK_HEIGHT = 50
@@ -45,10 +45,10 @@ function get_action(step)
 		angle = 0
 		count = 0
 	elseif (stage == STAGE_FORWARD) then
-		angle = math.fixadd(angle, math.fixmul(math.itofix(step), SPIN_SPEED))
+		angle = fixadd(angle, fixmul(step, SPIN_SPEED))
 		count = count + step
-		ox = math.fixtoi(math.fixmul(math.fixdiv(math.itofix(count), math.itofix(FORWARD_TIME)), math.itofix(dx)))
-		oy = math.fixtoi(math.fixmul(math.fixdiv(math.itofix(count), math.itofix(FORWARD_TIME)), math.itofix(dy)))
+		ox = fixtoi(fixmul(fixdiv(count, FORWARD_TIME), dx))
+		oy = fixtoi(fixmul(fixdiv(count, FORWARD_TIME), dy))
 		battleSetOx(myId, ox)
 		battleSetOy(myId, oy)
 		battleSetAngle(myId, angle)
@@ -59,12 +59,12 @@ function get_action(step)
 			stage = stage + 1
 		end
 	elseif (stage == STAGE_BACKWARD) then
-		angle = math.fixadd(angle, math.fixmul(math.itofix(step), SPIN_SPEED))
+		angle = fixadd(angle, fixmul(step, SPIN_SPEED))
 		count = count + step
-		ox = math.fixtoi(math.fixmul(math.fixsub(math.itofix(1), math.fixdiv(math.itofix(count), math.itofix(BACKWARD_TIME))), math.itofix(dx)))
-		oy = math.fixtoi(math.fixmul(math.fixsub(math.itofix(1), math.fixdiv(math.itofix(count), math.itofix(BACKWARD_TIME))), math.itofix(dy)))
-		local tmp = math.fixsin(math.fixmul(math.fixdiv(math.itofix(count), math.itofix(BACKWARD_TIME)), math.fixpi))
-		oy = math.fixtoi(math.fixsub(math.itofix(oy), math.fixmul(tmp, math.itofix(PEAK_HEIGHT))))
+		ox = fixtoi(fixmul(fixsub(1, fixdiv(count, BACKWARD_TIME)), dx))
+		oy = fixtoi(fixmul(fixsub(1, fixdiv(count, BACKWARD_TIME)), dy))
+		local tmp = fixsin(fixmul(fixdiv(count, BACKWARD_TIME), math.pi))
+		oy = fixtoi(fixsub(oy, fixmul(tmp, PEAK_HEIGHT)))
 		battleSetOx(myId, ox)
 		battleSetOy(myId, oy)
 		battleSetAngle(myId, angle)

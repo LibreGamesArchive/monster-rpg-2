@@ -20,7 +20,7 @@ STAGE_BACKDOWN = 5
 ox = 0
 oy = 0
 
-SPEED = math.frac2fix(3, 10)
+SPEED = 3 / 10
 MAX_HEIGHT = -200
 
 function initId(i)
@@ -41,18 +41,18 @@ function get_action(step)
 		start_x = battleGetX(id)
 		start_y = battleGetY(id)
 	elseif (stage == STAGE_JUMPING) then
-		oy = math.fixsub(oy, math.fixmul(SPEED, math.itofix(step)))
-		battleSetOy(id, math.fixtoi(oy))
-		if (math.fixtoi(oy) < MAX_HEIGHT) then
+		oy = fixsub(oy, fixmul(SPEED, step))
+		battleSetOy(id, fixtoi(oy))
+		if (fixtoi(oy) < MAX_HEIGHT) then
 			target = getRandomPlayer()
 			loc = battleGetLocation(id)
 			ox = battleGetX(target) - battleGetX(id)
 			battleSetOx(id, ox)
 			if (loc == LOCATION_LEFT) then
-				angle = math.fixmul(math.itofix(-1),
-					math.fixdiv(math.fixpi, math.itofix(2)))
+				angle = fixmul(-1,
+					fixdiv(math.pi, 2))
 			else
-				angle = math.fixdiv(math.fixpi, math.itofix(2))
+				angle = fixdiv(math.pi, 2)
 			end
 			battleSetAngle(id, angle)
 			dy = 0
@@ -64,10 +64,10 @@ function get_action(step)
 			stage = stage + 1
 		end
 	elseif (stage == STAGE_FALLING) then
-		oy = math.fixadd(oy, math.fixmul(SPEED, math.itofix(step)))
-		battleSetOy(id, math.fixtoi(oy))
-		if (math.fixtoi(oy) >= dy) then
-			oy = math.itofix(dy)
+		oy = fixadd(oy, fixmul(SPEED, step))
+		battleSetOy(id, fixtoi(oy))
+		if (fixtoi(oy) >= dy) then
+			oy = dy
 			loadPlayDestroy("chomp.ogg")
 			stage = stage + 1
 		end
@@ -78,9 +78,9 @@ function get_action(step)
 			stage = stage + 1
 		end
 	elseif (stage == STAGE_BACKUP) then
-		oy = math.fixsub(oy, math.fixmul(math.fixmul(SPEED, math.itofix(2)), math.itofix(step)))
-		battleSetOy(id, math.fixtoi(oy))
-		if (math.fixtoi(oy) < MAX_HEIGHT) then
+		oy = fixsub(oy, fixmul(fixmul(SPEED, 2), step))
+		battleSetOy(id, fixtoi(oy))
+		if (fixtoi(oy) < MAX_HEIGHT) then
 			ox = 0
 			battleSetOx(id, ox)
 			stage = stage + 1
@@ -91,9 +91,9 @@ function get_action(step)
 			battleResortEntity(id)
 		end
 	elseif (stage == STAGE_BACKDOWN) then
-		oy = math.fixadd(oy, math.fixmul(math.fixmul(SPEED, math.itofix(2)), math.itofix(step)))
-		battleSetOy(id, math.fixtoi(oy))
-		if (math.fixtoi(oy) > 0) then
+		oy = fixadd(oy, fixmul(fixmul(SPEED, 2), step))
+		battleSetOy(id, fixtoi(oy))
+		if (fixtoi(oy) > 0) then
 			oy = 0
 			battleSetOy(id, 0)
 			stage = 0
@@ -119,9 +119,9 @@ function pre_draw()
 			--y = start_y + dy
 			y = battleGetY(target)
 		end
-		local p = math.fixsub(math.itofix(1), math.fixdiv(oy, math.itofix(MAX_HEIGHT)))
-		local rx = math.fixtoi(math.fixmul(math.itofix(SHADOW_MAX_RX), p))
-		local ry = math.fixtoi(math.fixmul(math.itofix(SHADOW_MAX_RY), p))
+		local p = fixsub(1, fixdiv(oy, MAX_HEIGHT))
+		local rx = fixtoi(fixmul(SHADOW_MAX_RX), p)
+		local ry = fixtoi(fixmul(SHADOW_MAX_RY), p)
 		fillEllipse(start_x+ox, y, rx, ry, 0, 0, 0, 160)
 	end
 end

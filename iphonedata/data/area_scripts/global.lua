@@ -148,9 +148,9 @@ function Object:wander()
 	local dx = x - self.startx
 	local dy = y - self.starty
 
-	if (math.fixabs(math.itofix(dx)) > math.itofix(self.maxdist) or
-			math.fixabs(math.itofix(dy)) > 
-			math.itofix(self.maxdist)) then
+	if (math.abs(dx) > self.maxdist or
+			math.abs(dy) > 
+			self.maxdist) then
 		local l = false
 		local r = false
 		local u = false
@@ -676,7 +676,7 @@ function check_battle(chances, enemies, exceptions)
 	local px, py = getObjectPosition(0)
 	if (_last_battle_x == -1) then
 		-- do nothing
-	elseif (math.fixtoi(math.fixadd(math.fixabs(math.itofix(px-_last_battle_x)), math.fixabs(math.itofix(py-_last_battle_y)))) <= 1) then
+	elseif (math.floor(math.abs(px-_last_battle_x) + math.abs(py-_last_battle_y)) <= 1) then
 		return
 	end
 	if (not (px == _player_x) or not (py == _player_y)) then

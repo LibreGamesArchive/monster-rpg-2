@@ -220,26 +220,31 @@ endwhile:
 	va_end(vl);
 }
 
+/*
 static const luaL_Reg lualibs[] = {
 	{ "", luaopen_base },
 	{ LUA_LOADLIBNAME, luaopen_package },
 	{ LUA_TABLIBNAME, luaopen_table },
-//	{ LUA_IOLIBNAME, luaopen_io },
+	{ LUA_IOLIBNAME, luaopen_io },
 	{ LUA_OSLIBNAME, luaopen_os },
 	{ LUA_STRLIBNAME, luaopen_string },
 	{ LUA_MATHLIBNAME, luaopen_math },
 	{ LUA_DBLIBNAME, luaopen_debug },
 	{ 0, 0 }
 };
+*/
 
 void openLuaLibs(lua_State *L) 
 {
+	luaL_openlibs(L);
+/*
 	const luaL_Reg *lib = lualibs;
 	for (; lib->func; lib++) {
 		lua_pushcfunction(L, lib->func);
 		lua_pushstring(L, lib->name);
 		lua_call(L, 1, 0);
 	}
+*/
 }
 
 void dumpLuaStack(lua_State *l) 
@@ -1883,7 +1888,7 @@ static int CBattleSetEntityHP(lua_State *stack)
 static int CBattleSetAngle(lua_State *stack)
 {
 	int id = (int)lua_tonumber(stack, 1);
-	float a = al_fixtof(lua_tonumber(stack, 2));
+	float a = lua_tonumber(stack, 2);
 
 	CombatEntity *e = battle->getEntity(id);
 	if (!e) {
@@ -1956,7 +1961,7 @@ static int CSetMusicVolume(lua_State *stack)
 
 static int CSetAmbienceVolume(lua_State *stack)
 {
-	double vol = al_fixtof(lua_tonumber(stack, 1));
+	double vol = lua_tonumber(stack, 1);
 
 	setAmbienceVolume(vol);
 
@@ -3717,6 +3722,12 @@ static int CPreloadSpellSFX(lua_State *stack)
 	return 0;
 }
 
+int CDebug(lua_State *stack)
+{
+	printf("%s\n", lua_tostring(stack, 1));
+	return 0;
+}
+
 /*
  * This registers all the required C/C++ functions
  * with the Lua interpreter, so they can be called
@@ -4297,5 +4308,8 @@ void registerCFunctions(lua_State* luaState)
 
 	lua_pushcfunction(luaState, CPreloadSpellSFX);
 	lua_setglobal(luaState, "preloadSpellSFX");
+
+	lua_pushcfunction(luaState, CDebug);
+	lua_setglobal(luaState, "debug");
 }
 
