@@ -266,7 +266,9 @@ void setAmbienceVolume(float volume)
 
 	volume *= config.getMusicVolume()/255.0f;
 
-	al_set_audio_stream_gain(ambience, volume);
+	if (ambience) {
+		al_set_audio_stream_gain(ambience, volume);
+	}
 }
 
 float getMusicVolume(void)
