@@ -218,7 +218,7 @@ else(APPLE)
 		m pthread SM ICE X11 Xext Xcursor Xinerama Xrandr Xpm
 	)
         if(KCM_AUDIO)
-		LIST(APPEND MAIN_LIBS "pulse-simple" "pulse" "asound")
+		LIST(APPEND MAIN_LIBS "pulse-simple" "pulse" "asound" "openal")
 	else(KCM_AUDIO)
 		LIST(APPEND MAIN_LIBS "bass")
 	endif(KCM_AUDIO)
