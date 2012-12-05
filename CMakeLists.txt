@@ -201,7 +201,9 @@ if(APPLE)
 		LIST(APPEND MAIN_LIBS "bass")
 	endif(KCM_AUDIO)
 else(APPLE)
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,.")
+	if(NOT KCM_AUDIO)
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,.")
+	endif(NOT KCM_AUDIO)
 	LIST(APPEND MAIN_LIBS 
 		mo2-engine
 		allegro_ttf${ALLEG_SUFFIX}
