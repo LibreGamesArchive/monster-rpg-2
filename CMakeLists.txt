@@ -22,10 +22,6 @@ endfunction(copy_file_to_build)
 
 # Option configuration
 
-if("${ALLEG_SUFFIX}" STREQUAL "")
-	set(ALLEG_SUFFIX "-static")
-endif("${ALLEG_SUFFIX}" STREQUAL "")
-	
 if(WIN32)
 	if(MINGW)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
