@@ -22,7 +22,9 @@ endfunction(copy_file_to_build)
 
 # Option configuration
 
-set(ALLEG_SUFFIX "-static")
+if("${ALLEG_SUFFIX}" STREQUAL "")
+	set(ALLEG_SUFFIX "-static")
+endif("${ALLEG_SUFFIX}" STREQUAL "")
 	
 if(WIN32)
 	if(MINGW)
