@@ -1,5 +1,5 @@
 Kobold: Ik zie ze! \ Grijp ze!^
-Kobold: Yarp!^Kobold: ...^Kobold: Een van die trollen is door het lint gegaan!^Kobold: Laten we maar zeggen dat ik bij je in het krijt sta!^
+Kobold: Yarp!^Kobold: ...^Kobold: Een van die trollen is door het lint gegaan!^Kobold: Laten we maar zeggen dat ik bij jullie in het krijt sta!^
 Op slot...^
 Kobold: Hé! Scheer je weg!^
 Ohh, m'n hoofd. Dit is niet best! Ik moet Tiggy redden van die staf, en ik zal daarbij waarschijnlijk alle mogelijke hulp kunnen gebruiken!^Ik zal toch eerst maar moeten zien hoe ik hier uit kom...^
@@ -7,8 +7,8 @@ Eny: Ik moet wat naar achteren gaan staan en deze platen optillen...^
 * piep *^
 Mmm, het is alsof deze platen los zitten...^
 Gevangene: God zegene jullie! Dank u voor mijn redding!^
-Enkele slechteriken
-Omhoog schieten?
+Wat slechteriken
+overhoop schieten?
 Neem een kijkje
 in het rond?
 Eny: Het uitzicht hier is adembenemend!^
@@ -32,7 +32,7 @@ DENG! BENG! Ik was NIET TE STOPPEN!!!^
 Jullie zouden toch niet de kracht van de wachters van Flowey onderschatten? He-he-he-ha-ha-ha!^
 Soldaat: Dit pantser is alleen voor de sier. We leven in een vreedzame tijd.^
 Soldaat: We hebben het gehoord over die monsters in het noorden! Ik kan het haast niet geloven...^
-Soldaat: In tijden van vrede, ontvangt de koning bezoekers.^
+Soldaat: In tijden van vrede ontvangt de koning bezoekers.^
 Soldaat: De koning kan jullie ontvangen...^
 Soldaat: De troonzaal is hier naar boven.^
 Soldaat: Kom eens langs in de keuken, als je honger hebt!^
@@ -79,7 +79,7 @@ Kapitein: Als je weer ergens heen moet, weet je ons te vinden.^
 Gunnar: Dus, wat vind je er van?^Rider: Is dat wel zeewaardig?!^Gunnar: Absoluut...^Eny: Als het ons naar het drijvende fort kan brengen, dan ben ik blij.^Faelon: Gunnar, heb jij jouw gevechtsuitrusting?^Gunnar: Nee, ik moet bij de boot blijven, of we komen nooit van dat eiland...^Faelon: Mmm, dan komen we één man tekort...^
 Mel: Ik hoorde dat jullie hulp wilden...^Rider: En wat voor hulp zou jij dan bieden?^Mel: Ik ben wel eventjes heel goed in magie, hoor!^Eny: Je bent een klein meisje. Hoor je niet thuis te zijn bij je ouders?^Mel: Ik heb geen ouders... Ik heb helemaal geen familie...^Eny: Och hemel... Hoe is dat zo gekomen?^Mel: De monsters kregen ze te pakken...^Eny: Dus je wilt het hun betaald zetten?^Mel: Ja. \ Eny: Goed dan. Je kan meekomen.^Eny: We vertrekken onmiddellijk. Er is geen tijd te verliezen!^Gunnar: Allemaal aan boord!^
 Kapitein: Willen jullie het schip op? Ay, dan varen we uit, wanneer jullie klaar zijn!^
-Kapitein: Goed dan, daar gaan we!^
+Kapitein: Goed dan, trossen los!^
 Bootsman: G'ndag! ...^
 Meisje: Er zijn monsters in de buurt van Flowey en ze vallen mensen aan.^Meisje: Dat er een nieuwe opkomst van monsters is, zal de koning niet geloven!^Meisje: De mensen van Flowey kunnen de stad niet veel langer meer beschermen!^
 Meisje: Natuurlijk is Flowey nu wel veiliger... maar voor hoe lang?^
@@ -149,7 +149,7 @@ Je vond
 Je vond een 
 Je vond een 
 Uitrusting is vol...^
-Waard: Er is een lege kamer op de eerste verdieping. Wees astublieft onze gasten...^
+Waard: Er is een lege kamer op de eerste verdieping. Doe maar of je thuis bent...^
 Mooie ring! Hier, neem deze sleutel. Nee, niet voor niets; voor de ring!^
 Er ontbreekt hier iets... Maar ik weet niet precies wat.^
 Ik had je toch mijn sleutel gegeven? Wat zou je nog meer willen?!^
@@ -218,7 +218,7 @@ Dank u voor uw bezoek aan de koning...^
 Ik was zo gelukkig, toen de staf terugkeerde!^
 De voorvaderen van koning Albert hebben lang geleden de staf geruild voor bouwmateriaal...^
 Tiggy: O hemel... Heb ik... uh... Heb ik dit gedaan?^Eny: Nee, deze staf heeft dit gedaan, hij heeft je alleen gebruikt als drager!^Tiggy: We moeten deze staf vernietigen... Misschien weet de wijze koning hoe?^Faelon: Zeker. Laten wij oostwaarts gaan.^
-Toen de branden uitbraken, ging iedereen naar het zuiden.^
+Toen de branden uitbraken, is iedereen naar het zuiden gegaan.^
 Zeg, is dat een brief?^Dat lijkt wel mijn vaders handschrift!^... Het is aan mij geschreven!^Zeg, als je naar het oosten gaat, heb je misschien deze penning nodig...^Goede ruil? Okay.^
 Kapitein: Willen jullie het schip op? Ay, dan varen we uit, wanneer jullie klaar zijn!^
 Kapitein: Goed dan, daar gaan we!^
@@ -294,11 +294,11 @@ Shyzu
 Maan Vallei
 Muttrace
 Schaduw Zijde
-Kling vervaardigd uit walvisbot
-Helm vervaardigd uit walvisbot
+Kling vervaardigd uit walvisbeen
+Helm vervaardigd uit walvisbeen
 Herstelt 50 LP
 Een oude brief
-Geschubd walvisbotten pantser
+Geschubd walvisbenen pantser
 Een sterke houten staf
 Haalt iemand uit bewusteloosheid
 Verhelpt status effecten
@@ -320,7 +320,7 @@ Een schijnbaar belangrijke sleutel
 Een welvervaardigde kling
 Een stevige bamboe stok
 Gewaad met magische bescherming
-Maliënkolder
+Een maliënkolder
 Een oud lichtgevend medaillon
 Een sterke stalen helm
 Geharde kling
@@ -329,21 +329,21 @@ Veiligheidslaarzen
 Oude staf
 Oud gewaad
 Chique Hoge Hoed
-Goede manier om een brand te stichten
+Handig voor een vuurtje
 Een grote gouden sleutel
 Een verrekijker met een perfecte lens
-Een belangrijke kling...
+Een belangrijk zwaard...
 Beschermt tegen magische aanvallen
 Beschermt tegen magische aanvallen
 Sleutel voor een onbekende deur
 Sleutel voor een onbekende deur
 Herstelt 2000 LP
-Smaragd staf
-Smaragd gewaad
+Staf van smaragd
+Gewaad van smaragd
 Lichtgewicht doch sterk pantser
 Een uiterst krachtige staf
 Een versterkte jade kling
-Een versterkte jade staf
+Een versterkte jadxe staf
 Een borstschild van jade
 Een jade helm
 Een oplichtend kristal
@@ -376,7 +376,7 @@ G E W O N N E N !
 Kon niet vluchten!
 Verdedigen?
 Vluchten?
-Houding veranderen?
+Positie veranderen?
 Geen gamepad aangesloten
 Druk op een knop
 op je gamepad
@@ -421,7 +421,7 @@ Verscheur
 Stomp
 Spuit
 Reanimeer
-Versuft
+Verlam
 Traag
 Snel
 Zuur
@@ -493,7 +493,7 @@ Maken van screenshot mislukt
 Laden van big_font mislukt
 Laden van game_font mislukt
 Laden van huge_font mislukt
-Bot
+Been
 Remedie
 Brief
 Hout
@@ -602,10 +602,10 @@ Je spel
 is opgeslagen.
 Voorwerp
 Magie
-Vorm
+Formatie
 Stats
 Bekijk
-Save
+Opslag
 Speel
 Stop
 Cheat
@@ -683,11 +683,11 @@ Kies spel-staat in te plakken
 {027} Automatische scherm rotatie
 {027} Geen filtering
 {027} Lineaire filtering
-{027} Vergroot2x shader
-{027} Vergroot3x shader
-{027} Vergroot3x + lineaire filter
-{027} Vergroot4x shader
-{027} Vergroot2x + lineaire filter
+{027} Scale2x shader
+{027} Scale3x shader
+{027} Scale3x + lineaire filter
+{027} Scale4x shader
+{027} Scale2x + lineaire filter
 {027} Verklein
 {027} Halve schaal
 {027} Behoud beeldverhoudingen
@@ -709,7 +709,7 @@ Beweging: Gebruik pijltjes-toetsen of gamepad
 SPATIE/ENTER - Actie-knop
 ESC/. - Annuleer, ga terug, of open menu
 V - Bekijk sommige voorwerpen en menu's nader
-(Ofwel gamepad knoppen 1, 2 en 3)
+(Of gebruik gamepad knoppen 1, 2 en 3)
 S - Instellingen
 F1,F2 - Verhoog/verlaag volume van muziek
 F3,F4 - Verhoog/verlaag volume van geluidseffecten
@@ -751,15 +751,15 @@ Ja
 Bonus
 Level Up
 %d punten
-Exp:
-van de:
+Evarng:
+Nodig:
 Normaal
 LP:
 MP:
 LHand:
 RHand:
 HRusting:
-CRusting:
+TRusting:
 VRusting:
 <onbenut>
 MaxLP:
@@ -849,7 +849,7 @@ Rocky
 Speurhond
 Killien
 Shaduw
-Paddestoel
+Paddo
 Drab
 Drek
 Spin
@@ -923,7 +923,7 @@ Bollen
  goud
 F - Schakel schermvullende modus aan of uit
 --------------------------------------------------------
-%d ervaring verkregen^
+%d ervaring gekregen^
 Je hebt een %s gevonden!^
 Je hebt een %s gevonden!^
 Voltreffer!

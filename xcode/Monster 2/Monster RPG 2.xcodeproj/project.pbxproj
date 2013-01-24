@@ -491,7 +491,7 @@
 		9659CD91143A2A030007757E /* Icon-Small@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-Small@2x.png"; path = "../../icons/full/Icon-Small@2x.png"; sourceTree = "<group>"; };
 		9659CD92143A2A030007757E /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = ../../icons/full/Icon.png; sourceTree = "<group>"; };
 		9659CD93143A2A030007757E /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon@2x.png"; path = "../../icons/full/Icon@2x.png"; sourceTree = "<group>"; };
-		9659CD94143A2A030007757E /* iTunesArtwork */ = {isa = PBXFileReference; lastKnownFileType = file; name = iTunesArtwork; path = ../../icons/full/iTunesArtwork; sourceTree = "<group>"; };
+		9659CD94143A2A030007757E /* iTunesArtwork */ = {isa = PBXFileReference; lastKnownFileType = text; name = iTunesArtwork; path = ../../icons/full/iTunesArtwork; sourceTree = "<group>"; };
 		9659CDA0143A426C0007757E /* joypad.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = joypad.mm; path = ../../src/joypad.mm; sourceTree = "<group>"; };
 		9659CDA2143A42C50007757E /* joypad_handler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = joypad_handler.h; path = ../../src/joypad_handler.h; sourceTree = "<group>"; };
 		9659CDA3143A42C50007757E /* joypad_handler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = joypad_handler.m; path = ../../src/joypad_handler.m; sourceTree = "<group>"; };
@@ -639,7 +639,7 @@
 		96DDE20613DB24A9008AA371 /* Icon-Small@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-Small@2x.png"; path = "../../icons/lite/Icon-Small@2x.png"; sourceTree = "<group>"; };
 		96DDE20713DB24A9008AA371 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = ../../icons/lite/Icon.png; sourceTree = "<group>"; };
 		96DDE20813DB24A9008AA371 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon@2x.png"; path = "../../icons/lite/Icon@2x.png"; sourceTree = "<group>"; };
-		96DDE20913DB24A9008AA371 /* iTunesArtwork */ = {isa = PBXFileReference; lastKnownFileType = file; name = iTunesArtwork; path = ../../icons/lite/iTunesArtwork; sourceTree = "<group>"; };
+		96DDE20913DB24A9008AA371 /* iTunesArtwork */ = {isa = PBXFileReference; lastKnownFileType = text; name = iTunesArtwork; path = ../../icons/lite/iTunesArtwork; sourceTree = "<group>"; };
 		96ED3258136349520057B4C7 /* Monster_2-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Monster_2-Info.plist"; sourceTree = "<group>"; };
 		96FB52F0158EBBFC00FF36FC /* libbass.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbass.dylib; path = ../../../local/lib/libbass.dylib; sourceTree = "<group>"; };
 /* End PBXFileReference section */

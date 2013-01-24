@@ -2,6 +2,7 @@ project(monster-rpg-2)
 cmake_minimum_required(VERSION 2.6)
 
 OPTION(KCM_AUDIO "Use Allegro audio instead of BASS" off)
+OPTION(WITH_SVG "Enable SVG loader" off)
 
 if(KCM_AUDIO)
 	set(CMAKE_C_FLAGS "-DKCM_AUDIO")
@@ -40,6 +41,7 @@ else(WIN32)
 		set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL -march=armv6 -mfpu=vfp -mfloat-abi=hard")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL -march=armv6 -mfpu=vfp -mfloat-abi=hard")
 	else(RASPBERRYPI)
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DA5_OGL")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL")
 	endif(RASPBERRYPI)
 endif(WIN32)
@@ -104,6 +106,17 @@ else(APPLE)
 endif(APPLE)
 endif(WIN32)
 
+
+set(MAIN_LIBS "")
+
+if(WITH_SVG)
+	list(APPEND MAIN_LIBS "allegro_color${ALLEG_SUFFIX}" "wapcaplet" "svgtiny" "dom" "expat" "hubbub" "parserutils")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DWITH_SVG -I/opt/netsurf/include")
+	set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -DWITH_SVG -I/opt/netsurf/include")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/opt/netsurf/lib")
+	set(COMMON_SRCS ${COMMON_SRCS} src/svg.cpp)
+endif()
+
 add_library(mo2-engine
 	STATIC
 	${COMMON_SRCS}
@@ -113,7 +126,7 @@ add_executable(monster2
 	src/monster2.cpp
 )
 
-set(MAIN_LIBS "mo2-engine")
+list(APPEND MAIN_LIBS "mo2-engine")
 
 if(KCM_AUDIO)
 	LIST(APPEND MAIN_LIBS "allegro_audio${ALLEG_SUFFIX}" "allegro_acodec${ALLEG_SUFFIX}" "FLAC" "vorbisfile" "vorbis" "ogg")
