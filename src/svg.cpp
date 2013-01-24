@@ -108,10 +108,9 @@ static bool real_polygon_is_clockwise(const std::vector<float> &v)
 	}
 }
 
-ALLEGRO_BITMAP *load_svg(const char *filename)
+ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 {
 	FILE *fd;
-	float scale = 1.0;
 	struct stat sb;
 	char *buffer;
 	size_t size;
