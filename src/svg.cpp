@@ -1,7 +1,6 @@
 /*
  * Licensed under the MIT License,
  *                http://opensource.org/licenses/mit-license.php
- * Copyright 2013 Trent Gamblin <trent@nooskewl.com>
  * Copyright 2008 James Bursa <james@semichrome.net>
  */
 
