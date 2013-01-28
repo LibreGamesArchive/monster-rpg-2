@@ -19,94 +19,9 @@ extern "C" {
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_color.h>
+#include <allegro5/allegro_opengl.h>
 
 #include <vector>
-
-const int CONVEX = 1;
-const int CONCAVE = -1;
-
-int polygon_is_convex(const std::vector<float> &v)
-{
-	int i;
-	int x0, x1, x2;
-	int y0, y1, y2;
-	int flag = 0;
-	double z;
-
-	int n = v.size();
-
-	if (n < 6)
-		return(0);
-
-	for (i = 0; i < n; i += 2) {
-		x0 = v[i % n];
-		y0 = v[(i + 1) % n];
-		x1 = v[(i + 2) % n];
-		y1 = v[(i + 3) % n];
-		x2 = v[(i + 4) % n];
-		y2 = v[(i + 5) % n];
-
-		z = (x1 - x0) * (y2 - y1);
-		z -= (y1 - y0) * (x2 - x1);
-
-		if (z < 0)
-			flag |= 1;
-		else if (z > 0)
-			flag |= 2;
-		if (flag == 3)
-			return(CONCAVE);
-	}
-	if (flag != 0)
-		return(CONVEX);
-	else
-		return(0);
-}
-
-static bool real_polygon_is_clockwise(const std::vector<float> &v)
-{
-	int convex = polygon_is_convex(v);
-
-	if (convex == 0) {
-		return false;
-	}
-	
-	int n = v.size();
-
-	if (convex == CONVEX) {
-		for (int i = 0; i < n/2; i++) {
-			float x1, y1;
-			if (i == 0) {
-				x1 = v[n-2];
-				y1 = v[n-1];
-			}
-			else {
-				x1 = v[i*2-2];
-				y1 = v[i*2-1];
-			}
-			float x2 = v[i*2+0];
-			float y2 = v[i*2+1];
-			float x3 = v[(i*2+2) % n];
-			float y3 = v[(i*2+3) % n];
-			float cross = (x2-x1)*(y3-y2)-(y2-y1)*(x3-x2);
-			if (cross > 0) return false;
-		}
-		return true;
-	}
-	else {
-		float sum = 0;
-		for (int i = 0; i < n; i += 2) {
-			float x1 = v[i % n];
-			float y1 = v[(i + 1) % n];
-			float x2 = v[(i + 2) % n];
-			float y2 = v[(i + 3) % n];
-
-			sum += (x1*y2) - (x2*y1);
-		}
-		sum /= 2;
-
-		return sum < 0;
-	}
-}
 
 ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 {
@@ -133,6 +48,8 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 
 	buffer = (char *)malloc(size);
 	if (!buffer) {
+		fprintf(stderr, "Unable to allocate %lld bytes\n",
+				(long long) size);
 		return NULL;
 	}
 
@@ -146,6 +63,7 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 	/* create svgtiny object */
 	diagram = svgtiny_create();
 	if (!diagram) {
+		fprintf(stderr, "svgtiny_create failed\n");
 		return NULL;
 	}
 
@@ -177,12 +95,53 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 
 	free(buffer);
 
-	ALLEGRO_BITMAP *bmp;
-	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
+	int diagram_w = scale*diagram->width;
+	int diagram_h = scale*diagram->height;
 
-	bmp = al_create_bitmap(scale*diagram->width, scale*diagram->height);
-	al_set_target_bitmap(bmp);
-	al_clear_to_color(al_map_rgba_f(0, 0, 0, 0));
+	GLuint fb;
+	glGenFramebuffersEXT(1, &fb);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
+	GLuint ColorBufferID;
+	glGenRenderbuffersEXT(1, &ColorBufferID);
+	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, ColorBufferID);
+	glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, 4, GL_RGBA8, diagram_w, diagram_h);
+	GLuint DepthBufferID;
+	glGenRenderbuffersEXT(1, &DepthBufferID);
+	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, DepthBufferID);
+	glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, 4, GL_DEPTH24_STENCIL8_EXT, diagram_w, diagram_h);
+	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT, ColorBufferID);
+	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, DepthBufferID);
+	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, DepthBufferID);
+	GLint status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+
+	GLint old_vp[4];
+
+	glGetIntegerv(GL_VIEWPORT, old_vp);
+
+	glViewport(0, 0, diagram_w, diagram_h);
+
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, diagram_w, diagram_h, 0, -1, 1);
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glClearColor(0, 0, 0, 0);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+/*
+	ALLEGRO_TRANSFORM t, backup1, backup2;
+	al_copy_transform(&backup1, al_get_projection_transform(al_get_current_display()));
+	al_copy_transform(&backup2, al_get_current_transform());
+	al_identity_transform(&t);
+	al_orthographic_transform(&t, 0, 0, 1, diagram_w, diagram_h, 1000);
+	al_set_projection_transform(al_get_current_display(), &t);
+	al_identity_transform(&t);
+	al_use_transform(&t);
+*/
 
 	for (unsigned int i = 0; i != diagram->shape_count; i++) {
 		std::vector< std::vector<float> > points;
@@ -278,44 +237,89 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 			}
 		}
 
-		for (int j = 0; j < subshape+1; j++) {
-			bool reverse = !real_polygon_is_clockwise(points[j]);
+    		glClearStencil(0.0);
+		glClear(GL_STENCIL_BUFFER_BIT);
+    		glEnable(GL_STENCIL_TEST);
 
-			float *v = (float *)malloc(points[j].size()*sizeof(float));
+		glStencilOp(GL_INVERT, GL_INVERT, GL_INVERT);
+		glStencilFunc(GL_ALWAYS, 1, 1);
+		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
-			int count = 0;
+		float x1 = -1;
+		float y1 = -1;
 
-			for (int k = 0; k < (int)points[j].size()/2; k++) {
-				int l;
-				if (reverse) {
-					l = points[j].size() - ((k+1)*2);
-				}
-				else {
-					l = k*2;
-				}
+		glColor3f(1, 1, 1);
 
-				v[k*2] = points[j][l];
-				v[k*2+1] = points[j][l+1];
-
-				count++;
+		glBegin(GL_TRIANGLES);
+		for (size_t j = 0; j < points.size(); j++) {
+			for (int k = 0; k < (int)points[j].size()/2-1; k++) {
+				float x2 = points[j][k*2];
+				float y2 = points[j][k*2+1];
+				float x3 = points[j][(k+1)*2];
+				float y3 = points[j][(k+1)*2+1];
+				glVertex2f(x1, y1);
+				glVertex2f(x2, y2);
+				glVertex2f(x3, y3);
 			}
+		}
+		glEnd();
 
-			al_draw_filled_polygon(v, count, fill);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+		glStencilFunc(GL_EQUAL, 1, 1);
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-			al_draw_polyline(v, count, ALLEGRO_LINE_JOIN_NONE, ALLEGRO_LINE_CAP_NONE, stroke, stroke_width, 0.0);
+		glColor4f(fill.r, fill.g, fill.b, fill.a);
+		glBegin(GL_TRIANGLE_FAN);
+			glVertex2f(0, diagram_h);
+			glVertex2f(0, 0);
+			glVertex2f(diagram_w, 0);
+			glVertex2f(diagram_w, diagram_h);
+		glEnd();
 
-			free(v);
+		glDisable(GL_STENCIL_TEST);
+
+		for (size_t j = 0; j < points.size(); j++) {
+			al_draw_polyline(&points[j][0], points[j].size()/2, ALLEGRO_LINE_JOIN_NONE, ALLEGRO_LINE_CAP_NONE, stroke, stroke_width, 0.0);
 		}
 	}
+
+	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
+	int old_format = al_get_new_bitmap_format();
+	
+	//al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
+
+	ALLEGRO_BITMAP *out = al_create_bitmap(diagram_w, diagram_h);
+
+	al_set_target_bitmap(out);
+
+	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fb);
+	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, al_get_opengl_fbo(out));
+
+	int rw, rh;
+	al_get_opengl_texture_size(out, &rw, &rh);
+
+	glBlitFramebufferEXT(0, 0, diagram_w, diagram_h, 0, 0, diagram_w, diagram_h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+	al_set_target_bitmap(old_target);
+	al_set_new_bitmap_format(old_format);
 
 	double end = al_get_time();
 
 	//printf("elapsed: %f seconds\n", end-start);
 
+	glDeleteFramebuffersEXT(1, &fb);
+	glDeleteRenderbuffersEXT(1, &ColorBufferID);
+	glDeleteRenderbuffersEXT(1, &DepthBufferID);
+
 	svgtiny_free(diagram);
 
-	al_set_target_bitmap(old_target);
+	glViewport(old_vp[0], old_vp[1], old_vp[2], old_vp[3]);
 
-	return bmp;
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+
+	return out;
 }
 
