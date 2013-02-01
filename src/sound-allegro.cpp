@@ -210,11 +210,11 @@ void playMusic(std::string name, float vol, bool force)
 
 	music = al_load_audio_stream(name.c_str(), 4, 2048);
 
+	setMusicVolume(vol);
+
 	al_attach_audio_stream_to_mixer(music, al_get_default_mixer());
 
 	al_set_audio_stream_playmode(music, ALLEGRO_PLAYMODE_LOOP);
-
-	setMusicVolume(vol);
 }
 
 
@@ -251,11 +251,11 @@ void playAmbience(std::string name, float vol)
 
 	ambience = al_load_audio_stream(name.c_str(), 4, 2048);
 
+	setAmbienceVolume(vol);
+
 	al_attach_audio_stream_to_mixer(ambience, al_get_default_mixer());
 
 	al_set_audio_stream_playmode(ambience, ALLEGRO_PLAYMODE_LOOP);
-	
-	setAmbienceVolume(vol);
 }
 
 void setAmbienceVolume(float volume)
