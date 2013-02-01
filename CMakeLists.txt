@@ -129,7 +129,11 @@ add_executable(monster2
 list(APPEND MAIN_LIBS "mo2-engine")
 
 if(KCM_AUDIO)
-	LIST(APPEND MAIN_LIBS "allegro_audio${ALLEG_SUFFIX}" "allegro_acodec${ALLEG_SUFFIX}" "FLAC" "vorbisfile" "vorbis" "ogg")
+	if(RASPBERRYPI)
+		LIST(APPEND MAIN_LIBS "allegro_audio${ALLEG_SUFFIX}" "allegro_acodec${ALLEG_SUFFIX}" "/usr/lib/arm-linux-gnueabihf/libFLAC.a" "/usr/lib/arm-linux-gnueabihf/libvorbisfile.a" "/usr/lib/arm-linux-gnueabihf/libvorbis.a" "/usr/lib/arm-linux-gnueabihf/libogg.a")
+	else()
+		LIST(APPEND MAIN_LIBS "allegro_audio${ALLEG_SUFFIX}" "allegro_acodec${ALLEG_SUFFIX}" "FLAC" "vorbisfile" "vorbis" "ogg")
+	endif()
 endif(KCM_AUDIO)
 
 
@@ -230,7 +234,11 @@ else(APPLE)
 		m pthread SM ICE X11 Xext Xcursor Xinerama Xrandr Xpm
 	)
         if(KCM_AUDIO)
-		LIST(APPEND MAIN_LIBS "pulse-simple" "pulse" "asound" "openal")
+		if(RASPBERRYPI)
+			LIST(APPEND MAIN_LIBS "asound")
+		else()
+			LIST(APPEND MAIN_LIBS "pulse-simple" "pulse" "asound" "openal")
+		endif()
 	else(KCM_AUDIO)
 		LIST(APPEND MAIN_LIBS "/home/trent/code/monster-rpg-2/build/libbass.so")
 	endif(KCM_AUDIO)
