@@ -2113,6 +2113,82 @@ void android_assert_handler(char const *expr,
 }
 #endif
 
+static void _al_raspberrypi_get_screen_info(int *dx, int *dy,
+   int *screen_width, int *screen_height)
+{
+   graphics_get_display_size(0 /* LCD */, (uint32_t *)screen_width, (uint32_t *)screen_height);
+
+   /* On TV-out the visible area (area used by X and console)
+    * is different from that reported by the bcm functions. We
+    * have to 1) read fbwidth and fbheight from /proc/cmdline
+    * and also overscan parameters from /boot/config.txt so our
+    * displays are the same size and overlap perfectly.
+    */
+   *dx = 0;
+   *dy = 0;
+   FILE *cmdline = fopen("/proc/cmdline", "r");
+   if (cmdline) {
+      char line[1000];
+      int i;
+      for (i = 0; i < 999; i++) {
+         int c = fgetc(cmdline);
+         if (c == EOF) break;
+         line[i] = c;
+      }
+      line[i] = 0;
+      const char *p = strstr(line, "fbwidth=");
+      if (p) {
+         const char *p2 = strstr(line, "fbheight=");
+         if (p2) {
+            p += strlen("fbwidth=");
+            p2 += strlen("fbheight=");
+            int w = atoi(p);
+            int h = atoi(p2);
+            ALLEGRO_CONFIG *cfg = al_load_config_file("/boot/config.txt");
+            if (cfg) {
+               const char *disable_overscan =
+                  al_get_config_value(
+                     cfg, "", "disable_overscan"
+                  );
+               // If overscan parameters are disabled don't process
+               if (!disable_overscan ||
+                   (disable_overscan &&
+                    (!strcasecmp(disable_overscan, "false") ||
+                     atoi(disable_overscan) == 0))) {
+                  const char *left = al_get_config_value(
+                     cfg, "", "overscan_left");
+                  const char *right = al_get_config_value(
+                     cfg, "", "overscan_right");
+                  const char *top = al_get_config_value(
+                     cfg, "", "overscan_top");
+                  const char *bottom = al_get_config_value(
+                     cfg, "", "overscan_bottom");
+                  int xx = left ? atoi(left) : 0;
+                  xx -= right ? atoi(right) : 0;
+                  int yy = top ? atoi(top) : 0;
+                  yy -= bottom ? atoi(bottom) : 0;
+                  *dx = (*screen_width - w + xx) / 2;
+                  *dy = (*screen_height - h + yy) / 2;
+                  *screen_width = w;
+                  *screen_height = h;
+               }
+               else {
+                  *dx = (*screen_width - w) / 2;
+                  *dy = (*screen_height - h) / 2;
+                  *screen_width = w;
+                  *screen_height = h;
+               }
+               al_destroy_config(cfg);
+            }
+            else {
+               printf("Couldn't open /boot/config.txt\n");
+            }
+         }
+      }
+      fclose(cmdline);
+   }
+}
+
 bool init(int *argc, char **argv[])
 {
 	myArgc = *argc;
@@ -2286,8 +2362,12 @@ bool init(int *argc, char **argv[])
 		}
 		else {
 #ifdef ALLEGRO_RASPBERRYPI
-			sd->width = 240;
-			sd->height = 160;
+			void _al_raspberrypi_get_screen_info(
+				int *, int *, int *, int*
+			);
+			int unused1, unused2;
+			_al_raspberrypi_get_screen_info(&unused1, &unused2,
+			   &sd->width, &sd->height);
 #else
 			sd->width = 960;
 			sd->height = 640;
@@ -2491,6 +2571,10 @@ bool init(int *argc, char **argv[])
 
 	events_minor = al_create_event_queue();
 	al_register_event_source(events_minor, (ALLEGRO_EVENT_SOURCE *)display);
+#ifndef ALLEGRO_IPHONE /* FIXME: fix when adding iOS keyboard support */
+	al_register_event_source(events_minor, al_get_keyboard_event_source());
+#endif
+
 #ifdef ALLEGRO_IPHONE
 	next_shake = al_current_time();
 #endif

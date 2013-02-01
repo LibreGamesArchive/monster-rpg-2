@@ -275,7 +275,7 @@ bool is_close_pressed(void)
 		}
 #endif
 
-		if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE && !shooter_paused) {
+		if (((event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == config.getKeyQuit()) || event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) && !shooter_paused) {
 #ifdef ALLEGRO_IPHONE
 			if (!sound_was_playing_at_program_start)
 				iPodStop();
@@ -552,20 +552,36 @@ void do_close(bool quit)
 		close_pressed = false;
 		config_menu();
 	}
-	else if (prompt("Really exit?", "", 0, 0)) {
-		if (saveFilename) saveTime(saveFilename);
-		config.write();
-		al_set_target_bitmap(al_get_backbuffer(display));
-		m_clear(al_map_rgb(0, 0, 0));
-		m_flip_display();
-		m_clear(al_map_rgb(0, 0, 0));
-		m_flip_display();
+	else {
+		bool exit_game = false;
+		if (on_title_screen) {
+			exit_game = true;
+		}
+		else {
+			int r = triple_prompt("", "Really exit game or return to menu?", "", "Menu", "Exit Game", "Cancel", 2, true);
+			al_flush_event_queue(events_minor);
+			if (r == 0) {
+				break_main_loop = true;
+			}
+			else if (r == 1) {
+				exit_game = true;
+			}
+		}
+		if (exit_game) {
+			if (saveFilename) saveTime(saveFilename);
+			config.write();
+			al_set_target_bitmap(al_get_backbuffer(display));
+			m_clear(al_map_rgb(0, 0, 0));
+			m_flip_display();
+			m_clear(al_map_rgb(0, 0, 0));
+			m_flip_display();
 #ifdef ALLEGRO_WINDOWS
-		throw QuitError();
+			throw QuitError();
 #else
-		destroy();
-		exit(0);
+			destroy();
+			exit(0);
 #endif
+		}
 	}
 #endif
 }
@@ -1342,8 +1358,18 @@ int main(int argc, char *argv[])
 
 		if (area) {
 			delete area;
+			area = NULL;
 		}
-		area = NULL;
+
+		if (battle) {
+			delete battle;
+			battle = NULL;
+		}
+		if (speechDialog) {
+			dpad_on();
+			delete speechDialog;
+			speechDialog = NULL;
+		}
 
 		al_lock_mutex(input_mutex);
 		for (int i = 0; i < MAX_PARTY; i++) {

@@ -378,6 +378,10 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 				do_close();
 				close_pressed = false;
 			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
+			}
 
 			INPUT_EVENT ie = get_next_input_event();
 			if (iphone_shaken(0.1) || ie.button1 == DOWN || ie.button2 == DOWN) {
@@ -583,6 +587,10 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 				do_close();
 				close_pressed = false;
 			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
+			}
 
 			INPUT_EVENT ie = get_next_input_event();
 			if (iphone_shaken(0.1) || ie.button1 == DOWN || ie.button2 == DOWN) {
@@ -655,7 +663,8 @@ done:
 
 
 int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
-	std::string b1text, std::string b2text, std::string b3text, int shake_action)
+	std::string b1text, std::string b2text, std::string b3text, int shake_action,
+	bool called_from_is_close_pressed)
 {
 	dpad_off();
 	
@@ -710,9 +719,15 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 			next_input_event_ready = true;
 
 			tmp_counter--;
-			if (is_close_pressed()) {
-				do_close();
-				close_pressed = false;
+			if (!called_from_is_close_pressed) {
+				if (is_close_pressed()) {
+					do_close();
+					close_pressed = false;
+				}
+				// WARNING
+				if (break_main_loop) {
+					goto done;
+				}
 			}
 			TGUIWidget *widget = tguiUpdate();
 			if (widget == w1) {
@@ -887,6 +902,10 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 				if (is_close_pressed()) {
 					do_close();
 					close_pressed = false;
+				}
+				// WARNING
+				if (break_main_loop) {
+					goto done;
 				}
 			}
 			TGUIWidget *widget = tguiUpdate();
@@ -2373,6 +2392,10 @@ int MMap::update(int millis)
 				if (is_close_pressed()) {
 					do_close();
 					close_pressed = false;
+				}
+				// WARNING
+				if (break_main_loop) {
+					break;
 				}
 				float p = (float)MIN(totalElapsed, TOTAL) / TOTAL;
 				int curr_w = p * w/2 + w/2;

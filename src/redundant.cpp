@@ -635,6 +635,10 @@ void m_rest(double seconds)
 			do_close();
 			close_pressed = false;
 		}
+		// WARNING
+		if (break_main_loop) {
+			break;
+		}
 	}
 
 	al_rest(remainder);

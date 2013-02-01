@@ -179,6 +179,10 @@ static void showIpodControls(void)
 				do_close();
 				close_pressed = false;
 			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
+			}
 		
 			int sel = sound_toggle->getSelected();
 			if (sel == 0) {
@@ -330,6 +334,10 @@ void showSaveStateInfo(const char *basename)
 			if (is_close_pressed()) {
 				do_close();
 				close_pressed = false;
+			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
 			}
 
 			if (use_dpad) {
@@ -523,6 +531,10 @@ void showItemInfo(int index, bool preserve_buffer)
 			if (is_close_pressed()) {
 				do_close();
 				close_pressed = false;
+			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
 			}
 		}
 
@@ -991,6 +1003,24 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 			if (is_close_pressed()) {
 				do_close();
 				close_pressed = false;
+			}
+			// WARNING
+			if (break_main_loop) {
+				if (section == CHOOSER) {
+					tguiDeleteWidget(formChooser_target);
+					tguiSetFocus(formChooser_target);
+					if (formChooser_target) {
+						tguiDeleteWidget(formChooser_target);
+						delete formChooser_target;
+						formChooser_target = NULL;
+					}
+				}
+				else if (section != MAIN) {
+					tguiPop();
+					tguiSetFocus(mainItem);
+					section = MAIN;
+				}
+				goto done;
 			}
 		
 			// update gui
@@ -1682,6 +1712,10 @@ void doMap(std::string startPlace, std::string prefix)
 				do_close();
 				close_pressed = false;
 			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
+			}
 			// update gui
 			std::string startingName = mapWidget->getSelected();
 
@@ -1812,6 +1846,10 @@ void doShop(std::string name, const char *imageName, int nItems,
 			if (is_close_pressed()) {
 				do_close();
 				close_pressed = false;
+			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
 			}
 
 			// update gui
@@ -1982,6 +2020,10 @@ void into_the_sun(void)
 			if (is_close_pressed()) {
 				do_close();
 				close_pressed = false;
+			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
 			}
 		}
 
@@ -2214,6 +2256,10 @@ void credits(void)
 		if (is_close_pressed()) {
 			do_close();
 			close_pressed = false;
+		}
+		// WARNING
+		if (break_main_loop) {
+			goto done;
 		}
 		long now = tguiCurrentTimeMillis();
 		int step = now - start;
@@ -2466,6 +2512,7 @@ void credits(void)
 		m_rest(0.001);
 	}
 
+done:
 	fadeOut(black);
 
 	m_destroy_bitmap(bg);
@@ -2539,6 +2586,10 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 			if (is_close_pressed()) {
 				do_close();
 				close_pressed = false;
+			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
 			}
 
 			TGUIWidget *widget = tguiUpdate();
@@ -2852,6 +2903,11 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 				do_close();
 				close_pressed = false;
 			}
+			// WARNING
+			if (break_main_loop) {
+				*num = -1;
+				goto done;
+			}
 
 			TGUIWidget *widget = tguiUpdate();
 
@@ -2921,6 +2977,10 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 			else
 #endif
 			if (widget == save_list) {
+				if (break_main_loop) {
+					*num = -1;
+					goto done;
+				}
 				int sel = save_list->getSelected();
 				if (sel >= 0) {
 					int i, j = 0;
@@ -2945,6 +3005,10 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 			}
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			else if (widget == auto_list) {
+				if (break_main_loop) {
+					*num = -1;
+					goto done;
+				}
 				int sel = auto_list->getSelected();
 				if (sel >= 0) {
 					int i, j = 0;
@@ -3346,6 +3410,10 @@ bool config_menu(bool start_on_fullscreen)
 				do_close();
 				close_pressed = false;
 			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
+			}
 			
 			TGUIWidget *w = tguiUpdate();
 			
@@ -3634,6 +3702,10 @@ void pc_help(void)
 				do_close();
 				close_pressed = false;
 			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
+			}
 
 			INPUT_EVENT ie = get_next_input_event();
 			
@@ -3766,6 +3838,10 @@ static void hqm_menu(void)
 				do_close();
 				close_pressed = false;
 			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
+			}
 
 			TGUIWidget *widget = tguiUpdate();
 
@@ -3888,6 +3964,8 @@ done:
 int title_menu(void)
 {
 	on_title_screen = true;
+	
+	break_main_loop = false;
 
 	dpad_off();
 	
@@ -3988,20 +4066,25 @@ int title_menu(void)
 				fadeOut(black);
 				first_frame = true;
 				tguiPush();
+				on_title_screen = false;
 				hqm_menu();
+				on_title_screen = true;
 				tguiPop();
 			}
 			if (widget == config_button) {
 				fadeOut(black);
 				first_frame = true;
 				tguiPush();
+				on_title_screen = false;
 				bool result = config_menu();
+				on_title_screen = true;
 				tguiPop();
 				if (result == true) {
 					selected = 0xDEAD;
 					goto done;
 				}
 			}
+			break_main_loop = false; // AGAIN (SEE ABOVE)
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 			if (joypad && widget == joypad)

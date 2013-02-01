@@ -724,6 +724,10 @@ static int CDoDialogue(lua_State *stack)
 				do_close();
 				close_pressed = false;
 			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
+			}
 			if (timer_on) {
 				timer_time -= LOGIC_MILLIS;
 				if (timer_time <= 0) {
@@ -818,6 +822,17 @@ static int CDoShakeDialogue(lua_State *stack)
 				do_close();
 				close_pressed = false;
 			}
+			// WARNING
+			if (break_main_loop) {
+				lua_pushboolean(stack, false);
+				tguiDeleteWidget(speechDialog);
+				delete speechDialog;
+				speechDialog = NULL;
+				dpad_on();
+				area_panned_x = sx;
+				area_panned_y = sy;
+				return 1;
+			}
 		
 			if (timer_on) {
 				timer_time -= LOGIC_MILLIS;
@@ -905,6 +920,10 @@ bool anotherDoDialogue(const char *text, bool clearbuf, bool top)
 			if (is_close_pressed()) {
 				do_close();
 				close_pressed = false;
+			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
 			}
 		
 			// update gui
@@ -2903,6 +2922,10 @@ static int CDoItemTutorial(lua_State *stack)
 				do_close();
 				close_pressed = false;
 			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
+			}
 		
 			// update gui
 			TGUIWidget *widget = tguiUpdate();
@@ -3056,6 +3079,10 @@ static int CDoItemTutorial(lua_State *stack)
 	}
 
 done:
+	if (equipChooserAdded) {
+		tguiDeleteWidget(equipChooser);
+		tguiSetFocus(partySelectorTop);
+	}
 
 	tguiDeleteWidget(fullscreenRect);
 	tguiDeleteWidget(partySelectorTop);
@@ -3140,6 +3167,10 @@ static int CDoMapTutorial(lua_State *stack)
 			if (is_close_pressed()) {
 				do_close();
 				close_pressed = false;
+			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
 			}
 			// update gui
 			std::string startingName = mapWidget->getSelected();
@@ -3293,6 +3324,10 @@ static int CDoKingKingAlbertLook(lua_State *stack)
 				do_close();
 				close_pressed = false;
 			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
+			}
 			
 			TGUIWidget *w = tguiUpdate();
 			if (!dialogue_dismissed) {
@@ -3403,6 +3438,10 @@ static int CDoKeepLook(lua_State *stack)
 			if (is_close_pressed()) {
 				do_close();
 				close_pressed = false;
+			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
 			}
 
 			TGUIWidget *w = tguiUpdate();

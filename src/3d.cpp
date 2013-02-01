@@ -727,7 +727,7 @@ static bool moveGoblin(Goblin &g, int step)
 
 static int NUM_GOBLINS;
 
-static bool real_archery(int *accuracy_pts)
+static int real_archery(int *accuracy_pts)
 {
 	dpad_off();
 
@@ -835,6 +835,10 @@ static bool real_archery(int *accuracy_pts)
 			if (is_close_pressed()) {
 				do_close();
 				close_pressed = false;
+			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
 			}
 
 			runtime_ms += LOGIC_MILLIS;
@@ -1155,6 +1159,10 @@ done:
 
 	dpad_on();
 
+	if (break_main_loop) {
+		return 2;
+	}
+
 	return dead;
 }
 
@@ -1173,7 +1181,10 @@ bool archery(bool for_points)
 
 	while (1) {
 		int accuracy_pts;
-		bool dead = real_archery(&accuracy_pts);
+		int dead = real_archery(&accuracy_pts);
+		if (dead == 2) {
+			break;
+		}
 
 		m_rest(0.5);
 
@@ -1363,6 +1374,10 @@ void volcano_scene(void)
 			if (is_close_pressed()) {
 				do_close();
 				close_pressed = false;
+			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
 			}
 			
 			count += LOGIC_MILLIS;

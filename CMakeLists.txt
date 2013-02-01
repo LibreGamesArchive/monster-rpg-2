@@ -220,7 +220,6 @@ else(APPLE)
 		allegro_ttf${ALLEG_SUFFIX}
 		allegro_font${ALLEG_SUFFIX}
 		allegro_primitives${ALLEG_SUFFIX}
-		allegro_dialog${ALLEG_SUFFIX}
 		allegro_memfile${ALLEG_SUFFIX}
 		allegro_image${ALLEG_SUFFIX}
 		allegro_shader${ALLEG_SUFFIX}
@@ -233,12 +232,12 @@ else(APPLE)
         if(KCM_AUDIO)
 		LIST(APPEND MAIN_LIBS "pulse-simple" "pulse" "asound" "openal")
 	else(KCM_AUDIO)
-		LIST(APPEND MAIN_LIBS "bass")
+		LIST(APPEND MAIN_LIBS "/home/trent/code/monster-rpg-2/build/libbass.so")
 	endif(KCM_AUDIO)
 	if(RASPBERRYPI)
 		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host /usr/lib/arm-linux-gnueabihf/libfreetype.a /usr/lib/arm-linux-gnueabihf/libz.a /usr/lib/arm-linux-gnueabihf/libpng.a /usr/lib/arm-linux-gnueabihf/libjpeg.a)
 	else(RASPBERYPI)
-		LIST(APPEND MAIN_LIBS GL GLU freetype z png jpeg)
+		LIST(APPEND MAIN_LIBS alleg_dialog${ALLEG_SUFFIX} GL GLU freetype z png jpeg)
 	endif(RASPBERRYPI)
 endif(APPLE)
 endif(WIN32)

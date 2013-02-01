@@ -96,6 +96,8 @@ public:
 	void setKeySFXDown(int k);
 	void setKeyMusicUp(int k);
 	void setKeyMusicDown(int k);
+	int getKeyQuit(void);
+	void setKeyQuit(int k);
 	int getTargetFPS(void);
 	bool getUseOnlyMemoryBitmaps(void);
 	void setUseOnlyMemoryBitmaps(bool onlyMem);
@@ -209,6 +211,7 @@ private:
 	int keySFXDown;
 	int keyMusicUp;
 	int keyMusicDown;
+	int keyQuit;
 	bool gamepadAvailable;
 	bool onlyMemoryBitmaps;
 	bool lowCpuUsage;

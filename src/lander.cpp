@@ -372,6 +372,10 @@ top:
 			do_close();
 			close_pressed = false;
 		}
+		// WARNING
+		if (break_main_loop) {
+			break;
+		}
 	}
 
 done:

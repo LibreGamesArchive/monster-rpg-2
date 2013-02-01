@@ -254,6 +254,10 @@ void showIpod(void)
 				do_close();
 				close_pressed = false;
 			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
+			}
 			
 			TGUIWidget *w = tguiUpdate();
 
@@ -387,10 +391,12 @@ void showIpod(void)
 				}
 			}
 
+			/* Really? Here too?
 			if (close_pressed) {
 				do_close();
 				close_pressed = false;
 			}
+			*/
 		}
 
 		if (draw_counter > 0) {

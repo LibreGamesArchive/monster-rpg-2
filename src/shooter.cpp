@@ -801,6 +801,10 @@ start:
 			do_close();
 			close_pressed = false;
 		}
+		// WARNING
+		if (break_main_loop) {
+			goto done;
+		}
 
 		al_wait_cond(wait_cond, wait_mutex);
 
@@ -1018,6 +1022,10 @@ start:
 						if (is_close_pressed()) {
 							do_close();
 							close_pressed = false;
+						}
+						// WARNING
+						if (break_main_loop) {
+							goto done;
 						}
 						if (break_shooter_pause) {
 							can_pause = true;

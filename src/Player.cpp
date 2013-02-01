@@ -777,6 +777,10 @@ static void levelUpCallback(int selected, LEVEL_UP_CALLBACK_DATA *d)
 				do_close();
 				close_pressed = false;
 			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
+			}
 
 			// Logic
 			INPUT_EVENT ie = get_next_input_event();
@@ -960,6 +964,10 @@ bool levelUp(Player *player, int bonus)
 			if (is_close_pressed()) {
 				do_close();
 				close_pressed = false;
+			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
 			}
 
 			// update gui
