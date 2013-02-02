@@ -15,6 +15,10 @@ static inline ALLEGRO_BITMAP *my_tmp_load_bmp(const char *filename)
 	unsigned char *bytes = slurp_file(fn, &sz);
 
 	if (!bytes) {
+		native_error((std::string("Error loading ") + fn).c_str());
+	}
+
+	if (!bytes) {
 #ifdef WITH_SVG
 		strcpy(p, ".svg");
 		return load_svg(fn);

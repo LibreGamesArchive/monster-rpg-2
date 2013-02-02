@@ -35,6 +35,9 @@ std::string get_language_friendly_name(int index)
 void load_translation_tags(void)
 {
 	ALLEGRO_FILE *f = al_fopen(getResource("English.utf8"), "r");
+	if (!f) {
+		native_error("Couldn't load English.utf8.");
+	}
 
 	char buf[5000];
 
@@ -75,6 +78,9 @@ void load_translation(const char *filename)
 
 	int sz;
 	unsigned char *bytes = slurp_file(getResource("%s.utf8", filename), &sz);
+	if (!bytes) {
+		native_error((std::string("Couldn't load ") + filename + ".").c_str());
+	}
 
 	int pos = 0;
 	int32_t ch;

@@ -833,6 +833,7 @@ void Area::initLua()
 
 	debug_message("Loading global area script...\n");
 	bytes = slurp_file(getResource("area_scripts/global.%s", getScriptExtension().c_str()), &file_size);
+	if (!bytes) native_error("Couldn't load  area_scripts/global.lua.");
 	ALLEGRO_DEBUG("slurped %d bytes", file_size);
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
@@ -852,6 +853,7 @@ void Area::initLua()
 
 	debug_message("Loading area script (%s)...\n", name.c_str());
 	bytes = slurp_file(getResource("area_scripts/%s.%s", name.c_str(), getScriptExtension().c_str()), &file_size);
+	if (!bytes) native_error((std::string("Couldn't load  area_scripts/") + name + ".lua.").c_str());
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		lua_close(luaState);
@@ -943,7 +945,9 @@ void startArea(std::string name)
 	snprintf(resName, 1000, "areas/%s.area", name.c_str());
 	
 	area = new Area();
-	area->load(getResource(resName));
+	if (!area->load(getResource(resName))) {
+		native_error((std::string("Couldn't load area ") + resName + ".").c_str());
+	}
 
 	area->addObject(party[heroSpot]->getObject());
 
@@ -2128,11 +2132,12 @@ std::vector<Tile *> &Area::getTiles(void)
 	return tiles;
 }
 
-void Area::load(std::string filename)
+bool Area::load(std::string filename)
 {
 	ALLEGRO_FILE *f = al_fopen(filename.c_str(), "rb");
-	if (!f)
-		throw ReadError();
+	if (!f) {
+		return false;
+	}
 	
 	sizex = al_fread32le(f);
 	sizey = al_fread32le(f);
@@ -2225,6 +2230,8 @@ void Area::load(std::string filename)
 	}
 
 	al_fclose(f);
+
+	return true;
 }
 
 void Area::followPlayer(bool f)

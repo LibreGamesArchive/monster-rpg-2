@@ -6,6 +6,9 @@ int main(int argc, char **argv)
 	al_init();
 	al_init_image_addon();
 
+	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP | ALLEGRO_NO_PREMULTIPLIED_ALPHA);
+	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+
 	ALLEGRO_BITMAP *tm = al_load_bitmap("tilemapfixed.png");
 	int w = al_get_bitmap_width(tm);
 	int h = al_get_bitmap_height(tm);

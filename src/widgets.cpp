@@ -336,7 +336,7 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 
 static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data), void *data)
 {
-	if (!gfx_mode_set) return;
+	if (!inited) return;
 	
 	dpad_off();
 	
@@ -541,7 +541,7 @@ void showPlayerInfo_ptr(Player *p)
 
 void notify(std::string msg1, std::string msg2, std::string msg3)
 {
-	if (!gfx_mode_set) return;
+	if (!inited) return;
 
 	dpad_off();
 
@@ -2559,6 +2559,7 @@ void MMap::load_map_data(void)
 
 	debug_message("Loading global script...\n");
 	bytes = slurp_file(getResource("scripts/global.%s", getScriptExtension().c_str()), &file_size);
+	if (!bytes) native_error("Couldn't load scripts/global.lua.");
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
@@ -2578,6 +2579,7 @@ void MMap::load_map_data(void)
 
 	debug_message("Loading map script...\n");
 	bytes = slurp_file(getResource("%s.%s", prefix.c_str(), getScriptExtension().c_str()), &file_size);
+	if (!bytes) native_error((std::string("Couldn't load ") + prefix + ".lua.").c_str());
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();

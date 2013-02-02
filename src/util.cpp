@@ -186,30 +186,30 @@ int check_arg(int argc, char **argv, const char *s)
 
 
 // returns true to continue
-bool native_error(const char *msg)
+void native_error(const char *msg)
 {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
-	return true;
-#endif
-#ifdef EDITOR
-	return true;
+	fprintf(stderr, "%s\n", msg);
+	exit(1);
+#elif defined EDITOR
+	return;
 #else
-	if (gfx_mode_set) {
+	if (inited) {
 		if (prompt(msg, "Continue anyway?", 1, 0))
-			return true;
+			return;
 		else
-			return false;
+			exit(1);
 	}
-
 #if !defined(__linux__)
 	char buf[1000];
 	const char *crap = "Error";
-	sprintf(buf, "%s. Continue anyway?", msg);
+	snprintf(buf, 1000, "%s Continue anyway?", msg);
 	int button = al_show_native_message_box(display, crap, ":(", buf, NULL, ALLEGRO_MESSAGEBOX_YES_NO);
-	if (button == 1) return true;
-	else return false;
+	if (button == 1) return;
+	else exit(1);
 #else
-	printf("%s\n", msg);
+	fprintf("%s\n", msg);
+	exit(1);
 #endif
 #endif
 }

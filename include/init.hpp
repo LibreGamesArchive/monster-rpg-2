@@ -124,8 +124,6 @@ extern MBITMAP *poison_bmp_tmp2;
 extern volatile int draw_counter;
 extern volatile int logic_counter;
 
-extern bool gfx_mode_set;
-
 extern bool egl_workaround;
 extern bool inited;
 

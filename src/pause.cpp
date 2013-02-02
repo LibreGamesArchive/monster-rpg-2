@@ -2235,7 +2235,7 @@ void credits(void)
 	}
 
 
-	ALLEGRO_VERTEX verts[2000];
+	ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[20000];
 
 	for (int i = 0; i < 2000; i++)
 		verts[i].z = 0;
@@ -2250,8 +2250,6 @@ void credits(void)
 	MBITMAP *bg = m_load_bitmap(getResource("media/credit_bg.png"));
 	MBITMAP *font = m_load_bitmap(getResource("media/credit_font.png"));
 
-// FIXME:
-#if 0
 	long start = tguiCurrentTimeMillis();
 
 	for (;;) {
@@ -2308,6 +2306,9 @@ void credits(void)
 						}
 						else if (letter == '"') {
 							u = 280;
+						}
+						else if (letter == '.') {
+							u = 290;
 						}
 						else
 							u = (letter-'A')*10;
@@ -2377,6 +2378,9 @@ void credits(void)
 						}
 						else if (letter == '"') {
 							u = 280;
+						}
+						else if (letter == '.') {
+							u = 290;
 						}
 						else
 							u = (letter-'A')*10;
@@ -2516,10 +2520,10 @@ void credits(void)
 		m_flip_display();
 		m_rest(0.001);
 	}
-// FIXME:
-#endif
-done:
+
 	fadeOut(black);
+
+done:
 	
 	m_destroy_bitmap(bg);
 
@@ -2531,8 +2535,9 @@ done:
 	/* Now roll the Indiegogo sponsor credits! */
 
 	const char *lines[] = {
-		"And a very special thanks",
-		"to our Indiegogo sponsors!",
+		"AND A VERY SPECIAL",
+		"THANKS TO OUR",
+		"INDIEGOGO SPONSORS...",
 		"",
 		"",
 		"",
@@ -2583,7 +2588,7 @@ done:
 	for (; lines[nlines] != NULL; nlines++)
 		;
 
-	int scroll_size = nlines*10 + BH*2;
+	int scroll_size = nlines*10 + BH*1.2;
 	float scroll_amount = 0;
 
 	long start = tguiCurrentTimeMillis();
@@ -2601,14 +2606,14 @@ done:
 		int step = now - start;
 		start = now;
 
-		scroll_amount += 0.1 * step;
+		scroll_amount += 0.01 * step;
 
 		if (scroll_amount > scroll_size)
 			break;
 
 		vcount = 0;
 		int y = BH-scroll_amount;
-		for (int line = 0; nlines; line++) {
+		for (int line = 0; line < nlines; line++, y += 10) {
 			int x = BW/2 - strlen(lines[line])*10/2;
 			for (int c = 0; lines[line][c]; c++, x += 10) {
 				int letter = lines[line][c];
@@ -2626,6 +2631,9 @@ done:
 				}
 				else if (letter == '"') {
 					u = 280;
+				}
+				else if (letter == '.') {
+					u = 290;
 				}
 				else
 					u = (letter-'A')*10;
@@ -2667,6 +2675,8 @@ done:
 				vcount++;
 			}
 		}
+		
+		m_set_target_bitmap(buffer);
 
 		al_clear_to_color(al_map_rgb_f(0, 0, 0));
 
@@ -2678,7 +2688,11 @@ done:
 	}
 }
 	
+	fadeOut(black);
+	
 done2:
+	delete[] verts;
+
 	m_destroy_bitmap(font);
 
 	dpad_on();
@@ -3797,11 +3811,12 @@ done:
 	delete tuning_toggle;
 	delete aspect_toggle;
 
+	delete filter_type_toggle;
+
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (input_toggle)
 		delete input_toggle;
 	delete swap_buttons_toggle;
-	delete filter_type_toggle;
 #if defined ALLEGRO_IPHONE
 	delete shake_toggle;
 	delete flip_screen_toggle;

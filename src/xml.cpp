@@ -38,6 +38,7 @@ XMLData::XMLData(std::string filename) :
 
 	file = al_fopen(filename.c_str(), "r");
 	if (!file) {
+		native_error((std::string("Couldn't load ") + filename + ".").c_str());
 		al_fclose(file);
 		failed = true;
 		return;

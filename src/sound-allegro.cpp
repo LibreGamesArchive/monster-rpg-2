@@ -142,6 +142,9 @@ MSAMPLE loadSample(std::string name)
 	if (!sound_inited) return s;
 
 	s = al_load_sample(getResource("sfx/%s", name.c_str()));
+	if (s == 0) {
+		native_error((std::string("Couldn't load sfx/") + name + ".").c_str());
+	}
 
 	return s;
 }
@@ -209,6 +212,9 @@ void playMusic(std::string name, float vol, bool force)
 	name = check_music_name(name, &is_flac);
 
 	music = al_load_audio_stream(name.c_str(), 4, 2048);
+	if (music == 0) {
+		native_error((std::string("Couldn't load ") + name + ".").c_str());
+	}
 
 	setMusicVolume(vol);
 
@@ -250,6 +256,9 @@ void playAmbience(std::string name, float vol)
 	name = check_music_name(name, &is_flac);
 
 	ambience = al_load_audio_stream(name.c_str(), 4, 2048);
+	if (ambience == 0) {
+		native_error((std::string("Couldn't load ") + name + ".").c_str());
+	}
 
 	setAmbienceVolume(vol);
 

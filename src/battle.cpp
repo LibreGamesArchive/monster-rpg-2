@@ -1227,6 +1227,7 @@ void Battle::initLua(void)
 
 	debug_message("Loading global combat script...\n");
 	bytes = slurp_file(getResource("combat_scripts/global.%s", getScriptExtension().c_str()), &file_size);
+	if (!bytes) native_error("Couldn't load combat_scripts/global.lua.");
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
@@ -1242,6 +1243,7 @@ void Battle::initLua(void)
 	
 	debug_message("Loading combat script...\n");
 	bytes = slurp_file(getResource("combat_scripts/%s.%s", name.c_str(), getScriptExtension().c_str()), &file_size);
+	if (!bytes) native_error((std::string("Couldn't load combat_scripts/") + name + ".lua.").c_str());
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();

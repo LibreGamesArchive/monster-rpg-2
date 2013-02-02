@@ -779,7 +779,13 @@ static int real_archery(int *accuracy_pts)
 	float target_y = BH/2;
 
 	MODEL *bow_model = load_model2(getResource("models/bow.vtx"));
+	if (!bow_model) {
+		native_error("Couldn't load models/bow.vtx.");
+	}
 	MODEL *arrow_model = load_model2(getResource("models/arrow.vtx"));
+	if (!bow_model) {
+		native_error("Couldn't load models/arrow.vtx.");
+	}
 
 	int flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
@@ -1183,7 +1189,7 @@ bool archery(bool for_points)
 		int accuracy_pts;
 		int dead = real_archery(&accuracy_pts);
 		if (dead == 2) {
-			break;
+			return 2;
 		}
 
 		m_rest(0.5);
@@ -1344,9 +1350,15 @@ void volcano_scene(void)
 
 	MBITMAP *land_texture = m_load_bitmap(getResource("media/volcano_texture.png"));
 	MODEL *land_model = load_model(getResource("models/volcano_new.raw"), true, m_get_bitmap_width(land_texture));
+	if (!land_model) {
+		native_error("Couldn't load models/volcano_new.raw.");
+	}
 
 
 	MODEL *staff_model = load_model(getResource("models/staff.raw"));
+	if (!land_model) {
+		native_error("Couldn't load models/staff.raw.");
+	}
 	MODEL *ring_model = create_ring(32, ring_texture);
 
 	float star_top_y = 0-(m_get_bitmap_height(stars)-BH);

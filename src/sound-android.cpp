@@ -60,6 +60,9 @@ MSAMPLE loadSample_oldandroid(std::string name)
 		sprintf(fn, "%s/unpack/sfx/%s", al_path_cstr(p, '/'), name.c_str());
 		al_destroy_path(p);
 		s = bass_loadSample(fn);
+		if (s == 0) {
+			native_error((std::string("Couldn't load ") + fn + ".").c_str());
+		}
 	}
 
 	return s;
@@ -121,6 +124,9 @@ void playMusic_oldandroid(std::string name, float volume, bool force)
 		al_set_standard_file_interface();
 	}
 	music = bass_loadMusic(name.c_str());
+	if (music == 0) {
+		native_error((std::string("Couldn't load ") + name + ".").c_str());
+	}
 	if (is_flac) {
 		al_android_set_apk_file_interface();
 	}
@@ -163,6 +169,9 @@ void playAmbience_oldandroid(std::string name, float vol)
 		al_set_standard_file_interface();
 	}
 	ambience = bass_loadMusic(name.c_str());
+	if (ambience == 0) {
+		native_error((std::string("Couldn't load ") + name + ".").c_str());
+	}
 	if (is_flac) {
 		al_android_set_apk_file_interface();
 	}

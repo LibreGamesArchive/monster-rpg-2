@@ -168,6 +168,9 @@ void connect_second_display(void)
 	}
 	al_set_new_bitmap_format(format);
 	game_font_second_display = al_load_ttf_font(getResource("DejaVuSans.ttf"), 10, 0);
+	if (!game_font_second_display) {
+		native_error("Couldn't load DejaVuSans.ttf.");
+	}
 	
 	airplay_dpad = m_load_alpha_bitmap(getResource("media/airplay_pad.png"));
 	white_button = m_load_alpha_bitmap(getResource("media/whitebutton.png"));
@@ -558,7 +561,7 @@ void do_close(bool quit)
 			exit_game = true;
 		}
 		else {
-			int r = triple_prompt("", "Really exit game or return to menu?", "", "Menu", "Exit Game", "Cancel", 2, true);
+			int r = triple_prompt("", "Really quit game or return to menu?", "", "Menu", "Quit", "Cancel", 2, true);
 			al_flush_event_queue(events_minor);
 			if (r == 0) {
 				break_main_loop = true;
@@ -1168,7 +1171,7 @@ int main(int argc, char *argv[])
 	//do_lander(); 
 	//archery(false);
 	//shooter(false);
-	credits();
+	//credits();
 
 	while (!quit_game) {
 		playAmbience("");

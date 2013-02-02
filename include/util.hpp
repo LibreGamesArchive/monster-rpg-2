@@ -17,7 +17,7 @@ const char *my_itoa(int i);
 int countOccurances(const char *s, char c);
 const char *findOccurance(const char *text, char c, int num);
 int check_arg(int argc, char **argv, const char *arg);
-bool native_error(const char *msg);
+void native_error(const char *msg);
 bool isVowel(char c);
 
 enum IPHONE_LINE_DIR {

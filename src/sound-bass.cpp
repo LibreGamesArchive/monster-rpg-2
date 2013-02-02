@@ -314,13 +314,16 @@ MSAMPLE loadSample(std::string name)
 		BASS_SAMPLE_MONO|BASS_SAMPLE_OVER_POS);
 	
 	if (s == 0) {
-		ALLEGRO_DEBUG("s=0 error code %d", BASS_ErrorGetCode());
+		native_error((std::string("Couldn't load ") + fn + ".").c_str());
 	}
 #else
 	s = BASS_SampleLoad(false,
 		getResource("sfx/%s", name.c_str()),
 		0, 0, 8,
 		BASS_SAMPLE_OVER_POS);
+	if (s == 0) {
+		native_error((std::string("Couldn't sfx/") + name + ".").c_str());
+	}
 #endif
 
 	return s;
@@ -442,7 +445,6 @@ void playMusic(std::string name, float vol, bool force)
 		);
 	}
 	else {
-		debug_message("name='%s'", name.c_str());
 		PHYSFS_File *f = PHYSFS_openRead(name.c_str());
 		music = BASS_StreamCreateFileUser(
 			STREAMFILE_NOBUFFER,
@@ -451,15 +453,16 @@ void playMusic(std::string name, float vol, bool force)
 			(void *)f
 		);
 	}
-
-	if (music == 0)
-		ALLEGRO_DEBUG("music == 0 error code=%d", BASS_ErrorGetCode());
 #else
 	music = BASS_StreamCreateFile(false,
 		name.c_str(),
 		0, 0, 0);
 #endif
 	
+	if (music == 0) {
+	   native_error((std::string("Couldn't load ") + name + ".").c_str());
+	}
+
 	music_loop_start = 0;
 
 	BASS_ChannelSetSync(music, BASS_SYNC_END | BASS_SYNC_MIXTIME,
@@ -540,15 +543,16 @@ void playAmbience(std::string name, float vol)
 			(void *)f
 		);
 	}
-
-	if (ambience == 0)
-		ALLEGRO_DEBUG("ambience == 0 error code=%d", BASS_ErrorGetCode());
 #else
 	ambience = BASS_StreamCreateFile(false,
 		name.c_str(),
 		0, 0, 0);
 #endif
 	
+	if (ambience == 0) {
+		native_error((std::string("Couldn't load ") + name + ".").c_str());
+	}
+
 	ambience_loop_start = 0;
 	BASS_ChannelSetSync(ambience, BASS_SYNC_END | BASS_SYNC_MIXTIME,
 		0, AmbienceSyncProc, 0);

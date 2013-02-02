@@ -199,8 +199,6 @@ static bool safemode = false;
 volatile int draw_counter = 0;
 volatile int logic_counter = 0;
 
-bool gfx_mode_set = false;
-
 bool egl_workaround = false;
 bool inited = false;
 
@@ -296,28 +294,24 @@ void load_fonts(void)
 	game_font = al_load_ttf_font("/mnt/sdcard/removable_sdcard/DejaVuSans.ttf", 9, ttf_flags);
 	al_android_set_apk_file_interface();
 	if (!game_font) {
-		if (!native_error("Failed to load game_font"))
-			return;
+		native_error("Failed to load game_font.");
 	}
 #else
 	game_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 9, ttf_flags);
 	if (!game_font) {
-		if (!native_error("Failed to load medium_font"))
-			return;
+		native_error("Failed to load game_font.");
 	}
 #endif
 
 	medium_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 32, 0);
 	if (!medium_font) {
-		if (!native_error("Failed to load medium_font"))
-			return;
+		native_error("Failed to load medium_font.");
 	}
 	
 #ifndef LITE
 	huge_font = m_load_font(getResource("huge_font.tga"));
 	if (!huge_font) {
-		if (!native_error("Failed to load huge_font"))
-			return;
+		native_error("Failed to load huge_font.");
 	}
 #endif
 
@@ -1421,8 +1415,6 @@ static void *loader_proc(void *arg)
 
 	show_progress(60);
 
-	gfx_mode_set = true;
-
 	// Set an icon
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_MACOSX && !defined ALLEGRO_ANDROID
 	MBITMAP *tmp_bmp = m_load_alpha_bitmap(getResource("staff.png"));
@@ -2113,6 +2105,7 @@ void android_assert_handler(char const *expr,
 }
 #endif
 
+#ifdef ALLEGRO_RASPBERRPI
 static void _al_raspberrypi_get_screen_info(int *dx, int *dy,
    int *screen_width, int *screen_height)
 {
@@ -2188,6 +2181,7 @@ static void _al_raspberrypi_get_screen_info(int *dx, int *dy,
       fclose(cmdline);
    }
 }
+#endif
 
 bool init(int *argc, char **argv[])
 {
@@ -2477,8 +2471,7 @@ bool init(int *argc, char **argv[])
 #endif
 
 	if (!display) {
-		if (!native_error("Failed to set gfx mode"))
-			return false;
+		native_error("Failed to set gfx mode.");
 	}
 
 	al_rest(1.0);
@@ -2529,8 +2522,7 @@ bool init(int *argc, char **argv[])
 	else {
 		if (!al_have_opengl_extension("GL_EXT_framebuffer_object")
 		 && !al_have_opengl_extension("GL_ARB_framebuffer_object")) {
-			if (!native_error("Fragment shaders not supported"))
-				return false;
+			native_error("Fragment shaders not supported.");
 		}
 
 		my_opengl_version = al_get_opengl_version();
@@ -2640,16 +2632,14 @@ bool init(int *argc, char **argv[])
 #endif
 	
 	if (!buffer) {
-		if (!native_error("Failed to create buffer"))
-			return false;
+		native_error("Failed to create buffer.");
 	}
 
 	config.setFilterType(config.getFilterType());
 	
 	
 	if (!screenshot) {
-		if (!native_error("Failed to create screenshot"))
-			return false;
+		native_error("Failed to create screenshot buffer.");
 	}
 	
 	corner_bmp = m_load_bitmap(getResource("media/corner.png"));
