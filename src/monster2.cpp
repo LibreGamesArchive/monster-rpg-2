@@ -1168,7 +1168,7 @@ int main(int argc, char *argv[])
 	//do_lander(); 
 	//archery(false);
 	//shooter(false);
-	//credits();
+	credits();
 
 	while (!quit_game) {
 		playAmbience("");
