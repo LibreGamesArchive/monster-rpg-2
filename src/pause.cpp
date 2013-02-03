@@ -3084,10 +3084,10 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 	auto_list = new MScrollingList(20, 45, 200, LIST_H, trash_auto, BW-m_get_bitmap_width(trashcan)/2-5, BH-m_get_bitmap_height(trashcan)/2-5, show_savestate_info_callback, "auto");
 	MTab *save_tab = new MTab("Save", 10, 20);
 	int xx2 = 10 + m_text_length(game_font, _t("Save")) + 6;
-	int xx3 = xx2 + m_text_length(game_font, _t("Auto")) + 6;
 	MTab *auto_tab = new MTab("Auto", xx2, 20);
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+	int xx3 = xx2 + m_text_length(game_font, _t("Auto")) + 6;
 	MTab *copypaste_tab = new MTab("Copy & Paste", xx3, 20);
 #endif
 
