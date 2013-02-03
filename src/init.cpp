@@ -2225,7 +2225,10 @@ bool init(int *argc, char **argv[])
 #ifdef ALLEGRO_ANDROID
 	al_install_system(ALLEGRO_VERSION_INT, NULL);
 #else
-	al_init();
+	if (!al_init()) {
+		printf("al_init failed.\n");
+		exit(1);
+	}
 #endif
 
 #if !defined ALLEGRO_IPHONE
