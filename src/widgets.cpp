@@ -5940,7 +5940,7 @@ void MPartySelector::draw()
 		CombatantInfo &info = party[index]->getInfo();
 		char text[100];
 		if (info.abilities.hp <= 0) {
-			strcpy(text, "Unconscious");
+			strcpy(text, _t("Unconscious"));
 		}
 		else {
 			std::string cond = getConditionName(info.condition);
