@@ -194,11 +194,13 @@ void native_error(const char *msg, const char *msg2)
 #elif defined EDITOR
 	return;
 #else
+
+	const char *ss = msg2 ? strstr(msg2, "data/") : NULL;
+	if (ss) {
+		ss += 5;
+	}
+
 	if (inited) {
-		const char *ss = msg2 ? strstr(msg2, "data/") : NULL;
-		if (ss) {
-			ss += 5;
-		}
 		if (prompt(msg, "Continue anyway?", 1, 0, ss ? ss : "", NULL, true)) {
 			m_set_target_bitmap(buffer);
 			m_clear(al_map_rgb_f(0, 0, 0));
@@ -213,7 +215,7 @@ void native_error(const char *msg, const char *msg2)
 	char buf[1000];
 	const char *crap = "Error";
 	snprintf(buf, 1000, "%s Continue anyway?", msg);
-	int button = al_show_native_message_box(display, crap, ":(", buf, NULL, ALLEGRO_MESSAGEBOX_YES_NO);
+	int button = al_show_native_message_box(display, crap, ss ? ss : ":(", buf, NULL, ALLEGRO_MESSAGEBOX_YES_NO);
 	if (button == 1) return;
 	else exit(1);
 #else
