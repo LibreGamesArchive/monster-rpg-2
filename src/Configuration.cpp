@@ -311,6 +311,16 @@ void Configuration::setKeyQuit(int k)
 	keyQuit = k;
 }
 
+int Configuration::getKeySortItems()
+{
+	return keySortItems;
+}
+
+void Configuration::setKeySortItems(int k)
+{
+	keySortItems = k;
+}
+
 int Configuration::getTargetFPS(void)
 {
 	switch (getTuning()) {
@@ -465,6 +475,7 @@ bool Configuration::read()
 	XMLData *keyMusicUp = NULL;
 	XMLData *keyMusicDown = NULL;
 	XMLData *keyQuit = NULL;
+	XMLData *keySortItems = NULL;
 
 #ifdef ALLEGRO_RASPBERRYPI
 	const char *disp = getenv("DISPLAY");
@@ -484,6 +495,7 @@ bool Configuration::read()
 		keyMusicUp = game->find("keyMusicUp");
 		keyMusicDown = game->find("keyMusicDown");
 		keyQuit = game->find("keyQuit");
+		keySortItems = game->find("keySortItems");
 #ifdef ALLEGRO_RASPBERRYPI
 	}
 	last_session_was_x = getenv("DISPLAY") != NULL;
@@ -598,6 +610,7 @@ bool Configuration::read()
 	if (keyMusicUp) setKeyMusicUp(keyname_to_keycode(keyMusicUp->getValue().c_str()));
 	if (keyMusicDown) setKeyMusicDown(keyname_to_keycode(keyMusicDown->getValue().c_str()));
 	if (keyQuit) setKeyQuit(keyname_to_keycode(keyQuit->getValue().c_str()));
+	if (keySortItems) setKeySortItems(keyname_to_keycode(keySortItems->getValue().c_str()));
 
 	ScreenDescriptor sd;
 	sd.width = atoi(width->getValue().c_str());
@@ -655,6 +668,8 @@ void Configuration::write()
 		"keyMusicDown", al_keycode_to_name(getKeyMusicDown()));
 	XMLData* keyQuit = new XMLData(
 		"keyQuit", al_keycode_to_name(getKeyQuit()));
+	XMLData* keySortItems = new XMLData(
+		"keySortItems", al_keycode_to_name(getKeySortItems()));
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	XMLData* xml_dpad_type = new XMLData("dpad_type", old_control_mode < 0 ? my_itoa(getDpadType()) : my_itoa(old_control_mode));
@@ -691,6 +706,7 @@ void Configuration::write()
 	game->add(keyMusicUp);
 	game->add(keyMusicDown);
 	game->add(keyQuit);
+	game->add(keySortItems);
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	game->add(xml_dpad_type);
@@ -785,6 +801,7 @@ Configuration::Configuration() :
 	keyMusicUp(ALLEGRO_KEY_F2),
 	keyMusicDown(ALLEGRO_KEY_F1),
 	keyQuit(ALLEGRO_KEY_Q),
+	keySortItems(ALLEGRO_KEY_F8),
 
 	gamepadAvailable(true),
 	onlyMemoryBitmaps(false),

@@ -78,4 +78,11 @@
 	<frames>1</frames>
 </staff_stand_w>
 
+<sleep>
+	<x>0</x>
+	<y>48</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>1</frames>
+</sleep>
 

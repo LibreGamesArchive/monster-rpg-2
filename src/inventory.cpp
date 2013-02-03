@@ -74,6 +74,57 @@ Item items[] = {
 	{ "END", ITEM_TYPE_END, 0, }
 };
 
+void sortInventory()
+{
+	Inventory tmp[MAX_INVENTORY];
+
+	for (int i = 0; i < MAX_INVENTORY; i++) {
+		tmp[i].index = -1;
+		tmp[i].quantity = 0;
+	}
+
+	int nitems;
+
+	for (nitems = 0; items[nitems].type != ITEM_TYPE_END; nitems++);
+
+	const int ntypes = 6;
+
+	int types[ntypes] = {
+		ITEM_TYPE_STATUS,
+		ITEM_TYPE_SPECIAL,
+		ITEM_TYPE_WEAPON,
+		ITEM_TYPE_HEAD_ARMOR,
+		ITEM_TYPE_CHEST_ARMOR,
+		ITEM_TYPE_FEET_ARMOR
+	};
+
+	int curr_slot = 0;
+
+	for (int type = 0; type < ntypes; type++) {
+		for (int item = nitems-1; item >= 0; item--) {
+			if (items[item].type != types[type]) {
+				continue;
+			}
+			int quantity = 0;
+			for (int slot = 0; slot < MAX_INVENTORY; slot++) {
+				if (inventory[slot].index == item) {
+					quantity += inventory[slot].quantity;
+				}
+			}
+			if (quantity > 0) {
+				do {
+					int n = quantity > 99 ? 99 : quantity;
+					tmp[curr_slot].index = item;
+					tmp[curr_slot].quantity = n;
+					curr_slot++;
+					quantity -= n;
+				} while (quantity > 0);
+			}
+		}
+	}
+
+	memcpy(inventory, &tmp, sizeof(tmp));
+}
 
 const int ITEM_MEATBALLS = 59;
 
@@ -211,7 +262,6 @@ static std::string getItemSound(std::string name)
 }
 
 Inventory inventory[MAX_INVENTORY];
-
 
 std::string getWeaponSound(CombatantInfo &info)
 {

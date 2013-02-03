@@ -38,6 +38,30 @@ enum PauseSection {
 };
 
 
+static void draw_tiny_tri(int x, int y, int height, int dir, ALLEGRO_COLOR c)
+{
+	al_lock_bitmap_region(
+		al_get_target_bitmap(),
+		x - (1 + (height-1)*2)/2,
+		y - (dir < 0 ? height-1 : 0),
+		1 + (height-1)*2,
+		1 + (height-1)*2,
+		ALLEGRO_PIXEL_FORMAT_ANY,
+		ALLEGRO_LOCK_READWRITE
+	);
+
+	for (int i = 0; i < height; i++) {
+		int yy = y + (dir * i);
+		int w = 1 + (i*2);
+		int xx = x - w/2;
+		for (int j = 0; j < w; j++) {
+			m_put_pixel(xx+j, yy, c);
+		}
+	}
+
+	al_unlock_bitmap(al_get_target_bitmap());
+}
+
 
 static const char *strings[] = {
 "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0A", "0B", "0C", "0D", "0E", "0F", 
@@ -428,6 +452,7 @@ void showItemInfo(int index, bool preserve_buffer)
 	int y = (BH-h)/2;
 
 	bool can_use[MAX_PARTY] = { false, };
+	int diff[MAX_PARTY] = { 0, }; // better, worse, or equal to current item
 
 	ItemType type = items[index].type;
 
@@ -445,6 +470,23 @@ void showItemInfo(int index, bool preserve_buffer)
 			CombatantInfo &info = party[i]->getInfo();
 			if (info.characterClass & weapons[items[index].id].classes) {
 				can_use[i] = true;
+				if (weapons[items[index].id].satisfies < 0) {
+					int curr_power;
+					if (info.equipment.lhand >= 0 && weapons[items[info.equipment.lhand].id].satisfies < 0) {
+						curr_power = weapons[items[info.equipment.lhand].id].attack;
+						
+					}
+					else {
+						if (info.equipment.rhand < 0) {
+							curr_power = 0;
+						}
+						else {
+							curr_power = weapons[items[info.equipment.rhand].id].attack;
+						}
+					}
+					int selected_power = weapons[items[index].id].attack;
+					diff[i] = selected_power - curr_power;
+				}
 			}
 		}
 	}
@@ -455,6 +497,12 @@ void showItemInfo(int index, bool preserve_buffer)
 			CombatantInfo &info = party[i]->getInfo();
 			if (info.characterClass & helmets[items[index].id].classes) {
 				can_use[i] = true;
+				if (info.equipment.harmor < 0) {
+					diff[i] = 1;
+				}
+				else {
+					diff[i] = helmets[items[index].id].defense - helmets[items[info.equipment.harmor].id].defense;
+				}
 			}
 		}
 	}
@@ -465,6 +513,12 @@ void showItemInfo(int index, bool preserve_buffer)
 			CombatantInfo &info = party[i]->getInfo();
 			if (info.characterClass & chestArmors[items[index].id].classes) {
 				can_use[i] = true;
+				if (info.equipment.carmor < 0) {
+					diff[i] = 1;
+				}
+				else {
+					diff[i] = chestArmors[items[index].id].defense - chestArmors[items[info.equipment.harmor].id].defense;
+				}
 			}
 		}
 	}
@@ -475,6 +529,12 @@ void showItemInfo(int index, bool preserve_buffer)
 			CombatantInfo &info = party[i]->getInfo();
 			if (info.characterClass & feetArmors[items[index].id].classes) {
 				can_use[i] = true;
+				if (info.equipment.farmor < 0) {
+					diff[i] = 1;
+				}
+				else {
+					diff[i] = feetArmors[items[index].id].defense - feetArmors[items[info.equipment.harmor].id].defense;
+				}
 			}
 		}
 	}
@@ -602,7 +662,29 @@ void showItemInfo(int index, bool preserve_buffer)
 			}
 			for (int i = 0; i < MAX_PARTY; i++) {
 				if (can_use[i] && partyBmps[i]) {
+					int x = BW/2+(i-2)*20;
+					int y = 95;
+					int w = al_get_bitmap_width(partyBmps[i]->bitmap);
+					int h = al_get_bitmap_height(partyBmps[i]->bitmap);
 					m_draw_bitmap(partyBmps[i], BW/2+(i-2)*20, 95, 0);
+					if (diff[i] < 0) {
+						draw_tiny_tri(
+							x+w-2,
+							y+h-1,
+							3,
+							-1,
+							al_map_rgb_f(1, 0, 0)
+						);
+					}
+					else if (diff[i] > 0) {
+						draw_tiny_tri(
+							x+w-2,
+							y+h-6,
+							3,
+							1,
+							al_map_rgb_f(0, 1, 0)
+						);
+					}
 				}
 			}
 

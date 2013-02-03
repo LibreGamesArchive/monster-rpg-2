@@ -36,8 +36,8 @@ function activate_bartender()
 		else
 			doDialogue("Bartender: One swig of this will put hair on your chest... er... Mam.\n", true)
 			setInventory(slot, ITEM_JUICE, 1)
-			setMilestone(MS_TAVERN_JUICE, true);
 			loadPlayDestroy("chest.ogg")
+			setMilestone(MS_TAVERN_JUICE, true);
 		end
 	end
 end
@@ -53,6 +53,7 @@ function activate(activator, activated)
 			setInventory(slot, ITEM_MEDALLION, 1)
 			loadPlayDestroy("chest.ogg")
 			setMilestone(MS_GOT_MEDALLION, true)
+			doDialogue(_t("Got a ") .. getItemIcon(ITEM_MEDALLION) .. _t("Medallion") .. "\n", true)
 		elseif (not getMilestone(MS_GOT_KEY)) then
 			doDialogue("Oh my dear, I've lost my key... It's about this big and fancy...\nIf you find it, please, bring it to me!\n", true)
 		else

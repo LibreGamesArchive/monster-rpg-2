@@ -16,25 +16,19 @@ function undo_tint()
 end
 
 function done()
-	--print("done 1")
 	reviveAllPlayers()
-	--print("done 2")
 	setObjectSolid(0, true)
-	--print("done 3")
 	for i=1,count do
-		--print("i = ", i)
 		if (not (players[i].name == "Eny")) then
 			removeObject(players[i].id)
 		end
 	end
-	--print("done 4")
 	count = 0
 	setObjectDirection(0, DIRECTION_SOUTH)
 	scene_started = false
 	set_music_volume(1)
 	setMilestone(MS_SLEPT_IN_INN, true)
 	descriptifyPlayer()
-	--print("done all")
 end
 
 function start()
@@ -132,10 +126,12 @@ function update(step)
 							{ event_type=EVENT_WALK, dest_x=13+(count+(count-3)), dest_y=3 },
 							{ event_type=EVENT_WALK, dest_x=13+(count+(count-3))+1, dest_y=3 },
 							{ event_type=EVENT_LOOK, direction=DIRECTION_SOUTH },
+							{ event_type=EVENT_GESTURE, name="sleep" },
 							{ event_type=EVENT_SYNC, who=players[1], number=8 },
 							{ event_type=EVENT_WALK, dest_x=13+(count+(count-3)), dest_y=3 },
 							{ event_type=EVENT_WALK, dest_x=13+(count+(count-3)), dest_y=5 },
 							{ event_type=EVENT_WALK, dest_x=13, dest_y=5 },
+							{ event_type=EVENT_LOOK, direction=DIRECTION_SOUTH },
 							{ event_type=EVENT_SYNC, who=players[1], number=15 },
 						}
 					end
@@ -154,6 +150,7 @@ function activate(activator, activated)
 			setInventory(slot, ITEM_KEY, 1)
 			loadPlayDestroy("chest.ogg")
 			setMilestone(MS_GOT_KEY, true)
+			doDialogue(_t("Got a ") .. getItemIcon(ITEM_KEY) .. _t("Key") .. "\n", true)
 		elseif (not getMilestone(MS_GOT_RING)) then
 			doDialogue("Something's missing here... I'm just not sure what.\n")
 		else

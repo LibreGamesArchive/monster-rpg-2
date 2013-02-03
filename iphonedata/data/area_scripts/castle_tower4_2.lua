@@ -29,6 +29,7 @@ function activate(activator, activated)
 			setInventory(slot, ITEM_RING, 1)
 			loadPlayDestroy("chest.ogg")
 			setMilestone(MS_GOT_RING, true)
+			doDialogue(_t("Got a ") .. getItemIcon(ITEM_RING) .. _t("Silver") .. "\n", true)
 		end
 	end
 end

@@ -446,6 +446,9 @@ static void _drawSimpleStatus_real(Player *p, int x, int y, CombatantInfo info)
 	MBITMAP *icon = p->getIcon();
 	
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
+	if (info.condition == CONDITION_POISONED) {
+		al_draw_filled_rectangle(x-1, y-1, x+1+al_get_bitmap_width(icon->bitmap), y+1+al_get_bitmap_height(icon->bitmap), al_map_rgb_f(0.75f, 0.0f, 1.0f));
+	}
 	m_draw_bitmap(icon, x, y, 0);
 	int w = m_get_bitmap_width(icon);
 	
@@ -1868,6 +1871,9 @@ void MStats::draw()
 	CombatantInfo &info = p->getInfo();
 
 	MBITMAP *icon = p->getIcon();
+	if (info.condition == CONDITION_POISONED) {
+		al_draw_filled_rectangle(x+1, y+1, x+3+al_get_bitmap_width(icon->bitmap), y+3+al_get_bitmap_height(icon->bitmap), al_map_rgb_f(0.75f, 0.0f, 1.0f));
+	}
 	m_draw_bitmap(icon, x+2, y+2, 0);
 
 	char text[100];
@@ -4878,6 +4884,21 @@ int MItemSelector::update(int millis)
 			height = start_height - (y - start_y);
 		}
 	}
+
+#ifndef ALLEGRO_IPHONE // FIXME: fix when iphone gets keyboard support
+	if (canArrange) {
+		ALLEGRO_KEYBOARD_STATE st;
+		al_get_keyboard_state(&st);
+		if (al_key_down(&st, config.getKeySortItems())) {
+			playPreloadedSample("select.ogg");
+			sortInventory();
+			downCount = 0;
+			proceed1 = proceed2 = false;
+			pressed = -1;
+			al_rest(1);
+		}
+	}
+#endif
 
 	INPUT_EVENT ie;
 	InputDescriptor _id;

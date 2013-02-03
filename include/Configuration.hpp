@@ -98,6 +98,8 @@ public:
 	void setKeyMusicDown(int k);
 	int getKeyQuit(void);
 	void setKeyQuit(int k);
+	int getKeySortItems(void);
+	void setKeySortItems(int k);
 	int getTargetFPS(void);
 	bool getUseOnlyMemoryBitmaps(void);
 	void setUseOnlyMemoryBitmaps(bool onlyMem);
@@ -212,6 +214,7 @@ private:
 	int keyMusicUp;
 	int keyMusicDown;
 	int keyQuit;
+	int keySortItems;
 	bool gamepadAvailable;
 	bool onlyMemoryBitmaps;
 	bool lowCpuUsage;

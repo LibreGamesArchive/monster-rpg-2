@@ -81,6 +81,7 @@ void use(Combatant *c, int index, bool can_equip, int numTargets = 1);
 std::string getWeaponSound(CombatantInfo &info);
 int getResaleValue(int itemIndex);
 //void destroyWeaponAnimations(void);
+void sortInventory();
 
 
 

@@ -86,4 +86,11 @@
 	<frames>1</frames>
 </unconscious>
 
+<sleep>
+	<x>0</x>
+	<y>96</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>1</frames>
+</sleep>
 

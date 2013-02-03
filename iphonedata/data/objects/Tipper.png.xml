@@ -78,3 +78,10 @@
 	</delays>
 </walk_w>
 
+<sleep>
+	<x>0</x>
+	<y>80</y>
+	<width>16</width>
+	<height>16</height>
+	<frames>1</frames>
+</sleep>
