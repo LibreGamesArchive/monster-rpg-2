@@ -217,7 +217,7 @@ void native_error(const char *msg, const char *msg2)
 	if (button == 1) return;
 	else exit(1);
 #else
-	fprintf("%s\n", msg);
+	fprintf(stderr, "%s\n", msg);
 	exit(1);
 #endif
 #endif
