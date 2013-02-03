@@ -108,9 +108,7 @@ static void shift_auto_saves()
 	
 	[p drain];
 }
-#endif
-
-#ifdef ALLEGRO_ANDROID
+#else
 static void shift_auto_saves()
 {
 	char src_c[1000];
@@ -136,7 +134,6 @@ static void shift_auto_saves()
 
 void save_memory(bool save_screenshot)
 {
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	bool all_dead = true;
 	for (int i = 0; i < MAX_PARTY; i++) {
 		if (party[i] &&
@@ -169,7 +166,6 @@ void save_memory(bool save_screenshot)
 		al_android_set_apk_file_interface();
 #endif
 	}
-#endif
 }
 
 static int sign(float f)
@@ -833,7 +829,7 @@ void Area::initLua()
 
 	debug_message("Loading global area script...\n");
 	bytes = slurp_file(getResource("area_scripts/global.%s", getScriptExtension().c_str()), &file_size);
-	if (!bytes) native_error("Couldn't load  area_scripts/global.lua.");
+	if (!bytes) native_error("Load error.", "area_scripts/global.lua");
 	ALLEGRO_DEBUG("slurped %d bytes", file_size);
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
@@ -853,7 +849,7 @@ void Area::initLua()
 
 	debug_message("Loading area script (%s)...\n", name.c_str());
 	bytes = slurp_file(getResource("area_scripts/%s.%s", name.c_str(), getScriptExtension().c_str()), &file_size);
-	if (!bytes) native_error((std::string("Couldn't load  area_scripts/") + name + ".lua.").c_str());
+	if (!bytes) native_error("Load Error.", ((std::string("area_scripts/") + name + ".lua").c_str()));
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		lua_close(luaState);
@@ -946,7 +942,7 @@ void startArea(std::string name)
 	
 	area = new Area();
 	if (!area->load(getResource(resName))) {
-		native_error((std::string("Couldn't load area ") + resName + ".").c_str());
+		native_error("Load Error.", resName);
 	}
 
 	area->addObject(party[heroSpot]->getObject());
@@ -1425,7 +1421,6 @@ void Area::copyTile(int x, int y, Tile *t)
 }
 
 static int ss_save_counter = 1000;
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 static int mem_save_counter = 1000;
 
 void real_auto_save_game(void)
@@ -1459,7 +1454,6 @@ void Area::auto_save_game(int step, bool ignoreCount)
 		}
 	}
 }
-#endif
 
 void real_auto_save_screenshot(void)
 {
@@ -1579,10 +1573,8 @@ void Area::update(int step)
 			update_count = 1;
 		}
 		else {
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			auto_save_game(step);
 			auto_save_screenshot(step);
-#endif
 		}
 	}
 	else
@@ -2344,10 +2336,8 @@ Area::Area(void)
 	follow = true;
 	last_player_x = -1;
 	last_player_y = -1;
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	mem_save_counter = 1000;
 	ss_save_counter = 1000;
-#endif
 	down = false;
 	panned = false;
 	start_mx = 0;

@@ -231,7 +231,7 @@ public:
 
 		debug_message("Loading player script...\n");
 		bytes = slurp_file(getResource("combat_players/%s.%s", realName.c_str(), getScriptExtension().c_str()), &file_size);
-		if (!bytes) native_error((std::string("Couldn't load combat_players/") + realName + ".lua.").c_str());
+		if (!bytes) native_error("Load Error.", ((std::string("combat_players/") + realName + ".lua").c_str()));
 		if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 			dumpLuaStack(luaState);
 			throw ReadError();

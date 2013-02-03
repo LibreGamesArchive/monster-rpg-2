@@ -361,28 +361,23 @@ MBITMAP *new_mbitmap(ALLEGRO_BITMAP *bitmap)
 	return m;
 }
 
-MBITMAP *m_load_bitmap(const char *name, bool force_memory)
+MBITMAP *m_load_bitmap(const char *name, bool force_memory, bool ok_to_fail)
 {
 	ALLEGRO_BITMAP *bitmap = 0;
 	int flags = al_get_new_bitmap_flags();
 
-	if (!force_memory && !config.getUseOnlyMemoryBitmaps()) {
+	if (force_memory || config.getUseOnlyMemoryBitmaps()) {
+		al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
+	}
+	else {
 		al_set_new_bitmap_flags((flags & ~ALLEGRO_MEMORY_BITMAP));
-		bitmap = my_load_bitmap(name);
 	}
 
-	if (!bitmap) {
-		ALLEGRO_STATE s;
-		al_store_state(&s, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
-		al_set_new_bitmap_flags(flags|ALLEGRO_MEMORY_BITMAP);
-		bitmap = my_load_bitmap(name);
-		al_restore_state(&s);
-	}
+	bitmap = my_load_bitmap(name, ok_to_fail);
 
 	al_set_new_bitmap_flags(flags);
 
 	if (!bitmap) {
-		debug_message("Error loading bitmap %s\n", name);
 		return NULL;
 	}
 

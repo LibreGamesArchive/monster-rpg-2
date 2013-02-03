@@ -79,7 +79,7 @@ void load_translation(const char *filename)
 	int sz;
 	unsigned char *bytes = slurp_file(getResource("%s.utf8", filename), &sz);
 	if (!bytes) {
-		native_error((std::string("Couldn't load ") + filename + ".").c_str());
+		native_error("Load error.", filename);
 	}
 
 	int pos = 0;

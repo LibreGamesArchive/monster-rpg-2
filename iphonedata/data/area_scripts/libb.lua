@@ -48,6 +48,28 @@ function start()
 			setObjectDirection(rios.id, DIRECTION_WEST)
 		end
 	end
+	
+	books = {}
+	books[1] = Object:new{x=1, y=3}
+	books[2] = Object:new{x=3, y=3}
+	books[3] = Object:new{x=5, y=3}
+	books[4] = Object:new{x=8, y=3}
+	books[5] = Object:new{x=10, y=3}
+	books[6] = Object:new{x=12, y=3}
+	books[7] = Object:new{x=8, y=6}
+	books[8] = Object:new{x=10, y=6}
+	books[9] = Object:new{x=12, y=6}
+	
+	books2 = {}
+	books2[1] = Object:new{x=1+1, y=3}
+	books2[2] = Object:new{x=3+1, y=3}
+	books2[3] = Object:new{x=5+1, y=3}
+	books2[4] = Object:new{x=8+1, y=3}
+	books2[5] = Object:new{x=10+1, y=3}
+	books2[6] = Object:new{x=12+1, y=3}
+	books2[7] = Object:new{x=8+1, y=6}
+	books2[8] = Object:new{x=10+1, y=6}
+	books2[9] = Object:new{x=12+1, y=6}
 end
 
 function stop()
@@ -62,6 +84,17 @@ function update(step)
 		rios:update(step)
 	end
 end
+
+texts = {}
+texts[1] = "Fall of the Hooded Goblin"
+texts[2] = "30 Hymns"
+texts[3] = "Advanced Rocket Science for Farmers"
+texts[4] = "The Ancient Art of Brew"
+texts[5] = "White Magic Reference Manual"
+texts[6] = "Modern Tailoring"
+texts[7] = "Side Effects of Various Potions"
+texts[8] = "Forgive and Forget"
+texts[9] = "Where is the Queen?"
 
 function activate(activator, activated)
 	if (getMilestone(MS_RIOS_LEFT)) then
@@ -90,6 +123,18 @@ function activate(activator, activated)
 			setObjectDirection(librarian.id, player_dir(librarian))
 			doDialogue("Take care and come back soon!\n", true)
 			setObjectDirection(librarian.id, _d)
+		end
+	end
+	
+	local i
+	for i=1,#books do
+		if (activated == books[i].id) then
+			doDialogue("Eny: \"" .. texts[i] .. "\"...\n")
+		end
+	end
+	for i=1,#books2 do
+		if (activated == books2[i].id) then
+			doDialogue("Eny: \"" .. texts[i] .. "\"...\n")
 		end
 	end
 end

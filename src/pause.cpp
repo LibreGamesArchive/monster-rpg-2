@@ -932,9 +932,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	tguiAddWidget(mainExamine);
 	#endif
 	tguiAddWidget(mainSave);
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	//tguiAddWidget(mainResume);
-#endif
 #ifdef ALLEGRO_IPHONE
 #ifdef DEBUG
 	tguiAddWidget(mainLevelUp);
@@ -1359,11 +1356,9 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 			else if (widget == mainQuit) {
 				if (prompt("Really quit?", "", 0, 0)) {
 					ret = false;
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 					if (area) {
 						area->auto_save_game(0, true);
 					}
-#endif
 					goto done;
 				}
 			}
@@ -2817,24 +2812,18 @@ done:
 
 static SaveStateInfo save_info[10];
 static MScrollingList *save_list;
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 static SaveStateInfo auto_info[10];
 static MScrollingList *auto_list;
-#endif
 
 static void load_save_info(void)
 {
 	for (int i = 0; i < 10; i++) {
 		getSaveStateInfo(i, save_info[i], false);
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		getSaveStateInfo(i, auto_info[i], true);
-#endif
 	}
 	
 	std::vector<std::string> save_strings;
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	std::vector<std::string> auto_strings;
-#endif
 
 	for (int i = 0; i < 10; i++) {
 		char buf[100];
@@ -2846,7 +2835,6 @@ static void load_save_info(void)
 			);
 			save_strings.push_back(std::string(buf));
 		}
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		if (!(auto_info[i].exp == 0 && auto_info[i].gold == 0 && auto_info[i].time == 0)) {
 			sprintf(buf, "E:%d G:%d, %s",
 				auto_info[i].exp,
@@ -2855,18 +2843,13 @@ static void load_save_info(void)
 			);
 			auto_strings.push_back(std::string(buf));
 		}
-#endif
 	}
 
 	save_list->setItems(save_strings);
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	auto_list->setItems(auto_strings);
-#endif
 
 	save_list->reset();
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	auto_list->reset();
-#endif
 }
 
 static int get_num(const char *name, int n)
@@ -2874,16 +2857,12 @@ static int get_num(const char *name, int n)
 	int i, j = 0;
 	for (i = 0; i < 10; i++) {
 		SaveStateInfo *ssi;
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		if (name[0] == '\0') {
-#endif
 			ssi = save_info;
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		}
 		else {
 			ssi = auto_info;
 		}
-#endif
 		if (!(ssi[i].exp == 0 && ssi[i].gold == 0 && ssi[i].time == 0)) {
 			if (j == n)
 				break;
@@ -2913,14 +2892,12 @@ static void trash_save(int n)
 	trash(s, n);
 }
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 static void trash_auto(int n)
 {
 	char s[10];
 	strcpy(s, "auto");
 	trash(s, n);
 }
-#endif
 
 static void show_savestate_info_callback(int n, const void *data)
 {
@@ -2933,13 +2910,13 @@ static void show_savestate_info_callback(int n, const void *data)
 	showSaveStateInfo(buf);
 }
 
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 struct CHOOSE_SAVESTATE_INFO {
 	int num;
 	bool existing;
 	bool isAuto;
 };
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 static bool choose_copy_state(int n, bool exists, void *data)
 {
 	(void)data;
@@ -3022,16 +2999,16 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 
 	MFrame *frame = new MFrame(10, 35, 220, 110);
 	save_list = new MScrollingList(20, 45, 200, LIST_H, trash_save, BW-m_get_bitmap_width(trashcan)/2-5, BH-m_get_bitmap_height(trashcan)/2-5, show_savestate_info_callback, "");
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	auto_list = new MScrollingList(20, 45, 200, LIST_H, trash_auto, BW-m_get_bitmap_width(trashcan)/2-5, BH-m_get_bitmap_height(trashcan)/2-5, show_savestate_info_callback, "auto");
-#endif
 	MTab *save_tab = new MTab("Save", 10, 20);
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	int xx2 = 10 + m_text_length(game_font, _t("Save")) + 6;
 	int xx3 = xx2 + m_text_length(game_font, _t("Auto")) + 6;
 	MTab *auto_tab = new MTab("Auto", xx2, 20);
+
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	MTab *copypaste_tab = new MTab("Copy & Paste", xx3, 20);
 #endif
+
 	MTextButton *new_game_button = new MTextButton(BW-m_text_length(game_font, _t("New Game..."))-20, 12-m_text_height(game_font)/2, "New Game...");
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -3045,20 +3022,22 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 	tguiAddWidget(frame);
 	tguiAddWidget(save_list);
 	tguiAddWidget(save_tab);
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	tguiAddWidget(auto_tab);
+
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	tguiAddWidget(copypaste_tab);
 #endif
+
 	tguiAddWidget(new_game_button);
 	tguiAddWidget(trash_icon);
 	tguiSetFocus(new_game_button);
 
 	save_tab->setSelected(true);
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	auto_tab->setSelected(false);
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	copypaste_tab->setSelected(false);
-	int on = 0;
 #endif
+	int on = 0;
 
 	tguiLowerWidget(save_tab);
 	tguiLowerWidget(frame);
@@ -3088,20 +3067,23 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 
 			TGUIWidget *widget = tguiUpdate();
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			if (widget == save_tab) {
 				if (on != 0) {
 					save_tab->setSelected(true);
 					auto_tab->setSelected(false);
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 					copypaste_tab->setSelected(false);
+#endif
 					save_list->reset();
 					tguiSetParent(0);
 					tguiAddWidget(save_list);
 					if (on == 1)
 						tguiDeleteWidget(auto_list);
 					else {
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 						tguiDeleteWidget(copy_button);
 						tguiDeleteWidget(paste_button);
+#endif
 					}
 					tguiLowerWidget(save_list);
 					tguiLowerWidget(save_tab);
@@ -3114,15 +3096,19 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 				if (on != 1) {
 					auto_tab->setSelected(true);
 					save_tab->setSelected(false);
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 					copypaste_tab->setSelected(false);
+#endif
 					auto_list->reset();
 					tguiSetParent(0);
 					tguiAddWidget(auto_list);
 					if (on == 0)
 						tguiDeleteWidget(save_list);
 					else {
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 						tguiDeleteWidget(copy_button);
 						tguiDeleteWidget(paste_button);
+#endif
 					}
 					tguiLowerWidget(auto_list);
 					tguiLowerWidget(auto_tab);
@@ -3131,6 +3117,7 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 					on = 1;
 				}
 			}
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			if (widget == copypaste_tab) {
 				if (on != 2) {
 					save_tab->setSelected(false);
@@ -3151,9 +3138,10 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 					on = 2;
 				}
 			}
-			else
+		}
+		else
 #endif
-			if (widget == save_list) {
+		if (widget == save_list) {
 				if (break_main_loop) {
 					*num = -1;
 					goto done;
@@ -3180,7 +3168,6 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 					goto done;
 				}
 			}
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			else if (widget == auto_list) {
 				if (break_main_loop) {
 					*num = -1;
@@ -3208,7 +3195,6 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 					goto done;
 				}
 			}
-#endif
 			else if (widget == new_game_button) {
 				*num = 0;
 				*existing = false;
@@ -3232,15 +3218,12 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 			}
 #endif
 
-			//INPUT_EVENT ie = get_next_input_event();
-
 			InputDescriptor id = getInput()->getDescriptor();
 
 			if (iphone_shaken(0.1) || id.button2 == DOWN) {
 				if (id.button2) {
 					getInput()->waitForReleaseOr(5, 250);
 				}
-				//use_input_event();
 				iphone_clear_shaken();
 				*num = -1;
 				goto done;
@@ -3276,11 +3259,12 @@ done:
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	tguiDeleteWidget(copypaste_tab);
-	tguiDeleteWidget(auto_list);
-	tguiDeleteWidget(auto_tab);
 	tguiDeleteWidget(copy_button);
 	tguiDeleteWidget(paste_button);
 #endif
+	
+	tguiDeleteWidget(auto_list);
+	tguiDeleteWidget(auto_tab);
 
 	delete frame;
 	delete save_tab;
@@ -3292,9 +3276,10 @@ done:
 	delete copy_button;
 	delete paste_button;
 	delete copypaste_tab;
+#endif
+
 	delete auto_tab;
 	delete auto_list;
-#endif
 
 	m_destroy_bitmap(trashcan);
 

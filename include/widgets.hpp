@@ -1486,7 +1486,7 @@ protected:
 extern MSpeechDialog *speechDialog;
 void doDialogue(std::string text, bool top = false, int rows = 4, int offset = 10, bool bottom = false);
 void notify(std::string msg1, std::string msg2, std::string msg3);
-bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, std::string bottom_msg = "", bool *cancelled = NULL);
+bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, std::string bottom_msg = "", bool *cancelled = NULL, bool wide = false);
 int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 	std::string b1text, std::string b2text, std::string b3text, int shake_action,
 	bool called_from_is_close_pressed = false);

@@ -314,7 +314,7 @@ MSAMPLE loadSample(std::string name)
 		BASS_SAMPLE_MONO|BASS_SAMPLE_OVER_POS);
 	
 	if (s == 0) {
-		native_error((std::string("Couldn't load ") + fn + ".").c_str());
+		native_error("Load error.", fn.c_str());
 	}
 #else
 	s = BASS_SampleLoad(false,
@@ -460,7 +460,7 @@ void playMusic(std::string name, float vol, bool force)
 #endif
 	
 	if (music == 0) {
-	   native_error((std::string("Couldn't load ") + name + ".").c_str());
+	   native_error("Load error.", name.c_str());
 	}
 
 	music_loop_start = 0;
@@ -550,7 +550,7 @@ void playAmbience(std::string name, float vol)
 #endif
 	
 	if (ambience == 0) {
-		native_error((std::string("Couldn't load ") + name + ".").c_str());
+		native_error("Load error.", name.c_str());
 	}
 
 	ambience_loop_start = 0;

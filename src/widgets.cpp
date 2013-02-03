@@ -834,13 +834,19 @@ done:
 
 
 
-bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, std::string bottom_msg, bool *cancelled)
+bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, std::string bottom_msg, bool *cancelled, bool wide)
 {
 	dpad_off();
 
 	MBITMAP *tmp = m_clone_bitmap(buffer);
 	
-	int w = 160;
+	int w;
+	if (wide) {
+		w = 230;
+	}
+	else {
+		w = 160;
+	}
 	int h = 50;
 	int x = (BW-w)/2;
 	int y = (BH-h)/2;
@@ -2496,7 +2502,7 @@ void MMap::getLines(MapPoint *p)
 			b.point2_name = p->links[i]->internal_name;
 			XMLData *dat;
 			b.bitmap = m_load_bitmap(getResource("media/dots-%s_to_%s.png", 
-				b.point1_name.c_str(), b.point2_name.c_str()));
+				b.point1_name.c_str(), b.point2_name.c_str()), false, true);
 			if (!b.bitmap) {
 				b.bitmap = m_load_bitmap(getResource("media/dots-%s_to_%s.png", 
 					b.point2_name.c_str(), b.point1_name.c_str()));
@@ -2559,7 +2565,7 @@ void MMap::load_map_data(void)
 
 	debug_message("Loading global script...\n");
 	bytes = slurp_file(getResource("scripts/global.%s", getScriptExtension().c_str()), &file_size);
-	if (!bytes) native_error("Couldn't load scripts/global.lua.");
+	if (!bytes) native_error("Load error.", "scripts/global.lua.");
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
@@ -2579,7 +2585,7 @@ void MMap::load_map_data(void)
 
 	debug_message("Loading map script...\n");
 	bytes = slurp_file(getResource("%s.%s", prefix.c_str(), getScriptExtension().c_str()), &file_size);
-	if (!bytes) native_error((std::string("Couldn't load ") + prefix + ".lua.").c_str());
+	if (!bytes) native_error("Load error.", (prefix + ".lua").c_str());
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();

@@ -63,7 +63,7 @@ void m_draw_scaled_bitmap(MBITMAP *bmp, float sx, float sy, float sw, float sh,
 void m_draw_scaled_bitmap(MBITMAP *bmp, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh, int flags);
 int m_get_bitmap_width(MBITMAP *bmp);
 int m_get_bitmap_height(MBITMAP *bmp);
-MBITMAP *m_load_bitmap(const char *name, bool force_memory = false);
+MBITMAP *m_load_bitmap(const char *name, bool force_memory = false, bool ok_to_fail = false);
 MBITMAP *m_load_bitmap_redraw(const char *name, void (*redraw)(MBITMAP *bmp, RecreateData *data), RecreateData *data, bool delayed = false);
 MFONT *m_load_font(const char *name);
 MBITMAP *m_create_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateData *data) = NULL, RecreateData *data = NULL, void (*destroy)(MBITMAP *b) = NULL, bool delayed = false); // check

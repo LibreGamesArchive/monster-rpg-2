@@ -100,7 +100,7 @@ void startNewGame(const char *name)
 
 	debug_message("Loading global area script...\n");
 	bytes = slurp_file(getResource("area_scripts/global.%s", getScriptExtension().c_str()), &file_size);
-	if (!bytes) native_error("Couldn't load area_scripts/global.lua.");
+	if (!bytes) native_error("Load error.", "area_scripts/global.lua.");
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
@@ -116,7 +116,7 @@ void startNewGame(const char *name)
 
 	debug_message("Loading start script...\n");
 	bytes = slurp_file(getResource("scripts/%s.%s", name, getScriptExtension().c_str()), &file_size);
-	if (!bytes) native_error((std::string("Couldn't load scripts/") + name + ".lua.").c_str());
+	if (!bytes) native_error("Load error.", ((std::string("scripts/") + name + ".lua").c_str()));
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		lua_close(luaState);
@@ -146,7 +146,7 @@ void runGlobalScript(lua_State *luaState)
 
 	debug_message("Loading global script...\n");
 	bytes = slurp_file(getResource("scripts/global.%s", getScriptExtension().c_str()), &file_size);
-	if (!bytes) native_error("Couldn't load scripts/global.lua.");
+	if (!bytes) native_error("Load error.", "scripts/global.lua");
 	ALLEGRO_DEBUG("slurped %d bytes", file_size);
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);

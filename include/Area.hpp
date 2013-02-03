@@ -168,10 +168,8 @@ void cleanup_astar();
 void astar_stop(void);
 Node *get_path_tail(void);
 void save_memory(bool save_screenshot = true);
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 void auto_save();
 void delete_file(const char *s);
-#endif
 extern long roaming;
 extern bool dpad_panning;
 extern bool pan_centered_x;

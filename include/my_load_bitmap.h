@@ -1,7 +1,7 @@
 #include "svg.hpp"
 
-#define my_load_bitmap my_tmp_load_bmp
-static inline ALLEGRO_BITMAP *my_tmp_load_bmp(const char *filename)
+static inline ALLEGRO_BITMAP *my_load_bitmap(
+	const char *filename, bool ok_to_fail = false)
 {
 	char fn[2000];
 	strcpy(fn, filename);
@@ -14,8 +14,8 @@ static inline ALLEGRO_BITMAP *my_tmp_load_bmp(const char *filename)
 	int sz;
 	unsigned char *bytes = slurp_file(fn, &sz);
 
-	if (!bytes) {
-		native_error((std::string("Error loading ") + fn).c_str());
+	if (!bytes && !ok_to_fail) {
+		native_error("Load error.", fn);
 	}
 
 	if (!bytes) {

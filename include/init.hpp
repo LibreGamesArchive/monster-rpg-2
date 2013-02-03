@@ -225,4 +225,7 @@ extern bool d3d_halted;
 extern bool should_reset;
 extern bool is_fs_toggle;
 
+extern MBITMAP *custom_mouse_cursor;
+extern bool show_custom_mouse_cursor;
+
 #endif

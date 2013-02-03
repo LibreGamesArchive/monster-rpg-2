@@ -186,7 +186,7 @@ int check_arg(int argc, char **argv, const char *s)
 
 
 // returns true to continue
-void native_error(const char *msg)
+void native_error(const char *msg, const char *msg2)
 {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	fprintf(stderr, "%s\n", msg);
@@ -195,8 +195,17 @@ void native_error(const char *msg)
 	return;
 #else
 	if (inited) {
-		if (prompt(msg, "Continue anyway?", 1, 0))
+		const char *ss = msg2 ? strstr(msg2, "data/") : NULL;
+		if (ss) {
+			ss += 5;
+		}
+		if (prompt(msg, "Continue anyway?", 1, 0, ss ? ss : "", NULL, true)) {
+			m_set_target_bitmap(buffer);
+			m_clear(al_map_rgb_f(0, 0, 0));
+			drawBufferToScreen();
+			m_flip_display();
 			return;
+		}
 		else
 			exit(1);
 	}

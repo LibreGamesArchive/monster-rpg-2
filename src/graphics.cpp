@@ -648,6 +648,12 @@ static void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 	}
 #endif
 
+	if (custom_mouse_cursor && (show_custom_mouse_cursor || (al_get_display_flags(display) & ALLEGRO_FULLSCREEN_WINDOW))) {
+		ALLEGRO_MOUSE_STATE state;
+		al_get_mouse_state(&state);
+		al_draw_bitmap(custom_mouse_cursor->bitmap, state.x, state.y, 0);
+	}
+
 	if (use_programmable_pipeline) {
 		if (!(config.getFilterType() == FILTER_SCALE2X)) {
 			al_use_shader(cheap_shader, false);

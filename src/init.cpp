@@ -253,6 +253,9 @@ ALLEGRO_MUTEX *switch_mutex;
 ALLEGRO_COND *switch_cond;
 uint32_t my_opengl_version;
 
+MBITMAP *custom_mouse_cursor = NULL;
+bool show_custom_mouse_cursor = true;
+
 static bool is_modifier(int c)
 {
 	switch (c) {
@@ -786,6 +789,15 @@ static void *thread_proc(void *arg)
 			al_unlock_mutex(input_mutex);
 #endif
 
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+			if (event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY) {
+				show_custom_mouse_cursor = true;
+			}
+			else if (event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY) {
+				show_custom_mouse_cursor = false;
+			}
+			else
+#endif
 			if (event.type == ALLEGRO_EVENT_TIMER) {
 				if (event.timer.source == draw_timer) {
 					draw_counter++;
@@ -2475,6 +2487,15 @@ bool init(int *argc, char **argv[])
 	}
 
 	al_rest(1.0);
+	
+	if (have_mouse) {
+		al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
+	}
+
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	al_hide_mouse_cursor(display);
+	custom_mouse_cursor = m_load_bitmap(getResource("media/mouse_cursor.png"));
+#endif
 
 	set_screen_params();
       
@@ -2639,7 +2660,7 @@ bool init(int *argc, char **argv[])
 	
 	
 	if (!screenshot) {
-		native_error("Failed to create screenshot buffer.");
+		native_error("Failed to create SS buffer.");
 	}
 	
 	corner_bmp = m_load_bitmap(getResource("media/corner.png"));
@@ -3019,6 +3040,10 @@ void set_screen_params(void)
 
 void toggle_fullscreen(void)
 {
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	show_custom_mouse_cursor = true;
+#endif
+
 	pause_joystick_repeat_events = true;
 	ScreenDescriptor *sd = config.getWantedGraphicsMode();
 	sd->fullscreen = !sd->fullscreen;
@@ -3044,6 +3069,13 @@ void toggle_fullscreen(void)
 	is_fs_toggle = false;
 #endif
 	pause_joystick_repeat_events = false;
+
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	if (sd->fullscreen) {
+		al_hide_mouse_cursor(display);
+	}
+	al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
+#endif
 }
 
 bool imperfect_aspect(void)

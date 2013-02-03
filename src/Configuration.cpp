@@ -707,8 +707,21 @@ void Configuration::write()
 
 	XMLData* gfx = new XMLData("gfx", "");
 	ScreenDescriptor* sd = getWantedGraphicsMode();
+#if !defined ALLEGRO_IPHONE && !defined ALLEGR_ANDROIDA
+	XMLData *width;
+	XMLData *height;
+	if (sd->fullscreen) {
+		width = new XMLData("width", my_itoa(960));
+		height = new XMLData("height", my_itoa(640));
+	}
+	else {
+		width = new XMLData("width", my_itoa(sd->width));
+		height = new XMLData("height", my_itoa(sd->height));
+	}
+#else
 	XMLData* width = new XMLData("width", my_itoa(sd->width));
 	XMLData* height = new XMLData("height", my_itoa(sd->height));
+#endif
 	XMLData* fullscreen = new XMLData("fullscreen", my_itoa(sd->fullscreen));
 	XMLData* vsync = new XMLData("vsync", my_itoa(getWaitForVsync()));
 	XMLData *xml_filter_type = new XMLData("filter_type", my_itoa(getFilterType()));

@@ -874,7 +874,7 @@ void CombatEnemy::initLua(void)
 
 	debug_message("Loading global enemy script...\n");
 	bytes = slurp_file(getResource("combat_enemies/global.%s", getScriptExtension().c_str()), &file_size);
-	if (!bytes) native_error("Couldn't load combat_enemies/global.lua.");
+	if (!bytes) native_error("Load Error.", "combat_enemies/global.lua");
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
@@ -890,7 +890,7 @@ void CombatEnemy::initLua(void)
 
 	debug_message("Loading enemy script...\n");
 	bytes = slurp_file(getResource("combat_enemies/%s.%s", name.c_str(), getScriptExtension().c_str()), &file_size);
-	if (!bytes) native_error((std::string("Couldn't load combat_enemies/") + name + ".lua.").c_str());
+	if (!bytes) native_error("Load Error.", ((std::string("combat_enemies/") + name + ".lua").c_str()));
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
