@@ -215,7 +215,11 @@ void native_error(const char *msg, const char *msg2)
 	char buf[1000];
 	const char *crap = "Error";
 	snprintf(buf, 1000, "%s Continue anyway?", msg);
+#ifdef ALLEGRO_MACOSX
+	int button = al_show_native_message_box(display, ss ? ss : crap, ":(", buf, NULL, ALLEGRO_MESSAGEBOX_YES_NO);
+#else
 	int button = al_show_native_message_box(display, crap, ss ? ss : ":(", buf, NULL, ALLEGRO_MESSAGEBOX_YES_NO);
+#endif
 	if (button == 1) return;
 	else exit(1);
 #else

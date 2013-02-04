@@ -13,6 +13,8 @@
 #define glOrtho glOrthof
 #endif
 
+#include <cfloat>
+
 void disable_zbuffer(void)
 {
 	al_set_render_state(ALLEGRO_DEPTH_TEST, 0);
@@ -301,10 +303,12 @@ struct FACE {
 	int n;
 };
 
-static MODEL *load_model2(const char *filename)
+static MODEL *load_model2(const char *filename, MBITMAP *tex)
 {
 	int sz;
 	unsigned char *bytes = slurp_file(filename, &sz);
+	if (!bytes)
+		return NULL;
 
 	ALLEGRO_FILE *file = al_open_memfile(bytes, sz, "rb");
 	if (!file)
@@ -317,22 +321,28 @@ static MODEL *load_model2(const char *filename)
 	std::vector<VERT> verts;
 	std::vector<TEXCOORD> texcoords;
 	std::vector<FACE> faces;
+	std::vector<int> splits;
 
 	char line[1000];
 
 	int ntris = 0; // num triangles
 
 	while ((al_fgets(file, line, 1000))) {
-		if (line[0] == 'v' && line[1] == ' ') {
-			sscanf(line, "v %f %f %f", &v.x, &v.y, &v.z);
+		if (line[0] == '-') {
+			splits.push_back(ntris * 3);
+		}
+		else if (line[0] == 'v' && line[1] == ' ') {
+			//printf(line);
+			sscanf(line, "v %g %g %g", &v.x, &v.y, &v.z);
 			verts.push_back(v);
 		}
 		else if (line[0] == 'v') {
-			sscanf(line, "vt %f %f", &t.u, &t.v);
-			t.u *= 512; // FIXME: textures are NOW 512 maybe not later
-			t.v *= 512;
-#ifdef A5_OGL // FIXME: Is this right for D3D?
-			t.v = 512 - t.v;
+			//printf(line);
+			sscanf(line, "vt %g %g", &t.u, &t.v);
+			t.u *= m_get_bitmap_width(tex);
+			t.v *= m_get_bitmap_height(tex);
+#ifdef A5_OGL
+			t.v = m_get_bitmap_height(tex) - t.v;
 #endif
 			texcoords.push_back(t);
 		}
@@ -343,6 +353,31 @@ static MODEL *load_model2(const char *filename)
 				&f.v[2], &f.t[2],
 				&f.v[3], &f.t[3]
 			) / 2;
+			// FIXME
+			/*
+			if (f.n == 4) {
+				printf("f %d/%d %d/%d %d/%d %d/%d\n",
+					f.v[0]-16386,
+					f.t[0],
+					f.v[1]-16386,
+					f.t[1],
+					f.v[2]-16386,
+					f.t[2],
+					f.v[3]-16386,
+					f.t[3]
+				);
+			}
+			else {
+				printf("f %d/%d %d/%d %d/%d\n",
+					f.v[0]-16386,
+					f.t[0],
+					f.v[1]-16386,
+					f.t[1],
+					f.v[2]-16386,
+					f.t[2]
+				);
+			}
+			*/
 			for (int i = 0; i < 4; i++) {
 				f.v[i]--;
 				f.t[i]--;
@@ -357,11 +392,24 @@ static MODEL *load_model2(const char *filename)
 		}
 	}
 
+	splits.push_back(ntris*3);
+
 	MODEL *m = new MODEL;
-	m->num_verts = ntris * 3;
-	m->verts = new ALLEGRO_VERTEX[m->num_verts];
+
+	for (size_t i = 0; i < splits.size(); i++) {
+		int nv;
+		if (i == 0) {
+			nv = splits[i];
+		}
+		else {
+			nv = splits[i] - splits[i-1];
+		}
+		m->num_verts.push_back(nv);
+		m->verts.push_back(new ALLEGRO_VERTEX[nv]);
+	}
 
 	int cv = 0; // current vertex
+	int cp = 0; // current part (0->splits.size()-1)
 
 	for (size_t i = 0; i < faces.size(); i++) {
 		FACE &face = faces[i];
@@ -370,7 +418,7 @@ static MODEL *load_model2(const char *filename)
 			int order[] = { 0, 1, 2, 0, 2, 3 };
 			//int order[] = { 2, 1, 0, 3, 2, 0 };
 			for (int j = 0; j < 6; j++) {
-				vert = &m->verts[cv];
+				vert = &m->verts[cp][cv];
 				cv++;
 				int o = order[j];
 				vert->x = verts[face.v[o]].x;
@@ -383,7 +431,7 @@ static MODEL *load_model2(const char *filename)
 		}
 		else {
 			for (int j = 0; j < 3; j++) {
-				vert = &m->verts[cv];
+				vert = &m->verts[cp][cv];
 				cv++;
 				vert->x = verts[face.v[j]].x;
 				vert->y = verts[face.v[j]].y;
@@ -392,6 +440,10 @@ static MODEL *load_model2(const char *filename)
 				vert->v = texcoords[face.t[j]].v;
 				vert->color = al_map_rgb_f(1, 1, 1);
 			}
+		}
+		if (cv == splits[cp]) {
+			cp++;
+			cv = 0;
 		}
 	}
 
@@ -413,6 +465,8 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 
 	int sz;
 	unsigned char *bytes = slurp_file(filename, &sz);
+	if (!bytes)
+		return NULL;
 
 	ALLEGRO_FILE *f = al_open_memfile(bytes, sz, "rb");
 	if (!f)
@@ -440,8 +494,8 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 			vcount += 6;
 	}
 
-	m->num_verts = vcount;
-	m->verts = new ALLEGRO_VERTEX[vcount];
+	m->num_verts.push_back(vcount);
+	m->verts.push_back(new ALLEGRO_VERTEX[m->num_verts[0]]);
 
 	al_fseek(f, 0, ALLEGRO_SEEK_SET);
 
@@ -482,10 +536,10 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 			);
 			
 			for (int j = 0; j < 3; j++) {
-				m->verts[i].x = (float)xyz[j][0];
-				m->verts[i].y = (float)xyz[j][1];
-				m->verts[i].z = (float)xyz[j][2];
-				m->verts[i].color = al_map_rgb(
+				m->verts[0][i].x = (float)xyz[j][0];
+				m->verts[0][i].y = (float)xyz[j][1];
+				m->verts[0][i].z = (float)xyz[j][2];
+				m->verts[0][i].color = al_map_rgb(
 					rgb[j][0],
 					rgb[j][1],
 					rgb[j][2]
@@ -493,12 +547,12 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 				i++;
 			}
 			if (n > (6*3)) {
-				m->verts[i] = m->verts[i-3];
-				m->verts[i+1] = m->verts[i-1];
-				m->verts[i+2].x = (float)xyz[3][0];
-				m->verts[i+2].y = (float)xyz[3][1];
-				m->verts[i+2].z = (float)xyz[3][2];
-				m->verts[i+2].color = al_map_rgb(
+				m->verts[0][i] = m->verts[0][i-3];
+				m->verts[0][i+1] = m->verts[0][i-1];
+				m->verts[0][i+2].x = (float)xyz[3][0];
+				m->verts[0][i+2].y = (float)xyz[3][1];
+				m->verts[0][i+2].z = (float)xyz[3][2];
+				m->verts[0][i+2].color = al_map_rgb(
 					  rgb[3][0],
 					  rgb[3][1],
 					  rgb[3][2]
@@ -538,10 +592,10 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 				cv.push_back(b);
 			}
 			for (int j = 0; j < 3; j++) {
-				m->verts[i].x = vv[j*3+0];
-				m->verts[i].y = vv[j*3+1];
-				m->verts[i].z = vv[j*3+2];
-				m->verts[i].color = al_map_rgb(
+				m->verts[0][i].x = vv[j*3+0];
+				m->verts[0][i].y = vv[j*3+1];
+				m->verts[0][i].z = vv[j*3+2];
+				m->verts[0][i].color = al_map_rgb(
 							cv[j*3+0],
 							cv[j*3+1],
 							cv[j*3+2]
@@ -549,12 +603,12 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 				i++;
 			}
 			if (vv.size() > 9) {
-				m->verts[i] = m->verts[i-3];
-				m->verts[i+1] = m->verts[i-1];
-				m->verts[i+2].x = vv[3*3+0];
-				m->verts[i+2].y = vv[3*3+1];
-				m->verts[i+2].z = vv[3*3+2];
-				m->verts[i+2].color = al_map_rgb(
+				m->verts[0][i] = m->verts[0][i-3];
+				m->verts[0][i+1] = m->verts[0][i-1];
+				m->verts[0][i+2].x = vv[3*3+0];
+				m->verts[0][i+2].y = vv[3*3+1];
+				m->verts[0][i+2].z = vv[3*3+2];
+				m->verts[0][i+2].color = al_map_rgb(
 							  cv[3*3+0],
 							  cv[3*3+1],
 							  cv[3*3+2]
@@ -571,19 +625,19 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 				float xx = ((i/6) % 50) * inc;
 				float yy = (49 - ((i/6) / 50)) * inc;
 
-				m->verts[i+0].u = xx;
-				m->verts[i+0].v = yy;
-				m->verts[i+1].u = xx+inc;
-				m->verts[i+1].v = yy;
-				m->verts[i+2].u = xx;
-				m->verts[i+2].v = yy+inc;
+				m->verts[0][i+0].u = xx;
+				m->verts[0][i+0].v = yy;
+				m->verts[0][i+1].u = xx+inc;
+				m->verts[0][i+1].v = yy;
+				m->verts[0][i+2].u = xx;
+				m->verts[0][i+2].v = yy+inc;
 
-				m->verts[i+3].u = xx+inc;
-				m->verts[i+3].v = yy+inc;
-				m->verts[i+4].u = xx+inc;
-				m->verts[i+4].v = yy;
-				m->verts[i+5].u = xx;
-				m->verts[i+5].v = yy+inc;
+				m->verts[0][i+3].u = xx+inc;
+				m->verts[0][i+3].v = yy+inc;
+				m->verts[0][i+4].u = xx+inc;
+				m->verts[0][i+4].v = yy;
+				m->verts[0][i+5].u = xx;
+				m->verts[0][i+5].v = yy+inc;
 			}
 		}
 	}
@@ -598,19 +652,31 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 
 static void draw_model(MODEL *m)
 {
-	al_draw_prim(m->verts, 0, 0, 0, m->num_verts, ALLEGRO_PRIM_TRIANGLE_LIST);
+	for (size_t i = 0; i < m->verts.size(); i++) {
+		m_draw_prim(
+			m->verts[i],
+			0,
+			NULL,
+			0,
+			m->num_verts[i],
+			ALLEGRO_PRIM_TRIANGLE_LIST
+		);
+	}
 }
 
 
 static void draw_model_tex(MODEL *m, MBITMAP *texture)
 {
-	m_draw_prim(m->verts, 0, texture, 0, m->num_verts, ALLEGRO_PRIM_TRIANGLE_LIST);
-}
-
-static void draw_model(MODEL *m, MBITMAP *texture)
-{
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-	m_draw_prim(m->verts, 0, texture, 0, m->num_verts, ALLEGRO_PRIM_TRIANGLE_LIST);
+	for (size_t i = 0; i < m->verts.size(); i++) {
+		m_draw_prim(
+			m->verts[i],
+			0,
+			texture,
+			0,
+			m->num_verts[i],
+			ALLEGRO_PRIM_TRIANGLE_LIST
+		);
+	}
 }
 
 void set_projection(float neer, float farr, bool reverse_y, bool rotate)
@@ -778,21 +844,21 @@ static int real_archery(int *accuracy_pts)
 	float target_x = BW/2;
 	float target_y = BH/2;
 
-	MODEL *bow_model = load_model2(getResource("models/bow.vtx"));
-	if (!bow_model) {
-		native_error("Couldn't load models/bow.vtx.");
-	}
-	MODEL *arrow_model = load_model2(getResource("models/arrow.vtx"));
-	if (!bow_model) {
-		native_error("Couldn't load models/arrow.vtx.");
-	}
-
 	int flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
 	MBITMAP *bow_tex = m_load_bitmap(getResource("models/bow.png"));
 	MBITMAP *arrow_tex =
 		m_load_bitmap(getResource("models/arrow.png"));
 	al_set_new_bitmap_flags(flags);
+
+	MODEL *bow_model = load_model2(getResource("models/bow.vtx"), bow_tex);
+	if (!bow_model) {
+		native_error("Couldn't load models/bow.vtx.");
+	}
+	MODEL *arrow_model = load_model2(getResource("models/arrow.vtx"), arrow_tex);
+	if (!arrow_model) {
+		native_error("Couldn't load models/arrow.vtx.");
+	}
 
 	MBITMAP *grass, *tower;
 
@@ -1256,8 +1322,8 @@ void disable_cull_face(void)
 static MODEL *create_ring(int sd /* subdivisions */, MBITMAP *texture)
 {
 	MODEL *m = new MODEL;
-	m->num_verts = 6*sd;
-	m->verts = new ALLEGRO_VERTEX[m->num_verts];
+	m->num_verts.push_back(6*sd);
+	m->verts.push_back(new ALLEGRO_VERTEX[m->num_verts[0]]);
 
 	float angle_inc = (M_PI*2) / sd;
 	float outer_dist = 1.0;
@@ -1268,46 +1334,46 @@ static MODEL *create_ring(int sd /* subdivisions */, MBITMAP *texture)
 		float angle = i * angle_inc;
 		float angle2 = angle + angle_inc;
 		float inner_angle = ((angle2 - angle) / 2) + angle;
-		m->verts[i*6+0].x = sin(angle) * outer_dist * scale;
-		m->verts[i*6+0].y = cos(angle) * outer_dist * scale;
-		m->verts[i*6+0].z = 1;
-		m->verts[i*6+0].u = 0;
-		m->verts[i*6+0].v = m_get_bitmap_height(texture)-1;
-		m->verts[i*6+0].color = white;
-		m->verts[i*6+1].x = sin(angle2) * outer_dist * scale;
-		m->verts[i*6+1].y = cos(angle2) * outer_dist * scale;
-		m->verts[i*6+1].z = 1;
-		m->verts[i*6+1].u = m_get_bitmap_width(texture)-1;
-		m->verts[i*6+1].v = m_get_bitmap_height(texture)-1;
-		m->verts[i*6+1].color = white;
-		m->verts[i*6+2].x = sin(inner_angle) * inner_dist * scale;
-		m->verts[i*6+2].y = cos(inner_angle) * inner_dist * scale;
-		m->verts[i*6+2].z = 1;
-		m->verts[i*6+2].u = m_get_bitmap_width(texture)/2;
-		m->verts[i*6+2].v = 0;
-		m->verts[i*6+2].color = white;
+		m->verts[0][i*6+0].x = sin(angle) * outer_dist * scale;
+		m->verts[0][i*6+0].y = cos(angle) * outer_dist * scale;
+		m->verts[0][i*6+0].z = 1;
+		m->verts[0][i*6+0].u = 0;
+		m->verts[0][i*6+0].v = m_get_bitmap_height(texture)-1;
+		m->verts[0][i*6+0].color = white;
+		m->verts[0][i*6+1].x = sin(angle2) * outer_dist * scale;
+		m->verts[0][i*6+1].y = cos(angle2) * outer_dist * scale;
+		m->verts[0][i*6+1].z = 1;
+		m->verts[0][i*6+1].u = m_get_bitmap_width(texture)-1;
+		m->verts[0][i*6+1].v = m_get_bitmap_height(texture)-1;
+		m->verts[0][i*6+1].color = white;
+		m->verts[0][i*6+2].x = sin(inner_angle) * inner_dist * scale;
+		m->verts[0][i*6+2].y = cos(inner_angle) * inner_dist * scale;
+		m->verts[0][i*6+2].z = 1;
+		m->verts[0][i*6+2].u = m_get_bitmap_width(texture)/2;
+		m->verts[0][i*6+2].v = 0;
+		m->verts[0][i*6+2].color = white;
 		float tmp = angle2;
 		angle = inner_angle;
 		angle2 = inner_angle + angle_inc;
 		inner_angle = tmp;
-		m->verts[i*6+3].x = sin(angle) * inner_dist * scale;
-		m->verts[i*6+3].y = cos(angle) * inner_dist * scale;
-		m->verts[i*6+3].z = 1;
-		m->verts[i*6+3].u = 0;
-		m->verts[i*6+3].v = 0;
-		m->verts[i*6+3].color = white;
-		m->verts[i*6+4].x = sin(angle2) * inner_dist * scale;
-		m->verts[i*6+4].y = cos(angle2) * inner_dist * scale;
-		m->verts[i*6+4].z = 1;
-		m->verts[i*6+4].u = m_get_bitmap_width(texture)-1;
-		m->verts[i*6+4].v = 0;
-		m->verts[i*6+4].color = white;
-		m->verts[i*6+5].x = sin(inner_angle) * outer_dist * scale;
-		m->verts[i*6+5].y = cos(inner_angle) * outer_dist * scale;
-		m->verts[i*6+5].z = 1;
-		m->verts[i*6+5].u = m_get_bitmap_width(texture)/2;
-		m->verts[i*6+5].v = m_get_bitmap_height(texture)-1;
-		m->verts[i*6+5].color = white;
+		m->verts[0][i*6+3].x = sin(angle) * inner_dist * scale;
+		m->verts[0][i*6+3].y = cos(angle) * inner_dist * scale;
+		m->verts[0][i*6+3].z = 1;
+		m->verts[0][i*6+3].u = 0;
+		m->verts[0][i*6+3].v = 0;
+		m->verts[0][i*6+3].color = white;
+		m->verts[0][i*6+4].x = sin(angle2) * inner_dist * scale;
+		m->verts[0][i*6+4].y = cos(angle2) * inner_dist * scale;
+		m->verts[0][i*6+4].z = 1;
+		m->verts[0][i*6+4].u = m_get_bitmap_width(texture)-1;
+		m->verts[0][i*6+4].v = 0;
+		m->verts[0][i*6+4].color = white;
+		m->verts[0][i*6+5].x = sin(inner_angle) * outer_dist * scale;
+		m->verts[0][i*6+5].y = cos(inner_angle) * outer_dist * scale;
+		m->verts[0][i*6+5].z = 1;
+		m->verts[0][i*6+5].u = m_get_bitmap_width(texture)/2;
+		m->verts[0][i*6+5].v = m_get_bitmap_height(texture)-1;
+		m->verts[0][i*6+5].color = white;
 	}
 
 	return m;
@@ -1332,9 +1398,9 @@ void volcano_scene(void)
 	int count = 0;
 
 	/* Ground stage variables */
-	float dland_angle = 0.0001f;
+	float dland_angle = 0.00001f;
 	float land_angle = 0.0f;
-	const float MAX_LAND_ANGLE = M_PI/16;
+	const float MAX_LAND_ANGLE = M_PI/128;
 
 	float staff_oy = 0.0f;
 	float staff_dy1 = 0.0002f;
@@ -1355,9 +1421,14 @@ void volcano_scene(void)
 	}
 
 
-	MODEL *staff_model = load_model(getResource("models/staff.raw"));
-	if (!land_model) {
-		native_error("Couldn't load models/staff.raw.");
+	//int flags = al_get_new_bitmap_flags();
+	//al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
+	MBITMAP *staff_tex = m_load_bitmap(getResource("models/staff.png"));
+	//al_set_new_bitmap_flags(flags);
+
+	MODEL *staff_model = load_model2(getResource("models/staff.vtx"), staff_tex);
+	if (!staff_model) {
+		native_error("Couldn't load models/staff.vtx.");
 	}
 	MODEL *ring_model = create_ring(32, ring_texture);
 
@@ -1408,7 +1479,7 @@ void volcano_scene(void)
 						land_angle = -MAX_LAND_ANGLE;
 					}
 				}
-				if (count > 5000 && fabs(land_angle) < 0.01f) {
+				if (count > 5000 && fabs(land_angle) < 0.0001f) {
 					count = 0;
 					stage = STAGE_RISING;
 					land_angle = 0;
@@ -1477,21 +1548,13 @@ void volcano_scene(void)
 			clear_zbuffer();
 
 			ALLEGRO_TRANSFORM proj_push, view_push;
-			if (true /*use_programmable_pipeline*/) {
-				al_copy_transform(&proj_push, al_get_projection_transform(display));
-				al_copy_transform(&view_push, al_get_current_transform());
-			}
-			else {
-				glMatrixMode(GL_MODELVIEW);
-				glPushMatrix();
-				glMatrixMode(GL_PROJECTION);
-				glPushMatrix();
-
-			}
+			al_copy_transform(&proj_push, al_get_projection_transform(display));
+			al_copy_transform(&view_push, al_get_current_transform());
 
 			al_identity_transform(&proj_transform);
 			mesa_frustum((float *)proj_transform.m, -1, 1, (float)BH/BW, -(float)BH/BW, 1, 1000);
 			al_set_projection_transform(display, &proj_transform);
+			//set_projection(1, 1000);
 
 #ifdef A5_D3D
 			LPDIRECT3DDEVICE9 device = al_get_d3d_device(display);
@@ -1509,46 +1572,49 @@ void volcano_scene(void)
 			enable_cull_face(true);
 
 
-			if (true) {
-				al_identity_transform(&view_transform);
-				mesa_scale((float *)view_transform.m, 50, 50, 50);
+			al_identity_transform(&view_transform);
+			mesa_scale((float *)view_transform.m, 50, 50, 50);
+			mesa_translate((float *)view_transform.m, 0, 0.1+staff_oy, -0.33);
+			mesa_rotate((float *)view_transform.m, R2D(land_angle), 0, 1, 0);
+			mesa_rotate((float *)view_transform.m, 90, 1, 0, 0);
+			/*
+			mesa_rotate((float *)view_transform.m, R2D(land_angle), 0, 1, 0);
+			mesa_rotate((float *)view_transform.m, 90, 1, 0, 0);
+			mesa_rotate((float *)view_transform.m, 180, 0, 0, 1);
+			mesa_translate((float *)view_transform.m, 0, 0.2, -0.1);
+			mesa_translate((float *)view_transform.m, 0, 0, -staff_oy);
+			*/
+			al_use_transform(&view_transform);
 
-				mesa_translate((float *)view_transform.m, 0.01, 0.1+staff_oy, -0.3);
-				mesa_rotate((float *)view_transform.m, R2D(land_angle), 0, 1, 0);
-				mesa_rotate((float *)view_transform.m, 90, 1, 0, 0);
-				al_use_transform(&view_transform);
-			}
 
-			draw_model(land_model, land_texture);
+			draw_model_tex(land_model, land_texture);
 			clear_zbuffer();
 
-			if (true) {
+			mesa_translate((float *)view_transform.m, 0, 0.12-staff_oz, 0.05+staff_oy);
+			mesa_rotate((float *)view_transform.m, R2D(staff_a), 1, 0, 0);
+			/*
+			mesa_translate((float *)view_transform.m, 0, 0.05+staff_oz, 0.05+staff_oy);
+			mesa_rotate((float *)view_transform.m, -R2D(staff_a), 1, 0, 0);
+			*/
+			mesa_rotate((float *)view_transform.m, 90, 1, 0, 0);
+			mesa_scale((float *)view_transform.m, 1.0/(256/47.0), 1.0/(256/47.0), 1.0/(256/47.0));
+			al_use_transform(&view_transform);
 
-				mesa_translate((float *)view_transform.m, 0, 0.12-staff_oz, 0.05+staff_oy);
-				mesa_rotate((float *)view_transform.m, R2D(staff_a), 1, 0, 0);
-				mesa_scale((float *)view_transform.m, 1.0/256, 1.0/256, 1.0/256);
-				al_use_transform(&view_transform);
-			}
 			if (stage != STAGE_POOFING)
-				draw_model(staff_model);
+				draw_model_tex(staff_model, staff_tex);
 			else {
-				if (true) {
-					al_identity_transform(&view_transform);
-					mesa_translate((float *)view_transform.m, 0.5, 0.5, ring_z);
-					al_use_transform(&view_transform);
-					disable_cull_face();
-					draw_model(ring_model, ring_texture);
-					enable_cull_face(true);
-				}
+				al_identity_transform(&view_transform);
+				mesa_translate((float *)view_transform.m, 0.25, 0.25, ring_z);
+				al_use_transform(&view_transform);
+				disable_cull_face();
+				draw_model_tex(ring_model, ring_texture);
 			}
 
 			disable_cull_face();
 			disable_zbuffer();
 
-			if (true) {
-				al_set_projection_transform(display, &proj_push);
-				al_use_transform(&view_push);
-			}
+			al_set_projection_transform(display, &proj_push);
+			al_use_transform(&view_push);
 
 #ifdef A5_D3D
 			device->SetViewport(&old);
@@ -1573,6 +1639,8 @@ done:
 	m_destroy_bitmap(ring_texture);
 
 	m_destroy_bitmap(land_texture);
+
+	m_destroy_bitmap(staff_tex);
 
 	if (true /*use_programmable_pipeline*/)
 	{

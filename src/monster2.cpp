@@ -1167,7 +1167,7 @@ int main(int argc, char *argv[])
 #endif
 
 	// FIXME
-	//volcano_scene();
+	//while (1) volcano_scene();
 	//do_lander(); 
 	//archery(false);
 	//shooter(false);

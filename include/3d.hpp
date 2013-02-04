@@ -26,10 +26,12 @@ struct TMPMODEL {
 };
 
 struct MODEL {
-	ALLEGRO_VERTEX *verts;
-	int num_verts;
+	std::vector<ALLEGRO_VERTEX *> verts;
+	std::vector<int> num_verts;
 	~MODEL() {
-		delete[] verts;
+		for (size_t i = 0; i < verts.size(); i++) {
+			delete[] verts[i];
+		}
 	}
 };
 
