@@ -621,23 +621,29 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 
 		if (is_volcano) {
 			for (int i = 0; i < vcount; i += 6) {
+				m->verts[0][i+0].z *= 0.5f;
+				m->verts[0][i+1].z *= 0.5f;
+				m->verts[0][i+2].z *= 0.5f;
+				m->verts[0][i+3].z *= 0.5f;
+				m->verts[0][i+4].z *= 0.5f;
+				m->verts[0][i+5].z *= 0.5f;
+
 				float inc = tex_size / 50;
 				float xx = ((i/6) % 50) * inc;
-				float yy = (49 - ((i/6) / 50)) * inc;
+				float yy = ((i/6) / 50) * inc;
 
 				m->verts[0][i+0].u = xx;
 				m->verts[0][i+0].v = yy;
 				m->verts[0][i+1].u = xx+inc;
 				m->verts[0][i+1].v = yy;
-				m->verts[0][i+2].u = xx;
+				m->verts[0][i+2].u = xx+inc;
 				m->verts[0][i+2].v = yy+inc;
-
 				m->verts[0][i+3].u = xx+inc;
 				m->verts[0][i+3].v = yy+inc;
-				m->verts[0][i+4].u = xx+inc;
-				m->verts[0][i+4].v = yy;
+				m->verts[0][i+4].u = xx;
+				m->verts[0][i+4].v = yy+inc;
 				m->verts[0][i+5].u = xx;
-				m->verts[0][i+5].v = yy+inc;
+				m->verts[0][i+5].v = yy;
 			}
 		}
 	}
@@ -1325,6 +1331,8 @@ static MODEL *create_ring(int sd /* subdivisions */, MBITMAP *texture)
 	m->num_verts.push_back(6*sd);
 	m->verts.push_back(new ALLEGRO_VERTEX[m->num_verts[0]]);
 
+	ALLEGRO_COLOR trans_white = al_map_rgba_f(0.75f, 0.75f, 0.75f, 0.75f);
+
 	float angle_inc = (M_PI*2) / sd;
 	float outer_dist = 1.0;
 	float inner_dist = 0.75;
@@ -1339,19 +1347,19 @@ static MODEL *create_ring(int sd /* subdivisions */, MBITMAP *texture)
 		m->verts[0][i*6+0].z = 1;
 		m->verts[0][i*6+0].u = 0;
 		m->verts[0][i*6+0].v = m_get_bitmap_height(texture)-1;
-		m->verts[0][i*6+0].color = white;
+		m->verts[0][i*6+0].color = trans_white;
 		m->verts[0][i*6+1].x = sin(angle2) * outer_dist * scale;
 		m->verts[0][i*6+1].y = cos(angle2) * outer_dist * scale;
 		m->verts[0][i*6+1].z = 1;
 		m->verts[0][i*6+1].u = m_get_bitmap_width(texture)-1;
 		m->verts[0][i*6+1].v = m_get_bitmap_height(texture)-1;
-		m->verts[0][i*6+1].color = white;
+		m->verts[0][i*6+1].color = trans_white;
 		m->verts[0][i*6+2].x = sin(inner_angle) * inner_dist * scale;
 		m->verts[0][i*6+2].y = cos(inner_angle) * inner_dist * scale;
 		m->verts[0][i*6+2].z = 1;
 		m->verts[0][i*6+2].u = m_get_bitmap_width(texture)/2;
 		m->verts[0][i*6+2].v = 0;
-		m->verts[0][i*6+2].color = white;
+		m->verts[0][i*6+2].color = trans_white;
 		float tmp = angle2;
 		angle = inner_angle;
 		angle2 = inner_angle + angle_inc;
@@ -1361,19 +1369,19 @@ static MODEL *create_ring(int sd /* subdivisions */, MBITMAP *texture)
 		m->verts[0][i*6+3].z = 1;
 		m->verts[0][i*6+3].u = 0;
 		m->verts[0][i*6+3].v = 0;
-		m->verts[0][i*6+3].color = white;
+		m->verts[0][i*6+3].color = trans_white;
 		m->verts[0][i*6+4].x = sin(angle2) * inner_dist * scale;
 		m->verts[0][i*6+4].y = cos(angle2) * inner_dist * scale;
 		m->verts[0][i*6+4].z = 1;
 		m->verts[0][i*6+4].u = m_get_bitmap_width(texture)-1;
 		m->verts[0][i*6+4].v = 0;
-		m->verts[0][i*6+4].color = white;
+		m->verts[0][i*6+4].color = trans_white;
 		m->verts[0][i*6+5].x = sin(inner_angle) * outer_dist * scale;
 		m->verts[0][i*6+5].y = cos(inner_angle) * outer_dist * scale;
 		m->verts[0][i*6+5].z = 1;
 		m->verts[0][i*6+5].u = m_get_bitmap_width(texture)/2;
 		m->verts[0][i*6+5].v = m_get_bitmap_height(texture)-1;
-		m->verts[0][i*6+5].color = white;
+		m->verts[0][i*6+5].color = trans_white;
 	}
 
 	return m;
@@ -1414,17 +1422,16 @@ void volcano_scene(void)
 	moon = m_load_bitmap(getResource("media/moon.png"));
 	ring_texture = m_load_alpha_bitmap(getResource("media/ring_texture.png"));
 
+	int flags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_MIPMAP);
 	MBITMAP *land_texture = m_load_bitmap(getResource("media/volcano_texture.png"));
+	MBITMAP *staff_tex = m_load_bitmap(getResource("models/staff.png"));
+	al_set_new_bitmap_flags(flags);
+
 	MODEL *land_model = load_model(getResource("models/volcano_new.raw"), true, m_get_bitmap_width(land_texture));
 	if (!land_model) {
 		native_error("Couldn't load models/volcano_new.raw.");
 	}
-
-
-	//int flags = al_get_new_bitmap_flags();
-	//al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
-	MBITMAP *staff_tex = m_load_bitmap(getResource("models/staff.png"));
-	//al_set_new_bitmap_flags(flags);
 
 	MODEL *staff_model = load_model2(getResource("models/staff.vtx"), staff_tex);
 	if (!staff_model) {
@@ -1577,25 +1584,16 @@ void volcano_scene(void)
 			mesa_translate((float *)view_transform.m, 0, 0.1+staff_oy, -0.33);
 			mesa_rotate((float *)view_transform.m, R2D(land_angle), 0, 1, 0);
 			mesa_rotate((float *)view_transform.m, 90, 1, 0, 0);
-			/*
-			mesa_rotate((float *)view_transform.m, R2D(land_angle), 0, 1, 0);
-			mesa_rotate((float *)view_transform.m, 90, 1, 0, 0);
-			mesa_rotate((float *)view_transform.m, 180, 0, 0, 1);
-			mesa_translate((float *)view_transform.m, 0, 0.2, -0.1);
-			mesa_translate((float *)view_transform.m, 0, 0, -staff_oy);
-			*/
 			al_use_transform(&view_transform);
 
 
 			draw_model_tex(land_model, land_texture);
 			clear_zbuffer();
 
+			enable_cull_face(false);
+
 			mesa_translate((float *)view_transform.m, 0, 0.12-staff_oz, 0.05+staff_oy);
 			mesa_rotate((float *)view_transform.m, R2D(staff_a), 1, 0, 0);
-			/*
-			mesa_translate((float *)view_transform.m, 0, 0.05+staff_oz, 0.05+staff_oy);
-			mesa_rotate((float *)view_transform.m, -R2D(staff_a), 1, 0, 0);
-			*/
 			mesa_rotate((float *)view_transform.m, 90, 1, 0, 0);
 			mesa_scale((float *)view_transform.m, 1.0/(256/47.0), 1.0/(256/47.0), 1.0/(256/47.0));
 			al_use_transform(&view_transform);
