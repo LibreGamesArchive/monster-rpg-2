@@ -1167,7 +1167,7 @@ int main(int argc, char *argv[])
 #endif
 
 	// FIXME
-	playMusic("volcano.ogg"); while (1) volcano_scene();
+	//playMusic("volcano.ogg"); while (1) volcano_scene();
 	//do_lander(); 
 	//archery(false);
 	//shooter(false);
