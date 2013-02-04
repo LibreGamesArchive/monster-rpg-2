@@ -1413,7 +1413,7 @@ void volcano_scene(void)
 	float staff_oy = 0.0f;
 	float staff_dy1 = 0.0002f;
 	float staff_oz = 0.0f;
-	float staff_dz = 0.001f;
+	float staff_dz = 0.005f;
 	float staff_a = 0;
 
 	MBITMAP *stars, *moon, *ring_texture;
