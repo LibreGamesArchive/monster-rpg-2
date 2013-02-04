@@ -487,7 +487,7 @@ void saveTime(char *filename)
 }
 
 
-void getSaveStateInfo(int num, SaveStateInfo &info,  bool autosave)
+void getSaveStateInfo(int num, SaveStateInfo &info, bool autosave)
 {
 	gzFile f = NULL;
 	f = gzopen(getUserResource("%s%d.save", autosave ? "auto" : "", num), "rb");
