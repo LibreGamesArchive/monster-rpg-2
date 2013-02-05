@@ -1,16 +1,17 @@
 //
-//  MyUIViewController.h
+//  MyGameCenterVC.h
 //  Ballz
 //
 //  Created by Trent Gamblin on 11-06-19.
 //  Copyright 2011 Nooskewl. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
 #import <GameKit/GameKit.h>
 
+#ifdef ALLEGRO_IPHONE
+#import <UIKit/UIKit.h>
 
-@interface MyUIViewController : UIViewController <GKAchievementViewControllerDelegate> {
+@interface MyGameCenterVC : UIViewController <GKAchievementViewControllerDelegate> {
     
 }
 
@@ -33,3 +34,13 @@ int CreateModalDialog(NSString *title,
                       NSString *msg,   
                       NSString *ok,   
                       NSString *cancel);
+#else
+
+@interface MyGameCenterVC : NSObject <GKAchievementViewControllerDelegate> {
+}
+- (void) showAchievements;
+- (void)achievementViewControllerDidFinish:(GKAchievementViewController *)viewController;
+@end
+
+#endif
+

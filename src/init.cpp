@@ -311,12 +311,10 @@ void load_fonts(void)
 		native_error("Failed to load medium_font.");
 	}
 	
-#ifndef LITE
 	huge_font = m_load_font(getResource("huge_font.tga"));
 	if (!huge_font) {
 		native_error("Failed to load huge_font.");
 	}
-#endif
 
 	ALLEGRO_DEBUG("done loading fonts");
 	
@@ -2241,11 +2239,7 @@ bool init(int *argc, char **argv[])
 
 #if !defined ALLEGRO_IPHONE
 	al_set_org_name("Nooskewl");
-#ifdef LITE
-	al_set_app_name("Monster RPG 2 Lite");
-#else
 	al_set_app_name("Monster RPG 2");
-#endif
 #endif
 
 	debug_message("after set_app/org_name");
@@ -2527,7 +2521,7 @@ bool init(int *argc, char **argv[])
 	init_joypad();
 #endif
 
-#if defined ALLEGRO_IPHONE && !defined LITE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	authenticatePlayer();
 #endif
 
@@ -2613,11 +2607,7 @@ bool init(int *argc, char **argv[])
 	m_flip_display();
 #endif
 	
-#ifdef LITE
-	al_set_window_title(display, "Monster RPG 2 Lite");
-#else
 	al_set_window_title(display, "Monster RPG 2");
-#endif
 
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
@@ -2841,11 +2831,9 @@ void destroy(void)
 
 	m_destroy_bitmap(tile);
 	destroyIcons();
-#ifndef LITE
 	m_destroy_bitmap(stoneTexture);
 	m_destroy_bitmap(mushroom);
 	m_destroy_bitmap(webbed);
-#endif
 	m_destroy_bitmap(dpad_buttons);
 	m_destroy_bitmap(batteryIcon);
 	delete terrain;
@@ -2858,9 +2846,7 @@ void destroy(void)
 	m_destroy_bitmap(poison_bmp);
 	m_destroy_bitmap(poison_bmp_tmp);
 	m_destroy_bitmap(poison_bmp_tmp2);
-#ifndef LITE
 	m_destroy_bitmap(stomach_circle);
-#endif
 	if (screenshot) {
 		m_destroy_bitmap(screenshot);
 	}

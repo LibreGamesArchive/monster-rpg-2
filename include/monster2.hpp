@@ -78,8 +78,11 @@ ALLEGRO_DEBUG_CHANNEL("morpg2")
 
 #include <zlib.h>
 
+#if !defined NOSOUND
 #if !defined KCM_AUDIO
 #include <bass.h>
+#endif
+#include "sound.hpp"
 #endif
 
 #ifdef ALLEGRO_IPHONE
@@ -227,7 +230,6 @@ enum CloneType
 
 #include "c.h"
 #include "shooter.hpp"
-#include "sound.hpp"
 #include "redundant.hpp"
 #include "3d.hpp"
 #include "Error.hpp"
@@ -246,6 +248,9 @@ enum CloneType
 #include "Area.hpp"
 #ifdef ALLEGRO_IPHONE
 #include "iphone.h"
+#endif
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+#include "gamecenter.h"
 #endif
 #include "init.hpp"
 #include "Configuration.hpp"
@@ -267,7 +272,10 @@ enum CloneType
 #include "pause.hpp"
 #include "GenericEffect.hpp"
 #include "Items.hpp"
+
+#ifndef NOSOUND // HACK: move code out of widgets.hpp (playPreloadedSample etc)
 #include "widgets.hpp"
+#endif
 
 #include "my_load_bitmap.h"
 

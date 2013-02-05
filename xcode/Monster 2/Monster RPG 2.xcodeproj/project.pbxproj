@@ -102,7 +102,6 @@
 		96224297103D96D400756C5B /* widgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224273103D96D400756C5B /* widgets.cpp */; };
 		96224298103D96D400756C5B /* xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224274103D96D400756C5B /* xml.cpp */; };
 		9629BBBA1557C5AA009EAD48 /* quantize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9629BBB81557C5AA009EAD48 /* quantize.cpp */; };
-		9629BBBB1557C6E8009EAD48 /* quantize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9629BBB81557C5AA009EAD48 /* quantize.cpp */; };
 		9631BB90151E220A00CE43D0 /* libphysfs_xcode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9631BB8F151E220A00CE43D0 /* libphysfs_xcode.a */; };
 		9638490B1481A6B9000F7B07 /* joypad.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA0143A426C0007757E /* joypad.mm */; };
 		9638490C1481A6BD000F7B07 /* joypad_handler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA3143A42C50007757E /* joypad_handler.m */; };
@@ -111,7 +110,6 @@
 		963BB32A15CC5C5E002AD872 /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 963BB32915CC5C5E002AD872 /* data */; };
 		9647905215CE2F2F00B779B6 /* SBJoystickLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 967C33F915CC5ACF003FD960 /* SBJoystickLib.a */; };
 		9647905315CE2F5400B779B6 /* libJoypadCocoaTouch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 967C33ED15CC56A0003FD960 /* libJoypadCocoaTouch.a */; };
-		9647905515CE301500B779B6 /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9647905415CE301500B779B6 /* data */; };
 		964D7FC615CC7DAB00D6F9AF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7D13636EDE0068EB38 /* UIKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		964D7FC815CCF44600D6F9AF /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 964D7FC715CCF44600D6F9AF /* libcurl.a */; };
 		964D7FC915CCF45900D6F9AF /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 964D7FC715CCF44600D6F9AF /* libcurl.a */; };
@@ -250,9 +248,7 @@
 		96A4D269154A7DFB009ECD44 /* liballegro-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D261154A7DFA009ECD44 /* liballegro-static.a */; };
 		96A4D26B154A7E21009ECD44 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D26A154A7E21009ECD44 /* IOKit.framework */; };
 		96A4D270154A7EA0009ECD44 /* tftp_get.c in Sources */ = {isa = PBXBuildFile; fileRef = 96A4D26E154A7EA0009ECD44 /* tftp_get.c */; };
-		96A4D272154A7EC0009ECD44 /* liballegro_native_dialog-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D271154A7EC0009ECD44 /* liballegro_native_dialog-static.a */; };
 		96A4D273154A7F2F009ECD44 /* tftp_get.c in Sources */ = {isa = PBXBuildFile; fileRef = 96A4D26E154A7EA0009ECD44 /* tftp_get.c */; };
-		96B4B0AB143BB83100ACA64C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 96B4B0A9143BB83100ACA64C /* InfoPlist.strings */; };
 		96B4B0E2143BBBF300ACA64C /* joypad_handler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA3143A42C50007757E /* joypad_handler.m */; };
 		96B4B0E3143BBBF300ACA64C /* joypad.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA0143A426C0007757E /* joypad.mm */; };
 		96B4B0E4143BBBF300ACA64C /* translate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D175A713351F06008462BB /* translate.cpp */; };
@@ -291,13 +287,10 @@
 		96B4B12E143BBBF300ACA64C /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224272103D96D400756C5B /* util.cpp */; };
 		96B4B12F143BBBF300ACA64C /* widgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224273103D96D400756C5B /* widgets.cpp */; };
 		96B4B130143BBBF300ACA64C /* xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224274103D96D400756C5B /* xml.cpp */; };
-		96B4B135143BBEDC00ACA64C /* liblua-fixed.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B131143BBC4800ACA64C /* liblua-fixed.a */; };
 		96B4B139143BBEDC00ACA64C /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0D0143BBA8400ACA64C /* libfreetype.a */; };
 		96B4B13A143BBEDC00ACA64C /* libtgui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0D2143BBA8400ACA64C /* libtgui.a */; };
 		96B4B13B143BBEDC00ACA64C /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0D3143BBA8400ACA64C /* libz.a */; };
 		96B4B144143BC0A000ACA64C /* init.mm in Sources */ = {isa = PBXBuildFile; fileRef = 967976AB13BE8690006BCE29 /* init.mm */; };
-		96B4B145143BC0A000ACA64C /* atlas_accessor.c in Sources */ = {isa = PBXBuildFile; fileRef = 968C1E5E13BBE28800615225 /* atlas_accessor.c */; };
-		96B4B146143BC0A000ACA64C /* atlas.c in Sources */ = {isa = PBXBuildFile; fileRef = 968C1E6013BBE28800615225 /* atlas.c */; };
 		96B7D08513D09EF7004D7ED6 /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B7D08313D09EF7004D7ED6 /* libpng.a */; };
 		96B7D08613D09EF7004D7ED6 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B7D08413D09EF7004D7ED6 /* libz.a */; };
 		96BF3F9A13DB310300CE670E /* iTunesArtwork in Resources */ = {isa = PBXBuildFile; fileRef = 96DDE20913DB24A9008AA371 /* iTunesArtwork */; };
@@ -330,7 +323,12 @@
 		96BF3FBE13DB321300CE670E /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7C13636EDE0068EB38 /* QuartzCore.framework */; };
 		96BF3FBF13DB321300CE670E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7D13636EDE0068EB38 /* UIKit.framework */; };
 		96BF59F0146EFA170059C813 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 96B4B14C143BC21E00ACA64C /* icon.icns */; };
+		96C2C90816C0A53C004EBAB9 /* liballegro_dialog-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96C2C90616C0A53B004EBAB9 /* liballegro_dialog-static.a */; };
+		96C2C90916C0A53C004EBAB9 /* liblua5.2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96C2C90716C0A53C004EBAB9 /* liblua5.2.a */; };
+		96C2C90B16C0A595004EBAB9 /* gamecenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96C2C90A16C0A595004EBAB9 /* gamecenter.mm */; };
+		96CFE56A16C0AB6A00B7DB0C /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96CFE56916C0AB6A00B7DB0C /* GameKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		96D175A813351F06008462BB /* translate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D175A713351F06008462BB /* translate.cpp */; };
+		96E3D50516C0D06C00A4A973 /* mygamecentervc.m in Sources */ = {isa = PBXBuildFile; fileRef = 96E3D50416C0D06C00A4A973 /* mygamecentervc.m */; };
 		96FB52F1158EBBFD00FF36FC /* libbass.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 96FB52F0158EBBFC00FF36FC /* libbass.dylib */; };
 /* End PBXBuildFile section */
 
@@ -341,7 +339,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
-				9647905515CE301500B779B6 /* data in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -433,7 +430,7 @@
 		960DB4A1154C8341000869BD /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		960EFA3D1536971C008A2033 /* 60beat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = 60beat.h; path = ../../src/60beat.h; sourceTree = "<group>"; };
 		960EFA3E1536971C008A2033 /* 60beat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = 60beat.m; path = ../../src/60beat.m; sourceTree = "<group>"; };
-		9617A2DD11663E3D00E97A78 /* Area.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = Area.cpp; path = ../../src/Area.cpp; sourceTree = SOURCE_ROOT; };
+		9617A2DD11663E3D00E97A78 /* Area.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = Area.cpp; path = ../../src/Area.cpp; sourceTree = SOURCE_ROOT; };
 		961BFB42143E093A00DD1693 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		961BFB44143E097800DD1693 /* MyUIViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MyUIViewController.h; path = ../../src/MyUIViewController.h; sourceTree = "<group>"; };
 		961BFB45143E097800DD1693 /* MyUIViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MyUIViewController.m; path = ../../src/MyUIViewController.m; sourceTree = "<group>"; };
@@ -464,7 +461,7 @@
 		9622426B103D96D400756C5B /* Player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Player.cpp; path = ../../src/Player.cpp; sourceTree = SOURCE_ROOT; };
 		9622426C103D96D400756C5B /* redundant.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = redundant.cpp; path = ../../src/redundant.cpp; sourceTree = SOURCE_ROOT; };
 		9622426D103D96D400756C5B /* script.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = script.cpp; path = ../../src/script.cpp; sourceTree = SOURCE_ROOT; };
-		9622426E103D96D400756C5B /* shooter.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = shooter.cpp; path = ../../src/shooter.cpp; sourceTree = SOURCE_ROOT; };
+		9622426E103D96D400756C5B /* shooter.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = shooter.cpp; path = ../../src/shooter.cpp; sourceTree = SOURCE_ROOT; };
 		9622426F103D96D400756C5B /* sound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sound.cpp; path = ../../src/sound.cpp; sourceTree = SOURCE_ROOT; };
 		96224270103D96D400756C5B /* Spells.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Spells.cpp; path = ../../src/Spells.cpp; sourceTree = SOURCE_ROOT; };
 		96224271103D96D400756C5B /* Tile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Tile.cpp; path = ../../src/Tile.cpp; sourceTree = SOURCE_ROOT; };
@@ -478,7 +475,6 @@
 		9639C4351152D3A900804984 /* iphone.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = iphone.mm; path = ../../src/iphone.mm; sourceTree = SOURCE_ROOT; };
 		963AF9031585AA80007E85D5 /* MoRPG2-lite-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "MoRPG2-lite-Info.plist"; path = "MoRPG2-lite/MoRPG2-lite-Info.plist"; sourceTree = "<group>"; };
 		963BB32915CC5C5E002AD872 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = ../../iphonedata/data; sourceTree = "<group>"; };
-		9647905415CE301500B779B6 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = ../../litedata/data; sourceTree = "<group>"; };
 		96490EB9136368C500B2FBAF /* MoRPG2-DBG.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MoRPG2-DBG.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		964D7FC715CCF44600D6F9AF /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcurl.a; path = ../../../iphone_libs_r/libcurl.a; sourceTree = "<group>"; };
 		96581D701585710D006BF72E /* tftp_get.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = tftp_get.c; path = ../../src/tftp_get.c; sourceTree = "<group>"; };
@@ -629,8 +625,12 @@
 		96B4B14C143BC21E00ACA64C /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = icon.icns; path = "../../mac-icons/full/icon.icns"; sourceTree = "<group>"; };
 		96B7D08313D09EF7004D7ED6 /* libpng.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpng.a; path = ../../../iphone_libs_r/libpng.a; sourceTree = "<group>"; };
 		96B7D08413D09EF7004D7ED6 /* libz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libz.a; path = ../../../iphone_libs_r/libz.a; sourceTree = "<group>"; };
+		96C2C90616C0A53B004EBAB9 /* liballegro_dialog-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_dialog-static.a"; path = "../../../local/lib/liballegro_dialog-static.a"; sourceTree = "<group>"; };
+		96C2C90716C0A53C004EBAB9 /* liblua5.2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua5.2.a; path = ../../../local/lib/liblua5.2.a; sourceTree = "<group>"; };
+		96C2C90A16C0A595004EBAB9 /* gamecenter.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = gamecenter.mm; path = ../../src/gamecenter.mm; sourceTree = "<group>"; };
 		96CB82611596A77F00AD6979 /* Monster RPG 2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Monster RPG 2.entitlements"; sourceTree = "<group>"; };
 		96CB82621596A89100AD6979 /* libjpeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjpeg.a; path = ../../../local/lib/libjpeg.a; sourceTree = "<group>"; };
+		96CFE56916C0AB6A00B7DB0C /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/GameKit.framework; sourceTree = DEVELOPER_DIR; };
 		96D175A713351F06008462BB /* translate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = translate.cpp; path = ../../src/translate.cpp; sourceTree = "<group>"; };
 		96DB70C513DA65D7006F8FCF /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = ../../icons/full/Default.png; sourceTree = "<group>"; };
 		96DDE20313DB24A9008AA371 /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-72.png"; path = "../../icons/lite/Icon-72.png"; sourceTree = "<group>"; };
@@ -640,6 +640,7 @@
 		96DDE20713DB24A9008AA371 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = ../../icons/lite/Icon.png; sourceTree = "<group>"; };
 		96DDE20813DB24A9008AA371 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon@2x.png"; path = "../../icons/lite/Icon@2x.png"; sourceTree = "<group>"; };
 		96DDE20913DB24A9008AA371 /* iTunesArtwork */ = {isa = PBXFileReference; lastKnownFileType = text; name = iTunesArtwork; path = ../../icons/lite/iTunesArtwork; sourceTree = "<group>"; };
+		96E3D50416C0D06C00A4A973 /* mygamecentervc.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = mygamecentervc.m; path = ../../src/mygamecentervc.m; sourceTree = "<group>"; };
 		96ED3258136349520057B4C7 /* Monster_2-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Monster_2-Info.plist"; sourceTree = "<group>"; };
 		96FB52F0158EBBFC00FF36FC /* libbass.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbass.dylib; path = ../../../local/lib/libbass.dylib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -743,13 +744,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96CFE56A16C0AB6A00B7DB0C /* GameKit.framework in Frameworks */,
+				96C2C90816C0A53C004EBAB9 /* liballegro_dialog-static.a in Frameworks */,
+				96C2C90916C0A53C004EBAB9 /* liblua5.2.a in Frameworks */,
 				968D3F8E15CAE4E50080197D /* libJoypadCocoa.a in Frameworks */,
 				968D3F8B15CAE0EE0080197D /* libcurl.a in Frameworks */,
 				968D3EFE15CAD4FE0080197D /* libjpeg.a in Frameworks */,
 				969D9A5F159DAC780063280C /* libpng.a in Frameworks */,
 				9697997C1587B21C006E8AFA /* libbass.dylib in Frameworks */,
 				9691EA87154AF63800927975 /* libbassflac.dylib in Frameworks */,
-				96A4D272154A7EC0009ECD44 /* liballegro_native_dialog-static.a in Frameworks */,
 				96A4D26B154A7E21009ECD44 /* IOKit.framework in Frameworks */,
 				96A4D262154A7DFB009ECD44 /* liballegro_font-static.a in Frameworks */,
 				96A4D263154A7DFB009ECD44 /* liballegro_image-static.a in Frameworks */,
@@ -761,7 +764,6 @@
 				96A4D269154A7DFB009ECD44 /* liballegro-static.a in Frameworks */,
 				96A4D258154A7D55009ECD44 /* Cocoa.framework in Frameworks */,
 				96A4D259154A7D55009ECD44 /* OpenGL.framework in Frameworks */,
-				96B4B135143BBEDC00ACA64C /* liblua-fixed.a in Frameworks */,
 				96B4B139143BBEDC00ACA64C /* libfreetype.a in Frameworks */,
 				96B4B13A143BBEDC00ACA64C /* libtgui.a in Frameworks */,
 				96B4B13B143BBEDC00ACA64C /* libz.a in Frameworks */,
@@ -792,8 +794,12 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				96E3D50416C0D06C00A4A973 /* mygamecentervc.m */,
+				96CFE56916C0AB6A00B7DB0C /* GameKit.framework */,
+				96C2C90A16C0A595004EBAB9 /* gamecenter.mm */,
+				96C2C90616C0A53B004EBAB9 /* liballegro_dialog-static.a */,
+				96C2C90716C0A53C004EBAB9 /* liblua5.2.a */,
 				969A9E3C16083E3000F4DBE2 /* ftpget.cpp */,
-				9647905415CE301500B779B6 /* data */,
 				963BB32915CC5C5E002AD872 /* data */,
 				967C33F915CC5ACF003FD960 /* SBJoystickLib.a */,
 				967C33ED15CC56A0003FD960 /* libJoypadCocoaTouch.a */,
@@ -1280,7 +1286,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				96BF59F0146EFA170059C813 /* icon.icns in Resources */,
-				96B4B0AB143BB83100ACA64C /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1500,10 +1505,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96E3D50516C0D06C00A4A973 /* mygamecentervc.m in Sources */,
+				96C2C90B16C0A595004EBAB9 /* gamecenter.mm in Sources */,
 				96B4B144143BC0A000ACA64C /* init.mm in Sources */,
-				96B4B145143BC0A000ACA64C /* atlas_accessor.c in Sources */,
 				969A9E3E16083F6700F4DBE2 /* ftpget.cpp in Sources */,
-				96B4B146143BC0A000ACA64C /* atlas.c in Sources */,
 				96B4B0E2143BBBF300ACA64C /* joypad_handler.m in Sources */,
 				96B4B0E3143BBBF300ACA64C /* joypad.mm in Sources */,
 				96B4B0E4143BBBF300ACA64C /* translate.cpp in Sources */,
@@ -1528,7 +1533,6 @@
 				96B4B120143BBBF300ACA64C /* inventory.cpp in Sources */,
 				96B4B121143BBBF300ACA64C /* io.cpp in Sources */,
 				96B4B122143BBBF300ACA64C /* Items.cpp in Sources */,
-				9629BBBB1557C6E8009EAD48 /* quantize.cpp in Sources */,
 				96B4B123143BBBF300ACA64C /* lander.cpp in Sources */,
 				96B4B124143BBBF300ACA64C /* monster2.cpp in Sources */,
 				96B4B125143BBBF300ACA64C /* Object.cpp in Sources */,
@@ -2204,7 +2208,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Monster RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: Nooskewl";
+				CODE_SIGN_IDENTITY = "Mac Developer: Trent Gamblin (5923J6TNDK)";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2215,23 +2219,22 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Monster RPG 2/Monster RPG 2-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = A5_OGL;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
 					/Users/trent/code/local/include,
+					"/Users/trent/code/monster-rpg-2/include",
 				);
 				INFOPLIST_FILE = "Monster RPG 2/Monster RPG 2-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
-					"\"$(SRCROOT)/../../../local/lib\"",
+					/Users/trent/code/local/lib,
 					/Users/trent/code/JoypadSDKs/Cocoa/Mac/JoypadMac,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "8C355BDC-E8DE-4B44-B94F-2B8DF5849402";
+				PROVISIONING_PROFILE = "7AF15FA2-D1C8-46C3-91F8-9DDE111DF4D6";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
@@ -2242,7 +2245,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Monster RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: Nooskewl";
+				CODE_SIGN_IDENTITY = "Mac Developer: Trent Gamblin (5923J6TNDK)";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2254,25 +2257,24 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Monster RPG 2/Monster RPG 2-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = A5_OGL;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
 					/Users/trent/code/local/include,
+					"/Users/trent/code/monster-rpg-2/include",
 				);
 				INFOPLIST_FILE = "Monster RPG 2/Monster RPG 2-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
-					"\"$(SRCROOT)/../../../local/lib\"",
+					/Users/trent/code/local/lib,
 					/Users/trent/code/JoypadSDKs/Cocoa/Mac/JoypadMac,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "8C355BDC-E8DE-4B44-B94F-2B8DF5849402";
+				PROVISIONING_PROFILE = "7AF15FA2-D1C8-46C3-91F8-9DDE111DF4D6";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
@@ -2283,7 +2285,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Monster RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: Nooskewl";
+				CODE_SIGN_IDENTITY = "Mac Developer: Trent Gamblin (5923J6TNDK)";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2294,23 +2296,22 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Monster RPG 2/Monster RPG 2-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = A5_OGL;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
 					/Users/trent/code/local/include,
+					"/Users/trent/code/monster-rpg-2/include",
 				);
 				INFOPLIST_FILE = "Monster RPG 2/Monster RPG 2-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
-					"\"$(SRCROOT)/../../../local/lib\"",
+					/Users/trent/code/local/lib,
 					/Users/trent/code/JoypadSDKs/Cocoa/Mac/JoypadMac,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "8C355BDC-E8DE-4B44-B94F-2B8DF5849402";
+				PROVISIONING_PROFILE = "7AF15FA2-D1C8-46C3-91F8-9DDE111DF4D6";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
@@ -2321,7 +2322,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Monster RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: Nooskewl";
+				CODE_SIGN_IDENTITY = "Mac Developer: Trent Gamblin (5923J6TNDK)";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2332,23 +2333,22 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Monster RPG 2/Monster RPG 2-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = A5_OGL;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
 					/Users/trent/code/local/include,
+					"/Users/trent/code/monster-rpg-2/include",
 				);
 				INFOPLIST_FILE = "Monster RPG 2/Monster RPG 2-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
-					"\"$(SRCROOT)/../../../local/lib\"",
+					/Users/trent/code/local/lib,
 					/Users/trent/code/JoypadSDKs/Cocoa/Mac/JoypadMac,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "8C355BDC-E8DE-4B44-B94F-2B8DF5849402";
+				PROVISIONING_PROFILE = "7AF15FA2-D1C8-46C3-91F8-9DDE111DF4D6";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};

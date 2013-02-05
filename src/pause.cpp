@@ -829,7 +829,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 
 	int yyy = 6;
 
-#if defined ALLEGRO_IPHONE && !defined LITE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	MIcon *game_center = NULL;
 	if (isGameCenterAPIAvailable()) {
 		game_center = new MIcon(128, yyy, getResource("game_center.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
@@ -896,9 +896,9 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 		}
 	}
 
-#if defined(ALLEGRO_IPHONE) && !defined(LITE)
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	TGUIWidget *left_widget = game_center;
-#elif defined(ALLEGRO_IPHONE) || defined(ALLEGRO_MACOSX) || defined(ALLEGRO_ANDROID)
+#elif defined(ALLEGRO_ANDROID)
 	TGUIWidget *left_widget = joypad;
 #else
 	TGUIWidget *left_widget = NULL;
@@ -934,11 +934,9 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	yy += yinc;
 	MTextButton *mainLevelUp = new MTextButton(162, yy, "Cheat", false, left_widget);
 	MTextButton *mainQuit = new MTextButton(162, yy, "Quit", false, left_widget);
-#if defined ALLEGRO_IPHONE
-#ifndef LITE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	if (game_center)
 		game_center->set_right_widget(mainItem);
-#endif
 #endif
 
 #if defined IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
@@ -1022,11 +1020,9 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	tguiAddWidget(mainMusic);
 	tguiAddWidget(mainQuit);
 
-#ifdef ALLEGRO_IPHONE
-#ifndef LITE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	if (game_center)
 		tguiAddWidget(game_center);
-#endif
 #endif
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
@@ -1624,7 +1620,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				mainQuit->set_left_widget(NULL);
 			}
 			
-#if defined IPHONE && !defined LITE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 			else if (game_center && widget == game_center)
 			{
 				al_stop_timer(logic_timer);
@@ -1712,10 +1708,8 @@ done:
 	}
 	
 	delete fairy;
-#ifdef ALLEGRO_IPHONE
-#ifndef LITE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	delete game_center;
-#endif
 #endif
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
@@ -3555,12 +3549,12 @@ bool config_menu(bool start_on_fullscreen)
 	
 	const char *reset_str = "Reset achievements";
 	MTextButton *reset_game_center = NULL;
-	#if defined ALLEGRO_IPHONE && !defined LITE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	if (isGameCenterAPIAvailable()) {
 		reset_game_center = new MTextButton(BW-2-(m_text_length(game_font, _t(reset_str))+m_get_bitmap_width(cursor)+1), BH-2-m_text_height(game_font), reset_str);
 	}
 	y += 13;
-	#endif
+#endif
 	
 	FakeWidget *parent = new FakeWidget(0, 0, 1, 1, false);
 
@@ -3661,7 +3655,7 @@ bool config_menu(bool start_on_fullscreen)
 			
 			TGUIWidget *w = tguiUpdate();
 			
-#if defined(ALLEGRO_IPHONE) && !defined(LITE)
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 			if (w && w == reset_game_center) {
 				char buf[200];
 				sprintf(buf, "%s?", _t("Reset achievements"));
@@ -3887,6 +3881,8 @@ done:
 #if defined ALLEGRO_IPHONE
 	delete shake_toggle;
 	delete flip_screen_toggle;
+#endif
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	if (reset_game_center)
 		delete reset_game_center;	
 #endif

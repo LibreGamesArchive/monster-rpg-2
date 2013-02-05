@@ -431,7 +431,7 @@ static void drawOverlay(bool draw_controls, ALLEGRO_COLOR tint)
 		m_draw_triangle(0, 0, 16, 0, 0, 16, al_map_rgba_f(tint.r*tint.a, 0, 0, tint.a));
 	}
 	
-#if defined(ALLEGRO_IPHONE) && !defined(LITE)
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	if (isGameCenterAPIAvailable())
 	{
 		if (achievement_show) {

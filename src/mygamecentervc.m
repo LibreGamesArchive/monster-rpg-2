@@ -1,24 +1,19 @@
-//
-//  MyUIViewController.m
- //  Ballz
-//
-//  Created by Trent Gamblin on 11-06-19.
-//  Copyright 2011 Nooskewl. All rights reserved.
-//
-
-#define ASSERT ALLEGRO_ASSERT
 #include <allegro5/allegro.h>
-#include <allegro5/internal/aintern_iphone.h>
-#import "MyUIViewController.h"
 #import <GameKit/GameKit.h>
+#include "mygamecentervc.h"
+#include "gamecenter.h"
+
+extern ALLEGRO_DISPLAY *display;
+
+#ifdef ALLEGRO_IPHONE
+#include <allegro5/internal/aintern_iphone.h>
 
 extern bool modalViewShowing;
 extern bool airplay_connected;
-extern ALLEGRO_DISPLAY *display;
 extern ALLEGRO_DISPLAY *controller_display;
 UIWindow *al_iphone_get_window(ALLEGRO_DISPLAY *display);
 
-@implementation MyUIViewController
+@implementation MyGameCenterVC
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -144,3 +139,47 @@ int CreateModalDialog(NSString *title,
 	
 	return nResult;  
 }
+
+#else
+
+#define NOTIF_NAME @"GKDialogControllerWillDisappear"
+
+extern NSWindow *al_osx_get_window(ALLEGRO_DISPLAY *);
+
+@implementation MyGameCenterVC
+
+- (void) showAchievements
+{
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(shut_r_down:) name:NOTIF_NAME object:nil];
+
+	GKAchievementViewController *achievements = [[GKAchievementViewController alloc] init];
+
+	if (achievements != nil)
+	{
+		achievements.achievementDelegate = self;
+		GKDialogController *sdc = [GKDialogController sharedDialogController];
+		sdc.parentWindow = al_osx_get_window(display);
+		[sdc presentViewController: achievements];
+	}
+
+	[achievements release];
+}
+
+- (void)shut_r_down:(NSNotification *)notification
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:NOTIF_NAME object:nil];
+
+	modalViewShowing = false;
+}
+
+- (void)achievementViewControllerDidFinish:(GKGameCenterViewController *)achievementViewController
+{
+	GKDialogController *sdc = [GKDialogController sharedDialogController];
+	[sdc dismiss: achievementViewController];
+	modalViewShowing = false;
+}
+
+@end
+
+#endif
+
