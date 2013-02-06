@@ -2360,6 +2360,8 @@ bool init(int *argc, char **argv[])
 #ifdef ALLEGRO_RASPBERRYPI
 	sd->width = w;
 	sd->height = h;
+	config_save_width = w;
+	config_save_height = h;
 #else
 	if (config_read) {
 		config_save_width = sd->width;
@@ -2382,6 +2384,7 @@ bool init(int *argc, char **argv[])
 			i++;
 		}
 	}
+#endif
 	ScreenSize scr_sz = small_screen();
 	if (scr_sz == ScreenSize_Tiny) {
 		sd->width = 240;
@@ -2399,7 +2402,6 @@ bool init(int *argc, char **argv[])
 		sd->width = 960;
 		sd->height = 640;
 	}
-#endif
 #else
 	#ifndef ALLEGRO_ANDROID
 	// FIXME: do this for android when supporting multihead
