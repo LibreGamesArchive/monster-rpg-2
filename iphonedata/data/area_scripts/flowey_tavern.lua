@@ -35,9 +35,10 @@ function activate_bartender()
 			doDialogue("Bartender: * whistles *\n")
 		else
 			doDialogue("Bartender: One swig of this will put hair on your chest... er... Mam.\n", true)
-			setInventory(slot, ITEM_JUICE, 1)
-			loadPlayDestroy("chest.ogg")
-			setMilestone(MS_TAVERN_JUICE, true);
+			if (give_juice()) then
+				loadPlayDestroy("chest.ogg")
+				setMilestone(MS_TAVERN_JUICE, true);
+			end
 		end
 	end
 end
@@ -89,3 +90,23 @@ end
 function collide(id1, id2)
 end
 
+function give_juice()
+	slot = findUsedInventorySlot(ITEM_JUICE)
+	if (slot >= 0) then
+		local index, quantity = getInventory(slot)
+		if (99-quantity >= 1) then
+			setInventory(slot, ITEM_JUICE, 1+quantity)
+			return true
+		end
+	end
+
+	slot = findEmptyInventorySlot()
+	if (slot < 0) then
+		doDialogue("Inventory is full...\n")
+		return false
+	else
+		setInventory(slot, ITEM_JUICE, 1)
+	end
+
+	return true
+end
