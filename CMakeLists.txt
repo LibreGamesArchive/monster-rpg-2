@@ -169,11 +169,13 @@ if(WIN32)
 		allegro_memfile${ALLEG_SUFFIX}
 		allegro_image${ALLEG_SUFFIX}
 		allegro_shader${ALLEG_SUFFIX}
+		allegro_physfs${ALLEG_SUFFIX}
 		allegro${ALLEG_SUFFIX}
 		${ALLEGRO_MAIN_LIB}
 		${EXTRA_LIBS}
 		lua5.2
 		d3dx9
+		physfs
 	)
 	if(KCM_AUDIO)
 		LIST(APPEND MAIN_LIBS "ws2_32" "dsound")
@@ -204,11 +206,13 @@ if(APPLE)
 		allegro_memfile${ALLEG_SUFFIX}
 		allegro_image${ALLEG_SUFFIX}
 		allegro_shader${ALLEG_SUFFIX}
+		allegro_physfs${ALLEG_SUFFIX}
 		allegro${ALLEG_SUFFIX} ${ALLEGRO_MAIN_LIB}
 		${EXTRA_LIBS}
 		lua5.2
 		JoypadCocoa
 		curl
+		physfs
 	)
 
 	if(KCM_AUDIO)
@@ -228,6 +232,7 @@ else(APPLE)
 		allegro_memfile${ALLEG_SUFFIX}
 		allegro_image${ALLEG_SUFFIX}
 		allegro_shader${ALLEG_SUFFIX}
+		allegro_physfs${ALLEG_SUFFIX}
 		allegro${ALLEG_SUFFIX}
 		${ALLEGRO_MAIN_LIB}
 		curl
@@ -243,9 +248,9 @@ else(APPLE)
 		LIST(APPEND MAIN_LIBS "bass")
 	endif(KCM_AUDIO)
 	if(RASPBERRYPI)
-		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host /usr/lib/arm-linux-gnueabihf/libfreetype.a /usr/lib/arm-linux-gnueabihf/libz.a /usr/lib/arm-linux-gnueabihf/libpng.a /usr/lib/arm-linux-gnueabihf/libjpeg.a /usr/lib/arm-linux-gnueabihf/liblua5.2.a)
+		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host /usr/lib/arm-linux-gnueabihf/libfreetype.a /usr/lib/arm-linux-gnueabihf/libz.a /usr/lib/arm-linux-gnueabihf/libpng.a /usr/lib/arm-linux-gnueabihf/libjpeg.a /usr/lib/arm-linux-gnueabihf/liblua5.2.a /usr/lib/libphysfs.a)
 	else(RASPBERYPI)
-		LIST(APPEND MAIN_LIBS allegro_dialog${ALLEG_SUFFIX} GL GLU freetype z png jpeg lua5.2)
+		LIST(APPEND MAIN_LIBS allegro_dialog${ALLEG_SUFFIX} GL GLU freetype z png jpeg lua5.2 physfs)
 	endif(RASPBERRYPI)
 endif(APPLE)
 endif(WIN32)

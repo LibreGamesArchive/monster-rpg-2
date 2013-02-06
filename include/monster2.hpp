@@ -48,6 +48,10 @@
 #include <allegro5/allegro_shader.h>
 #include <allegro5/allegro_shader_glsl.h>
 #include <allegro5/allegro_memfile.h>
+#include <physfs.h>
+#ifndef ALLEGRO_ANDROID
+#include <allegro5/allegro_physfs.h>
+#endif
 
 ALLEGRO_DEBUG_CHANNEL("morpg2")
 

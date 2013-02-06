@@ -2030,8 +2030,15 @@ void Area::loadAnimation(int index, bool addIndex)
 	ALLEGRO_STATE st;
 	al_store_state(&st, ALLEGRO_STATE_BLENDER | ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
 	char nm[100];
+#ifdef ALLEGRO_ANDROID
 	sprintf(nm, "tiles/%d-%d.png", subx, suby);
 	MBITMAP *tmp = m_load_bitmap(getResource(nm));
+#else
+	sprintf(nm, "%d-%d.png", subx, suby);
+	al_set_physfs_file_interface();
+	MBITMAP *tmp = m_load_bitmap(nm);
+	al_set_standard_file_interface();
+#endif
 	int xx = tm_used % tm_w;
 	int yy = tm_used / tm_w;
 	tm_used++;
@@ -2087,8 +2094,16 @@ void Area::loadAnimation(int index, bool addIndex)
 
 		ALLEGRO_STATE st;
 		al_store_state(&st, ALLEGRO_STATE_BLENDER | ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
+
+#ifdef ALLEGRO_ANDROID
 		sprintf(nm, "tiles/%d-%d.png", subx, suby);
 		MBITMAP *tmp = m_load_bitmap(getResource(nm));
+#else
+		sprintf(nm, "%d-%d.png", subx, suby);
+		al_set_physfs_file_interface();
+		MBITMAP *tmp = m_load_bitmap(nm);
+		al_set_standard_file_interface();
+#endif
 		int xx = tm_used % tm_w;
 		int yy = tm_used / tm_w;
 		tm_used++;
@@ -2196,6 +2211,10 @@ bool Area::load(std::string filename)
 	luaState = 0;
 
 	al_fseek(f, 8, SEEK_SET);
+	
+#ifndef ALLEGRO_ANDROID
+	PHYSFS_addToSearchPath(getResource("tiles.zip"), 1);
+#endif
 
 	try {
 		// Read animation indexes
@@ -2218,8 +2237,11 @@ bool Area::load(std::string filename)
 			}
 			tiles.clear();
 		}
-		al_fclose(f);
 	}
+
+#ifndef ALLEGRO_ANDROID
+	PHYSFS_removeFromSearchPath(getResource("tiles.zip"));
+#endif
 
 	al_fclose(f);
 

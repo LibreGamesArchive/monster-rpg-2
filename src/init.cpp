@@ -8,10 +8,6 @@
 #define OPENGLES
 #endif
 
-#ifdef ALLEGRO_ANDROID
-#include <physfs.h>
-#endif
-
 #define ASSERT ALLEGRO_ASSERT
 #include <allegro5/internal/aintern_bitmap.h>
 #include <allegro5/internal/aintern_display.h>
@@ -2781,6 +2777,8 @@ bool init(int *argc, char **argv[])
 	}
 	PHYSFS_addToSearchPath(al_path_cstr(apkname, '/'), 1);
 	al_destroy_path(apkname);
+#else
+	PHYSFS_init(*argv[0]);
 #endif
 
 	return true;
