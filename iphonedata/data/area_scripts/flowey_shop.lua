@@ -34,7 +34,7 @@ function activate_sk1()
 end
 
 function activate_sign()
-	doDialogue("...As you can see, we have the lowest prices around...\n")
+	doDialogue("\"...As you can see, we have the lowest prices around...\"\n")
 end
 
 function activate(activator, activated)
