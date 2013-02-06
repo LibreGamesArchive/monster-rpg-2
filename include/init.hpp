@@ -231,5 +231,7 @@ extern bool show_custom_mouse_cursor;
 
 extern int width_before_fullscreen;
 extern int height_before_fullscreen;
+extern int config_save_width;
+extern int config_save_height;
 
 #endif

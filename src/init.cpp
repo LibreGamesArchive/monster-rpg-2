@@ -93,6 +93,8 @@ static void d3d_resource_restore(void)
 
 int width_before_fullscreen = 0;
 int height_before_fullscreen = 0;
+int config_save_width = 0;
+int config_save_height = 0;
 
 bool have_mouse;
 
@@ -2212,8 +2214,12 @@ bool init(int *argc, char **argv[])
 #ifndef ALLEGRO_ANDROID
 	if (check_arg(*argc, *argv, "-tiny") > 0)
 		scr_tiny = true;
+	else if (check_arg(*argc, *argv, "-smaller") > 0)
+		scr_smaller = true;
 	else if (check_arg(*argc, *argv, "-small") > 0)
 		scr_small = true;
+	else if (check_arg(*argc, *argv, "-medium") > 0)
+		scr_medium = true;
 
 	if (check_arg(*argc, *argv, "-fixed-pipeline") > 0)
 		use_fixed_pipeline = true;
@@ -2347,50 +2353,53 @@ bool init(int *argc, char **argv[])
 #if !defined(ALLEGRO_IPHONE) && !defined(ALLEGRO_ANDROID)
 	al_set_new_display_adapter(config.getAdapter());
 	
-	// set screenScale *for loading screen only*
-	if (!config_read) {
-		ScreenSize scr_sz = small_screen();
-		if (scr_sz == ScreenSize_Tiny) {
-			sd->width = 240;
-			sd->height = 160;
-		}
-		else if (scr_sz == ScreenSize_Smaller) {
-			sd->width = 480;
-			sd->height = 320;
-		}
-		else if (scr_sz == ScreenSize_Small) {
-			sd->width = 720;
-			sd->height = 480;
-		}
-		else if (scr_sz == ScreenSize_Medium) {
-			sd->width = 960;
-			sd->height = 640;
-		}
-		else {
-			ALLEGRO_MONITOR_INFO mi;
-			al_get_monitor_info(config.getAdapter(), &mi);
-			int w = mi.x2 - mi.x1;
-			int h = mi.y2 - mi.y1;
+	ALLEGRO_MONITOR_INFO mi;
+	al_get_monitor_info(config.getAdapter(), &mi);
+	int w = mi.x2 - mi.x1;
+	int h = mi.y2 - mi.y1;
 #ifdef ALLEGRO_RASPBERRYPI
-			sd->width = w;
-			sd->height = h;
+	sd->width = w;
+	sd->height = h;
 #else
-			int i = 1;
-			sd->width = 240;
-			sd->height = 160;
-			while (1) {
-				int this_w = 240*i;
-				int this_h = 160*i;
-				if (this_w > w || this_h > h) {
-					break;
-				}
-				sd->width = this_w;
-				sd->height = this_h;
-				i++;
+	if (config_read) {
+		config_save_width = sd->width;
+		config_save_height = sd->height;
+	}
+	else {
+		int i = 1;
+		int config_save_w = 240;
+		int config_save_h = 160;
+		while (1) {
+			int this_w = 240*i;
+			int this_h = 160*i;
+			if (this_w > w || this_h > h) {
+				break;
 			}
-#endif
+			config_save_width = this_w;
+			config_save_height = this_h;
+			sd->width = this_w;
+			sd->height = this_h;
+			i++;
 		}
 	}
+	ScreenSize scr_sz = small_screen();
+	if (scr_sz == ScreenSize_Tiny) {
+		sd->width = 240;
+		sd->height = 160;
+	}
+	else if (scr_sz == ScreenSize_Smaller) {
+		sd->width = 480;
+		sd->height = 320;
+	}
+	else if (scr_sz == ScreenSize_Small) {
+		sd->width = 720;
+		sd->height = 480;
+	}
+	else if (scr_sz == ScreenSize_Medium) {
+		sd->width = 960;
+		sd->height = 640;
+	}
+#endif
 #else
 	#ifndef ALLEGRO_ANDROID
 	// FIXME: do this for android when supporting multihead
@@ -2399,6 +2408,9 @@ bool init(int *argc, char **argv[])
 
 	sd->width = 1;
 	sd->height = 1;
+
+	config_save_width = 1;
+	config_save_height = 1;
 #endif
 
 	if (config.getWaitForVsync())
