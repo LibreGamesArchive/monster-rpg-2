@@ -781,7 +781,6 @@ start:
 	
 	int counter = 0;
 	int frames = 0;
-	bool fps_on = false;
 	int fps;
 	
 	
@@ -1193,7 +1192,7 @@ start:
 			if (fps_on) {
 				char msg[100];
 				sprintf(msg, "%d", fps);
-				mTextout(game_font, msg, 0, 0,
+				mTextout(game_font, msg, 0, 2,
 							white, black,
 							WGT_TEXT_BORDER, false);
 			}

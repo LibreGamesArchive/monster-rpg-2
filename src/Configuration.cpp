@@ -476,6 +476,7 @@ bool Configuration::read()
 	XMLData *keyMusicDown = NULL;
 	XMLData *keyQuit = NULL;
 	XMLData *keySortItems = NULL;
+	XMLData *fpsOn = NULL;
 
 #ifdef ALLEGRO_RASPBERRYPI
 	const char *disp = getenv("DISPLAY");
@@ -496,6 +497,7 @@ bool Configuration::read()
 		keyMusicDown = game->find("keyMusicDown");
 		keyQuit = game->find("keyQuit");
 		keySortItems = game->find("keySortItems");
+		fpsOn = game->find("fpsOn");
 #ifdef ALLEGRO_RASPBERRYPI
 	}
 	last_session_was_x = getenv("DISPLAY") != NULL;
@@ -611,6 +613,7 @@ bool Configuration::read()
 	if (keyMusicDown) setKeyMusicDown(keyname_to_keycode(keyMusicDown->getValue().c_str()));
 	if (keyQuit) setKeyQuit(keyname_to_keycode(keyQuit->getValue().c_str()));
 	if (keySortItems) setKeySortItems(keyname_to_keycode(keySortItems->getValue().c_str()));
+	if (fpsOn) fps_on = atoi(fpsOn->getValue().c_str());
 
 	ScreenDescriptor sd;
 	sd.width = atoi(width->getValue().c_str());
@@ -670,6 +673,8 @@ void Configuration::write()
 		"keyQuit", al_keycode_to_name(getKeyQuit()));
 	XMLData* keySortItems = new XMLData(
 		"keySortItems", al_keycode_to_name(getKeySortItems()));
+	XMLData* fpsOn = new XMLData(
+		"fpsOn", my_itoa(fps_on));
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	XMLData* xml_dpad_type = new XMLData("dpad_type", old_control_mode < 0 ? my_itoa(getDpadType()) : my_itoa(old_control_mode));
@@ -707,6 +712,7 @@ void Configuration::write()
 	game->add(keyMusicDown);
 	game->add(keyQuit);
 	game->add(keySortItems);
+	game->add(fpsOn);
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	game->add(xml_dpad_type);

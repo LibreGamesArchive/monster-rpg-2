@@ -206,6 +206,8 @@ struct MPoint {
 
 extern TGUIWidget *mainWidget;
 
+extern bool fps_on;
+
 
 class Battle;
 

@@ -2115,7 +2115,7 @@ void android_assert_handler(char const *expr,
 }
 #endif
 
-#ifdef ALLEGRO_RASPBERRPI
+#ifdef ALLEGRO_RASPBERRYPI
 static void _al_raspberrypi_get_screen_info(int *dx, int *dy,
    int *screen_width, int *screen_height)
 {

@@ -60,7 +60,7 @@ char *saveFilename = NULL;
 
 bool was_in_map = false;
 
-static bool fps_on = false;
+bool fps_on = false;
 static int fps;
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -964,7 +964,7 @@ static void run(void)
 			if (fps_on) {
 				char msg[100];
 				sprintf(msg, "%d", fps);
-				mTextout(game_font, msg, 0, 0,
+				mTextout(game_font, msg, 0, 2,
 					white, black,
 					WGT_TEXT_BORDER, false);
 			}
@@ -1029,9 +1029,6 @@ int main(int argc, char *argv[])
 	if ((n = check_arg(argc, argv, "-adapter")) != -1) {
 		config.setAdapter(atoi(argv[n+1]));
 	}
-	if (check_arg(argc, argv, "-show-fps") != -1) {
-		fps_on = true;
-	}
 #else
 	int argc = 0;
 	char **argv = NULL;
@@ -1042,7 +1039,7 @@ int main(int argc, char *argv[])
 		remove(getUserResource("launch_config"));
 		return 1;
 	}
-
+	
 #ifndef ALLEGRO_ANDROID
 	int c = argc;
 	char **p = argv;

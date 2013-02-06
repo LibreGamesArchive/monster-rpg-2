@@ -1053,7 +1053,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 
 	int counter = 0;
 	int frames = 0;
-	bool fps_on = false;
 	int fps = 0;
 
 	clear_input_events();
@@ -1650,7 +1649,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 			if (fps_on) {
 				char msg[100];
 				sprintf(msg, "%d", fps);
-				mTextout(game_font, msg, 0, 0,
+				mTextout(game_font, msg, 0, 2,
 							white, black,
 							WGT_TEXT_BORDER, false);
 			}
@@ -3620,7 +3619,6 @@ bool config_menu(bool start_on_fullscreen)
 
 	int counter = 0;
 	int frames = 0;
-	bool fps_on = false;
 	int fps = 0;
 
 	bool first_frame = true;
@@ -3847,7 +3845,7 @@ bool config_menu(bool start_on_fullscreen)
 			if (fps_on) {
 				char msg[100];
 				sprintf(msg, "%d", fps);
-				mTextout(game_font, msg, 0, 0,
+				mTextout(game_font, msg, 0, 2,
 					 white, black,
 					 WGT_TEXT_BORDER, false);
 			}
