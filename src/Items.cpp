@@ -232,6 +232,8 @@ JuiceEffect::JuiceEffect(int itemIndex) :
 	count = 0;
 
 	type = COMBATENTITY_TYPE_FRILL;
+	
+	loadPlayDestroy("juice.ogg");
 }
 
 

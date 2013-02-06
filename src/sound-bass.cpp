@@ -32,35 +32,6 @@ static float musicVolume = 1.0f;
 static float ambienceVolume = 1.0f;
 	
 static std::string preloaded_names[] = {
-#ifdef LITE
-	"bolt.ogg",
-	"ice1.ogg",
-	"fire1.ogg",
-	"Cure.ogg",
-	"Elixir.ogg",
-	"Heal.ogg",
-	"HolyWater.ogg",
-	"Revive.ogg",
-	"appear.ogg",
-	"battle.ogg",
-	"blip.ogg",
-	"boss.ogg",
-	"chest.ogg",
-	"door.ogg",
-	"enemy_die.ogg",
-	"error.ogg",
-	"fall.ogg",
-	"freeze.ogg",
-	"hit.ogg",
-	"melee_woosh.ogg",
-	"new_party_member.ogg",
-	"nooskewl.ogg",
-	"pistol.ogg",
-	"select.ogg",
-	"sleep.ogg",
-	"swipe.ogg",
-	"woosh.ogg",
-#else
 	"Bolt2.ogg",
 	"Bolt3.ogg",
 	"Fire2.ogg",
@@ -98,6 +69,7 @@ static std::string preloaded_names[] = {
 	"freeze.ogg",
 	"hit.ogg",
 	"ignite.ogg",
+	"juice.ogg",
 	"low_cackle.ogg",
 	"melee_woosh.ogg",
 	"new_party_member.ogg",
@@ -113,7 +85,6 @@ static std::string preloaded_names[] = {
 	"swipe.ogg",
 	"torpedo.ogg",
 	"woosh.ogg",
-#endif
 	""
 };
 

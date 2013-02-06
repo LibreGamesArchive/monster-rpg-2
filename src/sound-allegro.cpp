@@ -58,6 +58,7 @@ static std::string preloaded_names[] = {
 	"freeze.ogg",
 	"hit.ogg",
 	"ignite.ogg",
+	"juice.ogg",
 	"low_cackle.ogg",
 	"melee_woosh.ogg",
 	"new_party_member.ogg",

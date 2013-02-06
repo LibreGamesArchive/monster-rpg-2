@@ -247,8 +247,11 @@ SpecialItem specialItems[] = {
 
 static std::string getItemSound(std::string name)
 {
-	if (name == "Cure" || name == "Cure2" || name == "Cure3" || name == "Meatballs" || name == "Juice")
+	if (name == "Cure" || name == "Cure2" || name == "Cure3" || name == "Meatballs")
 		return "Cure.ogg";
+	else if (name == "Juice") {
+		return "juice.ogg";
+	}
 	else if (name == "Heal")
 		return "Heal.ogg";
 	else if (name == "Revive" || name == "Holy Water")
