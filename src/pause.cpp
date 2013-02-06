@@ -3516,11 +3516,9 @@ bool config_menu(bool start_on_fullscreen)
 	aspect_toggle->setSelected(aspect_real_to_option(curr_aspect));
 #if defined ALLEGRO_IPHONE
 	if (is_ipad()) {
-#elif defined ALLEGRO_RASPBERRYPI
-	if (false) {
 #endif
 		y += 13;
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_RASPBERRYPI
+#if defined ALLEGRO_IPHONE
 	}
 #endif
 
@@ -3588,11 +3586,9 @@ bool config_menu(bool start_on_fullscreen)
 
 #if defined ALLEGRO_IPHONE
 	if (is_ipad()) {
-#elif defined ALLEGRO_RASPBERRYPI
-	if (false) {
 #endif
 	tguiAddWidget(aspect_toggle);
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_RASPBERRYPI
+#if defined ALLEGRO_IPHONE
 	}
 #endif
 
@@ -3802,15 +3798,13 @@ bool config_menu(bool start_on_fullscreen)
 
 #if defined ALLEGRO_IPHONE
 		if (is_ipad()) {
-#elif defined ALLEGRO_RASPBERRYPI
-		if (false) {
 #endif
 		sel = aspect_toggle->getSelected();
 		if (aspect_real_to_option(config.getMaintainAspectRatio()) != sel) {
 			config.setMaintainAspectRatio(aspect_option_to_real(sel));
 			set_screen_params();
 		}
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_RASPBERRYPI
+#if defined ALLEGRO_IPHONE
 		}
 #endif
 
