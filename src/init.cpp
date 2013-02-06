@@ -2369,8 +2369,8 @@ bool init(int *argc, char **argv[])
 	}
 	else {
 		int i = 1;
-		int config_save_w = 240;
-		int config_save_h = 160;
+		config_save_width = 240;
+		config_save_height = 160;
 		while (1) {
 			int this_w = 240*i;
 			int this_h = 160*i;

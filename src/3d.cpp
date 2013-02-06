@@ -656,6 +656,7 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 }
 
 
+/*
 static void draw_model(MODEL *m)
 {
 	for (size_t i = 0; i < m->verts.size(); i++) {
@@ -669,7 +670,7 @@ static void draw_model(MODEL *m)
 		);
 	}
 }
-
+*/
 
 static void draw_model_tex(MODEL *m, MBITMAP *texture)
 {
