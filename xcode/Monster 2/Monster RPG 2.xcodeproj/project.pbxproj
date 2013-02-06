@@ -142,6 +142,8 @@
 		965E24961585324B00839861 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D256154A7D55009ECD44 /* Cocoa.framework */; };
 		965E24991585334500839861 /* liballegro_native_dialog-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 965E24981585334500839861 /* liballegro_native_dialog-static.a */; };
 		965E249A1585335100839861 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D26A154A7E21009ECD44 /* IOKit.framework */; };
+		9677118016C21DF10092EE0A /* liballegro_physfs-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9677117E16C21DF10092EE0A /* liballegro_physfs-static.a */; };
+		9677118116C21DF10092EE0A /* libphysfs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9677117F16C21DF10092EE0A /* libphysfs.a */; };
 		967976AC13BE8690006BCE29 /* init.mm in Sources */ = {isa = PBXBuildFile; fileRef = 967976AB13BE8690006BCE29 /* init.mm */; };
 		967C33C815CBA720003FD960 /* libJoypadCocoa.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 969A7CE7159F7293001BE047 /* libJoypadCocoa.a */; };
 		967C33C915CBA726003FD960 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 968D3F8A15CAE0EE0080197D /* libcurl.a */; };
@@ -497,6 +499,8 @@
 		965E24941585321C00839861 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		965E24981585334500839861 /* liballegro_native_dialog-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_native_dialog-static.a"; path = "../../../iphone_libs_r/liballegro_native_dialog-static.a"; sourceTree = "<group>"; };
 		966C6FB015CA5ACF00AA804D /* Monster RPG 2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Monster RPG 2.entitlements"; sourceTree = SOURCE_ROOT; };
+		9677117E16C21DF10092EE0A /* liballegro_physfs-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_physfs-static.a"; path = "../../../local/lib/liballegro_physfs-static.a"; sourceTree = "<group>"; };
+		9677117F16C21DF10092EE0A /* libphysfs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libphysfs.a; path = ../../../local/lib/libphysfs.a; sourceTree = "<group>"; };
 		96789CB814831C8D003F393D /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = ../../fulldataios/data; sourceTree = "<group>"; };
 		967976AB13BE8690006BCE29 /* init.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = init.mm; path = ../../src/init.mm; sourceTree = "<group>"; };
 		967C33CB15CBA765003FD960 /* Monster RPG 2 Lite.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Monster RPG 2 Lite.entitlements"; sourceTree = "<group>"; };
@@ -744,6 +748,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9677118016C21DF10092EE0A /* liballegro_physfs-static.a in Frameworks */,
+				9677118116C21DF10092EE0A /* libphysfs.a in Frameworks */,
 				96CFE56A16C0AB6A00B7DB0C /* GameKit.framework in Frameworks */,
 				96C2C90816C0A53C004EBAB9 /* liballegro_dialog-static.a in Frameworks */,
 				96C2C90916C0A53C004EBAB9 /* liblua5.2.a in Frameworks */,
@@ -794,6 +800,8 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				9677117E16C21DF10092EE0A /* liballegro_physfs-static.a */,
+				9677117F16C21DF10092EE0A /* libphysfs.a */,
 				96E3D50416C0D06C00A4A973 /* mygamecentervc.m */,
 				96CFE56916C0AB6A00B7DB0C /* GameKit.framework */,
 				96C2C90A16C0A595004EBAB9 /* gamecenter.mm */,

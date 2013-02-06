@@ -91,6 +91,9 @@ static void d3d_resource_restore(void)
 }
 #endif
 
+int width_before_fullscreen = 0;
+int height_before_fullscreen = 0;
+
 bool have_mouse;
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -2383,6 +2386,7 @@ bool init(int *argc, char **argv[])
 				}
 				sd->width = this_w;
 				sd->height = this_h;
+				i++;
 			}
 #endif
 		}
@@ -3047,6 +3051,12 @@ void toggle_fullscreen(void)
 
 	pause_joystick_repeat_events = true;
 	ScreenDescriptor *sd = config.getWantedGraphicsMode();
+
+	if (!sd->fullscreen) {
+		width_before_fullscreen = sd->width;
+		height_before_fullscreen = sd->height;
+	}
+
 	sd->fullscreen = !sd->fullscreen;
 #ifdef A5_D3D
 	is_fs_toggle = true;

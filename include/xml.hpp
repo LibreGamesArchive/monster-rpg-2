@@ -16,7 +16,7 @@ public:
 	std::string getName(void);
 	bool getFailed(void);
 	XMLData(std::string name, std::string value);
-	XMLData(std::string filename);
+	XMLData(std::string filename, int must_exist = 1);
 	~XMLData(void);
 private:
 	XMLData(std::string name, ALLEGRO_FILE* f);

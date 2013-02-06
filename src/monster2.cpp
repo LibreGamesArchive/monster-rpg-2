@@ -1319,15 +1319,11 @@ int main(int argc, char *argv[])
 		else if (choice == 4) {
 			save_memory(true);
 			config.write();
-#ifdef LITEXX
-			openFeedbackSite();
-#else
 #ifdef ALLEGRO_ANDROID
 			openURL("http://www.monster-rpg.com");
 			exit(0);
 #else
 			openRatingSite();
-#endif
 #endif
 		}
 		#endif

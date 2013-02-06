@@ -426,7 +426,7 @@ bool Configuration::read()
 	// load
 
 	debug_message("cfgfn='%s'\n", getUserResource("config"));
-	XMLData* xml = new XMLData(getUserResource("config"));
+	XMLData* xml = new XMLData(getUserResource("config"), 0);
 	if (xml->getFailed()) {
 	   debug_message("couldn't read config");
 	   delete xml;
@@ -733,8 +733,8 @@ void Configuration::write()
 	XMLData *width;
 	XMLData *height;
 	if (sd->fullscreen) {
-		width = new XMLData("width", my_itoa(960));
-		height = new XMLData("height", my_itoa(640));
+		width = new XMLData("width", my_itoa(width_before_fullscreen));
+		height = new XMLData("height", my_itoa(height_before_fullscreen));
 	}
 	else {
 		width = new XMLData("width", my_itoa(sd->width));

@@ -28,7 +28,7 @@ XMLData::XMLData(std::string name, ALLEGRO_FILE* f) :
 }
 
 
-XMLData::XMLData(std::string filename) :
+XMLData::XMLData(std::string filename, int must_exist) :
 	debug(false),
 	ungot(-1),
 	ungotReady(false),
@@ -38,7 +38,9 @@ XMLData::XMLData(std::string filename) :
 
 	file = al_fopen(filename.c_str(), "r");
 	if (!file) {
-		native_error("Load error.", filename.c_str());
+		if (must_exist == 1) {
+			native_error("Load error.", filename.c_str());
+		}
 		al_fclose(file);
 		failed = true;
 		return;
@@ -55,7 +57,7 @@ XMLData::XMLData(std::string name, std::string value) :
 	failed(false)
 {
 	this->name = name;
-	this->value = std::string(value);
+	this->value = value;
 }
 
 
