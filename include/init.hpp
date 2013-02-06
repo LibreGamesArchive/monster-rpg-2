@@ -61,6 +61,8 @@ extern "C" {
 	void unlock_joypad_mutex(void);
 }
 
+void maybe_enable_screensaver();
+
 // FIXME: TONNES OF GLOBALS
 
 extern ALLEGRO_TIMER *logic_timer, *draw_timer;

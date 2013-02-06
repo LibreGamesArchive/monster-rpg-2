@@ -37,6 +37,19 @@ extern "C" {
 #include "java.h"
 #endif
 
+/*
+static bool screensaver_was_on = false;
+int screensaver_idle_delay = 0;
+
+void maybe_enable_screensaver()
+{
+#if defined __linux__ && !(defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI)
+	system("gsettings set org.gnome.desktop.screensaver idle-activation-enabled true");
+	system((std::string("gsettings set org.gnome.desktop.session idle-delay ") + my_itoa(screensaver_idle_delay)).c_str());
+#endif
+}
+*/
+
 #ifdef A5_D3D
 LPDIRECT3DSURFACE9 big_depth_surface = NULL;
 
@@ -758,8 +771,19 @@ static void *thread_proc(void *arg)
 #endif
 
 	double next_shake = al_current_time();
+
+#if defined __linux__ && !(defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI)
+	double next_screensaver_disable = al_current_time() + 45;
+#endif
 	
 	while  (exit_event_thread != 1) {
+#if defined __linux__ && !(defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI)
+		if (al_get_time() > next_screensaver_disable) {
+			system("xscreensaver-command -deactivate > /dev/null");
+			system("gnome-screensaver-command -d > /dev/null");
+			next_screensaver_disable = al_get_time() + 45;
+		}
+#endif
 		if (reinstall_timer) {
 			al_destroy_timer(draw_timer);
 			draw_timer = al_create_timer(1.0/config.getTargetFPS());

@@ -208,8 +208,9 @@ void native_error(const char *msg, const char *msg2)
 			m_flip_display();
 			return;
 		}
-		else
+		else {
 			exit(1);
+		}
 	}
 #if !defined(__linux__)
 	char buf[1000];
@@ -221,7 +222,9 @@ void native_error(const char *msg, const char *msg2)
 	int button = al_show_native_message_box(display, crap, ss ? ss : ":(", buf, NULL, ALLEGRO_MESSAGEBOX_YES_NO);
 #endif
 	if (button == 1) return;
-	else exit(1);
+	else {
+		exit(1);
+	}
 #else
 	fprintf(stderr, "%s\n", msg);
 	exit(1);
