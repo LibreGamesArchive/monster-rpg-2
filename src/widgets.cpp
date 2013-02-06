@@ -5051,18 +5051,17 @@ int MItemSelector::update(int millis)
 		// Arrange
 		else {
 			// Group
-			if (inventory[pressed].index == inventory[selected].index) {
-				int q = 99-inventory[pressed].quantity;
-				if (q > inventory[selected].quantity) {
-					q = inventory[selected].quantity;
+			if (inventory[selected].index == inventory[pressed].index) {
+				int q = 99-inventory[selected].quantity;
+				if (q > inventory[pressed].quantity) {
+					q = inventory[pressed].quantity;
 				}
-				inventory[pressed].quantity += q;
-				inventory[selected].quantity -= q;
-				if (inventory[selected].quantity <= 0) {
-					inventory[selected].index = -1;
-					inventory[selected].quantity = 0;
+				inventory[selected].quantity += q;
+				inventory[pressed].quantity -= q;
+				if (inventory[pressed].quantity <= 0) {
+					inventory[pressed].index = -1;
+					inventory[pressed].quantity = 0;
 				}
-				
 			}
 			// Swap
 			else {
