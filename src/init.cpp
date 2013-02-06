@@ -237,8 +237,10 @@ bool red_off_press_on = false;
 volatile bool loading_done = false;
 MBITMAP *stomach_circle;
 
-bool scr_small = false;
 bool scr_tiny = false;
+bool scr_smaller = false;
+bool scr_small = false;
+bool scr_medium = false;
 
 char versionString[10];
 int versionMajor = 1;
@@ -417,16 +419,14 @@ ScreenSize small_screen(void)
 	if (scr_tiny) {
 		return ScreenSize_Tiny;
 	}
-	else if (scr_small) {
+	else if (scr_smaller) {
 		return ScreenSize_Smaller;
 	}
-
-	ALLEGRO_MONITOR_INFO mi;
-	al_get_monitor_info(config.getAdapter(), &mi);
-	int w = mi.x2 - mi.x1;
-	int h = mi.y2 - mi.y1;
-	if (w < 1024 || h < 768) {
+	else if (scr_small) {
 		return ScreenSize_Small;
+	}
+	else if (scr_medium) {
+		return ScreenSize_Medium;
 	}
 
 	return ScreenSize_Normal;
@@ -2359,17 +2359,31 @@ bool init(int *argc, char **argv[])
 			sd->width = 720;
 			sd->height = 480;
 		}
-		else {
-#ifdef ALLEGRO_RASPBERRYPI
-			void _al_raspberrypi_get_screen_info(
-				int *, int *, int *, int*
-			);
-			int unused1, unused2;
-			_al_raspberrypi_get_screen_info(&unused1, &unused2,
-			   &sd->width, &sd->height);
-#else
+		else if (scr_sz == ScreenSize_Medium) {
 			sd->width = 960;
 			sd->height = 640;
+		}
+		else {
+			ALLEGRO_MONITOR_INFO mi;
+			al_get_monitor_info(config.getAdapter(), &mi);
+			int w = mi.x2 - mi.x1;
+			int h = mi.y2 - mi.y1;
+#ifdef ALLEGRO_RASPBERRYPI
+			sd->width = w;
+			sd->height = h;
+#else
+			int i = 1;
+			sd->width = 240;
+			sd->height = 160;
+			while (1) {
+				int this_w = 240*i;
+				int this_h = 160*i;
+				if (this_w > w || this_h > h) {
+					break;
+				}
+				sd->width = this_w;
+				sd->height = this_h;
+			}
 #endif
 		}
 	}

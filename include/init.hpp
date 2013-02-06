@@ -7,7 +7,8 @@ enum ScreenSize {
 	ScreenSize_Normal = 0,
 	ScreenSize_Tiny,
 	ScreenSize_Smaller,
-	ScreenSize_Small
+	ScreenSize_Small,
+	ScreenSize_Medium
 };
 
 typedef std::pair< std::pair<int, int>, std::pair<int, int> > ZONE;
