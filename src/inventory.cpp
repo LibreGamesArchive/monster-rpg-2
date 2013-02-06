@@ -147,8 +147,8 @@ WeaponItem weapons[] = {
 	{ CLASS_MAGE|CLASS_CLERIC, 300, -1, -1, false, ELEMENT_NONE },
 	{ CLASS_MAGE|CLASS_CLERIC, 700, -1, -1, false, ELEMENT_NONE },
 	{ CLASS_WARRIOR, 700, -1, -1, false, ELEMENT_NONE },
-	{ CLASS_MAGE|CLASS_CLERIC, 600, -1, -1, false, ELEMENT_NONE },
-	{ CLASS_WARRIOR, 600, -1, -1, false, ELEMENT_NONE }
+	{ CLASS_MAGE|CLASS_CLERIC, 650, -1, -1, false, ELEMENT_NONE },
+	{ CLASS_WARRIOR, 650, -1, -1, false, ELEMENT_NONE }
 };
 
 struct nameAndAnims {
