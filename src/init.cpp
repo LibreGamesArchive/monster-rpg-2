@@ -779,8 +779,8 @@ static void *thread_proc(void *arg)
 	while  (exit_event_thread != 1) {
 #if defined __linux__ && !(defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI)
 		if (al_get_time() > next_screensaver_disable) {
-			system("xscreensaver-command -deactivate > /dev/null");
-			system("gnome-screensaver-command -d > /dev/null");
+			system("xscreensaver-command -deactivate >/dev/null 2>/dev/null");
+			system("gnome-screensaver-command -d >/dev/null 2>/dev/null");
 			next_screensaver_disable = al_get_time() + 45;
 		}
 #endif
