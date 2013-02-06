@@ -1363,6 +1363,7 @@ int main(int argc, char *argv[])
 		}
 		if (speechDialog) {
 			dpad_on();
+			tguiDeleteWidget(speechDialog);
 			delete speechDialog;
 			speechDialog = NULL;
 		}
