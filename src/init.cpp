@@ -2434,10 +2434,11 @@ bool init(int *argc, char **argv[])
 		int i = 1;
 		config_save_width = 240;
 		config_save_height = 160;
+		const float factor = 0.8f;
 		while (1) {
 			int this_w = 240*i;
 			int this_h = 160*i;
-			if (this_w > w || this_h > h) {
+			if (this_w > (w*0.8f) || this_h > (h*0.8f)) {
 				break;
 			}
 			config_save_width = this_w;
