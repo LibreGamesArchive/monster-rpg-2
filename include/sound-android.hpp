@@ -23,6 +23,9 @@ void stopAllSamples_oldandroid(void);
 void restartMusic_oldandroid(void);
 void restartAmbience_oldandroid(void);
 void playMusicVolumeOff_oldandroid(std::string name);
+void setStreamVolume_oldandroid(MSAMPLE stream, float volume);
+MSAMPLE streamSample_oldandroid(std::string name, float volume);
+void destroyStream_oldandroid(MSAMPLE stream);
 
 #endif
 

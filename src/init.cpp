@@ -912,12 +912,24 @@ static void *thread_proc(void *arg)
 					if (v <= 26) v = 0;
 					else v = v - 26; 
 					config.setSFXVolume(v);
+					if (boost) {
+						setStreamVolume(
+							boost,
+							boost_volume
+						);
+					}
 				}
 				else if (event.keyboard.keycode == config.getKeySFXUp()) {
 					int v = config.getSFXVolume();
 					if (v >= 230) v = 255;
 					else v = v + 26; 
 					config.setSFXVolume(v);
+					if (boost) {
+						setStreamVolume(
+							boost,
+							boost_volume
+						);
+					}
 				}
 				else if (event.keyboard.keycode == ALLEGRO_KEY_F5) {
 					f5_time = al_get_time();

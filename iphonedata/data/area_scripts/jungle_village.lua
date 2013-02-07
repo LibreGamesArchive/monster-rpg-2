@@ -1,14 +1,10 @@
 logic_count = 9
 
-if (get_platform() == "iphone") then
-	music = "jungle_ambience.flac"
-	ambience = "fire.flac"
-else
-	music = "jungle_ambience.ogg"
-	ambience = "fire.ogg"
-end
+music = "jungle_ambience.ogg"
 
 function start()
+	fire_stream = add_stream("fire.ogg")
+
 	fire = Object:new{x=9, y=20, anim_set="fire", solid=false}
 	
 	tohut1 = Portal:new{x=7, y=14}
@@ -28,7 +24,7 @@ function start()
 end
 
 function stop()
-	set_ambience_volume(1)
+	destroy_stream(fire_stream)
 end
 
 function update(step)
@@ -66,10 +62,10 @@ function update(step)
 		local disty = py - 20
 		local dist = math.sqrt(distx*distx+disty*disty)
 		if (dist >= 10) then
-			set_ambience_volume(0)
+			set_stream_volume(fire_stream, 0)
 		else
 			local vol = 1 - (dist / 10)
-			set_ambience_volume(vol)
+			set_stream_volume(fire_stream, vol)
 		end
 	end
 end

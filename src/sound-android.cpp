@@ -130,8 +130,8 @@ void playMusic_oldandroid(std::string name, float volume, bool force)
 	if (is_flac) {
 		al_android_set_apk_file_interface();
 	}
-	bass_playMusic(music);
 	setMusicVolume(volume);
+	bass_playMusic(music);
 }
 
 void setMusicVolume_oldandroid(float volume)
@@ -175,8 +175,8 @@ void playAmbience_oldandroid(std::string name, float vol)
 	if (is_flac) {
 		al_android_set_apk_file_interface();
 	}
-	bass_playMusic(ambience);
 	setAmbienceVolume(vol);
+	bass_playMusic(ambience);
 }
 
 void setAmbienceVolume_oldandroid(float volume)
@@ -219,5 +219,50 @@ void restartMusic_oldandroid(void)
 void restartAmbience_oldandroid(void)
 {
 	playAmbience_oldandroid(shutdownAmbienceName);
+}
+
+void setStreamVolume_oldandroid(MSAMPLE stream, float volume)
+{
+	if (!sound_inited) return;
+
+	volume *= config.getMusicVolume()/255.0f;
+
+	if (stream) {
+		bass_setMusicVolume(stream, volume);
+	}
+}
+
+MSAMPLE streamSample_oldandroid(std::string name, float volume)
+{
+	MSAMPLE stream;
+
+	if (!sound_inited) return 0;
+
+	bool is_flac;
+	name = check_music_name(name, &is_flac);
+
+	if (is_flac) {
+		al_set_standard_file_interface();
+	}
+	stream = bass_loadMusic(name.c_str());
+	if (stream == 0) {
+		native_error("Load error.", name.c_str());
+	}
+	if (is_flac) {
+		al_android_set_apk_file_interface();
+	}
+
+	setStreamVolume(stream, volume);
+
+	bass_playMusic(stream);
+
+	return stream;
+}
+
+void destroyStream_oldandroid(MSAMPLE stream)
+{
+	if (stream) {
+		bass_destroyMusic(stream);
+	}
 }
 

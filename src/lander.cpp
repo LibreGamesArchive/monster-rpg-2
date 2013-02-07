@@ -1,5 +1,8 @@
 #include "monster2.hpp"
 
+MSAMPLE boost = 0;
+float boost_volume = 0.0f;
+
 #define MAX_PARTICLES 200
 
 class MLanderButton : public TGUIWidget {
@@ -96,15 +99,9 @@ bool do_lander(void)
 	
 top:
 
-#ifdef ALLEGRO_IPHONE
-	playMusic("lander.flac");
-	playAmbience("boost.flac");
-#else
 	playMusic("lander.ogg");
-	playAmbience("boost.ogg");
-#endif
 
-	setAmbienceVolume(0);
+	boost = streamSample("boost.ogg", 0.0f);
 	float lastVolume = 0;
 
 	MBITMAP *lander_bmp = m_load_alpha_bitmap(getResource("media/lander.png"));
@@ -206,7 +203,8 @@ top:
 				
 			if (left) {
 				if (lastVolume != 1) {
-					setAmbienceVolume(1);
+					setStreamVolume(boost, 1);
+					boost_volume = 1;
 					lastVolume = 1;
 				}
 				lander_vel += lander_vel_delta * LOGIC_MILLIS;
@@ -223,7 +221,8 @@ top:
 			}
 			if (right) {
 				if (lastVolume != 1) {
-					setAmbienceVolume(1);
+					setStreamVolume(boost, 1);
+					boost_volume = 1;
 					lastVolume = 1;
 				}
 				lander_vel += lander_vel_delta * LOGIC_MILLIS;
@@ -240,7 +239,8 @@ top:
 			}
 
 			if (!left && !right && lastVolume != 0) {
-				setAmbienceVolume(0);
+				setStreamVolume(boost, 0);
+				boost_volume = 0;
 				lastVolume = 0;
 			}
 
@@ -397,14 +397,17 @@ done:
 	m_destroy_bitmap(lander_mem);
 	delete explosion;
 
-	playAmbience("");
-
 	fadeOut(black);
 	m_set_target_bitmap(buffer);
 	m_clear(black);
 	m_rest(5);
 
 	playMusic("");
+
+	MSAMPLE tmpsamp = boost;
+	boost = 0;
+	destroyStream(tmpsamp);
+	boost_volume = 0;
 
 	playMusic("underwater_final.ogg");
 

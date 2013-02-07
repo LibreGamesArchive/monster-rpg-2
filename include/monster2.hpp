@@ -56,7 +56,10 @@
 ALLEGRO_DEBUG_CHANNEL("morpg2")
 
 #ifdef ALLEGRO_MACOSX
-//#include <objc/objc.h>
+#include <objc/objc.h>
+#ifndef __OBJC__
+#define __OBJC__
+#endif
 #endif
 
 #ifdef ALLEGRO_IPHONE
@@ -82,12 +85,10 @@ ALLEGRO_DEBUG_CHANNEL("morpg2")
 
 #include <zlib.h>
 
-#if !defined NOSOUND
 #if !defined KCM_AUDIO
 #include <bass.h>
 #endif
 #include "sound.hpp"
-#endif
 
 #ifdef ALLEGRO_IPHONE
 #include "60beat.h"
@@ -269,7 +270,9 @@ enum CloneType
 #include "inventory.hpp"
 #include "CombatInfo.hpp"
 #include "CombatStatus.hpp"
+#if !defined NOSOUND
 #include "lander.hpp"
+#endif
 #include "CombatActions.hpp"
 #include "CombatPlayer.hpp"
 #include "CombatEnemy.hpp"

@@ -26,8 +26,6 @@ static DWORD music = 0;
 static DWORD ambience = 0;
 std::string musicName = "";
 std::string ambienceName = "";
-static QWORD music_loop_start = 0;
-static QWORD ambience_loop_start = 0;
 static float musicVolume = 1.0f;
 static float ambienceVolume = 1.0f;
 	
@@ -357,7 +355,7 @@ void loadPlayDestroy(std::string name)
 
 static void CALLBACK MusicSyncProc(HSYNC handle, DWORD channel, DWORD data, void *user)
 {
-	if (!BASS_ChannelSetPosition(channel, music_loop_start, BASS_POS_BYTE))
+	if (!BASS_ChannelSetPosition(channel, 0, BASS_POS_BYTE))
 		BASS_ChannelSetPosition(channel, 0, BASS_POS_BYTE);
 }
 
@@ -444,13 +442,11 @@ void playMusic(std::string name, float vol, bool force)
 	   native_error("Load error.", name.c_str());
 	}
 
-	music_loop_start = 0;
-
 	BASS_ChannelSetSync(music, BASS_SYNC_END | BASS_SYNC_MIXTIME,
 		0, MusicSyncProc, 0);
 
-	BASS_ChannelPlay(music, FALSE);
 	setMusicVolume(vol);
+	BASS_ChannelPlay(music, FALSE);
 }
 
 
@@ -471,12 +467,6 @@ void setMusicVolume(float volume)
 	if (music) {
 		BASS_ChannelSetAttribute(music, BASS_ATTRIB_VOL, volume);
 	}
-}
-
-static void CALLBACK AmbienceSyncProc(HSYNC handle, DWORD channel, DWORD data, void *user)
-{
-	if (!BASS_ChannelSetPosition(channel, ambience_loop_start, BASS_POS_BYTE))
-		BASS_ChannelSetPosition(channel, 0, BASS_POS_BYTE);
 }
 
 void playAmbience(std::string name, float vol)
@@ -534,12 +524,11 @@ void playAmbience(std::string name, float vol)
 		native_error("Load error.", name.c_str());
 	}
 
-	ambience_loop_start = 0;
 	BASS_ChannelSetSync(ambience, BASS_SYNC_END | BASS_SYNC_MIXTIME,
-		0, AmbienceSyncProc, 0);
+		0, MusicSyncProc, 0);
 
+	setAmbienceVolume(vol);
 	BASS_ChannelPlay(ambience, FALSE);
-	setMusicVolume(vol);
 }
 
 void setAmbienceVolume(float volume)
@@ -638,5 +627,83 @@ void restartAmbience(void)
 	}
 #endif
 	playAmbience(shutdownAmbienceName);
+}
+
+void setStreamVolume(MSAMPLE stream, float volume)
+{
+#ifdef ALLEGRO_ANDROID
+	if (is_android_lessthan_2_3) {
+		setStreamVolume_oldandroid(stream, volume);
+		return;
+	}
+#endif
+	if (!sound_inited) return;
+
+	volume *= config.getSFXVolume()/255.0f;
+
+	if (stream) {
+		BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, volume);
+	}
+}
+
+MSAMPLE streamSample(std::string name, float vol)
+{
+	MSAMPLE samp;
+
+#ifdef ALLEGRO_ANDROID
+	if (is_android_lessthan_2_3) {
+		return streamSample_oldandroid(name, vol);
+	}
+#endif
+	if (!sound_inited) return 0;
+
+	bool is_flac;
+	name = check_music_name(name, &is_flac);
+
+#ifdef ALLEGRO_ANDROID
+	if (is_flac) {
+		al_set_standard_file_interface();
+		ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
+		al_android_set_apk_file_interface();
+		samp = BASS_StreamCreateFileUser(
+			STREAMFILE_NOBUFFER,
+			BASS_SAMPLE_LOOP,
+			&fileprocs,
+			(void *)f
+		);
+	}
+	else {
+		PHYSFS_File *f = PHYSFS_openRead(name.c_str());
+		samp = BASS_StreamCreateFileUser(
+			STREAMFILE_NOBUFFER,
+			BASS_SAMPLE_LOOP,
+			&physfs_fileprocs,
+			(void *)f
+		);
+	}
+#else
+	samp = BASS_StreamCreateFile(false,
+		name.c_str(),
+		0, 0, 0);
+#endif
+	
+	if (samp == 0) {
+	   native_error("Load error.", name.c_str());
+	}
+
+	BASS_ChannelSetSync(samp, BASS_SYNC_END | BASS_SYNC_MIXTIME,
+		0, MusicSyncProc, 0);
+
+	setStreamVolume(samp, vol);
+	BASS_ChannelPlay(samp, FALSE);
+
+	return samp;
+}
+
+void destroyStream(MSAMPLE stream)
+{
+	if (stream) {
+		BASS_StreamFree(stream);
+	}
 }
 

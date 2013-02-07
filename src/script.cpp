@@ -3770,6 +3770,36 @@ int CDebug(lua_State *stack)
 	return 0;
 }
 
+int CAddStream(lua_State *stack)
+{
+	const char *name = lua_tostring(stack, 1);
+
+	MSAMPLE s = streamSample(name, 1.0f);
+
+	lua_pushlightuserdata(stack, (void *)s);
+
+	return 1;
+}
+
+int CSetStreamVolume(lua_State *stack)
+{
+	MSAMPLE s = (MSAMPLE)lua_touserdata(stack, 1);
+	float vol = lua_tonumber(stack, 2);
+
+	setStreamVolume(s, vol);
+
+	return 0;
+}
+
+int CDestroyStream(lua_State *stack)
+{
+	MSAMPLE s = (MSAMPLE)lua_touserdata(stack, 1);
+
+	destroyStream(s);
+	
+	return 0;
+}
+
 /*
  * This registers all the required C/C++ functions
  * with the Lua interpreter, so they can be called
@@ -4353,5 +4383,14 @@ void registerCFunctions(lua_State* luaState)
 
 	lua_pushcfunction(luaState, CDebug);
 	lua_setglobal(luaState, "debug");
+	
+	lua_pushcfunction(luaState, CAddStream);
+	lua_setglobal(luaState, "add_stream");
+	
+	lua_pushcfunction(luaState, CSetStreamVolume);
+	lua_setglobal(luaState, "set_stream_volume");
+	
+	lua_pushcfunction(luaState, CDestroyStream);
+	lua_setglobal(luaState, "destroy_stream");
 }
 

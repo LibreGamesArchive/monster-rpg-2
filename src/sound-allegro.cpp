@@ -326,3 +326,44 @@ void restartAmbience(void)
 	playAmbience(shutdownAmbienceName);
 }
 
+void setStreamVolume(MSAMPLE stream, float volume)
+{
+	if (!sound_inited) return;
+
+	volume *= config.getSFXVolume()/255.0f;
+
+	if (stream) {
+		al_set_audio_stream_gain((ALLEGRO_AUDIO_STREAM *)stream, volume);
+	}
+}
+
+MSAMPLE streamSample(std::string name, float vol)
+{
+	MSAMPLE stream;
+
+	if (!sound_inited) return 0;
+
+	bool is_flac;
+	name = check_music_name(name, &is_flac);
+
+	stream = (MSAMPLE)al_load_audio_stream(name.c_str(), 4, 2048);
+	if (stream == 0) {
+		native_error("Load error.", name.c_str());
+	}
+
+	setStreamVolume(stream, vol);
+
+	al_attach_audio_stream_to_mixer((ALLEGRO_AUDIO_STREAM *)stream, al_get_default_mixer());
+
+	al_set_audio_stream_playmode((ALLEGRO_AUDIO_STREAM *)stream, ALLEGRO_PLAYMODE_LOOP);
+
+	return stream;
+}
+
+void destroyStream(MSAMPLE stream)
+{
+	if (stream) {
+		al_destroy_audio_stream((ALLEGRO_AUDIO_STREAM *)stream);
+	}
+}
+

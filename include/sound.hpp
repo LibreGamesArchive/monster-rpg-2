@@ -39,6 +39,9 @@ void stopAllSamples(void);
 void restartMusic(void);
 void restartAmbience(void);
 void playMusicVolumeOff(std::string name);
+void setStreamVolume(MSAMPLE stream, float volume);
+MSAMPLE streamSample(std::string name, float vol);
+void destroyStream(MSAMPLE stream);
 
 bool loadSamples(void (*cb)(int, int));
 std::string check_music_name(std::string name, bool *is_flac);
