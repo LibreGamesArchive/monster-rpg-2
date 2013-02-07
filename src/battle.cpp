@@ -1028,11 +1028,13 @@ void Battle::addEntity(CombatEntity *add, bool force_pos, int id, int index)
 	}
 
 	zsorted_entities.insert(it, add);
-	
-	if (add->getType() == COMBATENTITY_TYPE_ENEMY) {
-		CombatEnemy *e = (CombatEnemy *)add;
-		e->added();
-		e->mkdeath();
+
+	if (index < 0) {
+		if (add->getType() == COMBATENTITY_TYPE_ENEMY) {
+			CombatEnemy *e = (CombatEnemy *)add;
+			e->added();
+			e->mkdeath();
+		}
 	}
 }
 
