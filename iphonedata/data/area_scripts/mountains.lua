@@ -25,7 +25,7 @@ function start()
 	chest4 = Chest:new{x=111, y=7, anim_set="chest", milestone=MS_MOUNTAIN_CHEST_4, index=ITEM_CURE2, quantity=1}
 
 	portal = Portal:new{x=111, y=15}
-	portal_start = Portal:new{x=10, y=82}
+	portal_start = Portal:new{x=9, y=82, width=3, height=1}
 end
 
 function stop()
