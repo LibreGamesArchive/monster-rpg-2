@@ -439,19 +439,11 @@ function update(step)
 
 	if (tig_scene_active) then
 		eny:update(step)
-	end
-	if (tig_scene_active) then
 		if (not rider_removed) then
 			rider:update(step)
 		end
-	end
-	if (tig_scene_active) then
 		faelon:update(step)
-	end
-	if (tig_scene_active) then
 		mel:update(step)
-	end
-	if (tig_scene_active) then
 		tig:update(step)
 	end
 end
@@ -593,12 +585,6 @@ function activate(activator, activated)
 			scope_chest:activate()
 		end
 	end
-
-	if ((not (door2 == nil)) and activated == door2.id) then
-		if (not getMilestone(MS_GOT_KEY2)) then
-			doDialogue("Locked...\n")
-		end
-	end
 end
 
 
@@ -661,6 +647,8 @@ function collide(id1, id2)
 			door2:open()
 			removeObject(door2.id)
 			door2 = nil
+		else
+			doDialogue("Locked...\n")
 		end
 	elseif ((not (door3 == nil)) and (id1 == door3.id or id2 == door3.id)) then
 		door3:open()
