@@ -129,7 +129,7 @@ function update(step)
 		(shopDoor2 == nil and shopPortal2.go_time)
 		)
 	then
-		change_areas("seaside_shop_repaired", 4, 9, DIRECTION_);
+		change_areas("seaside_shop_repaired", 4, 9, DIRECTION_NORTH);
 	end
 
 	px, py = getObjectPosition(0)
