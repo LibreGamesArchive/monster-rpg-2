@@ -61,7 +61,7 @@ MSAMPLE loadSample_oldandroid(std::string name)
 		al_destroy_path(p);
 		s = bass_loadSample(fn);
 		if (s == 0) {
-			native_error("Load error.", fn.c_str());
+			native_error("Load error.", fn);
 		}
 	}
 

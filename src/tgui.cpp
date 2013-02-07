@@ -619,18 +619,14 @@ TGUIWidget* tguiUpdate()
 				EV.x = ex;
 				EV.y = ey;
 				/* This check is Monster 2 specific! */
-				#ifdef MONSTER2
 				if (ignore_hot_zone || !(EV.x < 16 && EV.y < 16)) {
-				#endif
 					MouseEvent *e = new MouseEvent;
 					e->x = EV.x;
 					e->y = EV.y;
 					e->b = EV.BUTTON;
 					mouseDownEvents.push_back(e);
 					tguiMouseState.buttons |= EV.BUTTON;
-				#ifdef MONSTER2
 				}
-				#endif
 			}
 		}
 	}

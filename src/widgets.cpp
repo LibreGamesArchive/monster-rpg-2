@@ -5236,59 +5236,40 @@ void MManSelector::draw()
 	for (int i = 0; i < 3*4*2*12; i++) {
 		lines[i].z = 0;
 	}
+
+	MBITMAP *tmp = m_create_bitmap(16, 16);
+	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
+	m_set_target_bitmap(tmp);
+	al_clear_to_color(al_map_rgba_f(0, 0, 0, 0));
+	al_lock_bitmap(tmp->bitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READWRITE);
+	ALLEGRO_COLOR yellow = al_map_rgb_f(1, 1, 0);
+	for (int i = 1; i < 15; i++) {
+		al_put_pixel(i, 1, yellow);
+		al_put_pixel(1, i, yellow);
+		al_put_pixel(i, 14, yellow);
+		al_put_pixel(14, i, yellow);
+	}
+	al_unlock_bitmap(tmp->bitmap);
+	al_set_target_bitmap(old_target);
+
+	al_hold_bitmap_drawing(true);
+
 	int j = 0;
 	for (int i = 0; i < (int)mans.size(); i++) {
 		if (i == 6) continue;
 		int xx = mans[i].x * TILE_SIZE - area->getOriginX();
 		int yy = (mans[i].y+1) * TILE_SIZE - area->getOriginY();
 		for (int k = 0; k < 3; k++) {
-			lines[j].x = xx+2;
-			lines[j].y = yy+2+k*TILE_SIZE;
-			lines[j].color = 
-				al_map_rgba(alpha, alpha, 0, alpha);
-			j++;
-			lines[j].x = xx+2+TILE_SIZE-4;
-			lines[j].y = yy+2+k*TILE_SIZE;
-			lines[j].color = 
-				al_map_rgba(alpha, alpha, 0, alpha);
-			j++;
-			lines[j].x = xx+2+TILE_SIZE-4;
-			lines[j].y = yy+2+k*TILE_SIZE;
-			lines[j].color = 
-				al_map_rgba(alpha, alpha, 0, alpha);
-			j++;
-			lines[j].x = xx+2+TILE_SIZE-4;
-			lines[j].y = yy+2+k*TILE_SIZE+TILE_SIZE-4;
-			lines[j].color = 
-				al_map_rgba(alpha, alpha, 0, alpha);
-			j++;
-			lines[j].x = xx+2+TILE_SIZE-4;
-			lines[j].y = yy+2+k*TILE_SIZE+TILE_SIZE-4;
-			lines[j].color = 
-				al_map_rgba(alpha, alpha, 0, alpha);
-			j++;
-			lines[j].x = xx+2;
-			lines[j].y = yy+2+k*TILE_SIZE+TILE_SIZE-4;
-			lines[j].color = 
-				al_map_rgba(alpha, alpha, 0, alpha);
-			j++;
-			lines[j].x = xx+2;
-			lines[j].y = yy+2+k*TILE_SIZE+TILE_SIZE-4;
-			lines[j].color = 
-				al_map_rgba(alpha, alpha, 0, alpha);
-			j++;
-			lines[j].x = xx+2;
-			lines[j].y = yy+2+k*TILE_SIZE;
-			lines[j].color = 
-				al_map_rgba(alpha, alpha, 0, alpha);
-			j++;
+			m_draw_tinted_bitmap(
+				tmp, al_map_rgba(alpha, alpha, alpha, alpha),
+				xx, yy+k*TILE_SIZE, 0
+			);
 		}
 	}
-	for (int i = 0; i < 3*4*2*12; i++) {
-		lines[i].x += 0.5;
-		lines[i].y += 0.5;
-	}
-	al_draw_prim(lines, 0, 0, 0, 3*4*2*12, ALLEGRO_PRIM_LINE_LIST);
+
+	al_hold_bitmap_drawing(false);
+
+	m_destroy_bitmap(tmp);
 
 	// Draw arrow
 	int xx = mans[pos].x * TILE_SIZE - area->getOriginX() + TILE_SIZE/2 - m_get_bitmap_width(arrow)/2;
@@ -5355,7 +5336,7 @@ int MManSelector::update(int millis)
 					need_release = false;
 				}
 			}
-			else if (al_is_mouse_installed()) {
+			else if (al_is_mouse_installed())
 #endif
 			{
 				ALLEGRO_MOUSE_STATE s;

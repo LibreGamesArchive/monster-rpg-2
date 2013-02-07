@@ -50,6 +50,33 @@ void maybe_enable_screensaver()
 }
 */
 
+uint32_t parse_version(const char *v)
+{
+	char buf1[100];
+	char buf2[100];
+	int i, j;
+
+	for (i = 0; i < 99; i++) {
+		if (!isdigit(v[i])) {
+			break;
+		}
+		buf1[i] = v[i];
+	}
+	buf1[i++] = 0;
+
+	for (j = 0; j < 99; j++) {
+		if (!isdigit(v[i])) {
+			break;
+		}
+		buf2[j] = v[i++];
+	}
+	buf2[j] = 0;
+
+	printf("bufs=%s %s\n", buf1, buf2);
+
+	return (atoi(buf1) << 16) | atoi(buf2);
+}
+
 #ifdef A5_D3D
 LPDIRECT3DSURFACE9 big_depth_surface = NULL;
 
@@ -304,7 +331,7 @@ void load_fonts(void)
 
 	ALLEGRO_DEBUG("loading fonts");
 
-#ifdef ALLEGRO_ANDROID
+#ifdef ALLEGRO_ANDROIDXXX
 	ALLEGRO_PATH *res_dir = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
 	char boofer[1000];
 	sprintf(boofer, "%s/unpack/DejaVuSans.ttf", al_path_cstr(res_dir, '/'));
@@ -2556,9 +2583,7 @@ bool init(int *argc, char **argv[])
 #endif
 
 #ifdef ALLEGRO_ANDROID
-	debug_message("HERE 111");
 	uint32_t vers1 = parse_version(al_android_get_os_version());
-	debug_message("HERE 222");
 	uint32_t vers2 = parse_version("2.3");
 	if (vers1 < vers2) {
 		is_android_lessthan_2_3 = true;

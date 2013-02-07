@@ -257,6 +257,14 @@ InputDescriptor Input::getDescriptor()
 void Input::setDirection(int direction)
 {
 	descriptor.direction = direction;
+
+	TripleInput *ti = dynamic_cast<TripleInput *>(this);
+	if (ti) {
+		if (ti->kb)
+			ti->kb->setDirection(direction);
+		if (ti->js)
+			ti->js->setDirection(direction);
+	}
 }
 	
 void Input::waitForReleaseOr(int button_id, unsigned long wait_time)

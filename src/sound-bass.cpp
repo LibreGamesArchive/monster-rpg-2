@@ -89,6 +89,9 @@ static std::string preloaded_names[] = {
 };
 
 #ifdef ALLEGRO_ANDROID
+BASS_FILEPROCS fileprocs;
+BASS_FILEPROCS physfs_fileprocs;
+
 static void CALLBACK my_close(void *user)
 {
 	ALLEGRO_FILE *f = (ALLEGRO_FILE *)user;
@@ -207,6 +210,13 @@ void initSound(void)
 	if (!BASSFLACplugin) {
 		ALLEGRO_DEBUG("Error loading FLAC plugin (%d)\n", BASS_ErrorGetCode());
 	}
+
+	return;
+
+#ifdef ALLEGRO_ANDROID
+old:
+	initSound_oldandroid();
+#endif
 }
 
 bool loadSamples(void (*cb)(int, int))
@@ -285,7 +295,7 @@ MSAMPLE loadSample(std::string name)
 		BASS_SAMPLE_MONO|BASS_SAMPLE_OVER_POS);
 	
 	if (s == 0) {
-		native_error("Load error.", fn.c_str());
+		native_error("Load error.", fn);
 	}
 #else
 	s = BASS_SampleLoad(false,

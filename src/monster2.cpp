@@ -211,7 +211,7 @@ static void *wait_for_drawing_resume(void *arg)
 		}
 		else {
 			if (event.type == ALLEGRO_EVENT_DISPLAY_ORIENTATION) {
-				set_transform(display);
+				//set_transform(display);
 			}
 			else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN) {
 				al_start_timer(logic_timer);
@@ -250,6 +250,10 @@ static float backup_ambience_volume = 1.0f;
 // called from everywhere
 bool is_close_pressed(void)
 {
+
+#ifdef ALLEGRO_ANDROID	
+top:
+#endif
 
 #ifdef ALLEGRO_ANDROID
 	if (zeemote_enabled != zeemote_connected) {
@@ -316,7 +320,7 @@ bool is_close_pressed(void)
 #endif
 #if defined KINDLEFIRE
 		if (event.type == ALLEGRO_EVENT_DISPLAY_ORIENTATION) {
-			set_transform(display);
+			//set_transform(display);
 		}
 #endif
 

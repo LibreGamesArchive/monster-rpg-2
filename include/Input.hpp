@@ -106,6 +106,8 @@ protected:
 
 class TripleInput : public Input {
 public:
+	friend void Input::setDirection(int direction);
+
 	void reconfig(void) {
 		if (js)
 			js->reconfig();

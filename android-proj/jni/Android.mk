@@ -76,7 +76,7 @@ include $(PREBUILT_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_ALLOW_UNDEFINED_SYMBOLS := false
-LOCAL_MODULE    := monsterrpg2lite
+LOCAL_MODULE    := monsterrpg2
 LOCAL_SRC_FILES := \
 	3d.cpp\
 	Area.cpp\
@@ -92,7 +92,7 @@ LOCAL_SRC_FILES := \
 	debug.cpp\
 	equipment.cpp\
 	Frame.cpp\
-	ftpget.c\
+	ftpget.cpp\
 	GenericEffect.cpp\
 	graphics.cpp\
 	tftp_get.c\
@@ -107,7 +107,6 @@ LOCAL_SRC_FILES := \
 	Object.cpp\
 	pause.cpp\
 	Player.cpp\
-	quantize.cpp\
 	redundant.cpp\
 	script.cpp\
 	shooter.cpp\
@@ -119,14 +118,12 @@ LOCAL_SRC_FILES := \
 	util.cpp\
 	widgets.cpp\
 	xml.cpp\
-	atlas.c\
-	atlas_accessor.c\
 	init.cpp\
 
 LOCAL_ARM_MODE := arm
-LOCAL_CFLAGS    := -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/user/armeabi/include -DDEBUGMODE -DA5_OGL -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/include -DLITE
+LOCAL_CFLAGS    := -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/user/armeabi/include -DDEBUGMODE -DA5_OGL -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/include -I../include
 
-LOCAL_LDLIBS    := -L$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/lib -L$(ANDROID_NDK_TOOLCHAIN_ROOT)/user/armeabi/lib -L$(LOCAL_PATH)/$(TARGET_ARCH_ABI) -llog libs/$(TARGET_ARCH_ABI)/liballegro-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_memfile-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_primitives-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_image-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_font-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_ttf-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_shader-debug.so -lGLESv1_CM -lstdc++ -ltgui -llua -lz -lbass -lbassflac -lphysfs -lcurl
+LOCAL_LDLIBS    := -L$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/lib -L$(ANDROID_NDK_TOOLCHAIN_ROOT)/user/armeabi/lib -L$(LOCAL_PATH)/$(TARGET_ARCH_ABI) -llog libs/$(TARGET_ARCH_ABI)/liballegro-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_memfile-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_primitives-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_image-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_font-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_ttf-debug.so libs/$(TARGET_ARCH_ABI)/liballegro_shader-debug.so -lGLESv1_CM -lstdc++ -ltgui -llua5.2 -lz -lbass -lbassflac -lphysfs -lcurl
 
 include $(BUILD_SHARED_LIBRARY)
 
