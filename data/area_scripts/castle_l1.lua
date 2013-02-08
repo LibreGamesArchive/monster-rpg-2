@@ -1,9 +1,17 @@
 music = "castle.ogg"
 
+local clicked_gunnar = false
+
+function gunnar_cb()
+	removeObject(gunnar.id)
+	addPartyMember("Gunnar")
+	setMilestone(MS_GUNNAR_JOINED, true)
+	descriptifyPlayer()
+end
+
 function scriptify_cb()
 	scriptifyPlayer()
 end
-
 
 function preparing_cb()
 	done_preparing = true
@@ -42,6 +50,10 @@ function stop()
 end
 
 function update(step)
+	if (clicked_gunnar and not getMilestone(MS_GUNNAR_JOINED)) then
+		gunnar:update(step)
+	end
+
 	mainPortal:update()
 	
 	if (mainPortal.go_time) then
@@ -154,10 +166,14 @@ function activate(activator, activated)
 		setObjectDirection(gunnar.id, player_dir(gunnar))
 		scriptifyPlayer()
 		doDialogue("Gunnar: What am I doing? I design machines for the King.\nEny: We hear there are monsters attacking Flowey. Do you know if it's true?\nGunnar: I've heard the rumors, but I didn't think there was any way!\nEny: Monsters have already burned down Seaside, they have been awakened.\nEny: My friend became possessed by a staff with evil powers.\nGunnar: Then I must get to Flowey, and protect my place of birth!\nEny: Join us, then!\nGunnar: The path is through the mountains!\n", true)
-		removeObject(gunnar.id)
-		addPartyMember("Gunnar")
-		setMilestone(MS_GUNNAR_JOINED, true)
-		descriptifyPlayer()
+
+		local px, py = getObjectPosition(0)
+		setObjectSolid(gunnar.id, false)
+		gunnar.scripted_events = {
+			{ event_type=EVENT_WALK, dest_x=px, dest_y=py },
+			{ event_type=EVENT_CUSTOM, callback=gunnar_cb }
+		}
+		clicked_gunnar = true
 	end
 end
 
