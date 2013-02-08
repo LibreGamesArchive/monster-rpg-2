@@ -190,8 +190,18 @@ top:
 			if (!dead) {
 				if (use_dpad) {
 					InputDescriptor ie = getInput()->getDescriptor();
-					left = ie.left | ie.button1;
-					right = ie.right | ie.button2;
+					left = ie.left || ie.button1;
+					right = ie.right || ie.button2;
+					if (have_mouse) {
+						ALLEGRO_MOUSE_STATE state;
+						al_get_mouse_state(&state);
+						if (state.buttons & 1) {
+							left = true;
+						}
+						if (state.buttons & 2) {
+							right = true;
+						}
+					}
 				}
 				else {
 					if (left_button->getPressed())

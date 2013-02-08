@@ -804,6 +804,14 @@ static int real_archery(int *accuracy_pts)
 {
 	dpad_off();
 
+	int scr_w = al_get_display_width(display);
+	int scr_h = al_get_display_height(display);
+	MBITMAP *tmpcursor = custom_mouse_cursor;
+	custom_mouse_cursor = NULL;
+	al_set_mouse_xy(display, scr_w/2, scr_h/2);
+	int last_mouse_x = scr_w/2;
+	int last_mouse_y = scr_h/2;
+
 	// stop set_sets (astar with mouse)
 	getInput()->set(false, false, false, false, false, false, false);
 
@@ -995,7 +1003,15 @@ static int real_archery(int *accuracy_pts)
 				ie = getInput()->getDescriptor();
 			}
 
-			if ((use_dpad && ie.button1 && drawn) || (!use_dpad && clicked && released && drawn)) {
+			bool mouse_button_1_pressed = false;
+
+			if (have_mouse) {
+				ALLEGRO_MOUSE_STATE state;
+				al_get_mouse_state(&state);
+				mouse_button_1_pressed = state.buttons & 1;
+			}
+
+			if ((use_dpad && (ie.button1 || mouse_button_1_pressed) && drawn) || (!use_dpad && clicked && released && drawn)) {
 				num_shots++;
 				clicked = false;
 				drawn = false;
@@ -1049,6 +1065,20 @@ static int real_archery(int *accuracy_pts)
 					target_y += aim_speed * LOGIC_MILLIS;
 					if (target_y >= BH)
 						target_y = BH-1;
+				}
+				if (have_mouse) {
+					ALLEGRO_MOUSE_STATE state;
+					al_get_mouse_state(&state);
+					int mx = state.x;
+					int my = state.y;
+					if (mx != last_mouse_x || my != last_mouse_y) {
+						last_mouse_x = mx;
+						last_mouse_y = my;
+						scr_w = al_get_display_width(display);
+						scr_h = al_get_display_height(display);
+						target_x = (float)mx / scr_w * BW;
+						target_y = (float)my / scr_h * BW;
+					}
 				}
 			}
 		}
@@ -1237,6 +1267,8 @@ done:
 	*accuracy_pts = ((float)NUM_GOBLINS/num_shots) * 30 + 2;
 
 	dpad_on();
+	
+	custom_mouse_cursor = tmpcursor;
 
 	if (break_main_loop) {
 		return 2;
