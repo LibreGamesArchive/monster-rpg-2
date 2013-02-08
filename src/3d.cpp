@@ -808,7 +808,9 @@ static int real_archery(int *accuracy_pts)
 	int scr_h = al_get_display_height(display);
 	MBITMAP *tmpcursor = custom_mouse_cursor;
 	custom_mouse_cursor = NULL;
-	al_set_mouse_xy(display, scr_w/2, scr_h/2);
+	if (have_mouse) {
+		al_set_mouse_xy(display, scr_w/2, scr_h/2);
+	}
 	int last_mouse_x = scr_w/2;
 	int last_mouse_y = scr_h/2;
 
@@ -920,7 +922,9 @@ static int real_archery(int *accuracy_pts)
 
 			tmp_counter--;
 			if (is_close_pressed()) {
+				custom_mouse_cursor = tmpcursor;
 				do_close();
+				custom_mouse_cursor = NULL;
 				close_pressed = false;
 			}
 			// WARNING

@@ -79,6 +79,9 @@ static float randf(float lo, float hi)
 
 bool do_lander(void)
 {
+	MBITMAP *tmpcursor = custom_mouse_cursor;
+	custom_mouse_cursor = NULL;
+
 	// stop set_sets (astar with mouse)
 	getInput()->set(false, false, false, false, false, false, false);
 
@@ -379,7 +382,9 @@ top:
 		}
 
 		if (is_close_pressed()) {
+			custom_mouse_cursor = tmpcursor;
 			do_close();
+			custom_mouse_cursor = NULL;
 			close_pressed = false;
 		}
 		// WARNING
@@ -389,6 +394,8 @@ top:
 	}
 
 done:
+
+	custom_mouse_cursor = tmpcursor;
 
 	clear_input_events();
 

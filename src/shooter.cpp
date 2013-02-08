@@ -749,6 +749,14 @@ bool shooter(bool for_points)
 	anotherDoDialogue("Gunnar: Oh, no, the throttle jammed! Eny, you steer.\nMel, Rider, blast anything in our path! I'll go fix the engine!\n", true);
 
 start:
+	int scr_w = al_get_display_width(display);
+	int scr_h = al_get_display_height(display);
+	MBITMAP *tmpcursor = custom_mouse_cursor;
+	custom_mouse_cursor = NULL;
+	if (have_mouse) {
+		al_set_mouse_xy(display, scr_w/2, scr_h/2);
+	}
+
 	bool replay = false;
 
 	playMusic("underwater.ogg");
@@ -797,7 +805,9 @@ start:
 
 	for (; o >= TILE_SIZE*140;) {
 		if (is_close_pressed()) {
+			custom_mouse_cursor = tmpcursor;
 			do_close();
+			custom_mouse_cursor = NULL;
 			close_pressed = false;
 		}
 		// WARNING
@@ -869,6 +879,13 @@ start:
 				}
 				if (ie.right) {
 					x += LOGIC_MILLIS * 0.2;
+				}
+				if (have_mouse) {
+					ALLEGRO_MOUSE_STATE state;
+					al_get_mouse_state(&state);
+					int dx = state.x - al_get_display_width(display)/2;
+					x += dx / 5;
+					al_set_mouse_xy(display, al_get_display_width(display)/2+(dx-(dx/5*5)), al_get_display_height(display)/2);
 				}
 #endif
 			}
@@ -977,7 +994,7 @@ start:
 			}
 
 			ALLEGRO_MOUSE_STATE state;
-			if (al_is_mouse_installed()) {
+			if (have_mouse) {
 				al_get_mouse_state(&state);
 			}
 			else {
@@ -1013,6 +1030,8 @@ start:
 					al_stop_timer(logic_timer);
 
 					shooter_paused = true;
+
+					custom_mouse_cursor = tmpcursor;
 					
 					while (true) {
 						in = getInput()->getDescriptor();
@@ -1030,7 +1049,7 @@ start:
 							can_pause = true;
 							break;
 						}
-						if (al_is_mouse_installed()) {
+						if (have_mouse) {
 							al_get_mouse_state(&state);
 						}
 						else {
@@ -1065,13 +1084,28 @@ start:
 					al_start_timer(logic_timer);
 
 					shooter_paused = false;
+
+					custom_mouse_cursor = NULL;
+					
+					if (have_mouse) {
+						al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
+					}
 				}
 			}
 			else if (!state.buttons) {
 				can_pause = true;
 			}
 
-			if (!dead && (ie.button1 || pressed) && (al_get_time()-lastFire > 0.2)) {
+			bool mouse_button_1_pressed = false;
+			if (have_mouse) {
+				ALLEGRO_MOUSE_STATE state;
+				al_get_mouse_state(&state);
+				if (state.buttons & 1) {
+					mouse_button_1_pressed = true;
+				}
+			}
+
+			if (!dead && (ie.button1 || pressed || mouse_button_1_pressed) && (al_get_time()-lastFire > 0.2)) {
 				playPreloadedSample("torpedo.ogg");
 				lastFire = al_get_time();
 				Bullet b;
@@ -1203,6 +1237,8 @@ start:
 		}
 	}
 done:
+
+	custom_mouse_cursor = tmpcursor;
 	
 	clear_input_events();
 
