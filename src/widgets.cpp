@@ -6958,6 +6958,132 @@ MShop::~MShop(void)
 	}
 }
 
+void FakeWidget::draw(void) {
+	if (use_dpad && this == tguiActiveWidget && draw_outline) {
+		int n = (unsigned)tguiCurrentTimeMillis() % 1000;
+		float p;
+		if (n < 500) p = n / 500.0f;
+		else p = (500-(n-500)) / 500.0f;
+		int a = p*255;
+		m_draw_rectangle(x+0.5f, y+0.5f, x+width+0.5f, y+height+0.5f,
+			m_map_rgba(0xff*a/255, 0xd8*a/255, 0, a), 0);
+	}
+}
+
+void FakeWidget::mouseDown(int x, int y, int b)
+{
+	holdStart = tguiCurrentTimeMillis();
+}
+
+void FakeWidget::mouseUp(int x, int y, int b)
+{
+	if (x >= 0 && y >= 0) {
+		clicked = true;
+	}
+	holdStart = 0;
+	buttonHoldStarted = false;
+}
+
+unsigned long FakeWidget::getHoldStart(void)
+{
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	if (b3_pressed) {
+		b3_pressed = false;
+		return tguiCurrentTimeMillis() - 1000UL;
+	}
+	else
+#endif
+		return holdStart;
+}
+
+void FakeWidget::reset(void) 
+{
+	mouseUp(-1, -1, 0);
+}
+
+bool FakeWidget::acceptsFocus() { return accFocus; }
+
+int FakeWidget::update(int step)
+{
+	if (was_down && use_dpad && getInput()->getDescriptor().button1)
+		return TGUI_CONTINUE;
+	else
+		was_down = false;
+
+	if (tguiActiveWidget == this && use_dpad) {
+		INPUT_EVENT ie = get_next_input_event();
+		InputDescriptor id = getInput()->getDescriptor();
+
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+		if (ie.button3 == DOWN) {
+			b3_pressed = true;
+		}
+		else 
+#endif
+
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+		if (!id.button1 && holdStart != 0) {
+#else
+		if (buttonHoldStarted && !id.button1 && holdStart != 0) {
+#endif
+			use_input_event();
+			if (holdStart+250 > tguiCurrentTimeMillis()) {
+				clicked = true;
+			}
+			holdStart = 0;
+		}
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+		else if (id.button1 && holdStart == 0) {
+#else
+		else if (ie.button1 == DOWN && holdStart == 0) {
+#endif
+			use_input_event();
+			holdStart = tguiCurrentTimeMillis();
+			buttonHoldStarted = true;
+		}
+		else if (ie.left == DOWN || ie.up == DOWN) {
+			use_input_event();
+			playPreloadedSample("blip.ogg");
+			tguiFocusPrevious();
+		}
+		else if (ie.right == DOWN || ie.down == DOWN) {
+			use_input_event();
+			playPreloadedSample("blip.ogg");
+			tguiFocusNext();
+		}
+	}
+	if (clicked) {
+		clicked = false;
+		return TGUI_RETURN;
+	}
+	return TGUI_CONTINUE;
+}
+
+void FakeWidget::setFocus(bool fcs)
+{
+	TGUIWidget::setFocus(fcs);
+
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+	was_down = use_dpad && getInput()->getDescriptor().button1;
+#else
+	was_down = false;
+#endif
+}
+
+FakeWidget::FakeWidget(int x, int y, int w, int h, bool accFocus, bool draw_outline) {
+	this->hotkeys = 0;
+	this->x = x;
+	this->y = y;
+	this->width = w;
+	this->height = h;
+	clicked = false;
+	holdStart = 0;
+	this->accFocus = accFocus;
+	this->draw_outline = draw_outline;
+	b3_pressed = false;
+	buttonHoldStarted = false;
+}
+
 #ifdef EDITOR
 
 void WgtFrame::draw()

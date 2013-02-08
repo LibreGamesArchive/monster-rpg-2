@@ -76,14 +76,8 @@ public:
 			FakeWidget *formWidget = formWidgets[i];
 			if (formWidget && formWidget->getHoldStart() > 0 &&
 					formWidget->getHoldStart()+600UL < tguiCurrentTimeMillis()) {
-				if (use_dpad) {
-					InputDescriptor _id = getInput()->getDescriptor();
-					while (_id.button1) {
-						al_rest(0.001);
-						_id = getInput()->getDescriptor();
-					}
-				}
 				playPreloadedSample("select.ogg");
+				al_rest(0.5);
 				showPlayerInfo(i);
 				formWidget->reset();
 				return NULL;

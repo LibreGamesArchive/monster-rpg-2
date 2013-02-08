@@ -45,10 +45,10 @@ function get_action(step)
 		angle = 0
 		count = 0
 	elseif (stage == STAGE_FORWARD) then
-		angle = fixadd(angle, fixmul(step, SPIN_SPEED))
+		angle = angle + (step * SPIN_SPEED)
 		count = count + step
-		ox = fixtoi(fixmul(fixdiv(count, FORWARD_TIME), dx))
-		oy = fixtoi(fixmul(fixdiv(count, FORWARD_TIME), dy))
+		ox = (count / FORWARD_TIME) * dx
+		oy = (count / FORWARD_TIME) * dy
 		battleSetOx(myId, ox)
 		battleSetOy(myId, oy)
 		battleSetAngle(myId, angle)
@@ -59,12 +59,12 @@ function get_action(step)
 			stage = stage + 1
 		end
 	elseif (stage == STAGE_BACKWARD) then
-		angle = fixadd(angle, fixmul(step, SPIN_SPEED))
+		angle = angle + (step * SPIN_SPEED)
 		count = count + step
-		ox = fixtoi(fixmul(fixsub(1, fixdiv(count, BACKWARD_TIME)), dx))
-		oy = fixtoi(fixmul(fixsub(1, fixdiv(count, BACKWARD_TIME)), dy))
-		local tmp = fixsin(fixmul(fixdiv(count, BACKWARD_TIME), math.pi))
-		oy = fixtoi(fixsub(oy, fixmul(tmp, PEAK_HEIGHT)))
+		ox = (1 - (count / BACKWARD_TIME)) * dx
+		oy = (1 - (count / BACKWARD_TIME)) * dy
+		local tmp = math.sin((count / BACKWARD_TIME) * math.pi)
+		oy = oy - (tmp * PEAK_HEIGHT)
 		battleSetOx(myId, ox)
 		battleSetOy(myId, oy)
 		battleSetAngle(myId, angle)

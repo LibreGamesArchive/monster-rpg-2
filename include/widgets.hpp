@@ -219,133 +219,17 @@ private:
 
 class FakeWidget : public TGUIWidget {
 public:
-	void draw(void) {
-		if (use_dpad && this == tguiActiveWidget && draw_outline) {
-			int n = (unsigned)tguiCurrentTimeMillis() % 1000;
-			float p;
-			if (n < 500) p = n / 500.0f;
-			else p = (500-(n-500)) / 500.0f;
-			int a = p*255;
-			m_draw_rectangle(x+0.5f, y+0.5f, x+width+0.5f, y+height+0.5f,
-				m_map_rgba(0xff*a/255, 0xd8*a/255, 0, a), 0);
-		}
-	}
+	void draw(void);
+	void mouseDown(int x, int y, int b);
+	void mouseUp(int x, int y, int b);
+	unsigned long getHoldStart(void);
+	void reset(void);
+	bool acceptsFocus();
+	int update(int step);
+	virtual void setFocus(bool fcs);
 
-	void mouseDown(int x, int y, int b)
-	{
-		holdStart = tguiCurrentTimeMillis();
-	}
+	FakeWidget(int x, int y, int w, int h, bool accFocus = true, bool draw_outline = false);
 
-	void mouseUp(int x, int y, int b)
-	{
-		if (x >= 0 && y >= 0) {
-			clicked = true;
-		}
-		holdStart = 0;
-	}
-
-	unsigned long getHoldStart(void)
-	{
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-		return holdStart;
-#else
-		if (b3_pressed) {
-			b3_pressed = false;
-			return tguiCurrentTimeMillis() - 1000UL;
-		}
-		else
-			return 0;
-#endif
-	}
-
-	void reset(void) 
-	{
-		mouseUp(-1, -1, 0);
-	}
-
-	bool acceptsFocus() { return accFocus; }
-	
-	int update(int step)
-	{
-		if (was_down && use_dpad && getInput()->getDescriptor().button1)
-			return TGUI_CONTINUE;
-		else
-			was_down = false;
-
-		if (tguiActiveWidget == this && use_dpad) {
-			INPUT_EVENT ie = get_next_input_event();
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-			InputDescriptor id = getInput()->getDescriptor();
-#endif
-
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-			if (ie.button3 == DOWN) {
-				b3_pressed = true;
-			}
-			else 
-#endif
-
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-			if (!id.button1 && holdStart != 0) {
-#else
-			if (!ie.button1 == DOWN && holdStart != 0) {
-#endif
-				use_input_event();
-				if (holdStart+250 > tguiCurrentTimeMillis()) {
-					clicked = true;
-				}
-				holdStart = 0;
-			}
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-			else if (id.button1 && holdStart == 0) {
-#else
-			else if (ie.button1 == DOWN && holdStart == 0) {
-#endif
-				use_input_event();
-				holdStart = tguiCurrentTimeMillis();
-			}
-
-			else if (ie.left == DOWN || ie.up == DOWN) {
-				use_input_event();
-				playPreloadedSample("blip.ogg");
-				tguiFocusPrevious();
-			}
-			else if (ie.right == DOWN || ie.down == DOWN) {
-				use_input_event();
-				playPreloadedSample("blip.ogg");
-				tguiFocusNext();
-			}
-		}
-		if (clicked) {
-			clicked = false;
-			return TGUI_RETURN;
-		}
-		return TGUI_CONTINUE;
-	}
-
-	virtual void setFocus(bool fcs)
-	{
-		TGUIWidget::setFocus(fcs);
-
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-		was_down = use_dpad && getInput()->getDescriptor().button1;
-#else
-		was_down = false;
-#endif
-	}
-
-	FakeWidget(int x, int y, int w, int h, bool accFocus = true, bool draw_outline = false) {
-		this->hotkeys = 0;
-		this->x = x;
-		this->y = y;
-		this->width = w;
-		this->height = h;
-		clicked = false;
-		holdStart = 0;
-		this->accFocus = accFocus;
-		this->draw_outline = draw_outline;
-		b3_pressed = false;
-	}
 private:
 	bool clicked;
 	unsigned long holdStart;
@@ -353,6 +237,7 @@ private:
 	bool draw_outline;
 	bool b3_pressed;
 	bool was_down;
+	bool buttonHoldStarted;
 };
 
 

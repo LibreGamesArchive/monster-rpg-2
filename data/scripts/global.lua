@@ -351,6 +351,84 @@ item_resale_values = {
 	0,--light orb
 }
 
+-- We used to use a fixed point Lua, this is a dummy implementation
+-- of the fixed point functions
+function ftofix(f)
+	return f
+end
+
+function fixtof(f)
+	return f
+end
+
+function fixadd(a, b)
+	return a + b
+end
+
+function fixsub(a, b)
+	return a - b
+end
+
+function fixmul(a, b)
+	return a * b
+end
+
+function fixdiv(a, b)
+	return a / b
+end
+
+function fixfloor(a)
+	return math.floor(a)
+end
+
+function fixceil(a)
+	return math.ceil(a)
+end
+
+function itofix(a)
+	return a
+end
+
+function fixtoi(a)
+	return math.floor(a)
+end
+
+function fixsin(a)
+	return math.sin(a)
+end
+
+function fixcos(a)
+	return math.cos(a)
+end
+
+function fixtan(a)
+	return math.tan(a)
+end
+
+function fixacos(a)
+	return math.acos(a)
+end
+
+function fixasin(a)
+	return math.asin(a)
+end
+
+function fixatan(a)
+	return math.atan(a)
+end
+
+function fixatan2(a, b)
+	return math.atan2(a, b)
+end
+
+function fixsqrt(a)
+	return math.sqrt(a)
+end
+
+function fixabs(a)
+	return math.abs(a)
+end
+
 function get_item_resale_value(index)
 	return item_resale_values[index+1]
 end

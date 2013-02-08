@@ -41,9 +41,9 @@ function get_action(step)
 		start_x = battleGetX(id)
 		start_y = battleGetY(id)
 	elseif (stage == STAGE_JUMPING) then
-		oy = fixsub(oy, fixmul(SPEED, step))
-		battleSetOy(id, fixtoi(oy))
-		if (fixtoi(oy) < MAX_HEIGHT) then
+		oy = oy - (SPEED * step)
+		battleSetOy(id, oy)
+		if (oy < MAX_HEIGHT) then
 			target = getRandomPlayer()
 			loc = battleGetLocation(id)
 			ox = battleGetX(target) - battleGetX(id)
@@ -61,9 +61,9 @@ function get_action(step)
 			stage = stage + 1
 		end
 	elseif (stage == STAGE_FALLING) then
-		oy = fixadd(oy, fixmul(SPEED, step))
-		battleSetOy(id, fixtoi(oy))
-		if (fixtoi(oy) >= dy) then
+		oy = oy + (SPEED * step)
+		battleSetOy(id, oy)
+		if (oy >= dy) then
 			oy = dy
 			loadPlayDestroy("Thud.ogg")
 			stage = stage + 1
@@ -75,9 +75,9 @@ function get_action(step)
 			stage = stage + 1
 		end
 	elseif (stage == STAGE_BACKUP) then
-		oy = fixsub(oy, fixmul(fixmul(SPEED, 2), step))
-		battleSetOy(id, fixtoi(oy))
-		if (fixtoi(oy) < MAX_HEIGHT) then
+		oy = oy - ((SPEED * 2) * step)
+		battleSetOy(id, oy)
+		if (oy < MAX_HEIGHT) then
 			ox = 0
 			battleSetOx(id, ox)
 			stage = stage + 1
@@ -86,9 +86,9 @@ function get_action(step)
 			battleResortEntity(id)
 		end
 	elseif (stage == STAGE_BACKDOWN) then
-		oy = fixadd(oy, fixmul(fixmul(SPEED, 2), step))
-		battleSetOy(id, fixtoi(oy))
-		if (fixtoi(oy) > 0) then
+		oy = oy + ((SPEED * 2) * step)
+		battleSetOy(id, oy)
+		if (oy > 0) then
 			oy = 0
 			battleSetOy(id, 0)
 			stage = 0
@@ -113,10 +113,10 @@ function pre_draw()
 		else
 			y = battleGetY(target)
 		end
-		local p = fixsub(1, fixdiv(oy, MAX_HEIGHT))
-		local rx = fixmul(SHADOW_MAX_RX, p)
-		local ry = fixmul(SHADOW_MAX_RY, p)
-		fillEllipse(start_x+ox, y, fixtoi(rx), fixtoi(ry), 0, 0, 0, 160)
+		local p = 1 - (oy / MAX_HEIGHT)
+		local rx = SHADOW_MAX_RX * p
+		local ry = SHADOW_MAX_RY * p
+		fillEllipse(start_x+ox, y, rx, ry, 0, 0, 0, 160)
 	end
 end
 

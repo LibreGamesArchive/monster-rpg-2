@@ -1,10 +1,5 @@
-if (get_platform() == "iphone") then
-	music = "jungle_ambience.flac"
-	ambience = "jungle.flac"
-else
-	music = "jungle_ambience.ogg"
-	ambience = "jungle.ogg"
-end
+music = "jungle_ambience.ogg"
+ambience = "jungle.ogg"
 
 enemies = {}
 enemies[0] = "2Creeps"

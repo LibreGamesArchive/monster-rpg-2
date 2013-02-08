@@ -61,30 +61,30 @@ function get_action(step)
 		cy = battleGetY(id)
 
 		if (cx < dest_x) then
-			cx = fixadd(cx, fixmul(SPEED, step))
+			cx = cx + (SPEED * step)
 			if (cx > dest_x) then
 				cx = dest_x
 			end
 		elseif (cx > dest_x) then
-			cx = fixsub(cx, fixmul(SPEED, step))
+			cx = cx - (SPEED * step)
 			if (cx < dest_x) then
 				cx = dest_x
 			end
 		end
 		if (cy < dest_y) then
-			cy = fixadd(cy, fixmul(SPEED, step))
+			cy = cy + (SPEED * step)
 			if (cy > dest_y) then
 				cy = dest_y
 			end
 		elseif (cy > dest_y) then
-			cy = fixsub(cy, fixmul(SPEED, step))
+			cy = cy - (SPEED * step)
 			if (cy < dest_y) then
 				cy = dest_y
 			end
 		end
 
-		battleSetX(id, fixtoi(cx))
-		battleSetY(id, fixtoi(cy))
+		battleSetX(id, cx)
+		battleSetY(id, cy)
 
 		battleResortEntity(id)
 
@@ -112,30 +112,30 @@ function get_action(step)
 		cy = battleGetY(id)
 
 		if (cx < start_x) then
-			cx = fixadd(cx, fixmul(SPEED, step))
+			cx = cx + (SPEED * step)
 			if (cx > start_x) then
 				cx = start_x
 			end
 		elseif (cx > start_x) then
-			cx = fixsub(cx, fixmul(SPEED, step))
+			cx = cx - (SPEED * step)
 			if (cx < start_x) then
 				cx = start_x
 			end
 		end
 		if (cy < start_y) then
-			cy = fixadd(cy, fixmul(SPEED, step))
+			cy = cy + (SPEED * step)
 			if (cy > start_y) then
 				cy = start_y
 			end
 		elseif (cy > start_y) then
-			cy = fixsub(cy, fixmul(SPEED, step))
+			cy = cy - (SPEED * step)
 			if (cy < start_y) then
 				cy = start_y
 			end
 		end
 
-		battleSetX(id, fixtoi(cx))
-		battleSetY(id, fixtoi(cy))
+		battleSetX(id, cx)
+		battleSetY(id, cy)
 
 		battleResortEntity(id)
 
