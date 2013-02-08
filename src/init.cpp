@@ -2497,20 +2497,10 @@ bool init(int *argc, char **argv[])
 #endif
 
 	if (!use_fixed_pipeline) {
-#ifdef ALLEGRO_IPHONE
-		NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
-
-		NSString *reqSysVer = @"3.2";
-		NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
-		BOOL osVersionSupported = ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending);
-		if (osVersionSupported) {
-			al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_USE_PROGRAMMABLE_PIPELINE);
-		}
-
-		[p drain];
-#else
-		al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_USE_PROGRAMMABLE_PIPELINE);
-#endif
+		al_set_new_display_flags(
+			al_get_new_display_flags() |
+			ALLEGRO_USE_PROGRAMMABLE_PIPELINE
+		);
 	}
 
 #if defined ALLEGRO_IPHONE || defined KINDLEFIRE
@@ -2626,21 +2616,11 @@ bool init(int *argc, char **argv[])
 	if (use_fixed_pipeline) {
 		my_opengl_version = 0x01;
 	}
-#ifndef ALLEGRO_RASPBERRYPI
 	else {
-		if (!al_have_opengl_extension("GL_EXT_framebuffer_object")
-		 && !al_have_opengl_extension("GL_ARB_framebuffer_object")) {
-			native_error("Fragment shaders not supported.");
-		}
-
 		my_opengl_version = al_get_opengl_version();
 	}
 #else
-	my_opengl_version = al_get_opengl_version();
-#endif
-#else
 	my_opengl_version = 0x0;
-
 #endif
 
 	if (use_fixed_pipeline) {

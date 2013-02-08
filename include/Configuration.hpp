@@ -146,15 +146,15 @@ public:
 		if (display) {
 			if (auto_rot == 0)
 			{
-				al_change_display_option(display, ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_270_DEGREES);
+				al_set_display_option(display, ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_270_DEGREES);
 			}
 			else if (auto_rot == 1)
 			{
-				al_change_display_option(display, ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_90_DEGREES);
+				al_set_display_option(display, ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_90_DEGREES);
 			}
 			else
 			{
-				al_change_display_option(display, ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE);
+				al_set_display_option(display, ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE);
 			}
 		}
 		else

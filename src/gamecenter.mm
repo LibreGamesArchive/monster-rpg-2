@@ -5,8 +5,10 @@
 #include "monster2.hpp"
 #undef NOSOUND
 
-#ifdef ALLEGRO_MACOSX
+#if defined ALLEGRO_MACOSX
 #include <allegro5/allegro_osx.h>
+#elif defined ALLEGRO_IPHONE
+#include <allegro5/allegro_iphone_objc.h>
 #endif
 
 #include "mygamecentervc.h"

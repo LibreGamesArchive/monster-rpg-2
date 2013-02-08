@@ -10,7 +10,7 @@
 #import <MediaPlayer/MediaPlayer.h>
 #import <AudioToolbox/AudioToolbox.h>
 #import <AVFoundation/AVAudioSession.h>
-#import "MyUIViewController.h"
+#import "mygamecentervc.h"
 #include <allegro5/allegro_iphone.h>
 
 #import "NetReachability.h"

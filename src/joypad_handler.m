@@ -1,6 +1,4 @@
 #import "joypad_handler.h"
-#import "JoypadSDK.h"
-#import "JoypadControllerLayout.h"
 
 void lock_joypad_mutex(void);
 void unlock_joypad_mutex(void);
@@ -36,10 +34,10 @@ void disconnect_external_controls(void);
 
 -(void)start
 {
-	joypadManager = [[JoypadManager alloc] init];
+	joypadManager = [JPManager sharedManager];
 	[joypadManager setDelegate:self];
 	[joypadManager setMaxPlayerCount:1];
-	JoypadControllerLayout *l = [JoypadControllerLayout snesLayout];
+	JPControllerLayout *l = [JPControllerLayout snesLayout];
 	[l setName:@"Monster RPG 2"];
         [joypadManager setControllerLayout:l];
 
@@ -48,63 +46,63 @@ void disconnect_external_controls(void);
 
 -(void)find_devices
 {
-	[joypadManager startFindingDevices];
+	[[JPManager sharedManager] setGameState:kJPGameStateMenu];
 }
 
--(void)joypadManager:(JoypadManager *)manager didFindDevice:(JoypadDevice *)device previouslyConnected:(BOOL)prev
+-(void)joypadManager:(JPManager *)manager didFindDevice:(JPDevice *)device previouslyConnected:(BOOL)prev
 {
-	[manager stopFindingDevices];
+	[[JPManager sharedManager] setGameState:kJPGameStateGameplay];
 	[device setDelegate:self];
 }
 
--(void)joypadManager:(JoypadManager *)manager didLoseDevice:(JoypadDevice *)device;
+-(void)joypadManager:(JPManager *)manager didLoseDevice:(JPDevice *)device;
 {
 }
 
--(void)joypadManager:(JoypadManager *)manager deviceDidConnect:(JoypadDevice *)device player:(unsigned int)player
+-(void)joypadManager:(JPManager *)manager deviceDidConnect:(JPDevice *)device
 {
 	[device setDelegate:self];  // Use self to have the same delegate object as the joypad manager.
 	connected = true;
 	connect_external_controls();
 }
 
--(BOOL)joypadManager:(JoypadManager *)manager deviceShouldConnect:(JoypadDevice *)device
+-(BOOL)joypadManager:(JPManager *)manager deviceShouldConnect:(JPDevice *)device
 {
   return YES;
 }
 
 
--(void)joypadManager:(JoypadManager *)manager deviceDidDisconnect:(JoypadDevice *)device player:(unsigned int)player
+-(void)joypadManager:(JPManager *)manager deviceDidDisconnect:(JPDevice *)device
 {
 	connected = false;
 	left = right = up = down = ba = bb = bx = by = bl = br = false;
 	disconnect_external_controls();
 }
 
--(void)joypadDevice:(JoypadDevice *)device didAccelerate:(JoypadAcceleration)accel
+-(void)joypadDevice:(JPDevice *)device didAccelerate:(JPAcceleration)accel
 {
 }
 
--(void)joypadDevice:(JoypadDevice *)device dPad:(JoyInputIdentifier)dpad buttonUp:(JoyDpadButton)dpadButton
+-(void)joypadDevice:(JPDevice *)device dPad:(JPInputIdentifier)dpad buttonUp:(JPDpadButton)dpadButton
 {
 	lock_joypad_mutex();
 	
-	if (dpadButton == kJoyDpadButtonUp)
+	if (dpadButton == kJPDpadButtonUp)
 	{
 		up = false;
 		joy_u_up();
 	}
-	else if (dpadButton == kJoyDpadButtonDown)
+	else if (dpadButton == kJPDpadButtonDown)
 	{
 		down = false;
 		joy_d_up();
 	}
-	else if (dpadButton == kJoyDpadButtonLeft)
+	else if (dpadButton == kJPDpadButtonLeft)
 	{
 		left = false;
 		joy_l_up();
 	}
-	else if (dpadButton == kJoyDpadButtonRight)
+	else if (dpadButton == kJPDpadButtonRight)
 	{
 		right = false;
 		joy_r_up();
@@ -113,26 +111,26 @@ void disconnect_external_controls(void);
 	unlock_joypad_mutex();
 }
 
--(void)joypadDevice:(JoypadDevice *)device dPad:(JoyInputIdentifier)dpad buttonDown:(JoyDpadButton)dpadButton
+-(void)joypadDevice:(JPDevice *)device dPad:(JPInputIdentifier)dpad buttonDown:(JPDpadButton)dpadButton
 {
 	lock_joypad_mutex();
 	
-	if (dpadButton == kJoyDpadButtonUp)
+	if (dpadButton == kJPDpadButtonUp)
 	{
 		up = true;
 		joy_u_down();
 	}
-	else if (dpadButton == kJoyDpadButtonDown)
+	else if (dpadButton == kJPDpadButtonDown)
 	{
 		down = true;
 		joy_d_down();
 	}
-	else if (dpadButton == kJoyDpadButtonLeft)
+	else if (dpadButton == kJPDpadButtonLeft)
 	{
 		left = true;
 		joy_l_down();
 	}
-	else if (dpadButton == kJoyDpadButtonRight)
+	else if (dpadButton == kJPDpadButtonRight)
 	{
 		right = true;
 		joy_r_down();
@@ -141,34 +139,34 @@ void disconnect_external_controls(void);
 	unlock_joypad_mutex();
 }
 
--(void)joypadDevice:(JoypadDevice *)device buttonUp:(JoyInputIdentifier)button
+-(void)joypadDevice:(JPDevice *)device buttonUp:(JPInputIdentifier)button
 {
 	lock_joypad_mutex();
 	
-	if (button == kJoyInputAButton)
+	if (button == kJPInputAButton)
 	{
 		ba = false;
 		joy_b1_up();
 	}
-	else if (button == kJoyInputBButton)
+	else if (button == kJPInputBButton)
 	{
 		bb = false;
 		joy_b2_up();
 	}
-	else if (button == kJoyInputXButton)
+	else if (button == kJPInputXButton)
 	{
 		bx = false;
 		joy_b3_up();
 	}
-	else if (button == kJoyInputYButton)
+	else if (button == kJPInputYButton)
 	{
 		by = false;
 	}
-	else if (button == kJoyInputLButton)
+	else if (button == kJPInputLButton)
 	{
 		bl = false;
 	}
-	else if (button == kJoyInputRButton)
+	else if (button == kJPInputRButton)
 	{
 		br = false;
 	}
@@ -176,34 +174,34 @@ void disconnect_external_controls(void);
 	unlock_joypad_mutex();
 }
 
--(void)joypadDevice:(JoypadDevice *)device buttonDown:(JoyInputIdentifier)button
+-(void)joypadDevice:(JPDevice *)device buttonDown:(JPInputIdentifier)button
 {
 	lock_joypad_mutex();
 	
-	if (button == kJoyInputAButton)
+	if (button == kJPInputAButton)
 	{
 		ba = true;
 		joy_b1_down();
 	}
-	else if (button == kJoyInputBButton)
+	else if (button == kJPInputBButton)
 	{
 		bb = true;
 		joy_b2_down();
 	}
-	else if (button == kJoyInputXButton)
+	else if (button == kJPInputXButton)
 	{
 		bx = true;
 		joy_b3_down();
 	}
-	else if (button == kJoyInputYButton)
+	else if (button == kJPInputYButton)
 	{
 		by = true;
 	}
-	else if (button == kJoyInputLButton)
+	else if (button == kJPInputLButton)
 	{
 		bl = true;
 	}
-	else if (button == kJoyInputRButton)
+	else if (button == kJPInputRButton)
 	{
 		br = true;
 	}
@@ -211,7 +209,7 @@ void disconnect_external_controls(void);
 	unlock_joypad_mutex();
 }
 
--(void)joypadDevice:(JoypadDevice *)device analogStick:(JoyInputIdentifier)stick didMove:(JoypadStickPosition)newPosition
+-(void)joypadDevice:(JPDevice *)device analogStick:(JPInputIdentifier)stick didMove:(JPStickPosition)newPosition
 {
 }
 

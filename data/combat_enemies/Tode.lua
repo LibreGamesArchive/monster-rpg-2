@@ -84,6 +84,7 @@ function die()
 		if (battleGetEntityType(id) == COMBATENTITY_TYPE_PLAYER) then
 			if (battleGetEntityCondition(id) == CONDITION_SWALLOWED) then
 				battleSetEntityCondition(id, CONDITION_NORMAL)
+				battleSetSubAnimation(id, "stand")
 			end
 		end
 		id = battleGetNextEntity(id)

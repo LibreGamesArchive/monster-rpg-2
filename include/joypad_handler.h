@@ -6,11 +6,11 @@
 //  Copyright 2011 Nooskewl. All rights reserved.
 //
 
-#import "JoypadSDK.h"
+#import "JPSDK.h"
 
-@interface joypad_handler : NSObject<JoypadManagerDelegate, JoypadDeviceDelegate>
+@interface joypad_handler : NSObject<JPManagerDelegate, JPDeviceDelegate>
 {
-	JoypadManager *joypadManager;
+	JPManager *joypadManager;
 
 @public
 	bool connected, left, right, up, down, ba, bb, bx, by, bl, br;

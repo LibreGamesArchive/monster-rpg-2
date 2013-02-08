@@ -197,7 +197,7 @@ void initSound(void)
 	getcwd(buf1, MAX_PATH);
 	sprintf(buf2, "%s/libbassflac.so", buf1);
 	BASSFLACplugin = BASS_PluginLoad(buf2, 0);
-#elif defined IPHONE
+#elif defined ALLEGRO_IPHONE
 	BASS_PluginLoad((const char *)&BASSFLACplugin, 0);
 #elif defined ALLEGRO_MACOSX
 	BASSFLACplugin = BASS_PluginLoad("libbassflac.dylib", 0);

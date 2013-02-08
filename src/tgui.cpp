@@ -43,7 +43,7 @@ static int screen_offset_y = 0;
 static float screen_ratio_x = 1.0;
 static float screen_ratio_y = 1.0;
 
-#if !defined IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 static ALLEGRO_EVENT_QUEUE *key_events;
 #endif
 static ALLEGRO_EVENT_QUEUE *mouse_events;
@@ -137,7 +137,7 @@ static void tguiFindFocus()
  */
 static bool tguiShiftsPressed(ALLEGRO_KEYBOARD_STATE *kbdstate, int shifts)
 {
-#if !defined IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (shifts & TGUI_KEYFLAG_SHIFT) {
 		if (!al_key_down(kbdstate, ALLEGRO_KEY_LSHIFT) &&
 				!al_key_down(kbdstate, ALLEGRO_KEY_RSHIFT))
@@ -195,7 +195,7 @@ static bool tguiShiftsPressed(ALLEGRO_KEYBOARD_STATE *kbdstate, int shifts)
  */
 static bool tguiHotkeyPressed(int hotkey)
 {
-#if !defined IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	int shifts = tguiGetHotkeyFlags(hotkey);
 	int k = tguiGetHotkeyKey(hotkey);
 
@@ -320,7 +320,7 @@ void tguiShutdown()
 		delete activeGUI;
 	}
 	tguiStack.clear();
-#if !defined IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	al_unregister_event_source(key_events, al_get_keyboard_event_source());
 	al_destroy_event_queue(key_events);
 #endif
@@ -631,7 +631,7 @@ TGUIWidget* tguiUpdate()
 		}
 	}
 
-#if !defined IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (tguiActiveWidget) {
 		ALLEGRO_EVENT event;
 		while (!al_event_queue_is_empty(key_events)) {

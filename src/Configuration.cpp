@@ -547,7 +547,9 @@ bool Configuration::read()
 	}
 	else {
 		XMLData *xml_auto_rotate = game->find("auto_rotate");
-		setAutoRotation(atoi(xml_auto_rotate->getValue().c_str()));
+		if (xml_auto_rotate) {
+			setAutoRotation(atoi(xml_auto_rotate->getValue().c_str()));
+		}
 	}
 #endif
 	XMLData *xml_language = game->find("language");
@@ -598,6 +600,7 @@ bool Configuration::read()
 	if (joyb1) setJoyButton1(atoi(joyb1->getValue().c_str()));
 	if (joyb2) setJoyButton2(atoi(joyb2->getValue().c_str()));
 	if (joyb3) setJoyButton3(atoi(joyb3->getValue().c_str()));
+#if !defined ALLEGRO_IPHONE
 	if (key1) setKey1(keyname_to_keycode(key1->getValue().c_str()));
 	if (key2) setKey2(keyname_to_keycode(key2->getValue().c_str()));
 	if (key3) setKey3(keyname_to_keycode(key3->getValue().c_str()));
@@ -613,6 +616,7 @@ bool Configuration::read()
 	if (keyMusicDown) setKeyMusicDown(keyname_to_keycode(keyMusicDown->getValue().c_str()));
 	if (keyQuit) setKeyQuit(keyname_to_keycode(keyQuit->getValue().c_str()));
 	if (keySortItems) setKeySortItems(keyname_to_keycode(keySortItems->getValue().c_str()));
+#endif
 	if (fpsOn) fps_on = atoi(fpsOn->getValue().c_str());
 
 	ScreenDescriptor sd;
@@ -643,6 +647,7 @@ void Configuration::write()
 	XMLData* joyb1 = new XMLData("joyb1", my_itoa(getJoyButton1()));
 	XMLData* joyb2 = new XMLData("joyb2", my_itoa(getJoyButton2()));
 	XMLData* joyb3 = new XMLData("joyb3", my_itoa(getJoyButton3()));
+#if !defined ALLEGRO_IPHONE
 	XMLData* key1 = new XMLData(
 		"key1", al_keycode_to_name(getKey1()));
 	XMLData* key2 = new XMLData(
@@ -673,6 +678,7 @@ void Configuration::write()
 		"keyQuit", al_keycode_to_name(getKeyQuit()));
 	XMLData* keySortItems = new XMLData(
 		"keySortItems", al_keycode_to_name(getKeySortItems()));
+#endif
 	XMLData* fpsOn = new XMLData(
 		"fpsOn", my_itoa(fps_on));
 
@@ -697,6 +703,7 @@ void Configuration::write()
 	game->add(joyb1);
 	game->add(joyb2);
 	game->add(joyb3);
+#if !defined ALLEGRO_IPHONE
 	game->add(key1);
 	game->add(key2);
 	game->add(key3);
@@ -712,6 +719,7 @@ void Configuration::write()
 	game->add(keyMusicDown);
 	game->add(keyQuit);
 	game->add(keySortItems);
+#endif
 	game->add(fpsOn);
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
