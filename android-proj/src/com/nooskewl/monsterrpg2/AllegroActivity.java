@@ -943,8 +943,8 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
    }
 }
 
-class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback, 
-   View.OnKeyListener, View.OnTouchListener
+class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
+   View.OnTouchListener
 {
    
    static final int ALLEGRO_PIXEL_FORMAT_RGBA_8888 = 10;
@@ -1233,6 +1233,7 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
    public native void nativeOnChange(int format, int width, int height);
    public native void nativeOnKeyDown(int key);
    public native void nativeOnKeyUp(int key);
+   public native void nativeOnKeyChar(int key);
    public native void nativeOnTouch(int id, int action, float x, float y, boolean primary);
    
    /** functions that native code calls */
@@ -1610,6 +1611,9 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
       getHolder().addCallback(this); 
       
       Log.d("AllegroSurface", "ctor end");
+
+      setFocusable(true);
+      setFocusableInTouchMode(true);
    }
 
    void grabFocus()
@@ -1619,7 +1623,6 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
       setFocusable(true);
       setFocusableInTouchMode(true);
       requestFocus();
-      setOnKeyListener(this); 
       setOnTouchListener(this);
    }
       
@@ -1754,28 +1757,34 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
          }
    }
 
-   public boolean onKey(View v, int keyCode, KeyEvent event)
+   @Override
+   public boolean onKeyDown(int keyCode, KeyEvent event)
    {
-      if (event.getAction() == KeyEvent.ACTION_DOWN) {
-         if (!captureVolume) {
-            if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-               volumeChange(1);
-               return true;
-            }
-            else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-               volumeChange(-1);
-               return true;
-            }
+      if (!captureVolume) {
+         if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+            volumeChange(1);
+            return true;
          }
+         else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            volumeChange(-1);
+            return true;
+         }
+      }
+      if (event.getRepeatCount() == 0) {
          nativeOnKeyDown(keyMap[keyCode]);
-         return true;
+         nativeOnKeyChar(keyMap[keyCode]);
       }
-      else if (event.getAction() == KeyEvent.ACTION_UP) {
-         nativeOnKeyUp(keyMap[keyCode]);
-         return true;
+      else {
+         nativeOnKeyChar(keyMap[keyCode]);
       }
-         
-      return false;
+      return true;
+   }
+
+   @Override
+   public boolean onKeyUp(int keyCode, KeyEvent event)
+   {
+      nativeOnKeyUp(keyMap[keyCode]);
+      return true;
    }
 
    // FIXME: pull out android version detection into the setup

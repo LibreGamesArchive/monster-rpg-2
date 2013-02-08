@@ -1,1 +1,0 @@
-../../src/my_load_bitmap.h
