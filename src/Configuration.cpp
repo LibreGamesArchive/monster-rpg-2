@@ -788,6 +788,7 @@ Configuration::Configuration() :
 	joyB2(1),
 	joyB3(2),
 
+#ifndef ALLEGRO_ANDROID_ALWAYS
 	key1(ALLEGRO_KEY_SPACE),
 	key2(ALLEGRO_KEY_ESCAPE),
 	key3(ALLEGRO_KEY_V),
@@ -803,6 +804,23 @@ Configuration::Configuration() :
 	keyMusicDown(ALLEGRO_KEY_F1),
 	keyQuit(ALLEGRO_KEY_Q),
 	keySortItems(ALLEGRO_KEY_F8),
+#else
+	key1(ALLEGRO_KEY_DPAD_CENTER),
+	key2(ALLEGRO_KEY_BACK),
+	key3(ALLEGRO_KEY_BUTTON_Y),
+	keyLeft(ALLEGRO_KEY_DPAD_LEFT),
+	keyRight(ALLEGRO_KEY_DPAD_RIGHT),
+	keyUp(ALLEGRO_KEY_DPAD_UP),
+	keyDown(ALLEGRO_KEY_DPAD_DOWN),
+	keySettings(0),
+	keyFullscreen(0),
+	keySFXUp(ALLEGRO_KEY_VOLUME_UP),
+	keySFXDown(ALLEGRO_KEY_VOLUME_DOWN),
+	keyMusicUp(ALLEGRO_KEY_VOLUME_UP),
+	keyMusicDown(ALLEGRO_KEY_VOLUME_DOWN),
+	keyQuit(ALLEGRO_KEY_ANDROID_MENU),
+	keySortItems(ALLEGRO_KEY_BUTTON_X),
+#endif
 
 	gamepadAvailable(true),
 	onlyMemoryBitmaps(false),

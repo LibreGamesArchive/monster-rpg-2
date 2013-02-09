@@ -473,7 +473,7 @@ void set_player_path(int x, int y)
 
 void astar_stop(void)
 {
-	if (!have_mouse && use_dpad)
+	if (use_dpad)
 		return;
 
 	Input *i = getInput();
@@ -671,14 +671,10 @@ bool Area::activate(uint id, int direction)
 				if (v[j][0] == x1 && v[j][1] == y1) {
 					activated = true;
 					setObjectDirection(o, direction);
-					// HERE
-					if (use_dpad) {
-						getInput()->waitForReleaseOr(4, 5000);
-					}
-					
+					getInput()->waitForReleaseOr(4, 5000);
 					clear_input_events();
 					callLua(luaState, "activate", "ii>", id, obj->getId());
-					if (was_a_click || !use_dpad) {
+					if (was_a_click) {
 						callLua(luaState, "collide", "ii>", id, obj->getId());
 					}
 				}
@@ -1420,8 +1416,8 @@ void Area::copyTile(int x, int y, Tile *t)
        areaTile->setSolid(t->isSolid());
 }
 
-static int ss_save_counter = 1000;
-static int mem_save_counter = 1000;
+static int ss_save_counter = 10000;
+static int mem_save_counter = 10000;
 
 void real_auto_save_game(void)
 {
@@ -1441,7 +1437,7 @@ void Area::auto_save_game(int step, bool ignoreCount)
 		Object *o = party[heroSpot]->getObject();
 		if (
 		
-			(ignoreCount || mem_save_counter >= 1000 || had_battle)
+			(ignoreCount || mem_save_counter >= 10000 || had_battle)
 
 
 			// FIXME: is this bad news?
@@ -1470,7 +1466,7 @@ void Area::auto_save_screenshot(int step, bool force)
 	if (force || (!battle && !player_scripted && !manChooser && !timer_on && name != "tutorial" && oldArea == area && global_can_save)) {
 		ss_save_counter += step;
 		
-		if (force || (ss_save_counter >= 1000 || totalUpdates < 5)) {
+		if (force || (ss_save_counter >= 10000 || totalUpdates < 5)) {
 			real_auto_save_screenshot();
 		}
 	}
@@ -1541,7 +1537,7 @@ void Area::update(int step)
 		if (!objects[i]->update(this, step)) {
 			toDelete.push_back(i);
 		}
-		if (!speechDialog && use_dpad && !dpad_panning) {
+		if (!speechDialog && !dpad_panning) {
 			try {
 				Input *input = objects[i]->getInput();
 				if (input) {
@@ -1584,7 +1580,7 @@ void Area::update(int step)
 
 	if (!player_scripted && !battle && !manChooser
 			&& this == area && !speechDialog) {
-		if (have_mouse || !use_dpad) {
+		if (!use_dpad) {
 			if (!released && !down) {
 				down = true;
 				al_lock_mutex(click_mutex);
@@ -1658,7 +1654,7 @@ void Area::update(int step)
 				}
 			}
 		}
-		if (use_dpad && dpad_panning) {
+		if (dpad_panning) {
 			InputDescriptor ie = getInput()->getDescriptor();
 			for (int i = 0; i < (int)(0.2 * step); i++) {
 				if (ie.up) {
@@ -2358,8 +2354,8 @@ Area::Area(void)
 	follow = true;
 	last_player_x = -1;
 	last_player_y = -1;
-	mem_save_counter = 1000;
-	ss_save_counter = 1000;
+	mem_save_counter = 10000;
+	ss_save_counter = 10000;
 	down = false;
 	panned = false;
 	start_mx = 0;

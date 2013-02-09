@@ -128,7 +128,7 @@ void clear_input_events(void)
 	al_unlock_mutex(input_event_mutex);
 }
 
-void Input::set(bool l, bool r, bool u, bool d, int set_sets, bool clear_on_false)
+void Input::set(bool l, bool r, bool u, bool d, int set_sets)
 {
 	al_lock_mutex(mutex);
 	
@@ -191,7 +191,7 @@ void Input::set(bool l, bool r, bool u, bool d, int set_sets, bool clear_on_fals
 	al_unlock_mutex(mutex);
 }
 
-void Input::set(bool b1, bool b2, bool b3, int set_sets, bool clear_on_false)
+void Input::set(bool b1, bool b2, bool b3, int set_sets)
 {
 	al_lock_mutex(mutex);
 
@@ -220,11 +220,11 @@ void Input::set(bool b1, bool b2, bool b3, int set_sets, bool clear_on_false)
 	al_unlock_mutex(mutex);
 }
 
-void Input::set(bool l, bool r, bool u, bool d, bool b1, bool b2, bool b3, int set_sets, bool clear_on_false)
+void Input::set(bool l, bool r, bool u, bool d, bool b1, bool b2, bool b3, int set_sets)
 {
 	al_lock_mutex(mutex);
-	set(l, r, u, d, set_sets, clear_on_false);
-	set(b1, b2, b3, set_sets, clear_on_false);
+	set(l, r, u, d, set_sets);
+	set(b1, b2, b3, set_sets);
 	al_unlock_mutex(mutex);
 }
 
@@ -248,7 +248,7 @@ InputDescriptor Input::getDescriptor()
 	}
 	
 	InputDescriptor i = descriptor;
-	
+
 	al_unlock_mutex(mutex);
 	
 	return i;
@@ -316,7 +316,7 @@ void KeyboardInput::handle_event(ALLEGRO_EVENT *event)
 {
 	if (event->type != ALLEGRO_EVENT_KEY_DOWN && event->type != ALLEGRO_EVENT_KEY_UP)
 		return;
-
+	
 	int keycode = event->keyboard.keycode;
 	bool onoff = event->type == ALLEGRO_EVENT_KEY_DOWN;
 

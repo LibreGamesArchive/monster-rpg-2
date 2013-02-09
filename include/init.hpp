@@ -236,4 +236,7 @@ extern int height_before_fullscreen;
 extern int config_save_width;
 extern int config_save_height;
 
+extern bool f5_cheated, f6_cheated;
+extern double f5_time, f6_time;
+
 #endif

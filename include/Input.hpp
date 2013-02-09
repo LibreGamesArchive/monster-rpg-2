@@ -1,4 +1,4 @@
- #ifndef INPUT_H
+#ifndef INPUT_H
 #define INPUT_H
 
 #include "monster2.hpp"
@@ -7,9 +7,9 @@
 
 class Input {
 public:
-	void set(bool l, bool r, bool u, bool d, int set_sets = true, bool clear_on_false = true);
-	void set(bool b1, bool b2, bool b3, int set_sets = true, bool clear_on_false = true);
-	void set(bool l, bool r, bool u, bool d, bool b1, bool b2, bool b3, int set_sets = true, bool clear_on_false = true);
+	void set(bool l, bool r, bool u, bool d, int set_sets = true);
+	void set(bool b1, bool b2, bool b3, int set_sets = true);
+	void set(bool l, bool r, bool u, bool d, bool b1, bool b2, bool b3, int set_sets = true);
 	InputDescriptor getDescriptor();
 	void setDirection(int direction);
 	int getDirection(void) { return descriptor.direction; }

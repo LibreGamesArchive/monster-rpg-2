@@ -1197,15 +1197,9 @@ int MSpeechDialog::update(int millis)
 
 	INPUT_EVENT ie = { 0, };
 	
-	if (use_dpad) {
-		ie = get_next_input_event();
-	}
+	ie = get_next_input_event();
 	
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	if ((this == tguiActiveWidget) && (ie.button1 == DOWN || clicked)) {
-#else
-	if ((!use_dpad || this == tguiActiveWidget) && (ie.button1 == DOWN || clicked)) {
-#endif
+	if (this == tguiActiveWidget && (ie.button1 == DOWN || clicked)) {
 		use_input_event();
 		
 		Input *i = getInput();
@@ -1429,11 +1423,7 @@ int MTextButton::update(int millis)
 		m_text_height(game_font) + 2;
 
 	INPUT_EVENT ie;
-#ifdef ALLEGRO_IPHONE
-	if (this != tguiActiveWidget || !use_dpad) {
-#else
 	if (this != tguiActiveWidget) {
-#endif
 		ie = EMPTY_INPUT_EVENT;
 	}
 	else {

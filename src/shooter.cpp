@@ -763,13 +763,11 @@ start:
 
 	MShooterButton *button = NULL;
 	MShooterSlider *slider = NULL;
-	if (!use_dpad) {
-		button = new MShooterButton();
-		slider = new MShooterSlider();
-		tguiSetParent(0);
-		tguiAddWidget(button);
-		tguiAddWidget(slider);
-	}
+	button = new MShooterButton();
+	slider = new MShooterSlider();
+	tguiSetParent(0);
+	tguiAddWidget(button);
+	tguiAddWidget(slider);
 
 	crabs = crabs_start;
 	sharks = sharks_start;
@@ -862,17 +860,13 @@ start:
 			}
 			else if (!dead) {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-				if (use_dpad) {
-					if (ie.left) {
-						x -= LOGIC_MILLIS * 0.2;
-					}
-					if (ie.right) {
-						x += LOGIC_MILLIS * 0.2;
-					}
+				if (ie.left) {
+					x -= LOGIC_MILLIS * 0.2;
 				}
-				else {
-					x += LOGIC_MILLIS * slider->getValue()/3;
+				if (ie.right) {
+					x += LOGIC_MILLIS * 0.2;
 				}
+				x += LOGIC_MILLIS * slider->getValue()/3;
 #else
 				if (ie.left) {
 					x -= LOGIC_MILLIS * 0.2;
@@ -988,10 +982,8 @@ start:
 			}
 
 			bool pressed = false;
-			if (!use_dpad) {
-				tguiUpdate();
-				pressed = button->getPressed();
-			}
+			tguiUpdate();
+			pressed = button->getPressed();
 
 			ALLEGRO_MOUSE_STATE state;
 			if (have_mouse) {
@@ -1193,8 +1185,7 @@ start:
 				draw(x, o);
 			}
 
-			if (!use_dpad)
-				tguiDraw();
+			tguiDraw();
 		
 			m_save_blender();
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
@@ -1242,12 +1233,10 @@ done:
 	
 	clear_input_events();
 
-	if (!use_dpad) {
-		tguiDeleteWidget(button);
-		tguiDeleteWidget(slider);
-		delete button;
-		delete slider;
-	}
+	tguiDeleteWidget(button);
+	tguiDeleteWidget(slider);
+	delete button;
+	delete slider;
 
 	crabs.clear();
 	bullets.clear();

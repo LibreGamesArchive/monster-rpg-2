@@ -247,6 +247,23 @@ static float backup_music_volume = 1.0f;
 static float backup_ambience_volume = 1.0f;
 #endif
 
+static bool is_modifier(int c)
+{
+	switch (c) {
+		case ALLEGRO_KEY_LSHIFT:
+		case ALLEGRO_KEY_RSHIFT:
+		case ALLEGRO_KEY_LCTRL:
+		case ALLEGRO_KEY_RCTRL:
+		case ALLEGRO_KEY_ALT:
+		case ALLEGRO_KEY_ALTGR:
+		case ALLEGRO_KEY_LWIN:
+		case ALLEGRO_KEY_RWIN:
+			return true;
+	}
+
+	return false;
+}
+
 // called from everywhere
 bool is_close_pressed(void)
 {
@@ -267,6 +284,320 @@ top:
 
 		ALLEGRO_EVENT event;
 		al_get_next_event(events_minor, &event);
+
+#if !defined ALLEGRO_IPHONE
+		al_lock_mutex(input_mutex);
+		if (getInput())
+			getInput()->handle_event(&event);
+		al_unlock_mutex(input_mutex);
+#endif
+
+#if !defined ALLEGRO_IPHONE
+		if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+
+			if (event.keyboard.keycode == config.getKeyFullscreen()) {
+				if (!pause_f_to_toggle_fullscreen) {
+					do_toggle_fullscreen = true;
+				}
+			}
+			if (event.keyboard.keycode == config.getKeySettings()) {
+				if (!pause_f_to_toggle_fullscreen) {
+					close_pressed_for_configure = true;
+					close_pressed = true;
+				}
+			}
+			if (event.keyboard.keycode == config.getKeyMusicDown()) {
+				int v = config.getMusicVolume();
+				if (v <= 26) v = 0;
+				else v = v - 26; 
+				config.setMusicVolume(v);
+				setMusicVolume(getMusicVolume());
+				setAmbienceVolume(getAmbienceVolume());
+			}
+			if (event.keyboard.keycode == config.getKeyMusicUp()) {
+				int v = config.getMusicVolume();
+				if (v >= 230) v = 255;
+				else v = v + 26; 
+				config.setMusicVolume(v);
+				setMusicVolume(getMusicVolume());
+				setAmbienceVolume(getAmbienceVolume());
+			}
+			if (event.keyboard.keycode == config.getKeySFXDown()) {
+				int v = config.getSFXVolume();
+				if (v <= 26) v = 0;
+				else v = v - 26; 
+				config.setSFXVolume(v);
+				if (boost) {
+					setStreamVolume(
+						boost,
+						boost_volume
+					);
+				}
+			}
+			if (event.keyboard.keycode == config.getKeySFXUp()) {
+				int v = config.getSFXVolume();
+				if (v >= 230) v = 255;
+				else v = v + 26; 
+				config.setSFXVolume(v);
+				if (boost) {
+					setStreamVolume(
+						boost,
+						boost_volume
+					);
+				}
+			}
+			if (event.keyboard.keycode == ALLEGRO_KEY_F5) {
+				f5_time = al_get_time();
+			}
+			if (event.keyboard.keycode == ALLEGRO_KEY_F6) {
+				f6_time = al_get_time();
+			}
+			if (event.keyboard.keycode == ALLEGRO_KEY_F12) {
+				reload_translation = true;
+			}
+			/*
+			else {
+				INPUT_EVENT ie = EMPTY_INPUT_EVENT;
+				int c = event.keyboard.keycode;
+				bool m = is_modifier(c);
+				if (m && c == config.getKey1()) {
+					ie.button1 = DOWN;
+					add_input_event(ie);
+				}
+				else if (m && c == config.getKey2()) {
+					ie.button2 = DOWN;
+					add_input_event(ie);
+				}
+				else if (m && c == config.getKey3()) {
+					ie.button3 = DOWN;
+					add_input_event(ie);
+				}
+				else if (c == config.getKeyLeft()) {
+					ie.left = DOWN;
+					add_input_event(ie);
+				}
+				else if (c == config.getKeyRight()) {
+					ie.right = DOWN;
+					add_input_event(ie);
+				}
+				else if (c == config.getKeyUp()) {
+					ie.up = DOWN;
+					add_input_event(ie);
+				}
+				else if (c == config.getKeyDown()) {
+					ie.down = DOWN;
+					add_input_event(ie);
+				}
+				else if (c == config.getKey1()) {
+					ie.button1 = DOWN;
+					add_input_event(ie);
+				}
+				else if (c == config.getKey2()) {
+					ie.button2 = DOWN;
+					add_input_event(ie);
+				}
+				else if (c == config.getKey3()) {
+					ie.button3 = DOWN;
+					add_input_event(ie);
+				}
+			}
+			*/
+		}
+		else if (event.type == ALLEGRO_EVENT_KEY_CHAR) {
+			INPUT_EVENT ie = EMPTY_INPUT_EVENT;
+			int code = event.keyboard.keycode;
+			if (code == config.getKeyLeft()) {
+				ie.left = DOWN;
+				add_input_event(ie);
+			}
+			else if (code == config.getKeyRight()) {
+				ie.right = DOWN;
+				add_input_event(ie);
+			}
+			else if (code == config.getKeyUp()) {
+				ie.up = DOWN;
+				add_input_event(ie);
+			}
+			else if (code == config.getKeyDown()) {
+				ie.down = DOWN;
+				add_input_event(ie);
+			}
+			else if (code == config.getKey1()) {
+				ie.button1 = DOWN;
+				add_input_event(ie);
+			}
+			else if (code == config.getKey2()) {
+				ie.button2 = DOWN;
+				add_input_event(ie);
+			}
+			else if (code == config.getKey3()) {
+				ie.button3 = DOWN;
+				add_input_event(ie);
+			}
+		}
+		else if (event.type == ALLEGRO_EVENT_KEY_UP) {
+			INPUT_EVENT ie = EMPTY_INPUT_EVENT;
+			int code = event.keyboard.keycode;
+			if (code == config.getKeyLeft()) {
+				ie.left = UP;
+				add_input_event(ie);
+			}
+			else if (code == config.getKeyRight()) {
+				ie.right = UP;
+				add_input_event(ie);
+			}
+			else if (code == config.getKeyUp()) {
+				ie.up = UP;
+				add_input_event(ie);
+			}
+			else if (code == config.getKeyDown()) {
+				ie.down = UP;
+				add_input_event(ie);
+			}
+			else if (code == config.getKey1()) {
+				dpad_panning = false;
+				ie.button1 = UP;
+				add_input_event(ie);
+			}
+			else if (code == config.getKey2()) {
+				ie.button2 = UP;
+				add_input_event(ie);
+			}
+			else if (code == config.getKey3()) {
+				ie.button3 = UP;
+				add_input_event(ie);
+			}
+			else if (event.keyboard.keycode == ALLEGRO_KEY_F5) {
+				f5_time = -1;
+				f5_cheated = false;
+			}
+			else if (event.keyboard.keycode == ALLEGRO_KEY_F6) {
+				f6_time = -1;
+				f6_cheated = false;
+			}
+			else {
+				INPUT_EVENT ie = EMPTY_INPUT_EVENT;
+				int c = event.keyboard.keycode;
+				bool m = is_modifier(c);
+				if (m && c == config.getKey1()) {
+					ie.button1 = UP;
+					add_input_event(ie);
+				}
+				else if (m && c == config.getKey2()) {
+					ie.button2 = UP;
+					add_input_event(ie);
+				}
+				else if (m && c == config.getKey3()) {
+					ie.button3 = UP;
+					add_input_event(ie);
+				}
+			}
+		}
+#if !defined ALLEGRO_ANDROID
+		else if (event.type == ALLEGRO_EVENT_JOYSTICK_CONFIGURATION) {
+			al_reconfigure_joysticks();
+			int nj = al_get_num_joysticks();
+			if (nj == 0) {
+				num_joystick_buttons = 0;
+				config.setGamepadAvailable(false);
+			}
+			else if (nj > 0) {
+				set_user_joystick();
+				if (user_joystick != NULL) {
+					num_joystick_buttons = al_get_joystick_num_buttons(user_joystick);
+					config.setGamepadAvailable(true);
+				}
+				else {
+					num_joystick_buttons = 0;
+					config.setGamepadAvailable(false);
+				}
+			}
+			getInput()->reconfig();
+		}
+		else if (event.type == ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN) {
+			if (event.joystick.id == user_joystick) {
+				if (event.joystick.button == config.getJoyButton1()) {
+					joy_b1_down();
+				}
+				else if (event.joystick.button == config.getJoyButton2()) {
+					joy_b2_down();
+				}
+				else if (event.joystick.button == config.getJoyButton3()) {
+					joy_b3_down();
+				}
+			}
+		}
+		else if (event.type == ALLEGRO_EVENT_JOYSTICK_BUTTON_UP) {
+			if (event.joystick.id == user_joystick) {
+				if (event.joystick.button == config.getJoyButton1()) {
+					joy_b1_up();
+				}
+				else if (event.joystick.button == config.getJoyButton2()) {
+					joy_b2_up();
+				}
+				else if (event.joystick.button == config.getJoyButton3()) {
+					joy_b3_up();
+				}
+			}
+		}
+		else if (event.type == ALLEGRO_EVENT_JOYSTICK_AXIS) {
+			if (event.joystick.id == user_joystick) {
+				int axis = event.joystick.axis;
+				float pos = event.joystick.pos;
+				if (axis == 0) {
+					if (joy_axes[0] == -1) {
+						if (pos >= -0.5) {
+							joy_axes[0] = 0;
+							joy_l_up();
+						}
+					}
+					else if (joy_axes[0] == 1) {
+						if (pos <= 0.5) {
+							joy_axes[0] = 0;
+							joy_r_up();
+						}
+					}
+					else {
+						if (pos < -0.5) {
+							joy_axes[0] = -1;
+							joy_l_down();
+						}
+						else if (pos > 0.5) {
+							joy_axes[0] = 1;
+							joy_r_down();
+						}
+					}
+				}
+				else if (axis == 1) {
+					if (joy_axes[1] == -1) {
+						if (pos >= -0.5) {
+							joy_axes[1] = 0;
+							joy_u_up();
+						}
+					}
+					else if (joy_axes[1] == 1) {
+						if (pos <= 0.5) {
+							joy_axes[1] = 0;
+							joy_d_up();
+						}
+					}
+					else {
+						if (pos > 0.5) {
+							joy_axes[1] = 1;
+							joy_d_down();
+						}
+						else if (pos < -0.5) {
+							joy_axes[1] = -1;
+							joy_u_down();
+						}
+					}
+				}
+			}
+		}
+#endif
+#endif
+
+
 #ifdef ALLEGRO_IPHONE
 		if (event.type == ALLEGRO_EVENT_DISPLAY_CONNECTED) {
 			create_airplay_mirror = true;
