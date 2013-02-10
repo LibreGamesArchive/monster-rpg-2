@@ -151,6 +151,8 @@ top:
 	int explode_count = 0;
 	int expl_x = 0, expl_y = 0;
 
+	clear_input_events();
+
 	while  (1) {
 		int green = 0;
 		
@@ -396,8 +398,6 @@ top:
 done:
 
 	custom_mouse_cursor = tmpcursor;
-
-	clear_input_events();
 
 	if (!use_dpad) {
 		tguiDeleteWidget(left_button);

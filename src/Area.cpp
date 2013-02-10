@@ -473,9 +473,6 @@ void set_player_path(int x, int y)
 
 void astar_stop(void)
 {
-	if (use_dpad)
-		return;
-
 	Input *i = getInput();
 	if (i) {
 		//i->set(false, false, false, false);
@@ -672,7 +669,6 @@ bool Area::activate(uint id, int direction)
 					activated = true;
 					setObjectDirection(o, direction);
 					getInput()->waitForReleaseOr(4, 5000);
-					clear_input_events();
 					callLua(luaState, "activate", "ii>", id, obj->getId());
 					if (was_a_click) {
 						callLua(luaState, "collide", "ii>", id, obj->getId());
@@ -1419,55 +1415,43 @@ void Area::copyTile(int x, int y, Tile *t)
 static int ss_save_counter = 10000;
 static int mem_save_counter = 10000;
 
-void real_auto_save_game(void)
+void real_auto_save_game(bool save_ss)
 {
-	had_battle = false;
 	mem_save_counter = 0;
+	ss_save_counter = 0;
+
+	had_battle = false;
 	memory_save_offset = 0;
 	using_memory_save = true;
 	saveGame(NULL);
 	using_memory_save = false;
 	memory_saved = true;
+
+	if (save_ss) {
+		m_push_target_bitmap();
+		m_set_target_bitmap(screenshot);
+		m_draw_scaled_bitmap(buffer, 0, 0, BW, BH, 0, 0,
+				BW/2, BH/2, 0, 255);
+		m_pop_target_bitmap();
+	}
 }
 	
-void Area::auto_save_game(int step, bool ignoreCount)
+void Area::auto_save_game(int step, bool ignoreCount, bool save_ss)
 {
 	if (!battle && !player_scripted && !manChooser && !timer_on && name != "tutorial" && oldArea == area && global_can_save) {
 		mem_save_counter += step;
+		ss_save_counter += step;
 		Object *o = party[heroSpot]->getObject();
 		if (
 		
-			(ignoreCount || mem_save_counter >= 10000 || had_battle)
+			(ignoreCount || mem_save_counter >= 10000 || had_battle || totalUpdates < 5)
 
 
 			// FIXME: is this bad news?
 			&& !onAnyObject(o->getId(), o->getX(), o->getY())
 		)
 		{
-
-
-			real_auto_save_game();
-		}
-	}
-}
-
-void real_auto_save_screenshot(void)
-{
-	ss_save_counter = 0;
-	m_push_target_bitmap();
-	m_set_target_bitmap(screenshot);
-	m_draw_scaled_bitmap(buffer, 0, 0, BW, BH, 0, 0,
-			BW/2, BH/2, 0, 255);
-	m_pop_target_bitmap();
-}
-
-void Area::auto_save_screenshot(int step, bool force)
-{
-	if (force || (!battle && !player_scripted && !manChooser && !timer_on && name != "tutorial" && oldArea == area && global_can_save)) {
-		ss_save_counter += step;
-		
-		if (force || (ss_save_counter >= 10000 || totalUpdates < 5)) {
-			real_auto_save_screenshot();
+			real_auto_save_game(save_ss);
 		}
 	}
 }
@@ -1541,9 +1525,9 @@ void Area::update(int step)
 			try {
 				Input *input = objects[i]->getInput();
 				if (input) {
-					InputDescriptor ie = input->getDescriptor();
-					if (ie.button1) {
-						if (activate(objects[i]->getId(), ie.direction)) {
+					InputDescriptor id = input->getDescriptor();
+					if (id.button1) {
+						if (activate(objects[i]->getId(), id.direction)) {
 						}
 						else if (!player_scripted && !battle && !manChooser
 								&& this == area && !speechDialog) {
@@ -1570,7 +1554,6 @@ void Area::update(int step)
 		}
 		else {
 			auto_save_game(step);
-			auto_save_screenshot(step);
 		}
 	}
 	else
@@ -1580,105 +1563,103 @@ void Area::update(int step)
 
 	if (!player_scripted && !battle && !manChooser
 			&& this == area && !speechDialog) {
-		if (!use_dpad) {
-			if (!released && !down) {
-				down = true;
-				al_lock_mutex(click_mutex);
-				start_mx = click_x;
-				start_my = click_y;
-				current_mouse_x = start_mx;
-				current_mouse_y = start_my;
-				al_unlock_mutex(click_mutex);
-				down_time = al_current_time();
-			}
-			else if (down) {
-				al_lock_mutex(click_mutex);
-				int cx = current_mouse_x;
-				int cy = current_mouse_y;
-				al_unlock_mutex(click_mutex);
-				if ((abs(cx-start_mx) > 5 || abs(cy-start_my) > 5) && cx >= 0 && !path_head) {
-					// panning
-					area_panned_x += (start_mx - cx);
-					area_panned_y += (start_my - cy);
-					if (area_panned_x < -(BW-TILE_SIZE/2)) {
-						area_panned_x = -(BW-TILE_SIZE/2);
-					}
-					else if (area_panned_x > -TILE_SIZE/2) {
-						area_panned_x = -TILE_SIZE/2;
-					}
-					if (area_panned_y < -(BH-TILE_SIZE/2)) {
-						area_panned_y = -(BH-TILE_SIZE/2);
-					}
-					else if (area_panned_y > -TILE_SIZE/2) {
-						area_panned_y = -TILE_SIZE/2;
-					}
-					start_mx = cx;
-					start_my = cy;
-					panned = true;
-					adjusted_pan = true;
+		if (!released && !down) {
+			down = true;
+			al_lock_mutex(click_mutex);
+			start_mx = click_x;
+			start_my = click_y;
+			current_mouse_x = start_mx;
+			current_mouse_y = start_my;
+			al_unlock_mutex(click_mutex);
+			down_time = al_current_time();
+		}
+		else if (down) {
+			al_lock_mutex(click_mutex);
+			int cx = current_mouse_x;
+			int cy = current_mouse_y;
+			al_unlock_mutex(click_mutex);
+			if ((abs(cx-start_mx) > 5 || abs(cy-start_my) > 5) && cx >= 0 && !path_head) {
+				// panning
+				area_panned_x += (start_mx - cx);
+				area_panned_y += (start_my - cy);
+				if (area_panned_x < -(BW-TILE_SIZE/2)) {
+					area_panned_x = -(BW-TILE_SIZE/2);
 				}
-				if (released) {
-					down = false;
-					if (!panned) {
-						int tx = (start_mx + area->getOriginX()) / TILE_SIZE;
-						int ty = (start_my + area->getOriginY()) / TILE_SIZE;
-						callLua(luaState, "activate_any", "ii>b", tx, ty);
-						bool used;
-						if (lua_isboolean(luaState, -1)) {
-							used = lua_toboolean(luaState, -1);
+				else if (area_panned_x > -TILE_SIZE/2) {
+					area_panned_x = -TILE_SIZE/2;
+				}
+				if (area_panned_y < -(BH-TILE_SIZE/2)) {
+					area_panned_y = -(BH-TILE_SIZE/2);
+				}
+				else if (area_panned_y > -TILE_SIZE/2) {
+					area_panned_y = -TILE_SIZE/2;
+				}
+				start_mx = cx;
+				start_my = cy;
+				panned = true;
+				adjusted_pan = true;
+			}
+			if (released) {
+				down = false;
+				if (!panned) {
+					int tx = (start_mx + area->getOriginX()) / TILE_SIZE;
+					int ty = (start_my + area->getOriginY()) / TILE_SIZE;
+					callLua(luaState, "activate_any", "ii>b", tx, ty);
+					bool used;
+					if (lua_isboolean(luaState, -1)) {
+						used = lua_toboolean(luaState, -1);
+					}
+					else {
+						used = false;
+					}
+					lua_pop(luaState, 1);
+					if (!used) {
+						if (!path_head) {
+							set_player_path(start_mx, start_my);
+							astar_next_x = -1;
+							astar_next_immediate_x = -1;
 						}
 						else {
-							used = false;
-						}
-						lua_pop(luaState, 1);
-						if (!used) {
-							if (!path_head) {
-								set_player_path(start_mx, start_my);
-								astar_next_x = -1;
-								astar_next_immediate_x = -1;
-							}
-							else {
-								astar_next_immediate_x = start_mx;
-								astar_next_immediate_y = start_my;
-							}
+							astar_next_immediate_x = start_mx;
+							astar_next_immediate_y = start_my;
 						}
 					}
-					panned = false;
 				}
-				else {
-					if (al_current_time() > down_time+0.2 && !panned) {
-						astar_next_x = cx;
-						astar_next_y = cy;
-						down_time = al_current_time();
-					}
+				panned = false;
+			}
+			else {
+				if (al_current_time() > down_time+0.2 && !panned) {
+					astar_next_x = cx;
+					astar_next_y = cy;
+					down_time = al_current_time();
 				}
 			}
 		}
 		if (dpad_panning) {
-			InputDescriptor ie = getInput()->getDescriptor();
+			InputDescriptor id = getInput()->getDescriptor();
 			for (int i = 0; i < (int)(0.2 * step); i++) {
-				if (ie.up) {
+				if (id.up) {
 					area_panned_y--;
 					adjusted_pan = true;
 					if (area_panned_y < -(BH-TILE_SIZE/2)) {
 						area_panned_y = -(BH-TILE_SIZE/2);
 					}
 				}
-				else if (ie.down) {
+				else if (id.down) {
 					area_panned_y++;
 					adjusted_pan = true;
 					if (area_panned_y > -TILE_SIZE/2) {
 						area_panned_y = -TILE_SIZE/2;
 					}
 				}
-				if (ie.left) {
+				if (id.left) {
 					area_panned_x--;
 					adjusted_pan = true;
 					if (area_panned_x < -(BW-TILE_SIZE/2)) {
 						area_panned_x = -(BW-TILE_SIZE/2);
 					}
 				}
-				else if (ie.right) {
+				else if (id.right) {
 					area_panned_x++;
 					adjusted_pan = true;
 					if (area_panned_x > -TILE_SIZE/2) {
@@ -1759,13 +1740,13 @@ void Area::update(int step)
 						if (path_head && path_head->child) {
 							path_head = path_head->child;
 							GET_DIRECTIONS(path_head)
-							InputDescriptor ie = i->getDescriptor();
+							InputDescriptor id = i->getDescriptor();
 							int nextdir;
 							if (l) nextdir = DIRECTION_WEST;
 							else if (r) nextdir = DIRECTION_EAST;
 							else if (u) nextdir = DIRECTION_NORTH;
 							else nextdir = DIRECTION_SOUTH;
-							if (ie.direction != nextdir) {
+							if (id.direction != nextdir) {
 								o->stop();
 							}
 							if (area->isOccupied(0, path_head->x, path_head->y, true, true)) {

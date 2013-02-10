@@ -142,7 +142,7 @@ extern int current_mouse_x, current_mouse_y;
 extern ALLEGRO_MUTEX *click_mutex;
 extern ALLEGRO_MUTEX *input_mutex;
 extern ALLEGRO_MUTEX *dpad_mutex;
-extern ALLEGRO_MUTEX *orient_mutex;
+extern ALLEGRO_MUTEX *touch_mutex;
 extern float bright_ticker;
 extern float area_panned_x;
 extern float area_panned_y;
@@ -209,11 +209,9 @@ extern int versionMinor;
 
 extern bool do_acknowledge_resize;
 	
-extern ALLEGRO_EVENT_QUEUE *events_minor;
+extern ALLEGRO_EVENT_QUEUE *input_event_queue;
 extern ALLEGRO_EVENT_QUEUE *events;
-#ifdef ALLEGRO_IPHONE
 extern double next_shake;
-#endif
 
 extern bool sound_was_playing_at_program_start;
 #ifdef ALLEGRO_IPHONE

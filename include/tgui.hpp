@@ -5,10 +5,6 @@
 
 #include <allegro5/allegro5.h>
 
-#ifdef ALLEGRO_IPHONE
-#include "user_events.h"
-#endif
-
 #ifndef MIN
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #endif
@@ -72,6 +68,8 @@ public:
 	void setWidth(int w) { width = w; }
 	void setHeight(int h) { height = h; }
 	void setParent(TGUIWidget* p) { parent = p; }
+	bool getAllClear() { return allClear; }
+	void setAllClear(bool allClear) { this->allClear = allClear; }
 	virtual void setFocus(bool fcs) { focus = fcs; }
 	// pre_draw is called on widgets in the same order as draw, only before any draw call
 	virtual void pre_draw() {}
@@ -112,8 +110,9 @@ public:
 	virtual bool handleHotkey(int hotkey) { return false; }
 	virtual bool acceptsFocus() { return false; }
 	virtual bool acceptsHover() { return false; }
-	TGUIWidget() { focus = false; }
+	TGUIWidget();
 	virtual ~TGUIWidget() {}
+
 protected:
 	int x;
 	int y;
@@ -124,6 +123,7 @@ protected:
 	TGUIWidget* parent;
 	std::vector<int>* hotkeys;
 	bool focus;
+	bool allClear;
 };
 
 extern TGUIWidget* tguiActiveWidget;
@@ -131,8 +131,8 @@ extern TGUIPoint tguiActiveWidgetClickedPoint; // relative to widget
 
 extern bool tguiPointOnWidget(TGUIWidget* widget, int *x, int *y);
 extern unsigned long tguiCurrentTimeMillis();
-extern void tguiInit(void);
-extern bool tguiIsInitialized(void);
+extern void tguiInit();
+extern bool tguiIsInitialized();
 extern void tguiShutdown();
 extern void tguiSetFocus(int widget);
 extern void tguiSetFocus(TGUIWidget* widget);
@@ -166,11 +166,11 @@ extern void tguiCenterWidget(TGUIWidget* widget, int x, int y);
 extern TGUIWidget* tguiGetActiveWidget();
 extern void tguiMakeFresh();
 extern bool tguiWidgetIsChildOf(TGUIWidget* widget, TGUIWidget* parent);
-extern int tguiGetMouseX(void);
-extern int tguiGetMouseY(void);
-extern int tguiGetMouseButtons(void);
-extern void tguiClearKeybuffer(void);
-extern void tguiClearMouseEvents(void);
+extern int tguiGetMouseX();
+extern int tguiGetMouseY();
+extern int tguiGetMouseButtons();
+extern void tguiClearKeybuffer();
+extern void tguiClearMouseEvents();
 extern void tguiSetScale(float x_scale, float y_scale);
 extern void tguiSetTolerance(int pixels);
 void tguiSetLayout(int x, int y);
@@ -179,8 +179,8 @@ void tguiSetRotation(int angle_in_degrees);
 void tguiConvertMousePosition(int *x, int *y, int ox, int oy, float rx, float ry);
 void tguiDisableChildren(TGUIWidget *parent);
 void tguiEnableChildren(TGUIWidget *parent);
-void tguiDisableAllWidgets(void);
-void tguiEnableAllWidgets(void);
+void tguiDisableAllWidgets();
+void tguiEnableAllWidgets();
 bool tguiIsDisabled(TGUIWidget *widget);
 void tguiSetScreenSize(int width, int height);
 void tguiSetScreenParameters(int offset_x, int offset_y,

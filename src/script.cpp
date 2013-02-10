@@ -14,7 +14,6 @@ std::string mapStartPlace;
 std::string mapPrefix;
 int battleStartDirection;
 
-
 // Note: lua starts counting at 1, in C++ we start at 0, that's why you
 // see -1 and +1  here and there
 
@@ -688,7 +687,6 @@ int CDeScriptifyPlayer(lua_State *stack)
 	area->center_view = false;
 	area->resetInput();
 	al_unlock_mutex(input_mutex);
-	clear_input_events();
 	return 0;
 }
 
@@ -711,6 +709,8 @@ static int CDoDialogue(lua_State *stack)
 	doDialogue(textS, top, 4, 10, bottom);
 
 	if (!wait) { lua_pushboolean(stack, false); return 1; }
+
+	clear_input_events();
 
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
@@ -810,6 +810,8 @@ static int CDoShakeDialogue(lua_State *stack)
 	int sx = area_panned_x;
 	int sy = area_panned_y;
 	
+	clear_input_events();
+
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
 		// Logic
@@ -909,6 +911,8 @@ bool anotherDoDialogue(const char *text, bool clearbuf, bool top)
 	m_set_target_bitmap(tmp);
 	m_draw_bitmap(buffer, 0, 0, 0);
 	
+	clear_input_events();
+
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
 		// Logic
@@ -936,7 +940,7 @@ bool anotherDoDialogue(const char *text, bool clearbuf, bool top)
 			}
 	
 			INPUT_EVENT ie = get_next_input_event();
-			if (iphone_shaken(0.1) || (use_dpad && ie.button2 == DOWN)) {
+			if (iphone_shaken(0.1) || ie.button2 == DOWN) {
 				use_input_event();
 				iphone_clear_shaken();
 				ret = true;
@@ -1262,10 +1266,8 @@ static int CStartBattle(lua_State *stack)
 		return 0;
 	}
 
-	if (use_dpad) {
-		InputDescriptor ie = getInput()->getDescriptor();
-		battleStartDirection = ie.direction;
-	}
+	InputDescriptor ie = getInput()->getDescriptor();
+	battleStartDirection = ie.direction;
 
 	if (area->getName() == "jungle") {
 		playAmbience("");
@@ -1283,10 +1285,6 @@ static int CStartBattle(lua_State *stack)
 	battleTransition();
 
 	clear_input_events();
-
-	if (use_dpad) {
-		getInput()->set(false, false, false, false, false, false, false);
-	}
 
 	return 0;
 }
@@ -2815,24 +2813,22 @@ static int CGetPlatform(lua_State *stack)
 
 static int CGetPlayerDest(lua_State *stack)
 {
-	if ((have_mouse && path_head) || !use_dpad) {
-		Node *tail = get_path_tail();
-		if (tail) {
-			lua_pushnumber(stack, tail->x);
-			lua_pushnumber(stack, tail->y);
+	Node *tail = get_path_tail();
+	if (tail) {
+		lua_pushnumber(stack, tail->x);
+		lua_pushnumber(stack, tail->y);
+		return 2;
+	}
+	/* FIXME: MAYBE UNCOMMENT THIS
+	if (area) {
+		Object *o = area->findObject(0);
+		if (o) {
+			lua_pushnumber(stack, o->getX());
+			lua_pushnumber(stack, o->getY());
 			return 2;
 		}
 	}
-	if (use_dpad) {
-		if (area) {
-			Object *o = area->findObject(0);
-			if (o) {
-				lua_pushnumber(stack, o->getX());
-				lua_pushnumber(stack, o->getY());
-				return 2;
-			}
-		}
-	}
+	*/
 
 	lua_pushnil(stack);
 	lua_pushnil(stack);
@@ -2910,6 +2906,8 @@ static int CDoItemTutorial(lua_State *stack)
 			{ if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }}
 	}
 
+	clear_input_events();
+
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
 		// Logic
@@ -2980,17 +2978,15 @@ static int CDoItemTutorial(lua_State *stack)
 						partySelectorTop->setSelected(0);
 					}
 					else if (sel != MAX_PARTY) {
-						if (use_dpad) {
-							if (!equipChooserAdded) {
-								std::vector<int> i;
-								i.push_back(0);
-								equipChooser->setSelected(i);
-								i.clear();
-								tguiSetParent(0);
-								tguiAddWidget(equipChooser);
-								tguiSetFocus(equipChooser);
-								equipChooserAdded = true;
-							}
+						if (!partySelectorTop->didDragSomething() && !equipChooserAdded) {
+							std::vector<int> i;
+							i.push_back(0);
+							equipChooser->setSelected(i);
+							i.clear();
+							tguiSetParent(0);
+							tguiAddWidget(equipChooser);
+							tguiSetFocus(equipChooser);
+							equipChooserAdded = true;
 						}
 						else {
 							player->getInfo().equipment.rhand = -1;
@@ -3001,7 +2997,7 @@ static int CDoItemTutorial(lua_State *stack)
 #else
 							if (DLG("Great!\nNow I will show you how to use some other basic items...\nYou use an item just like you use a weapon...\nDrag the Cure to your player at the top to use it.\nYou can also press button 3 (default \"V\") to get a description.\n", false)) { if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }}
 #endif
-													inventory[0].index = CURE_INDEX;
+							inventory[0].index = CURE_INDEX;
 							inventory[0].quantity = 1;
 						}
 					}
@@ -3155,6 +3151,8 @@ static int CDoMapTutorial(lua_State *stack)
 
 
 	mapWidget->flash();
+
+	clear_input_events();
 
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
@@ -3312,6 +3310,8 @@ static int CDoKingKingAlbertLook(lua_State *stack)
 
 	MBITMAP *bmp = m_load_bitmap(getResource("media/kingkingalbert.png"));
 
+	clear_input_events();
+
 	while (1) {
 		al_wait_cond(wait_cond, wait_mutex);
 		// Logic
@@ -3345,13 +3345,8 @@ static int CDoKingKingAlbertLook(lua_State *stack)
 			}
 			else {
 				if (w == widget) {
-					if (use_dpad) {
-						InputDescriptor in = getInput()->getDescriptor();
-						while (in.button1) {
-							in = getInput()->getDescriptor();
-						}
-						clear_input_events();
-					}
+					waitForRelease(4);
+
 					playPreloadedSample("select.ogg");
 					goto done;
 				}
@@ -3428,6 +3423,8 @@ static int CDoKeepLook(lua_State *stack)
 
 	MBITMAP *bmp = m_load_bitmap(getResource("media/forest_treasure.png"));
 
+	clear_input_events();
+
 	while (1) {
 		al_wait_cond(wait_cond, wait_mutex);
 		int tmp_counter = logic_counter;
@@ -3460,13 +3457,8 @@ static int CDoKeepLook(lua_State *stack)
 			}
 			else {
 				if (w == widget) {
-					if (use_dpad) {
-						InputDescriptor in = getInput()->getDescriptor();
-						while (in.button1) {
-							in = getInput()->getDescriptor();
-						}
-						clear_input_events();
-					}
+					waitForRelease(4);
+
 					playPreloadedSample("select.ogg");
 					goto done;
 				}
@@ -3783,7 +3775,7 @@ int CAddStream(lua_State *stack)
 
 int CSetStreamVolume(lua_State *stack)
 {
-	MSAMPLE s = (MSAMPLE)lua_touserdata(stack, 1);
+	MSAMPLE s = (MSAMPLE)(int64_t)lua_touserdata(stack, 1);
 	float vol = lua_tonumber(stack, 2);
 
 	setStreamVolume(s, vol);
@@ -3793,7 +3785,7 @@ int CSetStreamVolume(lua_State *stack)
 
 int CDestroyStream(lua_State *stack)
 {
-	MSAMPLE s = (MSAMPLE)lua_touserdata(stack, 1);
+	MSAMPLE s = (MSAMPLE)(int64_t)lua_touserdata(stack, 1);
 
 	destroyStream(s);
 	

@@ -801,6 +801,8 @@ start:
 	
 	draw_all();
 
+	clear_input_events();
+
 	for (; o >= TILE_SIZE*140;) {
 		if (is_close_pressed()) {
 			custom_mouse_cursor = tmpcursor;
@@ -1004,9 +1006,7 @@ start:
 				int dy = pause_pos_y - press_y;
 				double dist = sqrt((float)dx*dx + dy*dy);
 				if (dist < pause_icon_w/2 || in.button2) {
-					while (in.button2) {
-						in = getInput()->getDescriptor();
-					}
+					waitForRelease(5);
 					// pause
 					can_pause = false;
 					const char *pause_text = "Paused";
@@ -1025,6 +1025,8 @@ start:
 
 					custom_mouse_cursor = tmpcursor;
 					
+					clear_input_events();
+
 					while (true) {
 						in = getInput()->getDescriptor();
 						next_input_event_ready = true;
@@ -1058,9 +1060,7 @@ start:
 							int dy = pause_pos_y - press_y;
 							double dist = sqrt((float)dx*dx + dy*dy);
 							if (dist < w/2 || in.button2) {
-								while (in.button2) {
-									in = getInput()->getDescriptor();
-								}
+								waitForRelease(5);
 								can_pause = false;
 								break;
 							}
@@ -1231,8 +1231,6 @@ done:
 
 	custom_mouse_cursor = tmpcursor;
 	
-	clear_input_events();
-
 	tguiDeleteWidget(button);
 	tguiDeleteWidget(slider);
 	delete button;

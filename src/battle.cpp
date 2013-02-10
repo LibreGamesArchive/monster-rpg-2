@@ -794,7 +794,6 @@ BattleResult Battle::update(int step)
 					doDialogue(std::string(speech), true, 1, 3);
 				}
 				else {
-					clear_input_events(); // HOOOO
 					CombatEntity *ce;
 					for (;;) {
 						currentEntity++;

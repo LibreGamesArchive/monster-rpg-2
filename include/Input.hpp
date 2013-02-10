@@ -12,29 +12,18 @@ public:
 	void set(bool l, bool r, bool u, bool d, bool b1, bool b2, bool b3, int set_sets = true);
 	InputDescriptor getDescriptor();
 	void setDirection(int direction);
-	int getDirection(void) { return descriptor.direction; }
+	int getDirection() { return descriptor.direction; }
 	bool isPlayerControlled() { return playerControlled; }
 	void setTimeTillNextNotification(int t);
-	unsigned long getTimeOfNextNotification(void);
+	unsigned long getTimeOfNextNotification();
 	void waitForReleaseOr(int button_id, unsigned long wait_time);
 	Input();
 	virtual ~Input() {
 		al_destroy_mutex(mutex);
 	}
-	void reset(void) {
-		descriptor.left =
-		descriptor.right =
-		descriptor.up =
-		descriptor.down =
-		descriptor.button1 =
-		descriptor.button2 =
-		descriptor.button3 = false;
-		sets = descriptor;
-		timeOfNextNotification = tguiCurrentTimeMillis();
-		orRelease = -1;
-	}
+	virtual void reset() {}
 
-	void dump(void) {
+	void dump() {
 		printf("Input dump:\n");
 		printf("%d %d %d %d\n",
 			descriptor.left,
@@ -67,6 +56,7 @@ class KeyboardInput : public Input {
 	friend class TripleInput;
 public:
 	void handle_event(ALLEGRO_EVENT *event);
+	virtual void reset();
 
 	KeyboardInput() {
 		playerControlled = true;
@@ -82,7 +72,7 @@ protected:
 class GamepadInput : public Input {
 	friend class TripleInput;
 public:
-	void reconfig(void) {
+	void reconfig() {
 		if (config.getGamepadAvailable())
 			joystick = al_get_joystick(0);
 		else
@@ -91,6 +81,7 @@ public:
 	}
 
 	void handle_event(ALLEGRO_EVENT *event);
+	virtual void reset();
 
 	GamepadInput() {
 		playerControlled = true;
@@ -108,7 +99,7 @@ class TripleInput : public Input {
 public:
 	friend void Input::setDirection(int direction);
 
-	void reconfig(void) {
+	void reconfig() {
 		if (js)
 			js->reconfig();
 	}
@@ -119,6 +110,8 @@ public:
 		if (js)
 			js->handle_event(event);
 	}
+
+	virtual void reset();
 
 	TripleInput();
 	virtual ~TripleInput() {
@@ -159,12 +152,14 @@ struct INPUT_EVENT {
 	INPUT_EVENT_TYPE button1;
 	INPUT_EVENT_TYPE button2;
 	INPUT_EVENT_TYPE button3;
+	double timestamp;
 };
 
-INPUT_EVENT get_next_input_event(void);
+INPUT_EVENT get_next_input_event();
 void add_input_event(INPUT_EVENT ie);
-void use_input_event(void);
-void clear_input_events(void);
+void use_input_event();
+void clear_input_events(double older_than = -1.0);
+void waitForRelease(int what);
 
 const long JOY_INITIAL_REPEAT_TIME = 500;
 const long JOY_REPEAT_TIME = 100;
@@ -192,28 +187,29 @@ extern INPUT_EVENT joystick_repeat_events[JOY_NUM_REPEATABLE];
 /*-------------*/
 
 void gamepad2Keypresses(int step);
-void initInput(void);
-void destroyInput(void);
-TripleInput *getInput(void);
-
+void initInput();
+void destroyInput();
+TripleInput *getInput();
 
 extern TripleInput *tripleInput; // too lazy to change the name now
 
+extern double drop_input_events_older_than;
+
 extern "C" {
-void joy_b1_down(void);
-void joy_b2_down(void);
-void joy_b3_down(void);
-void joy_b1_up(void);
-void joy_b2_up(void);
-void joy_b3_up(void);
-void joy_l_down(void);
-void joy_r_down(void);
-void joy_u_down(void);
-void joy_d_down(void);
-void joy_l_up(void);
-void joy_r_up(void);
-void joy_u_up(void);
-void joy_d_up(void);
+void joy_b1_down();
+void joy_b2_down();
+void joy_b3_down();
+void joy_b1_up();
+void joy_b2_up();
+void joy_b3_up();
+void joy_l_down();
+void joy_r_down();
+void joy_u_down();
+void joy_d_down();
+void joy_l_up();
+void joy_r_up();
+void joy_u_up();
+void joy_d_up();
 }
 #endif
 

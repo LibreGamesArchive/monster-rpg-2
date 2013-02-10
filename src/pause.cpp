@@ -168,6 +168,8 @@ static void showMusicToggle(void)
 	
 	std::string startAmbienceName = ambienceName;
 
+	clear_input_events();
+
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
 		// Logic
@@ -286,6 +288,8 @@ static void showIpodControls(void)
 	tguiSetFocus(sound_toggle);
 	
 	std::string startAmbienceName = ambienceName;
+
+	clear_input_events();
 
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
@@ -442,6 +446,9 @@ void showSaveStateInfo(const char *basename)
 	tguiAddWidget(w1);
 	tguiSetFocus(w1);
 
+	double started = al_get_time();
+	bool updating = false;
+
 	while (1) {
 		m_set_target_bitmap(buffer);
 		
@@ -463,18 +470,26 @@ void showSaveStateInfo(const char *basename)
 				goto done;
 			}
 
-			if (use_dpad) {
-				INPUT_EVENT ie = get_next_input_event();
-				if (ie.button1 == DOWN || ie.button2 == DOWN) {
-					use_input_event();
+			if (!updating) {
+				if (al_get_time() > started+1) {
+					clear_input_events();
+					updating = true;
+				}
+			}
+			else {
+				if (use_dpad) {
+					INPUT_EVENT ie = get_next_input_event();
+					if (ie.button1 == DOWN || ie.button2 == DOWN) {
+						use_input_event();
+						playPreloadedSample("select.ogg");
+						goto done;
+					}
+				}
+				if (tguiUpdate() == w1 || iphone_shaken(0.1)) {
+					iphone_clear_shaken();
 					playPreloadedSample("select.ogg");
 					goto done;
 				}
-			}
-			if (tguiUpdate() == w1 || iphone_shaken(0.1)) {
-				iphone_clear_shaken();
-				playPreloadedSample("select.ogg");
-				goto done;
 			}
 		}
 		
@@ -515,7 +530,6 @@ void showSaveStateInfo(const char *basename)
 			if (!delayed) {
 				delayed = true;
 				m_rest(0.25);
-				clear_input_events();
 			}
 		}
 	}
@@ -530,6 +544,10 @@ done:
 	delete w1;
 	
 	tguiPop();
+
+	waitForRelease(4);
+	waitForRelease(5);
+	clear_input_events();
 
 	return;
 }
@@ -666,6 +684,9 @@ void showItemInfo(int index, bool preserve_buffer)
 	tguiAddWidget(w1);
 	tguiSetFocus(w1);
 
+	double started = al_get_time();
+	bool updating = false;
+
 	while (1) {
 		al_wait_cond(wait_cond, wait_mutex);
 		int tmp_counter = logic_counter;
@@ -676,17 +697,6 @@ void showItemInfo(int index, bool preserve_buffer)
 			next_input_event_ready = true;
 
 			tmp_counter--;
-			INPUT_EVENT ie = get_next_input_event();
-			if (ie.button1 == DOWN || ie.button2 == DOWN) {
-				use_input_event();
-				playPreloadedSample("select.ogg");
-				goto done;
-			}
-			if (iphone_shaken(0.1) || tguiUpdate() == w1) {
-				iphone_clear_shaken();
-				playPreloadedSample("select.ogg");
-				goto done;
-			}
 			if (is_close_pressed()) {
 				do_close();
 				close_pressed = false;
@@ -694,6 +704,26 @@ void showItemInfo(int index, bool preserve_buffer)
 			// WARNING
 			if (break_main_loop) {
 				goto done;
+			}
+
+			if (!updating) {
+				if (al_get_time() > started+1) {
+					clear_input_events();
+					updating = true;
+				}
+			}
+			else {
+				INPUT_EVENT ie = get_next_input_event();
+				if (ie.button1 == DOWN || ie.button2 == DOWN) {
+					use_input_event();
+					playPreloadedSample("select.ogg");
+					goto done;
+				}
+				if (iphone_shaken(0.1) || tguiUpdate() == w1) {
+					iphone_clear_shaken();
+					playPreloadedSample("select.ogg");
+					goto done;
+				}
 			}
 		}
 
@@ -804,7 +834,6 @@ void showItemInfo(int index, bool preserve_buffer)
 			if (!delayed) {
 				delayed = true;
 				m_rest(0.25);
-				clear_input_events();
 			}
 		}
 		
@@ -831,6 +860,10 @@ done:
 		m_destroy_bitmap(tmp);
 	}
 	
+	waitForRelease(4);
+	waitForRelease(5);
+	clear_input_events();
+
 	return;
 }
 
@@ -1026,11 +1059,9 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	MTextButton *mainMusic = new MTextButton(162, yy, "Music", false, left_widget);
-#else
-	MTextButton *mainMusic = new MTextButton(162, yy, "Help", false, left_widget);
+	yy += yinc;
 #endif
 
-	yy += yinc;
 	MTextButton *mainLevelUp = new MTextButton(162, yy, "Cheat", false, left_widget);
 	MTextButton *mainQuit = new MTextButton(162, yy, "Quit", false, left_widget);
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
@@ -1116,7 +1147,11 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	tguiAddWidget(mainLevelUp);
 #endif
 #endif
+
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	tguiAddWidget(mainMusic);
+#endif
+
 	tguiAddWidget(mainQuit);
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
@@ -1269,6 +1304,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 					}
 					else if (section == EXAMINE) {
 						int index = inventory[sel].index;
+						playPreloadedSample("select.ogg");
 						showItemInfo(index, true);
 					}
 				}
@@ -1339,6 +1375,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 								}
 							}
 							else if (section == EXAMINE) {
+								playPreloadedSample("select.ogg");
 								showItemInfo(*toUnequip, true);
 							}
 							handled = true;
@@ -1406,6 +1443,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 								}
 							}
 							else if (section == EXAMINE) {
+								playPreloadedSample("select.ogg");
 								showItemInfo(*toUnequip, true);
 							}
 						}
@@ -1533,7 +1571,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				if (prompt("Really quit?", "", 0, 0)) {
 					ret = false;
 					if (area) {
-						area->auto_save_game(0, true);
+						area->auto_save_game(0, true, true);
 					}
 					goto done;
 				}
@@ -1547,18 +1585,18 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				tguiSetFocus(mainLevelUp);
 				section = MAIN;
 			}
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			else if (widget == mainMusic) {
 				getInput()->set(false, false, false, false, false, false, false);
 #if defined ALLEGRO_IPHONE
 				showIpodControls();
 #elif defined ALLEGRO_ANDROID
 				showMusicToggle();
-#else
-				pc_help();
 #endif
 				tguiSetFocus(mainMusic);
 				section = MAIN;
 			}
+#endif
 			else if (widget == formChooser) {
 				std::vector<int> &v = formChooser->getSelected();
 				if (v.size() > 0) {
@@ -1779,7 +1817,9 @@ done:
 	delete mainResume;
 	delete mainQuit;
 	delete mainLevelUp;
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	delete mainMusic;
+#endif
 	if (have_mouse || !use_dpad)
 		delete dndForm;
 	delete partyStats;
@@ -1823,6 +1863,14 @@ done:
 	dpad_on();
 	
 	tguiPop();
+
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+	stop_finding_joypads();
+#endif
+
+	waitForRelease(4);
+	waitForRelease(5);
+	clear_input_events();
 
 	in_pause = false;
 
@@ -1915,7 +1963,6 @@ done:
 	mapWidget = NULL;
 
 	input->setDirection(dir);
-	input->set(false, false, false, false, false, false, false);
 
 	in_map = false;
 
@@ -2000,6 +2047,8 @@ void doShop(std::string name, const char *imageName, int nItems,
 		22, grey);
 	tguiDraw();
 	fadeIn(black);
+
+	clear_input_events();
 
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
@@ -2171,6 +2220,8 @@ void into_the_sun(void)
 	int dx = 99;
 	int dy = 96;
 
+	clear_input_events();
+
 	while (true) {
 		m_set_target_bitmap(buffer);
 
@@ -2245,8 +2296,6 @@ done:
 	delete explosion;
 
 	dpad_on();
-
-	clear_input_events();
 }
 
 
@@ -2420,6 +2469,8 @@ void credits(void)
 	MBITMAP *font = m_load_bitmap(getResource("media/credit_font.png"));
 
 	long start = tguiCurrentTimeMillis();
+
+	clear_input_events();
 
 	for (;;) {
 		if (is_close_pressed()) {
@@ -2762,6 +2813,8 @@ done:
 
 	long start = tguiCurrentTimeMillis();
 
+	clear_input_events();
+
 	for (;;) {
 		if (is_close_pressed()) {
 			do_close();
@@ -2865,8 +2918,6 @@ done2:
 	m_destroy_bitmap(font);
 
 	dpad_on();
-
-	clear_input_events();
 }
 
 
@@ -2918,6 +2969,8 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 		tguiAddWidget(buttons[i]);
 	}
 	tguiSetFocus(buttons[0]);
+
+	clear_input_events();
 
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
@@ -3219,6 +3272,8 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 	bool first_frame = true;
 
 
+	clear_input_events();
+
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
 		int tmp_counter = logic_counter;
@@ -3394,9 +3449,6 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 			InputDescriptor id = getInput()->getDescriptor();
 
 			if (iphone_shaken(0.1) || id.button2 == DOWN) {
-				if (id.button2) {
-					getInput()->waitForReleaseOr(5, 250);
-				}
 				iphone_clear_shaken();
 				*num = -1;
 				goto done;
@@ -3653,8 +3705,6 @@ bool config_menu(bool start_on_fullscreen)
 	
 	FakeWidget *parent = new FakeWidget(0, 0, 1, 1, false);
 
-	clear_input_events();
-
 	tguiSetParent(0);
 	tguiAddWidget(parent);
 	tguiSetParent(parent);
@@ -3717,6 +3767,8 @@ bool config_menu(bool start_on_fullscreen)
 
 	bool first_frame = true;
 
+	clear_input_events();
+
 	for (;;) {
 		
 		al_wait_cond(wait_cond, wait_mutex);
@@ -3761,9 +3813,10 @@ bool config_menu(bool start_on_fullscreen)
 
 			INPUT_EVENT ie = get_next_input_event();
 
-			if ((use_dpad && ie.button2 == DOWN) || iphone_shaken(0.1)) {
+			if (ie.button2 == DOWN || iphone_shaken(0.1)) {
 				use_input_event();
 				iphone_clear_shaken();
+				getInput()->waitForReleaseOr(5, 1000);
 				goto done;
 			}
 		}
@@ -3991,9 +4044,14 @@ done:
 
 	fadeOut(black);
 
+	waitForRelease(4);
+	waitForRelease(5);
+	clear_input_events();
+
 	return false;
 }
 
+#if 0
 void pc_help(void)
 {
 	const char *text[] = {
@@ -4129,6 +4187,7 @@ done:
 
 	fadeOut(black);
 }
+#endif
 
 static void hqm_menu(void)
 {
@@ -4153,6 +4212,8 @@ static void hqm_menu(void)
 
 	bool first_frame = true;
 	bool nofade = false;
+
+	clear_input_events();
 
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
@@ -4290,6 +4351,10 @@ done:
 	if (!nofade) {
 		fadeOut(black);
 	}
+	
+	waitForRelease(4);
+	waitForRelease(5);
+	clear_input_events();
 }
 
 int title_menu(void)
@@ -4317,19 +4382,11 @@ int title_menu(void)
 	
 	MTextButtonFullShadow *buttons[MAX_BUTTONS];
 	int oy = 100;
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	buttons[curr_button++] = new MTextButtonFullShadow(5, oy, "Continue");
 	buttons[curr_button++] = new MTextButtonFullShadow(5, oy+15, "Start/Load Game");
 	buttons[curr_button++] = new MTextButtonFullShadow(5, oy+30, "Tutorial");
-#ifdef LITEXX
-	buttons[curr_button++] = new MTextButtonFullShadow(5, oy+45, "Leave feedback & win!");
-#else
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	buttons[curr_button++] = new MTextButtonFullShadow(5, oy+45, "Visit WWW site");
-#endif
-#else
-	buttons[curr_button++] = new MTextButtonFullShadow(5, oy, "Start");
-	buttons[curr_button++] = new MTextButtonFullShadow(5, oy+15, "Tutorial");
-	buttons[curr_button++] = new MTextButtonFullShadow(5, oy+30, "Help");
 #endif
 
 	MTextButton *hqm_button = new MTextButtonFullShadow(240-95, oy+30, "HQ sound track");
@@ -4338,12 +4395,9 @@ int title_menu(void)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 	MIcon *joypad = NULL;
 #ifdef ALLEGRO_ANDROID
-	joypad = new MIcon(BW-32-5, 5, getResource("zeemote.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
+	joypad = new MIcon(5, 5, getResource("zeemote.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
 #else
-	if (is_32_or_later())
-	{
-		joypad = new MIcon(5, 5, getResource("joypad_icon.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
-	}
+	joypad = new MIcon(5, 5, getResource("joypad_icon.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
 #endif
 #endif
 
@@ -4367,6 +4421,8 @@ int title_menu(void)
 
 	bool first_frame = true;
 	bool nofade = false;
+
+	clear_input_events();
 
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
@@ -4497,6 +4553,10 @@ done:
 	tguiEnableHotZone(true);
 
 	global_draw_red = gdr;
+
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+	stop_finding_joypads();
+#endif
 
 	on_title_screen = false;
 

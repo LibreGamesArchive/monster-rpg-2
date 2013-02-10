@@ -7,11 +7,11 @@ static joypad_handler *joypad = NULL;
 static bool b_is_32_or_later;
 
 extern "C" {
-void lock_joypad_mutex(void);
-void unlock_joypad_mutex(void);
+void lock_joypad_mutex();
+void unlock_joypad_mutex();
 }
 
-void find_joypads(void)
+void find_joypads()
 {
 	if (b_is_32_or_later && !joypad_connected())
 	{
@@ -19,12 +19,20 @@ void find_joypads(void)
 	}
 }
 
-bool is_32_or_later(void)
+void stop_finding_joypads()
+{
+	if (b_is_32_or_later && !joypad_connected())
+	{
+		[joypad performSelectorOnMainThread: @selector(stop_finding_devices) withObject:nil waitUntilDone:YES];
+	}
+}
+
+bool is_32_or_later()
 {
 	return b_is_32_or_later;
 }
 
-void init_joypad(void)
+void init_joypad()
 {
 #ifdef ALLEGRO_IPHONE
 	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
@@ -42,7 +50,7 @@ void init_joypad(void)
 	}
 }
 
-InputDescriptor get_joypad_state(void)
+InputDescriptor get_joypad_state()
 {
 	InputDescriptor i;
 
@@ -67,7 +75,24 @@ InputDescriptor get_joypad_state(void)
 	return i;
 }
 
-bool joypad_connected(void)
+void reset_joypad_state()
+{
+	lock_joypad_mutex();
+
+	if (b_is_32_or_later && joypad && joypad->connected) {
+		joypad->left = false;
+		joypad->right = false;
+		joypad->up = false;
+		joypad->down = false;
+		joypad->ba = false;
+		joypad->bb = false;
+		joypad->bx = false;
+	}
+
+	unlock_joypad_mutex();
+}
+
+bool joypad_connected()
 {
 	if (!b_is_32_or_later)
 		return false;

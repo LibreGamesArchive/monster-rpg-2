@@ -49,9 +49,14 @@ void disconnect_external_controls(void);
 	[[JPManager sharedManager] setGameState:kJPGameStateMenu];
 }
 
--(void)joypadManager:(JPManager *)manager didFindDevice:(JPDevice *)device previouslyConnected:(BOOL)prev
+-(void)stop_finding_devices
 {
 	[[JPManager sharedManager] setGameState:kJPGameStateGameplay];
+}
+
+-(void)joypadManager:(JPManager *)manager didFindDevice:(JPDevice *)device previouslyConnected:(BOOL)prev
+{
+	[self stop_finding_devices];
 	[device setDelegate:self];
 }
 

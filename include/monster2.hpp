@@ -210,7 +210,6 @@ struct MPoint {
 	float x, y;
 };
 
-
 extern TGUIWidget *mainWidget;
 
 extern bool fps_on;
@@ -319,7 +318,8 @@ extern std::vector<std::pair<int, bool> > forced_milestones;
 extern bool gonna_fade_in_red;
 
 void update_orientation(void);
-bool is_close_pressed(void);
+bool is_close_pressed(bool pump_events_only = false);
+#define pump_events() is_close_pressed(true)
 
 void connect_second_display(void);
 extern int old_control_mode;

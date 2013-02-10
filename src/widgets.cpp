@@ -351,8 +351,7 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 	int th = m_text_height(game_font);
 	int tw = m_text_length(game_font, _t("OK"));
 
-	tguiClearMouseEvents();
-	clear_input_events();
+	//tguiClearMouseEvents();
 
 	tguiPush();
 	FakeWidget *w1 = new FakeWidget(BW/2-tw/2, (y+h-15)-th, tw, 16);
@@ -363,6 +362,9 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 	tguiSetParent(fullscreenRect);
 	tguiAddWidget(w1);
 	tguiSetFocus(w1);
+
+	double started = al_get_time();
+	bool updating = false;
 
 	while (1) {
 		al_wait_cond(wait_cond, wait_mutex);
@@ -383,16 +385,24 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 				goto done;
 			}
 
-			INPUT_EVENT ie = get_next_input_event();
-			if (iphone_shaken(0.1) || ie.button1 == DOWN || ie.button2 == DOWN) {
-				use_input_event();
-				playPreloadedSample("select.ogg");
-				al_rest(0.25);
-				goto done;
+			if (!updating) {
+				if (al_get_time() > started+1) {
+					clear_input_events();
+					updating = true;
+				}
 			}
-			if (tguiUpdate() == w1) {
-				playPreloadedSample("select.ogg");
-				goto done;
+			else {
+				INPUT_EVENT ie = get_next_input_event();
+				if (iphone_shaken(0.1) || ie.button1 == DOWN || ie.button2 == DOWN) {
+					use_input_event();
+					playPreloadedSample("select.ogg");
+					al_rest(0.25);
+					goto done;
+				}
+				if (tguiUpdate() == w1) {
+					playPreloadedSample("select.ogg");
+					goto done;
+				}
 			}
 		}
 
@@ -422,7 +432,6 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 			if (!delayed) {
 				delayed = true;
 				m_rest(0.25);
-				clear_input_events();
 			}
 		}
 	}
@@ -438,6 +447,10 @@ done:
 
 	m_destroy_bitmap(tmp);
 	
+	waitForRelease(4);
+	waitForRelease(5);
+	clear_input_events();
+
 	return;
 }
 
@@ -563,7 +576,6 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 	int y = (BH-h)/2;
 
 	tguiClearMouseEvents();
-	clear_input_events();
 
 	tguiPush();
 
@@ -575,6 +587,8 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 	tguiSetParent(fullscreenRect);
 	tguiAddWidget(w1);
 	tguiSetFocus(w1);
+
+	clear_input_events();
 
 	while (1) {
 		al_wait_cond(wait_cond, wait_mutex);
@@ -653,12 +667,8 @@ done:
 	m_destroy_bitmap(tmp);
 	
 	if (use_dpad) {
-		InputDescriptor in = getInput()->getDescriptor();
-		while (in.button1) {
-			in = getInput()->getDescriptor();
-		}
+		waitForRelease(4);
 	}
-	clear_input_events();
 
 	return;
 }
@@ -680,7 +690,6 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 	int choice = 2;
 
 	tguiClearMouseEvents();
-	clear_input_events();
 	
 	int x1, x2, x3, xinc;
 	xinc = (w-20)/3;
@@ -712,6 +721,8 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 	tguiAddWidget(w3);
 	tguiSetFocus(w3);
 
+	clear_input_events();
+
 	while (1) {
 		al_wait_cond(wait_cond, wait_mutex);
 		int tmp_counter = logic_counter;
@@ -722,15 +733,13 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 			next_input_event_ready = true;
 
 			tmp_counter--;
-			if (!called_from_is_close_pressed) {
-				if (is_close_pressed()) {
-					do_close();
-					close_pressed = false;
-				}
-				// WARNING
-				if (break_main_loop) {
-					goto done;
-				}
+			if (is_close_pressed(called_from_is_close_pressed)) {
+				do_close();
+				close_pressed = false;
+			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
 			}
 			TGUIWidget *widget = tguiUpdate();
 			if (widget == w1) {
@@ -749,9 +758,7 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 				goto done;
 			}
 			INPUT_EVENT ie = { 0, };
-			if (use_dpad) {
-				ie = get_next_input_event();
-			}
+			ie = get_next_input_event();
 			if (iphone_shaken(0.1) || ie.button2 == DOWN) {
 				use_input_event();
 				iphone_clear_shaken();
@@ -824,13 +831,7 @@ done:
 	
 	m_destroy_bitmap(tmp);
 		
-	if (use_dpad) {
-		InputDescriptor in = getInput()->getDescriptor();
-		while (in.button1) {
-			in = getInput()->getDescriptor();
-		}
-	}
-	clear_input_events();
+	waitForRelease(4);
 
 	return choice;
 }
@@ -855,7 +856,6 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 	int y = (BH-h)/2;
 
 	tguiClearMouseEvents();
-	clear_input_events();
 		
 	const char *s1, *s2;
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
@@ -895,6 +895,8 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 	else
 		tguiSetFocus(w2);
 	#endif
+
+	clear_input_events();
 
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
@@ -1003,12 +1005,8 @@ done:
 	m_destroy_bitmap(tmp);
 
 	if (use_dpad) {
-		InputDescriptor in = getInput()->getDescriptor();
-		while (in.button1) {
-			in = getInput()->getDescriptor();
-		}
+		waitForRelease(4);
 	}
-	clear_input_events();
 
 	return choice;
 }
@@ -1233,8 +1231,6 @@ MSpeechDialog::MSpeechDialog(int x, int y, int width, int height,
 	this->y = 0;
 	this->width = BW;
 	this->height = BH;
-
-	clear_input_events();
 
 	xx = x;
 	yy = y;
@@ -2236,27 +2232,12 @@ void MMap::draw()
 void MMap::auto_save(int millis, bool force)
 {
 	if (!shouldFlash) {
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-		if (!force)
+		if (!force) {
 			mem_save_counter += millis;
-		if (mem_save_counter >= 1000 || force) {
-			mem_save_counter = 0;
-			memory_save_offset = 0;
-			using_memory_save = true;
-			saveGame(NULL, points[selected].internal_name);
-			using_memory_save = false;
-			memory_saved = true;
-		}
-#endif
-		if (!force)
 			ss_save_counter += millis;
-		if (ss_save_counter >= 1000 || force) {
-			ss_save_counter = 0;
-			m_push_target_bitmap();
-			m_set_target_bitmap(screenshot);
-			m_draw_scaled_bitmap(buffer, 
-				0, 0, BW, BH, 0, 0, BW/2, BH/2, 0, 255);
-			m_pop_target_bitmap();
+		}
+		if (mem_save_counter >= 10000 || force) {
+			real_auto_save_game(true);
 		}
 	}
 }
@@ -2390,6 +2371,9 @@ int MMap::update(int millis)
 			int elapsed = 0;
 			int totalElapsed = 0;
 			dpad_off();
+			
+			clear_input_events();
+
 			while  (now < end) {
 				if (is_close_pressed()) {
 					do_close();
@@ -2427,6 +2411,7 @@ int MMap::update(int millis)
 			m_destroy_bitmap(bmp);
 			m_rest(2);
 			fadeOut(black);
+			
 			clear_input_events();
 		}
 
@@ -2439,6 +2424,10 @@ int MMap::update(int millis)
 		m_set_target_bitmap(buffer);
 		m_clear(black);
 		al_set_target_bitmap(oldTarget);
+
+		waitForRelease(4);
+		clear_input_events();
+
 		area->update(1);
 		m_set_target_bitmap(buffer);
 		area->draw();
@@ -4200,48 +4189,28 @@ int MScrollingList::update(int millis)
 		}
 	}
 
-	if (use_dpad && this == tguiActiveWidget) {
+	if (this == tguiActiveWidget) {
 		INPUT_EVENT ie = get_next_input_event();
 		InputDescriptor id = getInput()->getDescriptor();
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		if (!id.button1 && holdTime != -1) {
-#else
-		(void)id;
-		if (!ie.button1 == DOWN && holdTime != -1) {
-#endif
 			use_input_event();
 			if ((unsigned long)holdTime+250 > tguiCurrentTimeMillis()) {
 				clicked = true;
 			}
 			holdTime = -1;
 		}
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		else if (id.button1 && holdTime == -1) {
-#else
-		else if (ie.button1 == DOWN && holdTime == -1) {
-#endif
 			use_input_event();
 			holdTime = tguiCurrentTimeMillis();
 		}
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		else if (id.button1) {
 			int elapsed = tguiCurrentTimeMillis() - holdTime;
 			if (hold_callback && elapsed > 600) {
 				playPreloadedSample("select.ogg");
-				while (id.button1) {
-					al_rest(0.001);
-					id = getInput()->getDescriptor();
-				}
-				clear_input_events();
 				hold_callback(selected, hold_data);
-				while (id.button1) {
-					al_rest(0.001);
-					id = getInput()->getDescriptor();
-				}
 				holdTime = -1;
 			}
 		}
-		#endif
 		if (ie.left == DOWN) {
 			use_input_event();
 			playPreloadedSample("blip.ogg");
@@ -4959,6 +4928,7 @@ int MItemSelector::update(int millis)
 		int index = inventory[selected].index;
 		reset();
 		if (index >= 0) {
+			playPreloadedSample("select.ogg");
 			showItemInfo(index, true);
 		}
 		else {
@@ -4971,7 +4941,7 @@ int MItemSelector::update(int millis)
 		if (_id.button1) {
 			double start = al_get_time();
 			while (_id.button1) {
-				al_rest(0.001);
+				pump_events();
 				_id = getInput()->getDescriptor();
 				if (al_get_time()-start > 0.6) {
 					if (!battle) {
@@ -4979,20 +4949,7 @@ int MItemSelector::update(int millis)
 							playPreloadedSample("select.ogg");
 							int index = inventory[selected].index;
 							reset();
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-							while (_id.button1) {
-								al_rest(0.001);
-								_id = getInput()->getDescriptor();
-							}
-							clear_input_events();
-#endif
 							showItemInfo(index, true);
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-							while (_id.button1) {
-								al_rest(0.001);
-								_id = getInput()->getDescriptor();
-							}
-#endif
 						}
 						else {
 							reset();
@@ -5002,7 +4959,6 @@ int MItemSelector::update(int millis)
 					}
 				}
 			}
-			clear_input_events();
 		}
 		
 		if (inventory[selected].index < 0) {
@@ -5860,6 +5816,10 @@ MMultiChooser::~MMultiChooser(void)
 	current.clear();
 }
 
+bool MPartySelector::didDragSomething()
+{
+	return draggedSomething;
+}
 
 void MPartySelector::setFocus(bool f)
 {
@@ -5890,6 +5850,7 @@ void MPartySelector::mouseUp(int x, int y, int b)
 			right_half_clicked = true;
 	}
 	else if (dragging) {
+		draggedSomething = true;
 		done = true;
 	}
 
@@ -6075,6 +6036,7 @@ int MPartySelector::update(int millis)
 					}
 					if (*toUnequip >= 0) {
 						down = false;
+						playPreloadedSample("select.ogg");
 						showItemInfo(*toUnequip, true);
 					}
 				}
@@ -6159,6 +6121,8 @@ int MPartySelector::update(int millis)
 		return TGUI_RETURN;
 	}
 
+	draggedSomething = false;
+
 	return TGUI_CONTINUE;
 }
 
@@ -6189,6 +6153,7 @@ MPartySelector::MPartySelector(int y, int index, bool show_trash)
 	dragBmp = NULL;
 	done = false;
 	down = false;
+	draggedSomething = false;
 
 	if (index != MAX_PARTY && !party[index]) {
 		next();
@@ -6949,7 +6914,7 @@ MShop::~MShop(void)
 }
 
 void FakeWidget::draw(void) {
-	if (use_dpad && this == tguiActiveWidget && draw_outline) {
+	if (this == tguiActiveWidget && draw_outline) {
 		int n = (unsigned)tguiCurrentTimeMillis() % 1000;
 		float p;
 		if (n < 500) p = n / 500.0f;
@@ -6976,14 +6941,13 @@ void FakeWidget::mouseUp(int x, int y, int b)
 
 unsigned long FakeWidget::getHoldStart(void)
 {
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (b3_pressed) {
 		b3_pressed = false;
 		return tguiCurrentTimeMillis() - 1000UL;
 	}
-	else
-#endif
+	else {
 		return holdStart;
+	}
 }
 
 void FakeWidget::reset(void) 
@@ -6995,38 +6959,26 @@ bool FakeWidget::acceptsFocus() { return accFocus; }
 
 int FakeWidget::update(int step)
 {
-	if (was_down && use_dpad && getInput()->getDescriptor().button1)
+	if (was_down && getInput()->getDescriptor().button1)
 		return TGUI_CONTINUE;
 	else
 		was_down = false;
 
-	if (tguiActiveWidget == this && use_dpad) {
+	if (tguiActiveWidget == this) {
 		INPUT_EVENT ie = get_next_input_event();
 		InputDescriptor id = getInput()->getDescriptor();
 
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		if (ie.button3 == DOWN) {
 			b3_pressed = true;
 		}
-		else 
-#endif
-
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-		if (!id.button1 && holdStart != 0) {
-#else
-		if (buttonHoldStarted && !id.button1 && holdStart != 0) {
-#endif
+		else if (buttonHoldStarted && !id.button1 && holdStart != 0) {
 			use_input_event();
 			if (holdStart+250 > tguiCurrentTimeMillis()) {
 				clicked = true;
 			}
 			holdStart = 0;
 		}
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		else if (id.button1 && holdStart == 0) {
-#else
-		else if (ie.button1 == DOWN && holdStart == 0) {
-#endif
 			use_input_event();
 			holdStart = tguiCurrentTimeMillis();
 			buttonHoldStarted = true;
@@ -7053,11 +7005,7 @@ void FakeWidget::setFocus(bool fcs)
 {
 	TGUIWidget::setFocus(fcs);
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	was_down = use_dpad && getInput()->getDescriptor().button1;
-#else
-	was_down = false;
-#endif
+	was_down = getInput()->getDescriptor().button1;
 }
 
 FakeWidget::FakeWidget(int x, int y, int w, int h, bool accFocus, bool draw_outline) {

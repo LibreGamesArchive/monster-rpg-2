@@ -1064,6 +1064,8 @@ public:
 	void mouseUp(int x, int y, int b);
 	void setFocus(bool f);
 
+	bool didDragSomething();
+
 	MPartySelector(int y, int index, bool show_trash);
 	virtual ~MPartySelector();
 protected:
@@ -1087,6 +1089,7 @@ protected:
 	int equipIndex;
 	MBITMAP *dragBmp;
 	bool done;
+	bool draggedSomething;
 };
 
 class MMultiChooser : public TGUIWidget {

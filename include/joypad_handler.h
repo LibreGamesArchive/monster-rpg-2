@@ -18,5 +18,6 @@
 
 -(void)start;
 -(void)find_devices;
+-(void)stop_finding_devices;
 
 @end

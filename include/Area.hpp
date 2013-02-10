@@ -17,8 +17,7 @@ public:
 	bool center_view;
 	// set to -1 on obj(0)->stop
 	int last_player_x, last_player_y;
-	void auto_save_game(int step, bool ignoreCount = false);
-	void auto_save_screenshot(int step, bool force=false);
+	void auto_save_game(int step, bool ignoreCount = false, bool save_ss = true);
 	lua_State* getLuaState();
 	void initLua();
 	std::vector<Object*> &getObjects();
@@ -184,6 +183,6 @@ extern int mapping[4096];
 extern Node *path_head;
 extern Node *path_tail;
 
-void real_auto_save_screenshot(void);
+void real_auto_save_game(bool save_ss);
 
 #endif

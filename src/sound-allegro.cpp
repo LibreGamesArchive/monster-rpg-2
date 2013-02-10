@@ -161,8 +161,10 @@ void destroySample(MSAMPLE sample)
 void playSample(MSAMPLE sample, MSAMPLE_ID *id)
 {
 	if (!sound_inited) return;
+	
+	float vol = (float)config.getSFXVolume()/255.0;
 
-	al_play_sample(sample, 1.0f, 0.0f, 1.0f, ALLEGRO_PLAYMODE_ONCE, id);
+	al_play_sample(sample, vol, 0.0f, 1.0f, ALLEGRO_PLAYMODE_ONCE, id);
 }
 
 

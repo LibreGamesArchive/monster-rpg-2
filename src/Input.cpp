@@ -9,12 +9,14 @@
 #endif
 
 extern "C" {
-void lock_joypad_mutex(void);
-void unlock_joypad_mutex(void);
+void lock_joypad_mutex();
+void unlock_joypad_mutex();
 }
 
 
 TripleInput *tripleInput = NULL;
+
+double drop_input_events_older_than = 0;
 
 InputDescriptor EMPTY_INPUT_DESCRIPTOR = {
 	false, false, false, false,
@@ -35,10 +37,7 @@ INPUT_EVENT joystick_repeat_events[JOY_NUM_REPEATABLE] = { EMPTY_INPUT_EVENT, };
 
 static INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 
-static int num_button_events_in_list = 0;
-static int num_skipped_button_events = 0;
-
-INPUT_EVENT get_next_input_event(void)
+INPUT_EVENT get_next_input_event()
 {
 	if (next_input_event_ready) {
 		al_lock_mutex(input_event_mutex);
@@ -48,11 +47,6 @@ INPUT_EVENT get_next_input_event(void)
 		else {
 			ie = input_events.front();
 			input_events.pop_front();
-		}
-		if (ie.button1 == DOWN || ie.button2 == DOWN || ie.button3 == DOWN) {
-			if (num_button_events_in_list > 0) {
-				num_button_events_in_list--;
-			}
 		}
 		al_unlock_mutex(input_event_mutex);
 		next_input_event_ready = false;
@@ -65,43 +59,12 @@ void add_input_event(INPUT_EVENT ie)
 {
 	al_lock_mutex(input_event_mutex);
 
-	if (ie.button1 == DOWN || ie.button2 == DOWN || ie.button3 == DOWN) {
-		if (num_button_events_in_list >= 5) {
-			num_skipped_button_events++;
-			al_unlock_mutex(input_event_mutex);
-			return;
-		}
-		else {
-			num_button_events_in_list++;
-		}
-	}
-	else if (ie.button1 == UP || ie.button2 == UP || ie.button3 == UP) {
-		if (num_skipped_button_events > 0) {
-			num_skipped_button_events--;
-			al_unlock_mutex(input_event_mutex);
-			return;
-		}
-	}
-	else {
-		// if axis event and queue too big
-		if (input_events.size() > 100) {
-			std::list<INPUT_EVENT>::iterator it = input_events.begin();
-			for (; it != input_events.end(); it++) {
-				INPUT_EVENT e = *it;
-				if (!(e.button1 == DOWN || e.button2 == DOWN || e.button3 == DOWN || e.button1 == UP || e.button2 == UP || e.button3 == UP)) {
-					input_events.erase(it);
-					break;
-				}
-			}
-		}
-	}
-
 	input_events.push_back(ie);
 
 	al_unlock_mutex(input_event_mutex);
 }
 
-void use_input_event(void)
+void use_input_event()
 {
 	al_lock_mutex(input_event_mutex);
 
@@ -110,22 +73,80 @@ void use_input_event(void)
 	al_unlock_mutex(input_event_mutex);
 }
 
-void clear_input_events(void)
+void clear_input_events(double older_than)
 {
-	al_lock_mutex(input_event_mutex);
+	if (older_than < 0) {
+		drop_input_events_older_than = al_get_time();
+	}
+	else {
+		drop_input_events_older_than = older_than;
+	}
 
-	input_events.clear();
+	while (input_events.size() > 0) {
+		INPUT_EVENT &ie = *input_events.begin();
+		if (ie.timestamp >= drop_input_events_older_than) {
+			break;
+		}
+		input_events.erase(input_events.begin());
+	}
 
-	num_button_events_in_list = 0;
-	
-	if (ie.button1 == UP || ie.button2 == UP || ie.button3 == UP) {
-		if (num_skipped_button_events > 0) {
-			num_skipped_button_events--;
+	for (int i = 0; i < JOY_NUM_REPEATABLE; i++) {
+		joystick_initial_repeat_countdown[i] = JOY_INITIAL_REPEAT_TIME;
+		joystick_repeat_countdown[i] = JOY_REPEAT_TIME;
+		joystick_repeat_started[i] = false;
+		joystick_repeat_events[i] = EMPTY_INPUT_EVENT;
+	}
+
+	Input *i = getInput();
+	if (i) {
+		i->reset();
+	}
+
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+	reset_joypad_state();
+#endif
+}
+
+void waitForRelease(int what)
+{
+	Input *i = getInput();
+	InputDescriptor id;
+	while (true) {
+		pump_events();
+		id = i->getDescriptor();
+		switch (what) {
+			case 0:
+				if (!id.left)
+					goto done;
+				break;
+			case 1:
+				if (!id.right)
+					goto done;
+				break;
+			case 2:
+				if (!id.up)
+					goto done;
+				break;
+			case 3:
+				if (!id.down)
+					goto done;
+				break;
+			case 4:
+				if (!id.button1)
+					goto done;
+				break;
+			case 5:
+				if (!id.button2)
+					goto done;
+				break;
+			case 6:
+				if (!id.button3)
+					goto done;
+				break;
 		}
 	}
-	ie = EMPTY_INPUT_EVENT;
 
-	al_unlock_mutex(input_event_mutex);
+done:;
 }
 
 void Input::set(bool l, bool r, bool u, bool d, int set_sets)
@@ -284,7 +305,7 @@ void Input::setTimeTillNextNotification(int t)
 }
 
 
-unsigned long Input::getTimeOfNextNotification(void)
+unsigned long Input::getTimeOfNextNotification()
 {
 	return timeOfNextNotification;
 }
@@ -306,6 +327,28 @@ Input::Input()
 	timeOfNextNotification = tguiCurrentTimeMillis();
 	orRelease = -1;
 	mutex = al_create_mutex_recursive();
+}
+
+void KeyboardInput::reset()
+{
+	descriptor.left =
+	descriptor.right =
+	descriptor.up =
+	descriptor.down =
+	descriptor.button1 =
+	descriptor.button2 =
+	descriptor.button3 = false;
+	sets = descriptor;
+	timeOfNextNotification = tguiCurrentTimeMillis();
+	orRelease = -1;
+
+	left =
+	right =
+	up =
+	down =
+	button1 =
+	button2 =
+	button3 = false;
 }
 
 void KeyboardInput::update()
@@ -364,6 +407,28 @@ void KeyboardInput::handle_event(ALLEGRO_EVENT *event)
 	}
 
 	set(left, right, up, down, button1, button2, button3);
+}
+
+void GamepadInput::reset()
+{
+	descriptor.left =
+	descriptor.right =
+	descriptor.up =
+	descriptor.down =
+	descriptor.button1 =
+	descriptor.button2 =
+	descriptor.button3 = false;
+	sets = descriptor;
+	timeOfNextNotification = tguiCurrentTimeMillis();
+	orRelease = -1;
+
+	left =
+	right =
+	up =
+	down =
+	button1 =
+	button2 =
+	button3 = false;
 }
 
 void GamepadInput::update()
@@ -431,6 +496,23 @@ void GamepadInput::handle_event(ALLEGRO_EVENT *event)
 	}
 
 	set(left, right, up, down, button1, button2, button3);
+}
+
+void TripleInput::reset()
+{
+	descriptor.left =
+	descriptor.right =
+	descriptor.up =
+	descriptor.down =
+	descriptor.button1 =
+	descriptor.button2 =
+	descriptor.button3 = false;
+	sets = descriptor;
+	timeOfNextNotification = tguiCurrentTimeMillis();
+	orRelease = -1;
+
+	if (kb) kb->reset();
+	if (js) js->reset();
 }
 
 TripleInput::TripleInput() :
@@ -537,20 +619,20 @@ void TripleInput::update()
 	al_unlock_mutex(mutex);
 }
 
-void initInput(void)
+void initInput()
 {
 	tripleInput = new TripleInput();
 }
 
 
-void destroyInput(void)
+void destroyInput()
 {
 	delete tripleInput;
 	tripleInput = NULL;
 }
 
 
-TripleInput *getInput(void)
+TripleInput *getInput()
 {
 	return tripleInput;
 }
@@ -561,7 +643,7 @@ ScriptInput::ScriptInput()
 void ScriptInput::update()
 {}
 
-void joy_b1_down(void)
+void joy_b1_down()
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.button1 = DOWN;
@@ -574,7 +656,7 @@ void joy_b1_down(void)
 	blueblock_times[4] = al_get_time();
 }
 
-void joy_b2_down(void)
+void joy_b2_down()
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.button2 = DOWN;
@@ -587,7 +669,7 @@ void joy_b2_down(void)
 	blueblock_times[5] = al_get_time();
 }
 
-void joy_b3_down(void)
+void joy_b3_down()
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.button3 = DOWN;
@@ -600,7 +682,7 @@ void joy_b3_down(void)
 	blueblock_times[6] = al_get_time();
 }
 
-void joy_b1_up(void)
+void joy_b1_up()
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.button1 = UP;
@@ -611,7 +693,7 @@ void joy_b1_up(void)
 	dpad_panning = false;
 }
 
-void joy_b2_up(void)
+void joy_b2_up()
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.button2 = UP;
@@ -621,7 +703,7 @@ void joy_b2_up(void)
 	joystick_repeat_countdown[JOY_REPEAT_B2] = JOY_REPEAT_TIME;
 }
 
-void joy_b3_up(void)
+void joy_b3_up()
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.button3 = UP;
@@ -631,7 +713,7 @@ void joy_b3_up(void)
 	joystick_repeat_countdown[JOY_REPEAT_B3] = JOY_REPEAT_TIME;
 }
 
-void joy_l_down(void)
+void joy_l_down()
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.left = DOWN;
@@ -644,7 +726,7 @@ void joy_l_down(void)
 	blueblock_times[0] = al_get_time();
 }
 
-void joy_r_down(void)
+void joy_r_down()
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.right = DOWN;
@@ -657,7 +739,7 @@ void joy_r_down(void)
 	blueblock_times[1] = al_get_time();
 }
 
-void joy_u_down(void)
+void joy_u_down()
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.up = DOWN;
@@ -670,7 +752,7 @@ void joy_u_down(void)
 	blueblock_times[2] = al_get_time();
 }
 
-void joy_d_down(void)
+void joy_d_down()
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.down = DOWN;
@@ -683,7 +765,7 @@ void joy_d_down(void)
 	blueblock_times[3] = al_get_time();
 }
 
-void joy_l_up(void)
+void joy_l_up()
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.left = UP;
@@ -693,7 +775,7 @@ void joy_l_up(void)
 	joystick_repeat_countdown[JOY_REPEAT_AXIS0] = JOY_REPEAT_TIME;
 }
 
-void joy_r_up(void)
+void joy_r_up()
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.right = UP;
@@ -703,7 +785,7 @@ void joy_r_up(void)
 	joystick_repeat_countdown[JOY_REPEAT_AXIS0] = JOY_REPEAT_TIME;
 }
 
-void joy_u_up(void)
+void joy_u_up()
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.up = UP;
@@ -713,7 +795,7 @@ void joy_u_up(void)
 	joystick_repeat_countdown[JOY_REPEAT_AXIS1] = JOY_REPEAT_TIME;
 }
 
-void joy_d_up(void)
+void joy_d_up()
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.down = UP;

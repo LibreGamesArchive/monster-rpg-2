@@ -675,8 +675,6 @@ void CombatEnemy::draw(void)
 		info.abilities.speed = 70;
 		info.abilities.mdefense = 300;
 		info.abilities.luck = 100;
-
-		clear_input_events();
 	}
 	// Draw fading out purple waving
 	else if (info.abilities.hp <= 0 && !explosionCircles) {

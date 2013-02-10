@@ -763,6 +763,8 @@ static void levelUpCallback(int selected, LEVEL_UP_CALLBACK_DATA *d)
 	tguiAddWidget(ok);
 	tguiSetFocus(ok);
 
+	clear_input_events();
+
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
 		int tmp_counter = logic_counter;
@@ -949,6 +951,8 @@ bool levelUp(Player *player, int bonus)
 	tguiAddWidget(stats);
 	tguiAddWidget(multiChooser);
 	tguiSetFocus(multiChooser);
+
+	clear_input_events();
 
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);

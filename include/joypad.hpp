@@ -3,10 +3,12 @@
 
 #include "monster2.hpp"
 
-void find_joypads(void);
-bool is_32_or_later(void);
-void init_joypad(void);
-InputDescriptor get_joypad_state(void);
-bool joypad_connected(void);
+void find_joypads();
+void stop_finding_joypads();
+bool is_32_or_later();
+void init_joypad();
+InputDescriptor get_joypad_state();
+bool joypad_connected();
+void reset_joypad_state();
 
 #endif

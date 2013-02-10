@@ -869,8 +869,6 @@ static void fade(int startAlpha, int endAlpha, int length, MCOLOR color)
 	dpad_on();
 	global_draw_red = true;
 	global_draw_controls = true;
-
-	clear_input_events();
 }
 
 
@@ -973,8 +971,6 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 	global_draw_red = true;
 	global_draw_controls = true;
 
-	clear_input_events();
-
 	return false;
 }
 
@@ -983,8 +979,6 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
  */
 bool transitionIn(bool can_cancel, bool toggle_dpad)
 {
-	real_auto_save_screenshot();
-	save_memory(true);
 	bool ret = transition(true, 600, can_cancel, toggle_dpad);
 	return ret;
 }
@@ -1083,8 +1077,6 @@ void battleTransition(void)
 		m_destroy_bitmap(bufcopy1);
 		m_destroy_bitmap(bufcopy2);
 
-		clear_input_events();
-
 		delete[] phase_lengths;
 		delete[] phase_peaks;
 
@@ -1144,7 +1136,6 @@ void battleTransition(void)
 	m_destroy_bitmap(battle_buf);
 
 	dpad_on();
-	clear_input_events();
 }
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID

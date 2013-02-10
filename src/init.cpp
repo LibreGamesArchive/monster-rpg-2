@@ -142,10 +142,8 @@ bool have_mouse;
 bool do_pause_game = false;
 #endif
 ALLEGRO_EVENT_QUEUE *events;
-ALLEGRO_EVENT_QUEUE *events_minor;
-#ifdef ALLEGRO_IPHONE
-double next_shake;
-#endif
+ALLEGRO_EVENT_QUEUE *input_event_queue;
+double next_shake = 0;
 
 bool do_acknowledge_resize = false;
 
@@ -253,8 +251,6 @@ bool use_dpad = true;
 int dpad_type;
 bool dpad_at_top = false;
 bool released = true;
-static int last_mouse_x = -1, last_mouse_y;
-static int total_mouse_x, total_mouse_y;
 int click_x, click_y;
 int event_mouse_x, event_mouse_y;
 int current_mouse_x = -1, current_mouse_y = -1;
@@ -490,242 +486,10 @@ static void show_progress(int percent)
 	progress_percent = percent;
 }
 
-static void get_inputs(int x, int y, bool *l, bool *r, bool *u, bool *d, bool *b1, bool *b2, bool *b3)
-{
-	*l = *r = *u = *d = *b1 = *b2 = *b3 = false;
-
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	return;
-#else
-
-	int xx = BW-BUTTON_SIZE-20;
-	int xx2 = xx + BUTTON_SIZE;
-	xx -= 5;
-	xx2 += 5;
-
-	if (x > xx & x < xx+BUTTON_SIZE) {
-		if (dpad_at_top) {
-			if (y < BUTTON_SIZE+10) {
-				if (config.getSwapButtons())
-					*b1 = true;
-				else
-					*b2 = true;
-			}
-		}
-		else {
-			if (y > BH-10-BUTTON_SIZE) {
-				if (config.getSwapButtons())
-					*b1 = true;
-				else
-					*b2 = true;
-			}
-		}
-	}
-
-	xx = BW-BUTTON_SIZE*2-25;
-	xx2 = xx + BUTTON_SIZE;
-	xx -= 5;
-	xx2 += 5;
-
-	if (x > xx & x < xx+BUTTON_SIZE) {
-		if (dpad_at_top) {
-			if (y < BUTTON_SIZE+10) {
-				if (config.getSwapButtons())
-					*b2 = true;
-				else
-					*b1 = true;
-			}
-		}
-		else {
-			if (y > BH-10-BUTTON_SIZE) {
-				if (config.getSwapButtons())
-					*b2 = true;
-				else
-					*b1 = true;
-			}
-		}
-	}
-
-	if (dpad_at_top) {
-		y -= 5;
-	}
-	else {
-		y -= BH-(BUTTON_SIZE*3)-5;
-	}
-
-	x -= 5;
-
-	if (x < BUTTON_SIZE*3 && y < BUTTON_SIZE*3) {
-		float angle = atan2(y-BUTTON_SIZE*1.5, x-BUTTON_SIZE*1.5);
-		while (angle < 0) angle += (M_PI*2);
-		const float fortyfive = M_PI/4;
-		if (angle >= fortyfive && angle < (fortyfive*3)) {
-			x = 1; y = 2;
-		}
-		else if (angle >= (fortyfive*3) && angle < (fortyfive*5)) {
-			x = 0; y = 1;
-		}
-		else if (angle >= (fortyfive*5) && angle < (fortyfive*7)) {
-			x = 1; y = 0;
-		}
-		else {
-			x = 2; y = 1;
-		}
-	}
-
-	switch (x) {
-		case 0:
-			switch (y) {
-				case 1:
-					*l = true;
-					break;
-			}
-			break;
-		case 1:
-			switch (y) {
-				case 0:
-					*u = true;
-					break;
-				case 2:
-					*d = true;
-					break;
-			}
-			break;
-		case 2:
-			switch (y) {
-				case 1:
-					*r = true;
-					break;
-			}
-			break;
-	}
-#endif
-}
-
-struct Touch {
-	int touch_id;
-	int x;
-	int y;
-	int onscreen_button;
-};
-
-const int MAX_TOUCHES = 10;
-
-Touch touches[MAX_TOUCHES] = { { -1, -1, -1, - 1 }, };
-
-volatile int curr_touches = 0;
-
-const int MOUSE_DOWN = 1;
-const int MOUSE_UP = 2;
-const int MOUSE_AXES = 3;
-
-void myTguiIgnore(int type)
-{
-	tguiIgnore(type);
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	if (!(config.getDpadType() == DPAD_TOTAL_1 || config.getDpadType() == DPAD_TOTAL_2)) {
-		al_lock_mutex(touch_mutex);
-		// FIXME: THIS OK REMOVED??? getInput()->set(false, false, false, false, false, false, false, true);
-		for (int i = 0; i < MAX_TOUCHES; i++) {
-			touches[i].x = touches[i].y = -1;
-		}
-		curr_touches = 0;
-		al_unlock_mutex(touch_mutex);
-	}
-#endif
-}
-
-static int find_touch(int touch_id)
-{
-	for (int i = 0; i < MAX_TOUCHES; i++) {
-		if (touches[i].touch_id == touch_id)
-			return i;
-	}
-	
-	return -1;
-}
-
-static void process_touch(int x, int y, int touch_id, int type) {
-	if (have_mouse)
-		return;
-	
-	al_lock_mutex(touch_mutex);
-	if (type == MOUSE_DOWN) {
-		if (curr_touches >= MAX_TOUCHES) {
-			al_unlock_mutex(touch_mutex);
-			return;
-		}
-		touches[curr_touches].x = x;
-		touches[curr_touches].y = y;
-		touches[curr_touches].touch_id = touch_id;
-		touches[curr_touches].onscreen_button = -1;
-		curr_touches++;
-	}
-	else if (type == MOUSE_UP) {
-		if (curr_touches > 0) {
-			int idx = find_touch(touch_id);
-			for (; idx < MAX_TOUCHES-1; idx++) {
-				touches[idx].x = touches[idx+1].x;
-				touches[idx].y = touches[idx+1].y;
-				touches[idx].touch_id = touches[idx+1].touch_id;
-			}
-			curr_touches--;
-		}
-	}
-	else { // MOVE
-		int idx = find_touch(touch_id);
-		touches[idx].x = x;
-		touches[idx].y = y;
-	}
-	al_unlock_mutex(touch_mutex);
-}
-
-static std::list<ZONE> zones;
-
-std::list<ZONE>::iterator define_zone(int x1, int y1, int x2, int y2)
-{
-	std::pair<int, int> a;
-	std::pair<int, int> b;
-
-	a.first = x1;
-	a.second = y1;
-
-	b.first = x2;
-	b.second = y2;
-
-	ZONE z;
-
-	z.first = a;
-	z.second = b;
-
-	return zones.insert(zones.begin(), z);
-}
-
-void delete_zone(std::list<ZONE>::iterator it)
-{
-	zones.erase(it);
-}
-
-bool zone_defined(int x, int y)
-{
-	std::list<ZONE>::iterator it;
-	for (it = zones.begin(); it != zones.end(); it++) {
-		ZONE z = *it;
-		std::pair<int, int> a = z.first;
-		std::pair<int, int> b = z.second;
-
-		if (x > a.first && y > a.second && x < b.first && y < b.second) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
 void register_display(ALLEGRO_DISPLAY *display)
 {
 	al_register_event_source(events, al_get_display_event_source(display));
-	al_register_event_source(events_minor, al_get_display_event_source(display));
+	al_register_event_source(input_event_queue, al_get_display_event_source(display));
 }
 
 void set_user_joystick(void)
@@ -757,12 +521,7 @@ static void *thread_proc(void *arg)
 #if defined A5_D3D || defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_register_event_source(events, al_get_display_event_source(display));
 #endif
-#if !defined ALLEGRO_IPHONE
-	al_register_event_source(events, al_get_keyboard_event_source());
-#endif
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	al_register_event_source(events, al_get_joystick_event_source());
-#endif
+
 	draw_timer = al_create_timer(1.0/config.getTargetFPS());
 	logic_timer = al_create_timer(1.0/LOGIC_RATE);
 	
@@ -772,16 +531,6 @@ static void *thread_proc(void *arg)
 	al_register_event_source(events, (ALLEGRO_EVENT_SOURCE *)draw_timer);
 	al_register_event_source(events, (ALLEGRO_EVENT_SOURCE *)logic_timer);
 	
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	al_register_event_source(events, al_get_touch_input_event_source());
-#else
-	if (have_mouse) {
-		al_register_event_source(events, al_get_mouse_event_source());
-	}
-#endif
-
-	double next_shake = al_current_time();
-
 #if defined __linux__ && !(defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI)
 	double next_screensaver_disable = al_current_time() + 45;
 #endif
@@ -853,258 +602,8 @@ static void *thread_proc(void *arg)
 				}
 				al_signal_cond(wait_cond);
 			}
-
-#ifdef ALLEGRO_ANDROID
-			if ((event.type == ALLEGRO_EVENT_KEY_DOWN || event->type == USER_KEY_DOWN) && event.keyboard.keycode == ALLEGRO_KEY_BACK) {
-				if (al_current_time() > next_shake) {
-					iphone_shake_time = al_current_time();
-					next_shake = al_current_time()+0.5;
-				}
-			}
-#endif
-
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-#define BEGIN ALLEGRO_EVENT_TOUCH_BEGIN
-#define END ALLEGRO_EVENT_TOUCH_END
-#define MOVE ALLEGRO_EVENT_TOUCH_MOVE
-#else
-#define BEGIN ALLEGRO_EVENT_MOUSE_BUTTON_DOWN
-#define END ALLEGRO_EVENT_MOUSE_BUTTON_UP
-#define MOVE ALLEGRO_EVENT_MOUSE_AXES
-#endif
-
-			Input *i = getInput();
-#if defined ALLEGRO_IPHONE
-			bool jp_conn = joypad_connected() || is_sb_connected();
-#elif defined ALLEGRO_MACOSX
-			bool jp_conn = joypad_connected();
-#elif defined ALLEGRO_ANDROID
-			bool jp_conn = zeemote_connected;
-#else
-			bool jp_conn = false;
-#endif
-			if (!jp_conn && i && i->isPlayerControlled() && 
-			(event.type == BEGIN ||
-			event.type == END ||
-			(event.type == MOVE && !path_head))) {
-
-				al_lock_mutex(input_mutex);
-
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-				int this_x = event.touch.x;
-				int this_y = event.touch.y;
-				int touch_id = event.touch.id;
-#else
-				int this_x = event.mouse.x;
-				int this_y = event.mouse.y;
-				int touch_id = 1;
-#endif
-				
-				event_mouse_x = this_x;
-				event_mouse_y = this_y;
-
-#ifdef ALLEGRO_IPHONE
-				if (airplay_connected) {
-					this_x = ((float)this_x / al_get_display_width(controller_display)) * 240;
-					this_y = ((float)this_y / al_get_display_height(controller_display)) * 160;
-				}
-				else if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN)
-#else
-				if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN)
-#endif
-					tguiConvertMousePosition(&this_x, &this_y, 0, 0, screen_ratio_x, screen_ratio_y);
-				else
-					tguiConvertMousePosition(&this_x, &this_y, screen_offset_x, screen_offset_y, 1, 1);
-					
-				void (*down[7])(void) = {
-					joy_l_down, joy_r_down, joy_u_down, joy_d_down,
-					joy_b1_down, joy_b2_down, joy_b3_down
-				};
-				void (*up[7])(void) = {
-					joy_l_up, joy_r_up, joy_u_up, joy_d_up,
-					joy_b1_up, joy_b2_up, joy_b3_up
-				};
-
-				bool state[7] = { false, };
-				
-				int type;
-				if (event.type == BEGIN)
-					type = MOUSE_DOWN;
-				else if (event.type == END)
-					type = MOUSE_UP;
-				else
-					type = MOUSE_AXES;
-				
-				al_lock_mutex(dpad_mutex);
-					
-				bool _l = false, _r = false, _u = false, _d = false, _b1 = false, _b2 = false, _b3 = false;
-
-				for (int i = 0; i < curr_touches; i++) {
-					bool __l = false, __r = false, __u = false, __d = false, __b1 = false, __b2 = false, __b3 = false;
-					get_inputs(touches[i].x, touches[i].y,
-						&__l, &__r, &__u, &__d, &__b1, &__b2, &__b3
-					);
-					_l = _l || __l;
-					_r = _r || __r;
-					_u = _u || __u;
-					_d = _d || __d;
-					_b1 = _b1 || __b1;
-					_b2 = _b2 || __b2;
-					_b3 = _b3 || __b3;
-				}
-				
-				process_touch(this_x, this_y, touch_id, type);
-				
-				bool l = false, r = false, u = false, d = false, b1 = false, b2 = false, b3 = false;
-
-				for (int i = 0; i < curr_touches; i++) {
-					bool __l = false, __r = false, __u = false, __d = false, __b1 = false, __b2 = false, __b3 = false;
-					get_inputs(touches[i].x, touches[i].y,
-						&__l, &__r, &__u, &__d, &__b1, &__b2, &__b3
-					);
-					l = l || __l;
-					r = r || __r;
-					u = u || __u;
-					d = d || __d;
-					b1 = b1 || __b1;
-					b2 = b2 || __b2;
-					b3 = b3 || __b3;
-				}
-				
-				al_unlock_mutex(dpad_mutex);
-				
-				bool on1[7] = { _l, _r, _u, _d, _b1, _b2, _b3 };
-				bool on2[7] = { l, r, u, d, b1, b2, b3 };
-				
-				if (use_dpad && !have_mouse) {
-					for (int i = 0; i < 7; i++) {
-						if (on1[i] == false && on2[i] == true) {
-							(*(down[i]))();
-						}
-						else if (on1[i] == true && on2[i] == false) {
-							(*(up[i]))();
-						}
-						
-						state[i] = on2[i];
-					}
-				}
-					
-				getInput()->set(state[0], state[1], state[2], state[3],
-					state[4], state[5], state[6], true);
-								
-				if (event.type == BEGIN) {
-					bool hot_corner_touched = false;
-					bool player_in_corner = false;
-					if (area) {
-						Object *o = area->findObject(0);
-						if (o && o->isMoving()) {
-							if ((area->getFocusX()-area->getOriginX() < (TILE_SIZE*3)/2) && (area->getFocusY()-area->getOriginY() < (TILE_SIZE*3)/2)) {
-								player_in_corner = true;
-							}
-						}
-					}
-					bool roam = (tguiCurrentTimeMillis() - roaming) < 500;
-					if (!roam || !player_in_corner) {
-						/* Hot top left corner */
-						if (global_draw_red || red_off_press_on) {
-							if (this_x < 16 && this_y < 16) {
-								hot_corner_touched = true;
-								if (al_current_time() > next_shake) {
-									iphone_shake_time = al_current_time();
-									next_shake = al_current_time()+0.5;
-								}
-							}
-						}
-					}
-					if (use_dpad) {
-						al_lock_mutex(dpad_mutex);
-						if (!zone_defined(this_x, this_y)) {
-							if (this_y < BH/3) {
-								dpad_at_top = true;
-							}
-							else if (this_y > (BH*2)/3) {
-								dpad_at_top = false;
-							}
-						}
-						al_unlock_mutex(dpad_mutex);
-					}
-					if (!hot_corner_touched) {
-						released = false;
-						al_lock_mutex(click_mutex);
-						click_x = this_x;
-						click_y = this_y;
-						al_unlock_mutex(click_mutex);
-					}
-				}
-				else if (event.type == END) {
-					al_lock_mutex(dpad_mutex);
-					if (!(this_x < 16 && this_y < 16)) {
-						released = true;
-						if (have_mouse || !use_dpad) {
-							total_mouse_x = 0;
-							total_mouse_y = 0;
-							last_mouse_x = -1;
-						}
-					}
-					al_unlock_mutex(dpad_mutex);
-				}
-				else if (event.type == MOVE) {
-					al_lock_mutex(click_mutex);
-					current_mouse_x = this_x;
-					current_mouse_y = this_y;
-					al_unlock_mutex(click_mutex);
-					al_lock_mutex(dpad_mutex);
-					if ((have_mouse && !released) || !use_dpad) {
-						if (last_mouse_x < 0) {
-							last_mouse_x = this_x;
-							last_mouse_y = this_y;
-						}
-						else {
-							int dx = this_x - last_mouse_x;
-							int dy = this_y - last_mouse_y;
-							last_mouse_x = this_x;
-							last_mouse_y = this_y;
-							total_mouse_x += dx;
-							total_mouse_y += dy;
-							if (total_mouse_x < (-IPHONE_LINE_MIN)) {
-								total_mouse_x = 0;
-								total_mouse_y = 0;
-								iphone_line_times[IPHONE_LINE_DIR_WEST] = al_current_time();
-							}
-							else if (total_mouse_x > IPHONE_LINE_MIN) {
-								total_mouse_x = 0;
-								total_mouse_y = 0;
-								iphone_line_times[IPHONE_LINE_DIR_EAST] = al_current_time();
-							}
-							if (total_mouse_y < (-IPHONE_LINE_MIN)) {
-								total_mouse_x = 0;
-								total_mouse_y = 0;
-								iphone_line_times[IPHONE_LINE_DIR_NORTH] = al_current_time();
-							}
-							else if (total_mouse_y > IPHONE_LINE_MIN) {
-								total_mouse_x = 0;
-								total_mouse_y = 0;
-								iphone_line_times[IPHONE_LINE_DIR_SOUTH] = al_current_time();
-							}
-						}
-					}
-					
-					al_unlock_mutex(dpad_mutex);
-				}
-				
-				al_unlock_mutex(input_mutex);
-			}
-		}
-		if (event.type == USER_KEY_DOWN || event.type == USER_KEY_UP || event.type == USER_KEY_CHAR) {
-			al_unref_user_event((ALLEGRO_USER_EVENT *)&event);
 		}
 	}
-	
-	al_unregister_event_source(events, (ALLEGRO_EVENT_SOURCE *)draw_timer);
-	al_unregister_event_source(events, (ALLEGRO_EVENT_SOURCE *)logic_timer);
-#if defined A5_D3D || defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	al_unregister_event_source(events, (ALLEGRO_EVENT_SOURCE *)display);
-#endif
 	
 	al_destroy_timer(draw_timer);
 	al_destroy_timer(logic_timer);
@@ -2246,14 +1745,12 @@ bool init(int *argc, char **argv[])
 	tguiInit();
 	tguiSetRotation(0);
 
-	if (have_mouse) {
-		al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
-	}
-
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	al_hide_mouse_cursor(display);
 	custom_mouse_cursor = m_load_bitmap(getResource("media/mouse_cursor.png"));
-#endif
+
+	if (have_mouse) {
+		al_set_mouse_xy(display, al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor->bitmap)-20, al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor->bitmap)-20);
+	}
 
 	set_screen_params();
       
@@ -2328,17 +1825,20 @@ bool init(int *argc, char **argv[])
 		config.setGamepadAvailable(false);
 	}
 
-	events_minor = al_create_event_queue();
-	al_register_event_source(events_minor, (ALLEGRO_EVENT_SOURCE *)display);
-#ifndef ALLEGRO_IPHONE /* FIXME: fix when adding iOS keyboard support */
-	al_register_event_source(events_minor, al_get_keyboard_event_source());
+	input_event_queue = al_create_event_queue();
+	al_register_event_source(input_event_queue, (ALLEGRO_EVENT_SOURCE *)display);
+#ifndef ALLEGRO_IPHONE
+	al_register_event_source(input_event_queue, al_get_keyboard_event_source());
 #ifndef ALLEGRO_ANDROID
-	al_register_event_source(events_minor, al_get_joystick_event_source());
+	al_register_event_source(input_event_queue, al_get_joystick_event_source());
 #endif
 #endif
-
-#ifdef ALLEGRO_IPHONE
-	next_shake = al_current_time();
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+	al_register_event_source(input_event_queue, al_get_touch_input_event_source());
+#else
+	if (have_mouse) {
+		al_register_event_source(input_event_queue, al_get_mouse_event_source());
+	}
 #endif
 
 	debug_message("GFX mode set.\n");
@@ -2702,7 +2202,6 @@ void dpad_off(bool count)
 			joystick_repeat_started[JOY_REPEAT_B3] = false;
 			joystick_initial_repeat_countdown[JOY_REPEAT_B3] = JOY_INITIAL_REPEAT_TIME;
 			joystick_repeat_countdown[JOY_REPEAT_B3] = JOY_REPEAT_TIME;
-			clear_input_events();
 		}
 		al_unlock_mutex(dpad_mutex);
 	}
@@ -2823,7 +2322,12 @@ void toggle_fullscreen(void)
 	if (sd->fullscreen) {
 		al_hide_mouse_cursor(display);
 	}
-	al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
+	if (in_shooter) {
+		al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
+	}
+	else {
+		al_set_mouse_xy(display, al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor->bitmap)-20, al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor->bitmap)-20);
+	}
 #endif
 }
 

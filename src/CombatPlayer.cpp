@@ -77,7 +77,6 @@ public:
 			if (formWidget && formWidget->getHoldStart() > 0 &&
 					formWidget->getHoldStart()+600UL < tguiCurrentTimeMillis()) {
 				playPreloadedSample("select.ogg");
-				al_rest(0.5);
 				showPlayerInfo(i);
 				formWidget->reset();
 				return NULL;
@@ -789,7 +788,6 @@ ActionHandler *AttackHandler::act(int step, Battle *b)
 		m_flip_display();
 		m_rest(5);
 		dpad_on();
-		clear_input_events();
 		if (win) {
 			attacked[0]->getAnimationSet()->setSubAnimation("broken");
 			if (!use_programmable_pipeline) {

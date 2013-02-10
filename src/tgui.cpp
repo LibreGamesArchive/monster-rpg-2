@@ -9,6 +9,8 @@
 
 #include "tgui.hpp"
 
+#include "monster2.hpp"
+
 struct TGUI {
 	int focus;
 	std::vector<TGUIWidget*> widgets;
@@ -34,14 +36,12 @@ TGUIPoint tguiActiveWidgetClickedPoint; // relative to widget
 int tguiMouseButton;
 TGUIPoint tguiMouseReleasePoint;
 
-//static TGUIWidget* tguiHoverWidget = 0;
-
 static int tguiScreenWidth = 0;
 static int tguiScreenHeight = 0;
-static int screen_offset_x = 0;
-static int screen_offset_y = 0;
-static float screen_ratio_x = 1.0;
-static float screen_ratio_y = 1.0;
+static int tgui_screen_offset_x = 0;
+static int tgui_screen_offset_ = 0;
+static float tgui_screen_ratio_x = 1.0;
+static float tgui_screen_ratio_y = 1.0;
 
 static ALLEGRO_EVENT_QUEUE *key_events;
 static ALLEGRO_EVENT_QUEUE *mouse_events;
@@ -213,6 +213,12 @@ static bool tguiHotkeyPressed(int hotkey)
 	return false;
 }
 
+TGUIWidget::TGUIWidget()
+{
+	focus = false;
+	allClear = true;
+}
+
 /*
  * Returns the widget that the pixel x, y fall on,
  * or 0 if none is found.
@@ -263,7 +269,7 @@ unsigned long tguiCurrentTimeMillis()
 //#endif
 }
 
-bool tguiIsInitialized(void)
+bool tguiIsInitialized()
 {
 	return activeGUI != NULL;
 }
@@ -272,7 +278,7 @@ bool tguiIsInitialized(void)
  * Delete the active widget set and allocates a blank one.
  * Must be called before any other GUI functions are called.
  */
-void tguiInit(void)
+void tguiInit()
 {
 	if (activeGUI) {
 		tguiDeleteActive();
@@ -412,7 +418,7 @@ TGUIWidget* tguiGetFocus()
  * Move the focus to the first widget before this currently
  * focused widget that accepts focus.
  */
-void tguiFocusPrevious(void)
+void tguiFocusPrevious()
 {
 	int focus = activeGUI->focus-1;
 
@@ -451,7 +457,7 @@ void tguiFocusPrevious(void)
 /*
  * Move the focus to the next widget that accepts focus.
  */
-void tguiFocusNext(void)
+void tguiFocusNext()
 {
 	int focus = activeGUI->focus+1;
 
@@ -602,7 +608,7 @@ TGUIWidget* tguiUpdate()
 					MouseEvent *e = new MouseEvent;
 					e->x = EV.x;
 					e->y = EV.y;
-					tguiConvertMousePosition(&e->x, &e->y, screen_offset_x, screen_offset_y, screen_ratio_x, screen_ratio_y);
+					tguiConvertMousePosition(&e->x, &e->y, tgui_screen_offset_x, tgui_screen_offset_, tgui_screen_ratio_x, tgui_screen_ratio_y);
 					e->b = 0;
 					mouseMoveEvents.push_back(e);
 				}
@@ -611,7 +617,7 @@ TGUIWidget* tguiUpdate()
 					MouseEvent *e = new MouseEvent;
 					e->x = EV.x;
 					e->y = EV.y;
-					tguiConvertMousePosition(&e->x, &e->y, screen_offset_x, screen_offset_y, screen_ratio_x, screen_ratio_y);
+					tguiConvertMousePosition(&e->x, &e->y, tgui_screen_offset_x, tgui_screen_offset_, tgui_screen_ratio_x, tgui_screen_ratio_y);
 					e->b = EV.BUTTON;
 					mouseUpEvents.push_back(e);
 					tguiMouseState.buttons &= (~EV.BUTTON);
@@ -621,7 +627,7 @@ TGUIWidget* tguiUpdate()
 				mouse_downs++;
 				int ex = EV.x;
 				int ey = EV.y;
-				tguiConvertMousePosition(&ex, &ey, screen_offset_x, screen_offset_y, screen_ratio_x, screen_ratio_y);
+				tguiConvertMousePosition(&ex, &ey, tgui_screen_offset_x, tgui_screen_offset_, tgui_screen_ratio_x, tgui_screen_ratio_y);
 				EV.x = ex;
 				EV.y = ey;
 				/* This check is Monster 2 specific! */
@@ -637,7 +643,31 @@ TGUIWidget* tguiUpdate()
 		}
 	}
 
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	bool allClear = false;
+	Input *i;
+	i = getInput();
+	if (i) {
+		InputDescriptor id;
+		id = i->getDescriptor();
+		if (
+		!id.left &&
+		!id.right &&
+		!id.up &&
+		!id.down &&
+		!id.button1 &&
+		!id.button2 &&
+		!id.button3) {
+			allClear = true;
+		}
+	}
+
+	if (allClear) {
+		for (size_t i = 0; i < activeGUI->widgets.size(); i++) {
+			TGUIWidget* widget = activeGUI->widgets[i];
+			widget->setAllClear(true);
+		}
+	}
+
 	if (tguiActiveWidget) {
 		ALLEGRO_EVENT event;
 		while (!al_event_queue_is_empty(key_events)) {
@@ -653,11 +683,12 @@ TGUIWidget* tguiUpdate()
 				al_unref_user_event((ALLEGRO_USER_EVENT *)&event);
 			}
 		}
-		for (unsigned int i = 0; i < keycodeBuffer.size(); i++) {
-			int keycode = keycodeBuffer[i];
-			int unichar = unicharBuffer[i];
-			if (!tguiActiveWidget->handleKey(keycode, unichar)) {
-			//	simulate_keypress(key);
+		if (tguiActiveWidget->getAllClear()) {
+			for (unsigned int i = 0; i < keycodeBuffer.size(); i++) {
+				int keycode = keycodeBuffer[i];
+				int unichar = unicharBuffer[i];
+				if (!tguiActiveWidget->handleKey(keycode, unichar)) {
+				}
 			}
 		}
 		keycodeBuffer.clear();
@@ -684,18 +715,22 @@ TGUIWidget* tguiUpdate()
 			}
 		}
 	}
-#endif
 
 	for (size_t i = 0; i < activeGUI->widgets.size(); i++) {
 		TGUIWidget* widget = activeGUI->widgets[i];
+		if (!widget->getAllClear()) {
+			continue;
+		}
 		if (tguiIsDisabled(widget))
 			continue;
 		unsigned int retVal = widget->update(elapsed);
 		switch (retVal) {
 			case TGUI_CONTINUE:
 				break;
-			case TGUI_RETURN:
+			case TGUI_RETURN: {
+				widget->setAllClear(false); // could help
 				return widget;
+			}
 		}
 		std::vector<int>* hotkeys = widget->getHotkeys();
 		if (hotkeys) {
@@ -730,7 +765,6 @@ TGUIWidget* tguiUpdate()
 		it++;
 	}
 
-	//if (tguiMouseReleased) {
 	for (int i = 0; i < (int)mouseMoveEvents.size(); i++) {
 		int saved_mouse_x = mouseMoveEvents[0]->x;
 		int saved_mouse_y = mouseMoveEvents[0]->y;
@@ -738,7 +772,7 @@ TGUIWidget* tguiUpdate()
 		mouseMoveEvents.erase(mouseMoveEvents.begin());
 		if (!(ignore & TGUI_MOUSE)) {
 			for (int i = 0; i < (int)activeGUI->widgets.size(); i++) {
-				if (!tguiIsDisabled(activeGUI->widgets[i])) {
+				if (activeGUI->widgets[i]->getAllClear() && !tguiIsDisabled(activeGUI->widgets[i])) {
 					activeGUI->widgets[i]->mouseMove(saved_mouse_x,
 						saved_mouse_y);
 				}
@@ -755,9 +789,12 @@ TGUIWidget* tguiUpdate()
 		if (!(ignore & TGUI_MOUSE)) {
 			std::vector<TGUIWidget *> tmpVec = activeGUI->widgets;
 			for (int i = 0; i < (int)tmpVec.size(); i++) {
-				TGUIWidget *w = tmpVec[i];
+				TGUIWidget *widget = tmpVec[i];
+				if (!widget->getAllClear()) {
+					continue;
+				}
 				if (!tguiIsDisabled(activeGUI->widgets[i])) {
-					w->mouseDownAbs(
+					widget->mouseDownAbs(
 						saved_mouse_x, 
 						saved_mouse_y,
 						saved_mouse_b
@@ -766,18 +803,20 @@ TGUIWidget* tguiUpdate()
 			}
 			TGUIWidget* widget =
 				tguiFindPixelOwner(saved_mouse_x, saved_mouse_y);
-			if (!tguiIsDisabled(widget)) {
-				if (widget && widget != tguiClickedWidget) {
-					tguiSetFocus(widget);
-					tguiActiveWidgetClickedPoint.x =
-						saved_mouse_x - widget->getX();
-					tguiActiveWidgetClickedPoint.y =
-						saved_mouse_y - widget->getY();
-					tguiMouseButton = saved_mouse_b;
-					widget->mouseDown(saved_mouse_x - widget->getX(),
-						saved_mouse_y - widget->getY(),
-						saved_mouse_b);
-					tguiClickedWidget = widget;
+			if (widget && widget->getAllClear()) {
+				if (!tguiIsDisabled(widget)) {
+					if (widget && widget != tguiClickedWidget) {
+						tguiSetFocus(widget);
+						tguiActiveWidgetClickedPoint.x =
+							saved_mouse_x - widget->getX();
+						tguiActiveWidgetClickedPoint.y =
+							saved_mouse_y - widget->getY();
+						tguiMouseButton = saved_mouse_b;
+						widget->mouseDown(saved_mouse_x - widget->getX(),
+							saved_mouse_y - widget->getY(),
+							saved_mouse_b);
+						tguiClickedWidget = widget;
+					}
 				}
 			}
 			tguiMouseReleased = false;
@@ -793,9 +832,9 @@ TGUIWidget* tguiUpdate()
 		if (!(ignore & TGUI_MOUSE)) {
 			std::vector<TGUIWidget *> tmpVec = activeGUI->widgets;
 			for (int i = 0; i < (int)tmpVec.size(); i++) {
-				TGUIWidget *w = tmpVec[i];
-				if (!tguiIsDisabled(activeGUI->widgets[i])) {
-					w->mouseUpAbs(
+				TGUIWidget *widget = tmpVec[i];
+				if (activeGUI->widgets[i]->getAllClear() && !tguiIsDisabled(activeGUI->widgets[i])) {
+					widget->mouseUpAbs(
 						saved_mouse_x, 
 						saved_mouse_y,
 						saved_mouse_b
@@ -811,7 +850,7 @@ TGUIWidget* tguiUpdate()
 				if (it == activeGUI->widgets.end())
 					tguiClickedWidget = NULL;
 			}
-			if (tguiClickedWidget && !tguiIsDisabled(tguiClickedWidget)) {
+			if (tguiClickedWidget && !tguiIsDisabled(tguiClickedWidget) && tguiClickedWidget->getAllClear()) {
 				tguiMouseReleasePoint.x = saved_mouse_x;
 				tguiMouseReleasePoint.y = saved_mouse_y;
 				int relativeX;
@@ -919,8 +958,8 @@ bool tguiPop()
 	std::vector<TGUI*>::iterator it = tguiStack.begin() + tguiStack.size() - 1;
 	tguiStack.erase(it);
 	tguiSetFocus(activeGUI->focus);
-	tguiClearMouseEvents();
-	tguiClearKeybuffer();
+	//tguiClearMouseEvents();
+	//tguiClearKeybuffer();
 	return true;
 }
 
@@ -1275,25 +1314,27 @@ bool tguiWidgetIsChildOf(TGUIWidget* widget, TGUIWidget* parent)
 	}
 }
 
-int tguiGetMouseX(void)
+int tguiGetMouseX()
 {
 	return tguiMouseState.x;
 }
 
-int tguiGetMouseY(void)
+int tguiGetMouseY()
 {
 	return tguiMouseState.y;
 }
 
-int tguiGetMouseButtons(void)
+int tguiGetMouseButtons()
 {
 	return tguiMouseState.buttons;
 }
 
-void tguiClearKeybuffer(void)
+void tguiClearKeybuffer()
 {
+/*
 	keycodeBuffer.clear();
 	unicharBuffer.clear();
+*/
 }
 
 void tguiSetScale(float xscale, float yscale)
@@ -1307,8 +1348,9 @@ void tguiSetTolerance(int pixels)
 	tolerance = pixels;
 }
 
-void tguiClearMouseEvents(void)
+void tguiClearMouseEvents()
 {
+/*
 	for (size_t i = 0; i < mouseMoveEvents.size(); i++) {
 		delete mouseMoveEvents[i];
 	}
@@ -1322,12 +1364,13 @@ void tguiClearMouseEvents(void)
 	}
 	mouseDownEvents.clear();
 	al_flush_event_queue(mouse_events);
+*/
 }
 
 void tguiIgnore(int type)
 {
 	ignore = type;
-	tguiClearMouseEvents();
+	//tguiClearMouseEvents();
 }
 
 void tguiSetRotation(int angle_in_degrees)
@@ -1341,8 +1384,8 @@ void tguiConvertMousePosition(int *x, int *y, int ox, int oy, float rx, float ry
 	int in_y = *y;
 
 	if (ox != 0 || oy != 0) {
-		in_x -= screen_offset_x;
-		in_y -= screen_offset_y;
+		in_x -= tgui_screen_offset_x;
+		in_y -= tgui_screen_offset_;
 	}
 	else {
 		in_x /= rx;
@@ -1380,7 +1423,7 @@ void tguiDisableChildren(TGUIWidget *parent)
 		}
 	}
 }
-void tguiDisableAllWidgets(void)
+void tguiDisableAllWidgets()
 {
 	for (int i = 0; i < (int)activeGUI->widgets.size(); i++) {
 		if (!tguiIsDisabled(activeGUI->widgets[i])) {
@@ -1403,7 +1446,7 @@ void tguiEnableChildren(TGUIWidget *parent)
 	}
 }
 
-void tguiEnableAllWidgets(void)
+void tguiEnableAllWidgets()
 {
 	disabledWidgets.clear();
 }
@@ -1427,10 +1470,10 @@ void tguiSetScreenSize(int width, int height)
 void tguiSetScreenParameters(int offset_x, int offset_y,
 	float ratio_x, float ratio_y)
 {
-	screen_offset_x = offset_x;
-	screen_offset_y = offset_y;
-	screen_ratio_x = ratio_x;
-	screen_ratio_y = ratio_y;
+	tgui_screen_offset_x = offset_x;
+	tgui_screen_offset_ = offset_y;
+	tgui_screen_ratio_x = ratio_x;
+	tgui_screen_ratio_y = ratio_y;
 }
 
 void tguiEnableHotZone(bool enable)

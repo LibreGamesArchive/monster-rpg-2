@@ -911,6 +911,8 @@ static int real_archery(int *accuracy_pts)
 
 	playPreloadedSample("bow_draw.ogg");
 
+	clear_input_events();
+
 	while  (1) {
 		al_wait_cond(wait_cond, wait_mutex);
 		int tmp_counter = logic_counter;
@@ -1248,8 +1250,6 @@ done:
 
 	disable_zbuffer();
 	
-	clear_input_events();
-
 	m_set_target_bitmap(buffer);
 
 	goblins.clear();
@@ -1488,6 +1488,8 @@ void volcano_scene(void)
 	al_copy_transform(&orig_proj, al_get_projection_transform(display));
 	ALLEGRO_TRANSFORM proj_transform, view_transform;
 
+	clear_input_events();
+
 	while  (1) {
 		al_wait_cond(wait_cond, wait_mutex);
 		int tmp_counter = logic_counter;
@@ -1683,6 +1685,4 @@ done:
 	}
 
 	dpad_on();
-
-	clear_input_events();
 }
