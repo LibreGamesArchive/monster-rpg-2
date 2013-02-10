@@ -288,12 +288,10 @@ top:
 		ALLEGRO_EVENT event;
 		al_get_next_event(events_minor, &event);
 
-#if !defined ALLEGRO_IPHONE
 		al_lock_mutex(input_mutex);
 		if (getInput())
 			getInput()->handle_event(&event);
 		al_unlock_mutex(input_mutex);
-#endif
 
 		if (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN) {
 

@@ -443,12 +443,8 @@ TripleInput::TripleInput() :
 	js = NULL;
 #endif
 
-#if !defined ALLEGRO_IPHONE
 	kb = new KeyboardInput();
-#else
-	kb = NULL;
-#endif
-}
+ }
 
 void TripleInput::update()
 {
@@ -489,6 +485,10 @@ void TripleInput::update()
 		false
 	);
 #elif defined ALLEGRO_IPHONE
+	kb->update();
+	
+	InputDescriptor id1 = kb->getDescriptor();
+
 	InputDescriptor id3;
 	if (joypad_connected()) {
 		id3 = get_joypad_state();
@@ -501,13 +501,13 @@ void TripleInput::update()
 	get_sb_state(&id4.left, &id4.right, &id4.up, &id4.down, &id4.button1, &id4.button2, &id4.button3);
 		
 	set(
-	    sets.left || id3.left || id4.left,
-	    sets.right || id3.right || id4.right,
-	    sets.up || id3.up || id4.up,
-	    sets.down || id3.down || id4.down,
-	    sets.button1 || id3.button1 || id4.button1,
-	    sets.button2 || id3.button2 || id4.button2,
-	    sets.button3 || id3.button3 || id4.button3,
+	    sets.left || id1.left || id3.left || id4.left,
+	    sets.right || id1.right || id3.right || id4.right,
+	    sets.up || id1.up || id3.up || id4.up,
+	    sets.down || id1.down || id3.down || id4.down,
+	    sets.button1 || id1.button1 || id3.button1 || id4.button1,
+	    sets.button2 || id1.button2 || id3.button2 || id4.button2,
+	    sets.button3 || id1.button3 || id3.button3 || id4.button3,
 	    false
 	    );
 #elif defined ALLEGRO_ANDROID
