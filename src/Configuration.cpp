@@ -11,27 +11,358 @@ Configuration config;
 static bool keynames_gotten = false;
 std::map<std::string, int> keyname_to_keycode_map;
 
+const char *keynames[] =
+{
+	"NULL",
+	"A",
+	"B",
+	"C",
+	"D",
+	"E",
+	"F",
+	"G",
+	"H",
+	"I",
+	"J",
+	"K",
+	"L",
+	"M",
+	"N",
+	"O",
+	"P",
+	"Q",
+	"R",
+	"S",
+	"T",
+	"U",
+	"V",
+	"W",
+	"X",
+	"Y",
+	"Z",
+	"0",
+	"1",
+	"2",
+	"3",
+	"4",
+	"5",
+	"6",
+	"7",
+	"8",
+	"9",
+	"PAD_0",
+	"PAD_1",
+	"PAD_2",
+	"PAD_3",
+	"PAD_4",
+	"PAD_5",
+	"PAD_6",
+	"PAD_7",
+	"PAD_8",
+	"PAD_9",
+	"F1",
+	"F2",
+	"F3",
+	"F4",
+	"F5",
+	"F6",
+	"F7",
+	"F8",
+	"F9",
+	"F10",
+	"F11",
+	"F12",
+	"ESCAPE",
+	"TILDE",
+	"MINUS",
+	"EQUALS",
+	"BACKSPACE",
+	"TAB",
+	"OPENBRACE",
+	"CLOSEBRACE",
+	"ENTER",
+	"SEMICOLON",
+	"QUOTE",
+	"BACKSLASH",
+	"BACKSLASH2",
+	"COMMA",
+	"FULLSTOP",
+	"SLASH",
+	"SPACE",
+	"INSERT",
+	"DELETE",
+	"HOME",
+	"END",
+	"PGUP",
+	"PGDN",
+	"LEFT",
+	"RIGHT",
+	"UP",
+	"DOWN",
+	"PAD_SLASH",
+	"PAD_ASTERISK",
+	"PAD_MINUS",
+	"PAD_PLUS",
+	"PAD_DELETE",
+	"PAD_ENTER",
+	"PRINTSCREEN",
+	"PAUSE",
+	"ABNT_C1",
+	"YEN",
+	"KANA",
+	"CONVERT",
+	"NOCONVERT",
+	"AT",
+	"CIRCUMFLEX",
+	"COLON2",
+	"KANJI",
+	"PAD_EQUALS",
+	"BACKQUOTE",
+	"SEMICOLON2",
+	"COMMAND",
+	"BACK",
+	"VOLUME_UP",
+	"VOLUME_DOWN",
+	"SEARCH",
+	"DPAD_CENTER",
+	"BUTTON_X",
+	"BUTTON_Y",
+	"DPAD_UP",
+	"DPAD_DOWN",
+	"DPAD_LEFT",
+	"DPAD_RIGHT",
+	"SELECT",
+	"START",
+	"L1",
+	"R1",
+	"122",
+	"123",
+	"124",
+	"125",
+	"126",
+	"127",
+	"128",
+	"129",
+	"130",
+	"131",
+	"132",
+	"133",
+	"134",
+	"135",
+	"136",
+	"137",
+	"138",
+	"139",
+	"140",
+	"141",
+	"142",
+	"143",
+	"144",
+	"145",
+	"146",
+	"147",
+	"148",
+	"149",
+	"150",
+	"151",
+	"152",
+	"153",
+	"154",
+	"155",
+	"156",
+	"157",
+	"158",
+	"159",
+	"160",
+	"161",
+	"162",
+	"163",
+	"164",
+	"165",
+	"166",
+	"167",
+	"168",
+	"169",
+	"170",
+	"171",
+	"172",
+	"173",
+	"174",
+	"175",
+	"176",
+	"177",
+	"178",
+	"179",
+	"180",
+	"181",
+	"182",
+	"183",
+	"184",
+	"185",
+	"186",
+	"187",
+	"188",
+	"189",
+	"190",
+	"191",
+	"192",
+	"193",
+	"194",
+	"195",
+	"196",
+	"197",
+	"198",
+	"199",
+	"200",
+	"201",
+	"202",
+	"203",
+	"204",
+	"205",
+	"206",
+	"207",
+	"208",
+	"209",
+	"210",
+	"211",
+	"212",
+	"213",
+	"214",
+	"LSHIFT",
+	"RSHIFT",
+	"LCTRL",
+	"RCTRL",
+	"ALT",
+	"ALTGR",
+	"LWIN",
+	"RWIN",
+	"MENU",
+	"SCROLLLOCK",
+	"NUMLOCK",
+	"CAPSLOCK",
+	"227",
+	"228",
+	"229",
+	"230",
+	"231",
+	"232",
+	"233",
+	"234",
+	"235",
+	"236",
+	"237",
+	"238",
+	"239",
+	"240",
+	"241",
+	"242",
+	"243",
+	"244",
+	"245",
+	"246",
+	"247",
+	"248",
+	"249",
+	"250",
+	"251",
+	"252",
+	"253",
+	"254",
+	"255"
+};
+
 static int keyname_to_keycode(const char *name)
 {
-	if (!keynames_gotten) {
-		keynames_gotten = true;
-		std::string phony = ".";
-		for (int i = 0; i < ALLEGRO_KEY_MAX; i++) {
-			std::string s = al_keycode_to_name(i);
-			if (keyname_to_keycode_map.find(s) != keyname_to_keycode_map.end()) {
-				s = phony;
-				phony += ".";
-			}
-			keyname_to_keycode_map[s] = i;
+	for (int i = 0; i < ALLEGRO_KEY_MAX; i++) {
+		if (!strcasecmp(name, keynames[i])) {
+			return i;
 		}
-
-	}
-
-	if (keyname_to_keycode_map.find(name) != keyname_to_keycode_map.end()) {
-		return keyname_to_keycode_map[name];
 	}
 
 	return 0;
+}
+
+static const char *keycode_to_keyname(int i)
+{
+	if (i < 0 || i >= ALLEGRO_KEY_MAX) {
+		return 0;
+	}
+
+	return keynames[i];
+}
+
+void wait_for_no_keys_or_buttons()
+{
+	while (true) {
+		al_rest(0.001);
+		ALLEGRO_KEYBOARD_STATE state;
+		al_get_keyboard_state(&state);
+		for (int i = 0; i < ALLEGRO_KEY_MAX; i++) {
+			if (al_key_down(&state, i)) {
+				continue;
+			}
+		}
+		if (al_is_joystick_installed()) {
+			int nb = al_get_joystick_num_buttons(user_joystick);
+			ALLEGRO_JOYSTICK_STATE state;
+			al_get_joystick_state(user_joystick, &state);
+			for (int i = 0; i < nb; i++) {
+				if (state.button[i]) {
+					continue;
+				}
+			}
+		}
+		break;
+	}
+}
+
+int wait_for_key()
+{	
+	double time = al_get_time();
+
+	while (true) {
+		if (al_get_time() > time+10) {
+			return 0;
+		}
+		al_rest(0.001);
+		ALLEGRO_KEYBOARD_STATE state;
+		al_get_keyboard_state(&state);
+		for (int i = 0; i < ALLEGRO_KEY_MAX; i++) {
+			if (al_key_down(&state, i)) {
+				if (i == ALLEGRO_KEY_BACKSPACE) {
+					return 0;
+				}
+				return i;
+			}
+		}
+	}
+}
+
+int wait_for_joystick_button()
+{
+	double time = al_get_time();
+
+	while (true) {
+		if (al_get_time() > time+10) {
+			return -1;
+		}
+		al_rest(0.001);
+		ALLEGRO_KEYBOARD_STATE state;
+		al_get_keyboard_state(&state);
+		if (al_key_down(&state, ALLEGRO_KEY_BACKSPACE)) {
+			return -1;
+		}
+		if (al_is_joystick_installed()) {
+			int nb = al_get_joystick_num_buttons(user_joystick);
+			ALLEGRO_JOYSTICK_STATE state;
+			al_get_joystick_state(user_joystick, &state);
+			for (int i = 0; i < nb; i++) {
+				if (state.button[i]) {
+					return i;
+				}
+			}
+		}
+	}
 }
 
 #ifdef ALLEGRO_ANDROID
@@ -649,35 +980,35 @@ void Configuration::write()
 	XMLData* joyb3 = new XMLData("joyb3", my_itoa(getJoyButton3()));
 #if !defined ALLEGRO_IPHONE
 	XMLData* key1 = new XMLData(
-		"key1", al_keycode_to_name(getKey1()));
+		"key1", keycode_to_keyname(getKey1()));
 	XMLData* key2 = new XMLData(
-		"key2", al_keycode_to_name(getKey2()));
+		"key2", keycode_to_keyname(getKey2()));
 	XMLData* key3 = new XMLData(
-		"key3", al_keycode_to_name(getKey3()));
+		"key3", keycode_to_keyname(getKey3()));
 	XMLData* keyLeft = new XMLData(
-		"keyLeft", al_keycode_to_name(getKeyLeft()));
+		"keyLeft", keycode_to_keyname(getKeyLeft()));
 	XMLData* keyRight = new XMLData(
-		"keyRight", al_keycode_to_name(getKeyRight()));
+		"keyRight", keycode_to_keyname(getKeyRight()));
 	XMLData* keyUp = new XMLData(
-		"keyUp", al_keycode_to_name(getKeyUp()));
+		"keyUp", keycode_to_keyname(getKeyUp()));
 	XMLData* keyDown = new XMLData(
-		"keyDown", al_keycode_to_name(getKeyDown()));
+		"keyDown", keycode_to_keyname(getKeyDown()));
 	XMLData* keySettings = new XMLData(
-		"keySettings", al_keycode_to_name(getKeySettings()));
+		"keySettings", keycode_to_keyname(getKeySettings()));
 	XMLData* keyFullscreen = new XMLData(
-		"keyFullscreen", al_keycode_to_name(getKeyFullscreen()));
+		"keyFullscreen", keycode_to_keyname(getKeyFullscreen()));
 	XMLData* keySFXUp = new XMLData(
-		"keySFXUp", al_keycode_to_name(getKeySFXUp()));
+		"keySFXUp", keycode_to_keyname(getKeySFXUp()));
 	XMLData* keySFXDown = new XMLData(
-		"keySFXDown", al_keycode_to_name(getKeySFXDown()));
+		"keySFXDown", keycode_to_keyname(getKeySFXDown()));
 	XMLData* keyMusicUp = new XMLData(
-		"keyMusicUp", al_keycode_to_name(getKeyMusicUp()));
+		"keyMusicUp", keycode_to_keyname(getKeyMusicUp()));
 	XMLData* keyMusicDown = new XMLData(
-		"keyMusicDown", al_keycode_to_name(getKeyMusicDown()));
+		"keyMusicDown", keycode_to_keyname(getKeyMusicDown()));
 	XMLData* keyQuit = new XMLData(
-		"keyQuit", al_keycode_to_name(getKeyQuit()));
+		"keyQuit", keycode_to_keyname(getKeyQuit()));
 	XMLData* keySortItems = new XMLData(
-		"keySortItems", al_keycode_to_name(getKeySortItems()));
+		"keySortItems", keycode_to_keyname(getKeySortItems()));
 #endif
 	XMLData* fpsOn = new XMLData(
 		"fpsOn", my_itoa(fps_on));
@@ -788,7 +1119,7 @@ Configuration::Configuration() :
 	joyB2(1),
 	joyB3(2),
 
-#ifndef ALLEGRO_ANDROID_ALWAYS
+#ifndef ALLEGRO_IPHONE
 	key1(ALLEGRO_KEY_SPACE),
 	key2(ALLEGRO_KEY_ESCAPE),
 	key3(ALLEGRO_KEY_V),
@@ -805,21 +1136,21 @@ Configuration::Configuration() :
 	keyQuit(ALLEGRO_KEY_Q),
 	keySortItems(ALLEGRO_KEY_F8),
 #else
-	key1(ALLEGRO_KEY_DPAD_CENTER),
-	key2(ALLEGRO_KEY_BACK),
-	key3(ALLEGRO_KEY_BUTTON_Y),
-	keyLeft(ALLEGRO_KEY_DPAD_LEFT),
-	keyRight(ALLEGRO_KEY_DPAD_RIGHT),
-	keyUp(ALLEGRO_KEY_DPAD_UP),
-	keyDown(ALLEGRO_KEY_DPAD_DOWN),
+	key1(ALLEGRO_KEY_Y),
+	key2(ALLEGRO_KEY_U),
+	key3(ALLEGRO_KEY_I),
+	keyLeft(ALLEGRO_KEY_A),
+	keyRight(ALLEGRO_KEY_D),
+	keyUp(ALLEGRO_KEY_W),
+	keyDown(ALLEGRO_KEY_X),
 	keySettings(0),
 	keyFullscreen(0),
-	keySFXUp(ALLEGRO_KEY_VOLUME_UP),
-	keySFXDown(ALLEGRO_KEY_VOLUME_DOWN),
-	keyMusicUp(ALLEGRO_KEY_VOLUME_UP),
-	keyMusicDown(ALLEGRO_KEY_VOLUME_DOWN),
-	keyQuit(ALLEGRO_KEY_ANDROID_MENU),
-	keySortItems(ALLEGRO_KEY_BUTTON_X),
+	keySFXUp(0),
+	keySFXDown(0),
+	keyMusicUp(0),
+	keyMusicDown(0),
+	keyQuit(ALLEGRO_KEY_O),
+	keySortItems(ALLEGRO_KEY_L),
 #endif
 
 	gamepadAvailable(true),

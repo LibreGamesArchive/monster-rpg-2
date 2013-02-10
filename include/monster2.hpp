@@ -53,6 +53,8 @@
 #include <allegro5/allegro_physfs.h>
 #endif
 
+#include "user_events.h"
+
 ALLEGRO_DEBUG_CHANNEL("morpg2")
 
 #ifdef ALLEGRO_MACOSX

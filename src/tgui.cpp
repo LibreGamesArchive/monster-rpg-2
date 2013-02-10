@@ -43,9 +43,7 @@ static int screen_offset_y = 0;
 static float screen_ratio_x = 1.0;
 static float screen_ratio_y = 1.0;
 
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 static ALLEGRO_EVENT_QUEUE *key_events;
-#endif
 static ALLEGRO_EVENT_QUEUE *mouse_events;
 struct MSESTATE {
 	int x, y, buttons;
@@ -97,6 +95,9 @@ void *queue_emptier(void *crap)
 			if (event.any.timestamp+KEEP_TIME < al_current_time()) {
 				al_drop_next_event(key_events);
 			}
+			if (event.type == USER_KEY_DOWN || event.type == USER_KEY_UP || event.type == USER_KEY_CHAR) {
+				al_unref_user_event((ALLEGRO_USER_EVENT *)&event);
+			}
 		}
 #endif
 		if (al_peek_next_event(mouse_events, &event)) {
@@ -113,6 +114,9 @@ void *queue_emptier(void *crap)
 					}
 				}
 				al_drop_next_event(mouse_events);
+			}
+			if (event.type == USER_KEY_DOWN || event.type == USER_KEY_UP || event.type == USER_KEY_CHAR) {
+				al_unref_user_event((ALLEGRO_USER_EVENT *)&event);
 			}
 		}
 		al_rest(0.001);
@@ -294,12 +298,17 @@ void tguiInit(void)
 
 		mouse_events = al_create_event_queue();
 		
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		key_events = al_create_event_queue();
+#if !defined ALLEGRO_IPHONE
 		al_register_event_source(key_events, al_get_keyboard_event_source());
+#else
+		al_register_event_source(key_events, &user_event_source);
+#endif
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		if (al_is_mouse_installed()) {
 			al_register_event_source(mouse_events, al_get_mouse_event_source());
 		}
+
 #else
 		al_register_event_source(mouse_events, al_get_touch_input_event_source());
 #endif
@@ -320,10 +329,7 @@ void tguiShutdown()
 		delete activeGUI;
 	}
 	tguiStack.clear();
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	al_unregister_event_source(key_events, al_get_keyboard_event_source());
 	al_destroy_event_queue(key_events);
-#endif
 	if (al_is_mouse_installed()) {
 		al_unregister_event_source(mouse_events, al_get_mouse_event_source());
 	}
@@ -637,11 +643,14 @@ TGUIWidget* tguiUpdate()
 		while (!al_event_queue_is_empty(key_events)) {
 			al_get_next_event(key_events, &event);
 			if (!(ignore & TGUI_KEYBOARD) && !tguiIsDisabled(tguiActiveWidget)) {
-				if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+				if (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN) {
 					ALLEGRO_KEYBOARD_EVENT *key = &event.keyboard;
 					keycodeBuffer.push_back(key->keycode);
 					unicharBuffer.push_back(key->unichar);
 				}
+			}
+			if (event.type == USER_KEY_DOWN || event.type == USER_KEY_UP || event.type == USER_KEY_CHAR) {
+				al_unref_user_event((ALLEGRO_USER_EVENT *)&event);
 			}
 		}
 		for (unsigned int i = 0; i < keycodeBuffer.size(); i++) {
@@ -658,7 +667,7 @@ TGUIWidget* tguiUpdate()
 		ALLEGRO_EVENT event;
 		while (!al_event_queue_is_empty(key_events)) {
 			al_get_next_event(key_events, &event);
-			if (event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_TAB) {
+			if ((event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN)  && event.keyboard.keycode == ALLEGRO_KEY_TAB) {
 				int focus = 0;
 				while (focus < (int)activeGUI->widgets.size()) {
 					if (activeGUI->widgets[focus]->acceptsFocus()) {
@@ -669,6 +678,9 @@ TGUIWidget* tguiUpdate()
 					}
 					focus++;
 				}
+			}
+			if (event.type == USER_KEY_DOWN || event.type == USER_KEY_UP || event.type == USER_KEY_CHAR) {
+				al_unref_user_event((ALLEGRO_USER_EVENT *)&event);
 			}
 		}
 	}

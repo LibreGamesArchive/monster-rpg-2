@@ -5,6 +5,10 @@
 
 #include <allegro5/allegro5.h>
 
+#ifdef ALLEGRO_IPHONE
+#include "user_events.h"
+#endif
+
 #ifndef MIN
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #endif

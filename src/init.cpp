@@ -141,6 +141,7 @@ bool have_mouse;
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 bool do_pause_game = false;
 #endif
+ALLEGRO_EVENT_QUEUE *events;
 ALLEGRO_EVENT_QUEUE *events_minor;
 #ifdef ALLEGRO_IPHONE
 double next_shake;
@@ -721,15 +722,13 @@ bool zone_defined(int x, int y)
 	return false;
 }
 
-static ALLEGRO_EVENT_QUEUE *events;
-
 void register_display(ALLEGRO_DISPLAY *display)
 {
 	al_register_event_source(events, al_get_display_event_source(display));
 	al_register_event_source(events_minor, al_get_display_event_source(display));
 }
 
-static void set_user_joystick(void)
+void set_user_joystick(void)
 {
 	int nj = al_get_num_joysticks();
 	user_joystick = NULL;
@@ -856,7 +855,7 @@ static void *thread_proc(void *arg)
 			}
 
 #ifdef ALLEGRO_ANDROID
-			if (event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_BACK) {
+			if ((event.type == ALLEGRO_EVENT_KEY_DOWN || event->type == USER_KEY_DOWN) && event.keyboard.keycode == ALLEGRO_KEY_BACK) {
 				if (al_current_time() > next_shake) {
 					iphone_shake_time = al_current_time();
 					next_shake = al_current_time()+0.5;
@@ -1095,6 +1094,9 @@ static void *thread_proc(void *arg)
 				
 				al_unlock_mutex(input_mutex);
 			}
+		}
+		if (event.type == USER_KEY_DOWN || event.type == USER_KEY_UP || event.type == USER_KEY_CHAR) {
+			al_unref_user_event((ALLEGRO_USER_EVENT *)&event);
 		}
 	}
 	
@@ -2161,9 +2163,6 @@ bool init(int *argc, char **argv[])
 	dpad_mutex = al_create_mutex();
 	touch_mutex = al_create_mutex();
 
-	tguiInit();
-	tguiSetRotation(0);
-
 	// Android because it's very slow switching back in on some devices
 #if defined A5_D3D || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	use_fixed_pipeline = true;
@@ -2240,6 +2239,13 @@ bool init(int *argc, char **argv[])
 
 	al_rest(1.0);
 	
+#ifdef ALLEGRO_IPHONE
+	al_init_user_event_source(&user_event_source);
+#endif
+
+	tguiInit();
+	tguiSetRotation(0);
+
 	if (have_mouse) {
 		al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
 	}
@@ -2327,7 +2333,7 @@ bool init(int *argc, char **argv[])
 #ifndef ALLEGRO_IPHONE /* FIXME: fix when adding iOS keyboard support */
 	al_register_event_source(events_minor, al_get_keyboard_event_source());
 #ifndef ALLEGRO_ANDROID
-	al_register_event_source(events, al_get_joystick_event_source());
+	al_register_event_source(events_minor, al_get_joystick_event_source());
 #endif
 #endif
 

@@ -606,3 +606,110 @@ void disableMic(void)
 {
 	[[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:NULL];
 }
+
+static UITextView *text_view;
+ALLEGRO_EVENT_SOURCE user_event_source;
+
+static void destroy_event(ALLEGRO_USER_EVENT *u)
+{
+}
+
+const char *downs = "WDXAYUIOHJKL";
+const char *ups   = "ECZQTFMGRNPV";
+
+static int event_type(char c, int *index)
+{
+	int i;
+
+	for (i = 0; downs[i]; i++) {
+		if (c == downs[i]) {
+			*index = i;
+			return USER_KEY_DOWN;
+		}
+	}
+
+	for (i = 0; ups[i]; i++) {
+		if (c == ups[i]) {
+			*index = i;
+			return USER_KEY_UP;
+		}
+	}
+
+	return -1;
+}
+
+static bool gen_event(ALLEGRO_EVENT *e, char c)
+{
+	int index;
+	int type = event_type(c, &index);
+	if (type < 0) {
+		return false;
+	}
+
+	c = (type == USER_KEY_DOWN) ? c : downs[index];
+	c = (c-'A') + ALLEGRO_KEY_A;
+
+	e->user.type = type;
+	e->keyboard.keycode = c;
+
+	return true;
+}
+
+@interface KBDelegate : NSObject<UITextViewDelegate>
+- (void)start;
+- (void)textViewDidChange:(UITextView *)textView;
+@end
+@implementation KBDelegate
+- (void)start
+{
+	UIWindow *window = al_iphone_get_window(display);
+
+	CGRect r = CGRectMake(-100, -100, 50, 50);
+	text_view = [[UITextView alloc] initWithFrame:r];
+	text_view.delegate = self;
+	text_view.hidden = YES;
+	
+	CGRect r2 = CGRectMake(-200, -100, 50, 50);
+	UIView *blank = [[UIView alloc] initWithFrame:r2];
+	blank.hidden = YES;
+	
+	text_view.inputView = blank;
+
+	[window addSubview:text_view];
+	[text_view becomeFirstResponder];
+}
+- (void)textViewDidChange:(UITextView *)textView
+{
+	while ([textView.text length] > 0) {
+		NSString *first = [textView.text substringToIndex:1];
+		NSString *remain = [textView.text substringFromIndex:1];
+		textView.text = remain;
+		const char *txt = [first UTF8String];
+		ALLEGRO_EVENT *e = new ALLEGRO_EVENT;
+		ALLEGRO_EVENT *e2 = NULL;
+		if (gen_event(e, toupper(txt[0]))) {
+			if (e->type == USER_KEY_DOWN) {
+				e2 = new ALLEGRO_EVENT;
+				e2->user.type = USER_KEY_CHAR;
+				e2->keyboard.keycode = e->keyboard.keycode;
+			}
+			al_emit_user_event(&user_event_source, e, destroy_event);
+			if (e2) {
+				al_emit_user_event(&user_event_source, e2, destroy_event);
+			}
+		}
+		else {
+			delete e;
+		}
+	}
+}
+@end
+
+static KBDelegate *text_delegate;
+
+void initiOSKeyboard()
+{
+	text_delegate = [[KBDelegate alloc] init];
+	[text_delegate performSelectorOnMainThread: @selector(start) withObject:nil waitUntilDone:YES];
+}
+

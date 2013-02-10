@@ -1083,22 +1083,24 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
    static final int ALLEGRO_KEY_BACK        = 107;
    static final int ALLEGRO_KEY_VOLUME_UP   = 108;
    static final int ALLEGRO_KEY_VOLUME_DOWN = 109;
-   
-   static final int ALLEGRO_KEY_SEARCH       = 110;
-   static final int ALLEGRO_KEY_ANDROID_MENU = 111;
-   static final int ALLEGRO_KEY_DPAD_CENTER  = 112;
-   static final int ALLEGRO_KEY_BUTTON_X     = 113;
-   static final int ALLEGRO_KEY_BUTTON_Y     = 114;
-   static final int ALLEGRO_KEY_DPAD_UP      = 115;
-   static final int ALLEGRO_KEY_DPAD_DOWN    = 116;
-   static final int ALLEGRO_KEY_DPAD_LEFT    = 117;
-   static final int ALLEGRO_KEY_DPAD_RIGHT   = 118;
-   static final int ALLEGRO_KEY_SELECT       = 119;
-   static final int ALLEGRO_KEY_START        = 120;
-   static final int ALLEGRO_KEY_L1           = 121;
-   static final int ALLEGRO_KEY_R1           = 122;
 
-   static final int ALLEGRO_KEY_UNKNOWN      = 123;
+   /* Some more standard Android keys.
+    * These happen to be the ones used by the Xperia Play.
+    */
+   static final int ALLEGRO_KEY_SEARCH       = 110;
+   static final int ALLEGRO_KEY_DPAD_CENTER  = 111;
+   static final int ALLEGRO_KEY_BUTTON_X     = 112;
+   static final int ALLEGRO_KEY_BUTTON_Y     = 113;
+   static final int ALLEGRO_KEY_DPAD_UP      = 114;
+   static final int ALLEGRO_KEY_DPAD_DOWN    = 115;
+   static final int ALLEGRO_KEY_DPAD_LEFT    = 116;
+   static final int ALLEGRO_KEY_DPAD_RIGHT   = 117;
+   static final int ALLEGRO_KEY_SELECT       = 118;
+   static final int ALLEGRO_KEY_START        = 119;
+   static final int ALLEGRO_KEY_L1           = 120;
+   static final int ALLEGRO_KEY_R1           = 121;
+
+   static final int ALLEGRO_KEY_UNKNOWN      = 122;
 
       /* All codes up to before ALLEGRO_KEY_MODIFIERS can be freely
       * assignedas additional unknown keys, like various multimedia
@@ -1205,7 +1207,7 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
       ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_HEADSETHOOK
       ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_FOCUS
       ALLEGRO_KEY_PAD_PLUS,    // KeyEvent.KEYCODE_PLUS
-      ALLEGRO_KEY_ANDROID_MENU,// KeyEvent.KEYCODE_MENU
+      ALLEGRO_KEY_MENU,        // KeyEvent.KEYCODE_MENU
       ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_NOTIFICATION
       ALLEGRO_KEY_SEARCH,      // KeyEvent.KEYCODE_SEARCH
       ALLEGRO_KEY_UNKNOWN,     // KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE

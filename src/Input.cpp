@@ -314,11 +314,11 @@ void KeyboardInput::update()
 
 void KeyboardInput::handle_event(ALLEGRO_EVENT *event)
 {
-	if (event->type != ALLEGRO_EVENT_KEY_DOWN && event->type != ALLEGRO_EVENT_KEY_UP)
+	if (event->type != ALLEGRO_EVENT_KEY_DOWN && event->type != ALLEGRO_EVENT_KEY_UP && event->type != USER_KEY_DOWN && event->type != USER_KEY_UP)
 		return;
 	
 	int keycode = event->keyboard.keycode;
-	bool onoff = event->type == ALLEGRO_EVENT_KEY_DOWN;
+	bool onoff = event->type == ALLEGRO_EVENT_KEY_DOWN || event->type == USER_KEY_DOWN;
 
 	if (keycode == config.getKey1()) {
 		 button1 = onoff;

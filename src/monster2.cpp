@@ -231,6 +231,9 @@ static void *wait_for_drawing_resume(void *arg)
 				music_replayed = false;
 			}
 		}
+		if (event.type == USER_KEY_DOWN || event.type == USER_KEY_UP || event.type == USER_KEY_CHAR) {
+			al_unref_user_event((ALLEGRO_USER_EVENT *)&event);
+		}
 	}
 
 	al_broadcast_cond(switch_cond);
@@ -292,8 +295,7 @@ top:
 		al_unlock_mutex(input_mutex);
 #endif
 
-#if !defined ALLEGRO_IPHONE
-		if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+		if (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN) {
 
 			if (event.keyboard.keycode == config.getKeyFullscreen()) {
 				if (!pause_f_to_toggle_fullscreen) {
@@ -355,55 +357,8 @@ top:
 			if (event.keyboard.keycode == ALLEGRO_KEY_F12) {
 				reload_translation = true;
 			}
-			/*
-			else {
-				INPUT_EVENT ie = EMPTY_INPUT_EVENT;
-				int c = event.keyboard.keycode;
-				bool m = is_modifier(c);
-				if (m && c == config.getKey1()) {
-					ie.button1 = DOWN;
-					add_input_event(ie);
-				}
-				else if (m && c == config.getKey2()) {
-					ie.button2 = DOWN;
-					add_input_event(ie);
-				}
-				else if (m && c == config.getKey3()) {
-					ie.button3 = DOWN;
-					add_input_event(ie);
-				}
-				else if (c == config.getKeyLeft()) {
-					ie.left = DOWN;
-					add_input_event(ie);
-				}
-				else if (c == config.getKeyRight()) {
-					ie.right = DOWN;
-					add_input_event(ie);
-				}
-				else if (c == config.getKeyUp()) {
-					ie.up = DOWN;
-					add_input_event(ie);
-				}
-				else if (c == config.getKeyDown()) {
-					ie.down = DOWN;
-					add_input_event(ie);
-				}
-				else if (c == config.getKey1()) {
-					ie.button1 = DOWN;
-					add_input_event(ie);
-				}
-				else if (c == config.getKey2()) {
-					ie.button2 = DOWN;
-					add_input_event(ie);
-				}
-				else if (c == config.getKey3()) {
-					ie.button3 = DOWN;
-					add_input_event(ie);
-				}
-			}
-			*/
 		}
-		else if (event.type == ALLEGRO_EVENT_KEY_CHAR) {
+		else if (event.type == ALLEGRO_EVENT_KEY_CHAR || event.type == USER_KEY_CHAR) {
 			INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 			int code = event.keyboard.keycode;
 			if (code == config.getKeyLeft()) {
@@ -435,7 +390,7 @@ top:
 				add_input_event(ie);
 			}
 		}
-		else if (event.type == ALLEGRO_EVENT_KEY_UP) {
+		else if (event.type == ALLEGRO_EVENT_KEY_UP || event.type == USER_KEY_UP) {
 			INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 			int code = event.keyboard.keycode;
 			if (code == config.getKeyLeft()) {
@@ -493,7 +448,7 @@ top:
 				}
 			}
 		}
-#if !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE
 		else if (event.type == ALLEGRO_EVENT_JOYSTICK_CONFIGURATION) {
 			al_reconfigure_joysticks();
 			int nj = al_get_num_joysticks();
@@ -595,7 +550,6 @@ top:
 			}
 		}
 #endif
-#endif
 
 
 #ifdef ALLEGRO_IPHONE
@@ -613,7 +567,7 @@ top:
 		}
 #endif
 
-		if (((event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == config.getKeyQuit()) || event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) && !shooter_paused) {
+		if ((((event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN) && event.keyboard.keycode == config.getKeyQuit()) || event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) && !shooter_paused) {
 #ifdef ALLEGRO_IPHONE
 			if (!sound_was_playing_at_program_start)
 				iPodStop();
@@ -730,6 +684,9 @@ top:
 			al_start_timer(draw_timer);
 #else
 #endif
+		}
+		if (event.type == USER_KEY_DOWN || event.type == USER_KEY_UP || event.type == USER_KEY_CHAR) {
+			al_unref_user_event((ALLEGRO_USER_EVENT *)&event);
 		}
 #endif
 	}
@@ -1504,6 +1461,12 @@ int main(int argc, char *argv[])
 	//archery(false);
 	//shooter(false);
 	//credits();
+
+#ifdef ALLEGRO_IPHONE
+	initiOSKeyboard();
+	al_register_event_source(events, &user_event_source);
+	al_register_event_source(events_minor, &user_event_source);
+#endif
 
 	while (!quit_game) {
 		playAmbience("");

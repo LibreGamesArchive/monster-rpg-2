@@ -27,6 +27,7 @@ void nslog_message(const char *fmt, ...);
 void vibrate(void);
 bool wifiConnected(void);
 void disableMic(void);
+void initiOSKeyboard();
 
 #ifdef __cplusplus
 }

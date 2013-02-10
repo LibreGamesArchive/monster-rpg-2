@@ -62,6 +62,8 @@ extern "C" {
 }
 
 void maybe_enable_screensaver();
+void set_user_joystick(void);
+
 
 // FIXME: TONNES OF GLOBALS
 
@@ -208,6 +210,7 @@ extern int versionMinor;
 extern bool do_acknowledge_resize;
 	
 extern ALLEGRO_EVENT_QUEUE *events_minor;
+extern ALLEGRO_EVENT_QUEUE *events;
 #ifdef ALLEGRO_IPHONE
 extern double next_shake;
 #endif
