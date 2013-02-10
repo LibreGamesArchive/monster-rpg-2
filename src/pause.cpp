@@ -634,7 +634,7 @@ void showItemInfo(int index, bool preserve_buffer)
 					diff[i] = 1;
 				}
 				else {
-					diff[i] = chestArmors[items[index].id].defense - chestArmors[items[info.equipment.harmor].id].defense;
+					diff[i] = chestArmors[items[index].id].defense - chestArmors[items[info.equipment.carmor].id].defense;
 				}
 			}
 		}
@@ -650,7 +650,7 @@ void showItemInfo(int index, bool preserve_buffer)
 					diff[i] = 1;
 				}
 				else {
-					diff[i] = feetArmors[items[index].id].defense - feetArmors[items[info.equipment.harmor].id].defense;
+					diff[i] = feetArmors[items[index].id].defense - feetArmors[items[info.equipment.farmor].id].defense;
 				}
 			}
 		}
@@ -3698,10 +3698,11 @@ bool config_menu(bool start_on_fullscreen)
 	MTextButton *reset_game_center = NULL;
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	if (isGameCenterAPIAvailable()) {
-		reset_game_center = new MTextButton(BW-2-(m_text_length(game_font, _t(reset_str))+m_get_bitmap_width(cursor)+1), BH-2-m_text_height(game_font), reset_str);
+		reset_game_center = new MTextButton(BW-2-(m_text_length(game_font, _t(reset_str))+m_get_bitmap_width(cursor)+1), BH-2-26, reset_str);
 	}
-	y += 13;
 #endif
+
+	MTextButton *controls = new MTextButton(BW-2-(m_text_length(game_font, _t(reset_str))+m_get_bitmap_width(cursor)+1), BH-2-13, "Controls");
 	
 	FakeWidget *parent = new FakeWidget(0, 0, 1, 1, false);
 
@@ -3749,6 +3750,8 @@ bool config_menu(bool start_on_fullscreen)
 	if (reset_game_center) {
 		tguiAddWidget(reset_game_center);
 	}
+
+	tguiAddWidget(controls);
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
 	if (start_on_fullscreen) {
@@ -3807,9 +3810,19 @@ bool config_menu(bool start_on_fullscreen)
 					resetAchievements();
 				}
 			}
-#else
-			(void)w;
+			else
 #endif
+			if (w && w == controls) {
+				int type = MInputGetter::TYPE_KB;
+				while (true) {
+					type = config_input(type);
+					if (type == 0) {
+						waitForRelease(5);
+						clear_input_events();
+						break;
+					}
+				}
+			}
 
 			INPUT_EVENT ie = get_next_input_event();
 

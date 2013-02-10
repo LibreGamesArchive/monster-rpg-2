@@ -242,11 +242,7 @@ volatile int logic_counter = 0;
 bool egl_workaround = false;
 bool inited = false;
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 bool use_dpad = false;
-#else
-bool use_dpad = true;
-#endif
 
 int dpad_type;
 bool dpad_at_top = false;
@@ -1522,7 +1518,6 @@ bool init(int *argc, char **argv[])
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	dpad_type = config.getDpadType();
-	use_dpad = false;
 #else
 	dpad_type = DPAD_TOTAL_1;
 #endif

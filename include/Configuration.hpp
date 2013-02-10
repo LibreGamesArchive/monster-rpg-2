@@ -246,6 +246,7 @@ private:
 extern Configuration config;
 
 bool do_config(void);
+const char *keycode_to_keyname(int i);
 
 extern "C" {
 bool zeemote_should_autoconnect(void);

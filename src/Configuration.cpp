@@ -282,7 +282,7 @@ static int keyname_to_keycode(const char *name)
 	return 0;
 }
 
-static const char *keycode_to_keyname(int i)
+const char *keycode_to_keyname(int i)
 {
 	if (i < 0 || i >= ALLEGRO_KEY_MAX) {
 		return 0;

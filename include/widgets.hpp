@@ -243,82 +243,13 @@ private:
 
 class MTab : public TGUIWidget {
 public:
-	void draw(void)
-	{
-		if (selected) {
-			m_draw_bitmap(bmp, x, y, 0);
-		}
-		MCOLOR color = grey;
-		if (use_dpad && this == tguiActiveWidget)
-			color = m_map_rgb(255, 255, 0);
-		mTextout_simple(_t(text.c_str()), x+width/2-m_text_length(game_font, _t(text.c_str()))/2, y+3, color);
-	}
-
-	void mouseUp(int x, int y, int b)
-	{
-		if (x >= 0 && y >= 0) {
-			clicked = true;
-		}
-	}
-
-	bool acceptsFocus() { return true; }
-	
-	int update(int step)
-	{
-		if (use_dpad && this == tguiActiveWidget) {
-			INPUT_EVENT ie = get_next_input_event();
-			if (ie.button1 == DOWN) {
-				use_input_event();
-				playPreloadedSample("select.ogg");
-				clicked = true;
-			}
-			else if (ie.left == DOWN || ie.up == DOWN) {
-				use_input_event();
-				playPreloadedSample("blip.ogg");
-				tguiFocusPrevious();
-			}
-			else if (ie.right == DOWN || ie.down == DOWN) {
-				use_input_event();
-				playPreloadedSample("blip.ogg");
-				tguiFocusNext();
-			}
-		}
-
-		if (clicked) {
-			clicked = false;
-			return TGUI_RETURN;
-		}
-		return TGUI_CONTINUE;
-	}
-
-	void setSelected(bool s)
-	{
-		selected = s;
-	}
-	
-	MTab(std::string text, int x, int y) {
-		this->hotkeys = 0;
-		this->x = x;
-		this->y = y;
-		this->width = m_text_length(game_font, _t(text.c_str())) + 6;
-		this->height = 15;
-		this->text = text;
-		clicked = false;
-		int flags = al_get_new_bitmap_flags();
-		al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-		bmp = m_create_bitmap(width, 14); // check
-		al_set_new_bitmap_flags(flags);
-		m_push_target_bitmap();
-		m_set_target_bitmap(bmp);
-		mDrawFrame(2, 2, width-4, 20);
-		m_pop_target_bitmap();
-		selected = false;
-	}
-
-	virtual ~MTab()
-	{
-		m_destroy_bitmap(bmp);
-	}
+	void draw(void);
+	void mouseUp(int x, int y, int b);
+	bool acceptsFocus();
+	int update(int step);
+	void setSelected(bool s);
+	MTab(std::string text, int x, int y);
+	virtual ~MTab();
 private:
 	bool clicked;
 	MBITMAP *bmp;
@@ -862,6 +793,34 @@ protected:
 };
 
 
+class MInputGetter : public TGUIWidget {
+public:
+	static const int TYPE_KB = 1;
+	static const int TYPE_GAMEPAD = 2;
+
+	static const int GETTING = 1;
+	static const int NORMAL = 2;
+
+	void draw(void);
+	int update(int millis);
+	bool acceptsFocus(void);
+
+	int getValue();
+	void setValue(int val);
+
+	MInputGetter(int type, int x, int y, int w, std::string text, int start_value);
+	virtual ~MInputGetter(void);
+
+protected:
+	int type;
+	std::string text;
+	int value;
+	int start_value;
+	int mode;
+	bool released_b1;
+};
+
+
 class MTextButtonFullShadow : public MTextButton {
 public:
 	MTextButtonFullShadow(int x, int y, std::string text);
@@ -1378,12 +1337,15 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 	std::string b1text, std::string b2text, std::string b3text, int shake_action,
 	bool called_from_is_close_pressed = false);
+int config_input(int type);
 
 
 void loadIcons(MBITMAP *bmp, RecreateData *data);
 void destroyIcons(void);
 
 extern MBITMAP *icon_bmp;
+
+extern bool getting_input_config;
 
 #endif
 

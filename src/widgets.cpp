@@ -19,6 +19,8 @@ std::vector<MBITMAP *> icons;
 MManSelector *manChooser = NULL;
 MBITMAP *icon_bmp;
 
+bool getting_input_config = false;
+
 
 void loadIcons(MBITMAP *bmp, RecreateData *data)
 {
@@ -1012,6 +1014,191 @@ done:
 }
 
 
+int config_input(int type)
+{
+	dpad_off();
+
+	tguiPush();
+
+	MRectangle *fullscreenRect = new MRectangle(0, 0, BW, BH,
+		m_map_rgba(0, 0, 0, 0), 0);
+
+	MInputGetter *getters[15];
+	int num_getters;
+	
+	if (type == MInputGetter::TYPE_KB) {
+		num_getters = 15;
+		getters[0] = new MInputGetter(type, 10, 5, 150, "Action Key", config.getKey1());
+		getters[1] = new MInputGetter(type, 10, 15, 150, "Back Key", config.getKey2());
+		getters[2] = new MInputGetter(type, 10, 25, 150, "View Key", config.getKey3());
+		getters[3] = new MInputGetter(type, 10, 35, 150, "Left Key", config.getKeyLeft());
+		getters[4] = new MInputGetter(type, 10, 45, 150, "Right Key", config.getKeyRight());
+		getters[5] = new MInputGetter(type, 10, 55, 150, "Up Key", config.getKeyUp());
+		getters[6] = new MInputGetter(type, 10, 65, 150, "Down Key", config.getKeyDown());
+		getters[7] = new MInputGetter(type, 10, 75, 150, "Settings Key", config.getKeySettings());
+		getters[8] = new MInputGetter(type, 10, 85, 150, "Fullscreen Key", config.getKeyFullscreen());
+		getters[9] = new MInputGetter(type, 10, 95, 150, "SFX Up Key", config.getKeySFXUp());
+		getters[10] = new MInputGetter(type, 10, 105, 150, "SFX Down Key", config.getKeySFXDown());
+		getters[11] = new MInputGetter(type, 10, 115, 150, "Music Up Key", config.getKeyMusicUp());
+		getters[12] = new MInputGetter(type, 10, 125, 150, "Music Down Key", config.getKeyMusicDown());
+		getters[13] = new MInputGetter(type, 10, 135, 150, "Quit Key", config.getKeyQuit());
+		getters[14] = new MInputGetter(type, 10, 145, 150, "Sort Items Key", config.getKeySortItems());
+	}
+	else {
+		num_getters= 3;
+		getters[0] = new MInputGetter(type, 10, 5, 150, "Action Button", config.getJoyButton1());
+		getters[1] = new MInputGetter(type, 10, 15, 150, "Back Button", config.getJoyButton2());
+		getters[2] = new MInputGetter(type, 10, 25, 150, "View Button", config.getJoyButton3());
+	}
+
+	MTextButton *apply = new MTextButton(170, 135, "Apply");
+
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	MTextButton *other = new MTextButton(170, 145, type == MInputGetter::TYPE_KB ? "Gamepad" : "Keyboard");
+#endif
+
+	int ret = 0;
+
+	tguiSetParent(0);
+	tguiAddWidget(fullscreenRect);
+	tguiSetParent(fullscreenRect);
+
+	for (int i = 0; i < num_getters; i++) {
+		tguiAddWidget(getters[i]);
+	}
+
+	tguiAddWidget(apply);
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	tguiAddWidget(other);
+#endif
+
+again:
+	tguiSetFocus(getters[0]);
+
+	clear_input_events();
+
+	for (;;) {
+		al_wait_cond(wait_cond, wait_mutex);
+		// Logic
+		int tmp_counter = logic_counter;
+		logic_counter = 0;
+		if (tmp_counter > 10)
+			tmp_counter = 1;
+		while (tmp_counter > 0) {
+			next_input_event_ready = true;
+
+			tmp_counter--;
+			if (is_close_pressed()) {
+				do_close();
+				close_pressed = false;
+			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
+			}
+
+			TGUIWidget *widget = tguiUpdate();
+			if (widget) {
+				if (widget == apply) {
+					bool dup = false;
+					for (int i = 0; i < num_getters; i++) {
+						for (int j = i+1; j < num_getters; j++) {
+							if (getters[i]->getValue() == getters[j]->getValue()) {
+								dup = true;
+								break;
+							}
+						}
+						if (dup) {
+							break;
+						}
+					}
+					if (dup) {
+						notify("Duplicate values", "Please correct", "");
+					}
+					else {
+						if (type == MInputGetter::TYPE_KB) {
+							config.setKey1(getters[0]->getValue());
+							config.setKey2(getters[1]->getValue());
+							config.setKey3(getters[2]->getValue());
+							config.setKeyLeft(getters[3]->getValue());
+							config.setKeyRight(getters[4]->getValue());
+							config.setKeyUp(getters[5]->getValue());
+							config.setKeyDown(getters[6]->getValue());
+							config.setKeySettings(getters[7]->getValue());
+							config.setKeyFullscreen(getters[8]->getValue());
+							config.setKeySFXUp(getters[9]->getValue());
+							config.setKeySFXDown(getters[10]->getValue());
+							config.setKeyMusicUp(getters[11]->getValue());
+							config.setKeyMusicDown(getters[12]->getValue());
+							config.setKeyQuit(getters[13]->getValue());
+							config.setKeySortItems(getters[14]->getValue());
+						}
+						else {
+							config.setJoyButton1(getters[0]->getValue());
+							config.setJoyButton2(getters[1]->getValue());
+							config.setJoyButton3(getters[2]->getValue());
+						}
+						notify("", "Done", "");
+					}
+				}
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+				else if (widget == other) {
+					if (type == MInputGetter::TYPE_KB) {
+						ret = MInputGetter::TYPE_GAMEPAD;
+					}
+					else {
+						ret = MInputGetter::TYPE_KB;
+					}
+					goto done;
+				}
+#endif
+				else {
+					goto done;
+				}
+			}
+
+			INPUT_EVENT ie = get_next_input_event();
+
+			if (ie.button2 == DOWN || iphone_shaken(0.1)) {
+				if (ie.button2 == DOWN) {
+					use_input_event();
+				}
+				goto done;
+			}
+		}
+
+		if (draw_counter) {
+			draw_counter = 0;
+			m_set_target_bitmap(buffer);
+			// Draw frame
+			mDrawFrame(0, 0, BW, BH, false);
+			tguiDraw();
+			drawBufferToScreen();
+			m_flip_display();
+		}
+	}
+done:
+	getting_input_config = false;
+
+	tguiDeleteWidget(fullscreenRect);
+
+	for (int i = 0; i < num_getters; i++) {
+		delete getters[i];
+	}
+
+	delete apply;
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	delete other;
+#endif
+
+	tguiPop();
+
+	dpad_on();
+
+	return ret;
+}
+
+
 
 // this got ugly...
 void doDialogue(std::string text, bool top, int rows, int offset, bool bottom)
@@ -1491,6 +1678,173 @@ MTextButton::MTextButton(int x, int y, std::string text, bool disabled, TGUIWidg
 
 
 MTextButton::~MTextButton(void)
+{
+}
+
+int MInputGetter::getValue()
+{
+	return value;
+}
+
+void MInputGetter::setValue(int v)
+{
+	value = v;
+}
+
+void MInputGetter::draw()
+{
+	MCOLOR color;
+
+	// Draw cursor
+	if (this == tguiActiveWidget) {
+		int tick = (unsigned)tguiCurrentTimeMillis() % 1000;
+		if (tick < 800) {
+			m_draw_bitmap(cursor, x, y, 0);
+		}
+	}
+
+	// draw text
+
+	if (mode == GETTING) {
+		color = al_map_rgb(255, 255, 0);
+	}
+	else if (this == tguiActiveWidget) {
+		color = white;
+	}
+	else {
+		color = grey;
+	}
+
+	mTextout(game_font, _t(text.c_str()), x+m_get_bitmap_width(cursor)+1, y,
+		color, black,
+		WGT_TEXT_DROP_SHADOW, false);
+
+	al_draw_textf(game_font, color, x+width, y, ALLEGRO_ALIGN_RIGHT, "%s",
+		type == TYPE_KB ? keycode_to_keyname(value) : my_itoa(value));
+}
+
+int MInputGetter::update(int millis)
+{
+	if (this == tguiActiveWidget) {
+		if (mode == GETTING) {
+			if (!released_b1) {
+				InputDescriptor id = getInput()->getDescriptor();
+				if (!id.button1) {
+					released_b1 = true;
+				}
+			}
+			else {
+				ALLEGRO_KEYBOARD_STATE state;
+				al_get_keyboard_state(&state);
+				if (type == TYPE_KB) {
+					for (int i = 0; i < ALLEGRO_KEY_MAX; i++) {
+						if (al_key_down(&state, i)) {
+							if (i == ALLEGRO_KEY_BACKSPACE) {
+								value = start_value;
+							}
+							else {
+								value = i;
+							}
+							mode = NORMAL;
+							getting_input_config = false;
+							do {
+								al_get_keyboard_state(&state);
+							} while (al_key_down(&state, value));
+							clear_input_events();
+							break;
+						}
+					}
+				}
+				else {
+					if (al_key_down(&state, ALLEGRO_KEY_BACKSPACE)) {
+						value = start_value;
+						mode = NORMAL;
+						getting_input_config = false;
+					}
+					else {
+						if (al_is_joystick_installed()) {
+							int nb = al_get_joystick_num_buttons(user_joystick);
+							ALLEGRO_JOYSTICK_STATE state;
+							al_get_joystick_state(user_joystick, &state);
+							for (int i = 0; i < nb; i++) {
+								if (state.button[i]) {
+									value = i;
+									mode = NORMAL;
+									getting_input_config = false;
+									do {
+										al_get_joystick_state(user_joystick, &state);
+									} while (state.button[i]);
+									clear_input_events();
+									break;
+								}
+							}
+						}
+						else {
+							mode = NORMAL;
+							getting_input_config = false;
+						}
+					}
+				}
+			}
+		}
+		else {
+			INPUT_EVENT ie;
+			ie = get_next_input_event();
+
+			if (ie.left == DOWN) {
+				use_input_event();
+				playPreloadedSample("blip.ogg");
+				tguiFocusPrevious();
+			}
+			else if (ie.up == DOWN) {
+				use_input_event();
+				playPreloadedSample("blip.ogg");
+				tguiFocusPrevious();
+			}
+			else if (ie.right == DOWN) {
+				use_input_event();
+				playPreloadedSample("blip.ogg");
+				tguiFocusNext();
+			}
+			else if (ie.down == DOWN) {
+				use_input_event();
+				playPreloadedSample("blip.ogg");
+				tguiFocusNext();
+			}
+			else if (ie.button1 == DOWN) {
+				use_input_event();
+				playPreloadedSample("select.ogg");
+				getting_input_config = true;
+				mode = GETTING;
+				released_b1 = false;
+			}
+		}
+	}
+
+	return TGUI_CONTINUE;
+}
+
+
+bool MInputGetter::acceptsFocus()
+{
+	return true;
+}
+
+MInputGetter::MInputGetter(int type, int x, int y, int w, std::string text, int start_value)
+{
+	this->x = x;
+	this->y = y;
+	this->text = text;
+	this->width = w;
+	this->height = m_text_height(game_font);
+	this->hotkeys = 0;
+	this->type = type;
+	this->value = start_value;
+	this->start_value = start_value;
+	this->mode = NORMAL;
+}
+
+MInputGetter::~MInputGetter(void)
 {
 }
 
@@ -2135,7 +2489,7 @@ void MMap::draw()
 {
 	m_set_blender(M_ONE, M_ZERO, white);
 
-	if (transitioning && use_dpad) {
+	if (transitioning) {
 		m_draw_bitmap_region(map_bmp,
 			top_x+offset_x, top_y+offset_y, BW, BH,
 			0, 0, 0);
@@ -2180,6 +2534,7 @@ void MMap::draw()
 				p->y-top_y-offset_y-m_get_bitmap_height(down_arrow)-ay, 0);
 		}
 
+/*
 		if (use_dpad) {
 			const char *s1;
 			const char *s2;
@@ -2221,6 +2576,7 @@ void MMap::draw()
 			mTextout_simple(_t(s1), BW-maxlen-5, BH-m_text_height(game_font)*2-5, white);
 			mTextout_simple(_t(s2), BW-maxlen-5, BH-m_text_height(game_font)-5, white);
 		}
+*/
 
 		// draw selected area name
 
@@ -2323,18 +2679,16 @@ int MMap::update(int millis)
 				selected = i;
 			}
 		}
-		if (use_dpad) {
-			transitioning = true;
-			startx = top_x;
-			starty = top_y;
-			int tmpx, tmpy;
-			getIdealPoint(points[selected].x, points[selected].y,
-				&tmpx, &tmpy);
-			destx = tmpx;
-			desty = tmpy;
-			percent_moved = 0;
-			count = 0;
-		}
+		transitioning = true;
+		startx = top_x;
+		starty = top_y;
+		int tmpx, tmpy;
+		getIdealPoint(points[selected].x, points[selected].y,
+			&tmpx, &tmpy);
+		destx = tmpx;
+		desty = tmpy;
+		percent_moved = 0;
+		count = 0;
 	}
 
 	if (shouldFlash) {
@@ -3101,14 +3455,14 @@ void MSpellSelector::draw()
 				color = grey;
 			}
 		}
-		#else
+#else
 		if (pressed == i) {
 			color = m_map_rgb(255, 255, 0);
 		}
 		else {
 			color = grey;
 		}
-		#endif
+#endif
 		mTextout(game_font, (std::string("{008}") + std::string(_t(name.c_str()))).c_str(), dx, dy,
 			color, black,
 			WGT_TEXT_DROP_SHADOW, false);
@@ -4252,7 +4606,12 @@ int MScrollingList::update(int millis)
 
 	if (clicked) {
 		clicked = false;
-		if (use_dpad) {
+		if (selected == up_selected && selected < (int)items.size()) {
+			playPreloadedSample("select.ogg");
+			up_selected = -1;
+			return TGUI_RETURN;
+		}
+		else {
 			playPreloadedSample("select.ogg");
 			if (!do_prompt || prompt("Run this game?", "", 0, 1)) {
 				return TGUI_RETURN;
@@ -4270,13 +4629,6 @@ int MScrollingList::update(int millis)
 					else
 						selected++;
 				}
-			}
-		}
-		else {
-			if (selected == up_selected && selected < (int)items.size()) {
-				playPreloadedSample("select.ogg");
-				up_selected = -1;
-				return TGUI_RETURN;
 			}
 		}
 	}
@@ -4607,31 +4959,12 @@ void MItemSelector::draw()
 			dx = BW/2+20;
 		}
 		sprintf(s, "%s%s", getItemIcon(inv->index).c_str(), _t(getItemName(inv->index).c_str()));
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		if (pressed == i) {
 			color = m_map_rgb(255, 255, 0);
 		}
 		else {
 			color = grey;
 		}
-#else
-		if (use_dpad) {
-			if (pressed == i) {
-				color = m_map_rgb(255, 255, 0);
-			}
-			else {
-				color = grey;
-			}
-		}
-		else {
-			if (selected == i) {
-				color = m_map_rgb(255, 255, 0);
-			}
-			else {
-				color = grey;
-			}
-		}
-#endif
 		mTextout(game_font, s, dx, dy,
 			color, black,
 			WGT_TEXT_DROP_SHADOW, false);
@@ -4749,7 +5082,6 @@ int MItemSelector::update(int millis)
 				WGT_TEXT_DROP_SHADOW, false);
 			m_pop_target_bitmap();
 		}
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		else if (selected >= 0) {
 			if (inventory[selected].index >= 0 && canArrange) {
 				downCount += millis;
@@ -4761,7 +5093,6 @@ int MItemSelector::update(int millis)
 				}
 			}
 		}
-#endif
 	}
 	else if (dragging) {
 		if (this == tguiActiveWidget && iphone_shaken(0.1)) {
@@ -6290,7 +6621,7 @@ int MIcon::update(int millis)
 		return TGUI_RETURN;
 	}
 
-	if (use_dpad && this == tguiActiveWidget) {
+	if (this == tguiActiveWidget) {
 		INPUT_EVENT ie = get_next_input_event();
 		if (ie.button1 == DOWN) {
 			use_input_event();
@@ -7020,6 +7351,86 @@ FakeWidget::FakeWidget(int x, int y, int w, int h, bool accFocus, bool draw_outl
 	this->draw_outline = draw_outline;
 	b3_pressed = false;
 	buttonHoldStarted = false;
+}
+
+void MTab::draw(void)
+{
+	if (selected) {
+		m_draw_bitmap(bmp, x, y, 0);
+	}
+	MCOLOR color = grey;
+	if (this == tguiActiveWidget)
+		color = m_map_rgb(255, 255, 0);
+	mTextout_simple(_t(text.c_str()), x+width/2-m_text_length(game_font, _t(text.c_str()))/2, y+3, color);
+}
+
+void MTab::mouseUp(int x, int y, int b)
+{
+	if (x >= 0 && y >= 0) {
+		clicked = true;
+	}
+}
+
+bool MTab::acceptsFocus()
+{
+	return true;
+}
+
+int MTab::update(int step)
+{
+	if (this == tguiActiveWidget) {
+		INPUT_EVENT ie = get_next_input_event();
+		if (ie.button1 == DOWN) {
+			use_input_event();
+			playPreloadedSample("select.ogg");
+			clicked = true;
+		}
+		else if (ie.left == DOWN || ie.up == DOWN) {
+			use_input_event();
+			playPreloadedSample("blip.ogg");
+			tguiFocusPrevious();
+		}
+		else if (ie.right == DOWN || ie.down == DOWN) {
+			use_input_event();
+			playPreloadedSample("blip.ogg");
+			tguiFocusNext();
+		}
+	}
+
+	if (clicked) {
+		clicked = false;
+		return TGUI_RETURN;
+	}
+	return TGUI_CONTINUE;
+}
+
+void MTab::setSelected(bool s)
+{
+	selected = s;
+}
+
+MTab::MTab(std::string text, int x, int y) {
+	this->hotkeys = 0;
+	this->x = x;
+	this->y = y;
+	this->width = m_text_length(game_font, _t(text.c_str())) + 6;
+	this->height = 15;
+	this->text = text;
+	clicked = false;
+	int flags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+	bmp = m_create_bitmap(width, 14); // check
+	al_set_new_bitmap_flags(flags);
+	m_push_target_bitmap();
+	m_set_target_bitmap(bmp);
+	mDrawFrame(2, 2, width-4, 20);
+	m_pop_target_bitmap();
+	selected = false;
+}
+
+MTab::~MTab()
+{
+	m_destroy_bitmap(bmp);
 }
 
 #ifdef EDITOR
