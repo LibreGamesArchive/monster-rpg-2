@@ -3523,7 +3523,9 @@ bool config_menu(bool start_on_fullscreen)
 
 	tguiPush();
 
-	MBITMAP *bg = m_load_bitmap(getResource("media/options_bg.png"));
+	fadeOut(black);
+
+	MIcon *bg = new MIcon(0, 0, getResource("media/options_bg.png"), al_map_rgba_f(0.25f, 0.25f, 0.25f, 1.0f));
 
 	int xx = 10;
 	int y = 10;
@@ -3704,11 +3706,9 @@ bool config_menu(bool start_on_fullscreen)
 
 	MTextButton *controls = new MTextButton(BW-2-(m_text_length(game_font, _t(reset_str))+m_get_bitmap_width(cursor)+1), BH-2-13, "Controls");
 	
-	FakeWidget *parent = new FakeWidget(0, 0, 1, 1, false);
-
 	tguiSetParent(0);
-	tguiAddWidget(parent);
-	tguiSetParent(parent);
+	tguiAddWidget(bg);
+	tguiSetParent(bg);
 	tguiAddWidget(sound_toggle);
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (input_toggle) {
@@ -3768,7 +3768,9 @@ bool config_menu(bool start_on_fullscreen)
 	int frames = 0;
 	int fps = 0;
 
-	bool first_frame = true;
+	m_set_target_bitmap(buffer);
+	tguiDraw();
+	fadeIn(black);
 
 	clear_input_events();
 
@@ -3817,6 +3819,10 @@ bool config_menu(bool start_on_fullscreen)
 				while (true) {
 					type = config_input(type);
 					if (type == 0) {
+						fadeOut(black);
+						m_set_target_bitmap(buffer);
+						tguiDraw();
+						fadeIn(black);
 						waitForRelease(5);
 						clear_input_events();
 						break;
@@ -3838,8 +3844,10 @@ bool config_menu(bool start_on_fullscreen)
 			curr_language = language_toggle->getSelected();
 			config.setLanguage(curr_language);
 			load_translation(get_language_name(config.getLanguage()).c_str());
-			if (reset_game_center)
+			if (reset_game_center) {
 				reset_game_center->setX(BW-2-(m_text_length(game_font, _t(reset_str))+m_get_bitmap_width(cursor)+1));
+				controls->setX(BW-2-(m_text_length(game_font, _t(reset_str))+m_get_bitmap_width(cursor)+1));
+			}
 		}
 		
 		int sel = sound_toggle->getSelected();
@@ -3992,12 +4000,6 @@ bool config_menu(bool start_on_fullscreen)
 
 			m_set_target_bitmap(buffer);
 
-			m_clear(m_map_rgb(0, 0, 0));
-			
-			al_draw_tinted_bitmap(bg->bitmap, al_map_rgba(64, 64, 64, 255), 0, 0, 0);
-			
-			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-
 			tguiDraw();
 
 			if (fps_on) {
@@ -4009,20 +4011,14 @@ bool config_menu(bool start_on_fullscreen)
 			}
 			frames++;
 			
-			if (first_frame) {
-				fadeIn(black);
-				first_frame = false;
-			}
-			else {
-				drawBufferToScreen();
-				m_flip_display();
-			}
+			drawBufferToScreen();
+			m_flip_display();
 		}
 	}
 done:
-	tguiDeleteWidget(parent);
+	tguiDeleteWidget(bg);
 
-	delete parent;
+	delete bg;
 	delete sound_toggle;
 	delete difficulty_toggle;
 	delete tuning_toggle;
@@ -4046,8 +4042,6 @@ done:
 	delete fullscreen_toggle;
 #endif
 	delete language_toggle;
-	
-	m_destroy_bitmap(bg);
 	
 	tguiPop();
 
@@ -4472,7 +4466,6 @@ int title_menu(void)
 				tguiPop();
 			}
 			if (widget == config_button) {
-				fadeOut(black);
 				first_frame = true;
 				tguiPush();
 				on_title_screen = false;

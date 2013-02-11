@@ -37,7 +37,7 @@ void iphone_clear_shaken(void);
 
 extern int myArgc;
 extern char **myArgv;
-extern unsigned long last_shake_check;
+extern double last_shake_check;
 
 
 #endif

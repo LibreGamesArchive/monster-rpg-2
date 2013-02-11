@@ -142,20 +142,20 @@ public:
 					b = new MIcon(start, 123,
 						getResource("combat_media/battle_icons/attack.png"), disabled ? greyed_out : white, true, actions[i], true);
 				}
-				else if (std::string(actions[i]) == "Item") {
-					b = new MIcon(start+30, 123,
-						getResource("combat_media/battle_icons/item.png"), disabled ? greyed_out : white, true, actions[i], true);
-				}
 				else if (std::string(actions[i]) == "Magic") {
-					b = new MIcon(start+120, 123,
+					b = new MIcon(start+30, 123,
 						getResource("combat_media/battle_icons/magic.png"), disabled ? greyed_out : white, true, actions[i], true);
 				}
-				else if (std::string(actions[i]) == "Defend") {
+				else if (std::string(actions[i]) == "Item") {
 					b = new MIcon(start+60, 123,
+						getResource("combat_media/battle_icons/item.png"), disabled ? greyed_out : white, true, actions[i], true);
+				}
+				else if (std::string(actions[i]) == "Defend") {
+					b = new MIcon(start+90, 123,
 						getResource("combat_media/battle_icons/defend.png"), disabled ? greyed_out : white, true, actions[i], true);
 				}
 				else if (std::string(actions[i]) == "Run") {
-					b = new MIcon(start+90, 123,
+					b = new MIcon(start+120, 123,
 						getResource("combat_media/battle_icons/run.png"), disabled ? greyed_out : white, true, actions[i], true);
 				}
 				buttons[i] = b;

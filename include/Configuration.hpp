@@ -238,9 +238,6 @@ private:
 	int cfg_auto_rotation;
 #endif
 	bool autoconnect_to_zeemote;
-#ifdef ALLEGRO_RASPBERRYPI
-	int last_session_was_x;
-#endif
 };
 
 extern Configuration config;

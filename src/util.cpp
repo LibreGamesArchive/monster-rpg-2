@@ -8,7 +8,7 @@
 
 int myArgc;
 char **myArgv;
-unsigned long last_shake_check;
+double last_shake_check;
 
 
 #if defined ALLEGRO_IPHONE
@@ -264,13 +264,15 @@ bool iphone_line(IPHONE_LINE_DIR dir, double since)
 bool iphone_shaken(double since)
 {
 #if defined ALLEGRO_IPHONE
-	if (use_dpad) return false;
+	if (use_dpad) {
+		return false;
+	}
 #endif
 #if defined ALLEGRO_ANDROID
 	if (!on_title_screen && use_dpad) return false;
 #endif
 
-	last_shake_check = tguiCurrentTimeMillis();
+	last_shake_check = al_get_time();
 
 	if (al_current_time()-iphone_shake_time < since) {
 		return true;

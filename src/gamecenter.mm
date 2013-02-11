@@ -252,17 +252,13 @@ void showAchievements(void)
 	UIView *view = al_iphone_get_view(d);
 	[window bringSubviewToFront:view];
 #else
-
 	modalViewShowing = true;
-	al_show_mouse_cursor(display);
 	MyGameCenterVC *vc = [[MyGameCenterVC alloc] init];
 	[vc performSelectorOnMainThread: @selector(showAchievements) withObject:nil waitUntilDone:FALSE];
 	while (modalViewShowing) {
 		al_rest(0.001);
 	}
 	[vc release];
-	al_hide_mouse_cursor(display);
-
 #endif
 }
 

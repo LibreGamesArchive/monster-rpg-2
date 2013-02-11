@@ -415,8 +415,8 @@ static void draw_the_controls(bool draw_controls, ALLEGRO_COLOR tint)
 
 static void drawOverlay(bool draw_controls, ALLEGRO_COLOR tint)
 {
-	long now = tguiCurrentTimeMillis();
-	bool draw_red = ((now - last_shake_check) < 500);
+	long now = al_get_time();
+	bool draw_red = ((now - last_shake_check) < 0.5) && !on_title_screen;
 
 #if defined ALLEGRO_IPHONE
 	if (draw_red && global_draw_red && !path_head && !joypad_connected() && !is_sb_connected() && !airplay_connected) {
@@ -648,11 +648,13 @@ static void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 	}
 #endif
 
+#if defined ALLEGRO_RASPBERRYPI
 	if (custom_mouse_cursor && (show_custom_mouse_cursor || (al_get_display_flags(display) & ALLEGRO_FULLSCREEN_WINDOW))) {
 		ALLEGRO_MOUSE_STATE state;
 		al_get_mouse_state(&state);
 		al_draw_bitmap(custom_mouse_cursor->bitmap, state.x, state.y, 0);
 	}
+#endif
 
 	if (use_programmable_pipeline) {
 		if (!(config.getFilterType() == FILTER_SCALE2X)) {

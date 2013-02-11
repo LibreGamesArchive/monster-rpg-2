@@ -39,7 +39,7 @@ TGUIPoint tguiMouseReleasePoint;
 static int tguiScreenWidth = 0;
 static int tguiScreenHeight = 0;
 static int tgui_screen_offset_x = 0;
-static int tgui_screen_offset_ = 0;
+static int tgui_screen_offset_y = 0;
 static float tgui_screen_ratio_x = 1.0;
 static float tgui_screen_ratio_y = 1.0;
 
@@ -90,7 +90,6 @@ void *queue_emptier(void *crap)
 
 	while (event_queues_created) {
 		ALLEGRO_EVENT event;
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		if (al_peek_next_event(key_events, &event)) {
 			if (event.any.timestamp+KEEP_TIME < al_current_time()) {
 				al_drop_next_event(key_events);
@@ -99,7 +98,6 @@ void *queue_emptier(void *crap)
 				al_unref_user_event((ALLEGRO_USER_EVENT *)&event);
 			}
 		}
-#endif
 		if (al_peek_next_event(mouse_events, &event)) {
 			if (event.any.timestamp+KEEP_TIME < al_current_time()) {
 				if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
@@ -290,10 +288,8 @@ void tguiInit()
 	tguiLastUpdate = tguiCurrentTimeMillis();
 
 	if (al_get_current_display()) {
-		ALLEGRO_BITMAP *bb = al_get_backbuffer(al_get_current_display());
-
-		tguiScreenWidth = al_get_bitmap_width(bb);
-		tguiScreenHeight = al_get_bitmap_height(bb);
+		tguiScreenWidth = al_get_display_width(al_get_current_display());
+		tguiScreenHeight = al_get_display_height(al_get_current_display());
 	}
 	else {
 		tguiScreenWidth = 480;
@@ -608,7 +604,7 @@ TGUIWidget* tguiUpdate()
 					MouseEvent *e = new MouseEvent;
 					e->x = EV.x;
 					e->y = EV.y;
-					tguiConvertMousePosition(&e->x, &e->y, tgui_screen_offset_x, tgui_screen_offset_, tgui_screen_ratio_x, tgui_screen_ratio_y);
+					tguiConvertMousePosition(&e->x, &e->y, tgui_screen_offset_x, tgui_screen_offset_y, tgui_screen_ratio_x, tgui_screen_ratio_y);
 					e->b = 0;
 					mouseMoveEvents.push_back(e);
 				}
@@ -617,7 +613,7 @@ TGUIWidget* tguiUpdate()
 					MouseEvent *e = new MouseEvent;
 					e->x = EV.x;
 					e->y = EV.y;
-					tguiConvertMousePosition(&e->x, &e->y, tgui_screen_offset_x, tgui_screen_offset_, tgui_screen_ratio_x, tgui_screen_ratio_y);
+					tguiConvertMousePosition(&e->x, &e->y, tgui_screen_offset_x, tgui_screen_offset_y, tgui_screen_ratio_x, tgui_screen_ratio_y);
 					e->b = EV.BUTTON;
 					mouseUpEvents.push_back(e);
 					tguiMouseState.buttons &= (~EV.BUTTON);
@@ -627,7 +623,7 @@ TGUIWidget* tguiUpdate()
 				mouse_downs++;
 				int ex = EV.x;
 				int ey = EV.y;
-				tguiConvertMousePosition(&ex, &ey, tgui_screen_offset_x, tgui_screen_offset_, tgui_screen_ratio_x, tgui_screen_ratio_y);
+				tguiConvertMousePosition(&ex, &ey, tgui_screen_offset_x, tgui_screen_offset_y, tgui_screen_ratio_x, tgui_screen_ratio_y);
 				EV.x = ex;
 				EV.y = ey;
 				/* This check is Monster 2 specific! */
@@ -1385,7 +1381,7 @@ void tguiConvertMousePosition(int *x, int *y, int ox, int oy, float rx, float ry
 
 	if (ox != 0 || oy != 0) {
 		in_x -= tgui_screen_offset_x;
-		in_y -= tgui_screen_offset_;
+		in_y -= tgui_screen_offset_y;
 	}
 	else {
 		in_x /= rx;
@@ -1471,7 +1467,7 @@ void tguiSetScreenParameters(int offset_x, int offset_y,
 	float ratio_x, float ratio_y)
 {
 	tgui_screen_offset_x = offset_x;
-	tgui_screen_offset_ = offset_y;
+	tgui_screen_offset_y = offset_y;
 	tgui_screen_ratio_x = ratio_x;
 	tgui_screen_ratio_y = ratio_y;
 }

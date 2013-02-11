@@ -826,10 +826,25 @@ top:
 				}
 			}
 		}
+#endif
 
 #ifdef ALLEGRO_ANDROID
 		if ((event.type == ALLEGRO_EVENT_KEY_DOWN || event->type == USER_KEY_DOWN) && event.keyboard.keycode == ALLEGRO_KEY_BACK) {
 			if (al_current_time() > next_shake) {
+				iphone_shake_time = al_current_time();
+				next_shake = al_current_time()+0.5;
+			}
+		}
+#endif
+
+#ifdef ALLEGRO_IPHONE
+		double shake = al_iphone_get_last_shake_time();
+		if (shake > allegro_iphone_shaken) {
+			allegro_iphone_shaken = shake;
+			if (config.getShakeAction() == CFG_SHAKE_CHANGE_SONG) {
+				iPodNext();
+			}
+			else if (al_current_time() > next_shake) {
 				iphone_shake_time = al_current_time();
 				next_shake = al_current_time()+0.5;
 			}
@@ -881,14 +896,13 @@ top:
 				this_x = ((float)this_x / al_get_display_width(controller_display)) * 240;
 				this_y = ((float)this_y / al_get_display_height(controller_display)) * 160;
 			}
-			else if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN)
-#else
-			if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN)
+			else
 #endif
+			if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN)
 				tguiConvertMousePosition(&this_x, &this_y, 0, 0, screen_ratio_x, screen_ratio_y);
 			else
 				tguiConvertMousePosition(&this_x, &this_y, screen_offset_x, screen_offset_y, 1, 1);
-				
+
 			void (*down[7])(void) = {
 				joy_l_down, joy_r_down, joy_u_down, joy_d_down,
 				joy_b1_down, joy_b2_down, joy_b3_down
@@ -1067,7 +1081,6 @@ top:
 			
 			al_unlock_mutex(input_mutex);
 		}
-#endif
 
 #ifdef ALLEGRO_IPHONE
 		if (event.type == ALLEGRO_EVENT_DISPLAY_CONNECTED) {
@@ -1207,20 +1220,6 @@ top:
 		}
 #endif
 	}
-
-#ifdef ALLEGRO_IPHONE
-	double shake = al_iphone_get_last_shake_time();
-	if (shake > allegro_iphone_shaken) {
-		allegro_iphone_shaken = shake;
-		if (config.getShakeAction() == CFG_SHAKE_CHANGE_SONG) {
-			iPodNext();
-		}
-		else if (al_current_time() > next_shake) {
-			iphone_shake_time = al_current_time();
-			next_shake = al_current_time()+0.5;
-		}
-	}
-#endif
 
 	if (pump_events_only) {
 		return false;
@@ -1363,7 +1362,6 @@ void do_close(bool quit)
 		throw QuitError();
 #else
 	if (close_pressed_for_configure) {
-		fadeOut(black);
 		close_pressed_for_configure = false;
 		close_pressed = false;
 		config_menu();

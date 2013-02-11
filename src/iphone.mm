@@ -664,12 +664,12 @@ static bool gen_event(ALLEGRO_EVENT *e, char c)
 {
 	UIWindow *window = al_iphone_get_window(display);
 
-	CGRect r = CGRectMake(-100, -100, 50, 50);
+	CGRect r = CGRectMake(0, 0, 0, 0);
 	text_view = [[UITextView alloc] initWithFrame:r];
 	text_view.delegate = self;
 	text_view.hidden = YES;
 	
-	CGRect r2 = CGRectMake(-200, -100, 50, 50);
+	CGRect r2 = CGRectMake(0, 0, 0, 0);
 	UIView *blank = [[UIView alloc] initWithFrame:r2];
 	blank.hidden = YES;
 	

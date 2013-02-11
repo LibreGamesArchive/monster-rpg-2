@@ -761,9 +761,6 @@ bool Configuration::read()
 	if (xml->getFailed()) {
 	   debug_message("couldn't read config");
 	   delete xml;
-#ifdef ALLEGRO_RASPBERRYPI
-	   last_session_was_x = getenv("DISPLAY") != NULL;
-#endif
 	   return false;
 	}
 	debug_message("3");
@@ -782,12 +779,6 @@ bool Configuration::read()
 	else {
 		setAutoconnectToZeemote(0);
 	}
-#ifdef ALLEGRO_RASPBERRYPI
-	XMLData* last_was_x = game->find("last_session_was_x");
-	if (last_was_x) {
-		last_session_was_x = atoi(last_was_x->getValue().c_str());
-	}
-#endif
 	XMLData* joyb1 = game->find("joyb1");
 	XMLData* joyb2 = game->find("joyb2");
 	XMLData* joyb3 = game->find("joyb3");
@@ -809,30 +800,22 @@ bool Configuration::read()
 	XMLData *keySortItems = NULL;
 	XMLData *fpsOn = NULL;
 
-#ifdef ALLEGRO_RASPBERRYPI
-	const char *disp = getenv("DISPLAY");
-	if ((last_session_was_x && disp) || (!last_session_was_x && !disp)) {
-#endif
-		key1 = game->find("key1");
-		key2 = game->find("key2");
-		key3 = game->find("key3");
-		keyLeft = game->find("keyLeft");
-		keyRight = game->find("keyRight");
-		keyUp = game->find("keyUp");
-		keyDown = game->find("keyDown");
-		keySettings = game->find("keySettings");
-		keyFullscreen = game->find("keyFullscreen");
-		keySFXUp = game->find("keySFXUp");
-		keySFXDown = game->find("keySFXDown");
-		keyMusicUp = game->find("keyMusicUp");
-		keyMusicDown = game->find("keyMusicDown");
-		keyQuit = game->find("keyQuit");
-		keySortItems = game->find("keySortItems");
-		fpsOn = game->find("fpsOn");
-#ifdef ALLEGRO_RASPBERRYPI
-	}
-	last_session_was_x = getenv("DISPLAY") != NULL;
-#endif
+	key1 = game->find("key1");
+	key2 = game->find("key2");
+	key3 = game->find("key3");
+	keyLeft = game->find("keyLeft");
+	keyRight = game->find("keyRight");
+	keyUp = game->find("keyUp");
+	keyDown = game->find("keyDown");
+	keySettings = game->find("keySettings");
+	keyFullscreen = game->find("keyFullscreen");
+	keySFXUp = game->find("keySFXUp");
+	keySFXDown = game->find("keySFXDown");
+	keyMusicUp = game->find("keyMusicUp");
+	keyMusicDown = game->find("keyMusicDown");
+	keyQuit = game->find("keyQuit");
+	keySortItems = game->find("keySortItems");
+	fpsOn = game->find("fpsOn");
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	XMLData *xml_dpad_type = game->find("dpad_type");
@@ -972,9 +955,6 @@ void Configuration::write()
 
 	XMLData* game = new XMLData("game", "");
 	XMLData* auto_zeemote = new XMLData("autoconnect_to_zeemote", my_itoa(getAutoconnectToZeemote()));
-#ifdef ALLEGRO_RASPBERRYPI
-	XMLData* last_was_x = new XMLData("last_session_was_x", my_itoa(last_session_was_x));
-#endif
 	XMLData* joyb1 = new XMLData("joyb1", my_itoa(getJoyButton1()));
 	XMLData* joyb2 = new XMLData("joyb2", my_itoa(getJoyButton2()));
 	XMLData* joyb3 = new XMLData("joyb3", my_itoa(getJoyButton3()));
@@ -1027,9 +1007,6 @@ void Configuration::write()
 	XMLData* xml_lang = new XMLData("language", my_itoa(getLanguage()));
 
 	game->add(auto_zeemote);
-#ifdef ALLEGRO_RASPBERRYPI
-	game->add(last_was_x);
-#endif
 
 	game->add(joyb1);
 	game->add(joyb2);
@@ -1176,9 +1153,6 @@ Configuration::Configuration() :
 #endif
 #ifdef ALLEGRO_ANDROID
 	,autoconnect_to_zeemote(false)
-#endif
-#ifdef ALLEGRO_RASPBERRYPI
-	,last_session_was_x(-1)
 #endif
 {
 #ifdef EDITOR

@@ -68,7 +68,6 @@ void set_user_joystick(void);
 // FIXME: TONNES OF GLOBALS
 
 extern ALLEGRO_TIMER *logic_timer, *draw_timer;
-extern float initial_screen_scale;
 extern ALLEGRO_DISPLAY *display;
 extern ALLEGRO_DISPLAY *controller_display;
 extern ALLEGRO_COND *wait_cond;

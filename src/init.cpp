@@ -72,8 +72,6 @@ uint32_t parse_version(const char *v)
 	}
 	buf2[j] = 0;
 
-	printf("bufs=%s %s\n", buf1, buf2);
-
 	return (atoi(buf1) << 16) | atoi(buf2);
 }
 
@@ -180,7 +178,6 @@ float screen_ratio_x, screen_ratio_y;
 #ifdef ALLEGRO_IPHONE
 double allegro_iphone_shaken = DBL_MIN;
 #endif
-float initial_screen_scale = 0.0f;
 bool sound_was_playing_at_program_start;
 ALLEGRO_DISPLAY *display = 0;
 ALLEGRO_DISPLAY *controller_display = 0;
@@ -1539,7 +1536,7 @@ bool init(int *argc, char **argv[])
 	
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_install_touch_input();
-	al_set_mouse_emulation_mode(ALLEGRO_MOUSE_EMULATION_5_0_x);
+	//al_set_mouse_emulation_mode(ALLEGRO_MOUSE_EMULATION_5_0_x);
 #endif
 
 	ALLEGRO_FILE *f = al_fopen(getResource("Version"), "rb");
@@ -1636,10 +1633,10 @@ bool init(int *argc, char **argv[])
 		sd->height = 640;
 	}
 #else
-	#ifndef ALLEGRO_ANDROID
+#ifndef ALLEGRO_ANDROID
 	// FIXME: do this for android when supporting multihead
 	al_set_new_display_adapter(0);
-	#endif
+#endif
 
 	sd->width = 1;
 	sd->height = 1;
@@ -1732,6 +1729,11 @@ bool init(int *argc, char **argv[])
 	}
 
 	al_rest(1.0);
+
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+	sd->width = al_get_display_width(display);
+	sd->height = al_get_display_height(display);
+#endif
 	
 #ifdef ALLEGRO_IPHONE
 	al_init_user_event_source(&user_event_source);
@@ -1740,8 +1742,14 @@ bool init(int *argc, char **argv[])
 	tguiInit();
 	tguiSetRotation(0);
 
+#ifdef ALLEGRO_RASPBERRYPI
 	al_hide_mouse_cursor(display);
+#endif
 	custom_mouse_cursor = m_load_bitmap(getResource("media/mouse_cursor.png"));
+#if !defined ALLEGRO_RASPBERRYPI && !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	ALLEGRO_MOUSE_CURSOR *allegro_cursor = al_create_mouse_cursor(custom_mouse_cursor->bitmap, 0, 0);
+	al_set_mouse_cursor(display, allegro_cursor);
+#endif
 
 	if (have_mouse) {
 		al_set_mouse_xy(display, al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor->bitmap)-20, al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor->bitmap)-20);
@@ -2254,11 +2262,12 @@ void set_screen_params(void)
 		screenScaleX = ratio;
 		screenScaleY = ratio;
 	}
+
 	screen_offset_x = (sd->width - (screenScaleX*BW)) / 2;
 	screen_offset_y = (sd->height - (screenScaleY*BH)) / 2;
 	screen_ratio_x = sd->width / (screenScaleX*BW);
 	screen_ratio_y = sd->height / (screenScaleY*BH);
-
+	 
 	if (tguiIsInitialized()) {
 		tguiSetScreenSize(screenScaleX*BW, screenScaleY*BH);
 
@@ -2268,10 +2277,8 @@ void set_screen_params(void)
 		else {
 			tguiSetScreenParameters(0, 0, screen_ratio_x, screen_ratio_y);
 		}
-#ifndef EDITOR
 		tguiSetScale(screenScaleX, screenScaleY);
 		tguiSetTolerance(3);
-#endif
 	}
 }
 
@@ -2314,9 +2321,6 @@ void toggle_fullscreen(void)
 	pause_joystick_repeat_events = false;
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	if (sd->fullscreen) {
-		al_hide_mouse_cursor(display);
-	}
 	if (in_shooter) {
 		al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
 	}

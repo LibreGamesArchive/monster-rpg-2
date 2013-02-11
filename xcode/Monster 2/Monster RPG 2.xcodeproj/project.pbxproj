@@ -1419,8 +1419,6 @@
 					OPENGLES,
 					A5_OGL,
 				);
-				GCC_THUMB_SUPPORT = NO;
-				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/Users/trent/code/iphone_libs_r,
@@ -1663,8 +1661,6 @@
 					OPENGLES,
 					A5_OGL,
 				);
-				GCC_THUMB_SUPPORT = NO;
-				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/Users/trent/code/iphone_libs_r,
@@ -1738,8 +1734,6 @@
 					OPENGLES,
 					A5_OGL,
 				);
-				GCC_THUMB_SUPPORT = NO;
-				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/Users/trent/code/iphone_libs_r,
@@ -1803,8 +1797,6 @@
 					OPENGLES,
 					A5_OGL,
 				);
-				GCC_THUMB_SUPPORT = NO;
-				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/Users/trent/code/iphone_libs_r,

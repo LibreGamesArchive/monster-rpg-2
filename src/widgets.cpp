@@ -1020,8 +1020,9 @@ int config_input(int type)
 
 	tguiPush();
 
-	MRectangle *fullscreenRect = new MRectangle(0, 0, BW, BH,
-		m_map_rgba(0, 0, 0, 0), 0);
+	fadeOut(black);
+
+	MFrame *frame = new MFrame(0, 0, BW, BH);
 
 	MInputGetter *getters[15];
 	int num_getters;
@@ -1051,7 +1052,7 @@ int config_input(int type)
 		getters[2] = new MInputGetter(type, 10, 25, 150, "View Button", config.getJoyButton3());
 	}
 
-	MTextButton *apply = new MTextButton(170, 135, "Apply");
+	MTextButton *apply = new MTextButton(170, 125, "Apply");
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	MTextButton *other = new MTextButton(170, 145, type == MInputGetter::TYPE_KB ? "Gamepad" : "Keyboard");
@@ -1060,8 +1061,8 @@ int config_input(int type)
 	int ret = 0;
 
 	tguiSetParent(0);
-	tguiAddWidget(fullscreenRect);
-	tguiSetParent(fullscreenRect);
+	tguiAddWidget(frame);
+	tguiSetParent(frame);
 
 	for (int i = 0; i < num_getters; i++) {
 		tguiAddWidget(getters[i]);
@@ -1074,6 +1075,10 @@ int config_input(int type)
 
 again:
 	tguiSetFocus(getters[0]);
+
+	m_set_target_bitmap(buffer);
+	tguiDraw();
+	fadeIn(black);
 
 	clear_input_events();
 
@@ -1170,8 +1175,6 @@ again:
 		if (draw_counter) {
 			draw_counter = 0;
 			m_set_target_bitmap(buffer);
-			// Draw frame
-			mDrawFrame(0, 0, BW, BH, false);
 			tguiDraw();
 			drawBufferToScreen();
 			m_flip_display();
@@ -1180,7 +1183,9 @@ again:
 done:
 	getting_input_config = false;
 
-	tguiDeleteWidget(fullscreenRect);
+	tguiDeleteWidget(frame);
+
+	delete frame;
 
 	for (int i = 0; i < num_getters; i++) {
 		delete getters[i];
@@ -1762,7 +1767,7 @@ int MInputGetter::update(int millis)
 						getting_input_config = false;
 					}
 					else {
-						if (al_is_joystick_installed()) {
+						if (al_is_joystick_installed() && user_joystick) {
 							int nb = al_get_joystick_num_buttons(user_joystick);
 							ALLEGRO_JOYSTICK_STATE state;
 							al_get_joystick_state(user_joystick, &state);
@@ -5883,28 +5888,23 @@ void MMultiChooser::draw()
 		int bmp_h = m_get_bitmap_height(arrow);
 		draw_y = (int)(p->y - (bmp_h/2));
 
-		if (use_dpad) {
-			if (inset) {
-				if (alpha == 255) {
-					draw_x -= m_get_bitmap_width(arrow);
-				}
-				else {
-					alpha = 0;
-				}
+		if (inset) {
+			if (alpha == 255) {
+				draw_x -= m_get_bitmap_width(arrow);
 			}
+			else {
+				alpha = 0;
+			}
+		}
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-			if (current.size() > 1 && points[current[0]].west == p->west) {
-				if (((unsigned)tguiCurrentTimeMillis() % 100) < 50) {
-					m_draw_bitmap(arrow, draw_x, draw_y, flags);
-				}
-			}
-			else
-#endif
-			{
+		if (current.size() == points.size() && points[current[0]].west == p->west) {
+			if (((unsigned)tguiCurrentTimeMillis() % 100) < 50) {
 				m_draw_bitmap(arrow, draw_x, draw_y, flags);
 			}
 		}
-		else {
+		else
+#endif
+		{
 			m_draw_bitmap(arrow, draw_x, draw_y, flags);
 		}
 
@@ -5927,144 +5927,142 @@ void MMultiChooser::setTapped(bool t)
 
 int MMultiChooser::update(int millis)
 {
-	if (use_dpad) {
-		std::vector<int> possibilities;
-		bool want_all = false;
+	std::vector<int> possibilities;
+	bool want_all = false;
 
-		INPUT_EVENT ie;
+	INPUT_EVENT ie;
 
-		if (this != tguiActiveWidget)
-			ie = EMPTY_INPUT_EVENT;
-		else
-			ie = get_next_input_event();
+	if (this != tguiActiveWidget)
+		ie = EMPTY_INPUT_EVENT;
+	else
+		ie = get_next_input_event();
 
-		if (ie.up == DOWN && current.size() <= 1) {
-			use_input_event();
-			playPreloadedSample("blip.ogg");
-			// reverse order hack
-			if (points.size() >= 1) {
-				for (int i = points.size()-1; i >= 0; i--) {
-					if (points[i].y < points[current[0]].y &&
-						points[i].west == points[current[0]].west) {
-						possibilities.push_back(i);
-					}
-				}
-			}
-		}
-		else if (ie.down == DOWN && current.size() <= 1) {
-			use_input_event();
-			playPreloadedSample("blip.ogg");
-			for (int i = 0; i < (int)points.size(); i++) {
-				if (points[i].y > points[current[0]].y &&
+	if (ie.up == DOWN && current.size() <= 1) {
+		use_input_event();
+		playPreloadedSample("blip.ogg");
+		// reverse order hack
+		if (points.size() >= 1) {
+			for (int i = points.size()-1; i >= 0; i--) {
+				if (points[i].y < points[current[0]].y &&
 					points[i].west == points[current[0]].west) {
 					possibilities.push_back(i);
 				}
 			}
 		}
-		else if (ie.left == DOWN) {
-			use_input_event();
-			playPreloadedSample("blip.ogg");
-			if (current.size() <= 1) {
-				for (int i = 0; i < (int)points.size(); i++) {
-					if (points[i].x < points[current[0]].x) {
-						possibilities.push_back(i);
-					}
-				}
+	}
+	else if (ie.down == DOWN && current.size() <= 1) {
+		use_input_event();
+		playPreloadedSample("blip.ogg");
+		for (int i = 0; i < (int)points.size(); i++) {
+			if (points[i].y > points[current[0]].y &&
+				points[i].west == points[current[0]].west) {
+				possibilities.push_back(i);
 			}
-			// unselect all
-			else if (can_multi) {
-				int min = BW;
-				int index = 0;
-				for (int i = 0; i < (int)points.size(); i++) {
-					if (points[i].x < min) {
-						min = (int)points[i].x;
-						index = i;
-					}
-				}
-				possibilities.push_back(index);
-			}
-			if (possibilities.size() <= 0 && can_multi) {
-				for (int i = 0; i < (int)points.size(); i++) {
-					if (points[i].west) {
-						possibilities.push_back(i);
-					}
-				}
-				want_all = true;
-			}
-		}
-		else if (ie.right == DOWN) {
-			use_input_event();
-			playPreloadedSample("blip.ogg");
-			if (current.size() <= 1) {
-				for (int i = 0; i < (int)points.size(); i++) {
-					if (points[i].x > points[current[0]].x) {
-						possibilities.push_back(i);
-					}
-				}
-			}
-			// unselect all
-			else if (can_multi) {
-				int max = 0;
-				int index = 0;
-				for (int i = 0; i < (int)points.size(); i++) {
-					if (points[i].x > max) {
-						max = (int)points[i].x;
-						index = i;
-					}
-				}
-				possibilities.push_back(index);
-			}
-			if (possibilities.size() <= 0 && can_multi) {
-				for (int i = 0; i < (int)points.size(); i++) {
-					if (!points[i].west) {
-						possibilities.push_back(i);
-					}
-				}
-				want_all = true;
-			}
-		}
-		else if (ie.button1 == DOWN) {
-			use_input_event();
-			call_callback = true;
-			playPreloadedSample("select.ogg");
-			return TGUI_RETURN;
-		}
-		else if (ie.button2 == DOWN || iphone_shaken(0.1)) {
-			use_input_event();
-			iphone_clear_shaken();
-			playPreloadedSample("select.ogg");
-			current.clear();
-			return TGUI_RETURN;
-		}
-
-		if (possibilities.size() > 0) {
-			int curr = current[0];
-			current.clear();
-
-			if (want_all) {
-				for (int i = 0; i < (int)possibilities.size(); i++) {
-					current.push_back(possibilities[i]);
-				}
-			}
-			else {
-				int closest = 0;
-				int closest_dist = INT_MAX;
-				for (int i = 0; i < (int)possibilities.size(); i++) {
-					int dx = points[possibilities[i]].x - points[curr].x;
-					int dy = points[possibilities[i]].y - points[curr].y;
-					int dist = (int)fabs(sqrt((float)(dx*dx + dy*dy)));
-					if (dist < closest_dist) {
-						closest = possibilities[i];
-						closest_dist = dist;
-					}
-				}
-				current.push_back(closest);
-			}
-
-			possibilities.clear();
 		}
 	}
-	if (have_mouse || !use_dpad) {
+	else if (ie.left == DOWN) {
+		use_input_event();
+		playPreloadedSample("blip.ogg");
+		if (current.size() <= 1) {
+			for (int i = 0; i < (int)points.size(); i++) {
+				if (points[i].x < points[current[0]].x) {
+					possibilities.push_back(i);
+				}
+			}
+		}
+		// unselect all
+		else if (can_multi) {
+			int min = BW;
+			int index = 0;
+			for (int i = 0; i < (int)points.size(); i++) {
+				if (points[i].x < min) {
+					min = (int)points[i].x;
+					index = i;
+				}
+			}
+			possibilities.push_back(index);
+		}
+		if (possibilities.size() <= 0 && can_multi) {
+			for (int i = 0; i < (int)points.size(); i++) {
+				if (points[i].west) {
+					possibilities.push_back(i);
+				}
+			}
+			want_all = true;
+		}
+	}
+	else if (ie.right == DOWN) {
+		use_input_event();
+		playPreloadedSample("blip.ogg");
+		if (current.size() <= 1) {
+			for (int i = 0; i < (int)points.size(); i++) {
+				if (points[i].x > points[current[0]].x) {
+					possibilities.push_back(i);
+				}
+			}
+		}
+		// unselect all
+		else if (can_multi) {
+			int max = 0;
+			int index = 0;
+			for (int i = 0; i < (int)points.size(); i++) {
+				if (points[i].x > max) {
+					max = (int)points[i].x;
+					index = i;
+				}
+			}
+			possibilities.push_back(index);
+		}
+		if (possibilities.size() <= 0 && can_multi) {
+			for (int i = 0; i < (int)points.size(); i++) {
+				if (!points[i].west) {
+					possibilities.push_back(i);
+				}
+			}
+			want_all = true;
+		}
+	}
+	else if (ie.button1 == DOWN) {
+		use_input_event();
+		call_callback = true;
+		playPreloadedSample("select.ogg");
+		return TGUI_RETURN;
+	}
+	else if (ie.button2 == DOWN || iphone_shaken(0.1)) {
+		use_input_event();
+		iphone_clear_shaken();
+		playPreloadedSample("select.ogg");
+		current.clear();
+		return TGUI_RETURN;
+	}
+
+	if (possibilities.size() > 0) {
+		int curr = current[0];
+		current.clear();
+
+		if (want_all) {
+			for (int i = 0; i < (int)possibilities.size(); i++) {
+				current.push_back(possibilities[i]);
+			}
+		}
+		else {
+			int closest = 0;
+			int closest_dist = INT_MAX;
+			for (int i = 0; i < (int)possibilities.size(); i++) {
+				int dx = points[possibilities[i]].x - points[curr].x;
+				int dy = points[possibilities[i]].y - points[curr].y;
+				int dist = (int)fabs(sqrt((float)(dx*dx + dy*dy)));
+				if (dist < closest_dist) {
+					closest = possibilities[i];
+					closest_dist = dist;
+				}
+			}
+			current.push_back(closest);
+		}
+
+		possibilities.clear();
+	}
+	if (!use_dpad) {
 		if (current.size() > 0) {
 			IPHONE_LINE_DIR dir;
 			IPHONE_LINE_DIR opposite;
@@ -6575,9 +6573,7 @@ void MIcon::pre_draw()
 
 void MIcon::draw()
 {
-	m_save_blender();
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, tint);
-	m_draw_bitmap(bitmap, x, y, 0);
+	m_draw_tinted_bitmap(bitmap, tint, x, y, 0);
 	if (this == tguiActiveWidget && show_focus) {
 		m_save_blender();
 		al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ONE);
@@ -6587,7 +6583,6 @@ void MIcon::draw()
 		al_draw_tinted_bitmap(bitmap->bitmap, al_map_rgba_f(a, a, a, a), x, y, 0);
 		m_restore_blender();
 	}
-	m_restore_blender();
 	if (down && show_name) {
 		m_draw_rectangle(
 			x+m_get_bitmap_width(bitmap)+10,
