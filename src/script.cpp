@@ -2897,7 +2897,11 @@ static int CDoItemTutorial(lua_State *stack)
 
 	#define DLG(t, c) anotherDoDialogue(t, c, !c)
 
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	if (true) {
+#else
 	if (use_dpad) {
+#endif
 		if (DLG("This is the inventory screen.\nFirst let's equip an item.\nMove to the sword in the bottom pane and select it by pressing twice.\n", false))
 			{ if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }}
 	}
@@ -2954,7 +2958,11 @@ static int CDoItemTutorial(lua_State *stack)
 				}
 				if (player->getInfo().equipment.rhand != -1) {
 					stage++;
-									if (use_dpad) {
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+					if (true) {
+#else
+					if (use_dpad) {
+#endif
 						if (DLG("Excellent!\nNow let's learn how to un-equip an item.\nMove to the top frame, press the action button, then move to and select the sword.\n", false))
 							{ if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }}
 					}
@@ -3043,7 +3051,11 @@ static int CDoItemTutorial(lua_State *stack)
 						inventory[sel].index = -1;
 						inventory[sel].quantity = 0;
 						stage++;
-											if (use_dpad) {
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+						if (true) {
+#else
+						if (use_dpad) {
+#endif
 							if (DLG("Ok, you're almost done.\nLet's try one battle just to get our feet wet...\nAttacking works by moving to an arrow next to the enemy you wish to attack.\nThen you press the action button.\nUsing items works the same way.\nYou have several other options in battle... Play around with them to make yourself familiar!\n", false)) { if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }}
 						}
 						else {
@@ -3142,7 +3154,11 @@ static int CDoMapTutorial(lua_State *stack)
 	
 	#define DLG(t, c) anotherDoDialogue(t, c, !c)
 
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	if (true) {
+#else
 	if (use_dpad) {
+#endif
 		if (DLG("Each area on the map has branches coming off of it.\nUse the arrows to move between areas. If you press on the icon with the arrow, you will enter that area.\nMove the cursor to Seaside town and then press the action button.\n", false))  { if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }};
 	}
 	else {

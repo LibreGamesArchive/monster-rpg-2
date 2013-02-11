@@ -547,6 +547,7 @@ protected:
 
 class MScrollingList : public TGUIWidget {
 public:
+	void post_draw(void);
 	void draw(void);
 	int update(int millis);
 	bool acceptsFocus(void);
@@ -804,6 +805,7 @@ public:
 	void draw(void);
 	int update(int millis);
 	bool acceptsFocus(void);
+	void mouseDown(int mx, int my, int mb);
 
 	int getValue();
 	void setValue(int val);
@@ -1153,10 +1155,7 @@ public:
 	void setRaiseOnFocus(bool r) { raiseOnFocus = r; }
 
 	void setShop(void) { isShop = true; }
-	void getDropLocation(int *dx, int *dy) {
-		if (dx) *dx = drop_x;
-		if (dy) *dy = drop_y;
-	}
+	void getDropLocation(int *dx, int *dy);
 
 	MItemSelector(int y1, int y2, int top, int selected, bool canArrange);
 	virtual ~MItemSelector(void);
@@ -1199,7 +1198,6 @@ protected:
 	int drop_y;
 	Inventory *inventory;
 	bool raiseOnFocus;
-	bool proceed1, proceed2;
 	bool maybe_scrolling;
 	bool was_down;
 };

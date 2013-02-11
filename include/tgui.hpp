@@ -74,6 +74,7 @@ public:
 	// pre_draw is called on widgets in the same order as draw, only before any draw call
 	virtual void pre_draw() {}
 	virtual void draw() {}
+	virtual void post_draw() {}
 	/*
 	 * Return false to close the current GUI.
 	 */

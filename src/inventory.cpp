@@ -497,7 +497,7 @@ void use(Combatant *c, int index, bool can_equip, int numTargets)
 						m_map_rgb(0xff, 0x7f, 0)); // orange
 				}
 			}
-			if (inventory[index].index == HOLY_WATER_INDEX) {
+			else if (inventory[index].index == HOLY_WATER_INDEX) {
 				char text[100];
 				strcpy(text, "LIFE!");
 				addOmnipotentText(std::string(text), 40, 40,

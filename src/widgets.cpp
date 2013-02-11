@@ -1029,33 +1029,33 @@ int config_input(int type)
 	
 	if (type == MInputGetter::TYPE_KB) {
 		num_getters = 15;
-		getters[0] = new MInputGetter(type, 10, 5, 150, "Action Key", config.getKey1());
-		getters[1] = new MInputGetter(type, 10, 15, 150, "Back Key", config.getKey2());
-		getters[2] = new MInputGetter(type, 10, 25, 150, "View Key", config.getKey3());
-		getters[3] = new MInputGetter(type, 10, 35, 150, "Left Key", config.getKeyLeft());
-		getters[4] = new MInputGetter(type, 10, 45, 150, "Right Key", config.getKeyRight());
-		getters[5] = new MInputGetter(type, 10, 55, 150, "Up Key", config.getKeyUp());
-		getters[6] = new MInputGetter(type, 10, 65, 150, "Down Key", config.getKeyDown());
-		getters[7] = new MInputGetter(type, 10, 75, 150, "Settings Key", config.getKeySettings());
-		getters[8] = new MInputGetter(type, 10, 85, 150, "Fullscreen Key", config.getKeyFullscreen());
-		getters[9] = new MInputGetter(type, 10, 95, 150, "SFX Up Key", config.getKeySFXUp());
-		getters[10] = new MInputGetter(type, 10, 105, 150, "SFX Down Key", config.getKeySFXDown());
-		getters[11] = new MInputGetter(type, 10, 115, 150, "Music Up Key", config.getKeyMusicUp());
-		getters[12] = new MInputGetter(type, 10, 125, 150, "Music Down Key", config.getKeyMusicDown());
-		getters[13] = new MInputGetter(type, 10, 135, 150, "Quit Key", config.getKeyQuit());
-		getters[14] = new MInputGetter(type, 10, 145, 150, "Sort Items Key", config.getKeySortItems());
+		getters[0] = new MInputGetter(type, 3, 5, 170, _t("Action Key"), config.getKey1());
+		getters[1] = new MInputGetter(type, 3, 15, 170, _t("Back Key"), config.getKey2());
+		getters[2] = new MInputGetter(type, 3, 25, 170, _t("View Key"), config.getKey3());
+		getters[3] = new MInputGetter(type, 3, 35, 170, _t("Left Key"), config.getKeyLeft());
+		getters[4] = new MInputGetter(type, 3, 45, 170, _t("Right Key"), config.getKeyRight());
+		getters[5] = new MInputGetter(type, 3, 55, 170, _t("Up Key"), config.getKeyUp());
+		getters[6] = new MInputGetter(type, 3, 65, 170, _t("Down Key"), config.getKeyDown());
+		getters[7] = new MInputGetter(type, 3, 75, 170, _t("Settings Key"), config.getKeySettings());
+		getters[8] = new MInputGetter(type, 3, 85, 170, _t("Fullscreen Key"), config.getKeyFullscreen());
+		getters[9] = new MInputGetter(type, 3, 95, 170, _t("SFX Up Key"), config.getKeySFXUp());
+		getters[10] = new MInputGetter(type, 3, 105, 170, _t("SFX Down Key"), config.getKeySFXDown());
+		getters[11] = new MInputGetter(type, 3, 115, 170, _t("Music Up Key"), config.getKeyMusicUp());
+		getters[12] = new MInputGetter(type, 3, 125, 170, _t("Music Down Key"), config.getKeyMusicDown());
+		getters[13] = new MInputGetter(type, 3, 135, 170, _t("Quit Key"), config.getKeyQuit());
+		getters[14] = new MInputGetter(type, 3, 145, 170, _t("Sort Items Key"), config.getKeySortItems());
 	}
 	else {
 		num_getters= 3;
-		getters[0] = new MInputGetter(type, 10, 5, 150, "Action Button", config.getJoyButton1());
-		getters[1] = new MInputGetter(type, 10, 15, 150, "Back Button", config.getJoyButton2());
-		getters[2] = new MInputGetter(type, 10, 25, 150, "View Button", config.getJoyButton3());
+		getters[0] = new MInputGetter(type, 3, 5, 170, _t("Action Button"), config.getJoyButton1());
+		getters[1] = new MInputGetter(type, 3, 15, 170, _t("Back Button"), config.getJoyButton2());
+		getters[2] = new MInputGetter(type, 3, 25, 170, _t("View Button"), config.getJoyButton3());
 	}
 
-	MTextButton *apply = new MTextButton(170, 125, "Apply");
+	MTextButton *apply = new MTextButton(180, 125, "Apply");
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	MTextButton *other = new MTextButton(170, 145, type == MInputGetter::TYPE_KB ? "Gamepad" : "Keyboard");
+	MTextButton *other = new MTextButton(180, 145, type == MInputGetter::TYPE_KB ? "Gamepad" : "Keyboard");
 #endif
 
 	int ret = 0;
@@ -1686,6 +1686,7 @@ MTextButton::~MTextButton(void)
 {
 }
 
+
 int MInputGetter::getValue()
 {
 	return value;
@@ -1711,21 +1712,37 @@ void MInputGetter::draw()
 	// draw text
 
 	if (mode == GETTING) {
-		color = al_map_rgb(255, 255, 0);
-	}
-	else if (this == tguiActiveWidget) {
-		color = white;
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+		if (type == TYPE_KB) {
+			al_draw_textf(game_font, al_map_rgb_f(0, 1, 0), x+(width-(m_get_bitmap_width(cursor)+1))/2+m_get_bitmap_width(cursor)+1, y-2, ALLEGRO_ALIGN_CENTRE, "%s", _t("Press key or tap to cancel"));
+		}
+		else {
+			al_draw_textf(game_font, al_map_rgb_f(0, 1, 0), x+(width-(m_get_bitmap_width(cursor)+1))/2+m_get_bitmap_width(cursor)+1, y-2, ALLEGRO_ALIGN_CENTRE, "%s", _t("Press button or tap to cancel"));
+		}
+#else
+		if (type == TYPE_KB) {
+			al_draw_textf(game_font, al_map_rgb_f(0, 1, 0), x+(width-(m_get_bitmap_width(cursor)+1))/2+m_get_bitmap_width(cursor)+1, y-2, ALLEGRO_ALIGN_CENTRE, "%s", _t("Press key or click to cancel"));
+		}
+		else {
+			al_draw_textf(game_font, al_map_rgb_f(0, 1, 0), x+(width-(m_get_bitmap_width(cursor)+1))/2+m_get_bitmap_width(cursor)+1, y-2, ALLEGRO_ALIGN_CENTRE, "%s", _t("Press button or click to cancel"));
+		}
+#endif
 	}
 	else {
-		color = grey;
+		if (this == tguiActiveWidget) {
+			color = white;
+		}
+		else {
+			color = grey;
+		}
+
+		mTextout(game_font, _t(text.c_str()), x+m_get_bitmap_width(cursor)+1, y,
+			color, black,
+			WGT_TEXT_DROP_SHADOW, false);
+
+		al_draw_textf(game_font, color, x+width, y-2, ALLEGRO_ALIGN_RIGHT, "%s",
+			type == TYPE_KB ? keycode_to_keyname(value) : my_itoa(value));
 	}
-
-	mTextout(game_font, _t(text.c_str()), x+m_get_bitmap_width(cursor)+1, y,
-		color, black,
-		WGT_TEXT_DROP_SHADOW, false);
-
-	al_draw_textf(game_font, color, x+width, y, ALLEGRO_ALIGN_RIGHT, "%s",
-		type == TYPE_KB ? keycode_to_keyname(value) : my_itoa(value));
 }
 
 int MInputGetter::update(int millis)
@@ -1833,6 +1850,11 @@ int MInputGetter::update(int millis)
 bool MInputGetter::acceptsFocus()
 {
 	return true;
+}
+
+void MInputGetter::mouseDown(int mx, int my, int mb)
+{
+	mode = NORMAL;
 }
 
 MInputGetter::MInputGetter(int type, int x, int y, int w, std::string text, int start_value)
@@ -4428,6 +4450,22 @@ void MScrollingList::mouseUpAbs(int xx, int yy, int b)
 	}
 }
 
+void MScrollingList::post_draw()
+{
+	if (dragging) {
+		ALLEGRO_MOUSE_STATE state;
+		m_get_mouse_state(&state);
+		m_save_blender();
+		m_set_blender(M_ONE, M_INVERSE_ALPHA, al_map_rgba(128, 128, 128, 128));
+		int w = m_get_bitmap_width(dragBmp);
+		int h = m_get_bitmap_height(dragBmp);
+		m_draw_scaled_bitmap(dragBmp, 0, 0, w, h,
+			state.x-w, state.y-h,
+			w*2, h*2, 0, 255);
+		m_restore_blender();
+	}
+}
+
 void MScrollingList::draw()
 {
 	int yy = y;
@@ -4459,19 +4497,6 @@ void MScrollingList::draw()
 	
 	al_set_clipping_rectangle(cx, cy, cw, ch);
 	
-	if (dragging) {
-		ALLEGRO_MOUSE_STATE state;
-		m_get_mouse_state(&state);
-		m_save_blender();
-		m_set_blender(M_ONE, M_INVERSE_ALPHA, al_map_rgba(128, 128, 128, 128));
-		int w = m_get_bitmap_width(dragBmp);
-		int h = m_get_bitmap_height(dragBmp);
-		m_draw_scaled_bitmap(dragBmp, 0, 0, w, h,
-			state.x-w, state.y-h,
-			w*2, h*2, 0, 255);
-		m_restore_blender();
-	}
-
 	int dx, dy;
 	/* draw arrows */
 	if (top > 0) {
@@ -4703,6 +4728,11 @@ MScrollingList::~MScrollingList(void)
 	m_destroy_bitmap(up_arrow);
 }
 
+void MItemSelector::getDropLocation(int *dx, int *dy)
+{
+	if (dx) *dx = drop_x;
+	if (dy) *dy = drop_y;
+}
 
 bool MItemSelector::itemsBelow(void)
 {
@@ -4838,10 +4868,12 @@ void MItemSelector::mouseDownAbs(int xx, int yy, int b)
 			maybe_scrolling = true;
 			selected = -1;
 		}
+		/*
 		if (inventory[n].index >= 0 || use_dpad) {
 			if (canArrange)
 				clicked = true;
 		}
+		*/
 
 		first_finger_x = downX;
 		first_finger_y = downY;
@@ -5041,6 +5073,7 @@ void MItemSelector::reset(void)
 	downCount = 0;
 	dragging = false;
 	clicked = false;
+	drop_x = drop_y = -1;
 	if (dragBmp) {
 		m_destroy_bitmap(dragBmp);
 		dragBmp = NULL;
@@ -5188,7 +5221,6 @@ int MItemSelector::update(int millis)
 			playPreloadedSample("select.ogg");
 			sortInventory();
 			downCount = 0;
-			proceed1 = proceed2 = false;
 			pressed = -1;
 			al_rest(1);
 		}
@@ -5273,26 +5305,24 @@ int MItemSelector::update(int millis)
 	}
 	
 
-	if (ie.button1 == DOWN && pressed < 0) {
+	if (_id.button1 && pressed < 0) {
 		if (_id.button1) {
 			double start = al_get_time();
 			while (_id.button1) {
 				pump_events();
 				_id = getInput()->getDescriptor();
 				if (al_get_time()-start > 0.6) {
-					if (!battle) {
-						if (inventory[selected].index >= 0) {
-							playPreloadedSample("select.ogg");
-							int index = inventory[selected].index;
-							reset();
-							showItemInfo(index, true);
-						}
-						else {
-							reset();
-							playPreloadedSample("error.ogg");
-						}
-						goto END;
+					if (inventory[selected].index >= 0) {
+						playPreloadedSample("select.ogg");
+						int index = inventory[selected].index;
+						reset();
+						showItemInfo(index, true);
 					}
+					else {
+						reset();
+						playPreloadedSample("error.ogg");
+					}
+					goto END;
 				}
 			}
 		}
@@ -5307,17 +5337,18 @@ int MItemSelector::update(int millis)
 		pressed = selected;
 		
 		if (canArrange) {
-			goto END;
+			//goto END;
 		}
 	}
 	
-	if ((ie.button1 == DOWN || clicked) && pressed >= 0) {
-	
+	if ((_id.button1 || clicked) && pressed >= 0) {
+
 		playPreloadedSample("select.ogg");
-		
+
+		getInput()->waitForReleaseOr(4, 250);
+	
 		if (pressed == selected) {
 			downCount = 0;
-			proceed1 = proceed2 = false;
 			pressed = -1;
 			if (have_mouse || !use_dpad) {
 				down = false;
@@ -5328,10 +5359,16 @@ int MItemSelector::update(int millis)
 				first_finger_x = -1;
 				first_finger_y = -1;
 			}
+			clicked = false;
 			return TGUI_RETURN;
 		}
 		// Arrange
 		else {
+			if (clicked) {
+				int tmp = pressed;
+				pressed = selected;
+				selected = tmp;
+			}
 			// Group
 			if (inventory[selected].index == inventory[pressed].index) {
 				int q = 99-inventory[selected].quantity;
@@ -5354,9 +5391,11 @@ int MItemSelector::update(int millis)
 				inventory[pressed].quantity = inventory[selected].quantity;
 				inventory[selected].index = tmp.index;
 				inventory[selected].quantity = tmp.quantity;
+				//selected = pressed;
 			}
 			pressed = -1;
 		}
+		clicked = false;
 	}
 	
 END:;
@@ -5368,13 +5407,11 @@ END:;
 		playPreloadedSample("select.ogg");
 		if (pressed < 0) {
 			downCount = 0;
-			proceed1 = proceed2 = false;
 			selected = -1;
 			return TGUI_RETURN;
 		}
 		else {
 			downCount = 0;
-			proceed1 = proceed2 = false;
 			pressed = -1;
 		}
 	}
@@ -5443,9 +5480,9 @@ MItemSelector::MItemSelector(int y1, int y2, int top, int selected,
 	isShop = false;
 	this->inventory = ::inventory;
 	dragBmp = NULL;
-	proceed1 = false;
-	proceed2 = false;
 	maybe_scrolling = false;
+	drop_x = -1;
+	drop_y = -1;
 }
 
 

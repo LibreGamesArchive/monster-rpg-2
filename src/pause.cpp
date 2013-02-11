@@ -2020,7 +2020,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 	shop->setShop();
 	shop->setInventory(shop_inventory);
 	shop->setRaiseOnFocus(true);
-	MItemSelector *isel = new MItemSelector(103, 103+60-4, 0, 0,
+	MItemSelector *isel = new MItemSelector(103, 103+60-5, 0, 0,
 		use_dpad ? false : true);
 	if (have_mouse)
 		isel->setShop();
@@ -2079,7 +2079,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 					goto done;
 				}
 				shop->getDropLocation(&drop_x, &drop_y);
-				if (use_dpad || drop_y >= 100) {
+				if (use_dpad || drop_y < 0 || drop_y >= 100) {
 					// buy
 					if (shop_inventory[sel].index >= 0) {
 						char s1[100];
@@ -2130,7 +2130,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 					goto done;
 				}
 				isel->getDropLocation(&drop_x, &drop_y);
-				if (use_dpad || (drop_y >= 40 && drop_y < 100)) {
+				if (use_dpad || drop_y < 0 || (drop_y >= 40 && drop_y < 100)) {
 					// sell
 					if (inventory[sel].index >= 0 &&
 						inventory[sel].quantity > 0 && 
@@ -3816,6 +3816,11 @@ bool config_menu(bool start_on_fullscreen)
 #endif
 			if (w && w == controls) {
 				int type = MInputGetter::TYPE_KB;
+#if defined ALLEGRO_IPHONE
+				notify("These controls are for", "iCade only!", "");
+#elif defined ALLEGRO_ANDROID
+				notify("For Bluetooth keyboards use the", "RawInputIME input method", "");
+#endif
 				while (true) {
 					type = config_input(type);
 					if (type == 0) {

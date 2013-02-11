@@ -83,6 +83,7 @@ public:
 			}
 			else if (formWidget && mainWidget == formWidget
 				&& player == battle->findPlayer(i)) {
+				playPreloadedSample("select.ogg");
 				return new ConfirmHandler(player, CONFIRM_FORM);
 			}
 		}
@@ -101,6 +102,8 @@ public:
 #endif
 			y = BH - 46;
 		memset(buttons, 0, sizeof(buttons));
+                const int start = (((BW*2)/3) - (30*5))/2;
+		int curr = start;
 		for (int i = 0; i < 5 && actions[i]; i++) {
 			bool disabled = false;
 			if (std::string(actions[i]) == "Item") {
@@ -129,7 +132,6 @@ public:
 					disabled = true;
 				}
 			}
-                        const int start = (((BW*2)/3) - (30*5))/2;
 			if (use_dpad) {
 				MTextButton *b = new MTextButton(x, y, std::string(actions[i]), disabled);
 				buttons[i] = b;
@@ -139,27 +141,28 @@ public:
 				MIcon *b = NULL;
 				MCOLOR greyed_out = m_map_rgb(100, 100, 100);
 				if (std::string(actions[i]) == "Attack") {
-					b = new MIcon(start, 123,
+					b = new MIcon(curr, 123,
 						getResource("combat_media/battle_icons/attack.png"), disabled ? greyed_out : white, true, actions[i], true);
 				}
 				else if (std::string(actions[i]) == "Magic") {
-					b = new MIcon(start+30, 123,
+					b = new MIcon(curr, 123,
 						getResource("combat_media/battle_icons/magic.png"), disabled ? greyed_out : white, true, actions[i], true);
 				}
 				else if (std::string(actions[i]) == "Item") {
-					b = new MIcon(start+60, 123,
+					b = new MIcon(curr, 123,
 						getResource("combat_media/battle_icons/item.png"), disabled ? greyed_out : white, true, actions[i], true);
 				}
 				else if (std::string(actions[i]) == "Defend") {
-					b = new MIcon(start+90, 123,
+					b = new MIcon(curr, 123,
 						getResource("combat_media/battle_icons/defend.png"), disabled ? greyed_out : white, true, actions[i], true);
 				}
 				else if (std::string(actions[i]) == "Run") {
-					b = new MIcon(start+120, 123,
+					b = new MIcon(curr, 123,
 						getResource("combat_media/battle_icons/run.png"), disabled ? greyed_out : white, true, actions[i], true);
 				}
 				buttons[i] = b;
 			}
+			curr += 30;
 		}
 
 		for (int i = 0; i < MAX_PARTY; i++) {
@@ -513,11 +516,13 @@ public:
 		playerInput = true;
 		this->reason = reason;
 
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		if (!use_dpad) {
 			if (reason == CHOOSE_ATTACK && !gameInfo.milestones[MS_SWIPE_TO_ATTACK]) {
 				onscreen_swipe_to_attack = true;
 			}
 		}
+#endif
 
 		std::list<CombatEntity *> &entities = battle->getEntities();
 
@@ -724,7 +729,7 @@ public:
 		chooser->setSelected(sel);
 		sel.clear();
 
-		if (have_mouse || !use_dpad) {
+		if (have_mouse) {
 			applyFrame = new MFrame(BW/3-20, 110+(50/2)-6-5, 112, 22, true);
 			applyButton = new MTextButton(BW/3-20+6, 110+(50/2)-6+2,
 									 "Apply");
@@ -732,7 +737,7 @@ public:
 
 		tguiSetParent(0);
 		tguiAddWidget(chooser);
-		if (have_mouse || !use_dpad) {
+		if (have_mouse) {
 			tguiAddWidget(applyFrame);
 			tguiAddWidget(applyButton);
 		}
@@ -741,7 +746,7 @@ public:
 
 	virtual ~ChooseTargetHandler(void) {
 		tguiDeleteWidget(chooser);
-		if (have_mouse || !use_dpad) {
+		if (have_mouse) {
 			tguiDeleteWidget(applyFrame);
 			tguiDeleteWidget(applyButton);
 			delete applyFrame;
@@ -1163,18 +1168,14 @@ RunHandler::RunHandler(CombatPlayer *p) :
 
 ActionHandler *ConfirmHandler::act(int step, Battle *b)
 {
-	if (use_dpad) {
-		INPUT_EVENT ie = get_next_input_event();
-		if (ie.button2 == DOWN) {
-			use_input_event();
-			return new MainHandler(player);
-		}
+	INPUT_EVENT ie = get_next_input_event();
+	if (ie.button2 == DOWN) {
+		use_input_event();
+		return new MainHandler(player);
 	}
-	if (have_mouse || !use_dpad) {
-		if (iphone_shaken(0.1)) {
-			iphone_clear_shaken();
-			return new MainHandler(player);
-		}
+	if (iphone_shaken(0.1)) {
+		iphone_clear_shaken();
+		return new MainHandler(player);
 	}
 	if (mainWidget == button) {
 		if (reason == CONFIRM_DEFEND) {

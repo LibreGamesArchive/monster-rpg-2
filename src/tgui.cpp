@@ -920,6 +920,18 @@ void tguiDrawRect(int x1, int y1, int x2, int y2)
 			widget->draw();
 		//}
 	}
+	for (size_t i = 0; i < activeGUI->widgets.size(); i++) {
+		TGUIWidget* widget = activeGUI->widgets[i];
+		/*
+		int wx1 = widget->getX();
+		int wy1 = widget->getY();
+		int wx2 = widget->getX() + widget->getWidth() - 1;
+		int wy2 = widget->getY() + widget->getHeight() - 1;
+		if (checkBoxCollision(wx1, wy1, wx2, wy2, x1, y1, x2, y2)) {
+		*/
+			widget->post_draw();
+		//}
+	}
 }
 
 /*
