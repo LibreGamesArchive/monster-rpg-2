@@ -743,8 +743,8 @@ static void levelUpCallback(int selected, LEVEL_UP_CALLBACK_DATA *d)
 	MTable *table = new MTable(x+5, y+5, tableData, 
 		m_map_rgb_f(blue.r+0.1, blue.g+0.1, blue.b+0.1));
 
-	MIcon *down = new MIcon(x+195-38, y+5+28-10, getResource("media/down.png"), white, !use_dpad, NULL, false, false, false, true, true);
-	MIcon *up = new MIcon(x+195-10, y+5+28-10, getResource("media/up.png"), white, !use_dpad, NULL, false, false, false, true, true);
+	MIcon *down = new MIcon(x+195-38, y+5+28-10, getResource("media/down.png"), white, false, NULL, false, false, false, true, true);
+	MIcon *up = new MIcon(x+195-10, y+5+28-10, getResource("media/up.png"), white, false, NULL, false, false, false, true, true);
 
 	MTextButton *ok = new MTextButton(BW/2-m_text_length(game_font, "OK***")/2, y+37,
 		"OK");

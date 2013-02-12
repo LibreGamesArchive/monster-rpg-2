@@ -70,7 +70,9 @@ char *saveFilename = NULL;
 bool was_in_map = false;
 
 bool fps_on = false;
-static int fps;
+int fps_frames = 0;
+double fps_counter = 0;
+int fps = 0;
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 static int bright_dir = 1;
@@ -537,7 +539,6 @@ static bool is_input_event(ALLEGRO_EVENT *e)
 // called from everywhere
 bool is_close_pressed(bool pump_events_only)
 {
-
 	/* This is a bit of a hack, to make sure input events don't
 	 * stack up forever in places that don't use them.
 	 */
@@ -864,17 +865,7 @@ top:
 #endif
 
 		Input *i = getInput();
-#if defined ALLEGRO_IPHONE
-		bool jp_conn = joypad_connected() || is_sb_connected();
-#elif defined ALLEGRO_MACOSX
-		bool jp_conn = joypad_connected();
-#elif defined ALLEGRO_ANDROID
-		bool jp_conn = zeemote_connected;
-#else
-		bool jp_conn = false;
-#endif
-
-		if (!jp_conn && i && i->isPlayerControlled() && 
+		if (i && i->isPlayerControlled() && 
 		(event.type == BEGIN ||
 		event.type == END ||
 		(event.type == MOVE && !path_head))) {
@@ -1412,8 +1403,10 @@ static bool playerCanLevel(std::string name)
 }
 
 
-static void run(void)
+static void run()
 {
+	//levelUp(party[heroSpot], 10);
+
 	// Fix because Eny used to be only CLASS_WARRIOR, some save
 	// states are missing CLASS_ENY
 	party[heroSpot]->getInfo().characterClass |= CLASS_ENY;
@@ -1421,9 +1414,6 @@ static void run(void)
 	runtime_start = tguiCurrentTimeMillis();
 	timer_on = false;
 	timer_time = 0;
-
-	int counter = 0;
-	int frames = 0;
 
 	clear_input_events();
 
@@ -1461,12 +1451,6 @@ static void run(void)
 			tmp_counter = 1;
 		while  (tmp_counter > 0) {
 			next_input_event_ready = true;
-
-			counter += LOGIC_MILLIS;
-			if (fps_on && counter > 2000) {
-				fps = (int)((float)frames/((float)counter/1000.0f));
-				counter = frames = 0;
-			}
 
 			tmp_counter--;
 			if (is_close_pressed()) {
@@ -1741,7 +1725,6 @@ static void run(void)
 		}
 
 		if (draw_counter > 0 && !dont_draw_now) {
-			frames++;
 			draw_counter = 0;
 			m_set_target_bitmap(buffer);
 			
@@ -1774,7 +1757,7 @@ static void run(void)
 			if (fps_on) {
 				char msg[100];
 				sprintf(msg, "%d", fps);
-				mTextout(game_font, msg, 0, 2,
+				mTextout(game_font, msg, 1, 3,
 					white, black,
 					WGT_TEXT_BORDER, false);
 			}

@@ -2561,52 +2561,6 @@ void MMap::draw()
 				p->y-top_y-offset_y-m_get_bitmap_height(down_arrow)-ay, 0);
 		}
 
-/*
-		if (use_dpad) {
-			const char *s1;
-			const char *s2;
-	
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
-			bool jp_conn = joypad_connected();
-#elif defined ALLEGRO_ANDROID
-			bool jp_conn = zeemote_connected;
-#else
-			bool jp_conn = false;
-#endif
-			if (jp_conn) {
-				s1 = "{034} Select";
-				s2 = "{035} Menu";
-			}
-#ifdef ALLEGRO_IPHONE
-			else if (airplay_connected) {
-				s1 = "{036} Select";
-				s2 = "{037} Menu";
-			}
-			else if (is_sb_connected()) {
-				s1 = "{038} Select";
-				s2 = "{039} Menu";
-			}
-#endif
-			else if (dpad_type == DPAD_HYBRID_1 || dpad_type == DPAD_TOTAL_1) {
-				s1 = "{004} Select";
-				s2 = "{005} Menu";
-			}
-			else {
-				s1 = "{031} Select";
-				s2 = "{032} Menu";
-			}
-
-			int len1 = m_text_length(game_font, _t(s1));
-			int len2 = m_text_length(game_font, _t(s2));
-			int maxlen = len1 > len2 ? len1 : len2;
-
-			mTextout_simple(_t(s1), BW-maxlen-5, BH-m_text_height(game_font)*2-5, white);
-			mTextout_simple(_t(s2), BW-maxlen-5, BH-m_text_height(game_font)-5, white);
-		}
-*/
-
-		// draw selected area name
-
 		mTextout_simple(_t(points[selected].display_name.c_str()), 5, BH-m_text_height(game_font)-5,  m_map_rgb(255, 255, 0));
 	}
 
@@ -3465,31 +3419,12 @@ void MSpellSelector::draw()
 		else {
 			dx = BW/3+5;
 		}
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-		if (use_dpad) {
-			if (pressed == i && this == tguiActiveWidget) {
-				color = m_map_rgb(255, 255, 0);
-			}
-			else {
-				color = grey;
-			}
-		}
-		else {
-			if (selected == i) {
-				color = m_map_rgb(255, 255, 0);
-			}
-			else {
-				color = grey;
-			}
-		}
-#else
 		if (pressed == i) {
 			color = m_map_rgb(255, 255, 0);
 		}
 		else {
 			color = grey;
 		}
-#endif
 		mTextout(game_font, (std::string("{008}") + std::string(_t(name.c_str()))).c_str(), dx, dy,
 			color, black,
 			WGT_TEXT_DROP_SHADOW, false);
@@ -3507,7 +3442,7 @@ loop:
 
 		int bmph = m_get_bitmap_height(arrow);
 
-		if ((!use_dpad || this == tguiActiveWidget) && selected >= 0) {
+		if (this == tguiActiveWidget && selected >= 0) {
 			if (dy+bmph/2 > y && dy+bmph/2 < y+height && top <= selected) {
 				m_draw_bitmap(arrow, dx, dy, M_FLIP_HORIZONTAL);
 			}
@@ -3733,7 +3668,6 @@ int MSpellSelector::update(int millis)
 	}
 	else if (ie.button1 == DOWN || clicked) {
 		use_input_event();
-		clicked = false;
 		if (!canArrange) {
 			pressed = selected;
 		}
@@ -3754,15 +3688,15 @@ int MSpellSelector::update(int millis)
 			}
 			else {
 				down = false;
-				//dragging = false;
 			}
 		}
 		else {
-			if (use_dpad) {
+			if (!clicked) {
 				playPreloadedSample("select.ogg");
 			}
 			// Use
 			if (pressed == selected) {
+				clicked = false;
 				pressed = -1;
 				return TGUI_RETURN;
 			}
@@ -3783,6 +3717,7 @@ int MSpellSelector::update(int millis)
 				pressed = -1;
 			}
 		}
+		clicked = false;
 	}
 	else if (this == tguiActiveWidget && (ie.button2 == DOWN || (!dragging && iphone_shaken(0.1)))) {
 		use_input_event();
@@ -6099,38 +6034,6 @@ int MMultiChooser::update(int millis)
 		}
 
 		possibilities.clear();
-	}
-	if (!use_dpad) {
-		if (current.size() > 0) {
-			IPHONE_LINE_DIR dir;
-			IPHONE_LINE_DIR opposite;
-			if (points[current[0]].west) {
-				dir = IPHONE_LINE_DIR_WEST;
-				opposite = IPHONE_LINE_DIR_EAST;
-			}
-			else {
-				dir = IPHONE_LINE_DIR_EAST;
-				opposite = IPHONE_LINE_DIR_WEST;
-			}
-			if (iphone_line(dir, 0.1)) {
-				iphone_clear_line(dir);
-				playPreloadedSample("select.ogg");
-				return TGUI_RETURN;
-			}
-			else if (iphone_line(opposite, 0.1)) {
-				iphone_clear_line(opposite);
-				for (int i = 0; i < (int)current.size(); i++) {
-					current[i] = -current[i] - 1;
-				}
-				return TGUI_RETURN;
-			}
-			else if (this == tguiActiveWidget && iphone_shaken(0.1)) {
-				iphone_clear_shaken();
-				playPreloadedSample("blip.ogg");
-				current.clear();
-				return TGUI_RETURN;
-			}
-		}
 	}
 	
 	return TGUI_CONTINUE;

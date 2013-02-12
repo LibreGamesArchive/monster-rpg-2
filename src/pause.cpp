@@ -1185,10 +1185,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 
 	int who = 0;
 
-	int counter = 0;
-	int frames = 0;
-	int fps = 0;
-
 	clear_input_events();
 
 	for (;;) {
@@ -1200,12 +1196,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 			tmp_counter = 1;
 		while  (tmp_counter > 0) {
 			next_input_event_ready = true;
-
-			counter += LOGIC_MILLIS;
-			if (fps_on && counter > 2000) {
-				fps = (int)((float)frames/((float)counter/1000.0));
-				counter = frames = 0;
-			}
 
 			tmp_counter--;
 			if (is_close_pressed()) {
@@ -1783,15 +1773,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 			m_set_target_bitmap(buffer);
 			m_clear(black);
 			tguiDraw();
-			if (fps_on) {
-				char msg[100];
-				sprintf(msg, "%d", fps);
-				mTextout(game_font, msg, 0, 2,
-							white, black,
-							WGT_TEXT_BORDER, false);
-			}
-			frames++;
-			
 			drawBufferToScreen();
 			m_flip_display();
 		}
@@ -3765,10 +3746,6 @@ bool config_menu(bool start_on_fullscreen)
 	}
 #endif
 
-	int counter = 0;
-	int frames = 0;
-	int fps = 0;
-
 	m_set_target_bitmap(buffer);
 	tguiDraw();
 	fadeIn(black);
@@ -3786,13 +3763,6 @@ bool config_menu(bool start_on_fullscreen)
 			tmp_counter = 1;
 		while  (tmp_counter > 0) {
 			next_input_event_ready = true;
-
-			counter += LOGIC_MILLIS;
-			if (fps_on && counter > 2000) {
-				fps = (int)((float)frames/((float)counter/1000.0));
-				counter = frames = 0;
-			}
-
 			tmp_counter--;
 			if (is_close_pressed()) {
 				do_close();
@@ -4008,15 +3978,6 @@ bool config_menu(bool start_on_fullscreen)
 
 			tguiDraw();
 
-			if (fps_on) {
-				char msg[100];
-				sprintf(msg, "%d", fps);
-				mTextout(game_font, msg, 0, 2,
-					 white, black,
-					 WGT_TEXT_BORDER, false);
-			}
-			frames++;
-			
 			drawBufferToScreen();
 			m_flip_display();
 		}

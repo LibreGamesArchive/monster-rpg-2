@@ -105,6 +105,8 @@ void clear_input_events(double older_than)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	reset_joypad_state();
 #endif
+
+	released = true;
 }
 
 void waitForRelease(int what)

@@ -605,6 +605,13 @@ void m_flip_display(void)
 		al_flip_display();
 		al_set_target_bitmap(target);
 	}
+
+	fps_frames++;
+	fps_counter += 1.0/60.0;
+	if (fps_on && fps_counter > 2) {
+		fps = (int)((float)fps_frames/fps_counter);
+		fps_counter = fps_frames = 0;
+	}
 }
 
 void m_draw_circle(int x, int y, int radius, MCOLOR color,

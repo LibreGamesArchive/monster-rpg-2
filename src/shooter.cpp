@@ -785,11 +785,6 @@ start:
 		}
 	}
 	
-	int counter = 0;
-	int frames = 0;
-	int fps;
-	
-	
 	crabs_destroyed = 0;
 	sharks_destroyed = 0;
 
@@ -823,12 +818,6 @@ start:
 		while  (tmp_counter > 0) {
 			next_input_event_ready = true;
 
-			counter += LOGIC_MILLIS;
-			if (fps_on && counter > 2000) {
-				fps = (int)((double)frames/((double)counter/1000.0));
-				counter = frames = 0;
-			}
-			
 			tmp_counter--;
 
 			runtime_ms += LOGIC_MILLIS;
@@ -1213,15 +1202,6 @@ start:
 			);
 	
 			m_restore_blender();
-			
-			if (fps_on) {
-				char msg[100];
-				sprintf(msg, "%d", fps);
-				mTextout(game_font, msg, 0, 2,
-							white, black,
-							WGT_TEXT_BORDER, false);
-			}
-			frames++;
 			
 			drawBufferToScreen();
 			m_flip_display();

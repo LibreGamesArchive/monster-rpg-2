@@ -419,14 +419,9 @@ static void drawOverlay(bool draw_controls, ALLEGRO_COLOR tint)
 	bool draw_red = ((now - last_shake_check) < 0.5) && !on_title_screen;
 
 #if defined ALLEGRO_IPHONE
-	if (draw_red && global_draw_red && !path_head && !joypad_connected() && !is_sb_connected() && !airplay_connected) {
+	if (draw_red && global_draw_red && !path_head && !airplay_connected) {
 #else
-#ifdef ALLEGRO_MACOSX
-	bool jp_conn = joypad_connected();
-#else
-	bool jp_conn = false;
-#endif
-	if (draw_red && global_draw_red && !path_head && !jp_conn) {
+	if (draw_red && global_draw_red && !path_head) {
 #endif
 		m_draw_triangle(0, 0, 16, 0, 0, 16, al_map_rgba_f(tint.r*tint.a, 0, 0, tint.a));
 	}
@@ -647,6 +642,17 @@ static void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 		);
 	}
 #endif
+	
+	if (fps_on) {
+		ALLEGRO_TRANSFORM backup, t;
+		al_copy_transform(&backup, al_get_current_transform());
+		al_identity_transform(&t);
+		al_scale_transform(&t, screenScaleX, screenScaleY);
+		al_use_transform(&t);
+		al_draw_textf(
+			game_font, al_map_rgb_f(1, 1, 0), 1, 1, 0, "%d", fps);
+		al_use_transform(&backup);
+	}
 
 #ifdef ALLEGRO_RASPBERRYPI
 	if (custom_mouse_cursor && show_custom_mouse_cursor) {

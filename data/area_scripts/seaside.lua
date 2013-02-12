@@ -166,7 +166,7 @@ function activate(activator, activated)
 				setInventory(slot, ITEM_BADGE, 1)
 				loadPlayDestroy("chest.ogg")
 				setMilestone(MS_GOT_BADGE, true)
-				doDialogue(_t("Got a ") .. getItemIcon(ITEM_BADGE) .. _t("Badge") .. "\n", true)
+				doDialogue(_t("Got a ") .. getItemIcon(ITEM_BADGE) .. _t("Badge") .. ".\n", true)
 			end
 		elseif (activated == chest0.id) then
 			chest0:activate()
