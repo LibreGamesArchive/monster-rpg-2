@@ -78,6 +78,15 @@
 		9636675D16C985EC00A24B46 /* libJoypadMac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636675C16C985EC00A24B46 /* libJoypadMac.a */; };
 		9636675F16C985F900A24B46 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636675E16C985F900A24B46 /* Security.framework */; };
 		9636676116C9886700A24B46 /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9636676016C9886700A24B46 /* data */; };
+		9636676716C9FC0800A24B46 /* libdom.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636676216C9FC0800A24B46 /* libdom.a */; };
+		9636676816C9FC0800A24B46 /* libhubbub.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636676316C9FC0800A24B46 /* libhubbub.a */; };
+		9636676916C9FC0800A24B46 /* libparserutils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636676416C9FC0800A24B46 /* libparserutils.a */; };
+		9636676A16C9FC0800A24B46 /* libsvgtiny.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636676516C9FC0800A24B46 /* libsvgtiny.a */; };
+		9636676B16C9FC0800A24B46 /* libwapcaplet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636676616C9FC0800A24B46 /* libwapcaplet.a */; };
+		9636676D16C9FC2B00A24B46 /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636676C16C9FC2B00A24B46 /* libexpat.a */; };
+		9636676F16C9FC8200A24B46 /* svg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9636676E16C9FC8200A24B46 /* svg.cpp */; };
+		9636677016C9FF0A00A24B46 /* svg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9636676E16C9FC8200A24B46 /* svg.cpp */; };
+		9636677216C9FF9100A24B46 /* liballegro_color-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636677116C9FF9100A24B46 /* liballegro_color-static.a */; };
 		9639C4361152D3A900804984 /* iphone.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9639C4351152D3A900804984 /* iphone.mm */; };
 		964D7FC615CC7DAB00D6F9AF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7D13636EDE0068EB38 /* UIKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		9659CDA1143A426C0007757E /* joypad.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA0143A426C0007757E /* joypad.mm */; };
@@ -282,6 +291,14 @@
 		9636675C16C985EC00A24B46 /* libJoypadMac.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libJoypadMac.a; path = "../../../JoypadSDK-0.3.5/JoypadMac-0.3.5/libJoypadMac.a"; sourceTree = "<group>"; };
 		9636675E16C985F900A24B46 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/Security.framework; sourceTree = DEVELOPER_DIR; };
 		9636676016C9886700A24B46 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = ../../data; sourceTree = "<group>"; };
+		9636676216C9FC0800A24B46 /* libdom.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdom.a; path = ../../../../../../opt/netsurf/lib/libdom.a; sourceTree = "<group>"; };
+		9636676316C9FC0800A24B46 /* libhubbub.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libhubbub.a; path = ../../../../../../opt/netsurf/lib/libhubbub.a; sourceTree = "<group>"; };
+		9636676416C9FC0800A24B46 /* libparserutils.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libparserutils.a; path = ../../../../../../opt/netsurf/lib/libparserutils.a; sourceTree = "<group>"; };
+		9636676516C9FC0800A24B46 /* libsvgtiny.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsvgtiny.a; path = ../../../../../../opt/netsurf/lib/libsvgtiny.a; sourceTree = "<group>"; };
+		9636676616C9FC0800A24B46 /* libwapcaplet.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwapcaplet.a; path = ../../../../../../opt/netsurf/lib/libwapcaplet.a; sourceTree = "<group>"; };
+		9636676C16C9FC2B00A24B46 /* libexpat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libexpat.a; path = ../../../../../../usr/local/lib/libexpat.a; sourceTree = "<group>"; };
+		9636676E16C9FC8200A24B46 /* svg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = svg.cpp; path = ../../src/svg.cpp; sourceTree = "<group>"; };
+		9636677116C9FF9100A24B46 /* liballegro_color-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_color-static.a"; path = "../../../local/lib/liballegro_color-static.a"; sourceTree = "<group>"; };
 		9639C4351152D3A900804984 /* iphone.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = iphone.mm; path = ../../src/iphone.mm; sourceTree = SOURCE_ROOT; };
 		963AF9031585AA80007E85D5 /* MoRPG2-lite-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "MoRPG2-lite-Info.plist"; path = "MoRPG2-lite/MoRPG2-lite-Info.plist"; sourceTree = "<group>"; };
 		96490EB9136368C500B2FBAF /* MoRPG2-DBG.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MoRPG2-DBG.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -433,6 +450,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9636677216C9FF9100A24B46 /* liballegro_color-static.a in Frameworks */,
+				9636676D16C9FC2B00A24B46 /* libexpat.a in Frameworks */,
+				9636676716C9FC0800A24B46 /* libdom.a in Frameworks */,
+				9636676816C9FC0800A24B46 /* libhubbub.a in Frameworks */,
+				9636676916C9FC0800A24B46 /* libparserutils.a in Frameworks */,
+				9636676A16C9FC0800A24B46 /* libsvgtiny.a in Frameworks */,
+				9636676B16C9FC0800A24B46 /* libwapcaplet.a in Frameworks */,
 				9636675F16C985F900A24B46 /* Security.framework in Frameworks */,
 				9636675D16C985EC00A24B46 /* libJoypadMac.a in Frameworks */,
 				9677118016C21DF10092EE0A /* liballegro_physfs-static.a in Frameworks */,
@@ -483,6 +507,13 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				9636677116C9FF9100A24B46 /* liballegro_color-static.a */,
+				9636676C16C9FC2B00A24B46 /* libexpat.a */,
+				9636676216C9FC0800A24B46 /* libdom.a */,
+				9636676316C9FC0800A24B46 /* libhubbub.a */,
+				9636676416C9FC0800A24B46 /* libparserutils.a */,
+				9636676516C9FC0800A24B46 /* libsvgtiny.a */,
+				9636676616C9FC0800A24B46 /* libwapcaplet.a */,
 				9636676016C9886700A24B46 /* data */,
 				9636675E16C985F900A24B46 /* Security.framework */,
 				9636675C16C985EC00A24B46 /* libJoypadMac.a */,
@@ -576,6 +607,7 @@
 		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
+				9636676E16C9FC8200A24B46 /* svg.cpp */,
 				9610AF8116C4BDFD0050372E /* Area.cpp */,
 				96A4D26E154A7EA0009ECD44 /* tftp_get.c */,
 				9659CDA3143A42C50007757E /* joypad_handler.m */,
@@ -927,6 +959,7 @@
 				960DB49F154C82EA000869BD /* ThrottledTCPConnection.m in Sources */,
 				960DB4A0154C82EA000869BD /* UDPSocket.m in Sources */,
 				9610AF8216C4BDFD0050372E /* Area.cpp in Sources */,
+				9636676F16C9FC8200A24B46 /* svg.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -939,6 +972,7 @@
 				96E3D50516C0D06C00A4A973 /* mygamecentervc.m in Sources */,
 				96C2C90B16C0A595004EBAB9 /* gamecenter.mm in Sources */,
 				96B4B144143BC0A000ACA64C /* init.mm in Sources */,
+				9636677016C9FF0A00A24B46 /* svg.cpp in Sources */,
 				969A9E3E16083F6700F4DBE2 /* ftpget.cpp in Sources */,
 				96B4B0E2143BBBF300ACA64C /* joypad_handler.m in Sources */,
 				96B4B0E3143BBBF300ACA64C /* joypad.mm in Sources */,
@@ -1257,7 +1291,10 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = A5_OGL;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					A5_OGL,
+					WITH_SVG,
+				);
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
@@ -1265,12 +1302,14 @@
 					/Users/trent/code/local/include,
 					"/Users/trent/code/monster-rpg-2/include",
 					"/Users/trent/code/JoypadSDK-0.3.5/JoypadMac-0.3.5/include",
+					/opt/netsurf/include,
 				);
 				INFOPLIST_FILE = "Monster RPG 2/Monster RPG 2-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					/Users/trent/code/local/lib,
 					/Users/trent/code/JoypadSDKs/Cocoa/Mac/JoypadMac,
 					"\"$(SRCROOT)/../../../JoypadSDK-0.3.5/JoypadMac-0.3.5\"",
+					/opt/netsurf/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
@@ -1298,7 +1337,10 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = A5_OGL;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					A5_OGL,
+					WITH_SVG,
+				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -1307,12 +1349,14 @@
 					/Users/trent/code/local/include,
 					"/Users/trent/code/monster-rpg-2/include",
 					"/Users/trent/code/JoypadSDK-0.3.5/JoypadMac-0.3.5/include",
+					/opt/netsurf/include,
 				);
 				INFOPLIST_FILE = "Monster RPG 2/Monster RPG 2-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					/Users/trent/code/local/lib,
 					/Users/trent/code/JoypadSDKs/Cocoa/Mac/JoypadMac,
 					"\"$(SRCROOT)/../../../JoypadSDK-0.3.5/JoypadMac-0.3.5\"",
+					/opt/netsurf/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
@@ -1339,7 +1383,10 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = A5_OGL;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					A5_OGL,
+					WITH_SVG,
+				);
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
@@ -1347,12 +1394,14 @@
 					/Users/trent/code/local/include,
 					"/Users/trent/code/monster-rpg-2/include",
 					"/Users/trent/code/JoypadSDK-0.3.5/JoypadMac-0.3.5/include",
+					/opt/netsurf/include,
 				);
 				INFOPLIST_FILE = "Monster RPG 2/Monster RPG 2-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					/Users/trent/code/local/lib,
 					/Users/trent/code/JoypadSDKs/Cocoa/Mac/JoypadMac,
 					"\"$(SRCROOT)/../../../JoypadSDK-0.3.5/JoypadMac-0.3.5\"",
+					/opt/netsurf/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
@@ -1379,7 +1428,10 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = A5_OGL;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					A5_OGL,
+					WITH_SVG,
+				);
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
@@ -1387,12 +1439,14 @@
 					/Users/trent/code/local/include,
 					"/Users/trent/code/monster-rpg-2/include",
 					"/Users/trent/code/JoypadSDK-0.3.5/JoypadMac-0.3.5/include",
+					/opt/netsurf/include,
 				);
 				INFOPLIST_FILE = "Monster RPG 2/Monster RPG 2-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					/Users/trent/code/local/lib,
 					/Users/trent/code/JoypadSDKs/Cocoa/Mac/JoypadMac,
 					"\"$(SRCROOT)/../../../JoypadSDK-0.3.5/JoypadMac-0.3.5\"",
+					/opt/netsurf/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;

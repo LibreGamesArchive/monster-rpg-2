@@ -21,6 +21,8 @@ static bool zeemote_enabled = false;
 #include "joypad.hpp"
 #endif
 
+#include "svg.hpp"
+
 static int last_mouse_x = -1, last_mouse_y;
 static int total_mouse_x, total_mouse_y;
 

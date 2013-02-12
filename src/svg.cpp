@@ -100,7 +100,11 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 	int diagram_h = scale*diagram->height;
 
 	bool opengl = (al_get_display_flags(al_get_current_display()) & ALLEGRO_OPENGL);
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+	bool multisample = false;
+#else
 	bool multisample = opengl;
+#endif
 	bool pp = (al_get_display_flags(al_get_current_display()) & ALLEGRO_USE_PROGRAMMABLE_PIPELINE);
 
 	ALLEGRO_BITMAP *out = al_create_bitmap(diagram_w, diagram_h);

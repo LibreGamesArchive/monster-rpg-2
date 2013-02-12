@@ -1973,26 +1973,26 @@ done:
 void doShop(std::string name, const char *imageName, int nItems,
 	int *indexes, int *costs)
 {
-	#define DRAW \
-		m_set_target_bitmap(buffer); \
-		m_clear(black); \
-		m_set_blender(M_ONE, M_INVERSE_ALPHA, white); \
-		mDrawFrame(3, 3, BW-6, 40-6); \
-		m_draw_bitmap(face, 5, 20-16, 0); \
-		char s[100]; \
-		sprintf(s, _t("%d gold"), gold); \
-		mTextout_simple(s, BW-5-m_text_length(game_font, _t(s)), \
-			20-m_text_height(game_font)-2, grey); \
-		int selected = shop->getSelected(); \
-		if (selected >= 0 && shop_inventory[selected].index >= 0) { \
-			sprintf(s, _t("Cost: %d"), costs[selected]); \
-		} \
-		else { \
-			strcpy(s, "-"); \
-		} \
-		mTextout_simple(s, BW-5-m_text_length(game_font, _t(s)), \
-			22, grey); \
-		tguiDraw();
+#define DRAW \
+	m_set_target_bitmap(buffer); \
+	m_clear(black); \
+	m_set_blender(M_ONE, M_INVERSE_ALPHA, white); \
+	mDrawFrame(3, 3, BW-6, 40-6); \
+	m_draw_bitmap(face, 5, 20-16, 0); \
+	char s[100]; \
+	sprintf(s, _t("%d gold"), gold); \
+	mTextout_simple(s, BW-5-m_text_length(game_font, _t(s)), \
+		20-m_text_height(game_font)-2, grey); \
+	int selected = shop->getSelected(); \
+	if (selected >= 0 && shop_inventory[selected].index >= 0) { \
+		sprintf(s, _t("Cost: %d"), costs[selected]); \
+	} \
+	else { \
+		strcpy(s, "-"); \
+	} \
+	mTextout_simple(s, BW-5-m_text_length(game_font, _t(s)), \
+		22, grey); \
+	tguiDraw();
 
 	dpad_off();
 
@@ -2015,13 +2015,11 @@ void doShop(std::string name, const char *imageName, int nItems,
 	}
 
 	// Main widgets
-	MItemSelector *shop = new MItemSelector(42, 42+60-4, 0, 0,
-		use_dpad ? false : true);
+	MItemSelector *shop = new MItemSelector(42, 42+60-4, 0, 0, true);
 	shop->setShop();
 	shop->setInventory(shop_inventory);
 	shop->setRaiseOnFocus(true);
-	MItemSelector *isel = new MItemSelector(103, 103+60-5, 0, 0,
-		use_dpad ? false : true);
+	MItemSelector *isel = new MItemSelector(103, 103+60-5, 0, 0, true);
 	if (have_mouse)
 		isel->setShop();
 	isel->setRaiseOnFocus(true);
@@ -2093,6 +2091,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 							int q = choice == 0 ? 1 : 5;
 							int total_cost = costs[sel]*q;
 							if (total_cost > gold) {
+								playPreloadedSample("error.ogg");
 								notify("You don't have", "enough gold to buy that!", "");
 							}
 							else {
@@ -2194,6 +2193,8 @@ done:
 	input->set(false, false, false, false, false, false, false);
 	
 	dpad_on();
+
+#undef DRAW
 }
 
 

@@ -212,6 +212,14 @@ void native_error(const char *msg, const char *msg2)
 			exit(1);
 		}
 	}
+
+	MBITMAP *tmp = custom_mouse_cursor;
+	ScreenDescriptor *sd = config.getWantedGraphicsMode();
+	if (sd->fullscreen) {
+		custom_mouse_cursor = NULL;
+		al_show_mouse_cursor(display);
+	}
+
 #if !defined(__linux__)
 	char buf[1000];
 	const char *crap = "Error";
@@ -221,6 +229,13 @@ void native_error(const char *msg, const char *msg2)
 #else
 	int button = al_show_native_message_box(display, crap, ss ? ss : ":(", buf, NULL, ALLEGRO_MESSAGEBOX_YES_NO);
 #endif
+	if (sd->fullscreen) {
+		al_hide_mouse_cursor(display);
+		custom_mouse_cursor = tmp;
+	}
+
+	custom_mouse_cursor = tmp;
+
 	if (button == 1) return;
 	else {
 		exit(1);

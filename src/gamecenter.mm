@@ -251,7 +251,16 @@ void showAchievements(void)
 	UIWindow *window = al_iphone_get_window(d);
 	UIView *view = al_iphone_get_view(d);
 	[window bringSubviewToFront:view];
+	clear_input_events();
 #else
+	ScreenDescriptor *sd = config.getWantedGraphicsMode();
+	bool was_fullscreen = sd->fullscreen;
+	if (sd->fullscreen) {
+		toggle_fullscreen();
+		drawBufferToScreen();
+		m_flip_display();
+	}
+
 	modalViewShowing = true;
 	MyGameCenterVC *vc = [[MyGameCenterVC alloc] init];
 	[vc performSelectorOnMainThread: @selector(showAchievements) withObject:nil waitUntilDone:FALSE];
@@ -259,6 +268,12 @@ void showAchievements(void)
 		al_rest(0.001);
 	}
 	[vc release];
+
+	if (was_fullscreen) {
+		toggle_fullscreen();
+	}
+
+	clear_input_events();
 #endif
 }
 

@@ -73,6 +73,7 @@ UIWindow *al_iphone_get_window(ALLEGRO_DISPLAY *display);
 		UIWindow *window = al_iphone_get_window(airplay_connected ? controller_display : display);
 		[window addSubview:self.view];
 		[self presentModalViewController:achievements animated:NO];
+		[window bringSubviewToFront:achievements.view];
 		modalViewShowing = true;
 	}
 	[achievements release];
