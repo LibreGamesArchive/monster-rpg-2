@@ -59,6 +59,7 @@ public:
 			return createMainHandler(player, "Attack");
 		for (int i = 0; i < 5 && buttons[i]; i++) {
 			if (mainWidget == buttons[i]) {
+				getInput()->waitForReleaseOr(4, 250);
 				ActionHandler *newHandler =
 					createMainHandler(player, std::string(actions[i]));
 				return newHandler;
@@ -734,6 +735,8 @@ public:
 			applyButton = new MTextButton(BW/3-20+6, 110+(50/2)-6+2,
 									 "Apply");
 		}
+
+		clear_input_events();
 
 		tguiSetParent(0);
 		tguiAddWidget(chooser);

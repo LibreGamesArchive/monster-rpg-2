@@ -3674,29 +3674,34 @@ int MSpellSelector::update(int millis)
 			}
 			// Arrange
 			else {
-				if (!clicked || was_dragged) {
-					if (was_dragged) {
-						was_dragged = false;
-						int tmp = pressed;
-						pressed = selected;
-						selected = tmp;
+				if (canArrange) {
+					if (!clicked || was_dragged) {
+						if (was_dragged) {
+							was_dragged = false;
+							int tmp = pressed;
+							pressed = selected;
+							selected = tmp;
+						}
+						CombatantInfo *info;
+						if (partySelector) {
+							Player *player = party[partySelector->getSelected()];
+							info = &player->getInfo();
+						}
+						else {
+							info = &playerInfo;
+						}
+						std::string tmp;
+						tmp = info->spells[pressed];
+						info->spells[pressed] = info->spells[selected];
+						info->spells[selected] = tmp;
+						pressed = -1;
 					}
-					CombatantInfo *info;
-					if (partySelector) {
-						Player *player = party[partySelector->getSelected()];
-						info = &player->getInfo();
+					else if (clicked) {
+						pressed = selected;
 					}
 					else {
-						info = &playerInfo;
+						pressed = -1;
 					}
-					std::string tmp;
-					tmp = info->spells[pressed];
-					info->spells[pressed] = info->spells[selected];
-					info->spells[selected] = tmp;
-					pressed = -1;
-				}
-				else if (clicked) {
-					pressed = selected;
 				}
 				else {
 					pressed = -1;
@@ -5232,11 +5237,11 @@ int MItemSelector::update(int millis)
 
 		playPreloadedSample("select.ogg");
 
-		if (!clicked) {
+		if (!clicked || (!canArrange && !isShop)) {
 			pressed = selected;
 		}
 
-		if (!canArrange && !clicked) {
+		if (!canArrange && (!clicked || !isShop)) {
 			clicked = true;
 			play_sound = false;
 		}
