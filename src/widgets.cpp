@@ -353,8 +353,6 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 	int th = m_text_height(game_font);
 	int tw = m_text_length(game_font, _t("OK"));
 
-	//tguiClearMouseEvents();
-
 	tguiPush();
 	FakeWidget *w1 = new FakeWidget(BW/2-tw/2, (y+h-15)-th, tw, 16);
 	MRectangle *fullscreenRect = new MRectangle(0, 0, BW, BH,
@@ -3225,6 +3223,11 @@ void MSpellSelector::mouseDownAbs(int xx, int yy, int b)
 		return;
 	}
 
+	if (b == 2) {
+		pressed = -1;
+		return;
+	}
+
 	if (down || maybe_scrolling) {
 		if (!scrolling && !dragging) {
 			down2X = xx+x;
@@ -3335,34 +3338,10 @@ void MSpellSelector::mouseUpAbs(int xx, int yy, int b)
 				n = top + (rows_down-1)*2 + col;
 			pressed = n;
 			clicked = true;
+			was_dragged = true;
 		}
 		else {
-			if (canArrange) {
-				// FIXME: should this be removed on iPhone too?
-				if (!have_mouse) {
-					playPreloadedSample("select.ogg");
-				}
-				if (!changed) {
-					pressed = selected;
-					clicked = true;
-				}
-			}
-			else {
-				int rows_down = (yy-3) / 15;
-				int col = xx / (BW/3);
-				if (col > 1) col = 1;
-				int n = top + (rows_down*2) + col;
-				if (n >= MAX_SPELLS_IN_THIS_GAME)
-					n = top + (rows_down-1)*2 + col;
-				if (n == selected) {
-					if (!have_mouse)
-						playPreloadedSample("select.ogg");
-					if (!changed) {
-						pressed = selected;
-						clicked = true;
-					}
-				}
-			}
+			clicked = true;
 		}
 	}
 
@@ -3419,7 +3398,7 @@ void MSpellSelector::draw()
 		else {
 			dx = BW/3+5;
 		}
-		if (pressed == i) {
+		if (this == tguiActiveWidget && pressed == i) {
 			color = m_map_rgb(255, 255, 0);
 		}
 		else {
@@ -3668,9 +3647,6 @@ int MSpellSelector::update(int millis)
 	}
 	else if (ie.button1 == DOWN || clicked) {
 		use_input_event();
-		if (!canArrange) {
-			pressed = selected;
-		}
 		if (pressed < 0) {
 			CombatantInfo info;
 			if (partySelector) {
@@ -3681,19 +3657,15 @@ int MSpellSelector::update(int millis)
 				info = playerInfo;
 			}
 			if (info.spells[selected] != "") {
-				if (use_dpad) {
-					pressed = selected;
-					playPreloadedSample("select.ogg");
-				}
+				pressed = selected;
+				playPreloadedSample("select.ogg");
 			}
 			else {
 				down = false;
 			}
 		}
 		else {
-			if (!clicked) {
-				playPreloadedSample("select.ogg");
-			}
+			playPreloadedSample("select.ogg");
 			// Use
 			if (pressed == selected) {
 				clicked = false;
@@ -3702,19 +3674,33 @@ int MSpellSelector::update(int millis)
 			}
 			// Arrange
 			else {
-				CombatantInfo *info;
-				if (partySelector) {
-					Player *player = party[partySelector->getSelected()];
-					info = &player->getInfo();
+				if (!clicked || was_dragged) {
+					if (was_dragged) {
+						was_dragged = false;
+						int tmp = pressed;
+						pressed = selected;
+						selected = tmp;
+					}
+					CombatantInfo *info;
+					if (partySelector) {
+						Player *player = party[partySelector->getSelected()];
+						info = &player->getInfo();
+					}
+					else {
+						info = &playerInfo;
+					}
+					std::string tmp;
+					tmp = info->spells[pressed];
+					info->spells[pressed] = info->spells[selected];
+					info->spells[selected] = tmp;
+					pressed = -1;
+				}
+				else if (clicked) {
+					pressed = selected;
 				}
 				else {
-					info = &playerInfo;
+					pressed = -1;
 				}
-				std::string tmp;
-				tmp = info->spells[pressed];
-				info->spells[pressed] = info->spells[selected];
-				info->spells[selected] = tmp;
-				pressed = -1;
 			}
 		}
 		clicked = false;
@@ -3723,18 +3709,12 @@ int MSpellSelector::update(int millis)
 		use_input_event();
 		iphone_clear_shaken();
 		playPreloadedSample("select.ogg");
-		if (use_dpad) {
-			if (pressed < 0) {
-				selected = -1;
-				return TGUI_RETURN;
-			}
-			else {
-				pressed = -1;
-			}
-		}
-		else {
+		if (pressed < 0) {
 			selected = -1;
 			return TGUI_RETURN;
+		}
+		else {
+			pressed = -1;
 		}
 	}
 
@@ -3801,6 +3781,7 @@ MSpellSelector::MSpellSelector(int y1, int y2, int top, int selected,
 	}
 	dragBmp = NULL;
 	maybe_scrolling = false;
+	was_dragged = false;
 }
 
 
@@ -4748,6 +4729,11 @@ void MItemSelector::mouseDownAbs(int xx, int yy, int b)
 	if (dragging)
 		return;
 
+	if (b == 2) {
+		pressed = -1;
+		return;
+	}
+
 	if (down || maybe_scrolling) {
 		if (!scrolling && !dragging) {
 			down2X = xx+x;
@@ -4862,8 +4848,10 @@ void MItemSelector::mouseUpAbs(int xx, int yy, int b)
 					pressed = -1;
 					down = false;
 				}
-				else
+				else {
+					was_dragged = true;
 					clicked = true;
+				}
 			}
 			else {
 				pressed = -1;
@@ -4871,32 +4859,10 @@ void MItemSelector::mouseUpAbs(int xx, int yy, int b)
 			}
 		}
 		else {
-			if (canArrange) {
-				pressed = -1;
-				down = false;
-			}
-			else {
-				int rows_down = (yy-3) / 15;
-				int col = xx / (BW/2);
-				int n = top + (rows_down*2) + col;
-				if (n >= MAX_INVENTORY)
-					n = top + (rows_down-1)*2 + col;
-				if (n == selected) {
-					pressed = selected;
-					clicked = true;
-				}
-			}
+			clicked = true;
 		}
 		drop_x = upx;
 		drop_y = upy;
-	}
-	else {
-		if (canArrange || (have_mouse && isShop)) {
-			pressed = selected;
-			clicked = true;
-			drop_x = upx;
-			drop_y = upy;
-		}
 	}
 
 done:
@@ -5241,7 +5207,7 @@ int MItemSelector::update(int millis)
 
 	bool play_sound = true;
 
-	if (_id.button1 && pressed < 0) {
+	if ((_id.button1 || clicked) && pressed < 0) {
 		double start = al_get_time();
 		while (_id.button1) {
 			pump_events();
@@ -5271,8 +5237,10 @@ int MItemSelector::update(int millis)
 		pressed = selected;
 		
 		if (!canArrange) {
-			clicked = true;
 			play_sound = false;
+		}
+		else {
+			clicked = false;
 		}
 	}
 	
@@ -5301,37 +5269,46 @@ int MItemSelector::update(int millis)
 		}
 		// Arrange
 		else {
-			if (clicked) {
-				int tmp = pressed;
+			if (!clicked || was_dragged) {
+				was_dragged = false;
+				if (clicked) {
+					int tmp = pressed;
+					pressed = selected;
+					selected = tmp;
+				}
+				// Group
+				if (inventory[selected].index == inventory[pressed].index) {
+					int q = 99-inventory[selected].quantity;
+					if (q > inventory[pressed].quantity) {
+						q = inventory[pressed].quantity;
+					}
+					inventory[selected].quantity += q;
+					inventory[pressed].quantity -= q;
+					if (inventory[pressed].quantity <= 0) {
+						inventory[pressed].index = -1;
+						inventory[pressed].quantity = 0;
+					}
+				}
+				// Swap
+				else {
+					Inventory tmp;
+					tmp.index = inventory[pressed].index;
+					tmp.quantity = inventory[pressed].quantity;
+					inventory[pressed].index = inventory[selected].index;
+					inventory[pressed].quantity = inventory[selected].quantity;
+					inventory[selected].index = tmp.index;
+					inventory[selected].quantity = tmp.quantity;
+					//selected = pressed;
+				}
+				pressed = -1;
+			}
+			else if (clicked) {
 				pressed = selected;
-				selected = tmp;
+			}
+			else {
+				pressed = -1;
 			}
 			clicked = false;
-			// Group
-			if (inventory[selected].index == inventory[pressed].index) {
-				int q = 99-inventory[selected].quantity;
-				if (q > inventory[pressed].quantity) {
-					q = inventory[pressed].quantity;
-				}
-				inventory[selected].quantity += q;
-				inventory[pressed].quantity -= q;
-				if (inventory[pressed].quantity <= 0) {
-					inventory[pressed].index = -1;
-					inventory[pressed].quantity = 0;
-				}
-			}
-			// Swap
-			else {
-				Inventory tmp;
-				tmp.index = inventory[pressed].index;
-				tmp.quantity = inventory[pressed].quantity;
-				inventory[pressed].index = inventory[selected].index;
-				inventory[pressed].quantity = inventory[selected].quantity;
-				inventory[selected].index = tmp.index;
-				inventory[selected].quantity = tmp.quantity;
-				//selected = pressed;
-			}
-			pressed = -1;
 		}
 	}
 	
@@ -5419,6 +5396,7 @@ MItemSelector::MItemSelector(int y1, int y2, int top, int selected,
 	maybe_scrolling = false;
 	drop_x = -1;
 	drop_y = -1;
+	was_dragged = false;
 }
 
 
@@ -5869,14 +5847,12 @@ void MMultiChooser::draw()
 				alpha = 0;
 			}
 		}
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-		if (current.size() == points.size() && points[current[0]].west == p->west) {
+		if (current.size() > 1 && points[current[0]].west == p->west && alpha == 255) {
 			if (((unsigned)tguiCurrentTimeMillis() % 100) < 50) {
 				m_draw_bitmap(arrow, draw_x, draw_y, flags);
 			}
 		}
 		else
-#endif
 		{
 			m_draw_bitmap(arrow, draw_x, draw_y, flags);
 		}
@@ -6034,6 +6010,39 @@ int MMultiChooser::update(int millis)
 		}
 
 		possibilities.clear();
+	}
+
+	if (!use_dpad) {
+		if (current.size() > 0) {
+			IPHONE_LINE_DIR dir;
+			IPHONE_LINE_DIR opposite;
+			if (points[current[0]].west) {
+				dir = IPHONE_LINE_DIR_WEST;
+				opposite = IPHONE_LINE_DIR_EAST;
+			}
+			else {
+				dir = IPHONE_LINE_DIR_EAST;
+				opposite = IPHONE_LINE_DIR_WEST;
+			}
+			if (iphone_line(dir, 0.1)) {
+				iphone_clear_line(dir);
+				playPreloadedSample("select.ogg");
+				return TGUI_RETURN;
+			}
+			else if (iphone_line(opposite, 0.1)) {
+				iphone_clear_line(opposite);
+				for (int i = 0; i < (int)current.size(); i++) {
+					current[i] = -current[i] - 1;
+				}
+				return TGUI_RETURN;
+			}
+			else if (this == tguiActiveWidget && iphone_shaken(0.1)) {
+				iphone_clear_shaken();
+				playPreloadedSample("blip.ogg");
+				current.clear();
+				return TGUI_RETURN;
+ 			}
+		}
 	}
 	
 	return TGUI_CONTINUE;

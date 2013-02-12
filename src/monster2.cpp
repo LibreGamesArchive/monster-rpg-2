@@ -1028,7 +1028,7 @@ top:
 				}
 				al_unlock_mutex(dpad_mutex);
 			}
-			else if (event.type == MOVE) {
+			else if (event.type == MOVE && !released) {
 				al_lock_mutex(click_mutex);
 				current_mouse_x = this_x;
 				current_mouse_y = this_y;
@@ -1754,13 +1754,6 @@ static void run()
 			// Draw the GUI
 			if (!manChooser || battle)
 				tguiDraw();
-			if (fps_on) {
-				char msg[100];
-				sprintf(msg, "%d", fps);
-				mTextout(game_font, msg, 1, 3,
-					white, black,
-					WGT_TEXT_BORDER, false);
-			}
 
 			drawBufferToScreen();
 			m_flip_display();

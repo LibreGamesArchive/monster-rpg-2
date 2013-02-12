@@ -1200,6 +1200,7 @@ protected:
 	bool raiseOnFocus;
 	bool maybe_scrolling;
 	bool was_down;
+	bool was_dragged;
 };
 
 
@@ -1252,6 +1253,7 @@ protected:
 	int down2Y;
 	bool changed;
 	bool maybe_scrolling;
+	bool was_dragged;
 };
 
 
