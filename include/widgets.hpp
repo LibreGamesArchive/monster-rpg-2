@@ -1199,7 +1199,6 @@ protected:
 	Inventory *inventory;
 	bool raiseOnFocus;
 	bool maybe_scrolling;
-	bool was_down;
 	bool was_dragged;
 };
 

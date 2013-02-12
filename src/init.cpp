@@ -1648,7 +1648,7 @@ bool init(int *argc, char **argv[])
 #if defined A5_D3D || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	use_fixed_pipeline = true;
 #endif
-
+	
 	if (!use_fixed_pipeline) {
 		al_set_new_display_flags(
 			al_get_new_display_flags() |

@@ -33,8 +33,7 @@ enum PauseSection {
 	ITEM,
 	MAGIC,
 	STATS,
-	CHOOSER,
-	EXAMINE
+	CHOOSER
 };
 
 
@@ -1048,7 +1047,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 		yy += yinc;
 	MTextButton *mainStats = new MTextButton(162, yy, "Stats", false, left_widget);
 	yy += yinc;
-	MTextButton *mainExamine = new MTextButton(162, yy, "View", false, left_widget);
 	TGUIWidget *mainSave;
 	if (can_save)
 		mainSave = new MTextButton(162, yy, "Save", false, left_widget);
@@ -1138,9 +1136,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	if (use_dpad)
 		tguiAddWidget(mainForm);
 	tguiAddWidget(mainStats);
-	#if 0
-	tguiAddWidget(mainExamine);
-	#endif
 	tguiAddWidget(mainSave);
 #ifdef ALLEGRO_IPHONE
 #ifdef DEBUG
@@ -1246,22 +1241,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 						onscreen_drag_to_use = true;
 				}
 			}
-			if (widget == mainExamine) {
-				tguiPush();
-				tguiSetParent(0);
-				tguiAddWidget(fullscreenRect2);
-				tguiSetParent(fullscreenRect2);
-				partySelectorTop->setSelected(0);
-				tguiAddWidget(partySelectorTop);
-				itemSelector->setSelected(0);
-				itemSelector->setTop(0);
-				tguiAddWidget(itemSelector);
-				m_set_target_bitmap(buffer);
-				tguiDraw();
-				maybeShowItemHelp();
-				tguiSetFocus(partySelectorTop);
-				section = EXAMINE;
-			}
 			else if (widget == itemSelector) {
 				onscreen_drag_to_use = false;
 				int sel = itemSelector->getSelected();
@@ -1275,27 +1254,27 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 					stopAllOmni();
 				}
 				else {
-					if (section == ITEM) {
-						if (!use_dpad) {
-							gameInfo.milestones[MS_DRAG_TO_USE] = true;
+					int drop_x, drop_y;
+					itemSelector->getDropLocation(&drop_x, &drop_y);
+					if ((drop_x < 0 && drop_y < 0) || (drop_x >= 0 && drop_y < itemSelector->getY())) {
+						if (section == ITEM) {
+							if (!use_dpad) {
+								gameInfo.milestones[MS_DRAG_TO_USE] = true;
+							}
+							int index = partySelectorTop->getSelected();
+							if (index >= MAX_PARTY) {
+								use(NULL, sel, true);
+							}
+							else if (party[index]) {
+								Combatant *c = party[index]->makeCombatant(index);
+								use(c, sel, true);
+								memcpy(&party[index]->getInfo(), &c->getInfo(), sizeof(CombatantInfo));
+								delete c;
+							}
+							else
+								playPreloadedSample("error.ogg");
 						}
-						int index = partySelectorTop->getSelected();
-						if (index >= MAX_PARTY) {
-							use(NULL, sel, true);
-						}
-						else if (party[index]) {
-							Combatant *c = party[index]->makeCombatant(index);
-							use(c, sel, true);
-							memcpy(&party[index]->getInfo(), &c->getInfo(), sizeof(CombatantInfo));
-							delete c;
-						}
-						else
-							playPreloadedSample("error.ogg");
-					}
-					else if (section == EXAMINE) {
-						int index = inventory[sel].index;
-						playPreloadedSample("select.ogg");
-						showItemInfo(index, true);
+						itemSelector->reset();
 					}
 				}
 			}
@@ -1364,10 +1343,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 									notify("You have no", "room in your", "inventory.");
 								}
 							}
-							else if (section == EXAMINE) {
-								playPreloadedSample("select.ogg");
-								showItemInfo(*toUnequip, true);
-							}
 							handled = true;
 						}
 					}
@@ -1431,10 +1406,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 								else {
 									notify("You have no", "room in your", "inventory.");
 								}
-							}
-							else if (section == EXAMINE) {
-								playPreloadedSample("select.ogg");
-								showItemInfo(*toUnequip, true);
 							}
 						}
 					}
@@ -1793,7 +1764,6 @@ done:
 	delete mainMagic;
 	delete mainForm;
 	delete mainStats;
-	delete mainExamine;
 	delete mainSave;
 	delete mainResume;
 	delete mainQuit;
@@ -1996,11 +1966,11 @@ void doShop(std::string name, const char *imageName, int nItems,
 	}
 
 	// Main widgets
-	MItemSelector *shop = new MItemSelector(42, 42+60-4, 0, 0, true);
+	MItemSelector *shop = new MItemSelector(42, 42+60-4, 0, 0, false);
 	shop->setShop();
 	shop->setInventory(shop_inventory);
 	shop->setRaiseOnFocus(true);
-	MItemSelector *isel = new MItemSelector(103, 103+60-5, 0, 0, true);
+	MItemSelector *isel = new MItemSelector(103, 103+60-5, 0, 0, false);
 	if (have_mouse)
 		isel->setShop();
 	isel->setRaiseOnFocus(true);

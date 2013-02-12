@@ -91,6 +91,12 @@
 		964D7FC615CC7DAB00D6F9AF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7D13636EDE0068EB38 /* UIKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		9659CDA1143A426C0007757E /* joypad.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA0143A426C0007757E /* joypad.mm */; };
 		9659CDA4143A42C50007757E /* joypad_handler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA3143A42C50007757E /* joypad_handler.m */; };
+		96729A7B16CADBDD00C094D5 /* libdom.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96729A7516CADBDD00C094D5 /* libdom.a */; };
+		96729A7C16CADBDD00C094D5 /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96729A7616CADBDD00C094D5 /* libexpat.a */; };
+		96729A7D16CADBDD00C094D5 /* libhubbub.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96729A7716CADBDD00C094D5 /* libhubbub.a */; };
+		96729A7E16CADBDD00C094D5 /* libparserutils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96729A7816CADBDD00C094D5 /* libparserutils.a */; };
+		96729A7F16CADBDD00C094D5 /* libsvgtiny.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96729A7916CADBDD00C094D5 /* libsvgtiny.a */; };
+		96729A8016CADBDD00C094D5 /* libwapcaplet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96729A7A16CADBDD00C094D5 /* libwapcaplet.a */; };
 		9677118016C21DF10092EE0A /* liballegro_physfs-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9677117E16C21DF10092EE0A /* liballegro_physfs-static.a */; };
 		9677118116C21DF10092EE0A /* libphysfs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9677117F16C21DF10092EE0A /* libphysfs.a */; };
 		967976AC13BE8690006BCE29 /* init.mm in Sources */ = {isa = PBXBuildFile; fileRef = 967976AB13BE8690006BCE29 /* init.mm */; };
@@ -319,6 +325,12 @@
 		965E24941585321C00839861 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		965E24981585334500839861 /* liballegro_native_dialog-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_native_dialog-static.a"; path = "../../../iphone_libs_r/liballegro_native_dialog-static.a"; sourceTree = "<group>"; };
 		966C6FB015CA5ACF00AA804D /* Monster RPG 2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Monster RPG 2.entitlements"; sourceTree = SOURCE_ROOT; };
+		96729A7516CADBDD00C094D5 /* libdom.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdom.a; path = ../../../iphone_libs_r/libdom.a; sourceTree = "<group>"; };
+		96729A7616CADBDD00C094D5 /* libexpat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libexpat.a; path = ../../../iphone_libs_r/libexpat.a; sourceTree = "<group>"; };
+		96729A7716CADBDD00C094D5 /* libhubbub.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libhubbub.a; path = ../../../iphone_libs_r/libhubbub.a; sourceTree = "<group>"; };
+		96729A7816CADBDD00C094D5 /* libparserutils.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libparserutils.a; path = ../../../iphone_libs_r/libparserutils.a; sourceTree = "<group>"; };
+		96729A7916CADBDD00C094D5 /* libsvgtiny.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsvgtiny.a; path = ../../../iphone_libs_r/libsvgtiny.a; sourceTree = "<group>"; };
+		96729A7A16CADBDD00C094D5 /* libwapcaplet.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwapcaplet.a; path = ../../../iphone_libs_r/libwapcaplet.a; sourceTree = "<group>"; };
 		9677117E16C21DF10092EE0A /* liballegro_physfs-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_physfs-static.a"; path = "../../../local/lib/liballegro_physfs-static.a"; sourceTree = "<group>"; };
 		9677117F16C21DF10092EE0A /* libphysfs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libphysfs.a; path = ../../../local/lib/libphysfs.a; sourceTree = "<group>"; };
 		967976AB13BE8690006BCE29 /* init.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = init.mm; path = ../../src/init.mm; sourceTree = "<group>"; };
@@ -418,6 +430,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96729A7B16CADBDD00C094D5 /* libdom.a in Frameworks */,
+				96729A7C16CADBDD00C094D5 /* libexpat.a in Frameworks */,
+				96729A7D16CADBDD00C094D5 /* libhubbub.a in Frameworks */,
+				96729A7E16CADBDD00C094D5 /* libparserutils.a in Frameworks */,
+				96729A7F16CADBDD00C094D5 /* libsvgtiny.a in Frameworks */,
+				96729A8016CADBDD00C094D5 /* libwapcaplet.a in Frameworks */,
 				9610AF9716C4C5540050372E /* Security.framework in Frameworks */,
 				9610AF9516C4C26A0050372E /* libJoypad.a in Frameworks */,
 				9610AF8A16C4BEAD0050372E /* liblua5.2.a in Frameworks */,
@@ -507,6 +525,12 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				96729A7516CADBDD00C094D5 /* libdom.a */,
+				96729A7616CADBDD00C094D5 /* libexpat.a */,
+				96729A7716CADBDD00C094D5 /* libhubbub.a */,
+				96729A7816CADBDD00C094D5 /* libparserutils.a */,
+				96729A7916CADBDD00C094D5 /* libsvgtiny.a */,
+				96729A7A16CADBDD00C094D5 /* libwapcaplet.a */,
 				9636677116C9FF9100A24B46 /* liballegro_color-static.a */,
 				9636676C16C9FC2B00A24B46 /* libexpat.a */,
 				9636676216C9FC0800A24B46 /* libdom.a */,
@@ -1049,6 +1073,8 @@
 				HEADER_SEARCH_PATHS = (
 					/Users/trent/code/iphone_libs_r,
 					"/Users/trent/code/monster-rpg-2/include",
+					"/Users/trent/code/JoypadSDK-0.3.5/Joypad-0.3.5/include",
+					/opt/netsurf/include,
 				);
 				INFOPLIST_FILE = "Monster_2-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
@@ -1121,6 +1147,8 @@
 				HEADER_SEARCH_PATHS = (
 					/Users/trent/code/iphone_libs_r,
 					"/Users/trent/code/monster-rpg-2/include",
+					"/Users/trent/code/JoypadSDK-0.3.5/Joypad-0.3.5/include",
+					/opt/netsurf/include,
 				);
 				INFOPLIST_FILE = "Monster_2-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
@@ -1194,6 +1222,8 @@
 				HEADER_SEARCH_PATHS = (
 					/Users/trent/code/iphone_libs_r,
 					"/Users/trent/code/monster-rpg-2/include",
+					"/Users/trent/code/JoypadSDK-0.3.5/Joypad-0.3.5/include",
+					/opt/netsurf/include,
 				);
 				INFOPLIST_FILE = "Monster_2-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
@@ -1257,6 +1287,8 @@
 				HEADER_SEARCH_PATHS = (
 					/Users/trent/code/iphone_libs_r,
 					"/Users/trent/code/monster-rpg-2/include",
+					"/Users/trent/code/JoypadSDK-0.3.5/Joypad-0.3.5/include",
+					/opt/netsurf/include,
 				);
 				INFOPLIST_FILE = "Monster_2-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;

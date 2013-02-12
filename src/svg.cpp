@@ -119,6 +119,7 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
 
 	if (multisample) {
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		al_copy_transform(&old_proj_transform, al_get_projection_transform(al_get_current_display()));
 		al_copy_transform(&old_view_transform, al_get_current_transform());
 
@@ -150,6 +151,7 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 		glViewport(0, 0, diagram_w, diagram_h);
 
 		al_clear_to_color(al_map_rgba_f(0, 0, 0, 0));
+#endif
 	}
 	else {
 		al_set_target_backbuffer(al_get_current_display());
@@ -329,6 +331,7 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 	al_set_target_bitmap(out);
 	
 	if (multisample) {
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fb);
 		glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, al_get_opengl_fbo(out));
 
@@ -340,14 +343,27 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 		glDeleteFramebuffersEXT(1, &fb);
 		glDeleteRenderbuffersEXT(1, &ColorBufferID);
 		glDeleteRenderbuffersEXT(1, &DepthBufferID);
+#endif
 	}
 	else {
+#if defined ALLEGRO_IPHONE_NEVER || defined ALLEGRO_ANDROID_NEVER
+		ALLEGRO_LOCKED_REGION *src = al_lock_bitmap(al_get_backbuffer(al_get_current_display()), ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE, ALLEGRO_LOCK_READONLY);
+		ALLEGRO_LOCKED_REGION *dst = al_lock_bitmap(out, ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE, ALLEGRO_LOCK_WRITEONLY);
+		for (int y = 0; y < al_get_bitmap_height(out); y++) {
+			uint8_t *p1 = (uint8_t *)src->data + y * src->pitch;
+			uint8_t *p2 = (uint8_t *)dst->data + y * src->pitch;
+			memcpy(p2, p1, 4*al_get_bitmap_width(out));
+		}
+		al_unlock_bitmap(al_get_backbuffer(al_get_current_display()));
+		al_unlock_bitmap(out);
+#else
 		al_draw_bitmap_region(
 			al_get_backbuffer(al_get_current_display()),
 			0, 0, diagram_w, diagram_h,
 			0, 0,
 			0
 		);
+#endif
 	}
 
 	svgtiny_free(diagram);

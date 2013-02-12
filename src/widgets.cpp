@@ -4663,12 +4663,6 @@ bool MItemSelector::itemsBelow(void)
 
 void MItemSelector::setFocus(bool f)
 {
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	was_down = getInput()->getDescriptor().button1;
-#else
-	was_down = false;
-#endif
-
 	if (!f) {
 		if (dragging) {
 			dragging = false;
@@ -4861,8 +4855,11 @@ void MItemSelector::mouseUpAbs(int xx, int yy, int b)
 		else {
 			clicked = true;
 		}
+	}
+	else {
 		drop_x = upx;
 		drop_y = upy;
+		clicked = true;
 	}
 
 done:
@@ -4983,10 +4980,11 @@ void MItemSelector::reset(void)
 
 int MItemSelector::update(int millis)
 {
-	if (was_down && getInput()->getDescriptor().button1)
-		return TGUI_CONTINUE;
-	else
-		was_down = false;
+	if (clicked && (drop_x >= 0 || drop_y >= 0)) {
+		playPreloadedSample("select.ogg");
+		clicked = false;
+		return TGUI_RETURN;
+	}
 
 	if (scrolling) {
 		int d = scroll_offs / 12;
@@ -5234,9 +5232,12 @@ int MItemSelector::update(int millis)
 
 		playPreloadedSample("select.ogg");
 
-		pressed = selected;
-		
-		if (!canArrange) {
+		if (!clicked) {
+			pressed = selected;
+		}
+
+		if (!canArrange && !clicked) {
+			clicked = true;
 			play_sound = false;
 		}
 		else {
@@ -5245,7 +5246,6 @@ int MItemSelector::update(int millis)
 	}
 	
 	if ((_id.button1 || clicked) && pressed >= 0) {
-
 		if (play_sound) {
 			playPreloadedSample("select.ogg");
 		}
