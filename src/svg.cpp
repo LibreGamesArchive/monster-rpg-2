@@ -4,6 +4,8 @@
  * Copyright 2008 James Bursa <james@semichrome.net>
  */
 
+// Allegro conversion by Trent Gamblin <trent@nooskewl.com>
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -97,50 +99,66 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 	int diagram_w = scale*diagram->width;
 	int diagram_h = scale*diagram->height;
 
-	GLuint fb;
-	glGenFramebuffersEXT(1, &fb);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
-	GLuint ColorBufferID;
-	glGenRenderbuffersEXT(1, &ColorBufferID);
-	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, ColorBufferID);
-	glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, 4, GL_RGBA8, diagram_w, diagram_h);
-	GLuint DepthBufferID;
-	glGenRenderbuffersEXT(1, &DepthBufferID);
-	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, DepthBufferID);
-	glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, 4, GL_DEPTH24_STENCIL8_EXT, diagram_w, diagram_h);
-	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT, ColorBufferID);
-	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, DepthBufferID);
-	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, DepthBufferID);
-	GLint status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+	bool opengl = (al_get_display_flags(al_get_current_display()) & ALLEGRO_OPENGL);
+	bool multisample = opengl;
+	bool pp = (al_get_display_flags(al_get_current_display()) & ALLEGRO_USE_PROGRAMMABLE_PIPELINE);
+
+	ALLEGRO_BITMAP *out = al_create_bitmap(diagram_w, diagram_h);
 
 	GLint old_vp[4];
+	GLuint fb;
+	GLuint ColorBufferID;
+	GLuint DepthBufferID;
+	ALLEGRO_TRANSFORM old_proj_transform;
+	ALLEGRO_TRANSFORM old_view_transform;
+		
+	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
 
-	glGetIntegerv(GL_VIEWPORT, old_vp);
+	if (multisample) {
+		al_copy_transform(&old_proj_transform, al_get_projection_transform(al_get_current_display()));
+		al_copy_transform(&old_view_transform, al_get_current_transform());
 
-	glViewport(0, 0, diagram_w, diagram_h);
+		ALLEGRO_TRANSFORM t;
 
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, diagram_w, diagram_h, 0, -1, 1);
+		al_identity_transform(&t);
+		al_orthographic_transform(&t, 0, 0, -1, diagram_w, diagram_h, 1);
+		al_set_projection_transform(al_get_current_display(), &t);
 
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
+		al_identity_transform(&t);
+		al_scale_transform(&t, scale, scale);
+		al_use_transform(&t);
 
-	glClearColor(0, 0, 0, 0);
-	glClear(GL_COLOR_BUFFER_BIT);
+		glGenFramebuffersEXT(1, &fb);
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
+		glGenRenderbuffersEXT(1, &ColorBufferID);
+		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, ColorBufferID);
+		glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, 4, GL_RGBA8, diagram_w, diagram_h);
+		glGenRenderbuffersEXT(1, &DepthBufferID);
+		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, DepthBufferID);
+		glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, 4, GL_DEPTH24_STENCIL8_EXT, diagram_w, diagram_h);
+		glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT, ColorBufferID);
+		glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, DepthBufferID);
+		glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, DepthBufferID);
+		GLint status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 
-/*
-	ALLEGRO_TRANSFORM t, backup1, backup2;
-	al_copy_transform(&backup1, al_get_projection_transform(al_get_current_display()));
-	al_copy_transform(&backup2, al_get_current_transform());
-	al_identity_transform(&t);
-	al_orthographic_transform(&t, 0, 0, 1, diagram_w, diagram_h, 1000);
-	al_set_projection_transform(al_get_current_display(), &t);
-	al_identity_transform(&t);
-	al_use_transform(&t);
-*/
+		glGetIntegerv(GL_VIEWPORT, old_vp);
+
+		glViewport(0, 0, diagram_w, diagram_h);
+
+		al_clear_to_color(al_map_rgba_f(0, 0, 0, 0));
+	}
+	else {
+		al_set_target_backbuffer(al_get_current_display());
+
+		al_copy_transform(&old_proj_transform, al_get_projection_transform(al_get_current_display()));
+		al_copy_transform(&old_view_transform, al_get_current_transform());
+
+		al_clear_to_color(al_map_rgba_f(0, 0, 0, 0));
+		ALLEGRO_TRANSFORM t;
+		al_identity_transform(&t);
+		al_scale_transform(&t, scale, scale);
+		al_use_transform(&t);
+	}
 
 	for (unsigned int i = 0; i != diagram->shape_count; i++) {
 		std::vector< std::vector<float> > points;
@@ -166,28 +184,32 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 			stroke = al_color_html(buf);
 			stroke.a = stroke_opacity;
 		}
-		float stroke_width = scale * diagram->shape[i].stroke_width;
+		float stroke_width = diagram->shape[i].stroke_width;
 		float last_x = 0, last_y = 0;
 		bool last_was_move = false;
+		bool last_was_close = false;
 		if (diagram->shape[i].path) {
 			for (unsigned int j = 0;
 					j != diagram->shape[i].path_length; ) {
 				switch ((int) diagram->shape[i].path[j]) {
+				last_was_close = false;
 				case svgtiny_PATH_LINE:
 					if (last_was_move) {
 						points[subshape].push_back(last_x);
 						points[subshape].push_back(last_y);
 					}
-					last_x = scale*diagram->shape[i].path[j+1];
-					last_y = scale*diagram->shape[i].path[j+2];
+					last_x = diagram->shape[i].path[j+1];
+					last_y = diagram->shape[i].path[j+2];
 					points[subshape].push_back(last_x);
 					points[subshape].push_back(last_y);
 					last_was_move = false;
 					j += 3;
 					break;
 				case svgtiny_PATH_MOVE:
-					last_x = scale*diagram->shape[i].path[j+1];
-					last_y = scale*diagram->shape[i].path[j+2];
+					last_x = diagram->shape[i].path[j+1];
+					last_y = diagram->shape[i].path[j+2];
+					points.push_back(std::vector<float>());
+					subshape++;
 					last_was_move = true;
 					j += 3;
 					break;
@@ -199,33 +221,35 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 					points.push_back(std::vector<float>());
 					subshape++;
 					last_was_move = false;
+					last_was_close = true;
 					j += 1;
 					break;
 				case svgtiny_PATH_BEZIER: {
 					float spline[8];
 					spline[0] = last_x;
 					spline[1] = last_y;
-					spline[2] = scale * diagram->shape[i].path[j + 1];
-					spline[3] = scale * diagram->shape[i].path[j + 2];
-					spline[4] = scale * diagram->shape[i].path[j + 3];
-					spline[5] = scale * diagram->shape[i].path[j + 4];
-					spline[6] = scale * diagram->shape[i].path[j + 5];
-					spline[7] = scale * diagram->shape[i].path[j + 6];
+					spline[2] = diagram->shape[i].path[j + 1];
+					spline[3] = diagram->shape[i].path[j + 2];
+					spline[4] = diagram->shape[i].path[j + 3];
+					spline[5] = diagram->shape[i].path[j + 4];
+					spline[6] = diagram->shape[i].path[j + 5];
+					spline[7] = diagram->shape[i].path[j + 6];
 					float dx, dy, dist;
 					dx = spline[6] - spline[0];
 					dy = spline[7] - spline[1];
 					dist = sqrt(dx*dx + dy*dy);
 					int npts = sqrt(dist*2) * 1.3; // trial and error yields this number
-					if (npts < 1) npts = 1;
-					float *out = (float *)malloc(npts*2*sizeof(float));
-					al_calculate_spline(out, 2*sizeof(float), spline, 0, npts);
-					for (int k = last_was_move ? 0 : 1; k < npts; k++) {
-						points[subshape].push_back(out[k*2]);
-						points[subshape].push_back(out[k*2+1]);
+					if (npts > 0) {
+						float *out = (float *)malloc(npts*2*sizeof(float));
+						al_calculate_spline(out, 2*sizeof(float), spline, 0, npts);
+						for (int k = last_was_move ? 0 : 1; k < npts; k++) {
+							points[subshape].push_back(out[k*2]);
+							points[subshape].push_back(out[k*2+1]);
+						}
+						last_x = out[(npts-1)*2];
+						last_y = out[(npts-1)*2+1];
+						free(out);
 					}
-					last_x = out[(npts-1)*2];
-					last_y = out[(npts-1)*2+1];
-					free(out);
 					last_was_move = false;
 					j += 7;
 					break;
@@ -236,88 +260,110 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 			}
 		}
 
-    		glClearStencil(0.0);
-		glClear(GL_STENCIL_BUFFER_BIT);
-    		glEnable(GL_STENCIL_TEST);
+		if (!last_was_close) {
+			points[subshape].push_back(last_x);
+			points[subshape].push_back(last_y);
+		}
 
-		glStencilOp(GL_INVERT, GL_INVERT, GL_INVERT);
-		glStencilFunc(GL_ALWAYS, 1, 1);
-		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+		if (opengl) {
+			glClearStencil(0.0);
+			glClear(GL_STENCIL_BUFFER_BIT);
+			glEnable(GL_STENCIL_TEST);
+
+			glStencilOp(GL_INVERT, GL_INVERT, GL_INVERT);
+			glStencilFunc(GL_ALWAYS, 1, 1);
+			glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+		}
 
 		float x1 = -1;
 		float y1 = -1;
 
-		glColor3f(1, 1, 1);
-
-		glBegin(GL_TRIANGLES);
 		for (size_t j = 0; j < points.size(); j++) {
+			if (points[j].size() == 0) {
+				continue;
+			}
+			ALLEGRO_VERTEX *v = new ALLEGRO_VERTEX[(points[j].size()/2-1)*3];
 			for (int k = 0; k < (int)points[j].size()/2-1; k++) {
 				float x2 = points[j][k*2];
 				float y2 = points[j][k*2+1];
 				float x3 = points[j][(k+1)*2];
 				float y3 = points[j][(k+1)*2+1];
-				glVertex2f(x1, y1);
-				glVertex2f(x2, y2);
-				glVertex2f(x3, y3);
+				v[k*3+0].x = x1;
+				v[k*3+0].y = y1;
+				v[k*3+0].z = 0;
+				v[k*3+0].color = al_map_rgb_f(1, 1, 1);
+				v[k*3+1].x = x2;
+				v[k*3+1].y = y2;
+				v[k*3+1].z = 0;
+				v[k*3+1].color = al_map_rgb_f(1, 1, 1);
+				v[k*3+2].x = x3;
+				v[k*3+2].y = y3;
+				v[k*3+2].z = 0;
+				v[k*3+2].color = al_map_rgb_f(1, 1, 1);
 			}
+			al_draw_prim(v, 0, 0, 0, (points[j].size()/2-1)*3, ALLEGRO_PRIM_TRIANGLE_LIST);
+			delete[] v;
 		}
-		glEnd();
 
-		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-		glStencilFunc(GL_EQUAL, 1, 1);
-		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+		if (opengl) {
+			glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+			glStencilFunc(GL_EQUAL, 1, 1);
+			glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+		}
 
-		glColor4f(fill.r, fill.g, fill.b, fill.a);
-		glBegin(GL_TRIANGLE_FAN);
-			glVertex2f(0, diagram_h);
-			glVertex2f(0, 0);
-			glVertex2f(diagram_w, 0);
-			glVertex2f(diagram_w, diagram_h);
-		glEnd();
+		al_draw_filled_rectangle(0, 0, diagram_w, diagram_h, fill);
 
-		glDisable(GL_STENCIL_TEST);
+		if (opengl) {
+			glDisable(GL_STENCIL_TEST);
+		}
 
 		for (size_t j = 0; j < points.size(); j++) {
-			al_draw_polyline(&points[j][0], points[j].size()/2, ALLEGRO_LINE_JOIN_NONE, ALLEGRO_LINE_CAP_NONE, stroke, stroke_width, 0.0);
+			al_draw_polyline(&points[j][0], points[j].size()/2, ALLEGRO_LINE_JOIN_MITER, ALLEGRO_LINE_CAP_ROUND, stroke, stroke_width, 4.0);
 		}
 	}
 
-	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
-	int old_format = al_get_new_bitmap_format();
-	
-	//al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
-
-	ALLEGRO_BITMAP *out = al_create_bitmap(diagram_w, diagram_h);
-
 	al_set_target_bitmap(out);
+	
+	if (multisample) {
+		glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fb);
+		glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, al_get_opengl_fbo(out));
 
-	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fb);
-	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, al_get_opengl_fbo(out));
+		int rw, rh;
+		al_get_opengl_texture_size(out, &rw, &rh);
 
-	int rw, rh;
-	al_get_opengl_texture_size(out, &rw, &rh);
+		glBlitFramebufferEXT(0, 0, diagram_w, diagram_h, 0, 0, diagram_w, diagram_h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
-	glBlitFramebufferEXT(0, 0, diagram_w, diagram_h, 0, 0, diagram_w, diagram_h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-
-	al_set_target_bitmap(old_target);
-	al_set_new_bitmap_format(old_format);
-
-	double end = al_get_time();
-
-	//printf("elapsed: %f seconds\n", end-start);
-
-	glDeleteFramebuffersEXT(1, &fb);
-	glDeleteRenderbuffersEXT(1, &ColorBufferID);
-	glDeleteRenderbuffersEXT(1, &DepthBufferID);
+		glDeleteFramebuffersEXT(1, &fb);
+		glDeleteRenderbuffersEXT(1, &ColorBufferID);
+		glDeleteRenderbuffersEXT(1, &DepthBufferID);
+	}
+	else {
+		al_draw_bitmap_region(
+			al_get_backbuffer(al_get_current_display()),
+			0, 0, diagram_w, diagram_h,
+			0, 0,
+			0
+		);
+	}
 
 	svgtiny_free(diagram);
 
-	glViewport(old_vp[0], old_vp[1], old_vp[2], old_vp[3]);
+	if (multisample) {
+		glViewport(old_vp[0], old_vp[1], old_vp[2], old_vp[3]);
+	}
 
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
+	al_set_target_backbuffer(al_get_current_display());
+
+	if (multisample) {
+		al_set_target_bitmap(old_target);
+		al_set_projection_transform(al_get_current_display(), &old_proj_transform);
+		al_use_transform(&old_view_transform);
+	}
+	else {
+		al_set_projection_transform(al_get_current_display(), &old_proj_transform);
+		al_use_transform(&old_view_transform);
+		al_set_target_bitmap(old_target);
+	}
 
 	return out;
 }

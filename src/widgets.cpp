@@ -5303,27 +5303,26 @@ int MItemSelector::update(int millis)
 			playPreloadedSample("error.ogg");
 		}
 	}
-	
+
+	bool play_sound = true;
 
 	if (_id.button1 && pressed < 0) {
-		if (_id.button1) {
-			double start = al_get_time();
-			while (_id.button1) {
-				pump_events();
-				_id = getInput()->getDescriptor();
-				if (al_get_time()-start > 0.6) {
-					if (inventory[selected].index >= 0) {
-						playPreloadedSample("select.ogg");
-						int index = inventory[selected].index;
-						reset();
-						showItemInfo(index, true);
-					}
-					else {
-						reset();
-						playPreloadedSample("error.ogg");
-					}
-					goto END;
+		double start = al_get_time();
+		while (_id.button1) {
+			pump_events();
+			_id = getInput()->getDescriptor();
+			if (al_get_time()-start > 0.6) {
+				if (inventory[selected].index >= 0) {
+					playPreloadedSample("select.ogg");
+					int index = inventory[selected].index;
+					reset();
+					showItemInfo(index, true);
 				}
+				else {
+					reset();
+					playPreloadedSample("error.ogg");
+				}
+				goto END;
 			}
 		}
 		
@@ -5336,18 +5335,22 @@ int MItemSelector::update(int millis)
 
 		pressed = selected;
 		
-		if (canArrange) {
-			//goto END;
+		if (!canArrange) {
+			clicked = true;
+			play_sound = false;
 		}
 	}
 	
 	if ((_id.button1 || clicked) && pressed >= 0) {
 
-		playPreloadedSample("select.ogg");
+		if (play_sound) {
+			playPreloadedSample("select.ogg");
+		}
 
 		getInput()->waitForReleaseOr(4, 250);
 	
 		if (pressed == selected) {
+			clicked = false;
 			downCount = 0;
 			pressed = -1;
 			if (have_mouse || !use_dpad) {
@@ -5359,7 +5362,6 @@ int MItemSelector::update(int millis)
 				first_finger_x = -1;
 				first_finger_y = -1;
 			}
-			clicked = false;
 			return TGUI_RETURN;
 		}
 		// Arrange
@@ -5369,6 +5371,7 @@ int MItemSelector::update(int millis)
 				pressed = selected;
 				selected = tmp;
 			}
+			clicked = false;
 			// Group
 			if (inventory[selected].index == inventory[pressed].index) {
 				int q = 99-inventory[selected].quantity;
@@ -5395,11 +5398,9 @@ int MItemSelector::update(int millis)
 			}
 			pressed = -1;
 		}
-		clicked = false;
 	}
 	
 END:;
-
 
 	if (this == tguiActiveWidget && (ie.button2 == DOWN || (!dragging && iphone_shaken(0.1)))) {
 		use_input_event();

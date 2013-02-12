@@ -708,9 +708,9 @@ static int CDoDialogue(lua_State *stack)
 
 	doDialogue(textS, top, 4, 10, bottom);
 
-	if (!wait) { lua_pushboolean(stack, false); return 1; }
-
 	clear_input_events();
+
+	if (!wait) { lua_pushboolean(stack, false); return 1; }
 
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);

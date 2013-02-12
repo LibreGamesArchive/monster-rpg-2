@@ -143,6 +143,8 @@ ALLEGRO_EVENT_QUEUE *events;
 ALLEGRO_EVENT_QUEUE *input_event_queue;
 double next_shake = 0;
 
+ALLEGRO_MOUSE_CURSOR *allegro_cursor;
+
 bool do_acknowledge_resize = false;
 
 ALLEGRO_JOYSTICK *user_joystick = NULL;
@@ -1563,21 +1565,9 @@ bool init(int *argc, char **argv[])
 
 	al_set_new_display_flags(flags);
 
-#ifdef ALLEGRO_ANDROID
-	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_REQUIRE);
-	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 0, ALLEGRO_REQUIRE);
-	al_set_new_display_option(ALLEGRO_RED_SIZE, 8, ALLEGRO_REQUIRE);
-	al_set_new_display_option(ALLEGRO_GREEN_SIZE, 8, ALLEGRO_REQUIRE);
-	al_set_new_display_option(ALLEGRO_BLUE_SIZE, 8, ALLEGRO_REQUIRE);
-	al_set_new_display_option(ALLEGRO_ALPHA_SIZE, 0, ALLEGRO_REQUIRE);
-#else
-#ifdef __linux__
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_SUGGEST);
-#else
-	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_SUGGEST);
-#endif
+	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 8, ALLEGRO_SUGGEST);
 	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 32, ALLEGRO_REQUIRE);
-#endif
 
 #if !defined(ALLEGRO_IPHONE) && !defined(ALLEGRO_ANDROID)
 	al_set_new_display_adapter(config.getAdapter());
@@ -1742,19 +1732,6 @@ bool init(int *argc, char **argv[])
 	tguiInit();
 	tguiSetRotation(0);
 
-#ifdef ALLEGRO_RASPBERRYPI
-	al_hide_mouse_cursor(display);
-#endif
-	custom_mouse_cursor = m_load_bitmap(getResource("media/mouse_cursor.png"));
-#if !defined ALLEGRO_RASPBERRYPI && !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	ALLEGRO_MOUSE_CURSOR *allegro_cursor = al_create_mouse_cursor(custom_mouse_cursor->bitmap, 0, 0);
-	al_set_mouse_cursor(display, allegro_cursor);
-#endif
-
-	if (have_mouse) {
-		al_set_mouse_xy(display, al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor->bitmap)-20, al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor->bitmap)-20);
-	}
-
 	set_screen_params();
       
 #ifdef A5_OGL
@@ -1783,6 +1760,8 @@ bool init(int *argc, char **argv[])
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	authenticatePlayer();
 #endif
+	
+	custom_mouse_cursor = m_load_bitmap(getResource("media/mouse_cursor.png"));
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (sd->fullscreen) {
@@ -1790,6 +1769,17 @@ bool init(int *argc, char **argv[])
 		toggle_fullscreen();
 	}
 #endif
+
+#ifdef ALLEGRO_RASPBERRYPI
+	al_hide_mouse_cursor(display);
+#endif
+#if !defined ALLEGRO_RASPBERRYPI && !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	allegro_cursor = al_create_mouse_cursor(custom_mouse_cursor->bitmap, 0, 0);
+	if (!sd->fullscreen) {
+		al_set_mouse_cursor(display, allegro_cursor);
+	}
+#endif
+	al_set_mouse_xy(display, al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor->bitmap)-20, al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor->bitmap)-20);
 
 #ifdef A5_OGL
 	if (use_fixed_pipeline) {
@@ -2321,6 +2311,13 @@ void toggle_fullscreen(void)
 	pause_joystick_repeat_events = false;
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	if (sd->fullscreen) {
+		al_hide_mouse_cursor(display);
+	}
+	else {
+		al_show_mouse_cursor(display);
+		al_set_mouse_cursor(display, allegro_cursor);
+	}
 	if (in_shooter) {
 		al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
 	}

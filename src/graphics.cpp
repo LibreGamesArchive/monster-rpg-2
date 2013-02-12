@@ -648,13 +648,15 @@ static void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 	}
 #endif
 
-#if defined ALLEGRO_RASPBERRYPI
-	if (custom_mouse_cursor && (show_custom_mouse_cursor || (al_get_display_flags(display) & ALLEGRO_FULLSCREEN_WINDOW))) {
+#ifdef ALLEGRO_RASPBERRYPI
+	if (custom_mouse_cursor && show_custom_mouse_cursor) {
+#else
+	if (sd->fullscreen) {
+#endif
 		ALLEGRO_MOUSE_STATE state;
 		al_get_mouse_state(&state);
 		al_draw_bitmap(custom_mouse_cursor->bitmap, state.x, state.y, 0);
 	}
-#endif
 
 	if (use_programmable_pipeline) {
 		if (!(config.getFilterType() == FILTER_SCALE2X)) {
@@ -893,8 +895,11 @@ void fadeOut(MCOLOR color)
  * 	in/out (e.g., focus of 2 would draw a two pixel square
  *	of the same color for every other pixel).
  */
-static bool transition(bool focusing, int length, bool can_cancel = false, bool toggle_dpad = true)
+static bool transition(bool focusing, int length, bool can_cancel = false, bool toggle_dpad = true, float scale = 1.0f)
 {
+	int BW = m_get_bitmap_width(buffer);
+	int BH = m_get_bitmap_height(buffer);
+
 	dpad_off();
 	global_draw_red = false;
 	global_draw_controls = false;
@@ -928,7 +933,7 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 		if (p > 1) p = 1;
 		if (focusing)
 			p = 1.0 - p;
-		int size = p * 32;
+		int size = p * (32*scale);
 		if (size < 1) size = 1;
 		p = 1.0 - p;
 		int rectw = p * BW;
@@ -979,16 +984,16 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 /* Transition draws a increasing/decreasing rectangular view of
  * the area with the inside focussing in/out.
  */
-bool transitionIn(bool can_cancel, bool toggle_dpad)
+bool transitionIn(bool can_cancel, bool toggle_dpad, float scale)
 {
-	bool ret = transition(true, 600, can_cancel, toggle_dpad);
+	bool ret = transition(true, 600, can_cancel, toggle_dpad, scale);
 	return ret;
 }
 
 
-void transitionOut(bool toggle_dpad)
+void transitionOut(bool toggle_dpad, float scale)
 {
-	transition(false, 600, false, toggle_dpad);
+	transition(false, 600, false, toggle_dpad, scale);
 }
 
 

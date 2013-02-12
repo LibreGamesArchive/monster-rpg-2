@@ -1886,7 +1886,15 @@ int main(int argc, char *argv[])
 #endif
 
 	
-	MBITMAP *nooskewl = m_load_bitmap(getResource("media/nooskewl.png"));
+	//MBITMAP *nooskewl = m_load_bitmap(getResource("media/nooskewl.png"));
+	const float svg_w = 362;
+	float disp_w = al_get_display_width(display);
+	float disp_h = al_get_display_height(display);
+	float wanted = disp_w * 0.75f;
+	float scale = wanted / svg_w;
+	ALLEGRO_BITMAP *nooskewl = load_svg(getResource("media/nooskewl.svg"), scale);
+
+	float transition_scale = disp_w / BW;
 
 #ifndef ALLEGRO_ANDROID
 	if ((n = check_arg(argc, argv, "-stick")) != -1) {
@@ -1906,22 +1914,19 @@ int main(int argc, char *argv[])
 	m_clear(al_map_rgb(0, 0, 0));
 	m_flip_display();
 
-	debug_message("loaded nooskewl bmp\n");
+	MBITMAP *oldbuf = buffer;
+	buffer = m_create_bitmap(disp_w, disp_h);
+
 	m_set_target_bitmap(buffer);
-	debug_message("set target to buffer\n");
-	debug_message("cleared buffer\n");
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-	debug_message("drawing nooskewl bitmap\n");
-	m_draw_bitmap(nooskewl, BW/2-m_get_bitmap_width(nooskewl)/2,
-		BH/2-m_get_bitmap_height(nooskewl)/2, 0);
-	debug_message("drew nooskewl bitmap to buffer, going to transition\n");
-	bool cancelled = transitionIn(true, false);
+	m_clear(black);
+	al_draw_bitmap(nooskewl, disp_w/2-al_get_bitmap_width(nooskewl)/2,
+		disp_h/2-al_get_bitmap_height(nooskewl)/2, 0);
+	bool cancelled = transitionIn(true, false, transition_scale);
 	if (!cancelled) {
 		m_set_target_bitmap(buffer);
 		m_clear(black);
-		m_draw_bitmap(nooskewl, BW/2-m_get_bitmap_width(nooskewl)/2,
-			BH/2-m_get_bitmap_height(nooskewl)/2, 0);
-		drawBufferToScreen();
+		al_draw_bitmap(nooskewl, disp_w/2-al_get_bitmap_width(nooskewl)/2,
+			disp_h/2-al_get_bitmap_height(nooskewl)/2, 0);
 		m_flip_display();
 		
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -1931,14 +1936,15 @@ int main(int argc, char *argv[])
 			
 		//loadPlayDestroy("nooskewl.ogg");
 		m_rest(1.5);
-		transitionOut(false);
+		transitionOut(false, transition_scale);
 	}
 	else {
 		m_rest(1);
 	}
-	m_destroy_bitmap(nooskewl);
+	al_destroy_bitmap(nooskewl);
 
-	debug_message("After logo\n");
+	m_destroy_bitmap(buffer);
+	buffer = oldbuf;
 
 	#ifdef DEBUG_XXX
 	DEBUG_DATA d;
