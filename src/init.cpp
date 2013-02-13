@@ -1538,7 +1538,7 @@ bool init(int *argc, char **argv[])
 	
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_install_touch_input();
-	//al_set_mouse_emulation_mode(ALLEGRO_MOUSE_EMULATION_5_0_x);
+	al_set_mouse_emulation_mode(ALLEGRO_MOUSE_EMULATION_5_0_x);
 #endif
 
 	ALLEGRO_FILE *f = al_fopen(getResource("Version"), "rb");

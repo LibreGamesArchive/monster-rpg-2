@@ -4949,10 +4949,9 @@ loop:
 	}
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	if (this != tguiActiveWidget)
-		return;
+	//if (this != tguiActiveWidget)
+		//return;
 #endif
-
 
 	// draw arrows
 	if (top > 0) {
@@ -5006,7 +5005,7 @@ int MItemSelector::update(int millis)
 	if (!dragging && down) {
 		ALLEGRO_MOUSE_STATE state;
 		m_get_mouse_state(&state);
-		if ((abs(initial_down_x-first_finger_x) >= 10 || abs(initial_down_y-first_finger_y) >= 10) && selected >= 0 && selected < MAX_INVENTORY && inventory[selected].index >= 0 && (canArrange || (have_mouse && isShop))) {
+		if ((abs(initial_down_x-first_finger_x) >= 10 || abs(initial_down_y-first_finger_y) >= 10) && selected >= 0 && selected < MAX_INVENTORY && inventory[selected].index >= 0 && (canArrange || isShop)) {
 			dragging = true;
 			Inventory *inv = &inventory[selected];
 			char s[100];
@@ -5141,9 +5140,6 @@ int MItemSelector::update(int millis)
 		ie = get_next_input_event();
 		_id = getInput()->getDescriptor();
 	}
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	(void)_id;
-#endif
 	
 	if (ie.left == DOWN) {
 		use_input_event();

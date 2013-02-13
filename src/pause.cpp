@@ -1971,8 +1971,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 	shop->setInventory(shop_inventory);
 	shop->setRaiseOnFocus(true);
 	MItemSelector *isel = new MItemSelector(103, 103+60-5, 0, 0, false);
-	if (have_mouse)
-		isel->setShop();
+	isel->setShop();
 	isel->setRaiseOnFocus(true);
 
 	MBITMAP *face = m_load_bitmap(imageName);
@@ -2137,8 +2136,9 @@ done:
 	m_destroy_bitmap(face);
 
 	setMusicVolume(1);
-	
-	m_rest(0.25);
+
+	fadeOut(black);
+	clear_input_events();
 
 	input->setDirection(dir);
 	input->set(false, false, false, false, false, false, false);
