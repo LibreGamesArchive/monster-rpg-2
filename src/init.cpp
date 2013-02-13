@@ -150,7 +150,7 @@ bool do_acknowledge_resize = false;
 ALLEGRO_JOYSTICK *user_joystick = NULL;
 bool is_intel_gpu_on_desktop_linux = false;
 #ifdef ALLEGRO_ANDROID
-bool is_android_lessthan_2_3;
+bool is_android_lessthan_2_3 = false;
 #endif
 
 bool achievement_show = false;
@@ -1457,14 +1457,10 @@ bool init(int *argc, char **argv[])
 		use_fixed_pipeline = true;
 #endif
 
-#ifdef ALLEGRO_ANDROID
-	al_install_system(ALLEGRO_VERSION_INT, NULL);
-#else
 	if (!al_init()) {
 		printf("al_init failed.\n");
 		exit(1);
 	}
-#endif
 
 #if !defined ALLEGRO_IPHONE
 	al_install_keyboard();
@@ -1565,8 +1561,13 @@ bool init(int *argc, char **argv[])
 
 	al_set_new_display_flags(flags);
 
-	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_SUGGEST);
-	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 8, ALLEGRO_SUGGEST);
+#ifdef ALLEGRO_ANDROID
+	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_REQUIRE);
+	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 8, ALLEGRO_REQUIRE);
+#else
+	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_REQUIRE);
+	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 8, ALLEGRO_REQUIRE);
+#endif
 	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 32, ALLEGRO_REQUIRE);
 
 #if !defined(ALLEGRO_IPHONE) && !defined(ALLEGRO_ANDROID)
@@ -2125,7 +2126,10 @@ void destroy(void)
 	big_depth_surface->Release();
 	#endif
 
-	al_destroy_display(display);
+	al_shutdown_ttf_addon();
+
+	// OK?
+	//al_destroy_display(display);
 
 	if (saveFilename)
 		free(saveFilename);
@@ -2145,8 +2149,6 @@ void destroy(void)
 
 	destroySound();
 
-	al_shutdown_ttf_addon();
-
 	destroy_translation();
 	
 #ifdef ALLEGRO_WINDOWS
@@ -2154,6 +2156,8 @@ void destroy(void)
 #endif
 
 	inited = false;
+
+	ALLEGRO_DEBUG("END OF DESTROY\n");
 }
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID

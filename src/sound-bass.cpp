@@ -175,18 +175,12 @@ void initSound(void)
 // Lots of crackling on RPi @ 44.1KHz
 #ifdef ALLEGRO_RASPBERRYPI
 	BASS_SetConfig(BASS_CONFIG_BUFFER, 4000);
-	if (!BASS_Init(-1, 22050, 0, NULL, NULL)) {
+	if (!BASS_Init(-1, 44100, 0, NULL, NULL)) {
 #else
 	if (!BASS_Init(-1, 44100, 0, NULL, NULL)) {
 #endif
 		int code = BASS_ErrorGetCode();
 		ALLEGRO_DEBUG("BASS_Init failed (%d). Failing or falling back", code);
-#ifdef ALLEGRO_ANDROID
-		is_android_lessthan_2_3 = true;
-		goto old;
-#else
-		return;
-#endif
 	}
 
 #if defined ALLEGRO_WINDOWS
@@ -210,11 +204,6 @@ void initSound(void)
 	}
 
 	return;
-
-#ifdef ALLEGRO_ANDROID
-old:
-	initSound_oldandroid();
-#endif
 }
 
 bool loadSamples(void (*cb)(int, int))
@@ -257,6 +246,8 @@ void destroySound(void)
 #endif
 
 	BASS_Free();
+
+	ALLEGRO_DEBUG("Sound shutdown\n");
 }
 
 void playPreloadedSample(std::string name)

@@ -146,9 +146,9 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
       System.loadLibrary("allegro_font-debug");
       System.loadLibrary("allegro_ttf-debug");
       System.loadLibrary("allegro_shader-debug");
+      System.loadLibrary("allegro_color-debug");
       System.loadLibrary("bass");
       System.loadLibrary("bassflac");
-      System.loadLibrary("bassmix");
       System.loadLibrary("monsterrpg2");
    }
 	
@@ -473,6 +473,8 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
       } catch(Exception x) {
          Log.d("AllegroActivity", "exception: " + x.getMessage());
       }
+      //Log.d("AllegroActivity", "Finishing!");
+      //System.exit(0);
    }
    
    /* end of functions native code calls */

@@ -331,12 +331,13 @@ void tguiShutdown()
 		delete activeGUI;
 	}
 	tguiStack.clear();
+	event_queues_created = false;
 	al_destroy_event_queue(key_events);
 	if (al_is_mouse_installed()) {
 		al_unregister_event_source(mouse_events, al_get_mouse_event_source());
 	}
 	al_destroy_event_queue(mouse_events);
-	event_queues_created = false;
+	al_rest(0.15);
 	pressedHotkeys.clear();
 }
 

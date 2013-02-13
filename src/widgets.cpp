@@ -3223,10 +3223,12 @@ void MSpellSelector::mouseDownAbs(int xx, int yy, int b)
 		return;
 	}
 
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (b == 2) {
 		pressed = -1;
 		return;
 	}
+#endif
 
 	if (down || maybe_scrolling) {
 		if (!scrolling && !dragging) {
@@ -4720,20 +4722,29 @@ void MItemSelector::mouseDownAbs(int xx, int yy, int b)
 
 	tguiRaiseWidget(this);
 
+	printf("1\n");
+
 	if (growing) return;
+	printf("2\n");
 
 	if (scrolling)
 		return;
+	printf("3\n");
 	
 	if (dragging)
 		return;
+	printf("4\n");
 
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (b == 2) {
 		pressed = -1;
 		return;
 	}
+#endif
+	printf("5\n");
 
 	if (down || maybe_scrolling) {
+		printf("scrolling=%d dragging=%d\n", scrolling, dragging);
 		if (!scrolling && !dragging) {
 			down2X = xx+x;
 			down2Y = yy+y;
@@ -4744,6 +4755,7 @@ void MItemSelector::mouseDownAbs(int xx, int yy, int b)
 		}
 		return;
 	}
+
 	downCount = 0;
 
 	int aw = m_get_bitmap_width(up_arrow)/2;
@@ -4778,23 +4790,16 @@ void MItemSelector::mouseDownAbs(int xx, int yy, int b)
 		if (n >= MAX_INVENTORY) {
 			n = top + ((rows_down-1)*2) + col;
 		}
-		down = true;
-		downX = xx+x;
-		downY = yy+y;
 		if (inventory[n].index >= 0) {
 			selected = n;
 		}
-		else if (!use_dpad) {
-			maybe_scrolling = true;
+		else {
 			selected = -1;
 		}
-		/*
-		if (inventory[n].index >= 0 || use_dpad) {
-			if (canArrange)
-				clicked = true;
-		}
-		*/
-
+		maybe_scrolling = true;
+		down = true;
+		downX = xx+x;
+		downY = yy+y;
 		first_finger_x = downX;
 		first_finger_y = downY;
 		initial_down_x = downX;
@@ -4984,12 +4989,7 @@ void MItemSelector::reset(void)
 
 int MItemSelector::update(int millis)
 {
-	if (clicked && (drop_x >= 0 || drop_y >= 0)) {
-		playPreloadedSample("select.ogg");
-		clicked = false;
-		return TGUI_RETURN;
-	}
-
+	//printf("scrolling=%d dragging=%d\n", scrolling, dragging);
 	if (scrolling) {
 		int d = scroll_offs / 12;
 		if (d) {
@@ -5000,6 +5000,12 @@ int MItemSelector::update(int millis)
 		}
 		scroll_offs %= 12;
 		return TGUI_CONTINUE;
+	}
+
+	if (clicked && (drop_x >= 0 || drop_y >= 0)) {
+		playPreloadedSample("select.ogg");
+		clicked = false;
+		return TGUI_RETURN;
 	}
 
 	if (!dragging && down) {
@@ -5024,7 +5030,7 @@ int MItemSelector::update(int millis)
 			m_pop_target_bitmap();
 		}
 		else if (selected >= 0) {
-			if (inventory[selected].index >= 0 && canArrange) {
+			if (inventory[selected].index >= 0) {
 				downCount += millis;
 				if (downCount >= 600) {
 					playPreloadedSample("select.ogg");

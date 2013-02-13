@@ -905,6 +905,8 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 {
 	int BW = m_get_bitmap_width(buffer);
 	int BH = m_get_bitmap_height(buffer);
+	int disp_w = al_get_display_width(display);
+	int disp_h = al_get_display_height(display);
 
 	dpad_off();
 	global_draw_red = false;
@@ -920,6 +922,7 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 	unsigned long now = start;
 	
 	while ((now - start) < (unsigned long)length) {
+		pump_events();
 		INPUT_EVENT ie = get_next_input_event();
 		if (ie.button1 == DOWN || ie.button2 == DOWN || !released) {
 			use_input_event();
@@ -937,6 +940,7 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 		int elapsed = now - start;
 		float p = (float)elapsed / length;
 		if (p > 1) p = 1;
+		if (p < 0) p = 0;
 		if (focusing)
 			p = 1.0 - p;
 		int size = p * (32*scale);
@@ -964,8 +968,15 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 		al_draw_scaled_bitmap(tmp->bitmap, 0, 0, BW/size, BH/size, 0, 0, BW, BH, 0);
 
 		al_set_clipping_rectangle(cx, cy, cw, ch);
-
-		drawBufferToScreen(buffer, true);
+		
+		al_set_target_backbuffer(display);
+		al_draw_scaled_bitmap(
+			buffer->bitmap,
+			0, 0, BW, BH,
+			0, 0, disp_w, disp_h,
+			0
+		);
+		//drawBufferToScreen(buffer, true);
 		m_flip_display();
 	}
 

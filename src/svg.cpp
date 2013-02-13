@@ -24,9 +24,11 @@ extern "C" {
 
 #include <vector>
 
+ALLEGRO_DEBUG_CHANNEL("Mo2SVG")
+
 ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 {
-	FILE *fd;
+	ALLEGRO_FILE *fd;
 	struct stat sb;
 	char *buffer;
 	size_t size;
@@ -37,15 +39,12 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 	double start = al_get_time();
 
 	/* load file into memory buffer */
-	fd = fopen(filename, "rb");
+	fd = al_fopen(filename, "rb");
 	if (!fd) {
 		return NULL;
 	}
 
-	if (stat(filename, &sb)) {
-		return NULL;
-	}
-	size = sb.st_size;
+	size = al_fsize(fd);
 
 	buffer = (char *)malloc(size);
 	if (!buffer) {
@@ -54,12 +53,12 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 		return NULL;
 	}
 
-	n = fread(buffer, 1, size, fd);
+	n = al_fread(fd, buffer, size);
 	if (n != size) {
 		return NULL;
 	}
 
-	fclose(fd);
+	al_fclose(fd);
 
 	/* create svgtiny object */
 	diagram = svgtiny_create();
@@ -346,24 +345,12 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 #endif
 	}
 	else {
-#if defined ALLEGRO_IPHONE_NEVER || defined ALLEGRO_ANDROID_NEVER
-		ALLEGRO_LOCKED_REGION *src = al_lock_bitmap(al_get_backbuffer(al_get_current_display()), ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE, ALLEGRO_LOCK_READONLY);
-		ALLEGRO_LOCKED_REGION *dst = al_lock_bitmap(out, ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE, ALLEGRO_LOCK_WRITEONLY);
-		for (int y = 0; y < al_get_bitmap_height(out); y++) {
-			uint8_t *p1 = (uint8_t *)src->data + y * src->pitch;
-			uint8_t *p2 = (uint8_t *)dst->data + y * src->pitch;
-			memcpy(p2, p1, 4*al_get_bitmap_width(out));
-		}
-		al_unlock_bitmap(al_get_backbuffer(al_get_current_display()));
-		al_unlock_bitmap(out);
-#else
 		al_draw_bitmap_region(
 			al_get_backbuffer(al_get_current_display()),
 			0, 0, diagram_w, diagram_h,
 			0, 0,
 			0
 		);
-#endif
 	}
 
 	svgtiny_free(diagram);

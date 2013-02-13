@@ -26,9 +26,12 @@ public class OldAndroid
 	private static ArrayList<Music> mps = new ArrayList<Music>();
 	private static int music_ids = 1;
 	private static int numFlacsPlaying = 0;
-
+   
 	public static void initSound(AllegroActivity activity)
 	{
+		Log.d("OldAndroid", "Loading bassmix");
+		System.loadLibrary("bassmix");
+
 		OldAndroid.activity = activity;
 
 		sp = new SoundPool(8, AudioManager.STREAM_MUSIC, 0);

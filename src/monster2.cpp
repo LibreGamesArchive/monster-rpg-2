@@ -603,74 +603,7 @@ top:
 			}
 		}
 
-		if (pump_events_only) {
-			continue;
-		}
-
-		if (!getting_input_config && (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN)) {
-
-			if (event.keyboard.keycode == config.getKeyFullscreen()) {
-				if (!pause_f_to_toggle_fullscreen) {
-					do_toggle_fullscreen = true;
-				}
-			}
-			if (event.keyboard.keycode == config.getKeySettings()) {
-				if (!pause_f_to_toggle_fullscreen) {
-					close_pressed_for_configure = true;
-					close_pressed = true;
-				}
-			}
-			if (event.keyboard.keycode == config.getKeyMusicDown()) {
-				int v = config.getMusicVolume();
-				if (v <= 26) v = 0;
-				else v = v - 26; 
-				config.setMusicVolume(v);
-				setMusicVolume(getMusicVolume());
-				setAmbienceVolume(getAmbienceVolume());
-			}
-			if (event.keyboard.keycode == config.getKeyMusicUp()) {
-				int v = config.getMusicVolume();
-				if (v >= 230) v = 255;
-				else v = v + 26; 
-				config.setMusicVolume(v);
-				setMusicVolume(getMusicVolume());
-				setAmbienceVolume(getAmbienceVolume());
-			}
-			if (event.keyboard.keycode == config.getKeySFXDown()) {
-				int v = config.getSFXVolume();
-				if (v <= 26) v = 0;
-				else v = v - 26; 
-				config.setSFXVolume(v);
-				if (boost) {
-					setStreamVolume(
-						boost,
-						boost_volume
-					);
-				}
-			}
-			if (event.keyboard.keycode == config.getKeySFXUp()) {
-				int v = config.getSFXVolume();
-				if (v >= 230) v = 255;
-				else v = v + 26; 
-				config.setSFXVolume(v);
-				if (boost) {
-					setStreamVolume(
-						boost,
-						boost_volume
-					);
-				}
-			}
-			if (event.keyboard.keycode == ALLEGRO_KEY_F5) {
-				f5_time = al_get_time();
-			}
-			if (event.keyboard.keycode == ALLEGRO_KEY_F6) {
-				f6_time = al_get_time();
-			}
-			if (event.keyboard.keycode == ALLEGRO_KEY_F12) {
-				reload_translation = true;
-			}
-		}
-		else if (event.type == ALLEGRO_EVENT_KEY_UP || event.type == USER_KEY_UP) {
+		if (event.type == ALLEGRO_EVENT_KEY_UP || event.type == USER_KEY_UP) {
 			INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 			int code = event.keyboard.keycode;
 			if (code == config.getKeyLeft()) {
@@ -728,8 +661,9 @@ top:
 				}
 			}
 		}
+
 #if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE
-		else if (event.type == ALLEGRO_EVENT_JOYSTICK_CONFIGURATION) {
+		if (event.type == ALLEGRO_EVENT_JOYSTICK_CONFIGURATION) {
 			al_reconfigure_joysticks();
 			int nj = al_get_num_joysticks();
 			if (nj == 0) {
@@ -832,7 +766,7 @@ top:
 #endif
 
 #ifdef ALLEGRO_ANDROID
-		if ((event.type == ALLEGRO_EVENT_KEY_DOWN || event->type == USER_KEY_DOWN) && event.keyboard.keycode == ALLEGRO_KEY_BACK) {
+		if ((event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN) && event.keyboard.keycode == ALLEGRO_KEY_BACK) {
 			if (al_current_time() > next_shake) {
 				iphone_shake_time = al_current_time();
 				next_shake = al_current_time()+0.5;
@@ -1075,6 +1009,74 @@ top:
 			al_unlock_mutex(input_mutex);
 		}
 
+		if (pump_events_only) {
+			continue;
+		}
+
+		if (!getting_input_config && (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN)) {
+
+			if (event.keyboard.keycode == config.getKeyFullscreen()) {
+				if (!pause_f_to_toggle_fullscreen) {
+					do_toggle_fullscreen = true;
+				}
+			}
+			if (event.keyboard.keycode == config.getKeySettings()) {
+				if (!pause_f_to_toggle_fullscreen) {
+					close_pressed_for_configure = true;
+					close_pressed = true;
+				}
+			}
+			if (event.keyboard.keycode == config.getKeyMusicDown()) {
+				int v = config.getMusicVolume();
+				if (v <= 26) v = 0;
+				else v = v - 26; 
+				config.setMusicVolume(v);
+				setMusicVolume(getMusicVolume());
+				setAmbienceVolume(getAmbienceVolume());
+			}
+			if (event.keyboard.keycode == config.getKeyMusicUp()) {
+				int v = config.getMusicVolume();
+				if (v >= 230) v = 255;
+				else v = v + 26; 
+				config.setMusicVolume(v);
+				setMusicVolume(getMusicVolume());
+				setAmbienceVolume(getAmbienceVolume());
+			}
+			if (event.keyboard.keycode == config.getKeySFXDown()) {
+				int v = config.getSFXVolume();
+				if (v <= 26) v = 0;
+				else v = v - 26; 
+				config.setSFXVolume(v);
+				if (boost) {
+					setStreamVolume(
+						boost,
+						boost_volume
+					);
+				}
+			}
+			if (event.keyboard.keycode == config.getKeySFXUp()) {
+				int v = config.getSFXVolume();
+				if (v >= 230) v = 255;
+				else v = v + 26; 
+				config.setSFXVolume(v);
+				if (boost) {
+					setStreamVolume(
+						boost,
+						boost_volume
+					);
+				}
+			}
+			if (event.keyboard.keycode == ALLEGRO_KEY_F5) {
+				f5_time = al_get_time();
+			}
+			if (event.keyboard.keycode == ALLEGRO_KEY_F6) {
+				f6_time = al_get_time();
+			}
+			if (event.keyboard.keycode == ALLEGRO_KEY_F12) {
+				reload_translation = true;
+			}
+		}
+			
 #ifdef ALLEGRO_IPHONE
 		if (event.type == ALLEGRO_EVENT_DISPLAY_CONNECTED) {
 			create_airplay_mirror = true;
@@ -1863,6 +1865,10 @@ int main(int argc, char *argv[])
 	}
 #endif
 
+#ifdef ALLEGRO_IPHONE
+	initiOSKeyboard();
+	al_register_event_source(input_event_queue, &user_event_source);
+#endif
 	
 	//MBITMAP *nooskewl = m_load_bitmap(getResource("media/nooskewl.png"));
 	const float svg_w = 362;
@@ -1900,8 +1906,9 @@ int main(int argc, char *argv[])
 	al_draw_bitmap(nooskewl, disp_w/2-al_get_bitmap_width(nooskewl)/2,
 		disp_h/2-al_get_bitmap_height(nooskewl)/2, 0);
 	bool cancelled = transitionIn(true, false, transition_scale);
+
 	if (!cancelled) {
-		m_set_target_bitmap(buffer);
+		al_set_target_backbuffer(display);
 		m_clear(black);
 		al_draw_bitmap(nooskewl, disp_w/2-al_get_bitmap_width(nooskewl)/2,
 			disp_h/2-al_get_bitmap_height(nooskewl)/2, 0);
@@ -1961,11 +1968,6 @@ int main(int argc, char *argv[])
 	//archery(false);
 	//shooter(false);
 	//credits();
-
-#ifdef ALLEGRO_IPHONE
-	initiOSKeyboard();
-	al_register_event_source(input_event_queue, &user_event_source);
-#endif
 
 	while (!quit_game) {
 		playAmbience("");
@@ -2194,9 +2196,9 @@ done:
 	al_unlock_mutex(wait_mutex);
 #endif
 
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	destroy();
-#endif
+
+	ALLEGRO_DEBUG("AFTER LAST DESTROY\n");
 
 #if defined ALLEGRO_WINDOWS && defined A5_OGL
 	for (int i = 0; i < argc; i++) {
@@ -2209,10 +2211,7 @@ done:
 
 	debug_message("done\n");
 
-#if defined ALLEGRO_ANDROID
-	debug_message("Android exiting");
-	exit(0);
-#endif
+	ALLEGRO_DEBUG("RETURNING FROM MAIN\n");
 
 	return 0;
 }
