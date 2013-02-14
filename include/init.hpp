@@ -230,6 +230,7 @@ extern bool is_fs_toggle;
 
 extern MBITMAP *custom_mouse_cursor;
 extern bool show_custom_mouse_cursor;
+extern ALLEGRO_MOUSE_CURSOR *allegro_cursor;
 
 extern int width_before_fullscreen;
 extern int height_before_fullscreen;

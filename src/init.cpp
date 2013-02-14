@@ -284,8 +284,6 @@ int versionMajor = 1;
 int versionMinor = 0;
 
 bool switched_out = false;
-ALLEGRO_MUTEX *switch_mutex;
-ALLEGRO_COND *switch_cond;
 uint32_t my_opengl_version;
 
 MBITMAP *custom_mouse_cursor = NULL;
@@ -719,9 +717,6 @@ static void *loader_proc(void *arg)
 	wait_cond = al_create_cond();
 	wait_mutex = al_create_mutex();
 	al_lock_mutex(wait_mutex);
-	
-	switch_cond = al_create_cond();
-	switch_mutex = al_create_mutex();
 	
 	joypad_mutex = al_create_mutex_recursive();
 
@@ -2048,8 +2043,6 @@ void destroy(void)
 	al_destroy_cond(wait_cond);
 	al_destroy_mutex(wait_mutex);
 	
-	al_destroy_cond(switch_cond);
-	al_destroy_mutex(switch_mutex);
 	al_destroy_mutex(joypad_mutex);
 
 	if (party[heroSpot] && party[heroSpot]->getObject()
@@ -2315,7 +2308,7 @@ void toggle_fullscreen(void)
 	pause_joystick_repeat_events = false;
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	if (sd->fullscreen) {
+	if (sd->fullscreen || in_shooter) {
 		al_hide_mouse_cursor(display);
 	}
 	else {

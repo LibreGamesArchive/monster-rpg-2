@@ -126,7 +126,7 @@ static void mTextout_real(MFONT *font, const char *text, int x, int y,
 		int index = atoi(num);
 		m_save_blender();
 		m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-		m_draw_bitmap(icons[index], x, y, 0);
+		m_draw_bitmap(icons[index], x, y-2, 0);
 		m_restore_blender();
 		x += m_text_height(font)+2;
 		strcpy(buf, text+5);
@@ -422,8 +422,8 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 			int tick = (unsigned)tguiCurrentTimeMillis() % 1000;
 			if (tick < 800) {
 				int size = m_get_bitmap_width(cursor);
-				int rx = BW/2-m_text_length(game_font, _t("OK"))/2-size;
-				int ry = y+h-15-size;
+				int rx = BW/2-m_text_length(game_font, _t("OK"))/2-size-2;
+				int ry = y+h-15-7;
 				m_draw_bitmap(cursor, rx, ry, 0);
 			}
 			drawBufferToScreen();
@@ -646,8 +646,8 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 			int tick = (unsigned)tguiCurrentTimeMillis() % 1000;
 			if (tick < 800) {
 				int size = m_get_bitmap_width(cursor);
-				int rx = BW/2-m_text_length(game_font, _t("OK"))/2-size;
-				int ry = y+5+48-size;
+				int rx = BW/2-m_text_length(game_font, _t("OK"))/2-size-2;
+				int ry = y+5+48-7;
 				m_draw_bitmap(cursor, rx, ry, 0);
 			}
 			drawBufferToScreen();
@@ -810,7 +810,7 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 					rx = x2 - size-2-m_text_length(game_font, _t(b2text.c_str()))/2;
 				else if (choice == 2)
 					rx = x3 - size-2-m_text_length(game_font, _t(b3text.c_str()))/2;
-				int ry = y+h-20-5;
+				int ry = y+h-20-7;
 				m_draw_bitmap(cursor, rx, ry, 0);
 			}
 			drawBufferToScreen();
@@ -971,21 +971,21 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 				int rx = 0;
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 				if (w1->getFocus()) {
-					rx = BW/2-w/4-m_text_length(game_font, _t("No"))/2-size;
+					rx = BW/2-w/4-m_text_length(game_font, _t("No"))/2-size-2;
 				}
 				else if (w2->getFocus()) {
-					rx = BW/2+w/4-m_text_length(game_font, _t("Yes"))/2-size;
+					rx = BW/2+w/4-m_text_length(game_font, _t("Yes"))/2-size-2;
 				}
 #else
 				bool sel = tguiActiveWidget == w1 ? true : false;
 				if (sel) {
-					rx = BW/2-w/4-m_text_length(game_font, _t("Yes"))/2-size;
+					rx = BW/2-w/4-m_text_length(game_font, _t("Yes"))/2-size-2;
 				}
 				else {
-					rx = BW/2+w/4-m_text_length(game_font, _t("No"))/2-size;
+					rx = BW/2+w/4-m_text_length(game_font, _t("No"))/2-size-2;
 				}
 #endif
-				int ry = y+5+38-size;
+				int ry = y+5+38-7;
 				m_draw_bitmap(cursor, rx, ry, 0);
 			}
 			drawBufferToScreen();
@@ -1315,13 +1315,13 @@ void MSpeechDialog::realDrawText(int section, int xo, int yo)
 		ss >> word;
 		if (word == "\\") {
 			cx = xx+xo;
-			cy += m_text_height(game_font) + 2;
+			cy += m_text_height(game_font)+1;
 			continue;
 		}
 		int endx = cx + m_text_length(game_font, word.c_str());
 		if (endx > xx+w-10) {
 			cx = xx+xo;
-			cy += m_text_height(game_font) + 2;
+			cy += m_text_height(game_font)+1;
 		}
 		mTextout(game_font, word.c_str(), cx, cy, white, black,
 			WGT_TEXT_DROP_SHADOW, false);
@@ -1343,13 +1343,13 @@ void MSpeechDialog::drawText(void)
 		}
 		int offset = (int)(h-(ratio*h));
 		m_set_clip(xx+5, yy+3, xx+w-10, yy+h-10);
-		realDrawText(currentSection-1, 10, 5-(h-offset));
-		realDrawText(currentSection, 10, 5+offset);
+		realDrawText(currentSection-1, 10, 6-(h-offset));
+		realDrawText(currentSection, 10, 6+offset);
 		ALLEGRO_BITMAP *target = al_get_target_bitmap();
 		m_set_clip(0, 0, al_get_bitmap_width(target), al_get_bitmap_height(target));
 	}
 	else {
-		realDrawText(currentSection, 10, 4);
+		realDrawText(currentSection, 10, 6);
 	}
 }
 
@@ -1584,7 +1584,7 @@ void MTextButton::draw()
 	if (this == tguiActiveWidget) {
 		int tick = (unsigned)tguiCurrentTimeMillis() % 1000;
 		if (tick < 800) {
-			m_draw_bitmap(cursor, x, y, 0);
+			m_draw_bitmap(cursor, x, y-1, 0);
 		}
 	}
 
@@ -3400,7 +3400,7 @@ void MSpellSelector::draw()
 		else {
 			dx = BW/3+5;
 		}
-		if (this == tguiActiveWidget && pressed == i) {
+		if (this == tguiActiveWidget && pressed == i && canArrange) {
 			color = m_map_rgb(255, 255, 0);
 		}
 		else {
@@ -3649,7 +3649,8 @@ int MSpellSelector::update(int millis)
 	}
 	else if (ie.button1 == DOWN || clicked) {
 		use_input_event();
-		if (pressed < 0) {
+		int tmp = pressed;
+		if (tmp < 0) {
 			CombatantInfo info;
 			if (partySelector) {
 				Player *player = party[partySelector->getSelected()];
@@ -3666,7 +3667,7 @@ int MSpellSelector::update(int millis)
 				down = false;
 			}
 		}
-		else {
+		if (tmp >= 0 || (!canArrange && !clicked)) {
 			playPreloadedSample("select.ogg");
 			// Use
 			if (pressed == selected) {
@@ -5430,7 +5431,7 @@ void MManSelector::mouseDown(int x, int y, int b)
 				holdTime = 600;
 				holdx = x;
 				holdy = y;
-				
+				return;
 			}
 		}
 	}
@@ -5566,25 +5567,23 @@ int MManSelector::update(int millis)
 	if (holdTime > 0) {
 		holdTime -= millis;
 		if (holdTime <= 0) {
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-			if (use_dpad) {
-				if (pos != 6) {
-					int p = pos;
-					if (p > 6) p--;
-					callLua(state, "do_info", "ii>", p, -1);
-					clicked = false;
-					need_release = false;
-				}
-			}
-			else if (al_is_mouse_installed())
-#endif
-			{
+			bool used = false;
+			if (have_mouse) {
 				ALLEGRO_MOUSE_STATE s;
 				m_get_mouse_state(&s);
 				if (abs(s.x-holdx) < 10 && abs(s.y-holdy) < 10 && holdi != 6)  {
 					if (holdi > 6) holdi--;
 					callLua(state, "do_info", "ii>", holdi, holdj);
+					used = true;
+					holdx = holdy = -1000;
 				}
+			}
+			if (!used && pos != 6) {
+				int p = pos;
+				if (p > 6) p--;
+				callLua(state, "do_info", "ii>", p, -1);
+				clicked = false;
+				need_release = false;
 			}
 			holdTime = 0;
 		}
@@ -5594,64 +5593,52 @@ int MManSelector::update(int millis)
 	INPUT_EVENT ie;
 	ie = get_next_input_event();
 
-	if (use_dpad) {
-		if (ie.left == DOWN) {
-			use_input_event();
-			int tmp = pos-1;
-			while (tmp >= 0 && (mans[tmp].used || mans[tmp].dead)) {
-				tmp--;
-			}
-			if (tmp >= 0 && !(mans[tmp].used || mans[tmp].dead)) {
-				pos = tmp;
-				playPreloadedSample("blip.ogg");
-			}
-			else
-				playPreloadedSample("error.ogg");
-							
+	if (ie.left == DOWN) {
+		use_input_event();
+		int tmp = pos-1;
+		while (tmp >= 0 && (mans[tmp].used || mans[tmp].dead)) {
+			tmp--;
 		}
-		else if (ie.right == DOWN) {
-			use_input_event();
-			int tmp = pos+1;
-			while (tmp <= (int)(mans.size()-1) && (mans[tmp].used || mans[tmp].dead)) {
-				tmp++;
-			}
-			if (tmp <= (int)(mans.size()-1) && !(mans[tmp].used || mans[tmp].dead)) {
-				pos = tmp;
-				playPreloadedSample("blip.ogg");
-			}
-			else
-				playPreloadedSample("error.ogg");
+		if (tmp >= 0 && !(mans[tmp].used || mans[tmp].dead)) {
+			pos = tmp;
+			playPreloadedSample("blip.ogg");
 		}
-		if (ie.button3 == DOWN) {
-			use_input_event();
-			if (pos != 6) {
-				int p = pos;
-				if (p > 6) p--;
-				callLua(state, "do_info", "ii>", p, -1);
-			}
+		else
+			playPreloadedSample("error.ogg");
+						
+	}
+	else if (ie.right == DOWN) {
+		use_input_event();
+		int tmp = pos+1;
+		while (tmp <= (int)(mans.size()-1) && (mans[tmp].used || mans[tmp].dead)) {
+			tmp++;
+		}
+		if (tmp <= (int)(mans.size()-1) && !(mans[tmp].used || mans[tmp].dead)) {
+			pos = tmp;
+			playPreloadedSample("blip.ogg");
+		}
+		else
+			playPreloadedSample("error.ogg");
+	}
+	if (ie.button3 == DOWN) {
+		use_input_event();
+		if (pos != 6) {
+			int p = pos;
+			if (p > 6) p--;
+			callLua(state, "do_info", "ii>", p, -1);
 		}
 	}
 
 	InputDescriptor id = getInput()->getDescriptor();
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	if (!id.button1 && use_dpad && need_release) {
-#else
-	(void)id;
-	if (!(ie.button1 == DOWN) && use_dpad && need_release) {
-#endif
-		use_input_event();
+	if (!id.button1 && need_release) {
 		holdTime = 0;
 		clicked = true;
 		need_release = false;
 	}
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	else if ((id.button1 || clicked) && !need_release) {
-#else
 	else if ((ie.button1 == DOWN || clicked) && !need_release) {
-#endif
 		use_input_event();
-		if (use_dpad && !clicked && holdTime == 0) {
+		if (!clicked && holdTime == 0) {
 			need_release = true;
 			holdTime = 600;
 		}
@@ -5713,6 +5700,8 @@ MManSelector::MManSelector(std::vector<MMan> mans)
 	holdTime = 0;
 
 	need_release = false;
+
+	holdx = holdy = -1000;
 }
 
 
@@ -6334,12 +6323,7 @@ int MPartySelector::update(int millis)
 		}
 	}
 
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	if (true) {
-#else
-	if (!use_dpad || this == tguiActiveWidget) {
-#endif
-
+	if (this == tguiActiveWidget) {
 		INPUT_EVENT ie;
 		if (this != tguiActiveWidget)
 			ie = EMPTY_INPUT_EVENT;
@@ -6385,7 +6369,7 @@ int MPartySelector::update(int millis)
 			playPreloadedSample("select.ogg");
 			return TGUI_RETURN;
 		}
-		else if (this == tguiActiveWidget && (ie.button2 == DOWN || iphone_shaken(0.1))) {
+		else if (ie.button2 == DOWN || iphone_shaken(0.1)) {
 			use_input_event();
 			iphone_clear_shaken();
 			if (dragging) {

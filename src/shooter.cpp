@@ -749,6 +749,9 @@ bool shooter(bool for_points)
 	anotherDoDialogue("Gunnar: Oh, no, the throttle jammed! Eny, you steer.\nMel, Rider, blast anything in our path! I'll go fix the engine!\n", true);
 
 start:
+	al_hide_mouse_cursor(display);
+	show_custom_mouse_cursor = false;
+
 	int scr_w = al_get_display_width(display);
 	int scr_h = al_get_display_height(display);
 	MBITMAP *tmpcursor = custom_mouse_cursor;
@@ -763,11 +766,13 @@ start:
 
 	MShooterButton *button = NULL;
 	MShooterSlider *slider = NULL;
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	button = new MShooterButton();
 	slider = new MShooterSlider();
 	tguiSetParent(0);
 	tguiAddWidget(button);
 	tguiAddWidget(slider);
+#endif
 
 	crabs = crabs_start;
 	sharks = sharks_start;
@@ -974,7 +979,10 @@ start:
 
 			bool pressed = false;
 			tguiUpdate();
+			
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			pressed = button->getPressed();
+#endif
 
 			ALLEGRO_MOUSE_STATE state;
 			if (have_mouse) {
@@ -1210,11 +1218,13 @@ start:
 done:
 
 	custom_mouse_cursor = tmpcursor;
-	
+
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	tguiDeleteWidget(button);
 	tguiDeleteWidget(slider);
 	delete button;
 	delete slider;
+#endif
 
 	crabs.clear();
 	bullets.clear();
@@ -1235,6 +1245,15 @@ done:
 	m_rest(5);
 
 	playMusic("underwater_final.ogg");
+
+#if !defined ALLEGRO_RASPBERRYPI
+	ScreenDescriptor *sd = config.getWantedGraphicsMode();
+	if (!sd->fullscreen) {
+		al_show_mouse_cursor(display);
+		al_set_mouse_cursor(display, allegro_cursor);
+	}
+#endif
+	show_custom_mouse_cursor = true;
 
 	if (dead) {
 		if (prompt("G A M E O V E R", "Try Again?", 1, 1))

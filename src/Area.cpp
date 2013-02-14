@@ -1563,75 +1563,77 @@ void Area::update(int step)
 
 	if (!player_scripted && !battle && !manChooser
 			&& this == area && !speechDialog) {
-		if (!released && !down) {
-			down = true;
-			al_lock_mutex(click_mutex);
-			start_mx = click_x;
-			start_my = click_y;
-			current_mouse_x = start_mx;
-			current_mouse_y = start_my;
-			al_unlock_mutex(click_mutex);
-			down_time = al_current_time();
-		}
-		else if (down) {
-			al_lock_mutex(click_mutex);
-			int cx = current_mouse_x;
-			int cy = current_mouse_y;
-			al_unlock_mutex(click_mutex);
-			if ((abs(cx-start_mx) > 5 || abs(cy-start_my) > 5) && cx >= 0 && !path_head) {
-				// panning
-				area_panned_x += (start_mx - cx);
-				area_panned_y += (start_my - cy);
-				if (area_panned_x < -(BW-TILE_SIZE/2)) {
-					area_panned_x = -(BW-TILE_SIZE/2);
-				}
-				else if (area_panned_x > -TILE_SIZE/2) {
-					area_panned_x = -TILE_SIZE/2;
-				}
-				if (area_panned_y < -(BH-TILE_SIZE/2)) {
-					area_panned_y = -(BH-TILE_SIZE/2);
-				}
-				else if (area_panned_y > -TILE_SIZE/2) {
-					area_panned_y = -TILE_SIZE/2;
-				}
-				start_mx = cx;
-				start_my = cy;
-				panned = true;
-				adjusted_pan = true;
+		if (!use_dpad) {
+			if (!released && !down) {
+				down = true;
+				al_lock_mutex(click_mutex);
+				start_mx = click_x;
+				start_my = click_y;
+				current_mouse_x = start_mx;
+				current_mouse_y = start_my;
+				al_unlock_mutex(click_mutex);
+				down_time = al_current_time();
 			}
-			if (released) {
-				down = false;
-				if (!panned) {
-					int tx = (start_mx + area->getOriginX()) / TILE_SIZE;
-					int ty = (start_my + area->getOriginY()) / TILE_SIZE;
-					callLua(luaState, "activate_any", "ii>b", tx, ty);
-					bool used;
-					if (lua_isboolean(luaState, -1)) {
-						used = lua_toboolean(luaState, -1);
+			else if (down) {
+				al_lock_mutex(click_mutex);
+				int cx = current_mouse_x;
+				int cy = current_mouse_y;
+				al_unlock_mutex(click_mutex);
+				if ((abs(cx-start_mx) > 5 || abs(cy-start_my) > 5) && cx >= 0 && !path_head) {
+					// panning
+					area_panned_x += (start_mx - cx);
+					area_panned_y += (start_my - cy);
+					if (area_panned_x < -(BW-TILE_SIZE/2)) {
+						area_panned_x = -(BW-TILE_SIZE/2);
 					}
-					else {
-						used = false;
+					else if (area_panned_x > -TILE_SIZE/2) {
+						area_panned_x = -TILE_SIZE/2;
 					}
-					lua_pop(luaState, 1);
-					if (!used) {
-						if (!path_head) {
-							set_player_path(start_mx, start_my);
-							astar_next_x = -1;
-							astar_next_immediate_x = -1;
+					if (area_panned_y < -(BH-TILE_SIZE/2)) {
+						area_panned_y = -(BH-TILE_SIZE/2);
+					}
+					else if (area_panned_y > -TILE_SIZE/2) {
+						area_panned_y = -TILE_SIZE/2;
+					}
+					start_mx = cx;
+					start_my = cy;
+					panned = true;
+					adjusted_pan = true;
+				}
+				if (released) {
+					down = false;
+					if (!panned) {
+						int tx = (start_mx + area->getOriginX()) / TILE_SIZE;
+						int ty = (start_my + area->getOriginY()) / TILE_SIZE;
+						callLua(luaState, "activate_any", "ii>b", tx, ty);
+						bool used;
+						if (lua_isboolean(luaState, -1)) {
+							used = lua_toboolean(luaState, -1);
 						}
 						else {
-							astar_next_immediate_x = start_mx;
-							astar_next_immediate_y = start_my;
+							used = false;
+						}
+						lua_pop(luaState, 1);
+						if (!used) {
+							if (!path_head) {
+								set_player_path(start_mx, start_my);
+								astar_next_x = -1;
+								astar_next_immediate_x = -1;
+							}
+							else {
+								astar_next_immediate_x = start_mx;
+								astar_next_immediate_y = start_my;
+							}
 						}
 					}
+					panned = false;
 				}
-				panned = false;
-			}
-			else {
-				if (al_current_time() > down_time+0.2 && !panned) {
-					astar_next_x = cx;
-					astar_next_y = cy;
-					down_time = al_current_time();
+				else {
+					if (al_current_time() > down_time+0.2 && !panned) {
+						astar_next_x = cx;
+						astar_next_y = cy;
+						down_time = al_current_time();
+					}
 				}
 			}
 		}

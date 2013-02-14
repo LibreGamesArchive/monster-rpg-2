@@ -328,6 +328,7 @@ void connect_second_display(void);
 extern int old_control_mode;
 void connect_airplay_controls(void);
 void disconnect_airplay_controls(void);
+void clear_touches();
 
 extern bool dont_draw_now;
 

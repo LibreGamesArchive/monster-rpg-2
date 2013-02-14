@@ -102,6 +102,8 @@ void clear_input_events(double older_than)
 		i->reset();
 	}
 
+	clear_touches();
+
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	reset_joypad_state();
 #endif

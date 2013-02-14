@@ -27,7 +27,6 @@ static int last_mouse_x = -1, last_mouse_y;
 static int total_mouse_x, total_mouse_y;
 
 #if defined ALLEGRO_ANDROID || defined ALLEGRO_IPHONE
-bool halted = false;
 static std::string old_music_name;
 static std::string old_ambience_name;
 static float old_music_volume;
@@ -203,53 +202,34 @@ void connect_second_display(void)
 }
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-bool got_resume = false;
-static void *wait_for_drawing_resume(void *arg)
+static void set_transform()
 {
-	ALLEGRO_EVENT_QUEUE *queue = (ALLEGRO_EVENT_QUEUE *)arg;
+   ALLEGRO_TRANSFORM t;
 
-	while (1) {
-		ALLEGRO_EVENT event;
-		al_wait_for_event(queue, &event);
-#if defined KINDLEFIRE_XXX
-		if (event.type == ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING ||
-			event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN) {
-#else
-		if (event.type == ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING) {
+   int BB_W = al_get_display_width(display);
+   int BB_H = al_get_display_height(display);
+
+   glViewport(0, 0, BB_W, BB_H);
+
+/*
+#if defined ALLEGRO_ANDROID
+   float r = BB_W / 960.0f;
+   BB_W /= r;
+   BB_H /= r;
+   al_identity_transform(&t);
+   al_scale_transform(&t, r, r);
+   al_use_transform(&t);
+   setScale(r);
+#elif defined ALLEGRO_IPHONE
+   float r = BB_W / 1024.0f;
+   BB_W /= r;
+   BB_H /= r;
+   al_identity_transform(&t);
+   al_scale_transform(&t, r, r);
+   al_use_transform(&t);
+   setScale(r);
 #endif
-			got_resume = true;
-			break;
-		}
-		else {
-			if (event.type == ALLEGRO_EVENT_DISPLAY_ORIENTATION) {
-				//set_transform(display);
-			}
-			else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN) {
-				al_start_timer(logic_timer);
-				al_start_timer(draw_timer);
-				switched_in = true;
-			}
-			else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT) {
-				old_music_name = musicName;
-				old_ambience_name = ambienceName;
-				old_music_volume = getMusicVolume();
-				old_ambience_volume = getAmbienceVolume();
-				playMusic("");
-				playAmbience("");
-				al_stop_timer(logic_timer);
-				al_stop_timer(draw_timer);
-				switched_in = false;
-				music_replayed = false;
-			}
-		}
-		if (event.type == USER_KEY_DOWN || event.type == USER_KEY_UP || event.type == USER_KEY_CHAR) {
-			al_unref_user_event((ALLEGRO_USER_EVENT *)&event);
-		}
-	}
-
-	al_broadcast_cond(switch_cond);
-
-	return NULL;
+*/
 }
 
 static bool should_pause_game(void)
@@ -343,6 +323,9 @@ static void get_inputs(int x, int y, bool *l, bool *r, bool *u, bool *d, bool *b
 			x = 2; y = 1;
 		}
 	}
+	else {
+		return;
+	}
 
 	switch (x) {
 		case 0:
@@ -377,12 +360,11 @@ struct Touch {
 	int touch_id;
 	int x;
 	int y;
-	int onscreen_button;
 };
 
 const int MAX_TOUCHES = 10;
 
-Touch touches[MAX_TOUCHES] = { { -1, -1, -1, - 1 }, };
+Touch touches[MAX_TOUCHES] = { { -1, -1, -1 }, };
 
 volatile int curr_touches = 0;
 
@@ -399,6 +381,7 @@ void myTguiIgnore(int type)
 		// FIXME: THIS OK REMOVED??? getInput()->set(false, false, false, false, false, false, false, true);
 		for (int i = 0; i < MAX_TOUCHES; i++) {
 			touches[i].x = touches[i].y = -1;
+			touches[i].touch_id = -1;
 		}
 		curr_touches = 0;
 		al_unlock_mutex(touch_mutex);
@@ -429,7 +412,6 @@ static void process_touch(int x, int y, int touch_id, int type) {
 		touches[curr_touches].x = x;
 		touches[curr_touches].y = y;
 		touches[curr_touches].touch_id = touch_id;
-		touches[curr_touches].onscreen_button = -1;
 		curr_touches++;
 	}
 	else if (type == MOUSE_UP) {
@@ -449,6 +431,16 @@ static void process_touch(int x, int y, int touch_id, int type) {
 		touches[idx].y = y;
 	}
 	al_unlock_mutex(touch_mutex);
+}
+
+void clear_touches()
+{
+	for (int i = 0; i < MAX_TOUCHES; i++) {
+		touches[i].touch_id = -1;
+		touches[i].x = -1;
+		touches[i].y = -1;
+	}
+	curr_touches = 0;
 }
 
 static std::list<ZONE> zones;
@@ -602,8 +594,7 @@ top:
 				add_input_event(ie);
 			}
 		}
-
-		if (event.type == ALLEGRO_EVENT_KEY_UP || event.type == USER_KEY_UP) {
+		else if (event.type == ALLEGRO_EVENT_KEY_UP || event.type == USER_KEY_UP) {
 			INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 			int code = event.keyboard.keycode;
 			if (code == config.getKeyLeft()) {
@@ -663,7 +654,7 @@ top:
 		}
 
 #if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE
-		if (event.type == ALLEGRO_EVENT_JOYSTICK_CONFIGURATION) {
+		else if (event.type == ALLEGRO_EVENT_JOYSTICK_CONFIGURATION) {
 			al_reconfigure_joysticks();
 			int nj = al_get_num_joysticks();
 			if (nj == 0) {
@@ -766,22 +757,8 @@ top:
 #endif
 
 #ifdef ALLEGRO_ANDROID
-		if ((event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN) && event.keyboard.keycode == ALLEGRO_KEY_BACK) {
+		else if ((event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN) && event.keyboard.keycode == ALLEGRO_KEY_BACK) {
 			if (al_current_time() > next_shake) {
-				iphone_shake_time = al_current_time();
-				next_shake = al_current_time()+0.5;
-			}
-		}
-#endif
-
-#ifdef ALLEGRO_IPHONE
-		double shake = al_iphone_get_last_shake_time();
-		if (shake > allegro_iphone_shaken) {
-			allegro_iphone_shaken = shake;
-			if (config.getShakeAction() == CFG_SHAKE_CHANGE_SONG) {
-				iPodNext();
-			}
-			else if (al_current_time() > next_shake) {
 				iphone_shake_time = al_current_time();
 				next_shake = al_current_time()+0.5;
 			}
@@ -798,11 +775,11 @@ top:
 #define MOVE ALLEGRO_EVENT_MOUSE_AXES
 #endif
 
-		Input *i = getInput();
-		if (i && i->isPlayerControlled() && 
+		else if (getInput() && getInput()->isPlayerControlled() && 
 		(event.type == BEGIN ||
 		event.type == END ||
 		(event.type == MOVE && !path_head))) {
+			Input *i = getInput();
 			al_lock_mutex(input_mutex);
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -850,7 +827,7 @@ top:
 				type = MOUSE_AXES;
 			
 			al_lock_mutex(dpad_mutex);
-				
+
 			bool _l = false, _r = false, _u = false, _d = false, _b1 = false, _b2 = false, _b3 = false;
 
 			for (int i = 0; i < curr_touches; i++) {
@@ -889,8 +866,8 @@ top:
 			
 			bool on1[7] = { _l, _r, _u, _d, _b1, _b2, _b3 };
 			bool on2[7] = { l, r, u, d, b1, b2, b3 };
-			
-			if (use_dpad && !have_mouse) {
+
+			if (use_dpad) {
 				for (int i = 0; i < 7; i++) {
 					if (on1[i] == false && on2[i] == true) {
 						(*(down[i]))();
@@ -1008,6 +985,138 @@ top:
 			
 			al_unlock_mutex(input_mutex);
 		}
+#ifdef ALLEGRO_IPHONE
+		else if (event.type == ALLEGRO_EVENT_DISPLAY_CONNECTED) {
+			create_airplay_mirror = true;
+		}
+		else if (event.type == ALLEGRO_EVENT_DISPLAY_DISCONNECTED) {
+			delete_airplay_mirror = true;
+		}
+#endif
+
+#ifdef A5_D3D_XXX
+		else if (event.type == ALLEGRO_EVENT_DISPLAY_FOUND) {
+			should_reset = true;
+		}
+#endif
+#if defined ALLEGRO_ANDROID
+		else if (event.type == ALLEGRO_EVENT_DISPLAY_RESIZE) {
+			do_acknowledge_resize = true;
+		}
+#endif
+#ifdef ALLEGRO_IPHONE
+		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT)
+		{
+			do_pause_game = should_pause_game();
+			if (do_pause_game || in_pause) {
+				backup_music_volume = 0.5;
+				backup_ambience_volume = 0.5;
+			}
+			else {
+				backup_music_volume = getMusicVolume();
+				backup_ambience_volume = getAmbienceVolume();
+			}
+			setMusicVolume(0.0);
+			setAmbienceVolume(0.0);
+		}
+		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN)
+		{
+			setMusicVolume(backup_music_volume);
+			setAmbienceVolume(backup_ambience_volume);
+		}
+#endif
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+		else if (event.type == ALLEGRO_EVENT_DISPLAY_ORIENTATION) {
+			set_transform();
+		}
+#endif
+
+#ifdef ALLEGRO_ANDROID
+		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN) {
+			switched_in = true;
+		}
+		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT) {
+			old_music_name = musicName;
+			old_ambience_name = ambienceName;
+			old_music_volume = getMusicVolume();
+			old_ambience_volume = getAmbienceVolume();
+			playMusic("");
+			playAmbience("");
+			switched_in = false;
+			music_replayed = false;
+		}
+#endif
+
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+		else if (event.type == ALLEGRO_EVENT_DISPLAY_HALT_DRAWING) {
+			if (in_shooter && shooter_paused) {
+				break_shooter_pause = true;
+			}
+			save_memory(false);
+#if defined ALLEGRO_IPHONE
+			if (!isMultitaskingSupported()) {
+				if (!sound_was_playing_at_program_start)
+					iPodStop();
+				exit(0);
+			}
+#elif defined ALLEGRO_ANDROID
+			_destroy_loaded_bitmaps();
+			destroy_fonts();
+#endif
+			config.write();
+			al_stop_timer(logic_timer);
+			al_stop_timer(draw_timer);
+			// halt
+			al_acknowledge_drawing_halt(display);
+
+			while (true) {
+				ALLEGRO_EVENT event;
+				al_wait_for_event(input_event_queue, &event);
+				if (event.type == ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING) {
+					break;
+				}
+				if (event.type == USER_KEY_DOWN || event.type == USER_KEY_UP || event.type == USER_KEY_CHAR) {
+					al_unref_user_event((ALLEGRO_USER_EVENT *)&event);
+				}
+			}
+
+			switched_in = true;
+
+			// resume
+			al_acknowledge_drawing_resume(display, _reload_loaded_bitmaps);
+#ifdef ALLEGRO_ANDROID
+			_reload_loaded_bitmaps_delayed();
+			load_fonts();
+			if (in_shooter) {
+				shooter_restoring = true;
+			}
+#endif
+			glDisable(GL_DITHER);
+			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
+			al_start_timer(logic_timer);
+			al_start_timer(draw_timer);
+		}
+		else {
+		}
+
+		if (ALLEGRO_EVENT_TYPE_IS_USER(event.type)) {
+			al_unref_user_event((ALLEGRO_USER_EVENT *)&event);
+		}
+#endif
+
+#ifdef ALLEGRO_IPHONE
+		double shake = al_iphone_get_last_shake_time();
+		if (shake > allegro_iphone_shaken) {
+			allegro_iphone_shaken = shake;
+			if (config.getShakeAction() == CFG_SHAKE_CHANGE_SONG) {
+				iPodNext();
+			}
+			else if (al_current_time() > next_shake) {
+				iphone_shake_time = al_current_time();
+				next_shake = al_current_time()+0.5;
+			}
+		}
+#endif
 
 		if (pump_events_only) {
 			continue;
@@ -1077,21 +1186,6 @@ top:
 			}
 		}
 			
-#ifdef ALLEGRO_IPHONE
-		if (event.type == ALLEGRO_EVENT_DISPLAY_CONNECTED) {
-			create_airplay_mirror = true;
-		}
-		else if (event.type == ALLEGRO_EVENT_DISPLAY_DISCONNECTED) {
-			delete_airplay_mirror = true;
-		}
-#endif
-
-#ifdef A5_D3D_XXX
-		if (event.type == ALLEGRO_EVENT_DISPLAY_FOUND) {
-			should_reset = true;
-		}
-#endif
-
 		if ((((event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN) && event.keyboard.keycode == config.getKeyQuit()) || event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) && !shooter_paused) {
 #ifdef ALLEGRO_IPHONE
 			if (!sound_was_playing_at_program_start)
@@ -1102,118 +1196,6 @@ top:
 			break;
 #endif
 		}
-#if defined ALLEGRO_ANDROID
-		if (event.type == ALLEGRO_EVENT_DISPLAY_RESIZE) {
-			do_acknowledge_resize = true;
-		}
-#endif
-#ifdef ALLEGRO_IPHONE
-		if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT)
-		{
-			do_pause_game = should_pause_game();
-			if (do_pause_game || in_pause) {
-				backup_music_volume = 0.5;
-				backup_ambience_volume = 0.5;
-			}
-			else {
-				backup_music_volume = getMusicVolume();
-				backup_ambience_volume = getAmbienceVolume();
-			}
-			setMusicVolume(0.0);
-			setAmbienceVolume(0.0);
-		}
-		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN)
-		{
-			setMusicVolume(backup_music_volume);
-			setAmbienceVolume(backup_ambience_volume);
-		}
-#endif
-#if defined KINDLEFIRE
-		if (event.type == ALLEGRO_EVENT_DISPLAY_ORIENTATION) {
-			//set_transform(display);
-		}
-#endif
-
-#ifdef ALLEGRO_ANDROID
-		if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN) {
-			al_start_timer(logic_timer);
-			al_start_timer(draw_timer);
-			switched_in = true;
-		}
-		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT) {
-			old_music_name = musicName;
-			old_ambience_name = ambienceName;
-			old_music_volume = getMusicVolume();
-			old_ambience_volume = getAmbienceVolume();
-			playMusic("");
-			playAmbience("");
-			al_stop_timer(logic_timer);
-			al_stop_timer(draw_timer);
-			switched_in = false;
-			music_replayed = false;
-		}
-#endif
-
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-		if (event.type == ALLEGRO_EVENT_DISPLAY_HALT_DRAWING) {
-			if (in_shooter && shooter_paused) {
-				break_shooter_pause = true;
-			}
-			save_memory(false);
-#if defined ALLEGRO_IPHONE
-			if (!isMultitaskingSupported()) {
-				if (!sound_was_playing_at_program_start)
-					iPodStop();
-				exit(0);
-			}
-#elif defined ALLEGRO_ANDROID
-			_destroy_loaded_bitmaps();
-			destroy_fonts();
-#endif
-			config.write();
-#ifndef ALLEGRO_ANDROID
-			al_stop_timer(logic_timer);
-			al_stop_timer(draw_timer);
-#endif
-			// halt
-			al_acknowledge_drawing_halt(display);
-			got_resume = false;
-			al_run_detached_thread(
-				wait_for_drawing_resume,
-				input_event_queue
-			);
-#ifdef ALLEGRO_ANDROID
-			halted = true;
-#endif
-			al_lock_mutex(switch_mutex);
-			while (!got_resume) {
-				al_wait_cond(switch_cond, switch_mutex);
-			}
-			al_unlock_mutex(switch_mutex);
-#ifdef ALLEGRO_ANDROID
-			halted = false;
-#endif
-			// resume
-			al_acknowledge_drawing_resume(display, _reload_loaded_bitmaps);
-#ifdef ALLEGRO_ANDROID
-			_reload_loaded_bitmaps_delayed();
-			load_fonts();
-			if (in_shooter) {
-				shooter_restoring = true;
-			}
-#endif
-			glDisable(GL_DITHER);
-			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-#ifndef ALLEGRO_ANDROID
-			al_start_timer(logic_timer);
-			al_start_timer(draw_timer);
-#else
-#endif
-		}
-		if (ALLEGRO_EVENT_TYPE_IS_USER(event.type)) {
-			al_unref_user_event((ALLEGRO_USER_EVENT *)&event);
-		}
-#endif
 	}
 
 	if (pump_events_only) {
@@ -1337,14 +1319,13 @@ top:
 		goto top;
 	}
 #endif
-	
+
 	return close_pressed;
 }
 
 
 void do_close(bool quit)
 {
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (mapWidget) {
 		mapWidget->auto_save(0, true);
 	}
@@ -1352,10 +1333,6 @@ void do_close(bool quit)
 		area->auto_save_game(0, true, false);
 	}
 	save_memory(true);
-	config.write();
-	if (quit)
-		throw QuitError();
-#else
 	if (close_pressed_for_configure) {
 		close_pressed_for_configure = false;
 		close_pressed = false;
@@ -1392,7 +1369,6 @@ void do_close(bool quit)
 #endif
 		}
 	}
-#endif
 }
 
 
@@ -1869,8 +1845,10 @@ int main(int argc, char *argv[])
 	initiOSKeyboard();
 	al_register_event_source(input_event_queue, &user_event_source);
 #endif
+
+	int ma = config.getMaintainAspectRatio();
+	config.setMaintainAspectRatio(ASPECT_FILL_SCREEN);
 	
-	//MBITMAP *nooskewl = m_load_bitmap(getResource("media/nooskewl.png"));
 	const float svg_w = 362;
 	float disp_w = al_get_display_width(display);
 	float disp_h = al_get_display_height(display);
@@ -1908,15 +1886,22 @@ int main(int argc, char *argv[])
 	bool cancelled = transitionIn(true, false, transition_scale);
 
 	if (!cancelled) {
-		al_set_target_backbuffer(display);
+		m_set_target_bitmap(buffer);
 		m_clear(black);
-		al_draw_bitmap(nooskewl, disp_w/2-al_get_bitmap_width(nooskewl)/2,
-			disp_h/2-al_get_bitmap_height(nooskewl)/2, 0);
+		al_draw_bitmap(
+			nooskewl,
+			disp_w/2-al_get_bitmap_width(nooskewl)/2,
+			disp_h/2-al_get_bitmap_height(nooskewl)/2,
+			0
+		);
+		drawBufferToScreen();
 		m_flip_display();
 		
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-			if (is_close_pressed())
+			if (is_close_pressed()) {
+				config.setMaintainAspectRatio(ma);
 				throw QuitError();
+			}
 #endif
 			
 		//loadPlayDestroy("nooskewl.ogg");
@@ -1930,6 +1915,8 @@ int main(int argc, char *argv[])
 
 	m_destroy_bitmap(buffer);
 	buffer = oldbuf;
+	
+	config.setMaintainAspectRatio(ma);
 
 	#ifdef DEBUG_XXX
 	DEBUG_DATA d;
@@ -1961,6 +1948,18 @@ int main(int argc, char *argv[])
 		connect_second_display();
 	}
 #endif
+
+
+
+/*
+	// FIXME:
+	while (true) {
+		is_close_pressed();
+	}
+*/
+
+
+
 
 	// FIXME
 	//playMusic("volcano.ogg"); while (1) volcano_scene();

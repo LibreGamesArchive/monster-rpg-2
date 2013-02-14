@@ -1043,7 +1043,9 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	MTextButton *mainMagic = new MTextButton(162, yy, "Magic", false, left_widget);
 	yy += yinc;
 	MTextButton *mainForm = new MTextButton(162, yy, "Form", false, left_widget);
+#if defined ALLEGRO_ANDROID || defined ALLEGRO_IPHONE
 	if (use_dpad)
+#endif
 		yy += yinc;
 	MTextButton *mainStats = new MTextButton(162, yy, "Stats", false, left_widget);
 	yy += yinc;
@@ -1133,7 +1135,9 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	tguiAddWidget(mainFrame);
 	tguiAddWidget(mainItem);
 	tguiAddWidget(mainMagic);
+#if defined ALLEGRO_ANDROID || defined ALLEGRO_IPHONE
 	if (use_dpad)
+#endif
 		tguiAddWidget(mainForm);
 	tguiAddWidget(mainStats);
 	tguiAddWidget(mainSave);
@@ -1291,7 +1295,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 					InputDescriptor id = getInput()->getDescriptor();
 
 					bool handled = false;
-					if ((have_mouse && !id.button1) || !use_dpad) {
+					if (!id.button1) {
 						int chosen = partySelectorTop->getEquipIndex();
 						int *toUnequip = 0;
 						int *toUnequip_quantity = 0;
@@ -1346,7 +1350,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 							handled = true;
 						}
 					}
-					if (use_dpad && !handled) {
+					if (!handled) {
 						std::vector<int> i;
 						i.push_back(0);
 						equipChooser->setSelected(i);
@@ -1413,14 +1417,10 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 					tguiSetFocus(partySelectorTop);
 				}
 				else {
-					if (use_dpad) {
-						tguiDeleteWidget(equipChooser);
-						tguiSetFocus(partySelectorTop);
-					}
-					if (have_mouse || !use_dpad) {
-						for (int i = 0; i < (int)chosen.size(); i++) {
-							chosen[i] = -chosen[i] - 1;
-						}
+					tguiDeleteWidget(equipChooser);
+					tguiSetFocus(partySelectorTop);
+					for (int i = 0; i < (int)chosen.size(); i++) {
+						chosen[i] = -chosen[i] - 1;
 					}
 				}
 			}
@@ -1837,9 +1837,6 @@ void doMap(std::string startPlace, std::string prefix)
 		was_in_map = true;
 	}
 
-	Input *input = getInput();
-	int dir = input->getDirection();
-
 	in_map = true;
 	
 	fadeOut(black);
@@ -1913,7 +1910,13 @@ done:
 	delete mapWidget;
 	mapWidget = NULL;
 
-	input->setDirection(dir);
+	if (party[heroSpot]) {
+		Input *obj_in = party[heroSpot]->getObject()->getInput();
+		Input *i = getInput();
+		if (obj_in && i) {
+			i->setDirection(obj_in->getDescriptor().direction);
+		}
+	}
 
 	in_map = false;
 
@@ -3220,9 +3223,11 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 
 	tguiLowerWidget(save_tab);
 	tguiLowerWidget(frame);
-
-	bool first_frame = true;
-
+			
+	m_set_target_bitmap(buffer);
+	m_clear(black);
+	tguiDraw();
+	fadeIn(black);
 
 	clear_input_events();
 
@@ -3410,20 +3415,13 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
+
 			m_set_target_bitmap(buffer);
-
 			m_clear(black);
-
 			tguiDraw();
 
-			if (first_frame) {
-				fadeIn(black);
-				first_frame = false;
-			}
-			else {
-				drawBufferToScreen();
-				m_flip_display();
-			}
+			drawBufferToScreen();
+			m_flip_display();
 		}
 	}
 done:
@@ -3648,12 +3646,14 @@ bool config_menu(bool start_on_fullscreen)
 	language_toggle->setSelected(curr_language);
 	y += 13;
 	
-	const char *reset_str = "Reset achievements";
 	MTextButton *reset_game_center = NULL;
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+	const char *reset_str = "Reset achievements";
 	if (isGameCenterAPIAvailable()) {
 		reset_game_center = new MTextButton(BW-2-(m_text_length(game_font, _t(reset_str))+m_get_bitmap_width(cursor)+1), BH-2-26, reset_str);
 	}
+#else
+	const char *reset_str = "Controls";
 #endif
 
 	MTextButton *controls = new MTextButton(BW-2-(m_text_length(game_font, _t(reset_str))+m_get_bitmap_width(cursor)+1), BH-2-13, "Controls");

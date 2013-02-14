@@ -178,10 +178,12 @@ end
 
 function do_info(spot, pos)
 	if (pos == -1) then
+		playPreloadedSample("select.ogg")
 		showBeachBattleInfo(spot)
 	else
 		local x, y = getObjectPosition(dudes[spot+1].obj.id)
 		if ((y-2) == pos) then
+			playPreloadedSample("select.ogg")
 			showBeachBattleInfo(spot)
 		end
 	end

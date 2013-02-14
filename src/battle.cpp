@@ -509,7 +509,7 @@ void Battle::draw(void)
 			}
 		}
 		mDrawFrame(x, y, w, h, true);
-		mTextout(game_font, _t((*messages.begin()).text.c_str()), x+5, y+3,
+		mTextout(game_font, _t((*messages.begin()).text.c_str()), x+5, y+4,
 			white, black,
 			WGT_TEXT_DROP_SHADOW, false);
 	}

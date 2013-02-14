@@ -31,7 +31,7 @@ public class RawInputIME extends InputMethodService
 		}
 		pressTimes[keyCode] = now;
 
-		Log.d("RawInputIME", "Down: " + keyCode);
+		//Log.d("RawInputIME", "Down: " + keyCode);
 		getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyCode));
 
 		return true;
@@ -45,7 +45,7 @@ public class RawInputIME extends InputMethodService
 
 		pressTimes[keyCode] = System.currentTimeMillis()-KEY_REPEAT_MILLIS;
 
-		Log.d("RawInputIME", "Up: " + keyCode);
+		//Log.d("RawInputIME", "Up: " + keyCode);
 		getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyCode));
 
 		return true;

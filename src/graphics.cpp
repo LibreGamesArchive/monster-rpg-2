@@ -657,7 +657,7 @@ static void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 #ifdef ALLEGRO_RASPBERRYPI
 	if (custom_mouse_cursor && show_custom_mouse_cursor) {
 #else
-	if (sd->fullscreen) {
+	if (sd->fullscreen && custom_mouse_cursor) {
 #endif
 		ALLEGRO_MOUSE_STATE state;
 		al_get_mouse_state(&state);
@@ -969,14 +969,7 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 
 		al_set_clipping_rectangle(cx, cy, cw, ch);
 		
-		al_set_target_backbuffer(display);
-		al_draw_scaled_bitmap(
-			buffer->bitmap,
-			0, 0, BW, BH,
-			0, 0, disp_w, disp_h,
-			0
-		);
-		//drawBufferToScreen(buffer, true);
+		drawBufferToScreen(buffer, true);
 		m_flip_display();
 	}
 

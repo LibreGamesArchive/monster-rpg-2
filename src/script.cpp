@@ -681,8 +681,10 @@ int CDeScriptifyPlayer(lua_State *stack)
 	al_lock_mutex(input_mutex);
 	player_scripted = false;
 	Input *i = party[heroSpot]->getObject()->getInput();
+	int d = i->getDescriptor().direction;
 	delete i;
 	party[heroSpot]->getObject()->setInput(getInput());
+	getInput()->setDirection(d);
 	astar_stop();
 	area->center_view = false;
 	area->resetInput();
