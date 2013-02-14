@@ -17,7 +17,7 @@ class Object
 {
 
 public:
-	bool isSpecialWalkable(void);
+	bool isSpecialWalkable();
 	void setSpecialWalkable(bool s);
 	void setDest(int dx, int dy);
         void setPosition(int x, int y);
@@ -29,42 +29,44 @@ public:
 	void setHidden(bool hidden);
 	void setSolid(bool solid);
 	void setPerson(bool person);
-	void stop(void);
+	void stop();
 	void setFloater(bool floater);
 	void setPoisoned(bool poisoned);
-	bool getPoisoned(void);
+	bool getPoisoned();
 	void setDimensions(int x, int y);
         
         void getPosition(int *x, int *y);
 	void getOffset(int *x, int *y);
-	int getX(void);
-	int getY(void);
+	int getX();
+	int getY();
         uint getId( void );
-	bool isHigh(void);
-	bool isLow(void);
-	bool isHidden(void);
-	Input *getInput(void);
-	AnimationSet *getAnimationSet(void);
-	std::vector<int *> &getOccupied(void);
-	bool isSolid(void);
-	bool isMoving(void);
-	int getMoveDirection(void);
+	bool isHigh();
+	bool isLow();
+	bool isHidden();
+	Input *getInput();
+	AnimationSet *getAnimationSet();
+	std::vector<int *> &getOccupied();
+	bool isSolid();
+	bool isMoving();
+	int getMoveDirection();
 	void getDimensions(int *x, int *y);
-	bool isPoisoned(void);
+	bool isPoisoned();
+
+	void faceInputsLikeSprite();
 
 	void draw(float x, float y);
-	virtual void draw(void);
-	virtual void drawUpper(void);
+	virtual void draw();
+	virtual void drawUpper();
 	// return false to destroy
 	virtual bool update(Area *area, int step);
 
-	Object(void);
-	virtual ~Object(void);
+	Object();
+	virtual ~Object();
 
 
 protected:
         
-	void clearOccupied(void);
+	void clearOccupied();
 	void addOccupied(int x, int y);
 
 	int x, y;
@@ -106,10 +108,10 @@ class SparklySpiral : public Object
 public:
 	static const int NUM_SPARKLES = 35;
 	bool update(Area *area, int step);
-	void draw(void);
+	void draw();
 
 	SparklySpiral(float x, float y);
-	virtual ~SparklySpiral(void);
+	virtual ~SparklySpiral();
 
 protected:
 	float x, y;
@@ -132,10 +134,10 @@ public:
 	static const int NUM_PUFFS = 6;
 	static const int MAX_HEIGHT = 25;
 	bool update(Area *area, int step);
-	void draw(void);
+	void draw();
 
 	Smoke(float x, float y);
-	virtual ~Smoke(void);
+	virtual ~Smoke();
 
 protected:
 	float x, y;
@@ -148,10 +150,10 @@ class Light : public Object
 {
 public:
 	bool update(Area *area, int step);
-	void draw(void);
+	void draw();
 
 	Light(float x, float y, int dir, int topw, int bottomw, int length, MCOLOR color);
-	virtual ~Light(void);
+	virtual ~Light();
 
 protected:
 	float x, y;
@@ -166,10 +168,10 @@ public:
 	static const int MAX_WIGGLE = 3;
 	static const float SPEED;
 	bool update(Area *area, int step);
-	void draw(void);
+	void draw();
 
 	Fish(float x, float y);
-	virtual ~Fish(void);
+	virtual ~Fish();
 
 protected:
 	float x, y;
@@ -201,13 +203,13 @@ public:
 	static const int MAX_PUFFS = 20;
 	static const int PUFF_RADIUS = TILE_SIZE*2;
 
-	void start(void);
+	void start();
 	
 	bool update(Area *area, int step);
-	void draw(void);
+	void draw();
 
 	Rocket(float x, float y, std::string spriteName);
-	virtual ~Rocket(void);
+	virtual ~Rocket();
 
 protected:
 	int area_ox, area_oy;
@@ -224,6 +226,6 @@ protected:
 	float vel;
 };
 
-void resetIds(void);
+void resetIds();
 
 #endif

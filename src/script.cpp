@@ -12,7 +12,6 @@ static bool lander_success = false;
 bool shouldDoMap = false;
 std::string mapStartPlace;
 std::string mapPrefix;
-int battleStartDirection;
 
 // Note: lua starts counting at 1, in C++ we start at 0, that's why you
 // see -1 and +1  here and there
@@ -1267,9 +1266,6 @@ static int CStartBattle(lua_State *stack)
 	if (t == "") {
 		return 0;
 	}
-
-	InputDescriptor ie = getInput()->getDescriptor();
-	battleStartDirection = ie.direction;
 
 	if (area->getName() == "jungle") {
 		playAmbience("");

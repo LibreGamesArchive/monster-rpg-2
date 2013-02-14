@@ -19,18 +19,40 @@ static int yoffsets[] = {
 static float poison_x;
 
 
-static unsigned int findUniqueId(void)
+static unsigned int findUniqueId()
 {
 	// Ok, this is easy enough...
 	return last_id++;
 }
 
-void resetIds(void)
+void resetIds()
 {
 	last_id = 0;
 }
 
-
+void Object::faceInputsLikeSprite()
+{
+	if (animationSet) {
+		std::string subName = animationSet->getSubName();
+		Input *i = getInput();
+		if (subName == "stand_s" || subName == "walk_s") {
+			if (i) i->setDirection(DIRECTION_SOUTH);
+			if (input) input->setDirection(DIRECTION_SOUTH);
+		}
+		else if (subName == "stand_n" || subName == "walk_n") {
+			if (i) i->setDirection(DIRECTION_NORTH);
+			if (input) input->setDirection(DIRECTION_NORTH);
+		}
+		else if (subName == "stand_e" || subName == "walk_e") {
+			if (i) i->setDirection(DIRECTION_EAST);
+			if (input) input->setDirection(DIRECTION_EAST);
+		}
+		else if (subName == "stand_w" || subName == "walk_w") {
+			if (i) i->setDirection(DIRECTION_WEST);
+			if (input) input->setDirection(DIRECTION_WEST);
+		}
+	}
+}
 
 void Object::setDimensions(int w, int h)
 {
@@ -117,12 +139,12 @@ uint Object::getId( void )
     return this->_id;
 }
 
-bool Object::isHigh(void)
+bool Object::isHigh()
 {
 	return high;
 }
 
-bool Object::isLow(void)
+bool Object::isLow()
 {
 	return low;
 }
@@ -137,7 +159,7 @@ void Object::setLow(bool low)
 	this->low = low;
 }
 
-bool Object::isHidden(void)
+bool Object::isHidden()
 {
 	return hidden;
 }
@@ -147,22 +169,22 @@ void Object::setHidden(bool hidden)
 	this->hidden = hidden;
 }
 
-int Object::getX(void)
+int Object::getX()
 {
 	return x;
 }
 
-int Object::getY(void)
+int Object::getY()
 {
 	return y;
 }
 
-Input *Object::getInput(void)
+Input *Object::getInput()
 {
 	return input;
 }
 
-std::vector<int *> &Object::getOccupied(void)
+std::vector<int *> &Object::getOccupied()
 {
 	return occupied;
 }
@@ -174,25 +196,25 @@ void Object::setInput(Input *i)
 }
 
 
-AnimationSet *Object::getAnimationSet(void)
+AnimationSet *Object::getAnimationSet()
 {
 	return animationSet;
 }
 
 
-bool Object::isSolid(void)
+bool Object::isSolid()
 {
 	return solid;
 }
 
 
-bool Object::isMoving(void)
+bool Object::isMoving()
 {
 	return moving;
 }
 
 
-int Object::getMoveDirection(void)
+int Object::getMoveDirection()
 {
 	return moveDirection;
 }
@@ -216,7 +238,7 @@ void Object::draw(float x, float y)
 	animationSet->draw(x, y-o);
 }
 
-void Object::draw(void)
+void Object::draw()
 {
 	if (!animationSet)
 		return;
@@ -231,7 +253,7 @@ void Object::draw(void)
 }
 
 
-void Object::drawUpper(void)
+void Object::drawUpper()
 {
 	if (poisoned && poisonBlocks[0].color.a > 0.0f) {
 		int dx = poisonBlocks[0].x;
@@ -297,7 +319,7 @@ void Object::drawUpper(void)
 	}
 }
 
-void Object::stop(void)
+void Object::stop()
 {
 	moving = false;
 	clearOccupied();
@@ -555,19 +577,19 @@ void Object::setPoisoned(bool p)
 	poisoned = p;
 }
 
-bool Object::getPoisoned(void)
+bool Object::getPoisoned()
 {
 	return poisoned;
 }
 
 
-bool Object::isPoisoned(void)
+bool Object::isPoisoned()
 {
 	return poisoned;
 }
 
 
-bool Object::isSpecialWalkable(void)
+bool Object::isSpecialWalkable()
 {
 	return specialWalkable;
 }
@@ -578,7 +600,7 @@ void Object::setSpecialWalkable(bool s)
 }
 
 
-Object::Object(void)
+Object::Object()
 {
 	x = y = 0;
 	ox = oy = 0;
@@ -604,7 +626,7 @@ Object::Object(void)
 }
 
 
-Object::~Object(void)
+Object::~Object()
 {
 	if (input)
 		delete input;
@@ -624,7 +646,7 @@ void Object::addOccupied(int occx, int occy)
 	}
 }
 
-void Object::clearOccupied(void)
+void Object::clearOccupied()
 {
 	for (uint i = 0; i < occupied.size(); i++)
 		delete[] occupied[i];
@@ -666,7 +688,7 @@ bool SparklySpiral::update(Area *area, int step)
 }
 
 
-void SparklySpiral::draw(void)
+void SparklySpiral::draw()
 {
 	int cx = m_get_bitmap_width(bitmap)/2;
 	int cy = m_get_bitmap_height(bitmap)/2;
@@ -707,7 +729,7 @@ SparklySpiral::SparklySpiral(float x, float y)
 }
 
 
-SparklySpiral::~SparklySpiral(void)
+SparklySpiral::~SparklySpiral()
 {
 	m_destroy_bitmap(bitmap);
 	sparkles.clear();
@@ -730,7 +752,7 @@ bool Smoke::update(Area *area, int step)
 }
 
 
-void Smoke::draw(void)
+void Smoke::draw()
 {
 	int dx, dy;
 	int half_w = m_get_bitmap_width(bitmap)/2;
@@ -766,7 +788,7 @@ Smoke::Smoke(float x, float y)
 }
 
 
-Smoke::~Smoke(void)
+Smoke::~Smoke()
 {
 	m_destroy_bitmap(bitmap);
 }
@@ -779,7 +801,7 @@ bool Light::update(Area *area, int step)
 }
 
 
-void Light::draw(void)
+void Light::draw()
 {
 	m_save_blender();
 
@@ -805,13 +827,13 @@ Light::Light(float x, float y, int dir, int topw, int bottomw, int length, MCOLO
 }
 
 
-Light::~Light(void)
+Light::~Light()
 {
 	m_destroy_bitmap(bmp);
 }
 
 
-void Fish::draw(void)
+void Fish::draw()
 {
 	m_push_target_bitmap();
 
@@ -937,7 +959,7 @@ Fish::~Fish()
 }
 
 
-void Rocket::draw(void)
+void Rocket::draw()
 {
 	if (!started) {
 		animationSet->draw(x+ox-area->getOriginX(), y-animationSet->getHeight()-area->getOriginY(), 0);
@@ -1045,7 +1067,7 @@ bool Rocket::update(Area *area, int step)
 }
 
 
-void Rocket::start(void)
+void Rocket::start()
 {
 	started = true;
 	area_ox = area_oy = 0;

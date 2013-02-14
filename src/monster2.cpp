@@ -1577,6 +1577,13 @@ static void run()
 					}
 					delete battle;
 					battle = NULL;
+					
+					if (party[heroSpot]) {
+						Object *o = party[heroSpot]->getObject();
+						if (o) {
+							o->faceInputsLikeSprite();
+						}
+					}
 				
 					if (result == BATTLE_ENEMY_WIN && battle_must_win) {
 						m_rest(5);
@@ -1592,7 +1599,6 @@ static void run()
 							}
 						}
 					}
-					getInput()->setDirection(battleStartDirection);
 				}
 				levels.clear();
 			}

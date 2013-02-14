@@ -34,6 +34,7 @@ function start()
 
 	if (not getMilestone(MS_BEAT_TROLL)) then
 		troll = Object:new{x=31, y=23, anim_set="Troll"}
+		setObjectHigh(troll.id, true)
 	end
 
 	if (not getMilestone(MS_KILLED_NANNER)) then
@@ -123,7 +124,6 @@ function update(step)
 		if (not inBattle()) then
 			troll_battle_started = false
 			if (battleWon()) then
-				descriptifyPlayer()
 				removeObject(troll.id)
 				setMilestone(MS_BEAT_TROLL, true)
 			end
@@ -132,7 +132,6 @@ function update(step)
 		troll_dialogue_started = true
 		stopObject(0)
 		setObjectDirection(0, DIRECTION_NORTH)
-		scriptifyPlayer()
 		doDialogue("Troll: Neeeeeeuuu!\nEny: What are you saying?\nTroll: Naaaaaaaaaarrr!\n", true, false, true)
 		startBattle("1Troll", true)
 		troll_battle_started = true
@@ -165,7 +164,6 @@ function update(step)
 	if (nanner_battle_started) then
 		if (not inBattle()) then
 			nanner_battle_started = false
-			descriptifyPlayer()
 			if (battleWon()) then
 				setMilestone(MS_KILLED_NANNER, true)
 				chest = Chest:new{x=28, y=8, anim_set="chest", milestone=MS_NANNER_CHEST, index=ITEM_KEEP_KEY_UP}
@@ -210,7 +208,6 @@ function activate(activator, activated)
 
 	if (not getMilestone(MS_KILLED_NANNER)) then
 		if (activated == nanner.id) then
-			scriptifyPlayer()
 			doDialogue("Nanner: See what the Rider did to me?!...\nNanner: All I have left is this key, so no, you can't have it!\n", true, false, true)
 			rest(0.5)
 			doDialogue("Nanner: Hmm.. and I'm going to destroy you too!\n", true)

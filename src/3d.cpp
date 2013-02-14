@@ -802,6 +802,10 @@ static int NUM_GOBLINS;
 
 static int real_archery(int *accuracy_pts)
 {
+	MBITMAP *tmp_cursor = custom_mouse_cursor;
+	custom_mouse_cursor = NULL;
+	al_hide_mouse_cursor(display);
+
 	dpad_off();
 
 	int scr_w = al_get_display_width(display);
@@ -847,7 +851,7 @@ static int real_archery(int *accuracy_pts)
 	current_mouse_y = BH/2;
 	al_set_mouse_xy(display, current_mouse_x, current_mouse_y);
 #endif
-
+	
 	m_set_target_bitmap(buffer);
 	m_clear(m_map_rgb(0, 0, 0));
 
@@ -999,25 +1003,26 @@ static int real_archery(int *accuracy_pts)
 				}
 			}
 
+			/*
 			if (!use_dpad) {
 				if (!clicked && !released) {
 					clicked = true;
 				}
 			}
-			InputDescriptor ie = { 0, };
-			if (use_dpad) {
-				ie = getInput()->getDescriptor();
-			}
+			*/
+
+			InputDescriptor id = { 0, };
+			id = getInput()->getDescriptor();
 
 			bool mouse_button_1_pressed = false;
 
-			if (have_mouse) {
-				ALLEGRO_MOUSE_STATE state;
-				al_get_mouse_state(&state);
-				mouse_button_1_pressed = state.buttons & 1;
-			}
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+			ALLEGRO_MOUSE_STATE state;
+			al_get_mouse_state(&state);
+			mouse_button_1_pressed = state.buttons & 1;
+#endif
 
-			if ((use_dpad && (ie.button1 || mouse_button_1_pressed) && drawn) || (!use_dpad && clicked && released && drawn)) {
+			if (((id.button1 || mouse_button_1_pressed) && drawn) || (!use_dpad && clicked && released && drawn)) {
 				num_shots++;
 				clicked = false;
 				drawn = false;
@@ -1046,47 +1051,48 @@ static int real_archery(int *accuracy_pts)
 				}
 			}
 
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			if (!use_dpad) {
 				al_lock_mutex(click_mutex);
 				target_x = current_mouse_x;
 				target_y = current_mouse_y;
 				al_unlock_mutex(click_mutex);
 			}
-			if (use_dpad) {
-				if (ie.left) {
-					target_x -= aim_speed * LOGIC_MILLIS;
-					if (target_x < 0) target_x = 0;
-				}
-				else if (ie.right) {
-					target_x += aim_speed * LOGIC_MILLIS;
-					if (target_x >= BW)
-						target_x = BW-1;
-				}
+#endif
 
-				if (ie.up) {
-					target_y -= aim_speed * LOGIC_MILLIS;
-					if (target_y < 0) target_y = 0;
-				}
-				else if (ie.down) {
-					target_y += aim_speed * LOGIC_MILLIS;
-					if (target_y >= BH)
-						target_y = BH-1;
-				}
-				if (have_mouse) {
-					ALLEGRO_MOUSE_STATE state;
-					al_get_mouse_state(&state);
-					int mx = state.x;
-					int my = state.y;
-					if (mx != last_mouse_x || my != last_mouse_y) {
-						last_mouse_x = mx;
-						last_mouse_y = my;
-						scr_w = al_get_display_width(display);
-						scr_h = al_get_display_height(display);
-						target_x = (float)mx / scr_w * BW;
-						target_y = (float)my / scr_h * BW;
-					}
-				}
+			if (id.left) {
+				target_x -= aim_speed * LOGIC_MILLIS;
+				if (target_x < 0) target_x = 0;
 			}
+			else if (id.right) {
+				target_x += aim_speed * LOGIC_MILLIS;
+				if (target_x >= BW)
+					target_x = BW-1;
+			}
+
+			if (id.up) {
+				target_y -= aim_speed * LOGIC_MILLIS;
+				if (target_y < 0) target_y = 0;
+			}
+			else if (id.down) {
+				target_y += aim_speed * LOGIC_MILLIS;
+				if (target_y >= BH)
+					target_y = BH-1;
+			}
+
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+			al_get_mouse_state(&state);
+			int mx = state.x;
+			int my = state.y;
+			if (mx != last_mouse_x || my != last_mouse_y) {
+				last_mouse_x = mx;
+				last_mouse_y = my;
+				scr_w = al_get_display_width(display);
+				scr_h = al_get_display_height(display);
+				target_x = (float)mx / scr_w * BW;
+				target_y = (float)my / scr_h * BW;
+			}
+#endif
 		}
 
 		if (draw_counter > 0)
@@ -1273,6 +1279,14 @@ done:
 	dpad_on();
 	
 	custom_mouse_cursor = tmpcursor;
+
+	custom_mouse_cursor = tmp_cursor;
+#if !defined ALLEGRO_RASPBERRYPI
+	if (!config.getWantedGraphicsMode()->fullscreen) {
+		al_show_mouse_cursor(display);
+		al_set_mouse_cursor(display, allegro_cursor);
+	}
+#endif
 
 	if (break_main_loop) {
 		return 2;

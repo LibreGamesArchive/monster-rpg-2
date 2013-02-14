@@ -470,7 +470,7 @@ void showSaveStateInfo(const char *basename)
 			}
 
 			if (!updating) {
-				if (al_get_time() > started+1) {
+				if (al_get_time() > started+0.5) {
 					clear_input_events();
 					updating = true;
 				}
@@ -706,7 +706,7 @@ void showItemInfo(int index, bool preserve_buffer)
 			}
 
 			if (!updating) {
-				if (al_get_time() > started+1) {
+				if (al_get_time() > started+0.5) {
 					clear_input_events();
 					updating = true;
 				}

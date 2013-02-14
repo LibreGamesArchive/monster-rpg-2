@@ -24,6 +24,5 @@ extern bool player_scripted;
 extern bool shouldDoMap;
 extern std::string mapStartPlace;
 extern std::string mapPrefix;
-extern int battleStartDirection;
 
 #endif

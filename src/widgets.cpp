@@ -386,7 +386,7 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 			}
 
 			if (!updating) {
-				if (al_get_time() > started+1) {
+				if (al_get_time() > started+0.5) {
 					clear_input_events();
 					updating = true;
 				}
@@ -460,7 +460,7 @@ static void _drawSimpleStatus_real(Player *p, int x, int y, CombatantInfo info)
 	
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 	if (info.condition == CONDITION_POISONED) {
-		al_draw_filled_rectangle(x-1, y-1, x+1+al_get_bitmap_width(icon->bitmap), y+1+al_get_bitmap_height(icon->bitmap), al_map_rgb_f(0.75f, 0.0f, 1.0f));
+		al_draw_filled_rectangle(x-1, y-1, x+1+al_get_bitmap_width(icon->bitmap), y+1+al_get_bitmap_height(icon->bitmap), al_map_rgb_f(1.0f, 0.0f, 1.0f));
 	}
 	m_draw_bitmap(icon, x, y, 0);
 	int w = m_get_bitmap_width(icon);
@@ -2237,7 +2237,7 @@ void MStats::draw()
 
 	MBITMAP *icon = p->getIcon();
 	if (info.condition == CONDITION_POISONED) {
-		al_draw_filled_rectangle(x+1, y+1, x+3+al_get_bitmap_width(icon->bitmap), y+3+al_get_bitmap_height(icon->bitmap), al_map_rgb_f(0.75f, 0.0f, 1.0f));
+		al_draw_filled_rectangle(x+1, y+1, x+3+al_get_bitmap_width(icon->bitmap), y+3+al_get_bitmap_height(icon->bitmap), al_map_rgb_f(1.0f, 0.0f, 1.0f));
 	}
 	m_draw_bitmap(icon, x+2, y+2, 0);
 
@@ -2705,8 +2705,6 @@ int MMap::update(int millis)
 			int totalElapsed = 0;
 			dpad_off();
 			
-			clear_input_events();
-
 			while  (now < end) {
 				if (is_close_pressed()) {
 					do_close();
@@ -2744,8 +2742,6 @@ int MMap::update(int millis)
 			m_destroy_bitmap(bmp);
 			m_rest(2);
 			fadeOut(black);
-			
-			clear_input_events();
 		}
 
 

@@ -2318,7 +2318,7 @@ void toggle_fullscreen(void)
 	if (in_shooter) {
 		al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
 	}
-	else {
+	else if (custom_mouse_cursor) {
 		al_set_mouse_xy(display, al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor->bitmap)-20, al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor->bitmap)-20);
 	}
 #endif
