@@ -1316,10 +1316,10 @@ void create_buffers(void)
 		m_destroy_bitmap(overlay);
 	int flags = al_get_new_bitmap_flags();
 	if (config.getFilterType() == FILTER_LINEAR) {
-		al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | NO_PRESERVE_TEXTURE);
+		al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | NO_PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
 	}
 	else
-		al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE);
+		al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
 	buffer = m_create_bitmap(BW, BH); // check
 	overlay = m_create_bitmap(BW, BH); // check
 	al_set_new_bitmap_flags(flags);
@@ -1990,6 +1990,7 @@ bool init(int *argc, char **argv[])
 	guiAnims.wide_sub = m_create_sub_bitmap(guiAnims.bitmap, 0, 3, 32, 3);
 	guiAnims.tall_sub = m_create_sub_bitmap(guiAnims.bitmap, 0, 6, 3, 32);
 
+	al_set_new_bitmap_flags(PRESERVE_TEXTURE);
 	al_set_new_bitmap_flags(PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
 	
 	cursor = m_load_bitmap(getResource("media/cursor.png"));
@@ -2301,11 +2302,15 @@ void toggle_fullscreen(void)
 		big_depth_surface->Release();
 	}
 	_destroy_loaded_bitmaps();
+	destroy_fonts();
+	destroyIcons();
 #endif
 	al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, config.getWantedGraphicsMode()->fullscreen);
 #ifdef A5_D3D
 	_reload_loaded_bitmaps();
 	_reload_loaded_bitmaps_delayed();
+	load_fonts();
+	icon_bmp = m_load_bitmap_redraw(getResource("media/icons.png"), loadIcons, NULL);
 #endif
 	set_screen_params();
 #ifdef A5_D3D

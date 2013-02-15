@@ -137,15 +137,21 @@ void connect_second_display(void)
 	int mvol = config.getMusicVolume();
 	int svol = config.getSFXVolume();
 
+	al_set_target_bitmap(NULL);
+
 	connect_airplay_controls();
 	
 	_destroy_loaded_bitmaps();
+	destroy_fonts();
+	destroyIcons();
 	
 	destroy_shaders();
 	al_destroy_display(display);
 	
 	_reload_loaded_bitmaps();
-
+	load_fonts();
+	icon_bmp = m_load_bitmap_redraw(getResource("media/icons.png"), loadIcons, NULL);
+    
 	al_set_new_display_adapter(1);
 	int flags = al_get_new_display_flags();
 	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_USE_PROGRAMMABLE_PIPELINE | flags);
@@ -153,9 +159,10 @@ void connect_second_display(void)
 	display = al_create_display(1, 1);
 	al_set_new_display_flags(flags);
 	init_shaders();
-	init2_shaders();
-	
+
 	_reload_loaded_bitmaps_delayed();
+
+	init2_shaders();
 	
 	set_screen_params();
 
@@ -1063,6 +1070,7 @@ top:
 #elif defined ALLEGRO_ANDROID
 			_destroy_loaded_bitmaps();
 			destroy_fonts();
+			destroyIcons();
 #endif
 			config.write();
 			al_stop_timer(logic_timer);
@@ -1088,6 +1096,7 @@ top:
 #ifdef ALLEGRO_ANDROID
 			_reload_loaded_bitmaps_delayed();
 			load_fonts();
+			icon_bmp = m_load_bitmap_redraw(getResource("media/icons.png"), loadIcons, NULL);
 			if (in_shooter) {
 				shooter_restoring = true;
 			}
@@ -1238,6 +1247,8 @@ top:
 			disconnect_airplay_controls();
 			
 			_destroy_loaded_bitmaps();
+			destroy_fonts();
+			destroyIcons();
 
 			destroy_shaders();
 			al_destroy_display(display);
@@ -1266,12 +1277,11 @@ top:
 			init2_shaders();
 
 			_reload_loaded_bitmaps_delayed();
+			load_fonts();
+			icon_bmp = m_load_bitmap_redraw(getResource("media/icons.png"), loadIcons, NULL);
 
 			set_screen_params();
 	
-			_reload_loaded_bitmaps();
-			_reload_loaded_bitmaps_delayed();
-			
 			m_set_target_bitmap(buffer);
 			
 			config.setMusicVolume(mvol);
@@ -1289,6 +1299,8 @@ top:
 	if (should_reset) {
 		big_depth_surface->Release();
 		_destroy_loaded_bitmaps();
+		destroy_fonts();
+		destroyIcons();
 		al_stop_timer(logic_timer);
 		al_stop_timer(draw_timer);
 		main_halted = true;
@@ -1298,6 +1310,8 @@ top:
 		init_big_depth_surface();
 		_reload_loaded_bitmaps();
 		_reload_loaded_bitmaps_delayed();
+		load_fonts();
+		icon_bmp = m_load_bitmap_redraw(getResource("media/icons.png"), loadIcons, NULL);
 		if (in_shooter) {
 			shooter_restoring = true;
 		}

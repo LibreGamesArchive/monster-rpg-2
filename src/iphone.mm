@@ -23,39 +23,32 @@ static MPMusicPlayerController *musicPlayer;
 
 void openRatingSite(void)
 {
-	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
 	const char *url_ascii = "http://www.monster-rpg.com";
 	NSString *u = [[NSString alloc] initWithCString:url_ascii encoding:NSUTF8StringEncoding];
 	CFURLRef url = CFURLCreateWithString(NULL, (CFStringRef)u, NULL);
 	[[UIApplication sharedApplication] openURL:(NSURL *)url];
 	[u release];
 	CFRelease(url);
-	[p drain];
 	exit(0);
 }
 
 void openFeedbackSite(void)
 {
-	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
 	const char *url_ascii = "http://www.monster-rpg.com/feedback.html";
 	NSString *u = [[NSString alloc] initWithCString:url_ascii encoding:NSUTF8StringEncoding];
 	CFURLRef url = CFURLCreateWithString(NULL, (CFStringRef)u, NULL);
 	[[UIApplication sharedApplication] openURL:(NSURL *)url];
 	[u release];
 	CFRelease(url);
-	[p drain];
 	exit(0);
 }
 
 
 MPMusicPlayerController *getMusicPlayer(void)
 {
-	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
-
 	if (musicPlayer == nil) {
  		musicPlayer = [MPMusicPlayerController iPodMusicPlayer];
 	}
-	[p drain];
 	return musicPlayer;
 }
 
@@ -70,8 +63,6 @@ struct Artist {
 
 void showIpod(void)
 {
-	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
-
 	global_draw_red = false;
 
 	MBITMAP *bg = m_load_bitmap(getResource("media/options_bg.png"));
@@ -490,8 +481,6 @@ superdone:
 	tguiPop();
 
 	global_draw_red = true;
-	
-	[p drain];
 }
 
 void shutdownIpod(void)
@@ -502,64 +491,48 @@ void shutdownIpod(void)
 
 bool iPodIsPlaying(void)
 {
-	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
 	return getMusicPlayer().playbackState & MPMusicPlaybackStatePlaying;
-	[p drain];
 }
 
 void iPodPrevious(void)
 {
-	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
 	[getMusicPlayer() skipToPreviousItem];
-	[p drain];
 }
 
 void iPodNext(void)
 {
-	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
 	[getMusicPlayer() skipToNextItem];
-	[p drain];
 }
 
 void iPodPlay(void)
 {
-	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
 	[getMusicPlayer() play];
-	[p drain];
 }
 
 void iPodPause(void)
 {
-	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
 	[getMusicPlayer() pause];
-	[p drain];
 }
 
 void iPodStop(void)
 {
-	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
 	[getMusicPlayer() stop];
-	[p drain];
 }
 
 // return true on success
 bool get_clipboard(char *buf, int len)
 {
-	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
 	NSString *d = [[UIPasteboard generalPasteboard] string];
 	if (d == nil)
 		return false;
 	strcpy(buf, [d UTF8String]);
-	[p drain];
 	return true;
 }
 
 void set_clipboard(char *buf)
 {
-	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
 	NSData *d = [NSData dataWithBytes:buf length:strlen(buf)];
 	[[UIPasteboard generalPasteboard] setData:d forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
-	[p drain];
 }
 
 float getBatteryLevel(void)
@@ -569,20 +542,16 @@ float getBatteryLevel(void)
 
 bool isMultitaskingSupported(void)
 {
-	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
 	char buf[100];
 	strcpy(buf, [[[UIDevice currentDevice] systemVersion] UTF8String]);
 	if (atof(buf) < 4.0) return false;
 	bool b = [[UIDevice currentDevice] isMultitaskingSupported];
-	[p drain];
 	return b;
 }
 
 void vibrate(void)
 {
-	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
 	AudioServicesPlaySystemSound (kSystemSoundID_Vibrate);
-	[p drain];
 }
 
 bool wifiConnected(void)

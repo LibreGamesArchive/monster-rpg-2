@@ -43,8 +43,6 @@ const char *file_date(const char *filename)
 {
 	static char buf[1000];
 
-	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
-
 	NSString *path = [
 		[NSString alloc]
 		initWithCString:filename encoding:NSUTF8StringEncoding];
@@ -55,26 +53,18 @@ const char *file_date(const char *filename)
 	NSString *dateStr = [date description];
 	[dateStr getCString:buf maxLength:999 encoding:NSUTF8StringEncoding];
 	[path release];
-	
-	[p drain];
 	return buf;
 }
 
 void delete_file(const char *s)
 {
-	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
-	
 	NSString *f = [[NSString alloc] initWithCString:s encoding:NSUTF8StringEncoding];
 	[[NSFileManager defaultManager] removeItemAtPath:f error:NULL];
 	[f release];
-
-	[p drain];
 }
 
 static void shift_auto_saves()
 {
-	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
-
 	char src_c[1000];
 	char dst_c[1000];
 	for (int i = 8; i >= 0; i--) {
@@ -105,8 +95,6 @@ static void shift_auto_saves()
 		[src release];
 		[dst release];
 	}
-	
-	[p drain];
 }
 #else
 static void shift_auto_saves()

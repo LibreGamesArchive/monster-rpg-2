@@ -3620,13 +3620,7 @@ bool config_menu(bool start_on_fullscreen)
 	MSingleToggle *aspect_toggle = new MSingleToggle(xx, y, aspect_choices);
 	int curr_aspect = config.getMaintainAspectRatio();
 	aspect_toggle->setSelected(aspect_real_to_option(curr_aspect));
-#if defined ALLEGRO_IPHONE
-	if (is_ipad()) {
-#endif
-		y += 13;
-#if defined ALLEGRO_IPHONE
-	}
-#endif
+	y += 13;
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
 	std::vector<std::string> fullscreen_choices;
@@ -3689,13 +3683,7 @@ bool config_menu(bool start_on_fullscreen)
 
 	tguiAddWidget(filter_type_toggle);
 
-#if defined ALLEGRO_IPHONE
-	if (is_ipad()) {
-#endif
 	tguiAddWidget(aspect_toggle);
-#if defined ALLEGRO_IPHONE
-	}
-#endif
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
 	tguiAddWidget(fullscreen_toggle);
@@ -3922,17 +3910,11 @@ bool config_menu(bool start_on_fullscreen)
 		}
 #endif
 
-#if defined ALLEGRO_IPHONE
-		if (is_ipad()) {
-#endif
 		sel = aspect_toggle->getSelected();
 		if (aspect_real_to_option(config.getMaintainAspectRatio()) != sel) {
 			config.setMaintainAspectRatio(aspect_option_to_real(sel));
 			set_screen_params();
 		}
-#if defined ALLEGRO_IPHONE
-		}
-#endif
 
 		sel = filter_type_toggle->getSelected();
 		if (config.getFilterType() != sel) {

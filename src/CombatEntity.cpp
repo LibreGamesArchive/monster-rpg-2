@@ -961,6 +961,9 @@ void WeepEffect::draw(void)
 			drops[i].color.g*drops[i].alpha*255,
 			drops[i].color.b*drops[i].alpha*255,
 			drops[i].alpha*255);
+		if (drops[i].length <= 0) {
+			continue;
+		}
 		m_draw_line(drops[i].x, 0, drops[i].x, drops[i].length,
 			color);
 	}

@@ -5710,6 +5710,8 @@ MManSelector::~MManSelector(void)
 
 void MMultiChooser::mouseDownAbs(int x, int y, int b)
 {
+	down = true;
+
 	for (int i = 0; i < (int)points.size(); i++) {
 		int w = m_get_bitmap_width(arrow)/2;
 		int dx = (x) - (points[i].x + ((points[i].west) ? w : -w));
@@ -5726,6 +5728,10 @@ void MMultiChooser::mouseDownAbs(int x, int y, int b)
 
 void MMultiChooser::mouseUp(int xx, int yy, int b)
 {
+	if (!down) {
+		return;
+	}
+
 	if (closest >= 0) {
 		closest = -1;
 
@@ -6079,6 +6085,7 @@ MMultiChooser::MMultiChooser(std::vector<MultiPoint> points, bool can_multi)
 	call_callback = false;
 	closest = -1;
 	inset = false;
+	down = false;
 }
 
 

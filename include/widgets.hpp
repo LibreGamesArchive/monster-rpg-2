@@ -1077,6 +1077,7 @@ protected:
 	bool call_callback;
 	int closest;
 	bool inset;
+	bool down;
 };
 
 

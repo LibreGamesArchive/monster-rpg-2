@@ -597,6 +597,9 @@ TGUIWidget* tguiUpdate()
 	while (!al_event_queue_is_empty(mouse_events)) {
 		ALLEGRO_EVENT event;
 		al_get_next_event(mouse_events, &event);
+		if (event.any.timestamp < drop_input_events_older_than) {
+			continue;
+		}
 		if (!(ignore & TGUI_MOUSE)) {
 			if (mouse_downs > 0) {
 				if (event.type == ALLEGRO_EVENT_MOUSE_AXES) {
@@ -669,6 +672,9 @@ TGUIWidget* tguiUpdate()
 		ALLEGRO_EVENT event;
 		while (!al_event_queue_is_empty(key_events)) {
 			al_get_next_event(key_events, &event);
+			if (event.any.timestamp < drop_input_events_older_than) {
+				continue;
+			}
 			if (!(ignore & TGUI_KEYBOARD) && !tguiIsDisabled(tguiActiveWidget)) {
 				if (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN) {
 					ALLEGRO_KEYBOARD_EVENT *key = &event.keyboard;
@@ -695,6 +701,9 @@ TGUIWidget* tguiUpdate()
 		ALLEGRO_EVENT event;
 		while (!al_event_queue_is_empty(key_events)) {
 			al_get_next_event(key_events, &event);
+			if (event.any.timestamp < drop_input_events_older_than) {
+				continue;
+			}
 			if ((event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN)  && event.keyboard.keycode == ALLEGRO_KEY_TAB) {
 				int focus = 0;
 				while (focus < (int)activeGUI->widgets.size()) {

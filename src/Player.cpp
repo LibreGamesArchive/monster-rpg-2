@@ -751,6 +751,7 @@ static void levelUpCallback(int selected, LEVEL_UP_CALLBACK_DATA *d)
 
 	MRectangle *fullscreenRect = new MRectangle(0, 0, BW, BH,
 		m_map_rgba(0, 0, 0, 0), 0);
+
 	tguiPush();
 	
 	tguiSetParent(0);
@@ -952,6 +953,11 @@ bool levelUp(Player *player, int bonus)
 	tguiAddWidget(multiChooser);
 	tguiSetFocus(multiChooser);
 
+	m_set_target_bitmap(buffer);
+	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
+	tguiDraw();
+	fadeIn(black);
+
 	clear_input_events();
 
 	for (;;) {
@@ -1060,9 +1066,9 @@ done:
 	delete fullscreenRect;
 	mcPoints.clear();
 
-	setMusicVolume(1);
+	fadeOut(black);
 
-	m_rest(1);
+	setMusicVolume(1);
 
 	dpad_on();
 

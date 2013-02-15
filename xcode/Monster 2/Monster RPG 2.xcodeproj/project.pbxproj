@@ -418,7 +418,7 @@
 		96E3D50416C0D06C00A4A973 /* mygamecentervc.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = mygamecentervc.m; path = ../../src/mygamecentervc.m; sourceTree = "<group>"; };
 		96ED3258136349520057B4C7 /* Monster_2-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Monster_2-Info.plist"; sourceTree = "<group>"; };
 		96FB52F0158EBBFC00FF36FC /* libbass.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbass.dylib; path = ../../../local/lib/libbass.dylib; sourceTree = "<group>"; };
-		96FB913616C4AA2E0051C00D /* gamecenter.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = gamecenter.mm; path = ../../src/gamecenter.mm; sourceTree = "<group>"; };
+		96FB913616C4AA2E0051C00D /* gamecenter.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; name = gamecenter.mm; path = ../../src/gamecenter.mm; sourceTree = "<group>"; };
 		96FB913716C4AA2E0051C00D /* mygamecentervc.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = mygamecentervc.m; path = ../../src/mygamecentervc.m; sourceTree = "<group>"; };
 		96FB913816C4AA2E0051C00D /* tgui.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = tgui.cpp; path = ../../src/tgui.cpp; sourceTree = "<group>"; };
 		96FB913C16C4AC140051C00D /* libSBJoystickLib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSBJoystickLib.a; path = ../../../iphone_libs_r/libSBJoystickLib.a; sourceTree = "<group>"; };
@@ -1068,7 +1068,7 @@
 					OPENGLES,
 					A5_OGL,
 				);
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
 					/Users/trent/code/iphone_libs_r,
 					"/Users/trent/code/monster-rpg-2/include",
@@ -1145,7 +1145,7 @@
 					OPENGLES,
 					A5_OGL,
 				);
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
 					/Users/trent/code/iphone_libs_r,
 					"/Users/trent/code/monster-rpg-2/include",
@@ -1223,7 +1223,7 @@
 					OPENGLES,
 					A5_OGL,
 				);
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
 					/Users/trent/code/iphone_libs_r,
 					"/Users/trent/code/monster-rpg-2/include",
@@ -1290,7 +1290,7 @@
 					OPENGLES,
 					A5_OGL,
 				);
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
 					/Users/trent/code/iphone_libs_r,
 					"/Users/trent/code/monster-rpg-2/include",
@@ -1369,6 +1369,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer: Trent Gamblin (5923J6TNDK)";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",

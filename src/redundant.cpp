@@ -586,7 +586,10 @@ void m_destroy_bitmap(MBITMAP *bmp, bool internals_only)
 		}
 	}
 
-	al_destroy_bitmap(bmp->bitmap);
+	if (bmp->bitmap) {
+		al_destroy_bitmap(bmp->bitmap);
+		bmp->bitmap = NULL;
+	}
 	
 	if (!internals_only) {
 		delete bmp;
@@ -1037,6 +1040,7 @@ void _destroy_loaded_bitmaps(void)
 		else {
 			MBITMAP *m = loaded_bitmaps[i].bitmap;
 			al_destroy_bitmap(m->bitmap);
+			m->bitmap = NULL;
 		}
 	}
 }

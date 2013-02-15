@@ -41,7 +41,7 @@ BOOL isGameCenterAPIAvailable()
 	return (localPlayerClassAvailable && osVersionSupported);
 }
 
-void loadAchievements(void)
+static void loadAchievements(void)
 {
 	if (!isGameCenterAPIAvailable() || !is_authenticated)
 		return;
@@ -74,21 +74,11 @@ void authenticatePlayer(void)
 
 	GKLocalPlayer *localPlayer = [GKLocalPlayer localPlayer];
 
-	BOOL osVersionSupported;
-
 #ifdef ALLEGRO_IPHONE
+	BOOL osVersionSupported;
 	NSString *reqSysVer = @"6.0";
 	NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
 	osVersionSupported = ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending);
-#else
-	OSErr err;
-	SInt32 systemVersion, versionMajor, versionMinor, versionBugFix;
-	if ((err = Gestalt(gestaltSystemVersion, &systemVersion)) == noErr) {
-		if (systemVersion >= 0x1082) {
-			osVersionSupported = TRUE;
-		}
-	}
-#endif
 
 	if (osVersionSupported) {
 		[localPlayer setAuthenticateHandler:^(UIViewController *viewController, NSError *error) {
@@ -105,7 +95,9 @@ void authenticatePlayer(void)
 			}
 		}];
 	}
-	else {
+	else
+#endif
+	{
 		[localPlayer authenticateWithCompletionHandler:^(NSError *error) {
 			if (localPlayer.isAuthenticated)
 			{
