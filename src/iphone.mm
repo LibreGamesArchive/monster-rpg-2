@@ -680,16 +680,17 @@ static bool gen_event(ALLEGRO_EVENT *e, char c)
 }
 - (void)textViewDidChange:(UITextView *)textView
 {
+printf("TVDC!!!!!!!!!\n");
 	while ([textView.text length] > 0) {
 		NSString *first = [textView.text substringToIndex:1];
 		NSString *remain = [textView.text substringFromIndex:1];
 		textView.text = remain;
 		const char *txt = [first UTF8String];
-		ALLEGRO_EVENT *e = new ALLEGRO_EVENT;
+		ALLEGRO_EVENT *e = (ALLEGRO_EVENT *)malloc(sizeof(ALLEGRO_EVENT));
 		ALLEGRO_EVENT *e2 = NULL;
 		if (gen_event(e, toupper(txt[0]))) {
 			if (e->type == USER_KEY_DOWN) {
-				e2 = new ALLEGRO_EVENT;
+				e2 = (ALLEGRO_EVENT *)malloc(sizeof(ALLEGRO_EVENT));
 				e2->user.type = USER_KEY_CHAR;
 				e2->keyboard.keycode = e->keyboard.keycode;
 			}

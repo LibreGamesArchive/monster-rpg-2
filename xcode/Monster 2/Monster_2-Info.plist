@@ -8,8 +8,6 @@
 	<string>${IPOD_DISPLAY_NAME}</string>
 	<key>CFBundleExecutable</key>
 	<string>${PRODUCT_NAME}</string>
-	<key>CFBundleGetInfoString</key>
-	<string></string>
 	<key>CFBundleIconFile</key>
 	<string>Icon.png</string>
 	<key>CFBundleIconFiles</key>

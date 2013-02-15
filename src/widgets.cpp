@@ -696,9 +696,9 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 	x1 = (BW-w)/2+xinc/2+10;
 	x2 = x1 + xinc;
 	x3 = x2 + xinc;
-	int ty = y+h-20;
+	int ty = y+h-15;
 	int my1, my2, my3;
-	my1 = y + 10;
+	my1 = y + 20;
 	my2 = my1 + m_text_height(game_font) + 3;
 	my3 = my2 + m_text_height(game_font) + 3;
 
@@ -810,7 +810,7 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 					rx = x2 - size-2-m_text_length(game_font, _t(b2text.c_str()))/2;
 				else if (choice == 2)
 					rx = x3 - size-2-m_text_length(game_font, _t(b3text.c_str()))/2;
-				int ry = y+h-20-7;
+				int ry = ty-7;
 				m_draw_bitmap(cursor, rx, ry, 0);
 			}
 			drawBufferToScreen();
@@ -2559,7 +2559,8 @@ void MMap::draw()
 				p->y-top_y-offset_y-m_get_bitmap_height(down_arrow)-ay, 0);
 		}
 
-		mTextout_simple(_t(points[selected].display_name.c_str()), 5, BH-m_text_height(game_font)-5,  m_map_rgb(255, 255, 0));
+		mTextout(game_font, _t(points[selected].display_name.c_str()), 5, BH-m_text_height(game_font)-5, m_map_rgb(255, 255, 0), black,
+			WGT_TEXT_BORDER, false);
 	}
 
 }
@@ -6023,7 +6024,7 @@ int MMultiChooser::update(int millis)
 			}
 			else if (iphone_line(opposite, 0.1)) {
 				iphone_clear_line(opposite);
-				for (int i = 0; i < (int)current.size(); i++) {
+				for (size_t i = 0; i < current.size(); i++) {
 					current[i] = -current[i] - 1;
 				}
 				return TGUI_RETURN;

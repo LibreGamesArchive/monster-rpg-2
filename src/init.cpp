@@ -4,10 +4,6 @@
 
 #include "monster2.hpp"
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
-#define OPENGLES
-#endif
-
 #define ASSERT ALLEGRO_ASSERT
 #include <allegro5/internal/aintern_bitmap.h>
 #include <allegro5/internal/aintern_display.h>
@@ -1966,7 +1962,7 @@ bool init(int *argc, char **argv[])
 	al_inhibit_screensaver(true);
 #endif
 
-#if defined ALLEGRO_IPHONE
+#if defined WITH_60BEAT
 	sb_start();
 #endif
 
@@ -2166,7 +2162,11 @@ void dpad_off(bool count)
 		al_lock_mutex(dpad_mutex);
 		use_dpad = (dpad_type == DPAD_TOTAL_1 || dpad_type == DPAD_TOTAL_2);
 #if defined ALLEGRO_IPHONE
+#if defined WITH_60BEAT
 		if (!joypad_connected() && !is_sb_connected()) {
+#else
+		if (!joypad_connected()) {
+#endif
 #elif defined ALLEGRO_ANDROID
 		if (!zeemote_connected) {
 #else
@@ -2207,7 +2207,11 @@ void dpad_on(bool count)
 		al_lock_mutex(dpad_mutex);
 		use_dpad = dpad_type != DPAD_NONE;
 #if defined ALLEGRO_IPHONE
+#if defined WITH_60BEAT
 		if (!joypad_connected() && !is_sb_connected()) {
+#else
+		if (!joypad_connected()) {
+#endif
 #elif defined ALLEGRO_ANDROID
 		if (!zeemote_connected) {
 #else
@@ -2233,21 +2237,27 @@ void set_screen_params(void)
 		screenScaleY = (float)sd->height / BH;
 	}
 	else {
-		float ratio;
+		float ratio_x, ratio_y;
 		if (config.getMaintainAspectRatio() == ASPECT_INTEGER) {
-			ratio = sd->width / BW;
-			if (ratio > (sd->height / BH)) {
-				ratio = sd->height / BH;
+			ratio_x = sd->width / BW;
+			if (ratio_x > (sd->height / BH)) {
+				ratio_x = sd->height / BH;
 			}
+			ratio_y = ratio_x;
 		}
 		else if (config.getMaintainAspectRatio() == ASPECT_MAINTAIN_RATIO) {
-			ratio = (float)sd->width / BW;
-			if (ratio > ((float)sd->height / BH)) {
-				ratio = (float)sd->height / BH;
+			ratio_x = (float)sd->width / BW;
+			if (ratio_x > ((float)sd->height / BH)) {
+				ratio_x = (float)sd->height / BH;
 			}
+			ratio_y = ratio_x;
 		}
-		screenScaleX = ratio;
-		screenScaleY = ratio;
+		else {
+			ratio_x = sd->width / (float)BW;
+			ratio_y = sd->height / (float)BH;
+		}
+		screenScaleX = ratio_x;
+		screenScaleY = ratio_y;
 	}
 
 	screen_offset_x = (sd->width - (screenScaleX*BW)) / 2;

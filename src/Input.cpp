@@ -584,7 +584,11 @@ void TripleInput::update()
 	}
 
 	InputDescriptor id4;
+#if defined WITH_60BEAT
 	get_sb_state(&id4.left, &id4.right, &id4.up, &id4.down, &id4.button1, &id4.button2, &id4.button3);
+#else
+	id4.left = id4.right = id4.up = id4.down = id4.button1 = id4.button2 = id4.button3 = false;
+#endif
 		
 	set(
 	    sets.left || id1.left || id3.left || id4.left,

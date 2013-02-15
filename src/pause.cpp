@@ -3504,7 +3504,11 @@ bool config_menu(bool start_on_fullscreen)
 	MSingleToggle *input_toggle;
 
 #if defined ALLEGRO_IPHONE
+#if defined WITH_60BEAT
 	if (airplay_connected || joypad_connected() || is_sb_connected()) {
+#else
+	if (airplay_connected || joypad_connected()) {
+#endif
 #elif defined ALLEGRO_ANDROID
 	if (zeemote_connected) {
 #endif
@@ -3821,7 +3825,11 @@ bool config_menu(bool start_on_fullscreen)
 			sel = input_toggle->getSelected();
 			if (config.getDpadType() != sel) {
 #if defined ALLEGRO_IPHONE
+#if defined WITH_60BEAT
 				if (joypad_connected() || airplay_connected || is_sb_connected()) {
+#else
+				if (joypad_connected() || airplay_connected) {
+#endif
 #elif defined ALLEGRO_ANDROID
 				if (zeemote_connected) {
 #endif
@@ -4264,7 +4272,7 @@ static void hqm_menu(void)
 				125,
 				black,
 				m_map_rgb(65, 65, 65),
-				WGT_TEXT_DROP_SHADOW,
+				WGT_TEXT_SQUARE_BORDER,
 				true
 			);
 	

@@ -359,10 +359,12 @@ bool loadGame(const char* filename)
 
 	readMilestones(gameInfo.milestones, MAX_MILESTONES, f);
 
+/*
 	for (int i = 0; i < (int)forced_milestones.size(); i++) {
 		std::pair<int, bool> &p = forced_milestones[i];
 		gameInfo.milestones[p.first] = p.second;
 	}
+*/
 
 	//gameInfo.milestones[MS_GOLEM_TIMER_STARTED] = false;
 

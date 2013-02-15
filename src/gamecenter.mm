@@ -18,8 +18,6 @@ NSMutableDictionary *achievementsDictionary;
 
 BOOL isGameCenterAPIAvailable()
 {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
 	// Check for presence of GKLocalPlayer class.
 	BOOL localPlayerClassAvailable = (NSClassFromString(@"GKLocalPlayer")) != nil;
 
@@ -40,8 +38,6 @@ BOOL isGameCenterAPIAvailable()
 	}
 #endif
 
-	[pool drain];
-	
 	return (localPlayerClassAvailable && osVersionSupported);
 }
 
@@ -49,8 +45,6 @@ void loadAchievements(void)
 {
 	if (!isGameCenterAPIAvailable() || !is_authenticated)
 		return;
-
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
 	achievementsDictionary = [[NSMutableDictionary alloc] init];
 	[GKAchievement loadAchievementsWithCompletionHandler:^(NSArray *achievements, NSError *error)
@@ -62,8 +56,6 @@ void loadAchievements(void)
 			 }
 		 }
 	 }];
-	 
-	 [pool drain];
 }
 
 #define NUM_ACHIEVEMENTS 30
@@ -79,36 +71,66 @@ void authenticatePlayer(void)
 		is_authenticated = 0;
 		return;
 	}
-	
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
 	GKLocalPlayer *localPlayer = [GKLocalPlayer localPlayer];
 
-	[localPlayer authenticateWithCompletionHandler:^(NSError *error) {
-		if (localPlayer.isAuthenticated)
-		{
-			// Perform additional tasks for the authenticated player.
-			is_authenticated = 1;
-			loadAchievements();
-			int i;
-			int n = num_backlog_achievements;
-			for (i = 0; i < n; i++) {
-				NSString *s = achievements_backlog[0];
-				int j;
-				for (j = 1; j < num_backlog_achievements; j++) {
-					achievements_backlog[j-1] = achievements_backlog[j];
-				}
-				num_backlog_achievements--;
-				reportAchievementIdentifier(s, false);
-				[s release];
+	BOOL osVersionSupported;
+
+#ifdef ALLEGRO_IPHONE
+	NSString *reqSysVer = @"6.0";
+	NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
+	osVersionSupported = ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending);
+#else
+	OSErr err;
+	SInt32 systemVersion, versionMajor, versionMinor, versionBugFix;
+	if ((err = Gestalt(gestaltSystemVersion, &systemVersion)) == noErr) {
+		if (systemVersion >= 0x1082) {
+			osVersionSupported = TRUE;
+		}
+	}
+#endif
+
+	if (osVersionSupported) {
+		[localPlayer setAuthenticateHandler:^(UIViewController *viewController, NSError *error) {
+			if (viewController != nil) {
+				al_iphone_set_statusbar_orientation(ALLEGRO_IPHONE_STATUSBAR_ORIENTATION_PORTRAIT);
+				UIWindow *win = al_iphone_get_window(display);
+				[win.rootViewController presentModalViewController:viewController animated:TRUE];
 			}
-		}
-		else {
-			is_authenticated = 0;
-		}
-	}];
-	
-	[pool drain];
+			else if (localPlayer.isAuthenticated) {
+				is_authenticated = true;
+			}
+			else {
+				is_authenticated = false;
+			}
+		}];
+	}
+	else {
+		[localPlayer authenticateWithCompletionHandler:^(NSError *error) {
+			if (localPlayer.isAuthenticated)
+			{
+				// Perform additional tasks for the authenticated player.
+				is_authenticated = 1;
+				loadAchievements();
+				int i;
+				int n = num_backlog_achievements;
+				for (i = 0; i < n; i++) {
+					NSString *s = achievements_backlog[0];
+					int j;
+					for (j = 1; j < num_backlog_achievements; j++) {
+						achievements_backlog[j-1] = achievements_backlog[j];
+					}
+					num_backlog_achievements--;
+					reportAchievementIdentifier(s, false);
+					[s release];
+				}
+			}
+			else {
+				printf("Game Center authentication error: code %d\n", [error code]);
+				is_authenticated = 0;
+			}
+		}];
+	}
 }
 
 bool reset_complete = false;
@@ -117,8 +139,6 @@ void resetAchievements(void)
 {
 	if (!isGameCenterAPIAvailable() || !is_authenticated)
 		return;
-
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
 	// Clear all locally saved achievement objects.
 	achievementsDictionary = [[NSMutableDictionary alloc] init];
@@ -131,8 +151,6 @@ void resetAchievements(void)
 		 }
 		 reset_complete = true;
 	 }];
-	 
-	 [pool drain];
 }
 
 void reportAchievementIdentifier(NSString* identifier, bool notification)
@@ -140,10 +158,7 @@ void reportAchievementIdentifier(NSString* identifier, bool notification)
 	if (!isGameCenterAPIAvailable() || !is_authenticated)
 		return;
 
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
 	if ([achievementsDictionary objectForKey:identifier] != nil) {
-		[pool drain];
 		return;
 	}
 	// check the backlog!
@@ -151,7 +166,6 @@ void reportAchievementIdentifier(NSString* identifier, bool notification)
 	for (i = 0; i < num_backlog_achievements; i++) {
 		if (NSOrderedSame == [achievements_backlog[i] compare:identifier]) {
 			// already there
-			[pool drain];
 			return;
 		}
 	}
@@ -175,8 +189,6 @@ void reportAchievementIdentifier(NSString* identifier, bool notification)
 			 }
 		 }];
 	}
-	
-	[pool drain];
 }
 
 struct Holder

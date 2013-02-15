@@ -528,8 +528,6 @@ bool Ice1Effect::update(int step)
 		SmallIcicle &icicle = *it;
 		icicle.x += dx * step;
 		icicle.y += dy * step;
-		if (icicle.y > y)
-			icicle.y = y;
 		if (icicle.y >= y) {
 			it = icicles.erase(it);
 			if (particles.size() > 256) {
@@ -645,9 +643,6 @@ Ice1Effect::Ice1Effect(Combatant *target) :
 Ice1Effect::~Ice1Effect(void)
 {
 	m_destroy_bitmap(bitmap);
-
-	icicles.clear();
-	particles.clear();
 }
 
 

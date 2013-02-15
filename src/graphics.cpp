@@ -152,7 +152,11 @@ static void draw_the_controls(bool draw_controls, ALLEGRO_COLOR tint)
 		}
 		else
 #if defined ALLEGRO_IPHONE
+#if defined WITH_60BEAT
 		if (!joypad_connected() && !is_sb_connected() && (dpad_type == DPAD_TOTAL_2 || dpad_type == DPAD_HYBRID_2)) {
+#else
+		if (!joypad_connected() && (dpad_type == DPAD_TOTAL_2 || dpad_type == DPAD_HYBRID_2)) {
+#endif
 #elif defined ALLEGRO_ANDROID
 		if (!zeemote_connected && (dpad_type == DPAD_TOTAL_2 || dpad_type == DPAD_HYBRID_2)) {
 #else
@@ -218,7 +222,11 @@ static void draw_the_controls(bool draw_controls, ALLEGRO_COLOR tint)
 				x+BUTTON_SIZE-4, y+4, dark, 1);
 		}
 #if defined ALLEGRO_IPHONE
+#if defined WITH_60BEAT
 		else if (!joypad_connected() && !is_sb_connected()) {
+#else
+		else if (!joypad_connected()) {
+#endif
 #elif defined ALLEGRO_ANDROID
 		else if (!zeemote_connected) {
 #else

@@ -107,8 +107,6 @@ static bool connect_to_server(void)
 	hints.ai_socktype = SOCK_DGRAM;
 	hints.ai_protocol = IPPROTO_UDP;
 
-	r;
-
 	if ((r = getaddrinfo(SERVER, PORT, &hints, &res)) != 0) {
 		debug_message("getaddrinfo failed: r=%d, errno=%d", r, errno);
 		return false;
@@ -568,12 +566,14 @@ void hqm_delete(void)
 #ifdef ALLEGRO_ANDROID
 		al_android_set_apk_file_interface();
 #endif
+		printf("al_create_fs_entry failed for hqm dir\n");
 		return;
 	}
 	if (!al_open_directory(dir)) {
 #ifdef ALLEGRO_ANDROID
 		al_android_set_apk_file_interface();
 #endif
+		printf("al_open_directory failed for hqm dir\n");
 		return;
 	}
 

@@ -78,7 +78,7 @@ static int bright_dir = 1;
 #endif
 float bright_ticker = 0;
 
-std::vector<std::pair<int, bool> > forced_milestones;
+//std::vector<std::pair<int, bool> > forced_milestones;
 
 bool global_can_save = true;
 
@@ -807,67 +807,67 @@ top:
 			else
 				tguiConvertMousePosition(&this_x, &this_y, screen_offset_x, screen_offset_y, 1, 1);
 
-			void (*down[7])(void) = {
-				joy_l_down, joy_r_down, joy_u_down, joy_d_down,
-				joy_b1_down, joy_b2_down, joy_b3_down
-			};
-			void (*up[7])(void) = {
-				joy_l_up, joy_r_up, joy_u_up, joy_d_up,
-				joy_b1_up, joy_b2_up, joy_b3_up
-			};
-
-			bool state[7] = { false, };
-			
-			int type;
-			if (event.type == BEGIN)
-				type = MOUSE_DOWN;
-			else if (event.type == END)
-				type = MOUSE_UP;
-			else
-				type = MOUSE_AXES;
-			
-			al_lock_mutex(dpad_mutex);
-
-			bool _l = false, _r = false, _u = false, _d = false, _b1 = false, _b2 = false, _b3 = false;
-
-			for (int i = 0; i < curr_touches; i++) {
-				bool __l = false, __r = false, __u = false, __d = false, __b1 = false, __b2 = false, __b3 = false;
-				get_inputs(touches[i].x, touches[i].y,
-					&__l, &__r, &__u, &__d, &__b1, &__b2, &__b3
-				);
-				_l = _l || __l;
-				_r = _r || __r;
-				_u = _u || __u;
-				_d = _d || __d;
-				_b1 = _b1 || __b1;
-				_b2 = _b2 || __b2;
-				_b3 = _b3 || __b3;
-			}
-			
-			process_touch(this_x, this_y, touch_id, type);
-			
-			bool l = false, r = false, u = false, d = false, b1 = false, b2 = false, b3 = false;
-
-			for (int i = 0; i < curr_touches; i++) {
-				bool __l = false, __r = false, __u = false, __d = false, __b1 = false, __b2 = false, __b3 = false;
-				get_inputs(touches[i].x, touches[i].y,
-					&__l, &__r, &__u, &__d, &__b1, &__b2, &__b3
-				);
-				l = l || __l;
-				r = r || __r;
-				u = u || __u;
-				d = d || __d;
-				b1 = b1 || __b1;
-				b2 = b2 || __b2;
-				b3 = b3 || __b3;
-			}
-			
-			al_unlock_mutex(dpad_mutex);
-			
-			bool on1[7] = { _l, _r, _u, _d, _b1, _b2, _b3 };
-			bool on2[7] = { l, r, u, d, b1, b2, b3 };
-
 			if (use_dpad) {
+				void (*down[7])(void) = {
+					joy_l_down, joy_r_down, joy_u_down, joy_d_down,
+					joy_b1_down, joy_b2_down, joy_b3_down
+				};
+				void (*up[7])(void) = {
+					joy_l_up, joy_r_up, joy_u_up, joy_d_up,
+					joy_b1_up, joy_b2_up, joy_b3_up
+				};
+
+				bool state[7] = { false, };
+				
+				int type;
+				if (event.type == BEGIN)
+					type = MOUSE_DOWN;
+				else if (event.type == END)
+					type = MOUSE_UP;
+				else
+					type = MOUSE_AXES;
+				
+				al_lock_mutex(dpad_mutex);
+
+				bool _l = false, _r = false, _u = false, _d = false, _b1 = false, _b2 = false, _b3 = false;
+
+				for (int i = 0; i < curr_touches; i++) {
+					bool __l = false, __r = false, __u = false, __d = false, __b1 = false, __b2 = false, __b3 = false;
+					get_inputs(touches[i].x, touches[i].y,
+						&__l, &__r, &__u, &__d, &__b1, &__b2, &__b3
+					);
+					_l = _l || __l;
+					_r = _r || __r;
+					_u = _u || __u;
+					_d = _d || __d;
+					_b1 = _b1 || __b1;
+					_b2 = _b2 || __b2;
+					_b3 = _b3 || __b3;
+				}
+				
+				process_touch(this_x, this_y, touch_id, type);
+				
+				bool l = false, r = false, u = false, d = false, b1 = false, b2 = false, b3 = false;
+
+				for (int i = 0; i < curr_touches; i++) {
+					bool __l = false, __r = false, __u = false, __d = false, __b1 = false, __b2 = false, __b3 = false;
+					get_inputs(touches[i].x, touches[i].y,
+						&__l, &__r, &__u, &__d, &__b1, &__b2, &__b3
+					);
+					l = l || __l;
+					r = r || __r;
+					u = u || __u;
+					d = d || __d;
+					b1 = b1 || __b1;
+					b2 = b2 || __b2;
+					b3 = b3 || __b3;
+				}
+				
+				al_unlock_mutex(dpad_mutex);
+				
+				bool on1[7] = { _l, _r, _u, _d, _b1, _b2, _b3 };
+				bool on2[7] = { l, r, u, d, b1, b2, b3 };
+
 				for (int i = 0; i < 7; i++) {
 					if (on1[i] == false && on2[i] == true) {
 						(*(down[i]))();
@@ -878,10 +878,10 @@ top:
 					
 					state[i] = on2[i];
 				}
+					
+				getInput()->set(state[0], state[1], state[2], state[3],
+					state[4], state[5], state[6], true);
 			}
-				
-			getInput()->set(state[0], state[1], state[2], state[3],
-				state[4], state[5], state[6], true);
 							
 			if (event.type == BEGIN) {
 				bool hot_corner_touched = false;
@@ -1018,6 +1018,7 @@ top:
 			}
 			setMusicVolume(0.0);
 			setAmbienceVolume(0.0);
+			do_close(false);
 		}
 		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN)
 		{
@@ -1326,6 +1327,7 @@ top:
 
 void do_close(bool quit)
 {
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (mapWidget) {
 		mapWidget->auto_save(0, true);
 	}
@@ -1333,6 +1335,16 @@ void do_close(bool quit)
 		area->auto_save_game(0, true, false);
 	}
 	save_memory(true);
+	config.write();
+	if (quit)
+		throw QuitError();
+#else
+	if (mapWidget) {
+		mapWidget->auto_save(0, true);
+	}
+	else if (area && !shouldDoMap) {
+		area->auto_save_game(0, true, false);
+	}
 	if (close_pressed_for_configure) {
 		close_pressed_for_configure = false;
 		close_pressed = false;
@@ -1369,6 +1381,7 @@ void do_close(bool quit)
 #endif
 		}
 	}
+#endif
 }
 
 
@@ -1447,6 +1460,13 @@ static void run()
 				}
 			}
 			
+			if (party[heroSpot]) {
+				Object *o = party[heroSpot]->getObject();
+				if (o) {
+					o->faceInputsLikeSprite();
+				}
+			}
+				
 			const float MAX_BRIGHT = 0.8f;
 			bright_ticker += MAX_BRIGHT/1000.0*bright_dir*LOGIC_MILLIS; // go from normal to white in 1000ms
 			if (bright_dir == 1 && bright_ticker >= MAX_BRIGHT) {
@@ -1696,6 +1716,13 @@ static void run()
 							area->draw();
 							fadeIn(black);
 
+							if (party[heroSpot]) {
+								Object *o = party[heroSpot]->getObject();
+								if (o) {
+									o->faceInputsLikeSprite();
+								}
+							}
+				
 							runtime_start = tguiCurrentTimeMillis();
 						}
 					}
@@ -1809,8 +1836,9 @@ int main(int argc, char *argv[])
 		remove(getUserResource("launch_config"));
 		return 1;
 	}
-	
-#ifndef ALLEGRO_ANDROID
+
+/*
+#if defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE
 	int c = argc;
 	char **p = argv;
 	while ((n = check_arg(c, p, "-ms")) != -1) {
@@ -1822,9 +1850,9 @@ int main(int argc, char *argv[])
 		forced_milestones.push_back(x);
 		c -= n+2;
 		p = &p[n+2];
-		printf("ms %d %d\n", num, value);
 	}
 #endif
+*/
 
 	// FIXME!
 	// Easiest way to restore a save state after deleting the app
@@ -1924,6 +1952,7 @@ int main(int argc, char *argv[])
 	
 	config.setMaintainAspectRatio(ma);
 
+/*
 	#ifdef DEBUG_XXX
 	DEBUG_DATA d;
 	char *xS;
@@ -1945,7 +1974,7 @@ int main(int argc, char *argv[])
 		}
 	}
 	#endif
-
+*/
 
 	
    

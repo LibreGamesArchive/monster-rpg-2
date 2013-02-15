@@ -128,6 +128,7 @@ top:
 	MLanderButton *left_button = NULL;
 	MLanderButton *right_button = NULL;
 
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (!use_dpad) {
 		left_button = new MLanderButton(true);
 		right_button = new MLanderButton(false);
@@ -135,6 +136,7 @@ top:
 		tguiAddWidget(left_button);
 		tguiAddWidget(right_button);
 	}
+#endif
 
 	std::list<Particle> particles;
 
@@ -189,31 +191,32 @@ top:
 			/* apply jets */
 			bool left = false, right = false;
 
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			if (!use_dpad)
 				tguiUpdate();
-		
+#endif
+
 			if (!dead) {
-				if (use_dpad) {
-					InputDescriptor ie = getInput()->getDescriptor();
-					left = ie.left || ie.button1;
-					right = ie.right || ie.button2;
-					if (have_mouse) {
-						ALLEGRO_MOUSE_STATE state;
-						al_get_mouse_state(&state);
-						if (state.buttons & 1) {
-							left = true;
-						}
-						if (state.buttons & 2) {
-							right = true;
-						}
-					}
+				InputDescriptor id = getInput()->getDescriptor();
+				left = id.left || id.button1;
+				right = id.right || id.button2;
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+				ALLEGRO_MOUSE_STATE state;
+				al_get_mouse_state(&state);
+				if (state.buttons & 1) {
+					left = true;
 				}
-				else {
+				if (state.buttons & 2) {
+					right = true;
+				}
+#else
+				if (!use_dpad) {
 					if (left_button->getPressed())
 						left = true;
 					if (right_button->getPressed())
 						right = true;
 				}
+#endif
 			}
 				
 			if (left) {
@@ -369,8 +372,10 @@ top:
 
 			delete[] verts;
 		
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			if (!use_dpad)
 				tguiDraw();
+#endif
 
 			drawBufferToScreen();
 			m_flip_display();
@@ -399,12 +404,14 @@ done:
 
 	custom_mouse_cursor = tmpcursor;
 
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (!use_dpad) {
 		tguiDeleteWidget(left_button);
 		tguiDeleteWidget(right_button);
 		delete left_button;
 		delete right_button;
 	}
+#endif
 
 	m_destroy_bitmap(lander_bmp);
 	m_destroy_bitmap(land_bmp);

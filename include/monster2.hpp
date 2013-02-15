@@ -92,7 +92,7 @@ ALLEGRO_DEBUG_CHANNEL("morpg2")
 #endif
 #include "sound.hpp"
 
-#ifdef ALLEGRO_IPHONE
+#ifdef WITH_60BEAT
 #include "60beat.h"
 #endif
 
@@ -317,7 +317,7 @@ extern bool global_can_save;
 
 extern void do_close(bool quit = true);
 
-extern std::vector<std::pair<int, bool> > forced_milestones;
+//extern std::vector<std::pair<int, bool> > forced_milestones;
 extern bool gonna_fade_in_red;
 
 void update_orientation(void);

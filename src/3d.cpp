@@ -829,7 +829,11 @@ static int real_archery(int *accuracy_pts)
 	}
 
 #ifdef ALLEGRO_IPHONE
+#if defined WITH_60BEAT
 	if (use_dpad || joypad_connected() || airplay_connected || is_sb_connected())
+#else
+	if (use_dpad || joypad_connected() || airplay_connected)
+#endif
 #else
 #if defined ALLEGRO_MACOSX
 	bool jp_conn = joypad_connected();
