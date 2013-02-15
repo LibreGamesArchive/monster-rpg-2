@@ -110,7 +110,7 @@ endif(WIN32)
 set(MAIN_LIBS "")
 
 if(WITH_SVG)
-	list(APPEND MAIN_LIBS "allegro_color${ALLEG_SUFFIX}" "wapcaplet" "svgtiny" "dom" "expat" "hubbub" "parserutils")
+	list(APPEND MAIN_LIBS "allegro_color${ALLEG_SUFFIX}" "hubbub" "svgtiny" "dom" "parserutils" "wapcaplet" "expat")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DWITH_SVG -I/opt/netsurf/include")
 	set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -DWITH_SVG -I/opt/netsurf/include")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/opt/netsurf/lib")
@@ -230,6 +230,7 @@ else(APPLE)
 		allegro_image${ALLEG_SUFFIX}
 		allegro_shader${ALLEG_SUFFIX}
 		allegro_physfs${ALLEG_SUFFIX}
+		allegro_color${ALLEG_SUFFIX}
 		allegro${ALLEG_SUFFIX}
 		${ALLEGRO_MAIN_LIB}
 		curl
