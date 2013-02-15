@@ -99,10 +99,15 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 	int diagram_h = scale*diagram->height;
 
 	bool opengl = (al_get_display_flags(al_get_current_display()) & ALLEGRO_OPENGL);
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+
+	/* I don't know how to detect proprietary drivers being used on Linux.
+	 * Open source drivers claim to support the extension but simply
+	 * crash when it's used. So disable it altogether on Linux.
+	 */
+#if defined A5_D3D || defined __linux__
 	bool multisample = false;
 #else
-	bool multisample = opengl;
+	bool multisample = al_have_opengl_extension("GL_EXT_framebuffer_multisample");
 #endif
 	bool pp = (al_get_display_flags(al_get_current_display()) & ALLEGRO_USE_PROGRAMMABLE_PIPELINE);
 
