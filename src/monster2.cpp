@@ -1001,11 +1001,6 @@ top:
 		}
 #endif
 
-#ifdef A5_D3D_XXX
-		else if (event.type == ALLEGRO_EVENT_DISPLAY_FOUND) {
-			should_reset = true;
-		}
-#endif
 #if defined ALLEGRO_ANDROID
 		else if (event.type == ALLEGRO_EVENT_DISPLAY_RESIZE) {
 			do_acknowledge_resize = true;
@@ -1297,10 +1292,9 @@ top:
 
 #ifdef A5_D3D
 	if (should_reset) {
+		al_get_d3d_device(display)->SetDepthStencilSurface(NULL);
 		big_depth_surface->Release();
 		_destroy_loaded_bitmaps();
-		destroy_fonts();
-		destroyIcons();
 		al_stop_timer(logic_timer);
 		al_stop_timer(draw_timer);
 		main_halted = true;
@@ -1310,8 +1304,6 @@ top:
 		init_big_depth_surface();
 		_reload_loaded_bitmaps();
 		_reload_loaded_bitmaps_delayed();
-		load_fonts();
-		icon_bmp = m_load_bitmap_redraw(getResource("media/icons.png"), loadIcons, NULL);
 		if (in_shooter) {
 			shooter_restoring = true;
 		}
@@ -1963,6 +1955,8 @@ int main(int argc, char *argv[])
 
 	m_destroy_bitmap(buffer);
 	buffer = oldbuf;
+
+	m_set_target_bitmap(buffer);
 	
 	config.setMaintainAspectRatio(ma);
 
@@ -2014,7 +2008,7 @@ int main(int argc, char *argv[])
 	//playMusic("volcano.ogg"); while (1) volcano_scene();
 	//do_lander(); 
 	//archery(false);
-	//shooter(false);
+	shooter(false);
 	//credits();
 
 	while (!quit_game) {

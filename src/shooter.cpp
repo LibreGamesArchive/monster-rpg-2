@@ -749,6 +749,7 @@ bool shooter(bool for_points)
 	anotherDoDialogue("Gunnar: Oh, no, the throttle jammed! Eny, you steer.\nMel, Rider, blast anything in our path! I'll go fix the engine!\n", true);
 
 start:
+	/*
 	al_hide_mouse_cursor(display);
 	show_custom_mouse_cursor = false;
 
@@ -759,6 +760,7 @@ start:
 	if (have_mouse) {
 		al_set_mouse_xy(display, scr_w/2, scr_h/2);
 	}
+	*/
 
 	bool replay = false;
 
@@ -802,25 +804,29 @@ start:
 	draw_all();
 
 	clear_input_events();
-
 	for (; o >= TILE_SIZE*140;) {
-		if (is_close_pressed()) {
-			custom_mouse_cursor = tmpcursor;
-			do_close();
-			custom_mouse_cursor = NULL;
-			close_pressed = false;
-		}
-		// WARNING
-		if (break_main_loop) {
-			goto done;
-		}
-
 		al_wait_cond(wait_cond, wait_mutex);
 
 		// Logic
 		int tmp_counter = logic_counter;
 		logic_counter = 0;
 		while  (tmp_counter > 0) {
+			if (is_close_pressed()) {
+				//custom_mouse_cursor = tmpcursor;
+				do_close();
+				//custom_mouse_cursor = NULL;
+				close_pressed = false;
+			}
+			// WARNING
+			if (break_main_loop) {
+				goto done;
+			}
+			if (shooter_restoring) {
+				shooter_restoring = false;
+				replay = true;
+				goto done;
+			}
+
 			next_input_event_ready = true;
 
 			tmp_counter--;
@@ -1020,7 +1026,7 @@ start:
 
 					shooter_paused = true;
 
-					custom_mouse_cursor = tmpcursor;
+					//custom_mouse_cursor = tmpcursor;
 					
 					clear_input_events();
 
@@ -1074,7 +1080,7 @@ start:
 
 					shooter_paused = false;
 
-					custom_mouse_cursor = NULL;
+					//custom_mouse_cursor = NULL;
 					
 					if (have_mouse) {
 						al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
@@ -1173,14 +1179,7 @@ start:
 			m_set_target_bitmap(buffer);
 			m_clear(m_map_rgb(105, 115, 145));
 	
-			if (shooter_restoring) {
-				shooter_restoring = false;
-				replay = true;
-				goto done;
-			}
-			else {
-				draw(x, o);
-			}
+			draw(x, o);
 
 			tguiDraw();
 		
@@ -1217,7 +1216,7 @@ start:
 	}
 done:
 
-	custom_mouse_cursor = tmpcursor;
+	//custom_mouse_cursor = tmpcursor;
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	tguiDeleteWidget(button);
@@ -1246,6 +1245,7 @@ done:
 
 	playMusic("underwater_final.ogg");
 
+	/*
 #if !defined ALLEGRO_RASPBERRYPI
 	ScreenDescriptor *sd = config.getWantedGraphicsMode();
 	if (!sd->fullscreen) {
@@ -1254,6 +1254,7 @@ done:
 	}
 #endif
 	show_custom_mouse_cursor = true;
+	*/
 
 	if (dead) {
 		if (prompt("G A M E O V E R", "Try Again?", 1, 1))

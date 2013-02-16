@@ -88,7 +88,7 @@ void init_big_depth_surface(void)
 
 	dev->CreateDepthStencilSurface(
 		size, size,
-		D3DFMT_D16,
+		D3DFMT_D24S8,
 		D3DMULTISAMPLE_NONE, 0,
 		true,
 		&big_depth_surface,
@@ -1552,10 +1552,10 @@ bool init(int *argc, char **argv[])
 
 	al_set_new_display_flags(flags);
 
-#ifdef ALLEGRO_ANDROID
+#if defined ALLEGRO_ANDROID
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 8, ALLEGRO_REQUIRE);
-#else
+#elif !defined A5_D3D // we manage depth stencil ourselves for D3D
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 8, ALLEGRO_REQUIRE);
 #endif
@@ -1839,7 +1839,6 @@ bool init(int *argc, char **argv[])
 	al_d3d_set_restore_callback(d3d_resource_restore);
 	al_d3d_set_release_callback(d3d_resource_release);
 #endif
-
 	m_clear(black);
 	m_flip_display();
 #endif
@@ -2113,6 +2112,7 @@ void destroy(void)
 	#endif
 
 	#ifdef A5_D3D
+	al_get_d3d_device(display)->SetDepthStencilSurface(NULL);
 	big_depth_surface->Release();
 	#endif
 
@@ -2280,7 +2280,7 @@ void set_screen_params(void)
 	}
 }
 
-void toggle_fullscreen(void)
+void toggle_fullscreen()
 {
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	show_custom_mouse_cursor = true;
@@ -2294,30 +2294,37 @@ void toggle_fullscreen(void)
 		height_before_fullscreen = sd->height;
 	}
 
+	al_set_target_backbuffer(display);
+	al_clear_to_color(black);
+	al_flip_display();
+
 	sd->fullscreen = !sd->fullscreen;
 #ifdef A5_D3D
 	is_fs_toggle = true;
 	bool depth_surface_inited = big_depth_surface != NULL;
 	if (depth_surface_inited) {
+		al_get_d3d_device(display)->SetDepthStencilSurface(NULL);
 		big_depth_surface->Release();
 	}
 	_destroy_loaded_bitmaps();
-	destroy_fonts();
-	destroyIcons();
 #endif
 	al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, config.getWantedGraphicsMode()->fullscreen);
-#ifdef A5_D3D
-	_reload_loaded_bitmaps();
-	_reload_loaded_bitmaps_delayed();
-	load_fonts();
-	icon_bmp = m_load_bitmap_redraw(getResource("media/icons.png"), loadIcons, NULL);
-#endif
-	set_screen_params();
+
+	al_rest(0.1);
+
 #ifdef A5_D3D
 	if (depth_surface_inited) {
 		init_big_depth_surface();
 	}
-	shooter_restoring = true;
+	_reload_loaded_bitmaps();
+	_reload_loaded_bitmaps_delayed();
+#endif
+	al_set_target_backbuffer(display);
+	set_screen_params();
+#ifdef A5_D3D
+	if (in_shooter) {
+		shooter_restoring = true;
+	}
 	is_fs_toggle = false;
 #endif
 	pause_joystick_repeat_events = false;

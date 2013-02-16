@@ -35,7 +35,7 @@ bool get_mouse_off(void);
 void dpad_off(bool count = true);
 void dpad_on(bool count = true);
 bool is_ipad(void);
-void toggle_fullscreen(void);
+void toggle_fullscreen();
 bool is_ipad(void);
 
 void init_shaders(void);

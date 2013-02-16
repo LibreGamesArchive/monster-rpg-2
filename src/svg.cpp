@@ -20,9 +20,16 @@ extern "C" {
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_color.h>
+
+#ifdef A5_D3D
+#include <allegro5/allegro_direct3d.h>
+#else
 #include <allegro5/allegro_opengl.h>
+#endif
 
 #include <vector>
+
+extern ALLEGRO_DISPLAY *display;
 
 ALLEGRO_DEBUG_CHANNEL("Mo2SVG")
 
@@ -48,8 +55,6 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 
 	buffer = (char *)malloc(size);
 	if (!buffer) {
-		fprintf(stderr, "Unable to allocate %lld bytes\n",
-				(long long) size);
 		return NULL;
 	}
 
@@ -98,7 +103,9 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 	int diagram_w = scale*diagram->width;
 	int diagram_h = scale*diagram->height;
 
-	bool opengl = (al_get_display_flags(al_get_current_display()) & ALLEGRO_OPENGL);
+#ifdef A5_D3D
+	IDirect3DDevice9 *dev = al_get_d3d_device(display);
+#endif
 
 	/* I don't know how to detect proprietary drivers being used on Linux.
 	 * Open source drivers claim to support the extension but simply
@@ -113,17 +120,20 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 
 	ALLEGRO_BITMAP *out = al_create_bitmap(diagram_w, diagram_h);
 
+#if !defined A5_D3D
 	GLint old_vp[4];
 	GLuint fb;
 	GLuint ColorBufferID;
 	GLuint DepthBufferID;
+#endif
+
 	ALLEGRO_TRANSFORM old_proj_transform;
 	ALLEGRO_TRANSFORM old_view_transform;
 		
 	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
 
 	if (multisample) {
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined A5_D3D
 		al_copy_transform(&old_proj_transform, al_get_projection_transform(al_get_current_display()));
 		al_copy_transform(&old_view_transform, al_get_current_transform());
 
@@ -275,15 +285,25 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 			points[subshape].push_back(last_y);
 		}
 
-		if (opengl) {
-			glClearStencil(0.0);
-			glClear(GL_STENCIL_BUFFER_BIT);
-			glEnable(GL_STENCIL_TEST);
+#if !defined A5_D3D
+		glClearStencil(0.0);
+		glClear(GL_STENCIL_BUFFER_BIT);
+		glEnable(GL_STENCIL_TEST);
 
-			glStencilOp(GL_INVERT, GL_INVERT, GL_INVERT);
-			glStencilFunc(GL_ALWAYS, 1, 1);
-			glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-		}
+		glStencilOp(GL_INVERT, GL_INVERT, GL_INVERT);
+		glStencilFunc(GL_ALWAYS, 1, 1);
+		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+#else
+		dev->Clear(0, NULL, D3DCLEAR_STENCIL, 0, 0, 0);
+		dev->SetRenderState(D3DRS_STENCILENABLE, TRUE);
+		dev->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_INVERT);
+		dev->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_INVERT);
+		dev->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_INVERT);
+		dev->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);
+		dev->SetRenderState(D3DRS_STENCILREF, 1);
+		dev->SetRenderState(D3DRS_STENCILMASK, 1);
+		dev->SetRenderState(D3DRS_COLORWRITEENABLE, 0);
+#endif
 
 		float x1 = -1;
 		float y1 = -1;
@@ -315,17 +335,25 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 			delete[] v;
 		}
 
-		if (opengl) {
-			glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-			glStencilFunc(GL_EQUAL, 1, 1);
-			glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-		}
+#if !defined A5_D3D
+		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+		glStencilFunc(GL_EQUAL, 1, 1);
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+#else
+		dev->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);
+		dev->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP);
+		dev->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_KEEP);
+		dev->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_EQUAL);
+		dev->SetRenderState(D3DRS_COLORWRITEENABLE, 0xFFFFFFFF);
+#endif
 
 		al_draw_filled_rectangle(0, 0, diagram_w, diagram_h, fill);
 
-		if (opengl) {
-			glDisable(GL_STENCIL_TEST);
-		}
+#if !defined A5_D3D
+		glDisable(GL_STENCIL_TEST);
+#else
+		dev->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+#endif
 
 		for (size_t j = 0; j < points.size(); j++) {
 			al_draw_polyline(&points[j][0], points[j].size()/2, ALLEGRO_LINE_JOIN_MITER, ALLEGRO_LINE_CAP_ROUND, stroke, stroke_width, 4.0);
@@ -335,7 +363,7 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 	al_set_target_bitmap(out);
 	
 	if (multisample) {
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined A5_D3D
 		glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fb);
 		glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, al_get_opengl_fbo(out));
 
@@ -361,7 +389,9 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 	svgtiny_free(diagram);
 
 	if (multisample) {
+#if !defined A5_D3D
 		glViewport(old_vp[0], old_vp[1], old_vp[2], old_vp[3]);
+#endif
 	}
 
 	al_set_target_backbuffer(al_get_current_display());

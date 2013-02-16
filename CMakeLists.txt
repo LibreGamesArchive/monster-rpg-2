@@ -30,7 +30,8 @@ if(WIN32)
 		# you must define one of A5_OGL (all platforms) or A5_D3D
 		#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DA5_D3D")
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows")
+		#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
 	else(MINGW)
 		#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DA5_OGL")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DA5_D3D")
@@ -107,10 +108,10 @@ endif(APPLE)
 endif(WIN32)
 
 
-set(MAIN_LIBS "")
+set(EXTRA_LIBS "")
 
 if(WITH_SVG)
-	list(APPEND MAIN_LIBS "allegro_color${ALLEG_SUFFIX}" "hubbub" "svgtiny" "dom" "parserutils" "wapcaplet" "expat")
+	list(APPEND EXTRA_LIBS "allegro_color${ALLEG_SUFFIX}" "svgtiny" "hubbub" "dom" "parserutils" "wapcaplet" "expat")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DWITH_SVG -I/opt/netsurf/include")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWITH_SVG -I/opt/netsurf/include")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/opt/netsurf/lib")
@@ -126,22 +127,19 @@ add_executable(monster2
 	src/monster2.cpp
 )
 
-list(APPEND MAIN_LIBS "mo2-engine")
-
 if(KCM_AUDIO)
 	if(RASPBERRYPI)
-		LIST(APPEND MAIN_LIBS "allegro_audio${ALLEG_SUFFIX}" "allegro_acodec${ALLEG_SUFFIX}" "/usr/lib/arm-linux-gnueabihf/libFLAC.a" "/usr/lib/arm-linux-gnueabihf/libvorbisfile.a" "/usr/lib/arm-linux-gnueabihf/libvorbis.a" "/usr/lib/arm-linux-gnueabihf/libogg.a")
+		LIST(APPEND EXTRA_LIBS "allegro_audio${ALLEG_SUFFIX}" "allegro_acodec${ALLEG_SUFFIX}" "/usr/lib/arm-linux-gnueabihf/libFLAC.a" "/usr/lib/arm-linux-gnueabihf/libvorbisfile.a" "/usr/lib/arm-linux-gnueabihf/libvorbis.a" "/usr/lib/arm-linux-gnueabihf/libogg.a")
 	else()
-		LIST(APPEND MAIN_LIBS "allegro_audio${ALLEG_SUFFIX}" "allegro_acodec${ALLEG_SUFFIX}" "FLAC" "vorbisfile" "vorbis" "ogg")
+		LIST(APPEND EXTRA_LIBS "allegro_audio${ALLEG_SUFFIX}" "allegro_acodec${ALLEG_SUFFIX}" "FLAC" "vorbisfile" "vorbis" "ogg")
 	endif()
 endif(KCM_AUDIO)
 
 
 if(WIN32)
 	set(ALLEGRO_MAIN_LIB "")
-	set(EXTRA_LIBS
+	list(APPEND EXTRA_LIBS
 		"curl"
-		"opengl32"
 		"dxguid"
 		"dinput8"
 		"dsound"
@@ -161,7 +159,8 @@ if(WIN32)
 		"freetype"
 		"z"
 	)
-	LIST(APPEND MAIN_LIBS 
+	SET(MAIN_LIBS 
+		mo2-engine
 		allegro_ttf${ALLEG_SUFFIX}
 		allegro_font${ALLEG_SUFFIX}
 		allegro_primitives${ALLEG_SUFFIX}
@@ -176,6 +175,7 @@ if(WIN32)
 		lua5.2
 		d3dx9
 		physfs
+		"opengl32"
 	)
 	if(KCM_AUDIO)
 		LIST(APPEND MAIN_LIBS "ws2_32" "dsound")
@@ -193,8 +193,8 @@ if(APPLE)
 	FIND_LIBRARY(AUDIOTOOLBOX_LIBRARY AudioToolbox)
 	FIND_LIBRARY(GAMEKIT_LIBRARY GameKit)
 	FIND_LIBRARY(SECURITY_LIBRARY Security)
-	SET(EXTRA_LIBS ${IOKIT_LIBRARY} ${OPENGL_LIBRARY} ${FOUNDATION_LIBRARY} ${APPSERVICES_LIBRARY} ${APPKIT_LIBRARY} ${AUDIOTOOLBOX_LIBRARY} ${GAMEKIT_LIBRARY} ${SECURITY_LIBRARY} freetype z)
-	LIST(APPEND MAIN_LIBS 
+	LIST(APPEND EXTRA_LIBS ${IOKIT_LIBRARY} ${OPENGL_LIBRARY} ${FOUNDATION_LIBRARY} ${APPSERVICES_LIBRARY} ${APPKIT_LIBRARY} ${AUDIOTOOLBOX_LIBRARY} ${GAMEKIT_LIBRARY} ${SECURITY_LIBRARY} freetype z)
+	SET(MAIN_LIBS 
 		mo2-engine
 		allegro_ttf${ALLEG_SUFFIX}
 		allegro_font${ALLEG_SUFFIX}
@@ -221,7 +221,7 @@ else(APPLE)
 	if(NOT KCM_AUDIO)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,.")
 	endif(NOT KCM_AUDIO)
-	LIST(APPEND MAIN_LIBS 
+	SET(MAIN_LIBS 
 		mo2-engine
 		allegro_ttf${ALLEG_SUFFIX}
 		allegro_font${ALLEG_SUFFIX}
@@ -233,6 +233,7 @@ else(APPLE)
 		allegro_color${ALLEG_SUFFIX}
 		allegro${ALLEG_SUFFIX}
 		${ALLEGRO_MAIN_LIB}
+		${EXTRA_LIBS}
 		curl
 		m pthread SM ICE X11 Xext Xcursor Xinerama Xrandr Xpm
 	)
