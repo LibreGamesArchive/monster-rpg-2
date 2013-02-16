@@ -20,6 +20,8 @@ extern "C" {
 #include "java.h"
 #endif
 
+bool transitioning;
+
 bool global_draw_controls = true;
 static TemporaryTextWidget omnipotentTexts[MAX_PARTY];
 static double current_time = -1;
@@ -662,11 +664,7 @@ static void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 		al_use_transform(&backup);
 	}
 
-#ifdef ALLEGRO_RASPBERRYPI
-	if (custom_mouse_cursor && show_custom_mouse_cursor) {
-#else
-	if (sd->fullscreen && custom_mouse_cursor) {
-#endif
+	if (custom_mouse_cursor && mouse_in_display && !transitioning) {
 		ALLEGRO_MOUSE_STATE state;
 		al_get_mouse_state(&state);
 		al_draw_bitmap(custom_mouse_cursor->bitmap, state.x, state.y, 0);
@@ -833,6 +831,8 @@ void m_draw_precise_line(MBITMAP *bitmap, float x1, float y1, float x2, float y2
 
 static void fade(int startAlpha, int endAlpha, int length, MCOLOR color)
 {
+	transitioning = true;
+
 	dpad_off();
 	global_draw_red = false;
 	global_draw_controls = false;
@@ -887,6 +887,8 @@ static void fade(int startAlpha, int endAlpha, int length, MCOLOR color)
 	dpad_on();
 	global_draw_red = true;
 	global_draw_controls = true;
+
+	transitioning = false;
 }
 
 
@@ -911,6 +913,8 @@ void fadeOut(MCOLOR color)
  */
 static bool transition(bool focusing, int length, bool can_cancel = false, bool toggle_dpad = true, float scale = 1.0f)
 {
+	transitioning = true;
+
 	int BW = m_get_bitmap_width(buffer);
 	int BH = m_get_bitmap_height(buffer);
 	int disp_w = al_get_display_width(display);
@@ -941,6 +945,7 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 				m_set_target_bitmap(buffer);
 				global_draw_red = true;
 				global_draw_controls = true;
+				transitioning = false;
 				return true;
 			}
 		}
@@ -996,6 +1001,8 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 	global_draw_red = true;
 	global_draw_controls = true;
 
+	transitioning = false;
+
 	return false;
 }
 
@@ -1017,6 +1024,8 @@ void transitionOut(bool toggle_dpad, float scale)
 
 void battleTransition(void)
 {
+	transitioning = true;
+
 	if (!use_programmable_pipeline) {
 		dpad_off();
 		global_draw_red = false;
@@ -1104,7 +1113,8 @@ void battleTransition(void)
 
 		delete[] phase_lengths;
 		delete[] phase_peaks;
-
+	
+		transitioning = false;
 		return;
 	}
 
@@ -1161,6 +1171,8 @@ void battleTransition(void)
 	m_destroy_bitmap(battle_buf);
 
 	dpad_on();
+
+	transitioning = false;
 }
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID

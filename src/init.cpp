@@ -139,8 +139,6 @@ ALLEGRO_EVENT_QUEUE *events;
 ALLEGRO_EVENT_QUEUE *input_event_queue;
 double next_shake = 0;
 
-ALLEGRO_MOUSE_CURSOR *allegro_cursor;
-
 bool do_acknowledge_resize = false;
 
 ALLEGRO_JOYSTICK *user_joystick = NULL;
@@ -282,8 +280,8 @@ int versionMinor = 0;
 bool switched_out = false;
 uint32_t my_opengl_version;
 
+static MBITMAP *custom_mouse_cursor_saved = NULL;
 MBITMAP *custom_mouse_cursor = NULL;
-bool show_custom_mouse_cursor = true;
 
 void destroy_fonts(void)
 {
@@ -552,16 +550,6 @@ static void *thread_proc(void *arg)
 		}
 		
 		if (al_wait_for_event_timed(events, &event, 1.0f/LOGIC_RATE)) {
-
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-			if (event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY) {
-				show_custom_mouse_cursor = true;
-			}
-			else if (event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY) {
-				show_custom_mouse_cursor = false;
-			}
-			else
-#endif
 			if (event.type == ALLEGRO_EVENT_TIMER) {
 				if (event.timer.source == draw_timer) {
 					draw_counter++;
@@ -649,15 +637,6 @@ static void *loader_proc(void *arg)
 
 	initInput();
 	debug_message("Input initialized.\n");
-
-	show_progress(60);
-
-	// Set an icon
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_MACOSX && !defined ALLEGRO_ANDROID
-	MBITMAP *tmp_bmp = m_load_alpha_bitmap(getResource("staff.png"));
-	al_set_display_icon(display, tmp_bmp->bitmap);
-	m_destroy_bitmap(tmp_bmp);
-#endif
 
 	show_progress(65);
 
@@ -1710,6 +1689,19 @@ bool init(int *argc, char **argv[])
 		native_error("Failed to set gfx mode.");
 	}
 
+	// Set an icon
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_MACOSX && !defined ALLEGRO_ANDROID
+	int icon_format = al_get_new_bitmap_format();
+	int icon_flags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
+	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
+	ALLEGRO_BITMAP *tmp_bmp = al_load_bitmap(getResource("staff.tga"));
+	al_set_display_icon(display, tmp_bmp);
+	al_destroy_bitmap(tmp_bmp);
+	al_set_new_bitmap_format(icon_format);
+	al_set_new_bitmap_flags(icon_flags);
+#endif
+
 	al_rest(1.0);
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -1753,7 +1745,9 @@ bool init(int *argc, char **argv[])
 	authenticatePlayer();
 #endif
 	
-	custom_mouse_cursor = m_load_bitmap(getResource("media/mouse_cursor.png"));
+	custom_mouse_cursor_saved = m_load_bitmap(getResource("media/mouse_cursor.png"));
+	al_hide_mouse_cursor(display);
+	show_custom_cursor();
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (sd->fullscreen) {
@@ -1762,16 +1756,7 @@ bool init(int *argc, char **argv[])
 	}
 #endif
 
-#ifdef ALLEGRO_RASPBERRYPI
-	al_hide_mouse_cursor(display);
-#endif
-#if !defined ALLEGRO_RASPBERRYPI && !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	allegro_cursor = al_create_mouse_cursor(custom_mouse_cursor->bitmap, 0, 0);
-	if (!sd->fullscreen) {
-		al_set_mouse_cursor(display, allegro_cursor);
-	}
-#endif
-	al_set_mouse_xy(display, al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor->bitmap)-20, al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor->bitmap)-20);
+	al_set_mouse_xy(display, al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor_saved->bitmap)-20, al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor_saved->bitmap)-20);
 
 #ifdef A5_OGL
 	if (use_fixed_pipeline) {
@@ -2282,10 +2267,6 @@ void set_screen_params(void)
 
 void toggle_fullscreen()
 {
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	show_custom_mouse_cursor = true;
-#endif
-
 	pause_joystick_repeat_events = true;
 	ScreenDescriptor *sd = config.getWantedGraphicsMode();
 
@@ -2330,19 +2311,14 @@ void toggle_fullscreen()
 	pause_joystick_repeat_events = false;
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	if (sd->fullscreen || in_shooter) {
-		al_hide_mouse_cursor(display);
-	}
-	else {
-		al_show_mouse_cursor(display);
-		al_set_mouse_cursor(display, allegro_cursor);
-	}
 	if (in_shooter) {
 		al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
 	}
 	else if (custom_mouse_cursor) {
-		al_set_mouse_xy(display, al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor->bitmap)-20, al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor->bitmap)-20);
+		al_set_mouse_xy(display, al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor_saved->bitmap)-20, al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor_saved->bitmap)-20);
 	}
+
+	al_hide_mouse_cursor(display);
 #endif
 }
 
@@ -2373,4 +2349,19 @@ void lock_joypad_mutex(void)
 void unlock_joypad_mutex(void)
 {
 	al_unlock_mutex(joypad_mutex);
+}
+
+void show_custom_cursor()
+{
+	custom_mouse_cursor = custom_mouse_cursor_saved;
+}
+
+void hide_custom_cursor()
+{
+	custom_mouse_cursor = NULL;
+}
+
+bool is_cursor_hidden()
+{
+	return custom_mouse_cursor == NULL;
 }

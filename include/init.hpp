@@ -229,8 +229,9 @@ extern bool should_reset;
 extern bool is_fs_toggle;
 
 extern MBITMAP *custom_mouse_cursor;
-extern bool show_custom_mouse_cursor;
-extern ALLEGRO_MOUSE_CURSOR *allegro_cursor;
+void show_custom_cursor();
+void hide_custom_cursor();
+bool is_cursor_hidden();
 
 extern int width_before_fullscreen;
 extern int height_before_fullscreen;

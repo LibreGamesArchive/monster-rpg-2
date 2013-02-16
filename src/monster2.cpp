@@ -23,6 +23,8 @@ static bool zeemote_enabled = false;
 
 #include "svg.hpp"
 
+bool mouse_in_display = true;
+
 static int last_mouse_x = -1, last_mouse_y;
 static int total_mouse_x, total_mouse_y;
 
@@ -569,7 +571,13 @@ top:
 			getInput()->handle_event(&event);
 		al_unlock_mutex(input_mutex);
 
-		if (event.type == ALLEGRO_EVENT_KEY_CHAR || event.type == USER_KEY_CHAR) {
+		if (event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY) {
+			mouse_in_display = true;
+		}
+		else if (event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY) {
+			mouse_in_display = false;
+		}
+		else if (event.type == ALLEGRO_EVENT_KEY_CHAR || event.type == USER_KEY_CHAR) {
 			INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 			int code = event.keyboard.keycode;
 			if (code == config.getKeyLeft()) {
@@ -2005,10 +2013,10 @@ int main(int argc, char *argv[])
 
 
 	// FIXME
-	//playMusic("volcano.ogg"); while (1) volcano_scene();
+	//playMusic("volcano.ogg"); volcano_scene();
 	//do_lander(); 
 	//archery(false);
-	shooter(false);
+	//shooter(false);
 	//credits();
 
 	while (!quit_game) {

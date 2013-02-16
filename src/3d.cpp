@@ -802,19 +802,13 @@ static int NUM_GOBLINS;
 
 static int real_archery(int *accuracy_pts)
 {
-	MBITMAP *tmp_cursor = custom_mouse_cursor;
-	custom_mouse_cursor = NULL;
-	al_hide_mouse_cursor(display);
+	hide_custom_cursor();
 
 	dpad_off();
 
 	int scr_w = al_get_display_width(display);
 	int scr_h = al_get_display_height(display);
-	MBITMAP *tmpcursor = custom_mouse_cursor;
-	custom_mouse_cursor = NULL;
-	if (have_mouse) {
-		al_set_mouse_xy(display, scr_w/2, scr_h/2);
-	}
+	al_set_mouse_xy(display, scr_w/2, scr_h/2);
 	int last_mouse_x = scr_w/2;
 	int last_mouse_y = scr_h/2;
 
@@ -932,9 +926,9 @@ static int real_archery(int *accuracy_pts)
 
 			tmp_counter--;
 			if (is_close_pressed()) {
-				custom_mouse_cursor = tmpcursor;
+				show_custom_cursor();
 				do_close();
-				custom_mouse_cursor = NULL;
+				hide_custom_cursor();
 				close_pressed = false;
 			}
 			// WARNING
@@ -1281,16 +1275,8 @@ done:
 	*accuracy_pts = ((float)NUM_GOBLINS/num_shots) * 30 + 2;
 
 	dpad_on();
-	
-	custom_mouse_cursor = tmpcursor;
 
-	custom_mouse_cursor = tmp_cursor;
-#if !defined ALLEGRO_RASPBERRYPI
-	if (!config.getWantedGraphicsMode()->fullscreen) {
-		al_show_mouse_cursor(display);
-		al_set_mouse_cursor(display, allegro_cursor);
-	}
-#endif
+	show_custom_cursor();
 
 	if (break_main_loop) {
 		return 2;
@@ -1444,6 +1430,8 @@ static MODEL *create_ring(int sd /* subdivisions */, MBITMAP *texture)
 
 void volcano_scene(void)
 {
+	hide_custom_cursor();
+
 	dpad_off();
 
 	m_set_target_bitmap(buffer);
@@ -1703,4 +1691,6 @@ done:
 	}
 
 	dpad_on();
+
+	show_custom_cursor();
 }

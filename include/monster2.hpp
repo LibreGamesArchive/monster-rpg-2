@@ -332,6 +332,8 @@ void clear_touches();
 
 extern bool dont_draw_now;
 
+extern bool mouse_in_display;
+
 #ifdef ALLEGRO_ANDROID
 extern bool halted;
 extern bool switched_in;

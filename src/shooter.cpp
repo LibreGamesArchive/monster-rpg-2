@@ -749,18 +749,11 @@ bool shooter(bool for_points)
 	anotherDoDialogue("Gunnar: Oh, no, the throttle jammed! Eny, you steer.\nMel, Rider, blast anything in our path! I'll go fix the engine!\n", true);
 
 start:
-	/*
-	al_hide_mouse_cursor(display);
-	show_custom_mouse_cursor = false;
 
+	hide_custom_cursor();
 	int scr_w = al_get_display_width(display);
 	int scr_h = al_get_display_height(display);
-	MBITMAP *tmpcursor = custom_mouse_cursor;
-	custom_mouse_cursor = NULL;
-	if (have_mouse) {
-		al_set_mouse_xy(display, scr_w/2, scr_h/2);
-	}
-	*/
+	al_set_mouse_xy(display, scr_w/2, scr_h/2);
 
 	bool replay = false;
 
@@ -812,9 +805,9 @@ start:
 		logic_counter = 0;
 		while  (tmp_counter > 0) {
 			if (is_close_pressed()) {
-				//custom_mouse_cursor = tmpcursor;
+				show_custom_cursor();
 				do_close();
-				//custom_mouse_cursor = NULL;
+				hide_custom_cursor();
 				close_pressed = false;
 			}
 			// WARNING
@@ -1026,8 +1019,6 @@ start:
 
 					shooter_paused = true;
 
-					//custom_mouse_cursor = tmpcursor;
-					
 					clear_input_events();
 
 					while (true) {
@@ -1080,11 +1071,7 @@ start:
 
 					shooter_paused = false;
 
-					//custom_mouse_cursor = NULL;
-					
-					if (have_mouse) {
-						al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
-					}
+					al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
 				}
 			}
 			else if (!state.buttons) {
@@ -1216,8 +1203,6 @@ start:
 	}
 done:
 
-	//custom_mouse_cursor = tmpcursor;
-
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	tguiDeleteWidget(button);
 	tguiDeleteWidget(slider);
@@ -1237,24 +1222,15 @@ done:
 	if (replay) {
 		goto start;
 	}
-
+	
 	fadeOut(black);
 	m_set_target_bitmap(buffer);
 	m_clear(black);
 	m_rest(5);
 
 	playMusic("underwater_final.ogg");
-
-	/*
-#if !defined ALLEGRO_RASPBERRYPI
-	ScreenDescriptor *sd = config.getWantedGraphicsMode();
-	if (!sd->fullscreen) {
-		al_show_mouse_cursor(display);
-		al_set_mouse_cursor(display, allegro_cursor);
-	}
-#endif
-	show_custom_mouse_cursor = true;
-	*/
+	
+	show_custom_cursor();
 
 	if (dead) {
 		if (prompt("G A M E O V E R", "Try Again?", 1, 1))

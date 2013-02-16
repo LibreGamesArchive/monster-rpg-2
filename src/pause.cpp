@@ -2256,6 +2256,8 @@ done:
 
 void credits(void)
 {
+	hide_custom_cursor();
+
 	dpad_off();
 
 	enum SECTION_STATE {
@@ -2706,164 +2708,164 @@ done:
 		goto done2;
 	}
 
-{
-	/* Now roll the Indiegogo sponsor credits! */
+	{
+		/* Now roll the Indiegogo sponsor credits! */
 
-	const char *lines[] = {
-		"AND A VERY SPECIAL",
-		"THANKS TO OUR",
-		"INDIEGOGO SPONSORS...",
-		"",
-		"",
-		"",
-		"TREVOR BEKOLAY",
-		"WILLIAM HENSLEY",
-		"WILLIAMGEORGEBROWNE",
-		"CHRISTOPHER VALORE",
-		"GAMINGONLINUX.COM",
-		"JAIME ROBERTSON",
-		"GIACOMO RUSSO",
-		"MICHAEL TERVOORT",
-		"PAWEL ZUBRBYCKI",
-		"JOSH GUNDERSON",
-		"JONAH LIBSTER",
-		"CHRISTOPHER WEIGLE",
-		"JAN SIMEK",
-		"BIGNIC",
-		"PAUL PRIDHAM",
-		"THOMAS FJELLSTROM",
-		"ELIAS PSCHERNIG",
-		"NAMIDA1",
-		"XERANAS",
-		"RUSTY.BOLTS",
-		"FERNANDO",
-		"MATTHEW BROOKS",
-		"TODD B.",
-		"GELE SEBASTIEN",
-		"J.W. GLAZE",
-		"DABASCHT",
-		"SIMON DWYER",
-		"JOSH BUSH",
-		"MATEHACKERS",
-		"MATTHEW.KEE",
-		"GUSTAV TIGER",
-		"JENNIFER ROGER",
-		"BERNARDO COMPAGNONI",
-		"STEPHANE GUILLOU",
-		"HARD ROCK",
-		"JON RAFKIND",
-		"PHILIPPE",
-		"MARK SMITH",
-		"O.KORFF",
-		"LEFTIUM",
-		NULL
-	};
+		const char *lines[] = {
+			"AND A VERY SPECIAL",
+			"THANKS TO OUR",
+			"INDIEGOGO SPONSORS...",
+			"",
+			"",
+			"",
+			"TREVOR BEKOLAY",
+			"WILLIAM HENSLEY",
+			"WILLIAMGEORGEBROWNE",
+			"CHRISTOPHER VALORE",
+			"GAMINGONLINUX.COM",
+			"JAIME ROBERTSON",
+			"GIACOMO RUSSO",
+			"MICHAEL TERVOORT",
+			"PAWEL ZUBRBYCKI",
+			"JOSH GUNDERSON",
+			"JONAH LIBSTER",
+			"CHRISTOPHER WEIGLE",
+			"JAN SIMEK",
+			"BIGNIC",
+			"PAUL PRIDHAM",
+			"THOMAS FJELLSTROM",
+			"ELIAS PSCHERNIG",
+			"NAMIDA1",
+			"XERANAS",
+			"RUSTY.BOLTS",
+			"FERNANDO",
+			"MATTHEW BROOKS",
+			"TODD B.",
+			"GELE SEBASTIEN",
+			"J.W. GLAZE",
+			"DABASCHT",
+			"SIMON DWYER",
+			"JOSH BUSH",
+			"MATEHACKERS",
+			"MATTHEW.KEE",
+			"GUSTAV TIGER",
+			"JENNIFER ROGER",
+			"BERNARDO COMPAGNONI",
+			"STEPHANE GUILLOU",
+			"HARD ROCK",
+			"JON RAFKIND",
+			"PHILIPPE",
+			"MARK SMITH",
+			"O.KORFF",
+			"LEFTIUM",
+			NULL
+		};
 
-	int nlines = 0;
-	for (; lines[nlines] != NULL; nlines++)
-		;
+		int nlines = 0;
+		for (; lines[nlines] != NULL; nlines++)
+			;
 
-	int scroll_size = nlines*10 + BH*1.2;
-	float scroll_amount = 0;
+		int scroll_size = nlines*10 + BH*1.2;
+		float scroll_amount = 0;
 
-	long start = tguiCurrentTimeMillis();
+		long start = tguiCurrentTimeMillis();
 
-	clear_input_events();
+		clear_input_events();
 
-	for (;;) {
-		if (is_close_pressed()) {
-			do_close();
-			close_pressed = false;
-		}
-		// WARNING
-		if (break_main_loop) {
-			goto done2;
-		}
-		long now = tguiCurrentTimeMillis();
-		int step = now - start;
-		start = now;
-
-		scroll_amount += 0.01 * step;
-
-		if (scroll_amount > scroll_size)
-			break;
-
-		vcount = 0;
-		int y = BH-scroll_amount;
-		for (int line = 0; line < nlines; line++, y += 10) {
-			int x = BW/2 - strlen(lines[line])*10/2;
-			for (int c = 0; lines[line][c]; c++, x += 10) {
-				int letter = lines[line][c];
-				int u;
-				ALLEGRO_COLOR col = white;
-				if (letter == ' ') {
-					col = al_map_rgba(0, 0, 0, 0);
-					u = 0;
-				}
-				else if (letter == '-') {
-					u = 260;
-				}
-				else if (letter == 'a') {
-					u = 270;
-				}
-				else if (letter == '"') {
-					u = 280;
-				}
-				else if (letter == '.') {
-					u = 290;
-				}
-				else
-					u = (letter-'A')*10;
-				verts[vcount].x = x;
-				verts[vcount].y = y;
-				verts[vcount].u = u;
-				verts[vcount].v = 0;
-				verts[vcount].color = col;
-				vcount++;
-				verts[vcount].x = x;
-				verts[vcount].y = y+10;
-				verts[vcount].u = u;
-				verts[vcount].v = 10;
-				verts[vcount].color = col;
-				vcount++;
-				verts[vcount].x = x+10;
-				verts[vcount].y = y;
-				verts[vcount].u = u+10;
-				verts[vcount].v = 0;
-				verts[vcount].color = col;
-				vcount++;
-				verts[vcount].x = x;
-				verts[vcount].y = y+10;
-				verts[vcount].u = u;
-				verts[vcount].v = 10;
-				verts[vcount].color = col;
-				vcount++;
-				verts[vcount].x = x+10;
-				verts[vcount].y = y;
-				verts[vcount].u = u+10;
-				verts[vcount].v = 0;
-				verts[vcount].color = col;
-				vcount++;
-				verts[vcount].x = x+10;
-				verts[vcount].y = y+10;
-				verts[vcount].u = u+10;
-				verts[vcount].v = 10;
-				verts[vcount].color = col;
-				vcount++;
+		for (;;) {
+			if (is_close_pressed()) {
+				do_close();
+				close_pressed = false;
 			}
+			// WARNING
+			if (break_main_loop) {
+				goto done2;
+			}
+			long now = tguiCurrentTimeMillis();
+			int step = now - start;
+			start = now;
+
+			scroll_amount += 0.01 * step;
+
+			if (scroll_amount > scroll_size)
+				break;
+
+			vcount = 0;
+			int y = BH-scroll_amount;
+			for (int line = 0; line < nlines; line++, y += 10) {
+				int x = BW/2 - strlen(lines[line])*10/2;
+				for (int c = 0; lines[line][c]; c++, x += 10) {
+					int letter = lines[line][c];
+					int u;
+					ALLEGRO_COLOR col = white;
+					if (letter == ' ') {
+						col = al_map_rgba(0, 0, 0, 0);
+						u = 0;
+					}
+					else if (letter == '-') {
+						u = 260;
+					}
+					else if (letter == 'a') {
+						u = 270;
+					}
+					else if (letter == '"') {
+						u = 280;
+					}
+					else if (letter == '.') {
+						u = 290;
+					}
+					else
+						u = (letter-'A')*10;
+					verts[vcount].x = x;
+					verts[vcount].y = y;
+					verts[vcount].u = u;
+					verts[vcount].v = 0;
+					verts[vcount].color = col;
+					vcount++;
+					verts[vcount].x = x;
+					verts[vcount].y = y+10;
+					verts[vcount].u = u;
+					verts[vcount].v = 10;
+					verts[vcount].color = col;
+					vcount++;
+					verts[vcount].x = x+10;
+					verts[vcount].y = y;
+					verts[vcount].u = u+10;
+					verts[vcount].v = 0;
+					verts[vcount].color = col;
+					vcount++;
+					verts[vcount].x = x;
+					verts[vcount].y = y+10;
+					verts[vcount].u = u;
+					verts[vcount].v = 10;
+					verts[vcount].color = col;
+					vcount++;
+					verts[vcount].x = x+10;
+					verts[vcount].y = y;
+					verts[vcount].u = u+10;
+					verts[vcount].v = 0;
+					verts[vcount].color = col;
+					vcount++;
+					verts[vcount].x = x+10;
+					verts[vcount].y = y+10;
+					verts[vcount].u = u+10;
+					verts[vcount].v = 10;
+					verts[vcount].color = col;
+					vcount++;
+				}
+			}
+			
+			m_set_target_bitmap(buffer);
+
+			al_clear_to_color(al_map_rgb_f(0, 0, 0));
+
+			m_draw_prim(verts, 0, font, 0, vcount, ALLEGRO_PRIM_TRIANGLE_LIST);
+
+			drawBufferToScreen();
+			m_flip_display();
+			m_rest(0.001);
 		}
-		
-		m_set_target_bitmap(buffer);
-
-		al_clear_to_color(al_map_rgb_f(0, 0, 0));
-
-		m_draw_prim(verts, 0, font, 0, vcount, ALLEGRO_PRIM_TRIANGLE_LIST);
-
-		drawBufferToScreen();
-		m_flip_display();
-		m_rest(0.001);
 	}
-}
 	
 	fadeOut(black);
 	
@@ -2873,6 +2875,8 @@ done2:
 	m_destroy_bitmap(font);
 
 	dpad_on();
+
+	show_custom_cursor();
 }
 
 
