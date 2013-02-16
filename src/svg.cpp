@@ -17,6 +17,7 @@ extern "C" {
 #include "svgtiny.h"
 }
 
+#define ALLEGRO_STATICLINK
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_color.h>
