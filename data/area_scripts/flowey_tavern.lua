@@ -38,7 +38,7 @@ function activate_bartender()
 			if (give_juice()) then
 				loadPlayDestroy("chest.ogg")
 				setMilestone(MS_TAVERN_JUICE, true);
-				doDialogue(_t("Got a ") .. getItemIcon(ITEM_JUICE) .. _t("Juice") .. ".\n", true)
+				doDialogue(_t("Got a ") .. getItemIcon(ITEM_JUICE) .. _t("Juice") .. "\n", true)
 			end
 		end
 	end
@@ -55,7 +55,7 @@ function activate(activator, activated)
 			setInventory(slot, ITEM_MEDALLION, 1)
 			loadPlayDestroy("chest.ogg")
 			setMilestone(MS_GOT_MEDALLION, true)
-			doDialogue(_t("Got a ") .. getItemIcon(ITEM_MEDALLION) .. _t("Medallion") .. ".\n", true)
+			doDialogue(_t("Got a ") .. getItemIcon(ITEM_MEDALLION) .. _t("Medallion") .. "\n", true)
 		elseif (not getMilestone(MS_GOT_KEY)) then
 			doDialogue("Oh my dear, I've lost my key... It's about this big and fancy...\nIf you find it, please, bring it to me!\n", true)
 		else

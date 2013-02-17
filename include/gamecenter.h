@@ -38,7 +38,7 @@
 BOOL isGameCenterAPIAvailable();
 void authenticatePlayer(void);
 void resetAchievements(void);
-void do_milestone(int num);
+void do_milestone(int num, bool visual);
 void showAchievements(void);
 
 extern volatile bool modalViewShowing;

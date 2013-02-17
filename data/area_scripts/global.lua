@@ -539,7 +539,7 @@ function Chest:activate()
 					setInventory(slot, self.index, self.quantity+quantity)
 					setMilestone(self.milestone, true);
 					if (self.quantity > 1) then
-						doDialogue(_t("Found ") .. self.quantity .." " .. getItemIcon(self.index) .. _t(getItemName(self.index) .. "s") .. ".\n")
+						doDialogue(_t("Found ") .. self.quantity .." " .. getItemIcon(self.index) .. _t(getItemName(self.index) .. "s") .. "\n")
 					else
 						if (startsWithVowel(getItemName(self.index))) then
 							doDialogue(_t("Found an ") .. getItemIcon(self.index) .. _t(getItemName(self.index)) .. "\n")
@@ -562,7 +562,7 @@ function Chest:activate()
 				setInventory(slot, self.index, self.quantity)
 				setMilestone(self.milestone, true);
 				if (self.quantity > 1) then
-					doDialogue(_t("Found ") .. self.quantity .." " .. getItemIcon(self.index) .. _t(getItemName(self.index) .. "s") .. ".\n")
+					doDialogue(_t("Found ") .. self.quantity .." " .. getItemIcon(self.index) .. _t(getItemName(self.index) .. "s") .. "\n")
 				else
 					if (startsWithVowel(getItemName(self.index))) then
 						doDialogue(_t("Found an ") .. getItemIcon(self.index) .. _t(getItemName(self.index)) .. "\n")

@@ -41,27 +41,7 @@ BOOL isGameCenterAPIAvailable()
 	return (localPlayerClassAvailable && osVersionSupported);
 }
 
-static void loadAchievements(void)
-{
-	if (!isGameCenterAPIAvailable() || !is_authenticated)
-		return;
-
-	achievementsDictionary = [[NSMutableDictionary alloc] init];
-	[GKAchievement loadAchievementsWithCompletionHandler:^(NSArray *achievements, NSError *error)
-	 {
-		 if (error == nil)
-		 {
-			 for (GKAchievement* achievement in achievements) {
-				 [achievementsDictionary setObject: achievement forKey: achievement.identifier];
-			 }
-		 }
-	 }];
-}
-
 #define NUM_ACHIEVEMENTS 30
-
-NSString *achievements_backlog[NUM_ACHIEVEMENTS];
-int num_backlog_achievements = 0;
 
 void reportAchievementIdentifier(NSString* identifier, bool notification);
 
@@ -103,19 +83,6 @@ void authenticatePlayer(void)
 			{
 				// Perform additional tasks for the authenticated player.
 				is_authenticated = 1;
-				loadAchievements();
-				int i;
-				int n = num_backlog_achievements;
-				for (i = 0; i < n; i++) {
-					NSString *s = achievements_backlog[0];
-					int j;
-					for (j = 1; j < num_backlog_achievements; j++) {
-						achievements_backlog[j-1] = achievements_backlog[j];
-					}
-					num_backlog_achievements--;
-					reportAchievementIdentifier(s, false);
-					[s release];
-				}
 			}
 			else {
 				printf("Game Center authentication error: code %d\n", [error code]);
@@ -153,14 +120,6 @@ void reportAchievementIdentifier(NSString* identifier, bool notification)
 	if ([achievementsDictionary objectForKey:identifier] != nil) {
 		return;
 	}
-	// check the backlog!
-	int i;
-	for (i = 0; i < num_backlog_achievements; i++) {
-		if (NSOrderedSame == [achievements_backlog[i] compare:identifier]) {
-			// already there
-			return;
-		}
-	}
 	
 	float percent = 100;
 	
@@ -173,11 +132,6 @@ void reportAchievementIdentifier(NSString* identifier, bool notification)
 		 {
 			 if (error != nil)
 			 {
-				 // Retain the achievement object and try again later (not shown).
-				 if (num_backlog_achievements < NUM_ACHIEVEMENTS) {
-					 achievements_backlog[num_backlog_achievements] = [[NSString alloc] initWithString:identifier];
-					 num_backlog_achievements++;
-				 }
 			 }
 		 }];
 	}
@@ -189,7 +143,7 @@ struct Holder
 	NSString *ident;
 };
 
-void do_milestone(int num)
+void do_milestone(int num, bool visual)
 {
 	num++;
 
@@ -230,8 +184,10 @@ void do_milestone(int num)
 	{
 		if (holders[i].num == num) {
 			reportAchievementIdentifier(holders[i].ident, true);
-			achievement_time = al_get_time();
-			achievement_show = true;
+			if (visual) {
+				achievement_time = al_get_time();
+				achievement_show = true;
+			}
 			return;
 		}
 	}

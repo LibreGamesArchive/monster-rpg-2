@@ -677,8 +677,6 @@ bool shooter(bool for_points)
 		crab_value = 100;
 	}
 
-	bool can_pause = true;
-
 	dpad_off();
 
 	int crabs_destroyed;
@@ -984,14 +982,16 @@ start:
 #endif
 
 			ALLEGRO_MOUSE_STATE state;
-			if (have_mouse) {
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+			if (!use_dpad) {
 				al_get_mouse_state(&state);
+				state.buttons = !released;
 			}
-			else {
+			else
+#endif
 				state.buttons = 0;
-			}
 			InputDescriptor in = getInput()->getDescriptor();
-			if ((state.buttons && can_pause) || in.button2) {
+			if (state.buttons || in.button2) {
 				int press_x = state.x;
 				int press_y = state.y;
 				if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN)
@@ -1002,9 +1002,7 @@ start:
 				int dy = pause_pos_y - press_y;
 				double dist = sqrt((float)dx*dx + dy*dy);
 				if (dist < pause_icon_w/2 || in.button2) {
-					waitForRelease(5);
 					// pause
-					can_pause = false;
 					const char *pause_text = "Paused";
 					int tw = m_text_length(game_font, _t(pause_text));
 					int th = m_text_height(game_font);
@@ -1018,6 +1016,7 @@ start:
 					al_stop_timer(logic_timer);
 
 					shooter_paused = true;
+					al_rest(0.5);
 
 					clear_input_events();
 
@@ -1034,19 +1033,20 @@ start:
 							goto done;
 						}
 						if (break_shooter_pause) {
-							can_pause = true;
 							break;
 						}
-						if (have_mouse) {
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+						if (!use_dpad) {
 							al_get_mouse_state(&state);
+							state.buttons = !released;
 						}
-						else {
+						else
+#endif
 							state.buttons = 0;
-						}
-						if ((state.buttons && can_pause) || in.button2) {
+						if (state.buttons || in.button2) {
 							press_x = state.x;
 							press_y = state.y;
-							if (is_ipad() && !config.getMaintainAspectRatio())
+							if (!config.getMaintainAspectRatio())
 								tguiConvertMousePosition(&press_x, &press_y, 0, 0, screen_ratio_x, screen_ratio_y);
 							else
 								tguiConvertMousePosition(&press_x, &press_y, screen_offset_x, screen_offset_y, 1, 1);
@@ -1054,13 +1054,9 @@ start:
 							int dy = pause_pos_y - press_y;
 							double dist = sqrt((float)dx*dx + dy*dy);
 							if (dist < w/2 || in.button2) {
-								waitForRelease(5);
-								can_pause = false;
+								al_rest(0.5);
 								break;
 							}
-						}
-						else if (!state.buttons) {
-							can_pause = true;
 						}
 						drawBufferToScreen();
 						m_flip_display();
@@ -1073,9 +1069,6 @@ start:
 
 					al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
 				}
-			}
-			else if (!state.buttons) {
-				can_pause = true;
 			}
 
 			bool mouse_button_1_pressed = false;

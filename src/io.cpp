@@ -99,7 +99,7 @@ void writeString(const char* s, gzFile f)
  * Milestones are stored as one big bit field, the
  * first bit in the file being the first milestone.
  */
-bool readMilestones(bool* ms, int num, gzFile f)
+static bool readMilestones(bool* ms, int num, gzFile f)
 {
 	for (int i = 0; i < num/8; i++) {
 		int c = gzgetc(f);
@@ -110,6 +110,11 @@ bool readMilestones(bool* ms, int num, gzFile f)
 			if (i*8+j >= num)
 				break;
 			ms[i*8+j] = c & 0x80;
+			// Make sure achievements get set (Game Center) in
+			// case something went wrong before.
+			if (c & 0x80) {
+				do_milestone(i*8+j, false);
+			}
 			c <<= 1;
 		}
 	}

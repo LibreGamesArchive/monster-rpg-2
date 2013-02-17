@@ -572,9 +572,11 @@ top:
 		al_unlock_mutex(input_mutex);
 
 		if (event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY) {
+			al_hide_mouse_cursor(display);
 			mouse_in_display = true;
 		}
 		else if (event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY) {
+			al_show_mouse_cursor(display);
 			mouse_in_display = false;
 		}
 		else if (event.type == ALLEGRO_EVENT_KEY_CHAR || event.type == USER_KEY_CHAR) {

@@ -16,8 +16,6 @@ extern void iputl(long l, gzFile f);
 extern long igetl(gzFile f);
 extern void my_pack_putc(int c, gzFile f);
 extern int my_pack_getc(gzFile f);
-extern bool readMilestones(bool* ms, int num, gzFile f);
-extern bool WriteMilestones(bool* ms, int num, gzFile f);
 extern const char *readString(gzFile f);
 extern void writeString(const char *s, gzFile f);
 extern void saveGame(const char* filename, std::string mapArea = "");

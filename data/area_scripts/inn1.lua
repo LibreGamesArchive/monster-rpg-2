@@ -150,7 +150,7 @@ function activate(activator, activated)
 			setInventory(slot, ITEM_KEY, 1)
 			loadPlayDestroy("chest.ogg")
 			setMilestone(MS_GOT_KEY, true)
-			doDialogue(_t("Got a ") .. getItemIcon(ITEM_KEY) .. _t("Key") .. ".\n", true)
+			doDialogue(_t("Got a ") .. getItemIcon(ITEM_KEY) .. _t("Key") .. "\n", true)
 		elseif (not getMilestone(MS_GOT_RING)) then
 			doDialogue("Something's missing here... I'm just not sure what.\n")
 		else

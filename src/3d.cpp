@@ -1001,14 +1001,6 @@ static int real_archery(int *accuracy_pts)
 				}
 			}
 
-			/*
-			if (!use_dpad) {
-				if (!clicked && !released) {
-					clicked = true;
-				}
-			}
-			*/
-
 			InputDescriptor id = { 0, };
 			id = getInput()->getDescriptor();
 
@@ -1018,6 +1010,12 @@ static int real_archery(int *accuracy_pts)
 			ALLEGRO_MOUSE_STATE state;
 			al_get_mouse_state(&state);
 			mouse_button_1_pressed = state.buttons & 1;
+#else
+			if (!use_dpad) {
+				if (!clicked && !released) {
+					clicked = true;
+				}
+			}
 #endif
 
 			if (((id.button1 || mouse_button_1_pressed) && drawn) || (!use_dpad && clicked && released && drawn)) {
@@ -1466,7 +1464,7 @@ void volcano_scene(void)
 	ring_texture = m_load_alpha_bitmap(getResource("media/ring_texture.png"));
 
 	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_MIPMAP);
+	al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
 	MBITMAP *land_texture = m_load_bitmap(getResource("media/volcano_texture.png"));
 	MBITMAP *staff_tex = m_load_bitmap(getResource("models/staff.png"));
 	al_set_new_bitmap_flags(flags);

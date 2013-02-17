@@ -664,11 +664,13 @@ static void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 		al_use_transform(&backup);
 	}
 
+#if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE
 	if (custom_mouse_cursor && mouse_in_display && !transitioning) {
 		ALLEGRO_MOUSE_STATE state;
 		al_get_mouse_state(&state);
 		al_draw_bitmap(custom_mouse_cursor->bitmap, state.x, state.y, 0);
 	}
+#endif
 
 	if (use_programmable_pipeline) {
 		if (!(config.getFilterType() == FILTER_SCALE2X)) {
