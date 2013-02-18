@@ -275,6 +275,12 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
          return new String();
       }
    }
+
+   public String getSDCardPrivateDir()
+   {
+   	//return Environment.getExternalStorageDirectory().getAbsolutePath();
+   	return getExternalFilesDir(null).getAbsolutePath();
+   }
    
    public String getResourcesDir()
    {
@@ -1508,9 +1514,9 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
    
       int[] configAttribs =
       {
-         EGL10.EGL_RED_SIZE, 4,
-         EGL10.EGL_GREEN_SIZE, 4,
-         EGL10.EGL_BLUE_SIZE, 4,
+         EGL10.EGL_RED_SIZE, 5,
+         EGL10.EGL_GREEN_SIZE, 6,
+         EGL10.EGL_BLUE_SIZE, 5,
          EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
          EGL10.EGL_NONE
       };
@@ -1543,13 +1549,13 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
       int ret = 1;
 
       es2_attrib = null;
-   /*
       if (version == 2) {
          if (checkGL20Support(context)) {
             es2_attrib = new int[3];
-            es2_attrib[0] = EGL10.EGL_RENDERABLE_TYPE;
-            es2_attrib[1] = EGL_OPENGL_ES2_BIT;
+            es2_attrib[0] = EGL_CONTEXT_CLIENT_VERSION;
+            es2_attrib[1] = 2;
             es2_attrib[2] = EGL10.EGL_NONE;
+	    Log.d("AllegroSurface", "Trying ES2");
          }
          else {
             es2_attrib = null;
@@ -1558,14 +1564,14 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
       }
       else {
          es2_attrib = new int[3];
-         es2_attrib[0] = EGL10.EGL_RENDERABLE_TYPE;
-         es2_attrib[1] = EGL_OPENGL_ES_BIT;
+         es2_attrib[0] = EGL_CONTEXT_CLIENT_VERSION;
+         es2_attrib[1] = 1;
          es2_attrib[2] = EGL10.EGL_NONE;
       }
-   */
       
-      egl_setConfigAttrib(EGL10.EGL_RENDERABLE_TYPE, version == 2 ? EGL_OPENGL_ES2_BIT : EGL_OPENGL_ES_BIT);
-
+      //egl_setConfigAttrib(EGL10.EGL_RENDERABLE_TYPE, version == 2 ? EGL_OPENGL_ES2_BIT : EGL_OPENGL_ES_BIT);
+	
+	/*
       boolean color_size_specified = false;
       for (int i = 0; i < egl_attribWork.size(); i++) {
          Log.d("AllegroSurface", "egl_attribs[" + i + "] = " + egl_attribWork.get(i));
@@ -1576,6 +1582,7 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
             }
          }
       }
+	*/
 
       egl_attribs = new int[egl_attribWork.size()+1];
       for (int i = 0; i < egl_attribWork.size(); i++) {

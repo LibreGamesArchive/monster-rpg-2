@@ -321,7 +321,7 @@ void load_fonts(void)
 		native_error("Failed to load medium_font.");
 	}
 	
-	huge_font = m_load_font(getResource("huge_font.tga"));
+	huge_font = m_load_font(getResource("huge_font.png"));
 	if (!huge_font) {
 		native_error("Failed to load huge_font.");
 	}
@@ -471,6 +471,7 @@ static int progress_percent = 0;
 static void show_progress(int percent)
 {
 	progress_percent = percent;
+	ALLEGRO_DEBUG("progress = %d\n", percent);
 }
 
 void register_display(ALLEGRO_DISPLAY *display)
@@ -622,20 +623,29 @@ static void *loader_proc(void *arg)
 	show_progress(55);
 
 	MBITMAP *deter_display_access_bmp;
+
+	ALLEGRO_DEBUG("1\n");
 	deter_display_access_bmp = m_create_bitmap(16, 16); // check
+	ALLEGRO_DEBUG("1\n");
 	m_set_target_bitmap(deter_display_access_bmp);
 
+	ALLEGRO_DEBUG("1\n");
 	guiAnims.bitmap = m_load_bitmap(getResource("gui.png"));
+	ALLEGRO_DEBUG("1\n");
 
 	poison_bmp = m_load_alpha_bitmap(getResource("media/poison.png"), true);
+	ALLEGRO_DEBUG("1\n");
 	poison_bmp_tmp = m_create_alpha_bitmap( // check
 		m_get_bitmap_width(poison_bmp)+10,
 		m_get_bitmap_height(poison_bmp)+10);
+	ALLEGRO_DEBUG("1\n");
 	poison_bmp_tmp2 = m_create_alpha_bitmap( // check
 		m_get_bitmap_width(poison_bmp)+10,
 		m_get_bitmap_height(poison_bmp)+10);
+	ALLEGRO_DEBUG("1\n");
 
 	initInput();
+	ALLEGRO_DEBUG("1\n");
 	debug_message("Input initialized.\n");
 
 	show_progress(65);
@@ -1289,6 +1299,7 @@ static void draw_loading_screen(MBITMAP *tmp, int percent, ScreenDescriptor *sd)
 
 void create_buffers(void)
 {
+	ALLEGRO_DEBUG("destroying old buffers\n");
 	if (buffer)
 		m_destroy_bitmap(buffer);
 	if (overlay)
@@ -1299,7 +1310,9 @@ void create_buffers(void)
 	}
 	else
 		al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
+	ALLEGRO_DEBUG("creating buffer\n");
 	buffer = m_create_bitmap(BW, BH); // check
+	ALLEGRO_DEBUG("creating overlay\n");
 	overlay = m_create_bitmap(BW, BH); // check
 	al_set_new_bitmap_flags(flags);
 }
@@ -1534,11 +1547,14 @@ bool init(int *argc, char **argv[])
 #if defined ALLEGRO_ANDROID
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 8, ALLEGRO_REQUIRE);
-#elif !defined A5_D3D // we manage depth stencil ourselves for D3D
+	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 16, ALLEGRO_REQUIRE);
+#else
+#if !defined A5_D3D // we manage depth stencil ourselves for D3D
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 8, ALLEGRO_REQUIRE);
 #endif
 	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 32, ALLEGRO_REQUIRE);
+#endif
 
 #if !defined(ALLEGRO_IPHONE) && !defined(ALLEGRO_ANDROID)
 	al_set_new_display_adapter(config.getAdapter());
@@ -1616,7 +1632,7 @@ bool init(int *argc, char **argv[])
 	touch_mutex = al_create_mutex();
 
 	// Android because it's very slow switching back in on some devices
-#if defined A5_D3D || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
+#if defined A5_D3D /*|| defined ALLEGRO_ANDROID*/ || defined ALLEGRO_RASPBERRYPI
 	use_fixed_pipeline = true;
 #endif
 	
@@ -1695,7 +1711,7 @@ bool init(int *argc, char **argv[])
 	int icon_flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
 	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
-	ALLEGRO_BITMAP *tmp_bmp = al_load_bitmap(getResource("staff.tga"));
+	ALLEGRO_BITMAP *tmp_bmp = al_load_bitmap(getResource("staff.png"));
 	al_set_display_icon(display, tmp_bmp);
 	al_destroy_bitmap(tmp_bmp);
 	al_set_new_bitmap_format(icon_format);
@@ -1827,6 +1843,8 @@ bool init(int *argc, char **argv[])
 	m_clear(black);
 	m_flip_display();
 #endif
+
+	ALLEGRO_DEBUG("setting window title\n");
 	
 	al_set_window_title(display, "Monster RPG 2");
 
@@ -1842,7 +1860,11 @@ bool init(int *argc, char **argv[])
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 #endif
 
+	ALLEGRO_DEBUG("creating buffers\n");
+
 	create_buffers();
+
+	ALLEGRO_DEBUG("creating screenshot buffer\n");
 
 	flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
@@ -1855,6 +1877,8 @@ bool init(int *argc, char **argv[])
 		scaleXX_buffer = m_create_bitmap(BW*2, BH*2); // check
 		al_set_new_bitmap_flags(flags);
 	}
+
+	ALLEGRO_DEBUG("initing shader variables\n");
 
 	init2_shaders();
 	
@@ -1876,6 +1900,8 @@ bool init(int *argc, char **argv[])
 	if (!screenshot) {
 		native_error("Failed to create SS buffer.");
 	}
+	
+	ALLEGRO_DEBUG("loading some bitmaps\n");
 	
 	corner_bmp = m_load_bitmap(getResource("media/corner.png"));
 	stomach_circle = m_load_bitmap(getResource("combat_media/stomach_circle.png"));
@@ -1907,10 +1933,13 @@ bool init(int *argc, char **argv[])
 		cached_bitmap_filename = "";
 	}
 
+	ALLEGRO_DEBUG("going into load loop\n");
+
 	while (1) {
 		if (!done_loading_samples) {
 			done_loading_samples = loadSamples(load_samples_cb);
 			if (done_loading_samples) {
+				ALLEGRO_DEBUG("running loader_proc\n");
 				al_run_detached_thread(loader_proc, NULL);
 			}
 		}
@@ -2147,17 +2176,7 @@ void dpad_off(bool count)
 	if (dpad_count > 0 || !count) {
 		al_lock_mutex(dpad_mutex);
 		use_dpad = (dpad_type == DPAD_TOTAL_1 || dpad_type == DPAD_TOTAL_2);
-#if defined ALLEGRO_IPHONE
-#if defined WITH_60BEAT
-		if (!joypad_connected() && !is_sb_connected()) {
-#else
-		if (!joypad_connected()) {
-#endif
-#elif defined ALLEGRO_ANDROID
-		if (!zeemote_connected) {
-#else
 		if (true) {
-#endif
 			if (use_dpad)
 				myTguiIgnore(TGUI_MOUSE);
 			else {
@@ -2192,17 +2211,7 @@ void dpad_on(bool count)
 	if (dpad_count <= 0 || !count) {
 		al_lock_mutex(dpad_mutex);
 		use_dpad = dpad_type != DPAD_NONE;
-#if defined ALLEGRO_IPHONE
-#if defined WITH_60BEAT
-		if (!joypad_connected() && !is_sb_connected()) {
-#else
-		if (!joypad_connected()) {
-#endif
-#elif defined ALLEGRO_ANDROID
-		if (!zeemote_connected) {
-#else
 		if (true) {
-#endif
 			if (use_dpad)
 				myTguiIgnore(TGUI_MOUSE);
 			else

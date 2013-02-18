@@ -61,14 +61,14 @@ static void draw_the_controls(bool draw_controls, ALLEGRO_COLOR tint)
 {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 #if defined ALLEGRO_IPHONE
-	if ((airplay_connected || (config.getDpadType() == DPAD_TOTAL_1 || config.getDpadType() == DPAD_TOTAL_2)) || (use_dpad && dpad_buttons && draw_controls && global_draw_controls)) {
+	if ((airplay_connected || config.getDpadType() == DPAD_TOTAL_1 || config.getDpadType() == DPAD_TOTAL_2) || (use_dpad && dpad_buttons && draw_controls && global_draw_controls)) {
 		if (controller_display) {
 			if (joypad_connected()) {
 				mTextout(game_font_second_display, "Joypad connected...", 2, 2, white, black, WGT_TEXT_NORMAL, false);
 			}
 			else {	
 #else
-	if (((config.getDpadType() == DPAD_TOTAL_1 || config.getDpadType() == DPAD_TOTAL_2)) || (use_dpad && dpad_buttons && draw_controls && global_draw_controls)) {
+	if ((config.getDpadType() == DPAD_TOTAL_1 || config.getDpadType() == DPAD_TOTAL_2) || (use_dpad && dpad_buttons && draw_controls && global_draw_controls)) {
 		if (false) {
 			if (false) {
 #endif
@@ -152,18 +152,7 @@ static void draw_the_controls(bool draw_controls, ALLEGRO_COLOR tint)
 				);
 			}
 		}
-		else
-#if defined ALLEGRO_IPHONE
-#if defined WITH_60BEAT
-		if (!joypad_connected() && !is_sb_connected() && (dpad_type == DPAD_TOTAL_2 || dpad_type == DPAD_HYBRID_2)) {
-#else
-		if (!joypad_connected() && (dpad_type == DPAD_TOTAL_2 || dpad_type == DPAD_HYBRID_2)) {
-#endif
-#elif defined ALLEGRO_ANDROID
-		if (!zeemote_connected && (dpad_type == DPAD_TOTAL_2 || dpad_type == DPAD_HYBRID_2)) {
-#else
-		if ((dpad_type == DPAD_TOTAL_2 || dpad_type == DPAD_HYBRID_2)) {
-#endif
+		else if ((dpad_type == DPAD_TOTAL_2 || dpad_type == DPAD_HYBRID_2)) {
 			ALLEGRO_COLOR light = al_map_rgba(100*tint.r, 200*tint.g, 100*tint.b, 255*tint.a);
 			ALLEGRO_COLOR dark = al_map_rgba(150*tint.r, 250*tint.g, 150*tint.b, 255*tint.a);
 			int x = BUTTON_SIZE+10;
@@ -223,17 +212,7 @@ static void draw_the_controls(bool draw_controls, ALLEGRO_COLOR tint)
 				x+BUTTON_SIZE/2, y+BUTTON_SIZE-4,
 				x+BUTTON_SIZE-4, y+4, dark, 1);
 		}
-#if defined ALLEGRO_IPHONE
-#if defined WITH_60BEAT
-		else if (!joypad_connected() && !is_sb_connected()) {
-#else
-		else if (!joypad_connected()) {
-#endif
-#elif defined ALLEGRO_ANDROID
-		else if (!zeemote_connected) {
-#else
-		else if (true) {
-#endif
+		else {
 			ALLEGRO_VERTEX verts[36];
 
 			InputDescriptor ie = getInput()->getDescriptor();

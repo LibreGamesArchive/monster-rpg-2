@@ -574,3 +574,28 @@ void autoconnect_zeemote(void)
 		"()V"
 	);
 }
+
+const char * get_sdcarddir()
+{
+	static char buf[2000];
+
+	jstring s =
+		(jstring)_jni_callObjectMethod(
+			_al_android_get_jnienv(),
+			_al_android_activity_object(),
+   			"getSDCardPrivateDir",
+			"()Ljava/lang/String;"
+		);
+	
+	if (s == NULL)
+		return "";
+	
+	const char *native = (*_al_android_get_jnienv())->GetStringUTFChars(_al_android_get_jnienv(), s, 0);
+
+	strcpy(buf, native);
+
+	(*_al_android_get_jnienv())->ReleaseStringUTFChars(_al_android_get_jnienv(), s, native);
+
+	return buf;
+}
+

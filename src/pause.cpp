@@ -3507,27 +3507,12 @@ bool config_menu(bool start_on_fullscreen)
 	input_choices.push_back("{027} Total D-Pad 2");
 	MSingleToggle *input_toggle;
 
-#if defined ALLEGRO_IPHONE
-#if defined WITH_60BEAT
-	if (airplay_connected || joypad_connected() || is_sb_connected()) {
-#else
-	if (airplay_connected || joypad_connected()) {
-#endif
-#elif defined ALLEGRO_ANDROID
-	if (zeemote_connected) {
-#endif
-		input_toggle = NULL;
-	}
-	else {
-		input_toggle = new MSingleToggle(xx, y, input_choices);
-		input_toggle->setSelected(config.getDpadType());
-		y += 13;
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	}
-#endif
+	input_toggle = new MSingleToggle(xx, y, input_choices);
+	input_toggle->setSelected(config.getDpadType());
+	y += 13;
 #endif
 
-#if defined ALLEGRO_ANDROID
+#if defined ALLEGRO_ANDROID_XXX
 	std::vector<std::string> zeemote_choices;
 	zeemote_choices.push_back("{027} Do not autoconnect to Zeemote");
 	zeemote_choices.push_back("{027} Autoconnect to Zeemote");
@@ -3669,7 +3654,7 @@ bool config_menu(bool start_on_fullscreen)
 		tguiAddWidget(input_toggle);
 	}
 #endif
-#if defined ALLEGRO_ANDROID
+#if defined ALLEGRO_ANDROID_XXX
 	tguiAddWidget(zeemote_toggle);
 #endif
 	tguiAddWidget(difficulty_toggle);
@@ -3816,48 +3801,34 @@ bool config_menu(bool start_on_fullscreen)
 		if (input_toggle) {
 			sel = input_toggle->getSelected();
 			if (config.getDpadType() != sel) {
-#if defined ALLEGRO_IPHONE
-#if defined WITH_60BEAT
-				if (joypad_connected() || airplay_connected || is_sb_connected()) {
-#else
-				if (joypad_connected() || airplay_connected) {
-#endif
-#elif defined ALLEGRO_ANDROID
-				if (zeemote_connected) {
-#endif
-					playPreloadedSample("error.ogg");
-					input_toggle->setSelected((int)config.getDpadType());
+				al_lock_mutex(dpad_mutex);
+				getInput()->reset();
+				config.setDpadType(sel);
+				joystick_repeat_started[JOY_REPEAT_AXIS0] = false;
+				joystick_repeat_started[JOY_REPEAT_AXIS1] = false;
+				joystick_repeat_started[JOY_REPEAT_B1] = false;
+				joystick_repeat_started[JOY_REPEAT_B2] = false;
+				joystick_repeat_started[JOY_REPEAT_B3] = false;
+				dpad_type = sel;
+				al_unlock_mutex(dpad_mutex);
+				
+				if (sel == DPAD_TOTAL_1 || sel == DPAD_TOTAL_2) {
+					dpad_on(false);
 				}
 				else {
-					al_lock_mutex(dpad_mutex);
-					getInput()->reset();
-					config.setDpadType(sel);
-					joystick_repeat_started[JOY_REPEAT_AXIS0] = false;
-					joystick_repeat_started[JOY_REPEAT_AXIS1] = false;
-					joystick_repeat_started[JOY_REPEAT_B1] = false;
-					joystick_repeat_started[JOY_REPEAT_B2] = false;
-					joystick_repeat_started[JOY_REPEAT_B3] = false;
-					dpad_type = sel;
-					al_unlock_mutex(dpad_mutex);
-					
-					if (sel == DPAD_TOTAL_1 || sel == DPAD_TOTAL_2) {
-						dpad_on(false);
-					}
-					else {
-						dpad_off(false);
-					}
-					if (use_dpad) {
-						if (config.getTellUserToUseDpad()) {
-							notify("Use the on-screen directional", "pad and buttons to navigate.", "");
-							config.setTellUserToUseDpad(false);
-						}
+					dpad_off(false);
+				}
+				if (use_dpad) {
+					if (config.getTellUserToUseDpad()) {
+						notify("Use the on-screen directional", "pad and buttons to navigate.", "");
+						config.setTellUserToUseDpad(false);
 					}
 				}
 			}
 		}
 #endif
 
-#ifdef ALLEGRO_ANDROID
+#ifdef ALLEGRO_ANDROID_XXX
 		sel = zeemote_toggle->getSelected();
 		if (config.getAutoconnectToZeemote() != sel) {
 			config.setAutoconnectToZeemote(sel);
@@ -4206,7 +4177,14 @@ static void hqm_menu(void)
 					playMusic("");
 					playAmbience("");
 
+#ifdef ALLEGRO_ANDROID
+					hqm_set_download_path(getUserResource("flacs"));
 					hqm_delete();
+					hqm_set_download_path((std::string(get_sdcarddir()) + "/MonsterRPG2").c_str());
+					hqm_delete();
+#else
+					hqm_delete();
+#endif
 
 					playMusic(old_music_name, old_music_volume, true);
 					playAmbience(old_ambience_name, old_ambience_volume);
@@ -4423,11 +4401,7 @@ int title_menu(void)
 #endif
 
 			INPUT_EVENT ie = get_next_input_event();
-#ifdef ALLEGRO_ANDROID
-			if ((!zeemote_connected && ie.button2 == DOWN) || iphone_shaken(0.1)) {
-#else
-			if (ie.button2 == DOWN) {
-#endif
+			if (ie.button2 == DOWN || iphone_shaken(0.1)) {
 				nofade = true;
 				selected = 0xBEEF;
 				goto done;

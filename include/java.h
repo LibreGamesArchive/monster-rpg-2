@@ -29,6 +29,8 @@ void openURL(const char *url);
 bool get_clipboard(char *buf, int len);
 void set_clipboard(char *buf);
 
+const char *get_sdcarddir();
+
 bool wifiConnected(void);
 
 struct InputDescriptor get_zeemote_state(void);

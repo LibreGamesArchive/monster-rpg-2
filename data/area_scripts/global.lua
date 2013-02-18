@@ -750,8 +750,8 @@ function change_areas(area, x, y, dir, trans_in)
 		credits()
 	end
 	setObjectPosition(0, x, y)
-	setObjectDirection(0, dir)
 	startArea(area)
+	setObjectDirection(0, dir)
 	clearBuffer()
 	updateArea()
 	-- hack for Archery game

@@ -931,7 +931,7 @@ void startArea(std::string name)
 	
 	Input *i;
 	if ((i = getInput())) {
-		i->set(false, false, false, false, false, false, false);
+		clear_input_events();
 		path_head = NULL;
 		Player *p = party[heroSpot];
 		if (p) {
@@ -2168,7 +2168,7 @@ bool Area::load(std::string filename)
 	bg = NULL;
 
 	// Can be null, it's ok
-	const char *_tmp = getResource("media/%s_bg.tga", name.c_str());
+	const char *_tmp = getResource("media/%s_bg.png", name.c_str());
 	ALLEGRO_FILE *_f = al_fopen(_tmp, "rb");
 	if (_f) {
 		al_fclose(_f);

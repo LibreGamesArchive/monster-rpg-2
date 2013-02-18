@@ -85,7 +85,7 @@ void authenticatePlayer(void)
 				is_authenticated = 1;
 			}
 			else {
-				printf("Game Center authentication error: code %d\n", [error code]);
+				printf("Game Center authentication error: code %ld\n", (long)[error code]);
 				is_authenticated = 0;
 			}
 		}];

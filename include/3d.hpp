@@ -7,15 +7,6 @@ struct V3 {
 	float u, v;
 };
 
-void mesa_frustum(float *transform,
-	float left, float right,
-	float bottom, float top,
-	float nearval, float farval);
-void mesa_rotate(float *transform,
-	float angle, float x, float y, float z );
-void mesa_scale(float *transform, float x, float y, float z);
-void mesa_translate(float *mat, float x, float y, float z);
-
 void enable_cull_face(bool ccw = false);
 void disable_cull_face(void);
 void enable_zbuffer(bool less_equal = true);

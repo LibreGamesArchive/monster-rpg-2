@@ -41,256 +41,6 @@ static void clear_zbuffer(void)
 	al_clear_depth_buffer(1.0f);
 }
 
-#define A(row,col)  a[(col<<2)+row]
-#define B(row,col)  b[(col<<2)+row]
-#define P(row,col)  product[(col<<2)+row]
-
-static void mesa_mult(float *product, const float *a, const float *b)
-{
-	int i;
-	for (i = 0; i < 4; i++) {
-		const float ai0=A(i,0),  ai1=A(i,1),  ai2=A(i,2),  ai3=A(i,3);
-		P(i,0) = ai0 * B(0,0) + ai1 * B(1,0) + ai2 * B(2,0) + ai3 * B(3,0);
-		P(i,1) = ai0 * B(0,1) + ai1 * B(1,1) + ai2 * B(2,1) + ai3 * B(3,1);
-		P(i,2) = ai0 * B(0,2) + ai1 * B(1,2) + ai2 * B(2,2) + ai3 * B(3,2);
-		P(i,3) = ai0 * B(0,3) + ai1 * B(1,3) + ai2 * B(2,3) + ai3 * B(3,3);
-	}
-}
-
-void mesa_frustum(float *transform,
-                  float left, float right,
-                  float bottom, float top,
-                  float nearval, float farval)
-{
-	float x, y, a, b, c, d;
-	float m[16];
-
-	x = (2.0F*nearval) / (right-left);
-	y = (2.0F*nearval) / (top-bottom);
-	a = (right+left) / (right-left);
-	b = (top+bottom) / (top-bottom);
-	c = -(farval+nearval) / ( farval-nearval);
-	d = -(2.0F*farval*nearval) / (farval-nearval);  /* error? */
-
-#define M(row,col)  m[col*4+row]
-	M(0,0) = x;
-	M(0,1) = 0.0F;
-	M(0,2) = a;
-	M(0,3) = 0.0F;
-	M(1,0) = 0.0F;
-	M(1,1) = y;
-	M(1,2) = b;
-	M(1,3) = 0.0F;
-	M(2,0) = 0.0F;
-	M(2,1) = 0.0F;
-	M(2,2) = c;
-	M(2,3) = d;
-	M(3,0) = 0.0F;
-	M(3,1) = 0.0F;
-	M(3,2) = -1.0F;
-	M(3,3) = 0.0F;
-#undef M
-
-	mesa_mult(transform, transform, m);
-}
-
-void mesa_rotate(float *transform,
-                 float angle, float x, float y, float z )
-{
-	float xx, yy, zz, xy, yz, zx, xs, ys, zs, one_c, s, c;
-	float m[16];
-	bool optimized;
-
-	s = (float) sin( angle * (M_PI/180.0) );
-	c = (float) cos( angle * (M_PI/180.0) );
-
-	memset(m, 0, sizeof(float)*16);
-	m[0] = m[5] = m[10] = m[15] = 1.0f;
-
-	optimized = false;
-
-#define M(row,col)  m[col*4+row]
-
-	if (x == 0.0F) {
-		if (y == 0.0F) {
-			if (z != 0.0F) {
-				optimized = true;
-				/* rotate only around z-axis */
-				M(0,0) = c;
-				M(1,1) = c;
-				if (z < 0.0F) {
-					M(0,1) = s;
-					M(1,0) = -s;
-				}
-				else {
-					M(0,1) = -s;
-					M(1,0) = s;
-				}
-			}
-		}
-		else if (z == 0.0F) {
-			optimized = true;
-			/* rotate only around y-axis */
-			M(0,0) = c;
-			M(2,2) = c;
-			if (y < 0.0F) {
-				M(0,2) = -s;
-				M(2,0) = s;
-			}
-			else {
-				M(0,2) = s;
-				M(2,0) = -s;
-			}
-		}
-	}
-	else if (y == 0.0F) {
-		if (z == 0.0F) {
-			optimized = true;
-			/* rotate only around x-axis */
-			M(1,1) = c;
-			M(2,2) = c;
-			if (x < 0.0F) {
-				M(1,2) = s;
-				M(2,1) = -s;
-			}
-			else {
-				M(1,2) = -s;
-				M(2,1) = s;
-			}
-		}
-	}
-
-	if (!optimized) {
-		const float mag = sqrtf(x * x + y * y + z * z);
-
-		if (mag <= 1.0e-4) {
-			/* no rotation, leave mat as-is */
-			return;
-		}
-
-		x /= mag;
-		y /= mag;
-		z /= mag;
-
-
-		/*
-		 *     Arbitrary axis rotation matrix.
-		 *
-		 *  This is composed of 5 matrices, Rz, Ry, T, Ry', Rz', multiplied
-		 *  like so:  Rz * Ry * T * Ry' * Rz'.  T is the final rotation
-		 *  (which is about the X-axis), and the two composite transforms
-		 *  Ry' * Rz' and Rz * Ry are (respectively) the rotations necessary
-		 *  from the arbitrary axis to the X-axis then back.  They are
-		 *  all elementary rotations.
-		 *
-		 *  Rz' is a rotation about the Z-axis, to bring the axis vector
-		 *  into the x-z plane.  Then Ry' is applied, rotating about the
-		 *  Y-axis to bring the axis vector parallel with the X-axis.  The
-		 *  rotation about the X-axis is then performed.  Ry and Rz are
-		 *  simply the respective inverse transforms to bring the arbitrary
-		 *  axis back to it's original orientation.  The first transforms
-		 *  Rz' and Ry' are considered inverses, since the data from the
-		 *  arbitrary axis gives you info on how to get to it, not how
-		 *  to get away from it, and an inverse must be applied.
-		 *
-		 *  The basic calculation used is to recognize that the arbitrary
-		 *  axis vector (x, y, z), since it is of unit length, actually
-		 *  represents the sines and cosines of the angles to rotate the
-		 *  X-axis to the same orientation, with theta being the angle about
-		 *  Z and phi the angle about Y (in the order described above)
-		 *  as follows:
-		 *
-		 *  cos ( theta ) = x / sqrt ( 1 - z^2 )
-		 *  sin ( theta ) = y / sqrt ( 1 - z^2 )
-		 *
-		 *  cos ( phi ) = sqrt ( 1 - z^2 )
-		 *  sin ( phi ) = z
-		 *
-		 *  Note that cos ( phi ) can further be inserted to the above
-		 *  formulas:
-		 *
-		 *  cos ( theta ) = x / cos ( phi )
-		 *  sin ( theta ) = y / sin ( phi )
-		 *
-		 *  ...etc.  Because of those relations and the standard trigonometric
-		 *  relations, it is pssible to reduce the transforms down to what
-		 *  is used below.  It may be that any primary axis chosen will give the
-		 *  same results (modulo a sign convention) using thie method.
-		 *
-		 *  Particularly nice is to notice that all divisions that might
-		 *  have caused trouble when parallel to certain planes or
-		 *  axis go away with care paid to reducing the expressions.
-		 *  After checking, it does perform correctly under all cases, since
-		 *  in all the cases of division where the denominator would have
-		 *  been zero, the numerator would have been zero as well, giving
-		 *  the expected result.
-		 */
-
-		xx = x * x;
-		yy = y * y;
-		zz = z * z;
-		xy = x * y;
-		yz = y * z;
-		zx = z * x;
-		xs = x * s;
-		ys = y * s;
-		zs = z * s;
-		one_c = 1.0F - c;
-
-		/* We already hold the identity-matrix so we can skip some statements */
-		M(0,0) = (one_c * xx) + c;
-		M(0,1) = (one_c * xy) - zs;
-		M(0,2) = (one_c * zx) + ys;
-		/*    M(0,3) = 0.0F; */
-
-		M(1,0) = (one_c * xy) + zs;
-		M(1,1) = (one_c * yy) + c;
-		M(1,2) = (one_c * yz) - xs;
-		/*    M(1,3) = 0.0F; */
-
-		M(2,0) = (one_c * zx) - ys;
-		M(2,1) = (one_c * yz) + xs;
-		M(2,2) = (one_c * zz) + c;
-		/*    M(2,3) = 0.0F; */
-
-		/*
-		      M(3,0) = 0.0F;
-		      M(3,1) = 0.0F;
-		      M(3,2) = 0.0F;
-		      M(3,3) = 1.0F;
-		*/
-	}
-#undef M
-
-	mesa_mult(transform, transform, m);
-}
-
-void mesa_scale(float *transform, float x, float y, float z)
-{
-	float *m = transform;
-	m[0] *= x;
-	m[4] *= y;
-	m[8]  *= z;
-	m[1] *= x;
-	m[5] *= y;
-	m[9]  *= z;
-	m[2] *= x;
-	m[6] *= y;
-	m[10] *= z;
-	m[3] *= x;
-	m[7] *= y;
-	m[11] *= z;
-}
-
-void mesa_translate(float *mat, float x, float y, float z)
-{
-	float *m = mat;
-	m[12] = m[0] * x + m[4] * y + m[8]  * z + m[12];
-	m[13] = m[1] * x + m[5] * y + m[9]  * z + m[13];
-	m[14] = m[2] * x + m[6] * y + m[10] * z + m[14];
-	m[15] = m[3] * x + m[7] * y + m[11] * z + m[15];
-}
-
 struct VERT {
 	float x, y, z;
 };
@@ -702,7 +452,8 @@ void set_projection(float neer, float farr, bool reverse_y, bool rotate)
 
 	ALLEGRO_TRANSFORM t;
 	al_identity_transform(&t);
-	mesa_frustum((float *)t.m, xmin, xmax, ymin, ymax, neer, farr);
+	/* Not really sure why ymin/ymax are swapped here */
+	al_perspective_transform(&t, xmin, ymax, neer, xmax, ymin, farr);
 	al_set_projection_transform(display, &t);
 }
 
@@ -900,10 +651,8 @@ static int real_archery(int *accuracy_pts)
 #else
 	const float aim_speed = 0.22f;
 #endif
-	const float arrow_start_z = -250.2;
-	const float bow_z = -250;
-	float bow_scale = 1;
-	float arrow_scale = 1;
+	const float arrow_start_z = -125;
+	const float bow_z = -125;
 
 	float arrow_z = arrow_start_z;
 	bool drawing = true;
@@ -1091,7 +840,7 @@ static int real_archery(int *accuracy_pts)
 #endif
 		}
 
-		if (draw_counter > 0)
+		if (draw_counter > 0) {
 			draw_counter = 0;
 
 			disable_zbuffer();
@@ -1101,13 +850,7 @@ static int real_archery(int *accuracy_pts)
 			float yrot = (target_x / BW - 0.5f) * max_xrot;
 			float xrot = (target_y / BH - 0.5f) * max_yrot;
 
-#ifdef A5_OGL
-			float arrow_dist = 0.175;
-#else
-			float arrow_dist = -0.1;
-			xrot = -xrot;
-			yrot = -yrot;
-#endif
+			float arrow_dist = 0.1;
 
 			m_set_blender(M_ONE, M_ZERO, white);
 
@@ -1167,84 +910,65 @@ static int real_archery(int *accuracy_pts)
 
 			set_projection(1, 1000);
 
-#ifdef A5_D3D
-#define OTHER1 mesa_translate((float *)view_transform.m, 0, 0.5, -0.4);
-#define OTHER2 mesa_translate((float *)view_transform.m, -0.6, 0.45, 0);
-#else
-#define OTHER1
-#define OTHER2
-#endif
-#define SETUP_BOW_ES2 \
-    al_identity_transform(&view_transform); \
-    mesa_scale((float *)view_transform.m, bow_scale, bow_scale, bow_scale); \
-    mesa_translate((float *)view_transform.m, 0, 0, bow_z); \
-    mesa_rotate((float *)view_transform.m, -R2D(xrot), 1, 0, 0); \
-    mesa_rotate((float *)view_transform.m, -R2D(yrot), 0, 1, 0); \
-    mesa_rotate((float *)view_transform.m, R2D(M_PI/2), 0, 0, 1); \
-    mesa_rotate((float *)view_transform.m, -R2D(M_PI/2), 0, 1, 0); \
-    OTHER1 \
-    al_use_transform(&view_transform);
+			#ifdef A5_D3D
+			D3DVIEWPORT9 backup_vp;
+			al_get_d3d_device(display)->GetViewport(&backup_vp);
+			D3DVIEWPORT9 vp;
+			vp.X = 0;
+			vp.Y = 0;
+			vp.Width = BW;
+			vp.Height = BH;
+			vp.MinZ = 0;
+			vp.MaxZ = 1;
+			al_get_d3d_device(display)->SetViewport(&vp);
+			#endif
 
-#define SETUP_ARROW_ES2 \
-    al_identity_transform(&view_transform); \
-    mesa_scale((float *)view_transform.m, arrow_scale, arrow_scale, arrow_scale); \
-    mesa_translate((float *)view_transform.m, 0, 0, arrow_start_z); \
-    mesa_rotate((float *)view_transform.m, -R2D(xrot), 1, 0, 0); \
-    mesa_rotate((float *)view_transform.m, -R2D(yrot), 0, 1, 0); \
-    mesa_rotate((float *)view_transform.m, -R2D(M_PI/2), 1, 0, 0); \
-    mesa_translate((float *)view_transform.m, 0, arrow_start_z-arrow_z, 0); \
-    mesa_translate((float *)view_transform.m, arrow_dist, 0, 0); \
-    OTHER2 \
-    al_use_transform(&view_transform);
+			// without this the feathers sometimes go invisible
+			float old_xrot = xrot;
+			float old_yrot = yrot;
+			if (fabs(xrot) < 0.001) xrot = 0.001;
+			if (fabs(yrot) < 0.001) yrot = 0.001;
+			
+			enable_zbuffer(false);
+			clear_zbuffer();
+			enable_cull_face(false);
 
-	#ifdef A5_D3D
-	D3DVIEWPORT9 backup_vp;
-	al_get_d3d_device(display)->GetViewport(&backup_vp);
-	D3DVIEWPORT9 vp;
-	vp.X = 0;
-	vp.Y = 0;
-	vp.Width = BW;
-	vp.Height = BH;
-	vp.MinZ = 0;
-	vp.MaxZ = 1;
-	al_get_d3d_device(display)->SetViewport(&vp);
-	#endif
+			al_identity_transform(&view_transform);
+			al_rotate_transform_3d(&view_transform, 1, 0, 0, -xrot);
+			al_rotate_transform_3d(&view_transform, 0, 1, 0, -yrot);
+			al_translate_transform_3d(&view_transform, 0, 0, bow_z);
+			al_use_transform(&view_transform);
+			draw_model_tex(bow_model, bow_tex);
 
-	// without this the feathers sometimes go invisible
-	float old_xrot = xrot;
-	float old_yrot = yrot;
-	if (fabs(xrot) < 0.001) xrot = 0.001;
-	if (fabs(yrot) < 0.001) yrot = 0.001;
-		
-	enable_zbuffer(false);
-	clear_zbuffer();
-	enable_cull_face(false);
-	SETUP_BOW_ES2;
-	draw_model_tex(bow_model, bow_tex);
-	if (!hiddenCount) {
-		SETUP_ARROW_ES2;
-		draw_model_tex(arrow_model, arrow_tex);
-	}
+			if (!hiddenCount) {
+				al_identity_transform(&view_transform);
+				al_translate_transform_3d(&view_transform, 0, 0, -(arrow_start_z-arrow_z));
+				al_rotate_transform_3d(&view_transform, 1, 0, 0, -xrot);
+				al_rotate_transform_3d(&view_transform, 0, 1, 0, -yrot);
+				al_translate_transform_3d(&view_transform, arrow_dist, 0, arrow_start_z);
+				al_use_transform(&view_transform);
+				draw_model_tex(arrow_model, arrow_tex);
+			}
 
-	disable_cull_face();
-	disable_zbuffer();
+			disable_cull_face();
+			disable_zbuffer();
 
-	xrot = old_xrot;
-	yrot = old_yrot;
+			xrot = old_xrot;
+			yrot = old_yrot;
 
-	#ifdef A5_D3D
-	al_get_d3d_device(display)->SetViewport(&backup_vp);
-	#endif
+			#ifdef A5_D3D
+			al_get_d3d_device(display)->SetViewport(&backup_vp);
+			#endif
 
+			al_use_transform(&view_push);
+			al_set_projection_transform(display, &proj_push);
 
-		al_use_transform(&view_push);
-		al_set_projection_transform(display, &proj_push);
+			m_flip_display();
 
-		m_flip_display();
-
-		if (really_done) {
-			fadeOut(black);
-			break;
+			if (really_done) {
+				fadeOut(black);
+				break;
+			}
 		}
 	}
 
@@ -1454,7 +1178,7 @@ void volcano_scene(void)
 	float staff_oy = 0.0f;
 	float staff_dy1 = 0.0002f;
 	float staff_oz = 0.0f;
-	float staff_dz = 0.005f;
+	float staff_dz = 0.015f;
 	float staff_a = 0;
 
 	MBITMAP *stars, *moon, *ring_texture;
@@ -1602,9 +1326,8 @@ void volcano_scene(void)
 			al_copy_transform(&view_push, al_get_current_transform());
 
 			al_identity_transform(&proj_transform);
-			mesa_frustum((float *)proj_transform.m, -1, 1, (float)BH/BW, -(float)BH/BW, 1, 1000);
+			al_perspective_transform(&proj_transform, -1, -(float)BH/BW, 1, 1, (float)BH/BW, 1000);
 			al_set_projection_transform(display, &proj_transform);
-			//set_projection(1, 1000);
 
 #ifdef A5_D3D
 			LPDIRECT3DDEVICE9 device = al_get_d3d_device(display);
@@ -1618,34 +1341,37 @@ void volcano_scene(void)
 			vp.MaxZ = 1;
 			device->SetViewport(&vp);
 #endif
+
 			enable_zbuffer();
 			enable_cull_face(true);
 
-
 			al_identity_transform(&view_transform);
-			mesa_scale((float *)view_transform.m, 50, 50, 50);
-			mesa_translate((float *)view_transform.m, 0, 0.1+staff_oy, -0.33);
-			mesa_rotate((float *)view_transform.m, R2D(land_angle), 0, 1, 0);
-			mesa_rotate((float *)view_transform.m, 90, 1, 0, 0);
+			al_rotate_transform_3d(&view_transform, 1, 0, 0, M_PI/2);
+			al_rotate_transform_3d(&view_transform, 0, 1, 0, land_angle);
+			al_translate_transform_3d(&view_transform, 0, 0.1+staff_oy, -0.33);
+			al_scale_transform_3d(&view_transform, 50, 50, 50);
 			al_use_transform(&view_transform);
-
-
 			draw_model_tex(land_model, land_texture);
-			clear_zbuffer();
 
+			clear_zbuffer();
 			enable_cull_face(false);
 
-			mesa_translate((float *)view_transform.m, 0, 0.12-staff_oz, 0.05+staff_oy);
-			mesa_rotate((float *)view_transform.m, R2D(staff_a), 1, 0, 0);
-			mesa_rotate((float *)view_transform.m, 90, 1, 0, 0);
-			mesa_scale((float *)view_transform.m, 1.0/(256/47.0), 1.0/(256/47.0), 1.0/(256/47.0));
+			al_identity_transform(&view_transform);
+			//al_scale_transform_3d(&view_transform, 50, 50, 50);
+			al_rotate_transform_3d(&view_transform, 0, 1, 0, -land_angle);
+			al_rotate_transform_3d(&view_transform, 1, 0, 0, M_PI);
+			al_rotate_transform_3d(&view_transform, 1, 0, 0, staff_a);
+			al_translate_transform_3d(&view_transform, 0, 0, -1.25);
+			al_translate_transform_3d(&view_transform, 0, 0.25, -staff_oz);
+			al_rotate_transform_3d(&view_transform, 0, 1, 0, -land_angle);
 			al_use_transform(&view_transform);
 
-			if (stage != STAGE_POOFING)
+			if (stage != STAGE_POOFING) {
 				draw_model_tex(staff_model, staff_tex);
+			}
 			else {
 				al_identity_transform(&view_transform);
-				mesa_translate((float *)view_transform.m, 0.25, 0.25, ring_z);
+				al_translate_transform_3d(&view_transform, 0.25, 0.25, ring_z);
 				al_use_transform(&view_transform);
 				disable_cull_face();
 				draw_model_tex(ring_model, ring_texture);

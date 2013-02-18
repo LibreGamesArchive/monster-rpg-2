@@ -11,6 +11,10 @@ extern "C" {
 #include <physfs.h>
 #endif
 
+#ifdef ALLEGRO_ANDROID
+#include "java.h"
+#endif
+
 static void destroyMusic(void);
 
 static std::string shutdownMusicName = "";
@@ -356,7 +360,13 @@ std::string check_music_name(std::string name, bool *is_flac)
 		std::string::size_type p = name.rfind(".");
 		if (p != std::string::npos) {
 			name = name.substr(0, p) + ".flac";
+#ifdef ALLEGRO_ANDROID
+			name = std::string(get_sdcarddir()) + "/MonsterRPG2/" + name;
+			*is_flac = true;
+			return name;
+#else
 			name = getUserResource((std::string("flacs/") + name).c_str());
+#endif
 			*is_flac = true;
 			return name;
 		}

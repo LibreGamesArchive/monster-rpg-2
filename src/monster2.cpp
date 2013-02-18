@@ -95,18 +95,22 @@ int old_control_mode = -1;
 void connect_airplay_controls(void)
 {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	old_control_mode = config.getDpadType();
 	al_lock_mutex(dpad_mutex);
 	getInput()->reset();
+#if !defined ALLEGRO_ANDROID
+	old_control_mode = config.getDpadType();
 	config.setDpadType(DPAD_TOTAL_2);
+	dpad_type = DPAD_TOTAL_2;
+#endif
 	joystick_repeat_started[JOY_REPEAT_AXIS0] = false;
 	joystick_repeat_started[JOY_REPEAT_AXIS1] = false;
 	joystick_repeat_started[JOY_REPEAT_B1] = false;
 	joystick_repeat_started[JOY_REPEAT_B2] = false;
 	joystick_repeat_started[JOY_REPEAT_B3] = false;
-	dpad_type = DPAD_TOTAL_2;
 	al_unlock_mutex(dpad_mutex);
+#if !defined ALLEGRO_ANDROID
 	dpad_on(false);
+#endif
 #endif
 }
 
@@ -115,14 +119,17 @@ void disconnect_airplay_controls(void)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_lock_mutex(dpad_mutex);
 	getInput()->reset();
+#if !defined ALLEGRO_ANDROID
 	config.setDpadType(old_control_mode);
+	dpad_type = old_control_mode;
+#endif
 	joystick_repeat_started[JOY_REPEAT_AXIS0] = false;
 	joystick_repeat_started[JOY_REPEAT_AXIS1] = false;
 	joystick_repeat_started[JOY_REPEAT_B1] = false;
 	joystick_repeat_started[JOY_REPEAT_B2] = false;
 	joystick_repeat_started[JOY_REPEAT_B3] = false;
-	dpad_type = old_control_mode;
 	al_unlock_mutex(dpad_mutex);
+#if !defined ALLEGRO_ANDROID
 	if (old_control_mode == DPAD_TOTAL_1 || old_control_mode == DPAD_TOTAL_2) {
 		dpad_on(false);
 	}
@@ -130,6 +137,7 @@ void disconnect_airplay_controls(void)
 		dpad_off(false);
 	}
 	old_control_mode = -1;
+#endif
 #endif
 }
 
@@ -1350,10 +1358,17 @@ void do_close(bool quit)
 	else if (area && !shouldDoMap) {
 		area->auto_save_game(0, true, false);
 	}
-	save_memory(true);
-	config.write();
-	if (quit)
-		throw QuitError();
+	if (close_pressed_for_configure) {
+		close_pressed_for_configure = false;
+		close_pressed = false;
+		config_menu();
+	}
+	else {
+		save_memory(true);
+		config.write();
+		if (quit)
+			throw QuitError();
+	}
 #else
 	if (mapWidget) {
 		mapWidget->auto_save(0, true);
@@ -1883,7 +1898,11 @@ int main(int argc, char *argv[])
 
 
 	// Setup HQM (High Quality Music) download path
+#ifdef ALLEGRO_ANDROID
+	hqm_set_download_path((std::string(get_sdcarddir()) + "/MonsterRPG2").c_str());
+#else
 	hqm_set_download_path(getUserResource("flacs"));
+#endif
 
 #ifdef ALLEGRO_ANDROID
 	if (config.getAutoconnectToZeemote()) {

@@ -9,6 +9,7 @@
 #endif
 
 #define R2D(a) ((a)*180/M_PI)
+#define D2R(a) ((a)*M_PI/180)
 
 #include <cstdio>
 #include <cstring>

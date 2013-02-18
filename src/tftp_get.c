@@ -6,6 +6,12 @@
 #define mkdir(a, b) mkdir(a)
 #endif
 
+#ifdef ALLEGRO_ANDROID
+#define PERMS 0775
+#else
+#define PERMS 0755
+#endif
+
 #ifdef LITE
 #define LIST_FILENAME "lite_list.txt"
 #else
@@ -368,7 +374,7 @@ static void *hqm_go_thread(void *arg)
 
 	is_downloading = true;
 
-	mkdir(DOWNLOAD_PATH, 0755);
+	mkdir(DOWNLOAD_PATH, PERMS);
 
 #ifdef ALLEGRO_WINDOWS
 	WSAStartup(MAKEWORD(2, 2), &crap);
@@ -405,7 +411,12 @@ static void *hqm_go_thread_curl(void *arg)
 
 	is_downloading = true;
 
-	mkdir(DOWNLOAD_PATH, 0755);
+	int ret = mkdir(DOWNLOAD_PATH, PERMS);
+	if (ret == -1) {
+		ALLEGRO_DEBUG("mkdir failed: %d\n", errno);
+	}
+
+	ALLEGRO_DEBUG("created download path: %s\n", DOWNLOAD_PATH);
 
 	len = download_file_curl(LIST_FILENAME);
 	if (len != EXPECTED_LIST_SIZE) {
@@ -554,7 +565,7 @@ void hqm_set_download_path(const char *path)
 	}
 }
 
-void hqm_delete(void)
+static void hqm_delete_real()
 {
 	ALLEGRO_FS_ENTRY *file;
 
@@ -590,3 +601,9 @@ void hqm_delete(void)
 	al_android_set_apk_file_interface();
 #endif
 }
+
+void hqm_delete()
+{
+	hqm_delete_real();
+}
+

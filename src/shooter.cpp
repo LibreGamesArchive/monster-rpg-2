@@ -5,10 +5,6 @@
 #endif
 #include <allegro5/internal/aintern_opengl.h>
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
-#define glFrustum glFrustumf
-#endif
-
 bool in_shooter = false;
 bool break_shooter_pause = false;
 bool shooter_paused = false;
@@ -518,30 +514,18 @@ static void draw(double cx, double cy, bool draw_objects = true)
 	double y = -2048+yoffset;
 	
 	ALLEGRO_DISPLAY *display = al_get_current_display();
-	ALLEGRO_TRANSFORM proj_push;
-	
-	ALLEGRO_TRANSFORM proj;
-	if (true /*use_programmable_pipeline*/) {
-		al_copy_transform(&proj_push, al_get_projection_transform(display));
+	ALLEGRO_TRANSFORM proj_push, view_push;
+	ALLEGRO_TRANSFORM proj, view;
 
-		al_identity_transform(&proj);
+	al_copy_transform(&proj_push, al_get_projection_transform(display));
+	al_copy_transform(&view_push, al_get_current_transform());
 
-		mesa_frustum((float *)proj.m, -BW/2, BW/2, BH/2, -BH/2, 1, 1000);
-		mesa_scale((float *)proj.m, 4, 2, 1);
-		mesa_translate((float *)proj.m, 0, 137, -1);
-		mesa_rotate((float *)proj.m, 1, 1, 0, 0);
-
-		al_set_projection_transform(display, &proj);
-	}
-	else {
-		glMatrixMode(GL_PROJECTION);
-		glPushMatrix();
-		glLoadIdentity();
-		glFrustum(-BW/2, BW/2, BH/2, -BH/2, 1, 1000);
-		glScalef(4, 2, 1);
-		glTranslatef(0, 137, -1);
-		glRotatef(1, 1, 0, 0);
-	}
+	al_identity_transform(&proj);
+	al_rotate_transform_3d(&proj, 1, 0, 0, D2R(1));
+	al_translate_transform_3d(&proj, 0, 137, -1);
+	al_scale_transform_3d(&proj, 4, 2, 1);
+	al_perspective_transform(&proj, -BW/2, -BH/2, 1, BW/2, BH/2, 1000);
+	al_set_projection_transform(display, &proj);
 
 	#ifdef A5_D3D
 	D3DVIEWPORT9 backup_vp;
@@ -562,12 +546,8 @@ static void draw(double cx, double cy, bool draw_objects = true)
 	m_draw_bitmap(btop, x, y, 0);
 	m_draw_bitmap(bbot, x, y+1024, 0);
 
-	if (true /*use_programmable_pipeline*/) {
-		al_set_projection_transform(display, &proj_push);
-	}
-	else {
-		glPopMatrix();
-	}
+	al_set_projection_transform(display, &proj_push);
+	al_use_transform(&view_push);
 	
 	#ifdef A5_D3D
 	al_get_d3d_device(display)->SetViewport(&backup_vp);
