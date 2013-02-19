@@ -39,6 +39,7 @@ enum PauseSection {
 
 static void draw_tiny_tri(int x, int y, int height, int dir, ALLEGRO_COLOR c)
 {
+/*
 	al_lock_bitmap_region(
 		al_get_target_bitmap(),
 		x - (1 + (height-1)*2)/2,
@@ -48,17 +49,18 @@ static void draw_tiny_tri(int x, int y, int height, int dir, ALLEGRO_COLOR c)
 		ALLEGRO_PIXEL_FORMAT_ANY,
 		ALLEGRO_LOCK_READWRITE
 	);
+*/
 
 	for (int i = 0; i < height; i++) {
 		int yy = y + (dir * i);
 		int w = 1 + (i*2);
 		int xx = x - w/2;
 		for (int j = 0; j < w; j++) {
-			m_put_pixel(xx+j, yy, c);
+			m_draw_pixel(xx+j, yy, c);
 		}
 	}
 
-	al_unlock_bitmap(al_get_target_bitmap());
+//	al_unlock_bitmap(al_get_target_bitmap());
 }
 
 

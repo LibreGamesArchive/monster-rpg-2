@@ -1582,10 +1582,10 @@ void ReviveSpell::init(Combatant *caster, Combatant **targets, int numTargets)
 {
 	Spell::init(caster, targets, numTargets);
 
-	loadPlayDestroy("HolyWater.ogg");
+	loadPlayDestroy("Revive.ogg");
 
 	for (int i = 0; i < numTargets; i++) {
-		g = new GenericHolyWaterEffect(caster, targets[i]);
+		g = new GenericHolyWaterEffect(caster, targets[i], false, false);
 		lifetime = g->getLifetime();
 		battle->addEntity(g);
 	}

@@ -997,7 +997,7 @@ void m_draw_prim (const void* vtxs, const ALLEGRO_VERTEX_DECL* decl, MBITMAP* te
 	}
 #endif
 #endif
-#ifdef ALLEGRO_RASPBERRYPI
+#if defined ALLEGRO_RASPBERRYPI || defined ALLEGRO_ANDROID
 	if (type == ALLEGRO_PRIM_POINT_LIST) {
 		int n = end-start;
 		ALLEGRO_VERTEX *v = new ALLEGRO_VERTEX[n*6];

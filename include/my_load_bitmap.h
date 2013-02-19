@@ -11,7 +11,6 @@ static inline ALLEGRO_BITMAP *my_load_bitmap(
 	strcpy(p, ".png");
 	strncpy(ext, p, 10);
 
-#if !defined ALLEGRO_ANDROID
 	int sz;
 	unsigned char *bytes = slurp_file(fn, &sz);
 
@@ -37,20 +36,6 @@ static inline ALLEGRO_BITMAP *my_load_bitmap(
 	}
 
 	delete[] bytes;
-#else
-	ALLEGRO_BITMAP *b = NULL;
-
-	b = al_load_bitmap(fn);
-
-	if (!b) {
-#ifdef WITH_SVG
-		strcpy(p, ".svg");
-		return load_svg(fn);
-#else
-		return NULL;
-#endif
-	}
-#endif
 
 	return b;
 }

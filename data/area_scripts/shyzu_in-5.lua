@@ -21,7 +21,7 @@ function activate(activator, activated)
 		dir = getObjectDirection(female.id)
 		setObjectDirection(female.id, player_dir(female))
 		doDialogue("Female: My husband is a very adventurous fellow... he loves it but it worries me.\n", true)
-		setObjectDirection(female.dir, dir)
+		setObjectDirection(female.id, dir)
 	end
 end
 

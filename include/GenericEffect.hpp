@@ -60,7 +60,7 @@ public:
 	int getLifetime(void);
 	void finalize(Combatant *target);
 
-	GenericHolyWaterEffect(Combatant *user, Combatant *target, bool finish = false);
+	GenericHolyWaterEffect(Combatant *user, Combatant *target, bool finish = false, bool sound = true);
 	virtual ~GenericHolyWaterEffect();
 protected:
 	int count;

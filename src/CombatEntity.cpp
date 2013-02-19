@@ -2229,10 +2229,6 @@ int TorrentEffect::getLifetime(void)
 }
 
 
-#define D2R(d) \
-	((d)*M_PI/180.0f)
-
-
 void TorrentEffect::draw(void)
 {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI

@@ -214,7 +214,7 @@ void GenericHolyWaterEffect::draw(void)
 }
 
 
-GenericHolyWaterEffect::GenericHolyWaterEffect(Combatant *user, Combatant *target, bool finish) :
+GenericHolyWaterEffect::GenericHolyWaterEffect(Combatant *user, Combatant *target, bool finish, bool sound) :
 	GenericEffect(user, target)
 {
 	this->finish = finish;
@@ -236,7 +236,9 @@ GenericHolyWaterEffect::GenericHolyWaterEffect(Combatant *user, Combatant *targe
 		pixels[i].offset = rand() % 5 - 2;
 	}
 	
-	loadPlayDestroy("HolyWater.ogg");
+	if (sound) {
+		loadPlayDestroy("HolyWater.ogg");
+	}
 }
 
 

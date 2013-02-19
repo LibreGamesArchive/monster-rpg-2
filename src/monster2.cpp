@@ -1084,6 +1084,7 @@ top:
 			_destroy_loaded_bitmaps();
 			destroy_fonts();
 			destroyIcons();
+			destroy_shaders();
 #endif
 			config.write();
 			al_stop_timer(logic_timer);
@@ -1107,7 +1108,9 @@ top:
 			// resume
 			al_acknowledge_drawing_resume(display, _reload_loaded_bitmaps);
 #ifdef ALLEGRO_ANDROID
+			init_shaders();
 			_reload_loaded_bitmaps_delayed();
+			init2_shaders();
 			load_fonts();
 			icon_bmp = m_load_bitmap_redraw(getResource("media/icons.png"), loadIcons, NULL);
 			if (in_shooter) {

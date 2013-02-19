@@ -27,6 +27,7 @@ function activate(activator, activated)
 				setInventory(slot, ITEM_LIGHT_ORB, 1)
 				setMilestone(MS_GOT_ORB, true)
 				loadPlayDestroy("chest.ogg")
+				doDialogue(_t("Got a ") .. getItemIcon(ITEM_LIGHT_ORB) .. _t("Orb") .. "\n", true)
 			end
 		else
 			doDialogue("Female: How did you get here?\n", true)
