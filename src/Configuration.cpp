@@ -8,7 +8,6 @@
 
 Configuration config;
 
-static bool keynames_gotten = false;
 std::map<std::string, int> keyname_to_keycode_map;
 
 const char *keynames[] =

@@ -515,7 +515,7 @@ static void draw(double cx, double cy, bool draw_objects = true)
 	
 	ALLEGRO_DISPLAY *display = al_get_current_display();
 	ALLEGRO_TRANSFORM proj_push, view_push;
-	ALLEGRO_TRANSFORM proj, view;
+	ALLEGRO_TRANSFORM proj;
 
 	al_copy_transform(&proj_push, al_get_projection_transform(display));
 	al_copy_transform(&view_push, al_get_current_transform());
@@ -732,14 +732,15 @@ start:
 	int scr_w = al_get_display_width(display);
 	int scr_h = al_get_display_height(display);
 	al_set_mouse_xy(display, scr_w/2, scr_h/2);
+	int last_mouse_x = scr_w/2;
 
 	bool replay = false;
 
 	playMusic("underwater.ogg");
 
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	MShooterButton *button = NULL;
 	MShooterSlider *slider = NULL;
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	button = new MShooterButton();
 	slider = new MShooterSlider();
 	tguiSetParent(0);
@@ -825,6 +826,11 @@ start:
 			int tx = (int)(x/TILE_SIZE);
 			int ty = (int)(py/TILE_SIZE);
 
+			ALLEGRO_MOUSE_STATE state;
+			if (have_mouse) {
+				al_get_mouse_state(&state);
+			}
+
 			if (!dead && solid[tx+ty*w]) {
 				dead = true;
 				Explosion *e = new Explosion(x, py-m_get_bitmap_height(sub_bmp));
@@ -848,11 +854,10 @@ start:
 					x += LOGIC_MILLIS * 0.2;
 				}
 				if (have_mouse) {
-					ALLEGRO_MOUSE_STATE state;
-					al_get_mouse_state(&state);
-					int dx = state.x - al_get_display_width(display)/2;
-					x += dx / 5;
-					al_set_mouse_xy(display, al_get_display_width(display)/2+(dx-(dx/5*5)), al_get_display_height(display)/2);
+					int dx = state.x - last_mouse_x;
+					x += (float)dx / 5;
+					al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
+					last_mouse_x = al_get_display_width(display)/2;
 				}
 #endif
 			}
@@ -961,10 +966,8 @@ start:
 			pressed = button->getPressed();
 #endif
 
-			ALLEGRO_MOUSE_STATE state;
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			if (!use_dpad) {
-				al_get_mouse_state(&state);
 				state.buttons = !released;
 			}
 			else
@@ -1053,8 +1056,6 @@ start:
 
 			bool mouse_button_1_pressed = false;
 			if (have_mouse) {
-				ALLEGRO_MOUSE_STATE state;
-				al_get_mouse_state(&state);
 				if (state.buttons & 1) {
 					mouse_button_1_pressed = true;
 				}

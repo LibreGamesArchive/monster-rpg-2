@@ -1135,13 +1135,11 @@ void init_shaders(void)
 					default_vertex_source
 					);
 
-#ifndef A5_D3D
 		al_attach_shader_source(
 					scale2x,
 					ALLEGRO_VERTEX_SHADER,
 					scale2x_vertex_source
 					);
-#endif	
 		al_attach_shader_source(
 					default_shader,
 					ALLEGRO_PIXEL_SHADER,
@@ -1177,14 +1175,11 @@ void init_shaders(void)
 					ALLEGRO_PIXEL_SHADER,
 					brighten_pixel_source
 					);
-
-#ifndef A5_D3D
 		al_attach_shader_source(
 					scale2x,
 					ALLEGRO_PIXEL_SHADER,
 					scale2x_pixel_source
 					);
-#endif
 
 		const char *shader_log;
 
@@ -1577,7 +1572,6 @@ bool init(int *argc, char **argv[])
 		int i = 1;
 		config_save_width = 240;
 		config_save_height = 160;
-		const float factor = 0.8f;
 		while (1) {
 			int this_w = 240*i;
 			int this_h = 160*i;

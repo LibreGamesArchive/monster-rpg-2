@@ -123,10 +123,9 @@ top:
 	
 	AnimationSet *explosion = new AnimationSet(getResource("media/explosion.png"));
 
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	MLanderButton *left_button = NULL;
 	MLanderButton *right_button = NULL;
-
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (!use_dpad) {
 		left_button = new MLanderButton(true);
 		right_button = new MLanderButton(false);

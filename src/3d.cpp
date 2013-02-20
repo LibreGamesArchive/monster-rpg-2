@@ -63,6 +63,13 @@ static MODEL *load_model2(const char *filename, MBITMAP *tex)
 	ALLEGRO_FILE *file = al_open_memfile(bytes, sz, "rb");
 	if (!file)
 		return NULL;
+	
+	int true_w, true_h;
+#ifdef A5_D3D
+	al_get_d3d_texture_size(tex->bitmap, &true_w, &true_h);
+#else
+	al_get_opengl_texture_size(tex->bitmap, &true_w, &true_h);
+#endif
 
 	VERT v;
 	TEXCOORD t;
@@ -89,11 +96,9 @@ static MODEL *load_model2(const char *filename, MBITMAP *tex)
 		else if (line[0] == 'v') {
 			//printf(line);
 			sscanf(line, "vt %g %g", &t.u, &t.v);
-			t.u *= m_get_bitmap_width(tex);
-			t.v *= m_get_bitmap_height(tex);
-#ifdef A5_OGL
-			t.v = m_get_bitmap_height(tex) - t.v;
-#endif
+			t.u *= true_w;
+			t.v *= true_h;;
+			t.v = true_h - t.v;
 			texcoords.push_back(t);
 		}
 		else if (line[0] == 'f') {
@@ -835,7 +840,7 @@ static int real_archery(int *accuracy_pts)
 				scr_w = al_get_display_width(display);
 				scr_h = al_get_display_height(display);
 				target_x = (float)mx / scr_w * BW;
-				target_y = (float)my / scr_h * BW;
+				target_y = (float)my / scr_h * BH;
 			}
 #endif
 		}
@@ -916,8 +921,8 @@ static int real_archery(int *accuracy_pts)
 			D3DVIEWPORT9 vp;
 			vp.X = 0;
 			vp.Y = 0;
-			vp.Width = BW;
-			vp.Height = BH;
+			vp.Width = al_get_display_width(display);
+			vp.Height = al_get_display_height(display);
 			vp.MinZ = 0;
 			vp.MaxZ = 1;
 			al_get_d3d_device(display)->SetViewport(&vp);
@@ -937,6 +942,9 @@ static int real_archery(int *accuracy_pts)
 			al_rotate_transform_3d(&view_transform, 1, 0, 0, -xrot);
 			al_rotate_transform_3d(&view_transform, 0, 1, 0, -yrot);
 			al_translate_transform_3d(&view_transform, 0, 0, bow_z);
+#ifdef A5_D3D
+			al_translate_transform_3d(&view_transform, 0.5f, 0.5f, 0.0f);
+#endif
 			al_use_transform(&view_transform);
 			draw_model_tex(bow_model, bow_tex);
 
@@ -946,6 +954,9 @@ static int real_archery(int *accuracy_pts)
 				al_rotate_transform_3d(&view_transform, 1, 0, 0, -xrot);
 				al_rotate_transform_3d(&view_transform, 0, 1, 0, -yrot);
 				al_translate_transform_3d(&view_transform, arrow_dist, 0, arrow_start_z);
+#ifdef A5_D3D
+				al_translate_transform_3d(&view_transform, 0.5f, 0.5f, 0.0f);
+#endif
 				al_use_transform(&view_transform);
 				draw_model_tex(arrow_model, arrow_tex);
 			}
@@ -1364,6 +1375,9 @@ void volcano_scene(void)
 			al_translate_transform_3d(&view_transform, 0, 0, -1.25);
 			al_translate_transform_3d(&view_transform, 0, 0.25, -staff_oz);
 			al_rotate_transform_3d(&view_transform, 0, 1, 0, -land_angle);
+#ifdef A5_D3D
+			al_translate_transform_3d(&view_transform, 0.5f, 0.5f, 0.0f);
+#endif
 			al_use_transform(&view_transform);
 
 			if (stage != STAGE_POOFING) {

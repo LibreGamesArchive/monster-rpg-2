@@ -898,8 +898,6 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 
 	int BW = m_get_bitmap_width(buffer);
 	int BH = m_get_bitmap_height(buffer);
-	int disp_w = al_get_display_width(display);
-	int disp_h = al_get_display_height(display);
 
 	dpad_off();
 	global_draw_red = false;

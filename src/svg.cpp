@@ -37,14 +37,11 @@ ALLEGRO_DEBUG_CHANNEL("Mo2SVG")
 ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 {
 	ALLEGRO_FILE *fd;
-	struct stat sb;
 	char *buffer;
 	size_t size;
 	size_t n;
 	struct svgtiny_diagram *diagram;
 	svgtiny_code code;
-
-	double start = al_get_time();
 
 	/* load file into memory buffer */
 	fd = al_fopen(filename, "rb");
@@ -117,7 +114,6 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 #else
 	bool multisample = al_have_opengl_extension("GL_EXT_framebuffer_multisample");
 #endif
-	bool pp = (al_get_display_flags(al_get_current_display()) & ALLEGRO_USE_PROGRAMMABLE_PIPELINE);
 
 	ALLEGRO_BITMAP *out = al_create_bitmap(diagram_w, diagram_h);
 

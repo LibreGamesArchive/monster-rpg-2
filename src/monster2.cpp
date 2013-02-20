@@ -804,7 +804,6 @@ top:
 		(event.type == BEGIN ||
 		event.type == END ||
 		(event.type == MOVE && !path_head))) {
-			Input *i = getInput();
 			al_lock_mutex(input_mutex);
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -1722,8 +1721,6 @@ static void run()
 						!speechDialog && !path_head) {
 					InputDescriptor ie = getInput()->getDescriptor();
 					if (ie.button2 || iphone_shaken(0.1)) {
-						InputDescriptor in = getInput()->getDescriptor();
-
 						waitForRelease(4);
 
 						if (area->getName() == "tutorial") {

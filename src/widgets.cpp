@@ -1071,7 +1071,6 @@ int config_input(int type)
 	tguiAddWidget(other);
 #endif
 
-again:
 	tguiSetFocus(getters[0]);
 
 	m_set_target_bitmap(buffer);
@@ -2660,8 +2659,8 @@ int MMap::update(int millis)
 			}
 		}
 		transitioning = true;
-		startx = top_x;
-		starty = top_y;
+		startx = top_x+offset_x;
+		starty = top_y+offset_y;
 		int tmpx, tmpy;
 		getIdealPoint(points[selected].x, points[selected].y,
 			&tmpx, &tmpy);
@@ -5470,11 +5469,6 @@ void MManSelector::mouseUp(int x, int y, int b)
 
 void MManSelector::draw()
 {
-	ALLEGRO_VERTEX lines[3*4*2*12];
-	for (int i = 0; i < 3*4*2*12; i++) {
-		lines[i].z = 0;
-	}
-
 	MBITMAP *tmp = m_create_bitmap(16, 16);
 	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
 	m_set_target_bitmap(tmp);
@@ -5492,7 +5486,6 @@ void MManSelector::draw()
 
 	al_hold_bitmap_drawing(true);
 
-	int j = 0;
 	for (int i = 0; i < (int)mans.size(); i++) {
 		if (i == 6) continue;
 		int xx = mans[i].x * TILE_SIZE - area->getOriginX();
