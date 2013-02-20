@@ -74,7 +74,6 @@ extern ALLEGRO_COND *wait_cond;
 extern ALLEGRO_MUTEX *wait_mutex;
 extern int exit_event_thread;
 extern ALLEGRO_SHADER *default_shader;
-extern ALLEGRO_SHADER *cheap_shader;
 extern ALLEGRO_SHADER *tinter;
 extern ALLEGRO_SHADER *warp;
 extern ALLEGRO_SHADER *shadow_shader;
@@ -229,6 +228,7 @@ extern bool should_reset;
 extern bool is_fs_toggle;
 
 extern MBITMAP *custom_mouse_cursor;
+extern int custom_cursor_w, custom_cursor_h;
 void show_custom_cursor();
 void hide_custom_cursor();
 bool is_cursor_hidden();

@@ -646,10 +646,11 @@ void m_flip_display(void)
 	}
 
 	fps_frames++;
-	fps_counter += 1.0/60.0;
-	if (fps_on && fps_counter > 2) {
-		fps = (int)((float)fps_frames/fps_counter);
-		fps_counter = fps_frames = 0;
+	double elapsed = al_get_time() - fps_counter;
+	if (fps_on && elapsed > 2) {
+		fps = (int)((float)fps_frames/elapsed);
+		fps_counter = al_get_time();
+		fps_frames = 0;
 	}
 }
 

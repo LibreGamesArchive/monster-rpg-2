@@ -449,12 +449,22 @@ static void drawOverlay(bool draw_controls, ALLEGRO_COLOR tint)
 
 static void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 {
-//#if !defined ALLEGRO_IPHONE || !defined ALLEGRO_ANDROID
-#if 1
-	m_set_target_bitmap(overlay);
-	m_clear(m_map_rgba(0, 0, 0, 0));
-	drawOverlay(draw_controls, white);
-#endif
+	int dw, dh;
+	int dx, dy;
+	
+	ScreenDescriptor *sd = config.getWantedGraphicsMode();
+	
+	if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN) {
+		dx = dy = 0;
+		dw = sd->width;
+		dh = sd->height;
+	}
+	else {
+		dx = screen_offset_x;
+		dy = screen_offset_y;
+		dw = screenScaleX*BW;
+		dh = screenScaleY*BH;
+	}
 
 	m_set_target_bitmap(buffer);
 
@@ -542,26 +552,31 @@ static void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 
 	al_set_target_backbuffer(display);
 
-	m_clear(black);
+	static int last_mouse_x = -1;
+	static int last_mouse_y = -1;
+	ALLEGRO_MOUSE_STATE state;
+
+	al_get_mouse_state(&state);
+
+	if (last_mouse_x >= 0) {
+		al_draw_filled_rectangle(
+			state.x, state.y,
+			state.x+custom_cursor_w,
+			state.y+custom_cursor_h,
+			black
+		);
+	}
+
+	last_mouse_x = state.x;
+	last_mouse_y = state.y;
 
 	ALLEGRO_SHADER *scale2x_shader = NULL;
 
-#if defined ALLEGRO_IPHONE
-	if (airplay_connected) {
-		//config.setFilterType(FILTER_NONE);
-	}
-#endif
-	
 	if (use_programmable_pipeline) {
 		if (config.getFilterType() == FILTER_SCALE2X) {
 			scale2x_shader = scale2x; // HERE
 			al_set_shader(display, scale2x_shader);
 			al_use_shader(scale2x_shader, true);
-		}
-		else {
-			al_set_shader(display, cheap_shader);
-			al_set_shader_sampler(cheap_shader, "tex", buf->bitmap, 0);
-			al_use_shader(cheap_shader, true);
 		}
 	}
 
@@ -582,81 +597,33 @@ static void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 		al_restore_state(&s);
 		buf = scaleXX_buffer;
 		al_use_shader(scale2x_shader, false);
-		al_set_shader(display, cheap_shader);
-		al_set_shader_sampler(cheap_shader, "tex", buf->bitmap, 0);
-		al_use_shader(cheap_shader, true);
+		al_set_shader(display, default_shader);
+		al_use_shader(default_shader, true);
 	}
 	
-	int dw, dh;
-	int dx, dy;
-	
-	ScreenDescriptor *sd = config.getWantedGraphicsMode();
-	
-	if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN) {
-		dx = dy = 0;
-		dw = sd->width;
-		dh = sd->height;
-	}
-	else {
-		dx = screen_offset_x;
-		dy = screen_offset_y;
-		dw = screenScaleX*BW;
-		dh = screenScaleY*BH;
-	}
-
 	m_draw_scaled_bitmap(buf, 0, 0, m_get_bitmap_width(buf), m_get_bitmap_height(buf), dx, dy, dw, dh, 0);
 
 	buf = buf_save;
 
-	if (use_programmable_pipeline) {
-		if (config.getFilterType() == FILTER_SCALE2X) {
-			al_use_shader(scale2x_shader, false);
-			al_set_shader(display, default_shader);
-		}
+	ALLEGRO_TRANSFORM backup, t;
+	al_copy_transform(&backup, al_get_current_transform());
+	al_identity_transform(&t);
+	al_scale_transform(&t, screenScaleX, screenScaleY);
+	al_translate_transform(&t, dx, dy);
+	al_use_transform(&t);
+	drawOverlay(draw_controls, al_map_rgba_f(0.4f, 0.4f, 0.4f, 0.4f));
+
+	if (fps_on) {
+		al_draw_textf(game_font, al_map_rgb_f(1, 1, 0), 1, 1, 0, "%d", fps);
 	}
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	m_draw_tinted_scaled_bitmap(overlay, al_map_rgba_f(0.4, 0.4, 0.4, 0.4), 0, 0, m_get_bitmap_width(overlay), m_get_bitmap_height(overlay), dx, dy, dw, dh, 0);
-#else
-	if (config.getMaintainAspectRatio()) {
-		m_draw_tinted_scaled_bitmap(overlay, al_map_rgba_f(0.4, 0.4, 0.4, 0.4), 0, 0, BW, BH, screen_offset_x, screen_offset_y,
-			screenScaleX*BW, screenScaleY*BH,
-			0
-		);
-	}
-	else {
-		m_draw_tinted_scaled_bitmap(overlay, al_map_rgba_f(0.4, 0.4, 0.4, 0.4), 0, 0, BW, BH, 0, 0,
-			sd->width, sd->height,
-			0
-		);
-	}
-#endif
-	
-	if (fps_on) {
-		ALLEGRO_TRANSFORM backup, t;
-		al_copy_transform(&backup, al_get_current_transform());
-		al_identity_transform(&t);
-		al_scale_transform(&t, screenScaleX, screenScaleY);
-		al_use_transform(&t);
-		al_draw_textf(
-			game_font, al_map_rgb_f(1, 1, 0), 1, 1, 0, "%d", fps);
-		al_use_transform(&backup);
-	}
+	al_use_transform(&backup);
 
 #if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE
 	if (custom_mouse_cursor && mouse_in_display && !transitioning) {
-		ALLEGRO_MOUSE_STATE state;
-		al_get_mouse_state(&state);
 		al_draw_bitmap(custom_mouse_cursor->bitmap, state.x, state.y, 0);
 	}
 #endif
-
-	if (use_programmable_pipeline) {
-		if (!(config.getFilterType() == FILTER_SCALE2X)) {
-			al_use_shader(cheap_shader, false);
-			al_set_shader(display, default_shader);
-		}
-	}
 }
 
 void drawBufferToScreen(void)
@@ -1211,7 +1178,7 @@ void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flag
 		src_h -= (dy+src_h) - (cy+ch);
 	}
 	
-#ifdef ALLEGRO_ANDROID
+#if 1//def ALLEGRO_ANDROID
 	ALLEGRO_BITMAP *tolock;
 	int ofsx = 0, ofsy = 0;
 	if (al_get_parent_bitmap(src->bitmap)) {
@@ -1239,7 +1206,7 @@ void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flag
 	float add_b = (color.b * amount) * 0xf;
 
 	for (int yy = 0; yy < src_h; yy++) {
-#ifdef ALLEGRO_ANDROID
+#if 1//def ALLEGRO_ANDROID
 		unsigned char *sptr = ((unsigned char *)sreg->data + (yy+ofsy) * sreg->pitch + (ofsx * 2));
 		unsigned char *dptr = ((unsigned char *)dreg->data + (yy+dy) * dreg->pitch + (dx * 2));
 #else
@@ -1287,7 +1254,7 @@ void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flag
 		}
 	}
 
-#ifdef ALLEGRO_ANDROID
+#if 1//def ALLEGRO_ANDROID
 	al_unlock_bitmap(tolock);
 #else
 	m_unlock_bitmap(src);
@@ -1385,7 +1352,7 @@ void death_blit_region(MBITMAP *src, int x, int y, int w, int h, int dx, int dy,
 		h -= (dy+h)-th;
 	}
 
-#ifdef ALLEGRO_ANDROID
+#if 1//def ALLEGRO_ANDROID
 	ALLEGRO_BITMAP *tolock;
 	if (al_get_parent_bitmap(src->bitmap)) {
 		tolock = al_get_parent_bitmap(src->bitmap);
@@ -1403,7 +1370,7 @@ void death_blit_region(MBITMAP *src, int x, int y, int w, int h, int dx, int dy,
 #endif
 
 	for (int yy = 0; yy < h; yy++) {
-#ifdef ALLEGRO_ANDROID
+#if 1//def ALLEGRO_ANDROID
 		unsigned char *sptr = ((unsigned char *)sreg->data + (yy+y) * sreg->pitch + (x * 2));
 		unsigned char *dptr = ((unsigned char *)dreg->data + (yy+dy) * dreg->pitch + (dx * 2));
 #else
@@ -1445,7 +1412,7 @@ void death_blit_region(MBITMAP *src, int x, int y, int w, int h, int dx, int dy,
 		}
 	}
 
-#ifdef ALLEGRO_ANDROID
+#if 1//def ALLEGRO_ANDROID
 	al_unlock_bitmap(tolock);
 #else
 	m_unlock_bitmap(src);

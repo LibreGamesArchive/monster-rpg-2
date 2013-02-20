@@ -33,6 +33,10 @@ extern "C" {
 #include "java.h"
 #endif
 
+#ifdef ALLEGRO_RASPBERRYPI
+#include <bcm_host.h>
+#endif
+
 /*
 static bool screensaver_was_on = false;
 int screensaver_idle_delay = 0;
@@ -182,7 +186,6 @@ ALLEGRO_MUTEX *wait_mutex;
 ALLEGRO_MUTEX *joypad_mutex;
 int exit_event_thread = 0;
 ALLEGRO_SHADER *default_shader;
-ALLEGRO_SHADER *cheap_shader;
 ALLEGRO_SHADER *tinter;
 ALLEGRO_SHADER *warp;
 ALLEGRO_SHADER *shadow_shader;
@@ -281,6 +284,7 @@ bool switched_out = false;
 uint32_t my_opengl_version;
 
 static MBITMAP *custom_mouse_cursor_saved = NULL;
+int custom_cursor_w, custom_cursor_h;
 MBITMAP *custom_mouse_cursor = NULL;
 
 void destroy_fonts(void)
@@ -789,7 +793,7 @@ bool loadTilemap(void)
 	return true;
 }
 
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
 #define LOWP ""
 #else
 #define LOWP "lowp"
@@ -798,30 +802,27 @@ bool loadTilemap(void)
 void init_shaders(void)
 {
 	if (use_programmable_pipeline) {
-		static const char *main_vertex_source =
+		static const char *default_vertex_source =
 		"attribute vec4 pos;\n"
 		"attribute vec4 color;\n"
 		"attribute vec2 texcoord;\n"
 		"uniform mat4 projview_matrix;\n"
+		"uniform bool use_tex_matrix;\n"
 		"uniform mat4 tex_matrix;\n"
-                "uniform bool use_tex_matrix;\n"
 		"varying vec4 varying_color;\n"
 		"varying vec2 varying_texcoord;\n"
 		"void main()\n"
 		"{\n"
-	 	"   varying_color = color;\n"
-		"   if (use_tex_matrix) {\n"
-		"     vec4 uv = tex_matrix * vec4(texcoord, 0, 1);\n"
-		"     varying_texcoord = vec2(uv.x, uv.y);\n"
-		"   }\n"
-		"   else\n"
-		"     varying_texcoord = texcoord;\n"
-#ifndef __linux__
-		"   gl_PointSize = 1.0;\n"
-#endif
-		"   gl_Position = projview_matrix * pos;\n"
+		"  varying_color = color;\n"
+		"  if (use_tex_matrix) {\n"
+		"    vec4 uv = tex_matrix * vec4(texcoord, 0, 1);\n"
+		"    varying_texcoord = vec2(uv.x, uv.y);\n"
+		"  }\n"
+		"  else\n"
+		"    varying_texcoord = texcoord;\n"
+		"  gl_Position = projview_matrix * pos;\n"
 		"}\n";
-		
+
 		static const char *warp_vertex_source =
 		"attribute vec4 pos;\n"
 		"attribute vec2 texcoord;\n"
@@ -831,30 +832,6 @@ void init_shaders(void)
 		"varying vec2 varying_texcoord;\n"
 		"void main()\n"
 		"{\n"
-		"   if (use_tex_matrix) {\n"
-		"     vec4 uv = tex_matrix * vec4(texcoord, 0, 1);\n"
-		"     varying_texcoord = vec2(uv.x, uv.y);\n"
-		"   }\n"
-		"   else\n"
-		"     varying_texcoord = texcoord;\n"
-#ifndef __linux__
-		"   gl_PointSize = 1.0;\n"
-#endif
-		"   gl_Position = projview_matrix * pos;\n"
-		"}\n";
-		
-		static const char *default_vertex_source =
-		"attribute vec4 pos;\n"
-		"attribute vec4 color;\n"
-		"attribute vec2 texcoord;\n"
-		"uniform mat4 projview_matrix;\n"
-		"uniform mat4 tex_matrix;\n"
-                "uniform bool use_tex_matrix;\n"
-		"varying vec4 varying_color;\n"
-		"varying vec2 varying_texcoord;\n"
-		"void main()\n"
-		"{\n"
-		"   varying_color = color;\n"
 		"   if (use_tex_matrix) {\n"
 		"     vec4 uv = tex_matrix * vec4(texcoord, 0, 1);\n"
 		"     varying_texcoord = vec2(uv.x, uv.y);\n"
@@ -898,37 +875,22 @@ void init_shaders(void)
 		"   gl_Position = projview_matrix * pos;\n"
 		"}\n";
 		
-		static const char *main_pixel_source =
-#if defined OPENGLES
+		static const char *default_pixel_source =
+#ifdef ALLEGRO_CFG_OPENGLES
 		"precision mediump float;\n"
 #endif
+		"uniform sampler2D tex;\n"
 		"uniform bool use_tex;\n"
-		"uniform sampler2D tex;\n"
-		"varying " LOWP " vec4 varying_color;\n"
+		"varying vec4 varying_color;\n"
 		"varying vec2 varying_texcoord;\n"
 		"void main()\n"
 		"{\n"
-		"  " LOWP " vec4 tmp = varying_color;\n"
-		"  if (use_tex) {\n"
-		"     vec4 coord = vec4(varying_texcoord, 0.0, 1.0);\n"
-		"     " LOWP " vec4 sample = texture2D(tex, coord.st);\n"
-		"     tmp *= sample;\n"
-                "  }\n"
-		"  gl_FragColor = tmp;\n"
+		"  if (use_tex)\n"
+		"    gl_FragColor = varying_color * texture2D(tex, varying_texcoord);\n"
+		"  else\n"
+		"    gl_FragColor = varying_color;\n"
 		"}\n";
-		
-		static const char *cheap_pixel_source =
-#if defined OPENGLES
-		"precision mediump float;\n"
-#endif
-		"uniform sampler2D tex;\n"
-		"varying " LOWP " vec4 varying_color;\n"
-		"varying vec2 varying_texcoord;\n"
-		"void main()\n"
-		"{\n"
-		"  gl_FragColor = texture2D(tex, varying_texcoord) * varying_color;\n"
-		"}\n";
-		
+	
 		const char *tinter_pixel_source =
 #if defined OPENGLES
 		"precision mediump float;\n"
@@ -1092,7 +1054,6 @@ void init_shaders(void)
 		"}\n";
 		
 		default_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
-		cheap_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
 		tinter = al_create_shader(ALLEGRO_SHADER_GLSL);
 		warp = al_create_shader(ALLEGRO_SHADER_GLSL);
 		shadow_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
@@ -1102,13 +1063,7 @@ void init_shaders(void)
 		al_attach_shader_source(
 					default_shader,
 					ALLEGRO_VERTEX_SHADER,
-					main_vertex_source
-					);
-		
-		al_attach_shader_source(
-					cheap_shader,
-					ALLEGRO_VERTEX_SHADER,
-					main_vertex_source
+					default_vertex_source
 					);
 		
 		al_attach_shader_source(
@@ -1143,13 +1098,7 @@ void init_shaders(void)
 		al_attach_shader_source(
 					default_shader,
 					ALLEGRO_PIXEL_SHADER,
-					main_pixel_source
-					);
-		
-		al_attach_shader_source(
-					cheap_shader,
-					ALLEGRO_PIXEL_SHADER,
-					cheap_pixel_source
+					default_pixel_source
 					);
 		
 		al_attach_shader_source(
@@ -1187,30 +1136,26 @@ void init_shaders(void)
 		if ((shader_log = al_get_shader_log(default_shader))[0] != 0) {
 			printf("1. %s\n", shader_log);
 		}
-		al_link_shader(cheap_shader);
-		if ((shader_log = al_get_shader_log(cheap_shader))[0] != 0) {
-			printf("2. %s\n", shader_log);
-		}
 		al_link_shader(tinter);
 		if ((shader_log = al_get_shader_log(tinter))[0] != 0) {
-			printf("3. %s\n", shader_log);
+			printf("2. %s\n", shader_log);
 		}
 		al_link_shader(warp);
 		if ((shader_log = al_get_shader_log(warp))[0] != 0) {
-			printf("4. %s\n", shader_log);
+			printf("3. %s\n", shader_log);
 		}
 		al_link_shader(shadow_shader);
 		if ((shader_log = al_get_shader_log(shadow_shader))[0] != 0) {
-			printf("5. %s\n", shader_log);
+			printf("4. %s\n", shader_log);
 		}
 		al_link_shader(brighten);
 		if ((shader_log = al_get_shader_log(brighten))[0] != 0) {
-			printf("6. %s\n", shader_log);
+			printf("5. %s\n", shader_log);
 		}
 #ifndef A5_D3D
 		al_link_shader(scale2x);
 		if ((shader_log = al_get_shader_log(scale2x))[0] != 0) {
-			printf("7. %s\n", shader_log);
+			printf("6. %s\n", shader_log);
 		}
 #endif
 		
@@ -1227,7 +1172,6 @@ void init_shaders(void)
 #endif
 
 #endif
-		
 	}
 }
 
@@ -1244,7 +1188,6 @@ void init2_shaders(void)
 		al_set_shader_sampler(scale2x, "tex", scaleXX_buffer->bitmap, 0);
 		
 		al_set_shader_bool(default_shader, "use_tex_matrix", false);
-		al_set_shader_bool(cheap_shader, "use_tex_matrix", false);
 		al_set_shader_bool(tinter, "use_tex_matrix", false);
 		al_set_shader_bool(warp, "use_tex_matrix", false);
 		al_set_shader_bool(shadow_shader, "use_tex_matrix", false);
@@ -1262,7 +1205,6 @@ void destroy_shaders(void)
 {
 	if (use_programmable_pipeline) {
 		al_destroy_shader(default_shader);
-		al_destroy_shader(cheap_shader);
 		al_destroy_shader(tinter);
 		al_destroy_shader(brighten);
 		al_destroy_shader(warp);
@@ -1756,6 +1698,8 @@ bool init(int *argc, char **argv[])
 #endif
 	
 	custom_mouse_cursor_saved = m_load_bitmap(getResource("media/mouse_cursor.png"));
+	custom_cursor_w = m_get_bitmap_width(custom_mouse_cursor_saved);
+	custom_cursor_h = m_get_bitmap_height(custom_mouse_cursor_saved);
 	al_hide_mouse_cursor(display);
 	show_custom_cursor();
 

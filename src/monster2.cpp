@@ -71,8 +71,8 @@ char *saveFilename = NULL;
 bool was_in_map = false;
 
 bool fps_on = false;
-int fps_frames = 0;
-double fps_counter = 0;
+int fps_frames;
+double fps_counter;
 int fps = 0;
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -1896,7 +1896,6 @@ int main(int argc, char *argv[])
 	//#endif
 #endif
 
-
 	// Setup HQM (High Quality Music) download path
 #ifdef ALLEGRO_ANDROID
 	hqm_set_download_path((std::string(get_sdcarddir()) + "/MonsterRPG2").c_str());
@@ -1940,6 +1939,9 @@ int main(int argc, char *argv[])
 		config.setXbox360(true);
 	}
 #endif
+
+	bool fps_save = fps_on;
+	fps_on = false;
 	
 	al_set_target_backbuffer(display);
 	m_clear(al_map_rgb(0, 0, 0));
@@ -1988,6 +1990,8 @@ int main(int argc, char *argv[])
 	m_set_target_bitmap(buffer);
 	
 	config.setMaintainAspectRatio(ma);
+
+	fps_on = fps_save;
 
 /*
 	#ifdef DEBUG_XXX
@@ -2039,6 +2043,9 @@ int main(int argc, char *argv[])
 	//archery(false);
 	//shooter(false);
 	//credits();
+	
+	fps_counter = al_get_time();
+	fps_frames = 0;
 
 	while (!quit_game) {
 		playAmbience("");

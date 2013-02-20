@@ -130,7 +130,7 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
 
 	if (multisample) {
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined A5_D3D
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined A5_D3D && !defined ALLEGRO_RASPBERRYPI
 		al_copy_transform(&old_proj_transform, al_get_projection_transform(al_get_current_display()));
 		al_copy_transform(&old_view_transform, al_get_current_transform());
 
@@ -360,7 +360,7 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 	al_set_target_bitmap(out);
 	
 	if (multisample) {
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined A5_D3D
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined A5_D3D && !defined ALLEGRO_RASPBERRYPI
 		glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fb);
 		glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, al_get_opengl_fbo(out));
 
