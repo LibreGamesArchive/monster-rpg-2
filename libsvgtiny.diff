@@ -1,0 +1,178 @@
+diff --git a/Makefile b/Makefile
+index e4da493..5f5bf1c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -18,7 +18,7 @@ WARNFLAGS := -Wall -W -Wundef -Wpointer-arith -Wcast-align \
+ # BeOS/Haiku/AmigaOS standard library headers create warnings
+ ifneq ($(TARGET),beos)
+   ifneq ($(TARGET),amiga)
+-    WARNFLAGS := $(WARNFLAGS) -Werror
++    WARNFLAGS := $(WARNFLAGS)
+   endif
+ endif
+ 
+diff --git a/include/svgtiny.h b/include/svgtiny.h
+index 85f146f..3bfc9d8 100644
+--- a/include/svgtiny.h
++++ b/include/svgtiny.h
+@@ -30,6 +30,8 @@ struct svgtiny_shape {
+ 	svgtiny_colour fill;
+ 	svgtiny_colour stroke;
+ 	int stroke_width;
++	float fill_opacity;
++	float stroke_opacity;
+ };
+ 
+ struct svgtiny_diagram {
+diff --git a/src/svgtiny.c b/src/svgtiny.c
+index 0bcfe7d..3ac12b7 100644
+--- a/src/svgtiny.c
++++ b/src/svgtiny.c
+@@ -26,6 +26,11 @@
+ 
+ #define KAPPA		0.5522847498
+ 
++const struct svgtiny_named_color *
++		svgtiny_color_lookup(register const char *str,
++				register unsigned int len);
++
++
+ static svgtiny_code svgtiny_parse_svg(dom_element *svg,
+ 		struct svgtiny_parse_state state);
+ static svgtiny_code svgtiny_parse_path(dom_element *path,
+@@ -55,6 +60,7 @@ static svgtiny_code svgtiny_add_path(float *p, unsigned int n,
+ 		struct svgtiny_parse_state *state);
+ static void _svgtiny_parse_color(const char *s, svgtiny_colour *c,
+ 		struct svgtiny_parse_state *state);
++static float _svgtiny_parse_float(const char *s);
+ 
+ 
+ /**
+@@ -196,6 +202,8 @@ svgtiny_code svgtiny_parse(struct svgtiny_diagram *diagram,
+ 	state.fill = 0x000000;
+ 	state.stroke = svgtiny_TRANSPARENT;
+ 	state.stroke_width = 1;
++	state.fill_opacity = 1;
++	state.stroke_opacity = 1;
+ 	state.linear_gradient_stop_count = 0;
+ 
+ 	/* parse tree */
+@@ -1127,6 +1135,14 @@ float svgtiny_parse_length(dom_string *s, int viewport_size,
+ 	return ret;
+ }
+ 
++float svgtiny_parse_float(dom_string *s)
++{
++	char *ss = strndup(dom_string_data(s), dom_string_byte_length(s));
++	float ret = _svgtiny_parse_float(ss);
++	free(ss);
++	return ret;
++}
++
+ /**
+  * Parse paint attributes, if present.
+  */
+@@ -1156,6 +1172,18 @@ void svgtiny_parse_paint_attributes(dom_element *node,
+ 		dom_string_unref(attr);
+ 	}
+ 
++	exc = dom_element_get_attribute(node, state->interned_fill_opacity, &attr);
++	if (exc == DOM_NO_ERR && attr != NULL) {
++		state->fill_opacity = svgtiny_parse_float(attr);
++		dom_string_unref(attr);
++	}
++
++	exc = dom_element_get_attribute(node, state->interned_stroke_opacity, &attr);
++	if (exc == DOM_NO_ERR && attr != NULL) {
++		state->stroke_opacity = svgtiny_parse_float(attr);
++		dom_string_unref(attr);
++	}
++
+ 	exc = dom_element_get_attribute(node, state->interned_style, &attr);
+ 	if (exc == DOM_NO_ERR && attr != NULL) {
+ 		char *style = strndup(dom_string_data(attr),
+@@ -1187,6 +1215,22 @@ void svgtiny_parse_paint_attributes(dom_element *node,
+ 						state->viewport_width, *state);
+ 			free(value);
+ 		}
++		if ((s = strstr(style, "fill-opacity:"))) {
++			s += 13;
++			while (*s == ' ')
++				s++;
++			value = strndup(s, strcspn(s, "; "));
++			state->fill_opacity = _svgtiny_parse_float(value);
++			free(value);
++		}
++		if ((s = strstr(style, "stroke-opacity:"))) {
++			s += 15;
++			while (*s == ' ')
++				s++;
++			value = strndup(s, strcspn(s, "; "));
++			state->stroke_opacity = _svgtiny_parse_float(value);
++			free(value);
++		}
+ 		free(style);
+ 		dom_string_unref(attr);
+ 	}
+@@ -1264,6 +1308,13 @@ void svgtiny_parse_color(dom_string *s, svgtiny_colour *c,
+ 	free(ss);
+ }
+ 
++static float _svgtiny_parse_float(const char *s)
++{
++	float n = atof((const char *)s);
++	return n;
++}
++
++
+ /**
+  * Parse font attributes, if present.
+  */
+@@ -1450,6 +1501,8 @@ struct svgtiny_shape *svgtiny_add_shape(struct svgtiny_parse_state *state)
+ 			(state->ctm.a + state->ctm.d) / 2.0);
+ 	if (0 < state->stroke_width && shape->stroke_width == 0)
+ 		shape->stroke_width = 1;
++	shape->fill_opacity = state->fill_opacity;
++	shape->stroke_opacity = state->stroke_opacity;
+ 
+ 	return shape;
+ }
+diff --git a/src/svgtiny_internal.h b/src/svgtiny_internal.h
+index 0fd5af9..a5b1145 100644
+--- a/src/svgtiny_internal.h
++++ b/src/svgtiny_internal.h
+@@ -42,6 +42,8 @@ struct svgtiny_parse_state {
+ 	svgtiny_colour fill;
+ 	svgtiny_colour stroke;
+ 	int stroke_width;
++	float fill_opacity;
++	float stroke_opacity;
+ 
+ 	/* gradients */
+ 	unsigned int linear_gradient_stop_count;
+@@ -64,6 +66,7 @@ struct svgtiny_list;
+ /* svgtiny.c */
+ float svgtiny_parse_length(dom_string *s, int viewport_size,
+ 		const struct svgtiny_parse_state state);
++float svgtiny_parse_float(dom_string *s);
+ void svgtiny_parse_color(dom_string *s, svgtiny_colour *c,
+ 		struct svgtiny_parse_state *state);
+ void svgtiny_parse_transform(char *s, float *ma, float *mb,
+ #endif
+diff --git a/src/svgtiny_strings.h b/src/svgtiny_strings.h
+index d075eb6..5e5995b 100644
+--- a/src/svgtiny_strings.h
++++ b/src/svgtiny_strings.h
+@@ -49,9 +49,11 @@ SVGTINY_STRING_ACTION(offset)
+ SVGTINY_STRING_ACTION(gradientUnits)
+ SVGTINY_STRING_ACTION(gradientTransform)
+ SVGTINY_STRING_ACTION(userSpaceOnUse)
+-SVGTINY_STRING_ACTION2(stroke_width,stroke-width)
++SVGTINY_STRING_ACTION2(stroke_opacity,stroke-opacity)
+ SVGTINY_STRING_ACTION2(stop_color,stop-color)
+ SVGTINY_STRING_ACTION2(zero_percent,0%)
+ SVGTINY_STRING_ACTION2(hundred_percent,100%)
++SVGTINY_STRING_ACTION2(stroke_width,stroke-width)
++SVGTINY_STRING_ACTION2(fill_opacity,fill-opacity)
+ 
+ #undef SVGTINY_STRING_ACTION
