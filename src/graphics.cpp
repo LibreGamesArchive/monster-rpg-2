@@ -788,6 +788,7 @@ void m_draw_precise_line(MBITMAP *bitmap, float x1, float y1, float x2, float y2
 
 static void draw_mouse_patch()
 {
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (mouse_patch_x < 0) return;
 	if (is_cursor_hidden()) return;
 	al_set_target_backbuffer(display);
@@ -798,6 +799,7 @@ static void draw_mouse_patch()
 	m_draw_bitmap(custom_mouse_patch, mouse_patch_x, mouse_patch_y, 0);
 	al_use_transform(&backup);
 	mouse_patch_x = -1;
+#endif
 }
 
 static void fade(int startAlpha, int endAlpha, int length, MCOLOR color)
