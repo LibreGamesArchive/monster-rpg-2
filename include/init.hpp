@@ -42,12 +42,12 @@ void init_shaders(void);
 void destroy_shaders(void);
 
 ScreenSize small_screen(void);
-void get_buffer_true_size(int *buffer_true_w, int *buffer_true_h);
+//void get_buffer_true_size(int *buffer_true_w, int *buffer_true_h);
 
 void init_big_depth_surface(void);
 
 bool imperfect_aspect(void);
-void create_buffers(void);
+//void create_buffers(void);
 void destroy_fonts(void);
 void load_fonts(void);
 
@@ -64,6 +64,7 @@ extern "C" {
 void maybe_enable_screensaver();
 void set_user_joystick(void);
 
+void get_screen_offset_size(int *dx, int *dy, int *dw, int *dh);
 
 // FIXME: TONNES OF GLOBALS
 
@@ -86,9 +87,11 @@ extern ALLEGRO_SHADER *scale2x_linear;
 extern ALLEGRO_SHADER *scale2x_linear_flipped;
 extern ALLEGRO_SHADER *scale3x_linear;
 extern ALLEGRO_SHADER *scale3x_linear_flipped;
+/*
 extern MBITMAP *buffer;
 extern MBITMAP *overlay;
 extern MBITMAP *scaleXX_buffer;
+*/
 extern int shadow_buf_w, shadow_buf_h;
 extern int shadow_buf_x, shadow_buf_y;
 extern MBITMAP *screenshot;
@@ -182,7 +185,6 @@ extern bool use_digital_joystick;
 // cheats
 extern bool superpower, healall;
 
-extern bool have_mouse;
 extern bool reload_translation;
 
 extern int PRESERVE_TEXTURE;
@@ -228,9 +230,11 @@ extern bool should_reset;
 extern bool is_fs_toggle;
 
 extern MBITMAP *custom_mouse_cursor;
+extern MBITMAP *custom_mouse_patch;
+extern int mouse_patch_x, mouse_patch_y;
 extern int custom_cursor_w, custom_cursor_h;
-void show_custom_cursor();
-void hide_custom_cursor();
+void show_mouse_cursor();
+void hide_mouse_cursor();
 bool is_cursor_hidden();
 
 extern int width_before_fullscreen;

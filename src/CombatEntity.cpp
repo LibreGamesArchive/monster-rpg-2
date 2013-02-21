@@ -2365,7 +2365,8 @@ void BeamP1Effect::draw(void)
 
 	color.a = 0.2f;
 	
-#define tmp buffer
+//#define tmp buffer
+#define tmp NULL
 
 	m_draw_precise_line(tmp, sx, sy, dx, dy, color);
 	
@@ -2447,7 +2448,8 @@ void BeamP2Effect::draw(void)
 
 	color.a = 0.2f;
 
-#define tmp buffer
+//#define tmp buffer
+#define tmp NULL
 
 	m_draw_precise_line(tmp, sx, sy, dx, dy, color);
 	
@@ -2647,11 +2649,11 @@ void Ice3Effect::draw(void)
 	else {
 		int cx, cy, cw, ch;
 		al_get_clipping_rectangle(&cx, &cy, &cw, &ch);
-		al_set_clipping_rectangle(x-m_get_bitmap_width(icicle)/2, y-m_get_bitmap_height(icicle),
-			m_get_bitmap_width(icicle), m_get_bitmap_height(icicle));
-
+		m_set_clip(
+			x-m_get_bitmap_width(icicle)/2, y-m_get_bitmap_height(icicle),
+			x-m_get_bitmap_width(icicle)/2+m_get_bitmap_width(icicle), y
+		);
 		m_draw_trans_bitmap(icicle, x-m_get_bitmap_width(icicle)/2, y-m_get_bitmap_height(icicle)+BELOW_GROUND-(dy-yy), alpha*255);
-
 		al_set_clipping_rectangle(cx, cy, cw, ch);
 
 		ALLEGRO_VERTEX verts[NUM_PARTICLES];
@@ -3947,7 +3949,8 @@ void BlazeEffect::draw(void)
 
 
 	MBITMAP *target;
-	target = buffer;
+	//target = buffer;
+	target = NULL;
 
 	MCOLOR color = m_map_rgb(255, 0, 0);
 
@@ -4094,7 +4097,8 @@ void LaserEffect::draw(void)
 
 
 	MBITMAP *target;
-	target = buffer;
+	//target = buffer;
+	target = NULL;
 
 	MCOLOR color = m_map_rgb(0, 200, 255);
 
@@ -4485,7 +4489,11 @@ void SwallowEffect::draw(void)
 	MCOLOR color = m_map_rgb(200, 100, 100);
 
 	color.a = 0.2f;
-	m_draw_precise_line(buffer, dx, dy, cx, cy, color);
+
+//#define tmp buffer
+#define tmp NULL
+
+	m_draw_precise_line(tmp, dx, dy, cx, cy, color);
 	
 	for (float i = 0.333f; i < 5.0f/2; i += 0.333f) {
 		color.a = interpolate(0.2f, 0.0f, (i/(5.0f/2)));
@@ -4493,12 +4501,12 @@ void SwallowEffect::draw(void)
 		float yy1 = dy + yinc * i;
 		float xx2 = cx + xinc * i;
 		float yy2 = cy + yinc * i;
-		m_draw_precise_line(buffer, xx1, yy1, xx2, yy2, color);
+		m_draw_precise_line(tmp, xx1, yy1, xx2, yy2, color);
 		xx1 = dx - xinc * i;
 		yy1 = dy - yinc * i;
 		xx2 = cx - xinc * i;
 		yy2 = cy - yinc * i;
-		m_draw_precise_line(buffer, xx1, yy1, xx2, yy2, color);
+		m_draw_precise_line(tmp, xx1, yy1, xx2, yy2, color);
 	}
 
 	m_draw_circle(cx, cy, 3, m_map_rgb(200, 100, 100), M_FILLED);

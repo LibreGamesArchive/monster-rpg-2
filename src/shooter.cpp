@@ -515,10 +515,13 @@ static void draw(double cx, double cy, bool draw_objects = true)
 	
 	ALLEGRO_DISPLAY *display = al_get_current_display();
 	ALLEGRO_TRANSFORM proj_push, view_push;
-	ALLEGRO_TRANSFORM proj;
+	ALLEGRO_TRANSFORM proj, view;
 
 	al_copy_transform(&proj_push, al_get_projection_transform(display));
 	al_copy_transform(&view_push, al_get_current_transform());
+
+	al_identity_transform(&view);
+	al_use_transform(&view);
 
 	al_identity_transform(&proj);
 	al_rotate_transform_3d(&proj, 1, 0, 0, D2R(1));
@@ -728,7 +731,7 @@ bool shooter(bool for_points)
 
 start:
 
-	hide_custom_cursor();
+	hide_mouse_cursor();
 	int scr_w = al_get_display_width(display);
 	int scr_h = al_get_display_height(display);
 	al_set_mouse_xy(display, scr_w/2, scr_h/2);
@@ -774,19 +777,20 @@ start:
 	lastFire = al_get_time();
 	
 	draw_all();
+	
+	bool break_for_fade_after_draw = false;
 
 	clear_input_events();
-	for (; o >= TILE_SIZE*140;) {
+
+	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
 
 		// Logic
 		int tmp_counter = logic_counter;
 		logic_counter = 0;
-		while  (tmp_counter > 0) {
+		while  (!break_for_fade_after_draw && tmp_counter > 0) {
 			if (is_close_pressed()) {
-				show_custom_cursor();
 				do_close();
-				hide_custom_cursor();
 				close_pressed = false;
 			}
 			// WARNING
@@ -826,10 +830,10 @@ start:
 			int tx = (int)(x/TILE_SIZE);
 			int ty = (int)(py/TILE_SIZE);
 
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 			ALLEGRO_MOUSE_STATE state;
-			if (have_mouse) {
-				al_get_mouse_state(&state);
-			}
+			al_get_mouse_state(&state);
+#endif
 
 			if (!dead && solid[tx+ty*w]) {
 				dead = true;
@@ -853,12 +857,12 @@ start:
 				if (ie.right) {
 					x += LOGIC_MILLIS * 0.2;
 				}
-				if (have_mouse) {
-					int dx = state.x - last_mouse_x;
-					x += (float)dx / 5;
-					al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
-					last_mouse_x = al_get_display_width(display)/2;
-				}
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+				int dx = state.x - last_mouse_x;
+				x += (float)dx / 5;
+				al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
+				last_mouse_x = al_get_display_width(display)/2;
+#endif
 #endif
 			}
 
@@ -955,8 +959,10 @@ start:
 
 			if (dead) {
 				deadCount += LOGIC_MILLIS;
-				if (deadCount > 2000)
-					goto done;
+				if (deadCount > 2000) {
+					break_for_fade_after_draw = true;
+					break;
+				}
 			}
 
 			bool pressed = false;
@@ -989,7 +995,8 @@ start:
 					const char *pause_text = "Paused";
 					int tw = m_text_length(game_font, _t(pause_text));
 					int th = m_text_height(game_font);
-					m_set_target_bitmap(buffer);
+					al_set_target_backbuffer(display);
+					//m_set_target_bitmap(buffer);
 					m_draw_rectangle(BW/2-tw/2-5, BH/2-th/2-5, BW/2+tw/2+5, BH/2+th/2+5, black, M_FILLED);
 					m_draw_rectangle(BW/2-tw/2-5+0.5, BH/2-th/2-5+0.5, BW/2+tw/2+5, BH/2+th/2+5, white, M_OUTLINED);
 					mTextout_simple(_t(pause_text), BW/2-tw/2, BH/2-th/2, white);
@@ -1055,11 +1062,11 @@ start:
 			}
 
 			bool mouse_button_1_pressed = false;
-			if (have_mouse) {
-				if (state.buttons & 1) {
-					mouse_button_1_pressed = true;
-				}
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+			if (state.buttons & 1) {
+				mouse_button_1_pressed = true;
 			}
+#endif
 
 			if (!dead && (ie.button1 || pressed || mouse_button_1_pressed) && (al_get_time()-lastFire > 0.2)) {
 				playPreloadedSample("torpedo.ogg");
@@ -1134,10 +1141,11 @@ start:
 			}
 		}
 
-		if (draw_counter > 0) {
+		if (break_for_fade_after_draw || draw_counter > 0) {
 			draw_counter = 0;
 
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			m_clear(m_map_rgb(105, 115, 145));
 	
 			draw(x, o);
@@ -1172,6 +1180,13 @@ start:
 			m_restore_blender();
 			
 			drawBufferToScreen();
+
+			if (o < TILE_SIZE*140) {
+				break_for_fade_after_draw = true;
+			}
+			if (break_for_fade_after_draw) {
+				break;
+			}
 			m_flip_display();
 		}
 	}
@@ -1197,14 +1212,19 @@ done:
 		goto start;
 	}
 	
-	fadeOut(black);
-	m_set_target_bitmap(buffer);
+	if (break_for_fade_after_draw) {
+		break_for_fade_after_draw = false;
+		fadeOut(black);
+	}
+
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
 	m_clear(black);
 	m_rest(5);
 
 	playMusic("underwater_final.ogg");
 	
-	show_custom_cursor();
+	show_mouse_cursor();
 
 	if (dead) {
 		if (prompt("G A M E O V E R", "Try Again?", 1, 1))

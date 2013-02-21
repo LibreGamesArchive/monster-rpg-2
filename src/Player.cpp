@@ -658,7 +658,11 @@ static void levelUpCallback(int selected, LEVEL_UP_CALLBACK_DATA *d)
 		orig_values = ov2;
 	}
 
-	MBITMAP *tmp = m_clone_bitmap(buffer);
+	//MBITMAP *tmp = m_clone_bitmap(buffer);
+	MBITMAP *tmp = m_create_bitmap(BW, BH);
+	int dx, dy, dw, dh;
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW, BH, tmp);
 
 	MFrame_NormalDraw *frame = new MFrame_NormalDraw(x, y, width, height, true);
 
@@ -835,7 +839,8 @@ static void levelUpCallback(int selected, LEVEL_UP_CALLBACK_DATA *d)
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			m_draw_bitmap(tmp, 0, 0, 0);
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 			// Draw the GUI
@@ -953,9 +958,11 @@ bool levelUp(Player *player, int bonus)
 	tguiAddWidget(multiChooser);
 	tguiSetFocus(multiChooser);
 
-	m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 	tguiDraw();
+	drawBufferToScreen();
 	fadeIn(black);
 
 	clear_input_events();
@@ -1009,7 +1016,8 @@ bool levelUp(Player *player, int bonus)
 				}
 			}
 			if (multiChooser->getTapped() >= 0) {
-				m_set_target_bitmap(buffer);
+				al_set_target_backbuffer(display);
+				//m_set_target_bitmap(buffer);
 				m_clear(black);
 				m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 				// Draw the GUI
@@ -1020,14 +1028,16 @@ bool levelUp(Player *player, int bonus)
 				levelUpCallback(multiChooser->getTapped(), &levelUpData);
 				multiChooser->setTapped(false);
 
-				if (points <= 0)
+				if (points <= 0) {
 					goto done;
+				}
 			}
 		}
 
-		if (draw_counter) {
+		if (draw_counter > 0) {
 			draw_counter = 0;
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			m_clear(black);
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 			// Draw the GUI
@@ -1038,7 +1048,9 @@ bool levelUp(Player *player, int bonus)
 	}
 
 done:
-	m_set_target_bitmap(buffer);
+
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
 	m_clear(black);
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 	// Draw the GUI
@@ -1057,6 +1069,17 @@ done:
 		memcpy(&info.abilities, &orig_info.abilities, sizeof(CombatantAbilities));
 		ret = true;
 	}
+	
+	setMusicVolume(1);
+			
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
+	m_clear(black);
+	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
+	// Draw the GUI
+	tguiDraw();
+	drawBufferToScreen();
+	fadeOut(black);
 
 	tguiDeleteWidget(fullscreenRect);
 
@@ -1065,10 +1088,6 @@ done:
 	delete multiChooser;
 	delete fullscreenRect;
 	mcPoints.clear();
-
-	fadeOut(black);
-
-	setMusicVolume(1);
 
 	dpad_on();
 

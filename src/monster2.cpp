@@ -92,6 +92,8 @@ void check_some_stuff_in_shooter(void);
 
 int old_control_mode = -1;
 
+bool prompt_for_close_on_next_flip = false;
+
 void connect_airplay_controls(void)
 {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -204,7 +206,8 @@ void connect_second_display(void)
 	black_button = m_load_alpha_bitmap(getResource("media/blackbutton.png"));
 	airplay_logo = m_load_alpha_bitmap(getResource("media/m2_controller_logo.png"));
 	
-	m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
 
 	config.setMusicVolume(mvol);
 	config.setSFXVolume(svol);
@@ -416,9 +419,11 @@ static int find_touch(int touch_id)
 	return -1;
 }
 
-static void process_touch(int x, int y, int touch_id, int type) {
-	if (have_mouse)
-		return;
+static void process_touch(int x, int y, int touch_id, int type)
+{
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	return;
+#endif
 	
 	al_lock_mutex(touch_mutex);
 	if (type == MOUSE_DOWN) {
@@ -955,7 +960,7 @@ top:
 				al_lock_mutex(dpad_mutex);
 				if (!(this_x < 16 && this_y < 16)) {
 					released = true;
-					if (have_mouse || !use_dpad) {
+					if (!use_dpad) {
 						total_mouse_x = 0;
 						total_mouse_y = 0;
 						last_mouse_x = -1;
@@ -969,7 +974,11 @@ top:
 				current_mouse_y = this_y;
 				al_unlock_mutex(click_mutex);
 				al_lock_mutex(dpad_mutex);
-				if ((have_mouse && !released) || !use_dpad) {
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+				if (!use_dpad) {
+#else
+				if (!released) {
+#endif
 					if (last_mouse_x < 0) {
 						last_mouse_x = this_x;
 						last_mouse_y = this_y;
@@ -1297,7 +1306,8 @@ top:
 
 			set_screen_params();
 	
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			
 			config.setMusicVolume(mvol);
 			config.setSFXVolume(svol);
@@ -1350,6 +1360,22 @@ top:
 	return close_pressed;
 }
 
+void do_close_exit_game()
+{
+	if (saveFilename) saveTime(saveFilename);
+	config.write();
+	al_set_target_bitmap(al_get_backbuffer(display));
+	m_clear(al_map_rgb(0, 0, 0));
+	m_flip_display();
+	m_clear(al_map_rgb(0, 0, 0));
+	m_flip_display();
+#ifdef ALLEGRO_WINDOWS
+	throw QuitError();
+#else
+	destroy();
+	exit(0);
+#endif
+}
 
 void do_close(bool quit)
 {
@@ -1384,34 +1410,12 @@ void do_close(bool quit)
 		config_menu();
 	}
 	else {
-		bool exit_game = false;
 		if (on_title_screen) {
-			exit_game = true;
+			do_close_exit_game();
 		}
 		else {
 			close_pressed = false;
-			int r = triple_prompt("", "Really quit game or return to menu?", "", "Menu", "Quit", "Cancel", 2, true);
-			if (r == 0) {
-				break_main_loop = true;
-			}
-			else if (r == 1) {
-				exit_game = true;
-			}
-		}
-		if (exit_game) {
-			if (saveFilename) saveTime(saveFilename);
-			config.write();
-			al_set_target_bitmap(al_get_backbuffer(display));
-			m_clear(al_map_rgb(0, 0, 0));
-			m_flip_display();
-			m_clear(al_map_rgb(0, 0, 0));
-			m_flip_display();
-#ifdef ALLEGRO_WINDOWS
-			throw QuitError();
-#else
-			destroy();
-			exit(0);
-#endif
+			prompt_for_close_on_next_flip = true;
 		}
 	}
 #endif
@@ -1426,6 +1430,47 @@ static bool playerCanLevel(std::string name)
 	return true;
 }
 
+void main_draw(bool draw_cursor)
+{
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
+	
+	/* draw the Area */
+	if (battle) {
+		battle->draw();
+	}
+	else if (area) {
+		if (gonna_fade_in_red)
+			m_clear(m_map_rgb(255, 0, 0));
+		else {
+			//m_clear(black);
+			area->draw();
+		}
+	}
+	if (timer_on) {
+		int minutes = (timer_time/1000) / 60;
+		int seconds = (timer_time/1000) % 60;
+		char text[10];
+		sprintf(text, "%d:%02d", minutes, seconds);
+		int tw = m_text_length(huge_font, "5:55") + 10;
+		int th = m_text_height(huge_font);
+		mTextout(huge_font, text, BW-(tw/2)-10, th/2+5,
+			white, black,
+			WGT_TEXT_DROP_SHADOW, true);
+	}
+	// Draw the GUI
+	if (!manChooser || battle)
+		tguiDraw();
+
+	MBITMAP *tmp = custom_mouse_cursor;
+	if (!draw_cursor) {
+		custom_mouse_cursor = NULL;
+	}
+	drawBufferToScreen();
+	if (!draw_cursor) {
+		custom_mouse_cursor = tmp;
+	}
+}
 
 static void run()
 {
@@ -1488,6 +1533,7 @@ static void run()
 				do_pause_game = false;
 				bool ret = pause(true, false);
 				if (!ret) {
+					main_draw();
 					fadeOut(black);
 					return;
 				}
@@ -1549,17 +1595,23 @@ static void run()
 						speechDialog = NULL;
 					}
 
-					if (!battle)
-							fadeOut(m_map_rgb(255, 0, 0));
-					m_set_target_bitmap(buffer);
+					if (!battle) {
+						main_draw();
+						fadeOut(m_map_rgb(255, 0, 0));
+					}
+					al_set_target_backbuffer(display);
+					//m_set_target_bitmap(buffer);
 					m_clear(m_map_rgb(255, 0, 0));
+					hide_mouse_cursor();
+					drawBufferToScreen();
+					show_mouse_cursor();
 
 					if (battle) {
 						delete battle;
 						battle = NULL;
 					}
 
-					anotherDoDialogue("You were not quick enough to stop the Golems.\n", false, true);
+					anotherDoDialogue("You were not quick enough to stop the Golems.\n", false, true, false);
 
 					return;
 				}
@@ -1723,28 +1775,23 @@ static void run()
 					if (ie.button2 || iphone_shaken(0.1)) {
 						waitForRelease(4);
 
-						if (area->getName() == "tutorial") {
-							if (prompt("Really exit", "tutorial?", 0, 1)) {
-								tutorial_started = false;
-
-								return;
-							}
-						}
-						else {
+						if (area->getName() != "tutorial") {
 							iphone_clear_shaken();
 							int posx, posy;
 							party[heroSpot]->getObject()->getPosition(&posx, &posy);
 							bool can_save = true;
+							main_draw();
 							fadeOut(black);
 							bool ret = pause(can_save);
 							if (!ret) {
-								fadeOut(black);
 								return;
 							}
 							
-							m_set_target_bitmap(buffer);
+							al_set_target_backbuffer(display);
+							//m_set_target_bitmap(buffer);
 							m_clear(black);
 							area->draw();
+							drawBufferToScreen();
 							fadeIn(black);
 
 							if (party[heroSpot]) {
@@ -1768,36 +1815,9 @@ static void run()
 
 		if (draw_counter > 0 && !dont_draw_now) {
 			draw_counter = 0;
-			m_set_target_bitmap(buffer);
-			
-			/* draw the Area */
-			if (battle) {
-				battle->draw();
-			}
-			else if (area) {
-				if (gonna_fade_in_red)
-					m_clear(m_map_rgb(255, 0, 0));
-				else {
-					m_clear(black);
-					area->draw();
-				}
-			}
-			if (timer_on) {
-				int minutes = (timer_time/1000) / 60;
-				int seconds = (timer_time/1000) % 60;
-				char text[10];
-				sprintf(text, "%d:%02d", minutes, seconds);
-				int tw = m_text_length(huge_font, "5:55") + 10;
-				int th = m_text_height(huge_font);
-				mTextout(huge_font, text, BW-(tw/2)-10, th/2+5,
-					white, black,
-					WGT_TEXT_DROP_SHADOW, true);
-			}
-			// Draw the GUI
-			if (!manChooser || battle)
-				tguiDraw();
 
-			drawBufferToScreen();
+			main_draw();
+
 			m_flip_display();
 		}
 		
@@ -1805,6 +1825,7 @@ static void run()
 
 		if (!battle && party[heroSpot] && party[heroSpot]->getName() == "Eny" && party[heroSpot]->getObject()->getPoisoned() && !gameInfo.milestones[MS_FIRST_POISON]) {
 			gameInfo.milestones[MS_FIRST_POISON] = true;
+			main_draw(false);
 			anotherDoDialogue("Oh, no! Someone is poisoned. They'll lose health every turn until they're healed.\n", false, true);
 		}
 
@@ -1914,17 +1935,13 @@ int main(int argc, char *argv[])
 	al_register_event_source(input_event_queue, &user_event_source);
 #endif
 
-	int ma = config.getMaintainAspectRatio();
-	config.setMaintainAspectRatio(ASPECT_FILL_SCREEN);
-	
+	int dx, dy, dw, dh;
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
+
 	const float svg_w = 362;
-	float disp_w = al_get_display_width(display);
-	float disp_h = al_get_display_height(display);
-	float wanted = disp_w * 0.75f;
+	float wanted = dw * 0.75f;
 	float scale = wanted / svg_w;
 	ALLEGRO_BITMAP *nooskewl = load_svg(getResource("media/nooskewl.svg"), scale);
-
-	float transition_scale = disp_w / BW;
 
 #ifndef ALLEGRO_ANDROID
 	if ((n = check_arg(argc, argv, "-stick")) != -1) {
@@ -1943,26 +1960,37 @@ int main(int argc, char *argv[])
 	bool fps_save = fps_on;
 	fps_on = false;
 	
+	//MBITMAP *oldbuf = buffer;
+	//buffer = m_create_bitmap(disp_w, disp_h);
+
+	//m_set_target_bitmap(buffer);
+
+	ALLEGRO_TRANSFORM backup, t;
+	al_copy_transform(&backup, al_get_current_transform());
+	al_identity_transform(&t);
+	al_use_transform(&t);
+
 	al_set_target_backbuffer(display);
-	m_clear(al_map_rgb(0, 0, 0));
-	m_flip_display();
-
-	MBITMAP *oldbuf = buffer;
-	buffer = m_create_bitmap(disp_w, disp_h);
-
-	m_set_target_bitmap(buffer);
 	m_clear(black);
-	al_draw_bitmap(nooskewl, disp_w/2-al_get_bitmap_width(nooskewl)/2,
-		disp_h/2-al_get_bitmap_height(nooskewl)/2, 0);
-	bool cancelled = transitionIn(true, false, transition_scale);
+	al_draw_bitmap(
+		nooskewl,
+		dx+dw/2-al_get_bitmap_width(nooskewl)/2,
+		dy+dh/2-al_get_bitmap_height(nooskewl)/2,
+		0
+	);
+	drawBufferToScreen();
+
+	bool cancelled = transitionIn(true, false);
 
 	if (!cancelled) {
-		m_set_target_bitmap(buffer);
+		al_set_target_backbuffer(display);
+		//m_set_target_bitmap(buffer);
 		m_clear(black);
+		al_use_transform(&t);
 		al_draw_bitmap(
 			nooskewl,
-			disp_w/2-al_get_bitmap_width(nooskewl)/2,
-			disp_h/2-al_get_bitmap_height(nooskewl)/2,
+			dx+dw/2-al_get_bitmap_width(nooskewl)/2,
+			dy+dh/2-al_get_bitmap_height(nooskewl)/2,
 			0
 		);
 		drawBufferToScreen();
@@ -1977,20 +2005,28 @@ int main(int argc, char *argv[])
 			
 		//loadPlayDestroy("nooskewl.ogg");
 		m_rest(1.5);
-		transitionOut(false, transition_scale);
+		m_clear(black);
+		al_draw_bitmap(
+			nooskewl,
+			dx+dw/2-al_get_bitmap_width(nooskewl)/2,
+			dy+dh/2-al_get_bitmap_height(nooskewl)/2,
+			0
+		);
+		drawBufferToScreen();
+		transitionOut(false);
 	}
 	else {
 		m_rest(1);
 	}
 	al_destroy_bitmap(nooskewl);
 
-	m_destroy_bitmap(buffer);
-	buffer = oldbuf;
+	//m_destroy_bitmap(buffer);
+	//buffer = oldbuf;
 
-	m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
+	al_use_transform(&backup);
 	
-	config.setMaintainAspectRatio(ma);
-
 	fps_on = fps_save;
 
 /*
@@ -2069,7 +2105,8 @@ int main(int argc, char *argv[])
 		choice = title_menu();
 		
 		m_push_target_bitmap();
-		m_set_target_bitmap(buffer);
+		al_set_target_backbuffer(display);
+		//m_set_target_bitmap(buffer);
 		m_clear(m_map_rgb(0, 0, 0));
 		m_pop_target_bitmap();
 
@@ -2092,8 +2129,10 @@ int main(int argc, char *argv[])
 						was_in_map = false;
 					}
 					else {
-						m_set_target_bitmap(buffer);
+						al_set_target_backbuffer(display);
+						//m_set_target_bitmap(buffer);
 						area->draw();
+						drawBufferToScreen();
 						transitionIn();
 					}
 				}
@@ -2112,7 +2151,8 @@ int main(int argc, char *argv[])
 
 			choose_savestate(&num, &exists, &isAuto);
 
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			m_clear(black);
 			drawBufferToScreen();
 			m_flip_display();
@@ -2131,8 +2171,10 @@ int main(int argc, char *argv[])
 							was_in_map = false;
 						}
 						else {
-							m_set_target_bitmap(buffer);
+							al_set_target_backbuffer(display);
+							//m_set_target_bitmap(buffer);
 							area->draw();
+							drawBufferToScreen();
 							transitionIn();
 						}
 					}

@@ -21,6 +21,7 @@ MBITMAP *icon_bmp;
 
 bool getting_input_config = false;
 
+int show_item_info_on_flip = -1;
 
 void loadIcons(MBITMAP *bmp, RecreateData *data)
 {
@@ -226,13 +227,16 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
 	if (use_programmable_pipeline && shadow) {
-		int buffer_true_w, buffer_true_h;
-		get_buffer_true_size(&buffer_true_w, &buffer_true_h);
+		int dx, dy, dw, dh;
+		get_screen_offset_size(&dx, &dy, &dw, &dh);
 		al_set_shader(display, shadow_shader);
-		al_set_shader_float(shadow_shader, "x1", x);
-		al_set_shader_float(shadow_shader, "y1", y);
-		al_set_shader_float(shadow_shader, "x2", x+w);
-		al_set_shader_float(shadow_shader, "y2", y+h);
+		al_set_shader_float(shadow_shader, "x1", dx+x*screenScaleX);
+		al_set_shader_float(shadow_shader, "y1", dy+y*screenScaleY);
+		al_set_shader_float(shadow_shader, "x2", dx+(x+w)*screenScaleX);
+		al_set_shader_float(shadow_shader, "y2", dy+(y+h)*screenScaleY);
+		al_set_shader_float(shadow_shader, "BW", al_get_display_width(display));
+		al_set_shader_float(shadow_shader, "BH", al_get_display_height(display));
+		al_set_shader_float(shadow_shader, "radius", screenScaleX*10);
 		al_use_shader(shadow_shader, true);
 		m_draw_rectangle(x-10, y-10, x+w+10, y+h+10, black, M_FILLED);
 		al_use_shader(shadow_shader, false);
@@ -344,7 +348,11 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 	
 	bool delayed = false;
 
-	MBITMAP *tmp = m_clone_bitmap(buffer);
+	//MBITMAP *tmp = m_clone_bitmap(buffer);
+	MBITMAP *tmp = m_create_bitmap(BW, BH);
+	int dx, dy, dw, dh;
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW, BH, tmp);
 
 	int w = 230;
 	int h = 100;
@@ -409,7 +417,8 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 		if (draw_counter > 0) {
 			draw_counter = 0;
 
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			m_draw_bitmap(tmp, 0, 0, 0);
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
@@ -566,9 +575,10 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 	MBITMAP *tmp = m_create_bitmap(BW, BH); // check
 	al_set_new_bitmap_flags(flags);
 	ALLEGRO_BITMAP *oldTarget = al_get_target_bitmap();
-	m_set_target_bitmap(tmp);
-	m_draw_bitmap(buffer, 0, 0, 0);
-	al_set_target_bitmap(oldTarget);
+	//m_draw_bitmap(buffer, 0, 0, 0);
+	int dx, dy, dw, dh;
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW, BH, tmp);
 	
 	int w = 200;
 	int h = 65;
@@ -623,7 +633,8 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			m_clear(m_map_rgb(0, 0, 0));
 			m_draw_bitmap(tmp, 0, 0, 0);
 			// Draw frame
@@ -681,7 +692,11 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 {
 	dpad_off();
 	
-	MBITMAP *tmp = m_clone_bitmap(buffer);
+	//MBITMAP *tmp = m_clone_bitmap(buffer);
+	MBITMAP *tmp = m_create_bitmap(BW, BH);
+	int dx, dy, dw, dh;
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW, BH, tmp);
 	
 	int w = 230;
 	int h = 100;
@@ -771,7 +786,8 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			m_clear(m_map_rgb(0, 0, 0));
 			m_draw_bitmap(tmp, 0, 0, 0);
 			// Draw frame
@@ -842,7 +858,11 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 {
 	dpad_off();
 
-	MBITMAP *tmp = m_clone_bitmap(buffer);
+	//MBITMAP *tmp = m_clone_bitmap(buffer);
+	MBITMAP *tmp = m_create_bitmap(BW, BH);
+	int dx, dy, dw, dh;
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW, BH, tmp);
 	
 	int w;
 	if (wide) {
@@ -942,7 +962,8 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 
 		if (draw_counter) {
 			draw_counter = 0;
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			m_clear(m_map_rgb(0, 0, 0));
 			m_draw_bitmap(tmp, 0, 0, 0);
 			// Draw frame
@@ -1018,8 +1039,6 @@ int config_input(int type)
 
 	tguiPush();
 
-	fadeOut(black);
-
 	MFrame *frame = new MFrame(0, 0, BW, BH);
 
 	MInputGetter *getters[15];
@@ -1073,8 +1092,10 @@ int config_input(int type)
 
 	tguiSetFocus(getters[0]);
 
-	m_set_target_bitmap(buffer);
+	//m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
 	tguiDraw();
+	drawBufferToScreen();
 	fadeIn(black);
 
 	clear_input_events();
@@ -1171,7 +1192,8 @@ int config_input(int type)
 
 		if (draw_counter) {
 			draw_counter = 0;
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			tguiDraw();
 			drawBufferToScreen();
 			m_flip_display();
@@ -1341,11 +1363,12 @@ void MSpeechDialog::drawText(void)
 			scrollingSection = false;
 		}
 		int offset = (int)(h-(ratio*h));
+		int xxx, yyy, www, hhh;
+		al_get_clipping_rectangle(&xxx, &yyy, &www, &hhh);
 		m_set_clip(xx+5, yy+3, xx+w-10, yy+h-10);
 		realDrawText(currentSection-1, 10, 6-(h-offset));
 		realDrawText(currentSection, 10, 6+offset);
-		ALLEGRO_BITMAP *target = al_get_target_bitmap();
-		m_set_clip(0, 0, al_get_bitmap_width(target), al_get_bitmap_height(target));
+		al_set_clipping_rectangle(xxx, yyy, www, hhh);
 	}
 	else {
 		realDrawText(currentSection, 10, 6);
@@ -2457,8 +2480,6 @@ void MMap::mouseDown(int xx, int yy, int b)
 	m_get_mouse_state(&s);
 	downX = s.x;
 	downY = s.y;
-
-	ALLEGRO_DEBUG("mouseDown done");
 }
 
 
@@ -2474,7 +2495,6 @@ void MMap::mouseUp(int x, int y, int b)
 		int dy = y - py;
 		if (sqrtf(dx*dx + dy*dy) < 10) {
 			clicked = true;
-			ALLEGRO_DEBUG("MOUSE UP! RETURNING");
 			return;
 		}
 		// test surrounding points
@@ -2572,6 +2592,7 @@ void MMap::auto_save(int millis, bool force)
 			ss_save_counter += millis;
 		}
 		if (mem_save_counter >= 10000 || force) {
+			mem_save_counter = ss_save_counter = 0;
 			real_auto_save_game(true);
 		}
 	}
@@ -2683,6 +2704,7 @@ int MMap::update(int millis)
 		use_input_event();
 		clicked = false;
 		playPreloadedSample("select.ogg");
+		main_draw();
 		fadeOut(black);
 
 		/* Scroll in a portrait of the keep if entering it */
@@ -2704,8 +2726,8 @@ int MMap::update(int millis)
 			int elapsed = 0;
 			int totalElapsed = 0;
 			dpad_off();
-			
-			while  (now < end) {
+		
+			while (true) {
 				if (is_close_pressed()) {
 					do_close();
 					close_pressed = false;
@@ -2720,7 +2742,8 @@ int MMap::update(int millis)
 				int curr_x = start_x - (p * start_x);
 				int curr_y = p * target_y;
 
-				m_set_target_bitmap(buffer);
+				al_set_target_backbuffer(display);
+				//m_set_target_bitmap(buffer);
 				/*
 				 * For some unknown reason m_draw_scaled_bitmap
 				 * sets an alpha blender, and I don't want to
@@ -2730,6 +2753,9 @@ int MMap::update(int millis)
 				m_draw_scaled_bitmap(bmp, curr_x, curr_y, curr_w, curr_h, 0, 0, BW, BH, 0);
 				m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 				drawBufferToScreen();
+				if  (now >= end) {
+					break;
+				}
 				m_flip_display();
 
 				now = tguiCurrentTimeMillis();
@@ -2750,7 +2776,8 @@ int MMap::update(int millis)
 		setObjectDirection(o, points[selected].dest_dir);
 		startArea(points[selected].dest_area);
 		ALLEGRO_BITMAP *oldTarget = al_get_target_bitmap();
-		m_set_target_bitmap(buffer);
+		al_set_target_backbuffer(display);
+		//m_set_target_bitmap(buffer);
 		m_clear(black);
 		al_set_target_bitmap(oldTarget);
 
@@ -2758,8 +2785,10 @@ int MMap::update(int millis)
 		clear_input_events();
 
 		area->update(1);
-		m_set_target_bitmap(buffer);
+		al_set_target_backbuffer(display);
+		//m_set_target_bitmap(buffer);
 		area->draw();
+		drawBufferToScreen();
 		transitionIn();
 		return TGUI_RETURN;
 	}
@@ -4353,6 +4382,12 @@ void MScrollingList::mouseUpAbs(int xx, int yy, int b)
 	else {
 		int dx = drop_x - mx;
 		int dy = drop_y - my;
+		al_set_target_backbuffer(display);
+		m_clear(black);
+		tguiDraw();
+		hide_mouse_cursor();
+		drawBufferToScreen();
+		show_mouse_cursor();
 		if (drop_callback && sqrt((float)dx*dx + dy*dy) < 10) {
 			drop_callback(selected);
 		}
@@ -4392,7 +4427,7 @@ void MScrollingList::draw()
 
 	int cx, cy, cw, ch;
 	al_get_clipping_rectangle(&cx, &cy, &cw, &ch);
-	al_set_clipping_rectangle(x, y-1, width-30, 15*rows+1);
+	m_set_clip(x, y-1, width-30+x, 15*rows+1+y-1);
 
 	bool held = al_is_bitmap_drawing_held();
 	al_hold_bitmap_drawing(true);
@@ -4471,6 +4506,12 @@ int MScrollingList::update(int millis)
 				downCount += millis;
 				if (downCount >= 600 && hold_callback) {
 					playPreloadedSample("select.ogg");
+					al_set_target_backbuffer(display);
+					m_clear(black);
+					tguiDraw();
+					hide_mouse_cursor();
+					drawBufferToScreen();
+					show_mouse_cursor();
 					hold_callback(selected, hold_data);
 					down = false;
 					downX = -1;
@@ -4511,6 +4552,12 @@ int MScrollingList::update(int millis)
 			int elapsed = tguiCurrentTimeMillis() - holdTime;
 			if (hold_callback && elapsed > 600) {
 				playPreloadedSample("select.ogg");
+				al_set_target_backbuffer(display);
+				m_clear(black);
+				tguiDraw();
+				hide_mouse_cursor();
+				drawBufferToScreen();
+				show_mouse_cursor();
 				hold_callback(selected, hold_data);
 				holdTime = -1;
 			}
@@ -4550,6 +4597,12 @@ int MScrollingList::update(int millis)
 		else if (ie.button3 == DOWN && hold_callback) {
 			use_input_event();
 			playPreloadedSample("select.ogg");
+			al_set_target_backbuffer(display);
+			m_clear(black);
+			tguiDraw();
+			hide_mouse_cursor();
+			drawBufferToScreen();
+			show_mouse_cursor();
 			hold_callback(selected, hold_data);
 		}
 	}
@@ -4563,11 +4616,29 @@ int MScrollingList::update(int millis)
 		}
 		else {
 			playPreloadedSample("select.ogg");
+			al_set_target_backbuffer(display);
+			m_clear(black);
+			tguiDraw();
+			hide_mouse_cursor();
+			drawBufferToScreen();
+			show_mouse_cursor();
 			if (!do_prompt || prompt("Run this game?", "", 0, 1)) {
 				return TGUI_RETURN;
 			}
-			else if (prompt("Delete this game?", "", 0, 0)) {
+			al_set_target_backbuffer(display);
+			m_clear(black);
+			tguiDraw();
+			hide_mouse_cursor();
+			drawBufferToScreen();
+			show_mouse_cursor();
+			if (prompt("Delete this game?", "", 0, 0)) {
 				if (drop_callback) {
+					al_set_target_backbuffer(display);
+					m_clear(black);
+					tguiDraw();
+					hide_mouse_cursor();
+					drawBufferToScreen();
+					show_mouse_cursor();
 					drop_callback(selected);
 					// delete
 					if (items.size() <= 0) {
@@ -4719,18 +4790,13 @@ void MItemSelector::mouseDownAbs(int xx, int yy, int b)
 
 	tguiRaiseWidget(this);
 
-	printf("1\n");
-
 	if (growing) return;
-	printf("2\n");
 
 	if (scrolling)
 		return;
-	printf("3\n");
 	
 	if (dragging)
 		return;
-	printf("4\n");
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (b == 2) {
@@ -4738,7 +4804,6 @@ void MItemSelector::mouseDownAbs(int xx, int yy, int b)
 		return;
 	}
 #endif
-	printf("5\n");
 
 	if (down || maybe_scrolling) {
 		printf("scrolling=%d dragging=%d\n", scrolling, dragging);
@@ -5033,7 +5098,8 @@ int MItemSelector::update(int millis)
 					playPreloadedSample("select.ogg");
 					int index = inventory[selected].index;
 					reset();
-					showItemInfo(index, true);
+					//showItemInfo(index, true);
+					show_item_info_on_flip = index;
 				}
 			}
 		}
@@ -5200,7 +5266,8 @@ int MItemSelector::update(int millis)
 		reset();
 		if (index >= 0) {
 			playPreloadedSample("select.ogg");
-			showItemInfo(index, true);
+			show_item_info_on_flip = index;
+			//showItemInfo(index, true);
 		}
 		else {
 			playPreloadedSample("error.ogg");
@@ -5219,7 +5286,8 @@ int MItemSelector::update(int millis)
 					playPreloadedSample("select.ogg");
 					int index = inventory[selected].index;
 					reset();
-					showItemInfo(index, true);
+					show_item_info_on_flip = index;
+					//showItemInfo(index, true);
 				}
 				else {
 					reset();
@@ -5260,7 +5328,7 @@ int MItemSelector::update(int millis)
 			clicked = false;
 			downCount = 0;
 			pressed = -1;
-			if (have_mouse || !use_dpad) {
+			if (!use_dpad) {
 				down = false;
 				dragging = false;
 				if (dragBmp)
@@ -5558,16 +5626,16 @@ int MManSelector::update(int millis)
 		holdTime -= millis;
 		if (holdTime <= 0) {
 			bool used = false;
-			if (have_mouse) {
-				ALLEGRO_MOUSE_STATE s;
-				m_get_mouse_state(&s);
-				if (abs(s.x-holdx) < 10 && abs(s.y-holdy) < 10 && holdi != 6)  {
-					if (holdi > 6) holdi--;
-					callLua(state, "do_info", "ii>", holdi, holdj);
-					used = true;
-					holdx = holdy = -1000;
-				}
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+			ALLEGRO_MOUSE_STATE s;
+			m_get_mouse_state(&s);
+			if (abs(s.x-holdx) < 10 && abs(s.y-holdy) < 10 && holdi != 6)  {
+				if (holdi > 6) holdi--;
+				callLua(state, "do_info", "ii>", holdi, holdj);
+				used = true;
+				holdx = holdy = -1000;
 			}
+#endif
 			if (!used && pos != 6) {
 				int p = pos;
 				if (p > 6) p--;
@@ -6309,7 +6377,8 @@ int MPartySelector::update(int millis)
 					if (*toUnequip >= 0) {
 						down = false;
 						playPreloadedSample("select.ogg");
-						showItemInfo(*toUnequip, true);
+						show_item_info_on_flip = index;
+						//showItemInfo(*toUnequip, true);
 					}
 				}
 				down = false;

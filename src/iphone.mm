@@ -66,7 +66,8 @@ void showIpod(void)
 	global_draw_red = false;
 
 	MBITMAP *bg = m_load_bitmap(getResource("media/options_bg.png"));
-	m_set_target_bitmap(buffer);
+	//m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
 	m_clear(m_map_rgb(0, 0, 0));
 
 	mTextout_simple("Please wait...",
@@ -393,7 +394,8 @@ void showIpod(void)
 		if (draw_counter > 0) {
 			draw_counter = 0;
 
-			m_set_target_bitmap(buffer);
+			//m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
 
 			al_draw_tinted_bitmap(bg->bitmap, al_map_rgba(64, 64, 64, 255), 0, 0, 0);
 

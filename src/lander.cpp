@@ -98,7 +98,7 @@ bool do_lander(void)
 	}
 	
 top:
-	hide_custom_cursor();
+	hide_mouse_cursor();
 
 	playMusic("lander.ogg");
 
@@ -150,6 +150,8 @@ top:
 	int explode_count = 0;
 	int expl_x = 0, expl_y = 0;
 
+	bool break_for_fade_after_draw = false;
+
 	clear_input_events();
 
 	while  (1) {
@@ -163,7 +165,7 @@ top:
 		if (tmp_counter > 10)
 			tmp_counter = 1;
 			
-		while (tmp_counter > 0) {
+		while  (!break_for_fade_after_draw && tmp_counter > 0) {
 			next_input_event_ready = true;
 
 			tmp_counter--;
@@ -327,12 +329,13 @@ top:
 			}			
 		}
 
-		if (draw_counter > 0) {
+		if (break_for_fade_after_draw || draw_counter > 0) {
 			draw_counter = 0;
 
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			
 			m_draw_bitmap(sky_bmp, 0, 0, 0);
 			m_draw_bitmap(land_bmp, 0, 0, 0);
@@ -375,20 +378,24 @@ top:
 #endif
 
 			drawBufferToScreen();
-			m_flip_display();
-		
+
 			if (!dead && green > 3) {
-				goto done;
+				break_for_fade_after_draw = true;
 			}
 			else if (explode_count > 3000) {
-				goto done;
+				break_for_fade_after_draw = true;
 			}
+
+			if (break_for_fade_after_draw) {
+				drawBufferToScreen();
+				break;
+			}
+
+			m_flip_display();
 		}
 
 		if (is_close_pressed()) {
-			show_custom_cursor();
 			do_close();
-			hide_custom_cursor();
 			close_pressed = false;
 		}
 		// WARNING
@@ -399,7 +406,12 @@ top:
 
 done:
 
-	show_custom_cursor();
+	if (break_for_fade_after_draw) {
+		break_for_fade_after_draw = false;
+		fadeOut(black);
+	}
+
+	show_mouse_cursor();
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (!use_dpad) {
@@ -418,8 +430,7 @@ done:
 	m_destroy_bitmap(lander_mem);
 	delete explosion;
 
-	fadeOut(black);
-	m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
 	m_clear(black);
 	m_rest(5);
 

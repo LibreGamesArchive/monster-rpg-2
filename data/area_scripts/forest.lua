@@ -47,6 +47,7 @@ function fade_in()
 	dpad_off()
 	drawArea()
 	dpad_on()
+	drawBufferToScreen()
 	fadeIn(255, 0, 0)
 	setGonnaFadeInRed(false)
 end
@@ -65,6 +66,8 @@ end
 
 function fade_out()
 	reviveAllPlayers()
+	drawArea()
+	drawBufferToScreen()
 	fadeOut(0, 0, 0, 5)
 	clearBuffer(0, 0, 0)
 	setMilestone(MS_OPENING_SCENE, true)
@@ -75,6 +78,7 @@ function fade_out()
 	dpad_off()
 	drawArea()
 	dpad_on()
+	drawBufferToScreen()
 	fadeIn(0, 0, 0)
 end
 

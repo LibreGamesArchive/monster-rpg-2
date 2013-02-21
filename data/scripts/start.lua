@@ -6,5 +6,6 @@ setObjectSubAnimation(0, "stand_s")
 clearBuffer()
 updateArea()
 drawArea()
+drawBufferToScreen()
 transitionIn()
 

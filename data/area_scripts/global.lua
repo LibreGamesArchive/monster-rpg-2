@@ -744,6 +744,8 @@ end
 function change_areas(area, x, y, dir, trans_in)
 	ChangedAreasJustNow = true -- stop battle from happening immediately after entering a room (even a room with no battles defined)
 	stopObject(0)
+	drawArea()
+	drawBufferToScreen()
 	transitionOut()
 	if (area == "portal" and not getMilestone(MS_DONE_CREDITS)) then
 		setMilestone(MS_DONE_CREDITS, true)
@@ -757,6 +759,7 @@ function change_areas(area, x, y, dir, trans_in)
 	-- hack for Archery game
 	if (getBreakMainLoop()) then return end
 	drawArea()
+	drawBufferToScreen()
 	if (trans_in == nil) then
 		dpad_off()
 		transitionIn()

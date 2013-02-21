@@ -224,7 +224,8 @@ static void showMusicToggle(void)
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			m_clear(black);
 			tguiDraw();
 			drawBufferToScreen();
@@ -378,7 +379,8 @@ static void showIpodControls(void)
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			m_set_target_bitmap(buffer);
+			//m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
 			m_clear(black);
 			tguiDraw();
 			drawBufferToScreen();
@@ -429,6 +431,11 @@ void showSaveStateInfo(const char *basename)
 	int x = (BW-w)/2;
 	int y = (BH-h)/2;
 
+	MBITMAP *tmp = m_create_bitmap(BW, BH);
+	int dx, dy, dw, dh;
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW, BH, tmp);
+
 #ifdef ALLEGRO_ANDROID
 	al_set_standard_file_interface();
 #endif
@@ -451,7 +458,8 @@ void showSaveStateInfo(const char *basename)
 	bool updating = false;
 
 	while (1) {
-		m_set_target_bitmap(buffer);
+		al_set_target_backbuffer(display);
+		//m_set_target_bitmap(buffer);
 		
 		al_wait_cond(wait_cond, wait_mutex);
 		int tmp_counter = logic_counter;
@@ -497,6 +505,8 @@ void showSaveStateInfo(const char *basename)
 		if (draw_counter > 0) {
 			draw_counter = 0;
 
+			m_draw_bitmap(tmp, 0, 0, 0);
+
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
 			// Draw info
@@ -536,10 +546,14 @@ void showSaveStateInfo(const char *basename)
 	}
 	
 done:
+
+	m_destroy_bitmap(tmp);
+
 	dpad_on();
 
-	if (ss)
+	if (ss) {
 		m_destroy_bitmap(ss);
+	}
 	
 	tguiDeleteWidget(w1);
 	delete w1;
@@ -558,10 +572,15 @@ void showItemInfo(int index, bool preserve_buffer)
 	dpad_off();
 	
 	bool delayed = false;
+	
+	int dx, dy, dw, dh;
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
 
 	MBITMAP *tmp = NULL;
 	if (preserve_buffer) {
-		tmp = m_clone_bitmap(buffer);
+		//tmp = m_clone_bitmap(buffer);
+		tmp = m_create_bitmap(BW, BH);
+		m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW, BH, tmp);
 	}
 	
 	int w = 200;
@@ -730,7 +749,8 @@ void showItemInfo(int index, bool preserve_buffer)
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			if (preserve_buffer) {
 				m_clear(m_map_rgb(0, 0, 0));
 				m_draw_bitmap(tmp, 0, 0, 0);
@@ -893,6 +913,11 @@ static bool choose_save_slot(int num, bool exists, void *data)
 					delete_file(getUserResource("%d.png", num));
 				}
 
+				al_set_target_backbuffer(display);
+				tguiDraw();
+				hide_mouse_cursor();
+				drawBufferToScreen();
+				show_mouse_cursor();
 				notify("Your game", "has been saved...", "");
 			}
 		}
@@ -1079,7 +1104,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	fairy->set_right_widget(mainItem);
 
 	MDragNDropForm *dndForm = NULL;
-	if (have_mouse || !use_dpad)
+	if (!use_dpad)
 		dndForm = new MDragNDropForm();
 
 
@@ -1169,7 +1194,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 		tguiAddWidget(fairy);
 
 	tguiAddWidget(partyStats);
-	if (have_mouse || !use_dpad)
+	if (dndForm)
 		tguiAddWidget(dndForm);
 	tguiAddWidget(mainTimeLabel);
 	tguiAddWidget(mainTime);
@@ -1177,14 +1202,17 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	tguiAddWidget(mainGold);
 	tguiSetFocus(mainItem);
 
-	m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
 	tguiDraw();
+	drawBufferToScreen();
 	fadeIn(black);
 
 	PauseSection section = MAIN;
 	std::string spellName;
 
 	int who = 0;
+
+	bool break_for_fade_after_draw = false;
 
 	clear_input_events();
 
@@ -1195,7 +1223,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 		logic_counter = 0;
 		if (tmp_counter > 10)
 			tmp_counter = 1;
-		while  (tmp_counter > 0) {
+		while  (!break_for_fade_after_draw && tmp_counter > 0) {
 			next_input_event_ready = true;
 
 			tmp_counter--;
@@ -1237,7 +1265,8 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				itemSelector->setSelected(0);
 				itemSelector->setTop(0);
 				tguiAddWidget(itemSelector);
-				m_set_target_bitmap(buffer);
+				al_set_target_backbuffer(display);
+				//m_set_target_bitmap(buffer);
 				tguiDraw();
 				maybeShowItemHelp();
 				tguiSetFocus(partySelectorTop);
@@ -1269,10 +1298,22 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 							}
 							int index = partySelectorTop->getSelected();
 							if (index >= MAX_PARTY) {
+								al_set_target_backbuffer(display);
+								m_clear(black);
+								tguiDraw();
+								hide_mouse_cursor();
+								drawBufferToScreen();
+								show_mouse_cursor();
 								use(NULL, sel, true);
 							}
 							else if (party[index]) {
 								Combatant *c = party[index]->makeCombatant(index);
+								al_set_target_backbuffer(display);
+								m_clear(black);
+								tguiDraw();
+								hide_mouse_cursor();
+								drawBufferToScreen();
+								show_mouse_cursor();
 								use(c, sel, true);
 								memcpy(&party[index]->getInfo(), &c->getInfo(), sizeof(CombatantInfo));
 								delete c;
@@ -1346,6 +1387,12 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 									}
 								}
 								else {
+									al_set_target_backbuffer(display);
+									m_clear(black);
+									tguiDraw();
+									hide_mouse_cursor();
+									drawBufferToScreen();
+									show_mouse_cursor();
 									notify("You have no", "room in your", "inventory.");
 								}
 							}
@@ -1410,6 +1457,12 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 									}
 								}
 								else {
+									al_set_target_backbuffer(display);
+									m_clear(black);
+									tguiDraw();
+									hide_mouse_cursor();
+									drawBufferToScreen();
+									hide_mouse_cursor();
 									notify("You have no", "room in your", "inventory.");
 								}
 							}
@@ -1436,7 +1489,8 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				spellSelector->setSelected(0);
 				spellSelector->setTop(0);
 				tguiAddWidget(spellSelector);
-				m_set_target_bitmap(buffer);
+				al_set_target_backbuffer(display);
+				//m_set_target_bitmap(buffer);
 				tguiDraw();
 				// draw
 				tguiSetFocus(partySelectorTop2);
@@ -1531,6 +1585,12 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				goto done;
 			}
 			else if (widget == mainQuit) {
+				al_set_target_backbuffer(display);
+				m_clear(black);
+				tguiDraw();
+				hide_mouse_cursor();
+				drawBufferToScreen();
+				show_mouse_cursor();
 				if (prompt("Really quit?", "", 0, 0)) {
 					ret = false;
 					if (area) {
@@ -1678,12 +1738,18 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 
 			else if (widget == fairy)
 			{
+				al_set_target_backbuffer(display);
+				m_clear(black);
+				tguiDraw();
+				hide_mouse_cursor();
+				drawBufferToScreen();
+				show_mouse_cursor();
 				if (need_gold) {
 					gold = 250;
-					anotherDoDialogue(_t("Fairy: I see you're low on gold. I can help a bit...\n"), false, true);
+					anotherDoDialogue(_t("Fairy: I see you're low on gold. I can help a bit...\n"), false, true, false);
 				}
 				else {
-					anotherDoDialogue(_t("Fairy: You look like you're in need of supplies...\n"), false, true);
+					anotherDoDialogue(_t("Fairy: You look like you're in need of supplies...\n"), false, true, false);
 				}
 
 				char imgname[1000];
@@ -1736,22 +1802,31 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 			INPUT_EVENT ie = get_next_input_event();
 			if (section == MAIN && ie.button2 == DOWN) {
 				use_input_event();
-				fadeOut(black);
-				goto done;
+				break_for_fade_after_draw = true;
+				break;
 			}
 		}
 
-		if (draw_counter > 0) {
+		if (break_for_fade_after_draw || draw_counter > 0) {
 			draw_counter = 0;
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			m_clear(black);
 			tguiDraw();
 			drawBufferToScreen();
+			if (break_for_fade_after_draw) {
+				break;
+			}
 			m_flip_display();
 		}
 	}
 
 done:
+	
+	if (break_for_fade_after_draw) {
+		break_for_fade_after_draw = false;
+		fadeOut(black);
+	}
 
 	save_memory(true);
 
@@ -1773,7 +1848,7 @@ done:
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	delete mainMusic;
 #endif
-	if (have_mouse || !use_dpad)
+	if (dndForm)
 		delete dndForm;
 	delete partyStats;
 	delete mainTimeLabel;
@@ -1841,8 +1916,6 @@ void doMap(std::string startPlace, std::string prefix)
 
 	in_map = true;
 	
-	fadeOut(black);
-
 	playMusic("");
 	playAmbience("");
 
@@ -1859,8 +1932,10 @@ void doMap(std::string startPlace, std::string prefix)
 	tguiAddWidget(mapWidget);
 	tguiSetFocus(mapWidget);
 
-	m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
 	tguiDraw();
+	drawBufferToScreen();
 	fadeIn(black);
 
 	clear_input_events();
@@ -1894,9 +1969,9 @@ void doMap(std::string startPlace, std::string prefix)
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			m_set_target_bitmap(buffer);
-			MCOLOR color = black;
-			m_clear(color);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
+			m_clear(black);
 			// Draw the GUI
 			tguiDraw();
 			drawBufferToScreen();
@@ -1930,7 +2005,8 @@ void doShop(std::string name, const char *imageName, int nItems,
 	int *indexes, int *costs)
 {
 #define DRAW \
-	m_set_target_bitmap(buffer); \
+	al_set_target_backbuffer(display); \
+	/*m_set_target_bitmap(buffer);*/ \
 	m_clear(black); \
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white); \
 	mDrawFrame(3, 3, BW-6, 40-6); \
@@ -1987,7 +2063,8 @@ void doShop(std::string name, const char *imageName, int nItems,
 	tguiAddWidget(isel);
 	tguiSetFocus(shop);
 
-	m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
 	mDrawFrame(3, 3, BW-6, 40-6);
 	m_draw_bitmap(face, 5, 20-16, 0);
 	char s[100];
@@ -1999,7 +2076,10 @@ void doShop(std::string name, const char *imageName, int nItems,
 	mTextout_simple(_t(s), BW-5-m_text_length(game_font, _t(s)),
 		22, grey);
 	tguiDraw();
+	drawBufferToScreen();
 	fadeIn(black);
+	
+	bool break_for_fade_after_draw = false;
 
 	clear_input_events();
 
@@ -2009,7 +2089,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 		logic_counter = 0;
 		if (tmp_counter > 10)
 			tmp_counter = 1;
-		while  (tmp_counter > 0) {
+		while  (!break_for_fade_after_draw && tmp_counter > 0) {
 			next_input_event_ready = true;
 
 			tmp_counter--;
@@ -2029,7 +2109,8 @@ void doShop(std::string name, const char *imageName, int nItems,
 			if (widget == shop) {
 				int sel = shop->getSelected();
 				if (sel < 0) {
-					goto done;
+					break_for_fade_after_draw = true;
+					break;
 				}
 				shop->getDropLocation(&drop_x, &drop_y);
 				if (use_dpad || drop_y < 0 || drop_y >= 100) {
@@ -2081,7 +2162,8 @@ void doShop(std::string name, const char *imageName, int nItems,
 			else if (widget == isel) {
 				int sel = isel->getSelected();
 				if (sel < 0) {
-					goto done;
+					break_for_fade_after_draw = true;
+					break;
 				}
 				isel->getDropLocation(&drop_x, &drop_y);
 				if (use_dpad || drop_y < 0 || (drop_y >= 40 && drop_y < 100)) {
@@ -2122,15 +2204,25 @@ void doShop(std::string name, const char *imageName, int nItems,
 			}
 		}
 		
-		if (draw_counter > 0) {
+		if (break_for_fade_after_draw || draw_counter > 0) {
 			draw_counter = 0;
 			DRAW
 			drawBufferToScreen();
+			if (break_for_fade_after_draw) {
+				break;
+			}
 			m_flip_display();
 		}
 	}
 
 done:
+	
+	setMusicVolume(1);
+	
+	if (break_for_fade_after_draw) {
+		break_for_fade_after_draw = false;
+		fadeOut(black);
+	}
 
 	tguiDeleteWidget(shop);
 	tguiDeleteWidget(isel);
@@ -2140,9 +2232,6 @@ done:
 
 	m_destroy_bitmap(face);
 
-	setMusicVolume(1);
-
-	fadeOut(black);
 	clear_input_events();
 
 	input->setDirection(dir);
@@ -2165,8 +2254,10 @@ void into_the_sun(void)
 
 	AnimationSet *explosion = new AnimationSet(getResource("media/explosion.png"));
 
-	m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
 	m_draw_bitmap(bg, 0, 0, 0);
+	drawBufferToScreen();
 	fadeIn(black);
 
 	int count = 0;
@@ -2180,7 +2271,8 @@ void into_the_sun(void)
 	clear_input_events();
 
 	while (true) {
-		m_set_target_bitmap(buffer);
+		al_set_target_backbuffer(display);
+		//m_set_target_bitmap(buffer);
 
 		al_wait_cond(wait_cond, wait_mutex);
 		int tmp_counter = logic_counter;
@@ -2241,11 +2333,18 @@ void into_the_sun(void)
 		}
 	}
 done:
-	m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
 	m_draw_bitmap(bg, 0, 0, 0);
 	drawBufferToScreen();
 	m_flip_display();
 	m_rest(5);
+	
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
+	m_draw_bitmap(bg, 0, 0, 0);
+	drawBufferToScreen();
+	fadeOut(black);
 
 	m_destroy_bitmap(bg);
 	m_unlock_bitmap(bg_locked);
@@ -2258,7 +2357,7 @@ done:
 
 void credits(void)
 {
-	hide_custom_cursor();
+	hide_mouse_cursor();
 
 	dpad_off();
 
@@ -2444,7 +2543,8 @@ void credits(void)
 		int step = now - start;
 		start = now;
 		offset += 0.01f * step;
-		m_set_target_bitmap(buffer);
+		al_set_target_backbuffer(display);
+		//m_set_target_bitmap(buffer);
 		m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, white);
 		m_draw_bitmap(bg, 0, 0, 0);
 		m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, white);
@@ -2693,9 +2793,10 @@ void credits(void)
 				}
 			}
 		}
-		if (section >= sections)
-			break;
 		drawBufferToScreen();
+		if (section >= sections) {
+			break;
+		}
 		m_flip_display();
 		m_rest(0.001);
 	}
@@ -2789,9 +2890,6 @@ done:
 
 			scroll_amount += 0.01 * step;
 
-			if (scroll_amount > scroll_size)
-				break;
-
 			vcount = 0;
 			int y = BH-scroll_amount;
 			for (int line = 0; line < nlines; line++, y += 10) {
@@ -2857,13 +2955,18 @@ done:
 				}
 			}
 			
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 
 			al_clear_to_color(al_map_rgb_f(0, 0, 0));
 
 			m_draw_prim(verts, 0, font, 0, vcount, ALLEGRO_PRIM_TRIANGLE_LIST);
 
 			drawBufferToScreen();
+			
+			if (scroll_amount > scroll_size)
+				break;
+
 			m_flip_display();
 			m_rest(0.001);
 		}
@@ -2878,7 +2981,7 @@ done2:
 
 	dpad_on();
 
-	show_custom_cursor();
+	show_mouse_cursor();
 }
 
 
@@ -2956,6 +3059,11 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 
 			for (int i = 0; i < 10; i++) {
 				if (widget == buttons[i]) {
+					al_set_target_backbuffer(display);
+					tguiDraw();
+					hide_mouse_cursor();
+					drawBufferToScreen();
+					show_mouse_cursor();
 					if (callback(i, (infos[i].exp == 0 && infos[i].gold == 0 && infos[i].time == 0) ? false : true, data)) {
 						goto done;
 					}
@@ -2976,7 +3084,8 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 		
 			tguiDraw();
 			
@@ -3230,10 +3339,14 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 	tguiLowerWidget(save_tab);
 	tguiLowerWidget(frame);
 			
-	m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
 	m_clear(black);
 	tguiDraw();
+	drawBufferToScreen();
 	fadeIn(black);
+
+	bool break_for_fade_after_draw = false;
 
 	clear_input_events();
 
@@ -3243,7 +3356,7 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 		logic_counter = 0;
 		if (tmp_counter > 10)
 			tmp_counter = 1;
-		while  (tmp_counter > 0) {
+		while  (!break_for_fade_after_draw && tmp_counter > 0) {
 			next_input_event_ready = true;
 
 			tmp_counter--;
@@ -3335,7 +3448,8 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 		if (widget == save_list) {
 				if (break_main_loop) {
 					*num = -1;
-					goto done;
+					break_for_fade_after_draw = true;
+					break;
 				}
 				int sel = save_list->getSelected();
 				if (sel >= 0) {
@@ -3351,18 +3465,21 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 						*num = i;
 						*existing = true;
 						*isAuto = false;
-						goto done;
+						break_for_fade_after_draw = true;
+						break;
 					}
 				}
 				else {
 					*num = -1;
-					goto done;
+					break_for_fade_after_draw = true;
+					break;
 				}
 			}
 			else if (widget == auto_list) {
 				if (break_main_loop) {
 					*num = -1;
-					goto done;
+					break_for_fade_after_draw = true;
+					break;
 				}
 				int sel = auto_list->getSelected();
 				if (sel >= 0) {
@@ -3378,18 +3495,21 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 						*num = i;
 						*existing = true;
 						*isAuto = true;
-						goto done;
+						break_for_fade_after_draw = true;
+						break;
 					}
 				}
 				else {
 					*num = -1;
-					goto done;
+					break_for_fade_after_draw = true;
+					break;
 				}
 			}
 			else if (widget == new_game_button) {
 				*num = 0;
 				*existing = false;
-				goto done;
+				break_for_fade_after_draw = true;
+				break;
 			}
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			else if (widget == copy_button) {
@@ -3404,7 +3524,8 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 					*num = i.num;
 					*existing = i.existing;
 					*isAuto = i.isAuto;
-					goto done;
+					break_for_fade_after_draw = true;
+					break;
 				}
 			}
 #endif
@@ -3414,23 +3535,36 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 			if (iphone_shaken(0.1) || id.button2 == DOWN) {
 				iphone_clear_shaken();
 				*num = -1;
-				goto done;
+				break_for_fade_after_draw = true;
+				break;
 			}
 		}
 
 
-		if (draw_counter > 0) {
+		if (break_for_fade_after_draw || draw_counter > 0) {
 			draw_counter = 0;
 
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			m_clear(black);
 			tguiDraw();
 
 			drawBufferToScreen();
+
+			if (break_for_fade_after_draw) {
+				break;
+			}
+
 			m_flip_display();
 		}
 	}
 done:
+	playMusic(musicName);
+	
+	if (break_for_fade_after_draw) {
+		break_for_fade_after_draw = false;
+		fadeOut(black);
+	}
 
 	tguiDeleteWidget(frame);
 	tguiDeleteWidget(save_tab);
@@ -3464,11 +3598,7 @@ done:
 
 	m_destroy_bitmap(trashcan);
 
-	playMusic(musicName);
-
 	dpad_on();
-
-	fadeOut(black);
 }
 
 bool config_menu(bool start_on_fullscreen)
@@ -3478,8 +3608,6 @@ bool config_menu(bool start_on_fullscreen)
 	pause_f_to_toggle_fullscreen = true;
 
 	tguiPush();
-
-	fadeOut(black);
 
 	MIcon *bg = new MIcon(0, 0, getResource("media/options_bg.png"), al_map_rgba_f(0.25f, 0.25f, 0.25f, 1.0f));
 
@@ -3699,9 +3827,13 @@ bool config_menu(bool start_on_fullscreen)
 	}
 #endif
 
-	m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
 	tguiDraw();
+	drawBufferToScreen();
 	fadeIn(black);
+
+	bool break_for_fade_after_draw = false;
 
 	clear_input_events();
 
@@ -3714,7 +3846,7 @@ bool config_menu(bool start_on_fullscreen)
 		logic_counter = 0;
 		if (tmp_counter > 10)
 			tmp_counter = 1;
-		while  (tmp_counter > 0) {
+		while  (!break_for_fade_after_draw && tmp_counter > 0) {
 			next_input_event_ready = true;
 			tmp_counter--;
 			if (is_close_pressed()) {
@@ -3748,9 +3880,10 @@ bool config_menu(bool start_on_fullscreen)
 				while (true) {
 					type = config_input(type);
 					if (type == 0) {
-						fadeOut(black);
-						m_set_target_bitmap(buffer);
+						al_set_target_backbuffer(display);
+						//m_set_target_bitmap(buffer);
 						tguiDraw();
+						drawBufferToScreen();
 						fadeIn(black);
 						waitForRelease(5);
 						clear_input_events();
@@ -3765,7 +3898,8 @@ bool config_menu(bool start_on_fullscreen)
 				use_input_event();
 				iphone_clear_shaken();
 				getInput()->waitForReleaseOr(5, 1000);
-				goto done;
+				break_for_fade_after_draw = true;
+				break;
 			}
 		}
 		
@@ -3896,7 +4030,7 @@ bool config_menu(bool start_on_fullscreen)
 		sel = filter_type_toggle->getSelected();
 		if (config.getFilterType() != sel) {
 			config.setFilterType(sel);
-			create_buffers();
+			//create_buffers();
 		}
 
 #if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE && !defined ALLEGRO_RASPBERRYPI
@@ -3908,18 +4042,27 @@ bool config_menu(bool start_on_fullscreen)
 		}
 #endif
 
-		if (draw_counter > 0) {
+		if (break_for_fade_after_draw || draw_counter > 0) {
 			draw_counter = 0;
 
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 
 			tguiDraw();
 
 			drawBufferToScreen();
+			if (break_for_fade_after_draw) {
+				break;
+			}
 			m_flip_display();
 		}
 	}
 done:
+	if (break_for_fade_after_draw) {
+		break_for_fade_after_draw = false;
+		fadeOut(black);
+	}
+
 	tguiDeleteWidget(bg);
 
 	delete bg;
@@ -3953,152 +4096,12 @@ done:
 
 	pause_f_to_toggle_fullscreen = false;
 
-	fadeOut(black);
-
 	waitForRelease(4);
 	waitForRelease(5);
 	clear_input_events();
 
 	return false;
 }
-
-#if 0
-void pc_help(void)
-{
-	const char *text[] = {
-		"Arrows move, or plug in a gamepad",
-		" ",
-		"SPACE/ENTER - Action button",
-		"ESC/. - Cancel, go back, or open menu",
-		"V - Examines some items/menu choices",
-		"(Substitute gamepad buttons 1, 2, 3)",
-		" ",
-		"F - Toggle fullscreen mode",
-		"S - Settings",
-		"F1,F2 - Lower/raise music volume",
-		"F3,F4 - Lower/raise sound effects volume",
-		"(Keyboard only)",
-		" ",
-		"The GUI responds to your mouse",
-		""
-	};
-	
-	MBITMAP *bg = m_load_bitmap(getResource("media/m2_controller_logo.png"));
-	bool first_frame = true;
-	
-	tguiPush();
-	
-	while (1) {
-		al_wait_cond(wait_cond, wait_mutex);
-		int tmp_counter = logic_counter;
-		logic_counter = 0;
-		if (tmp_counter > 10)
-			tmp_counter = 1;
-		while  (tmp_counter > 0) {
-			next_input_event_ready = true;
-
-			tmp_counter--;
-			if (is_close_pressed()) {
-				do_close();
-				close_pressed = false;
-			}
-			// WARNING
-			if (break_main_loop) {
-				goto done;
-			}
-
-			INPUT_EVENT ie = get_next_input_event();
-			
-			if (ie.button1 == DOWN || ie.button2 == DOWN || ie.button3 == DOWN || iphone_shaken(0.1)) {
-				use_input_event();
-				iphone_clear_shaken();
-				goto done;
-			}
-		}
-
-		if (draw_counter > 0) {
-			draw_counter = 0;
-
-			m_set_target_bitmap(buffer);
-			
-			m_clear(black);
-			
-			int w = m_get_bitmap_width(bg);
-			int h = m_get_bitmap_height(bg);
-			float r = 220.0f / w;
-			int ww = w * r;
-			int hh = h * r;
-			int xx = BW/2-ww/2;
-			int yy = BH/2-hh;
-			
-			m_draw_scaled_bitmap(
-				bg,
- 				0, 0, w, h,
-				xx, yy, ww, hh,
-				0
-			);
-			
-			yy += hh;
-			
-			m_draw_scaled_bitmap(
-				bg,
-				0, h*2/3, w, h/3,
-				xx, yy, ww, hh/3,
-				M_FLIP_VERTICAL
-			);
-			
-			ALLEGRO_VERTEX verts[6];
-			verts[0].x = xx;
-			verts[0].y = yy;
-			verts[0].z = 0;
-			verts[0].color = m_map_rgba(0, 0, 0, 0);
-			verts[1].x = xx+ww;
-			verts[1].y = yy;
-			verts[1].z = 0;
-			verts[1].color = m_map_rgba(0, 0, 0, 0);
-			verts[2].x = xx;
-			verts[2].y = yy+hh/3;
-			verts[2].z = 0;
-			verts[2].color = m_map_rgba(0, 0, 0, 255);
-			verts[3].x = xx+ww;
-			verts[3].y = yy+hh/3;
-			verts[3].z = 0;
-			verts[3].color = m_map_rgba(0, 0, 0, 255);
-			verts[4].x = xx+ww;
-			verts[4].y = yy;
-			verts[4].z = 0;
-			verts[4].color = m_map_rgba(0, 0, 0, 0);
-			verts[5].x = xx;
-			verts[5].y = yy+hh/3;
-			verts[5].z = 0;
-			verts[5].color = m_map_rgba(0, 0, 0, 255);
-			
-			al_draw_prim(verts, 0, 0, 0, 6, ALLEGRO_PRIM_TRIANGLE_LIST);
-			
-			m_draw_rectangle(0, 0, BW, BH, al_map_rgba_f(0, 0, 0, 0.8f), M_FILLED);
-			
-			for (int i = 0; text[i][0]; i++) {
-				mTextout_simple(_t(text[i]), 5, 5+i*10, grey);
-			}
-			
-			if (first_frame) {
-				fadeIn(black);
-				first_frame = false;
-			}
-			else {
-				drawBufferToScreen();
-				m_flip_display();
-			}
-		}
-	}
-done:
-	m_destroy_bitmap(bg);
-
-	tguiPop();
-
-	fadeOut(black);
-}
-#endif
 
 static void hqm_menu(void)
 {
@@ -4122,7 +4125,8 @@ static void hqm_menu(void)
 	tguiSetFocus(buttons[3]);
 
 	bool first_frame = true;
-	bool nofade = false;
+
+	bool break_for_fade_after_draw = false;
 
 	clear_input_events();
 
@@ -4133,7 +4137,7 @@ static void hqm_menu(void)
 		logic_counter = 0;
 		if (tmp_counter > 10)
 			tmp_counter = 1;
-		while  (tmp_counter > 0) {
+		while  (!break_for_fade_after_draw && tmp_counter > 0) {
 			next_input_event_ready = true;
 
 			tmp_counter--;
@@ -4193,22 +4197,24 @@ static void hqm_menu(void)
 				}
 			}
 			else if (widget == buttons[3]) {
-				goto done;
+				break_for_fade_after_draw = true;
+				break;
 			}
 
 			INPUT_EVENT ie = get_next_input_event();
-			if ((use_dpad && ie.button2 == DOWN) || iphone_shaken(0.1)) {
-				nofade = true;
+			if (ie.button2 == DOWN || iphone_shaken(0.1)) {
 				use_input_event();
 				iphone_clear_shaken();
-				goto done;
+				break_for_fade_after_draw = true;
+				break;
 			}
 		}
 
-		if (draw_counter > 0) {
+		if (break_for_fade_after_draw || draw_counter > 0) {
 			draw_counter = 0;
 
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 		
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
@@ -4241,19 +4247,28 @@ static void hqm_menu(void)
 				WGT_TEXT_SQUARE_BORDER,
 				true
 			);
+			
+			drawBufferToScreen();
 	
 			if (first_frame) {
 				fadeIn(black);
 				first_frame = false;
 			}
 			else {
-				drawBufferToScreen();
+				if (break_for_fade_after_draw) {
+					break;
+				}
 				m_flip_display();
 			}
 		}
 	}
 
 done:
+
+	if (break_for_fade_after_draw) {
+		break_for_fade_after_draw = false;
+		fadeOut(black);
+	}
 
 	m_destroy_bitmap(bg);
 
@@ -4266,13 +4281,31 @@ done:
 
 	tguiPop();
 
-	if (!nofade) {
-		fadeOut(black);
-	}
-	
 	waitForRelease(4);
 	waitForRelease(5);
 	clear_input_events();
+}
+
+static void title_draw(MBITMAP *bg, bool first_frame)
+{
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
+
+	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
+
+	m_draw_bitmap(bg, 0, 0, 0);
+
+	tguiDraw();
+
+	mTextout(game_font, versionString,
+		BW-m_text_length(game_font, versionString)-1,
+		2, white, black, WGT_TEXT_SQUARE_BORDER, false);
+
+	drawBufferToScreen();
+
+	if (first_frame) {
+		fadeIn(black);
+	}
 }
 
 int title_menu(void)
@@ -4339,6 +4372,8 @@ int title_menu(void)
 
 	bool first_frame = true;
 	bool nofade = false;
+	
+	bool break_for_fade_after_draw = false;
 
 	clear_input_events();
 
@@ -4349,7 +4384,7 @@ int title_menu(void)
 		logic_counter = 0;
 		if (tmp_counter > 10)
 			tmp_counter = 1;
-		while  (tmp_counter > 0) {
+		while  (!break_for_fade_after_draw && tmp_counter > 0) {
 			next_input_event_ready = true;
 
 			tmp_counter--;
@@ -4363,11 +4398,13 @@ int title_menu(void)
 			for (int i = 0; i < curr_button; i++) {
 				if (widget == buttons[i]) {
 					selected = i;
-					goto done;
+					break_for_fade_after_draw = true;
+					break;
 				}
 			}
 
 			if (widget == hqm_button) {
+				title_draw(bg, false);
 				fadeOut(black);
 				first_frame = true;
 				tguiPush();
@@ -4377,6 +4414,8 @@ int title_menu(void)
 				tguiPop();
 			}
 			if (widget == config_button) {
+				title_draw(bg, false);
+				fadeOut(black);
 				first_frame = true;
 				tguiPush();
 				on_title_screen = false;
@@ -4385,7 +4424,8 @@ int title_menu(void)
 				tguiPop();
 				if (result == true) {
 					selected = 0xDEAD;
-					goto done;
+					break_for_fade_after_draw = true;
+					break;
 				}
 			}
 			break_main_loop = false; // AGAIN (SEE ABOVE)
@@ -4410,32 +4450,29 @@ int title_menu(void)
 			}
 		}
 
-		if (draw_counter > 0) {
+		if (break_for_fade_after_draw || draw_counter > 0) {
 			draw_counter = 0;
 
-			m_set_target_bitmap(buffer);
-		
-			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
+			title_draw(bg, first_frame);
 
-			m_draw_bitmap(bg, 0, 0, 0);
-
-			tguiDraw();
-
-			mTextout(game_font, versionString,
-				BW-m_text_length(game_font, versionString)-1,
-				2, white, black, WGT_TEXT_SQUARE_BORDER, false);
-	
 			if (first_frame) {
-				fadeIn(black);
 				first_frame = false;
+				continue;
 			}
-			else {
-				drawBufferToScreen();
-				m_flip_display();
+
+			if (break_for_fade_after_draw) {
+				break;
 			}
+
+			m_flip_display();
 		}
 	}
 done:
+
+	if (break_for_fade_after_draw) {
+		break_for_fade_after_draw = false;
+		fadeOut(black);
+	}
 
 	m_destroy_bitmap(bg);
 
@@ -4458,10 +4495,6 @@ done:
 	dpad_on();
 
 	tguiPop();
-
-	if (!nofade) {
-		fadeOut(black);
-	}
 
 	tguiEnableHotZone(true);
 
@@ -4677,7 +4710,8 @@ void debug_start(DEBUG_DATA *d)
 			d->area = std::string(area_names[area_list->getSelected()]);
 			break;
 		}
-		m_set_target_bitmap(buffer);
+		al_set_target_backbuffer(display);
+		//m_set_target_bitmap(buffer);
 		m_clear(m_map_rgb(0, 0, 0));
 
 		tguiDraw();
@@ -4710,7 +4744,8 @@ void debug_start(DEBUG_DATA *d)
 		if (w == button) {
 			break;
 		}
-		m_set_target_bitmap(buffer);
+		al_set_target_backbuffer(display);
+		//m_set_target_bitmap(buffer);
 		m_clear(m_map_rgb(0, 0, 0));
 
 		tguiDraw();
@@ -4951,7 +4986,8 @@ void debug_start(DEBUG_DATA *d)
 		if (w == button) {
 			break;
 		}
-		m_set_target_bitmap(buffer);
+		al_set_target_backbuffer(display);
+		//m_set_target_bitmap(buffer);
 		m_clear(m_map_rgb(0, 0, 0));
 
 		tguiDraw();

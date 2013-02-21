@@ -635,6 +635,28 @@ void m_destroy_bitmap(MBITMAP *bmp, bool internals_only)
 
 void m_flip_display(void)
 {
+	if (prompt_for_close_on_next_flip) {
+		bool hide = is_cursor_hidden();
+		show_mouse_cursor();
+		prompt_for_close_on_next_flip = false;
+		int r = triple_prompt("", "Really quit game or return to menu?", "", "Menu", "Quit", "Cancel", 2, true);
+		if (hide) {
+			hide_mouse_cursor();
+		}
+		if (r == 0) {
+			break_main_loop = true;
+		}
+		else if (r == 1) {
+			do_close_exit_game();
+		}
+	}
+
+	if (show_item_info_on_flip >= 0) {
+		int tmp = show_item_info_on_flip;
+		show_item_info_on_flip = -1;
+		showItemInfo(tmp, true);
+	}
+
 	al_flip_display();
 
 	if (controller_display)
@@ -644,6 +666,8 @@ void m_flip_display(void)
 		al_flip_display();
 		al_set_target_bitmap(target);
 	}
+
+	m_clear(black);
 
 	fps_frames++;
 	double elapsed = al_get_time() - fps_counter;
@@ -718,7 +742,9 @@ void m_set_target_bitmap(MBITMAP *bmp)
 
 void m_set_clip(int x1, int y1, int x2, int y2)
 {
-	al_set_clipping_rectangle(x1, y1, x2-x1, y2-y1);
+	int dx, dy, dw, dh;
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
+	al_set_clipping_rectangle(dx+x1*screenScaleX, dy+y1*screenScaleY, (x2-x1)*screenScaleX, (y2-y1)*screenScaleY);
 }
 
 
@@ -912,7 +938,7 @@ void m_pop_target_bitmap(void)
 void m_get_mouse_state(ALLEGRO_MOUSE_STATE *s)
 {
 	al_get_mouse_state(s);
-	if ((have_mouse || is_ipad()) && !config.getMaintainAspectRatio())
+	if (!config.getMaintainAspectRatio())
 		tguiConvertMousePosition(&s->x, &s->y, 0, 0, screen_ratio_x, screen_ratio_y);
 	else
 		tguiConvertMousePosition(&s->x, &s->y, screen_offset_x, screen_offset_y, 1, 1);
@@ -986,6 +1012,7 @@ void m_restore_blender(void)
 
 void m_draw_prim (const void* vtxs, const ALLEGRO_VERTEX_DECL* decl, MBITMAP* texture, int start, int end, int type)
 {
+/*
 #if !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
 #if defined __linux__
 	// work around for nvidia+gallium
@@ -998,7 +1025,8 @@ void m_draw_prim (const void* vtxs, const ALLEGRO_VERTEX_DECL* decl, MBITMAP* te
 	}
 #endif
 #endif
-#if defined ALLEGRO_RASPBERRYPI || defined ALLEGRO_ANDROID
+*/
+#if 1//defined ALLEGRO_RASPBERRYPI || defined ALLEGRO_ANDROID
 	if (type == ALLEGRO_PRIM_POINT_LIST) {
 		int n = end-start;
 		ALLEGRO_VERTEX *v = new ALLEGRO_VERTEX[n*6];
@@ -1175,3 +1203,36 @@ void m_draw_bitmap_region_to_self(MBITMAP *b, int sx, int sy, int sw, int sh, in
 	m_draw_bitmap_region(tmp, sx, sy, sw, sh, dx, dy, flags);
 	m_destroy_bitmap(tmp);
 }
+
+void m_draw_scaled_backbuffer(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, MBITMAP *dest)
+{
+	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
+	int old_format = al_get_new_bitmap_format();
+	al_set_new_bitmap_format(al_get_bitmap_format(al_get_backbuffer(display)));
+	MBITMAP *tmp = m_create_bitmap(sw, sh);
+	ALLEGRO_LOCKED_REGION *lr1 = al_lock_bitmap(tmp->bitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
+	ALLEGRO_LOCKED_REGION *lr2 = al_lock_bitmap_region(
+		al_get_backbuffer(display),
+		sx, sy, sw, sh,
+		ALLEGRO_PIXEL_FORMAT_ANY,
+		ALLEGRO_LOCK_READONLY
+	);
+	int pixel_size = al_get_pixel_size(al_get_bitmap_format(al_get_backbuffer(display)));
+	for (int y = 0; y < sh; y++) {
+		uint8_t *d1 = (uint8_t *)lr1->data + lr1->pitch * y;
+		uint8_t *d2 = (uint8_t *)lr2->data + lr2->pitch * y;
+		memcpy(d1, d2, pixel_size*sw);
+	}
+	al_unlock_bitmap(tmp->bitmap);
+	al_unlock_bitmap(al_get_backbuffer(display));
+	al_set_target_bitmap(dest->bitmap);
+	al_draw_scaled_bitmap(
+		tmp->bitmap,
+		0, 0, sw, sh,
+		dx, dy, dw, dh,
+		0
+	);
+	m_destroy_bitmap(tmp);
+	al_set_target_bitmap(old_target);
+}
+

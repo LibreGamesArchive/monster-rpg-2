@@ -558,7 +558,7 @@ static int NUM_GOBLINS;
 
 static int real_archery(int *accuracy_pts)
 {
-	hide_custom_cursor();
+	hide_mouse_cursor();
 
 	dpad_off();
 
@@ -606,7 +606,8 @@ static int real_archery(int *accuracy_pts)
 	al_set_mouse_xy(display, current_mouse_x, current_mouse_y);
 #endif
 	
-	m_set_target_bitmap(buffer);
+	//m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
 	m_clear(m_map_rgb(0, 0, 0));
 
 	playMusic("shmup2.ogg");
@@ -667,6 +668,8 @@ static int real_archery(int *accuracy_pts)
 
 	playPreloadedSample("bow_draw.ogg");
 
+	bool break_for_fade_after_draw = false;
+
 	clear_input_events();
 
 	while  (1) {
@@ -675,14 +678,12 @@ static int real_archery(int *accuracy_pts)
 		logic_counter = 0;
 		if (tmp_counter > 10)
 			tmp_counter = 1;
-		while  (tmp_counter > 0) {
+		while  (!break_for_fade_after_draw && tmp_counter > 0) {
 			next_input_event_ready = true;
 
 			tmp_counter--;
 			if (is_close_pressed()) {
-				show_custom_cursor();
 				do_close();
-				hide_custom_cursor();
 				close_pressed = false;
 			}
 			// WARNING
@@ -718,8 +719,8 @@ static int real_archery(int *accuracy_pts)
 			}
 
 			if (dead) {
-				fadeOut(black);
-				goto done;
+				break_for_fade_after_draw = true;
+				continue;
 			}
 
 			std::vector<Goblin>::iterator it;
@@ -845,12 +846,13 @@ static int real_archery(int *accuracy_pts)
 #endif
 		}
 
-		if (draw_counter > 0) {
+		if (break_for_fade_after_draw || draw_counter > 0) {
 			draw_counter = 0;
 
 			disable_zbuffer();
 			
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 
 			float yrot = (target_x / BW - 0.5f) * max_xrot;
 			float xrot = (target_y / BH - 0.5f) * max_yrot;
@@ -974,20 +976,31 @@ static int real_archery(int *accuracy_pts)
 			al_use_transform(&view_push);
 			al_set_projection_transform(display, &proj_push);
 
-			m_flip_display();
+			drawBufferToScreen();
 
 			if (really_done) {
-				fadeOut(black);
+				break_for_fade_after_draw = true;
+			}
+			
+			if (break_for_fade_after_draw) {
 				break;
 			}
+			
+			m_flip_display();
 		}
 	}
 
 done:
 
+	if (break_for_fade_after_draw) {
+		break_for_fade_after_draw = false;
+		fadeOut(black);
+	}
+
 	disable_zbuffer();
 	
-	m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
 
 	goblins.clear();
 
@@ -1009,7 +1022,7 @@ done:
 
 	dpad_on();
 
-	show_custom_cursor();
+	show_mouse_cursor();
 
 	if (break_main_loop) {
 		return 2;
@@ -1025,7 +1038,8 @@ bool archery(bool for_points)
 		anotherDoDialogue("Faelon: Here comes the horde! Let's have some fun!...\n", true);
 	}
 
-	m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
 	m_clear(m_map_rgb(0, 0, 0));
 
 	if (dpad_type != DPAD_TOTAL_1 && dpad_type != DPAD_TOTAL_2)
@@ -1163,11 +1177,12 @@ static MODEL *create_ring(int sd /* subdivisions */, MBITMAP *texture)
 
 void volcano_scene(void)
 {
-	hide_custom_cursor();
+	hide_mouse_cursor();
 
 	dpad_off();
 
-	m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
 	m_clear(m_map_rgb(0, 0, 0));
 
 	enum {
@@ -1297,19 +1312,14 @@ void volcano_scene(void)
 					loadPlayDestroy("staff_poof.ogg");
 				}
 			}
-			else if (stage == STAGE_POOFING) {
-				ring_z += ring_z_delta * LOGIC_MILLIS;
-				if (count > 5000) {
-					goto done;
-				}
-			}
 		}
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
 
 			disable_zbuffer();
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
@@ -1328,7 +1338,7 @@ void volcano_scene(void)
 
 			drawBufferToScreen(false);
 
-			al_set_target_backbuffer(display);
+			//al_set_target_backbuffer(display);
 			
 			clear_zbuffer();
 
@@ -1401,10 +1411,19 @@ void volcano_scene(void)
 			device->SetViewport(&old);
 #endif
 			
+			if (stage == STAGE_POOFING) {
+				ring_z += ring_z_delta * LOGIC_MILLIS;
+				if (count > 5000) {
+					goto done;
+				}
+			}
+
 			m_flip_display();
 		}
 	}
 done:
+
+	fadeOut(black);
 
 #if defined A5_OGL
 	disable_cull_face();
@@ -1430,5 +1449,5 @@ done:
 
 	dpad_on();
 
-	show_custom_cursor();
+	show_mouse_cursor();
 }

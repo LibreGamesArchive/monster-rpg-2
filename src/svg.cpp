@@ -100,6 +100,10 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 
 	int diagram_w = scale*diagram->width;
 	int diagram_h = scale*diagram->height;
+	
+	int cx, cy, cw, ch;
+	al_get_clipping_rectangle(&cx, &cy, &cw, &ch);
+	al_set_clipping_rectangle(0, 0, al_get_display_width(display), al_get_display_height(display));
 
 #ifdef A5_D3D
 	IDirect3DDevice9 *dev = al_get_d3d_device(display);
@@ -403,6 +407,10 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 		al_use_transform(&old_view_transform);
 		al_set_target_bitmap(old_target);
 	}
+
+	al_clear_to_color(al_map_rgb_f(0, 0, 0));
+
+	al_set_clipping_rectangle(cx, cy, cw, ch);
 
 	return out;
 }

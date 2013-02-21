@@ -730,31 +730,24 @@ public:
 		chooser->setSelected(sel);
 		sel.clear();
 
-		if (have_mouse) {
-			applyFrame = new MFrame(BW/3-20, 110+(50/2)-6-5, 112, 22, true);
-			applyButton = new MTextButton(BW/3-20+6, 110+(50/2)-6+2,
-									 "Apply");
-		}
+		applyFrame = new MFrame(BW/3-20, 110+(50/2)-6-5, 112, 22, true);
+		applyButton = new MTextButton(BW/3-20+6, 110+(50/2)-6+2, "Apply");
 
 		clear_input_events();
 
 		tguiSetParent(0);
 		tguiAddWidget(chooser);
-		if (have_mouse) {
-			tguiAddWidget(applyFrame);
-			tguiAddWidget(applyButton);
-		}
+		tguiAddWidget(applyFrame);
+		tguiAddWidget(applyButton);
 		tguiSetFocus(chooser);
 	}
 
 	virtual ~ChooseTargetHandler(void) {
 		tguiDeleteWidget(chooser);
-		if (have_mouse) {
-			tguiDeleteWidget(applyFrame);
-			tguiDeleteWidget(applyButton);
-			delete applyFrame;
-			delete applyButton;
-		}
+		tguiDeleteWidget(applyFrame);
+		tguiDeleteWidget(applyButton);
+		delete applyFrame;
+		delete applyButton;
 		delete chooser;
 		points.clear();
 	}
@@ -789,7 +782,8 @@ ActionHandler *AttackHandler::act(int step, Battle *b)
 			loadPlayDestroy("ching.ogg");
 			win = false;
 		}
-		m_set_target_bitmap(buffer);
+		al_set_target_backbuffer(display);
+		//m_set_target_bitmap(buffer);
 		m_draw_bitmap(bmp, 0, 0, 0);
 		dpad_off();
 		drawBufferToScreen();
@@ -1440,7 +1434,7 @@ void CombatPlayer::draw(void)
 	}
 	else {
 		if (battle->isInWater())
-			al_set_clipping_rectangle(0, cy, BW, ch);
+			m_set_clip(0, cy, BW, cy+ch);
 
 		MBITMAP *b = animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 		draw_shadow(b, x, y, location == LOCATION_LEFT);
@@ -1476,7 +1470,7 @@ void CombatPlayer::draw(void)
 		}
 
 		if (battle->isInWater())
-			al_set_clipping_rectangle(cx, cy, cw, ch);
+			m_set_clip(cx, cy, cx+cw, cy+ch);
 
 		if (use_programmable_pipeline) {
 			al_set_shader(display, brighten);
@@ -1580,7 +1574,7 @@ void CombatPlayer::draw(void)
 		}
 		else {
 			if (battle->isInWater())
-				al_set_clipping_rectangle(cx, cy, cw, ch);
+				m_set_clip(cx, cy, cx+cw, cy+ch);
 			animSet->draw(x-(w/2), y-h, flags);
 			if (battle->isInWater())
 				al_set_clipping_rectangle(savex, savey, savew, saveh);

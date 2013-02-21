@@ -10,8 +10,8 @@ void m_draw_precise_line(MBITMAP *bmp, float x1, float y1, float x2, float y2, M
 
 void fadeIn(MCOLOR color);
 void fadeOut(MCOLOR color);
-bool transitionIn(bool can_cancel = false, bool toggle_dpad = true, float scale = 1.0f);
-void transitionOut(bool toggle_dpad = true, float scale = 1.0f);
+bool transitionIn(bool can_cancel = false, bool toggle_dpad = true);
+void transitionOut(bool toggle_dpad = true);
 void battleTransition(void);
 
 void addOmnipotentText(std::string text, int cx, int cy, MCOLOR color);

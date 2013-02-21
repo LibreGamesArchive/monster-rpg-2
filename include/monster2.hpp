@@ -316,7 +316,8 @@ extern bool was_in_map;
 
 extern bool global_can_save;
 
-extern void do_close(bool quit = true);
+void do_close(bool quit = true);
+void do_close_exit_game();
 
 //extern std::vector<std::pair<int, bool> > forced_milestones;
 extern bool gonna_fade_in_red;
@@ -331,9 +332,13 @@ void connect_airplay_controls(void);
 void disconnect_airplay_controls(void);
 void clear_touches();
 
+void main_draw(bool draw_cursor = true);
+
 extern bool dont_draw_now;
 
 extern bool mouse_in_display;
+
+extern bool prompt_for_close_on_next_flip;
 
 #ifdef ALLEGRO_ANDROID
 extern bool halted;
@@ -341,4 +346,3 @@ extern bool switched_in;
 #endif
 
 #endif
-

@@ -760,7 +760,8 @@ static int CDoDialogue(lua_State *stack)
 
 		if (draw_counter) {
 			draw_counter = 0;
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			MCOLOR color = black;
 			m_clear(color);
 			/* draw the Area */
@@ -872,7 +873,8 @@ static int CDoShakeDialogue(lua_State *stack)
 		
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			m_set_target_bitmap(buffer);
+			//m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
 			MCOLOR color = black;
 			m_clear(color);
 			/* draw the Area */
@@ -895,7 +897,7 @@ static int CDoShakeDialogue(lua_State *stack)
 
 
 // returns true if shaken
-bool anotherDoDialogue(const char *text, bool clearbuf, bool top)
+bool anotherDoDialogue(const char *text, bool clearbuf, bool top, bool draw_area)
 {
 	bool ret = false;
 
@@ -905,12 +907,22 @@ bool anotherDoDialogue(const char *text, bool clearbuf, bool top)
 
 	doDialogue(textS, top, 4, 10, false);
 
+	if (area && draw_area) {
+		al_set_target_backbuffer(display);
+		area->draw();
+		hide_mouse_cursor();
+		drawBufferToScreen();
+		hide_mouse_cursor();
+	}
+
 	int flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 	MBITMAP *tmp = m_create_bitmap(BW, BH); // check
 	al_set_new_bitmap_flags(flags);
-	m_set_target_bitmap(tmp);
-	m_draw_bitmap(buffer, 0, 0, 0);
+	//m_draw_bitmap(buffer, 0, 0, 0);
+	int dx, dy, dw, dh;
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW, BH, tmp);
 	
 	clear_input_events();
 
@@ -951,7 +963,8 @@ bool anotherDoDialogue(const char *text, bool clearbuf, bool top)
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			if (clearbuf) {
 				m_clear(black);
 			}
@@ -1280,6 +1293,9 @@ static int CStartBattle(lua_State *stack)
 	
 	debug_message("battle->start called\n");
 
+	al_set_target_backbuffer(display);
+	area->draw();
+	drawBufferToScreen();
 	battleTransition();
 
 	clear_input_events();
@@ -1305,7 +1321,8 @@ static int CInBattle(lua_State *stack)
 
 static int CDrawArea(lua_State *stack)
 {
-	m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
 	area->draw();
 	return 0;
 }
@@ -1338,7 +1355,8 @@ static int CClearBuffer(lua_State *stack)
 	int b = (int)lua_tonumber(stack, 3);
 	
 	ALLEGRO_BITMAP *oldTarget = al_get_target_bitmap();
-	m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
 	m_clear(m_map_rgb(r, g, b));
 	al_set_target_bitmap(oldTarget);
 
@@ -1349,7 +1367,8 @@ static int CClearBuffer(lua_State *stack)
 
 static int CSetBufferTarget(lua_State *stack)
 {
-	m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
 
 	return 0;
 }
@@ -1656,6 +1675,7 @@ static int CDoShop(lua_State *stack)
 		costs[i] = cost;
 	}
 
+	main_draw();
 	fadeOut(black);
 
 	static char buf[100];
@@ -2656,6 +2676,13 @@ static int CRest(lua_State *stack)
 }
 
 
+static int CDrawBufferToScreen(lua_State *stack)
+{
+	drawBufferToScreen();
+	return 0;
+}
+
+
 static int CFlip(lua_State *stack)
 {
 	drawBufferToScreen();
@@ -2707,6 +2734,9 @@ static int CGiveGold(lua_State *stack)
 static int CGameOver(lua_State *stack)
 {
 	if (saveFilename) saveTime(saveFilename);
+	al_set_target_backbuffer(display);
+	al_clear_to_color(al_map_rgb_f(1, 0, 0));
+	drawBufferToScreen();
 	fadeOut(m_map_rgb(255, 0, 0));
 	break_main_loop = true;
 	return 0;
@@ -2888,24 +2918,32 @@ static int CDoItemTutorial(lua_State *stack)
 	tguiAddWidget(itemSelector);
 	tguiSetFocus(partySelectorTop);
 
-	m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
 	tguiDraw();
 	drawBufferToScreen();
 	m_flip_display();
 
-	#define DLG(t, c) anotherDoDialogue(t, c, !c)
+	MBITMAP *tmp;
+
+	#define DLG(t, c) \
+		al_set_target_backbuffer(display); \
+		m_clear(black); \
+		tguiDraw(); \
+		hide_mouse_cursor(); \
+		drawBufferToScreen(); \
+		show_mouse_cursor(); \
+		anotherDoDialogue(t, c, !c, false)
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (true) {
 #else
 	if (use_dpad) {
 #endif
-		if (DLG("This is the inventory screen.\nFirst let's equip an item.\nMove to the sword in the bottom pane and select it by pressing twice.\n", false))
-			{ if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }}
+		DLG("This is the inventory screen.\nFirst let's equip an item.\nMove to the sword in the bottom pane and select it by pressing twice.\n", false);
 	}
 	else {
-		if (DLG("This is the inventory screen.\nFirst let's equip an item.\nDrag the sword into the player selector at the top.\n", false))
-			{ if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }}
+		DLG("This is the inventory screen.\nFirst let's equip an item.\nDrag the sword into the player selector at the top.\n", false);
 	}
 
 	clear_input_events();
@@ -2944,14 +2982,10 @@ static int CDoItemTutorial(lua_State *stack)
 						inventory[sel].quantity = 0;
 					}
 					else if (sel < 0) {
-						if (prompt("Really exit", "tutorial?", 0, 1))
-						{ ret = true; goto done; }
 						itemSelector->setSelected(0);
 					}
 				}
 				else if (widget == partySelectorTop && partySelectorTop->getSelected() == -1) {
-					if (prompt("Really exit", "tutorial?", 0, 1))
-					{ ret = true; goto done; }
 					partySelectorTop->setSelected(0);
 				}
 				if (player->getInfo().equipment.rhand != -1) {
@@ -2961,26 +2995,20 @@ static int CDoItemTutorial(lua_State *stack)
 #else
 					if (use_dpad) {
 #endif
-						if (DLG("Excellent!\nNow let's learn how to un-equip an item.\nMove to the top frame, press the action button, then move to and select the sword.\n", false))
-							{ if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }}
+						DLG("Excellent!\nNow let's learn how to un-equip an item.\nMove to the top frame, press the action button, then move to and select the sword.\n", false);
 					}
 					else {
-						if (DLG("Excellent!\nNow let's learn how to un-equip an item.\nDrag the sword from the top frame to the bottom frame.\n", false))
-							{ if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }}
+						DLG("Excellent!\nNow let's learn how to un-equip an item.\nDrag the sword from the top frame to the bottom frame.\n", false);
 					}
-								}
+				}
 			}
 			else if (stage == 1) {
 				if (widget == itemSelector && itemSelector->getSelected() == -1) {
-					if (prompt("Really exit", "tutorial?", 0, 1))
-					{ ret = true; goto done; }
 					itemSelector->setSelected(0);
 				}
 				else if (widget == partySelectorTop) {
 					int sel = partySelectorTop->getSelected();
 					if (sel == -1) {
-						if (prompt("Really exit", "tutorial?", 0, 1))
-						{ ret = true; goto done; }
 						partySelectorTop->setSelected(0);
 					}
 					else if (sel != MAX_PARTY) {
@@ -2999,9 +3027,9 @@ static int CDoItemTutorial(lua_State *stack)
 							player->getInfo().equipment.rquantity = 0;
 							stage++;
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-							if (DLG("Great!\nNow I will show you how to use some other basic items...\nYou use an item just like you use a weapon...\nDrag the Cure to your player at the top to use it.\nYou can also press and hold an item name to get a description.\n", false)) { if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }}
+							DLG("Great!\nNow I will show you how to use some other basic items...\nYou use an item just like you use a weapon...\nDrag the Cure to your player at the top to use it.\nYou can also press and hold an item name to get a description.\n", false);
 #else
-							if (DLG("Great!\nNow I will show you how to use some other basic items...\nYou use an item just like you use a weapon...\nDrag the Cure to your player at the top to use it.\nYou can also press button 3 (default \"V\") to get a description.\n", false)) { if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }}
+							DLG("Great!\nNow I will show you how to use some other basic items...\nYou use an item just like you use a weapon...\nDrag the Cure to your player at the top to use it.\nYou can also press button 3 (default \"V\") to get a description.\n", false);
 #endif
 							inventory[0].index = CURE_INDEX;
 							inventory[0].quantity = 1;
@@ -3018,9 +3046,9 @@ static int CDoItemTutorial(lua_State *stack)
 								player->getInfo().equipment.rhand = -1;
 								player->getInfo().equipment.rquantity = 0;
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-								if (DLG("Great!\nNow I will show you how to use some other basic items...\nYou use an item just like you use a weapon...\nPress twice on the Cure to use it.\nYou can also press and hold an item name to get a description.\n", false)) { if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }}
+								DLG("Great!\nNow I will show you how to use some other basic items...\nYou use an item just like you use a weapon...\nPress twice on the Cure to use it.\nYou can also press and hold an item name to get a description.\n", false);
 #else
-								if (DLG("Great!\nNow I will show you how to use some other basic items...\nYou use an item just like you use a weapon...\nPress twice on the Cure to use it.\nYou can also press button 3 (default \"V\") to get a description.\n", false)) { if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }}
+								DLG("Great!\nNow I will show you how to use some other basic items...\nYou use an item just like you use a weapon...\nPress twice on the Cure to use it.\nYou can also press button 3 (default \"V\") to get a description.\n", false);
 #endif
 								inventory[0].index = CURE_INDEX;
 								inventory[0].quantity = 1;
@@ -3054,23 +3082,19 @@ static int CDoItemTutorial(lua_State *stack)
 #else
 						if (use_dpad) {
 #endif
-							if (DLG("Ok, you're almost done.\nLet's try one battle just to get our feet wet...\nAttacking works by moving to an arrow next to the enemy you wish to attack.\nThen you press the action button.\nUsing items works the same way.\nYou have several other options in battle... Play around with them to make yourself familiar!\n", false)) { if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }}
+							DLG("Ok, you're almost done.\nLet's try one battle just to get our feet wet...\nAttacking works by moving to an arrow next to the enemy you wish to attack.\nThen you press the action button.\nUsing items works the same way.\nYou have several other options in battle... Play around with them to make yourself familiar!\n", false);
 						}
 						else {
-							if (DLG("Ok, you're almost done.\nLet's try one battle just to get our feet wet...\nAttacking works by pressing an arrow next to the enemy you wish to attack.\nThen you draw an invisible line in the direction of the arrow.\nUsing items works the same way.\nYou have several other options in battle... Play around with them to make yourself familiar!\n", false)) { if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }}
-							if (DLG("Remember, draw an invisible line in the direction of the arrows to perform an action!\nThat includes attacking, using items, casting spells, etc.\nHere we go!\n", false)) { if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }}
+							DLG("Ok, you're almost done.\nLet's try one battle just to get our feet wet...\nAttacking works by pressing an arrow next to the enemy you wish to attack.\nThen you draw an invisible line in the direction of the arrow.\nUsing items works the same way.\nYou have several other options in battle... Play around with them to make yourself familiar!\n", false);
+							DLG("Remember, draw an invisible line in the direction of the arrows to perform an action!\nThat includes attacking, using items, casting spells, etc.\nHere we go!\n", false);
 						}
 											goto done;
 					}
 					else if (sel < 0) {
-						if (prompt("Really exit", "tutorial?", 0, 1))
-						{ ret = true; goto done; }
 						itemSelector->setSelected(0);
 					}
 				}
 				else if (widget == partySelectorTop && partySelectorTop->getSelected() == -1) {
-					if (prompt("Really exit", "tutorial?", 0, 1))
-					{ ret = true; goto done; }
 					partySelectorTop->setSelected(0);
 				}
 			}
@@ -3078,7 +3102,8 @@ static int CDoItemTutorial(lua_State *stack)
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			m_clear(black);
 			tguiDraw();
 			
@@ -3113,6 +3138,7 @@ done:
 	dpad_on();
 	
 	return 1;
+#undef DLG
 }
 
 static int CStartsWithVowel(lua_State *stack)
@@ -3144,23 +3170,27 @@ static int CDoMapTutorial(lua_State *stack)
 	tguiAddWidget(mapWidget);
 	tguiSetFocus(mapWidget);
 
-	m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
 	tguiDraw();
 	drawBufferToScreen();
 	m_flip_display();
-
+	tguiDraw();
+	hide_mouse_cursor();
+	drawBufferToScreen();
+	show_mouse_cursor();
 	
-	#define DLG(t, c) anotherDoDialogue(t, c, !c)
+	#define DLG(t, c, draw_area) anotherDoDialogue(t, c, !c, draw_area)
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (true) {
 #else
 	if (use_dpad) {
 #endif
-		if (DLG("Each area on the map has branches coming off of it.\nUse the arrows to move between areas. If you press on the icon with the arrow, you will enter that area.\nMove the cursor to Seaside town and then press the action button.\n", false))  { if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }};
+		DLG("Each area on the map has branches coming off of it.\nUse the arrows to move between areas. If you press on the icon with the arrow, you will enter that area.\nMove the cursor to Seaside town and then press the action button.\n", false, false);
 	}
 	else {
-		if (DLG("Each area on the map has branches coming off of it.\nPress an icon to move in that direction. If you press on the icon with the arrow, you will enter that area.\nMove the cursor to Seaside town and then press the icon.\n", false))  { if (prompt("Really exit", "tutorial?", 0, 1)) { ret = true; goto done; }};
+		DLG("Each area on the map has branches coming off of it.\nPress an icon to move in that direction. If you press on the icon with the arrow, you will enter that area.\nMove the cursor to Seaside town and then press the icon.\n", false, false);
 	}
 
 
@@ -3200,16 +3230,13 @@ static int CDoMapTutorial(lua_State *stack)
 
 			if (iphone_shaken(0.1)) {
 				iphone_clear_shaken();
-				if (prompt("Really exit", "tutorial?", 0, 1)) {
-					ret = true;
-					goto done;
-				}
 			}
 		}
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			MCOLOR color = black;
 			m_clear(color);
 			// Draw the GUI
@@ -3236,7 +3263,8 @@ done:
 
 	dpad_on();
 
-	m_set_target_bitmap(buffer);
+	al_set_target_backbuffer(display);
+	//m_set_target_bitmap(buffer);
 	m_clear(black);
 	area->draw();
 	drawBufferToScreen();
@@ -3369,7 +3397,8 @@ static int CDoKingKingAlbertLook(lua_State *stack)
 		
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			m_draw_bitmap(bmp, 0, 0, 0);
 			tguiDraw();
 			drawBufferToScreen();
@@ -3483,7 +3512,8 @@ static int CDoKeepLook(lua_State *stack)
 		if (draw_counter > 0) {
 			draw_counter = 0;
 
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 			m_draw_bitmap(bmp, 0, 0, 0);
 			if (show_shine) {
 				m_save_blender();
@@ -4242,6 +4272,9 @@ void registerCFunctions(lua_State* luaState)
 
 	lua_pushcfunction(luaState, CRest);
 	lua_setglobal(luaState, "rest");
+
+	lua_pushcfunction(luaState, CDrawBufferToScreen);
+	lua_setglobal(luaState, "drawBufferToScreen");
 
 	lua_pushcfunction(luaState, CFlip);
 	lua_setglobal(luaState, "flip");

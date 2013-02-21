@@ -642,6 +642,9 @@ BattleResult Battle::update(int step)
 
 	if (running && messages.size() <= 0) {
 		storeStats(false);
+		al_set_target_backbuffer(display);
+		draw();
+		drawBufferToScreen();
 		fadeOut(black);
 		return BATTLE_PLAYER_RUN;
 	}
@@ -650,11 +653,17 @@ BattleResult Battle::update(int step)
 		playersAllDeadCount += step;
 		if (playersAllDeadCount > 2000) {
 			debug_message("player loses\n");
+			al_set_target_backbuffer(display);
+			draw();
+			drawBufferToScreen();
 			fadeOut(m_map_rgb(255, 0, 0));
 			if (name != "first_battle" && name != "2Statues" && !manChooser && !(area && area->getName() == "tutorial")) {
-				m_set_target_bitmap(buffer);
+				al_set_target_backbuffer(display);
 				m_clear(m_map_rgb(255, 0, 0));
-				anotherDoDialogue("You were defeated in battle...\nRestore your game and save the world!\n", false, true);
+				hide_mouse_cursor();
+				drawBufferToScreen();
+				show_mouse_cursor();
+				anotherDoDialogue("You were defeated in battle...\nRestore your game and save the world!\n", false, true, false);
 			}
 			return BATTLE_ENEMY_WIN;
 		}
@@ -705,6 +714,9 @@ BattleResult Battle::update(int step)
 			else {
 				// Keep battle stats
 				storeStats(true);
+				al_set_target_backbuffer(display);
+				draw();
+				drawBufferToScreen();
 				fadeOut(black);
 				return BATTLE_PLAYER_WIN;
 			}

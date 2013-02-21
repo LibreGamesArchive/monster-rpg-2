@@ -5,8 +5,6 @@
 
 #include <sys/stat.h>
 
-#include <set>
-
 static bool compare_node_pointer(Node *n1, Node *n2)
 {
 	return n1->TotalCost < n2->TotalCost;
@@ -1336,7 +1334,8 @@ void Area::draw(int bw, int bh)
 			m_draw_rectangle(x1, y2, x2, y2+BH, black, M_FILLED);
 			// draw circle
 			m_draw_bitmap(orb_bmp, x1, y1, 0);
-			m_set_target_bitmap(buffer);
+			al_set_target_backbuffer(display);
+			//m_set_target_bitmap(buffer);
 		}
 		else {
 			m_draw_rectangle(0, 0, BW, BH, black, M_FILLED);
@@ -1416,11 +1415,10 @@ void real_auto_save_game(bool save_ss)
 	memory_saved = true;
 
 	if (save_ss) {
-		m_push_target_bitmap();
-		m_set_target_bitmap(screenshot);
-		m_draw_scaled_bitmap(buffer, 0, 0, BW, BH, 0, 0,
-				BW/2, BH/2, 0, 255);
-		m_pop_target_bitmap();
+		int dx, dy, dw, dh;
+		get_screen_offset_size(&dx, &dy, &dw, &dh);
+		//m_draw_scaled_bitmap(buffer, 0, 0, BW, BH, 0, 0,
+		m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW/2, BH/2, screenshot);
 	}
 }
 	

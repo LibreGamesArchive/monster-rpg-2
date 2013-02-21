@@ -134,8 +134,6 @@ int height_before_fullscreen = 0;
 int config_save_width = 0;
 int config_save_height = 0;
 
-bool have_mouse;
-
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 bool do_pause_game = false;
 #endif
@@ -164,6 +162,8 @@ int NO_PRESERVE_TEXTURE = ALLEGRO_NO_PRESERVE_TEXTURE;
 bool reload_translation = false;
 static std::string replayMusicName = "";
 
+static bool have_mouse = false;
+
 bool do_toggle_fullscreen = false;
 
 // cheats
@@ -191,9 +191,9 @@ ALLEGRO_SHADER *warp;
 ALLEGRO_SHADER *shadow_shader;
 ALLEGRO_SHADER *brighten;
 ALLEGRO_SHADER *scale2x;
-MBITMAP *buffer = 0;
-MBITMAP *overlay = 0;
-MBITMAP *scaleXX_buffer = 0;
+//MBITMAP *buffer = 0;
+//MBITMAP *overlay = 0;
+//MBITMAP *scaleXX_buffer = 0;
 MBITMAP *screenshot = 0;
 MBITMAP *tilemap = 0;
 bool *tileTransparent = 0;
@@ -284,6 +284,8 @@ bool switched_out = false;
 uint32_t my_opengl_version;
 
 static MBITMAP *custom_mouse_cursor_saved = NULL;
+MBITMAP *custom_mouse_patch = NULL;
+int mouse_patch_x, mouse_patch_y;
 int custom_cursor_w, custom_cursor_h;
 MBITMAP *custom_mouse_cursor = NULL;
 
@@ -336,6 +338,7 @@ void load_fonts(void)
 	load_translation(get_language_name(config.getLanguage()).c_str());
 }
 
+/*
 void get_buffer_true_size(int *buffer_true_w, int *buffer_true_h)
 {
 #ifdef A5_OGL
@@ -344,6 +347,7 @@ void get_buffer_true_size(int *buffer_true_w, int *buffer_true_h)
 	al_get_d3d_texture_size(buffer->bitmap, buffer_true_w, buffer_true_h);
 #endif
 }
+*/
 
 static void create_shadows(MBITMAP *bmp, RecreateData *data)
 {
@@ -949,17 +953,20 @@ void init_shaders(void)
 		"uniform float y1;\n"
 		"uniform float x2;\n"
 		"uniform float y2;\n"
+		"uniform float BH;\n"
+		"uniform float BW;\n"
+		"uniform float radius;\n"
 		"void main() {\n"
 		// rx, ry is the closest point to gl_FragCoord on the rectangle
 		"   float rx, ry;\n"
 		"   float dx, dy;\n"
-		"   float frag_y = (160.0-1.0) - gl_FragCoord.y;\n"
+		"   float frag_y = (BH-1.0) - gl_FragCoord.y;\n"
 		"   rx = clamp(gl_FragCoord.x, x1, x2);\n"
 		"   ry = clamp(frag_y, y1, y2);\n"
 		"   dx = gl_FragCoord.x - rx;\n"
 		"   dy = frag_y - ry;\n"
-		"   float dist = clamp(sqrt(dx*dx + dy*dy), 0.0, 10.0);\n"
-		"   float alpha = 1.0 - (dist / 10.0);\n"
+		"   float dist = clamp(sqrt(dx*dx + dy*dy), 0.0, radius);\n"
+		"   float alpha = 1.0 - (dist / radius);\n"
 		"   gl_FragColor = vec4(0.0, 0.0, 0.0, alpha);\n"
 		"}\n";
 		
@@ -1178,6 +1185,7 @@ void init_shaders(void)
 void init2_shaders(void)
 {
 	if (use_programmable_pipeline) {
+		/*
 		int buffer_true_w, buffer_true_h;
 		get_buffer_true_size(&buffer_true_w, &buffer_true_h);
 
@@ -1186,17 +1194,18 @@ void init2_shaders(void)
 		al_set_shader_float(scale2x, "offset_x", 1);
 		al_set_shader_float(scale2x, "offset_y", 0);
 		al_set_shader_sampler(scale2x, "tex", scaleXX_buffer->bitmap, 0);
+		*/
 		
 		al_set_shader_bool(default_shader, "use_tex_matrix", false);
 		al_set_shader_bool(tinter, "use_tex_matrix", false);
 		al_set_shader_bool(warp, "use_tex_matrix", false);
 		al_set_shader_bool(shadow_shader, "use_tex_matrix", false);
 		al_set_shader_bool(brighten, "use_tex_matrix", false);
-		al_set_shader_bool(scale2x, "use_tex_matrix", false);
+		//al_set_shader_bool(scale2x, "use_tex_matrix", false);
 		
 #ifndef A5_OGL
-		al_set_shader_float(warp, "cx", ((float)BW/buffer_true_w)/2);
-		al_set_shader_float(warp, "cy", ((float)BH/buffer_true_h)/2);
+		//al_set_shader_float(warp, "cx", ((float)BW/buffer_true_w)/2);
+		//al_set_shader_float(warp, "cy", ((float)BH/buffer_true_h)/2);
 #endif
 	}	
 }
@@ -1230,12 +1239,13 @@ static void draw_loading_screen(MBITMAP *tmp, int percent, ScreenDescriptor *sd)
 	dot_loader->draw(118, 24, 0);
 	al_set_target_backbuffer(display);
 	m_clear(black);
-	m_draw_scaled_bitmap(tmp, 0, 0, BH, BW, 0, 0, (float)sd->height/BW*BH, sd->height, 0);
+	m_draw_scaled_bitmap(tmp, 0, 0, BH, BW, 0, 0, BH*BH/BW, BH, 0);
 	m_flip_display();
 }
 
 void create_buffers(void)
 {
+/*
 	ALLEGRO_DEBUG("destroying old buffers\n");
 	if (buffer)
 		m_destroy_bitmap(buffer);
@@ -1252,6 +1262,7 @@ void create_buffers(void)
 	ALLEGRO_DEBUG("creating overlay\n");
 	overlay = m_create_bitmap(BW, BH); // check
 	al_set_new_bitmap_flags(flags);
+*/
 }
 
 // FIXME FIXME FIXME FIXME FIXME
@@ -1448,9 +1459,6 @@ bool init(int *argc, char **argv[])
 
 
 	have_mouse = al_install_mouse();
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	have_mouse = false;
-#endif
 	
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_install_touch_input();
@@ -1568,7 +1576,7 @@ bool init(int *argc, char **argv[])
 	touch_mutex = al_create_mutex();
 
 	// Android because it's very slow switching back in on some devices
-#if defined A5_D3D /*|| defined ALLEGRO_ANDROID*/ || defined ALLEGRO_RASPBERRYPI
+#if defined A5_D3D || defined ALLEGRO_RASPBERRYPI
 	use_fixed_pipeline = true;
 #endif
 	
@@ -1661,6 +1669,28 @@ bool init(int *argc, char **argv[])
 	sd->height = al_get_display_height(display);
 #endif
 	
+#ifdef A5_OGL
+	if (use_fixed_pipeline) {
+		my_opengl_version = 0x01;
+	}
+	else {
+		my_opengl_version = al_get_opengl_version();
+	}
+#else
+	my_opengl_version = 0x0;
+#endif
+
+	if (use_fixed_pipeline) {
+		use_programmable_pipeline = false;
+	}
+	else {
+		use_programmable_pipeline = al_get_display_flags(display) & ALLEGRO_USE_PROGRAMMABLE_PIPELINE;
+	}
+
+	ALLEGRO_DEBUG("initing shaders");
+
+	init_shaders();
+
 #ifdef ALLEGRO_IPHONE
 	al_init_user_event_source(&user_event_source);
 #endif
@@ -1700,8 +1730,9 @@ bool init(int *argc, char **argv[])
 	custom_mouse_cursor_saved = m_load_bitmap(getResource("media/mouse_cursor.png"));
 	custom_cursor_w = m_get_bitmap_width(custom_mouse_cursor_saved);
 	custom_cursor_h = m_get_bitmap_height(custom_mouse_cursor_saved);
+	custom_mouse_patch = m_create_bitmap(custom_cursor_w, custom_cursor_h);
 	al_hide_mouse_cursor(display);
-	show_custom_cursor();
+	show_mouse_cursor();
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (sd->fullscreen) {
@@ -1710,29 +1741,9 @@ bool init(int *argc, char **argv[])
 	}
 #endif
 
-	al_set_mouse_xy(display, al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor_saved->bitmap)-20, al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor_saved->bitmap)-20);
-
-#ifdef A5_OGL
-	if (use_fixed_pipeline) {
-		my_opengl_version = 0x01;
-	}
-	else {
-		my_opengl_version = al_get_opengl_version();
-	}
-#else
-	my_opengl_version = 0x0;
-#endif
-
-	if (use_fixed_pipeline) {
-		use_programmable_pipeline = false;
-	}
-	else {
-		use_programmable_pipeline = al_get_display_flags(display) & ALLEGRO_USE_PROGRAMMABLE_PIPELINE;
-	}
-
-	ALLEGRO_DEBUG("initing shaders");
-
-	init_shaders();
+	int mousex = al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor_saved->bitmap)-20;
+	int mousey = al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor_saved->bitmap)-20;
+	al_set_mouse_xy(display, mousex, mousey);
 
 	ALLEGRO_DEBUG("done initing shaders");
 
@@ -1798,9 +1809,9 @@ bool init(int *argc, char **argv[])
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 #endif
 
-	ALLEGRO_DEBUG("creating buffers\n");
+	//ALLEGRO_DEBUG("creating buffers\n");
 
-	create_buffers();
+	//create_buffers();
 
 	ALLEGRO_DEBUG("creating screenshot buffer\n");
 
@@ -1810,10 +1821,12 @@ bool init(int *argc, char **argv[])
 	al_set_new_bitmap_flags(flags);
 
 	if (use_programmable_pipeline) {
+		/*
 		int flags = al_get_new_bitmap_flags();
 		al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE);
 		scaleXX_buffer = m_create_bitmap(BW*2, BH*2); // check
 		al_set_new_bitmap_flags(flags);
+		*/
 	}
 
 	ALLEGRO_DEBUG("initing shader variables\n");
@@ -1827,10 +1840,12 @@ bool init(int *argc, char **argv[])
 #else
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 #endif
-	
+
+	/*
 	if (!buffer) {
 		native_error("Failed to create buffer.");
 	}
+	*/
 
 	config.setFilterType(config.getFilterType());
 	
@@ -1956,7 +1971,7 @@ bool init(int *argc, char **argv[])
 	debug_message("Loading icons\n");
 	icon_bmp = m_load_bitmap_redraw(getResource("media/icons.png"), loadIcons, NULL);
 
-	m_set_target_bitmap(buffer);
+	//m_set_target_bitmap(buffer);
 	
 	inited = true;
 
@@ -2012,11 +2027,13 @@ void destroy(void)
 		cached_bitmap_filename = "";
 	}
 
+	/*
 	m_destroy_bitmap(buffer);
 	m_destroy_bitmap(overlay);
 	if (scaleXX_buffer) {
 		m_destroy_bitmap(scaleXX_buffer);
 	}
+	*/
 
 	m_destroy_bitmap(tile);
 	destroyIcons();
@@ -2210,6 +2227,38 @@ void set_screen_params(void)
 		tguiSetScale(screenScaleX, screenScaleY);
 		tguiSetTolerance(3);
 	}
+
+	al_set_target_backbuffer(display);
+
+	int dw, dh;
+	int dx, dy;
+
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
+	
+	ALLEGRO_TRANSFORM t;
+	al_identity_transform(&t);
+	al_scale_transform(&t, screenScaleX, screenScaleY);
+	al_translate_transform(&t, dx, dy);
+	al_use_transform(&t);
+
+	al_set_clipping_rectangle(dx, dy, dw, dh);
+}
+
+void get_screen_offset_size(int *dx, int *dy, int *dw, int *dh)
+{
+	ScreenDescriptor *sd = config.getWantedGraphicsMode();
+	
+	if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN) {
+		*dx = *dy = 0;
+		*dw = sd->width;
+		*dh = sd->height;
+	}
+	else {
+		*dx = screen_offset_x;
+		*dy = screen_offset_y;
+		*dw = screenScaleX*BW;
+		*dh = screenScaleY*BH;
+	}
 }
 
 void toggle_fullscreen()
@@ -2298,12 +2347,12 @@ void unlock_joypad_mutex(void)
 	al_unlock_mutex(joypad_mutex);
 }
 
-void show_custom_cursor()
+void show_mouse_cursor()
 {
 	custom_mouse_cursor = custom_mouse_cursor_saved;
 }
 
-void hide_custom_cursor()
+void hide_mouse_cursor()
 {
 	custom_mouse_cursor = NULL;
 }

@@ -107,6 +107,7 @@ function update(step)
 		--dpad_on()
 		updateArea()
 		drawArea()
+		drawBufferToScreen()
 		transitionIn()
 	elseif (not CRAP) then
 		CRAP = true

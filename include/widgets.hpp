@@ -1347,5 +1347,7 @@ extern MBITMAP *icon_bmp;
 
 extern bool getting_input_config;
 
+extern int show_item_info_on_flip;
+
 #endif
 
