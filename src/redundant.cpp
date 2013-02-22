@@ -667,7 +667,7 @@ void m_flip_display(void)
 		al_set_target_bitmap(target);
 	}
 
-	m_clear(black);
+	//m_clear(black);
 
 	fps_frames++;
 	double elapsed = al_get_time() - fps_counter;
@@ -1210,6 +1210,22 @@ void m_draw_scaled_backbuffer(int sx, int sy, int sw, int sh, int dx, int dy, in
 	int old_format = al_get_new_bitmap_format();
 	al_set_new_bitmap_format(al_get_bitmap_format(al_get_backbuffer(display)));
 	MBITMAP *tmp = m_create_bitmap(sw, sh);
+	int scr_w = al_get_display_width(display);
+	int scr_h = al_get_display_height(display);
+	if (sx+sw >= scr_w) {
+		sw = scr_w-sx-1;
+	}
+	else if (sx < 0) {
+		sw -= sx;
+		sx = 0;
+	}
+	if (sy+sh >= scr_h) {
+		sh = scr_h-sy-1;
+	}
+	else if (sy < 0) {
+		sh -= sy;
+		sy = 0;
+	}
 	ALLEGRO_LOCKED_REGION *lr1 = al_lock_bitmap(tmp->bitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
 	ALLEGRO_LOCKED_REGION *lr2 = al_lock_bitmap_region(
 		al_get_backbuffer(display),

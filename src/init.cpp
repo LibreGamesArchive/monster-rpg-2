@@ -37,19 +37,6 @@ extern "C" {
 #include <bcm_host.h>
 #endif
 
-/*
-static bool screensaver_was_on = false;
-int screensaver_idle_delay = 0;
-
-void maybe_enable_screensaver()
-{
-#if defined __linux__ && !(defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI)
-	system("gsettings set org.gnome.desktop.screensaver idle-activation-enabled true");
-	system((std::string("gsettings set org.gnome.desktop.session idle-delay ") + my_itoa(screensaver_idle_delay)).c_str());
-#endif
-}
-*/
-
 uint32_t parse_version(const char *v)
 {
 	char buf1[100];
@@ -1577,6 +1564,9 @@ bool init(int *argc, char **argv[])
 
 	// Android because it's very slow switching back in on some devices
 #if defined A5_D3D || defined ALLEGRO_RASPBERRYPI
+#ifdef ALLEGRO_RASPBERRYPI
+	if (check_arg(*argc, *argv, "-programmable-pipeline") <= 0)
+#endif
 	use_fixed_pipeline = true;
 #endif
 	
@@ -1730,8 +1720,14 @@ bool init(int *argc, char **argv[])
 	custom_mouse_cursor_saved = m_load_bitmap(getResource("media/mouse_cursor.png"));
 	custom_cursor_w = m_get_bitmap_width(custom_mouse_cursor_saved);
 	custom_cursor_h = m_get_bitmap_height(custom_mouse_cursor_saved);
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
 	custom_mouse_patch = m_create_bitmap(custom_cursor_w, custom_cursor_h);
 	al_hide_mouse_cursor(display);
+#elif defined ALLEGRO_RASPBERRYPI
+	ALLEGRO_MOUSE_CURSOR *tmp_cursor = al_create_mouse_cursor(custom_mouse_cursor_saved->bitmap, 0, 0);
+	al_set_mouse_cursor(display, tmp_cursor);
+	al_destroy_mouse_cursor(tmp_cursor);
+#endif
 	show_mouse_cursor();
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
@@ -1744,8 +1740,6 @@ bool init(int *argc, char **argv[])
 	int mousex = al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor_saved->bitmap)-20;
 	int mousey = al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor_saved->bitmap)-20;
 	al_set_mouse_xy(display, mousex, mousey);
-
-	ALLEGRO_DEBUG("done initing shaders");
 
 	if (al_install_joystick()) {
 		set_user_joystick();
@@ -2349,12 +2343,16 @@ void unlock_joypad_mutex(void)
 
 void show_mouse_cursor()
 {
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
 	custom_mouse_cursor = custom_mouse_cursor_saved;
+#endif
 }
 
 void hide_mouse_cursor()
 {
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
 	custom_mouse_cursor = NULL;
+#endif
 }
 
 bool is_cursor_hidden()

@@ -39,9 +39,16 @@ if(WIN32)
 	endif(MINGW)
 else(WIN32)
 	if(RASPBERRYPI)
-		set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL -march=armv6 -mfpu=vfp -mfloat-abi=hard")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL -march=armv6 -mfpu=vfp -mfloat-abi=hard")
-   		include_directories("/opt/vc/include/interface/vmcs_host/linux")
+		set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL -O2 -march=armv6 -mfpu=vfp -mfloat-abi=hard")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL -O2 -march=armv6 -mfpu=vfp -mfloat-abi=hard")
+   		include_directories(
+			"/opt/vc/include"
+			"/opt/vc/include/interface/vcos/pthreads"
+			"/opt/vc/include/interface/vmcs_host/linux"
+		)
+		link_directories(
+			"/opt/vc/lib"
+		)
 	else(RASPBERRYPI)
 		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DA5_OGL")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL")
@@ -236,7 +243,6 @@ else(APPLE)
 		allegro${ALLEG_SUFFIX}
 		${ALLEGRO_MAIN_LIB}
 		${EXTRA_LIBS}
-		curl
 		m pthread SM ICE X11 Xext Xcursor Xinerama Xrandr Xpm
 	)
         if(KCM_AUDIO)
@@ -249,9 +255,9 @@ else(APPLE)
 		LIST(APPEND MAIN_LIBS "bass")
 	endif(KCM_AUDIO)
 	if(RASPBERRYPI)
-		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host /usr/lib/arm-linux-gnueabihf/libfreetype.a /usr/lib/arm-linux-gnueabihf/libz.a /usr/lib/arm-linux-gnueabihf/libpng.a /usr/lib/arm-linux-gnueabihf/libjpeg.a /usr/lib/arm-linux-gnueabihf/liblua5.2.a /usr/lib/libphysfs.a)
+		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host /usr/lib/libfreetype.a /usr/lib/libz.a /usr/lib/libpng.a /usr/lib/libjpeg.a /usr/local/lib/liblua.a /usr/lib/libphysfs.a /usr/local/lib/libcurl.a /usr/lib/libbz2.a)
 	else(RASPBERYPI)
-		LIST(APPEND MAIN_LIBS allegro_dialog${ALLEG_SUFFIX} GL GLU freetype z png jpeg lua5.2 physfs)
+		LIST(APPEND MAIN_LIBS allegro_dialog${ALLEG_SUFFIX} GL GLU freetype z png jpeg lua5.2 physfs curl)
 	endif(RASPBERRYPI)
 endif(APPLE)
 endif(WIN32)
