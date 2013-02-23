@@ -1445,6 +1445,12 @@ bool init(int *argc, char **argv[])
 	debug_message("al_init success\n");
 
 
+#if defined ALLEGRO_RASPBERRYPI
+	if (!al_filename_exists("/dev/input/mouse0")) {
+		have_mouse = false;
+	}
+	else
+#endif
 	have_mouse = al_install_mouse();
 	
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -1724,9 +1730,14 @@ bool init(int *argc, char **argv[])
 	custom_mouse_patch = m_create_bitmap(custom_cursor_w, custom_cursor_h);
 	al_hide_mouse_cursor(display);
 #elif defined ALLEGRO_RASPBERRYPI
-	ALLEGRO_MOUSE_CURSOR *tmp_cursor = al_create_mouse_cursor(custom_mouse_cursor_saved->bitmap, 0, 0);
-	al_set_mouse_cursor(display, tmp_cursor);
-	al_destroy_mouse_cursor(tmp_cursor);
+	if (have_mouse) {
+		ALLEGRO_MOUSE_CURSOR *tmp_cursor = al_create_mouse_cursor(custom_mouse_cursor_saved->bitmap, 0, 0);
+		al_set_mouse_cursor(display, tmp_cursor);
+		al_destroy_mouse_cursor(tmp_cursor);
+	}
+	else {
+		al_hide_mouse_cursor(display);
+	}
 #endif
 	show_mouse_cursor();
 
@@ -1737,9 +1748,11 @@ bool init(int *argc, char **argv[])
 	}
 #endif
 
-	int mousex = al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor_saved->bitmap)-20;
-	int mousey = al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor_saved->bitmap)-20;
-	al_set_mouse_xy(display, mousex, mousey);
+	if (have_mouse) {
+		int mousex = al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor_saved->bitmap)-20;
+		int mousey = al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor_saved->bitmap)-20;
+		al_set_mouse_xy(display, mousex, mousey);
+	}
 
 	if (al_install_joystick()) {
 		set_user_joystick();
@@ -1810,7 +1823,7 @@ bool init(int *argc, char **argv[])
 	ALLEGRO_DEBUG("creating screenshot buffer\n");
 
 	flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
+	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
 	screenshot = m_create_bitmap(BW/2, BH/2); // check
 	al_set_new_bitmap_flags(flags);
 
@@ -2257,6 +2270,10 @@ void get_screen_offset_size(int *dx, int *dy, int *dw, int *dh)
 
 void toggle_fullscreen()
 {
+#ifdef ALLEGRO_RASPBERRYPI
+	return;
+#endif
+
 	pause_joystick_repeat_events = true;
 	ScreenDescriptor *sd = config.getWantedGraphicsMode();
 

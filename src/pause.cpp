@@ -1593,9 +1593,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				show_mouse_cursor();
 				if (prompt("Really quit?", "", 0, 0)) {
 					ret = false;
-					if (area) {
-						area->auto_save_game(0, true, true);
-					}
 					goto done;
 				}
 			}
@@ -1827,8 +1824,6 @@ done:
 		break_for_fade_after_draw = false;
 		fadeOut(black);
 	}
-
-	save_memory(true);
 
 	stopAllOmni();
 

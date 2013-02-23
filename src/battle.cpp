@@ -1310,10 +1310,6 @@ Battle::Battle(std::string name, bool can_run) :
 	draw_player_status(true),
 	fade_regulator(9)
 {
-	if (area && !player_scripted) {
-		save_memory(true);
-	}
-
 	dpad_off();
 
 	this->can_run = can_run;

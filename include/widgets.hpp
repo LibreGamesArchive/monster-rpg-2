@@ -1282,7 +1282,7 @@ struct MapPoint {
 
 class MMap : public TGUIWidget {
 public:
-	void auto_save(int millis, bool force);
+	void auto_save_game_to_memory(int millis, bool force);
 	bool isTransitioning(void);
 	std::string getSelected(void);
 	void setSelected(std::string s);

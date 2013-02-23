@@ -118,8 +118,9 @@ static void shift_auto_saves()
 }
 #endif
 
-void save_memory(bool save_screenshot)
+static void *save_auto_save_to_disk_thread(void *save_ss)
 {
+	bool save_screenshot = (save_ss != NULL);
 	bool all_dead = true;
 	for (int i = 0; i < MAX_PARTY; i++) {
 		if (party[i] &&
@@ -130,10 +131,10 @@ void save_memory(bool save_screenshot)
 	}
 
 	if (all_dead)
-		return;
+		return NULL;
 
 	if (!memory_saved)
-		return;
+		return NULL;
 
 	shift_auto_saves();
 	gzFile f = gzopen(getUserResource("auto0.save"), "wb9");
@@ -152,6 +153,13 @@ void save_memory(bool save_screenshot)
 		al_android_set_apk_file_interface();
 #endif
 	}
+
+	return NULL;
+}
+
+void save_auto_save_to_disk()
+{
+	al_run_detached_thread(save_auto_save_to_disk_thread, (void *)1);
 }
 
 static int sign(float f)
@@ -1402,7 +1410,7 @@ void Area::copyTile(int x, int y, Tile *t)
 static int ss_save_counter = 10000;
 static int mem_save_counter = 10000;
 
-void real_auto_save_game(bool save_ss)
+void real_auto_save_game_to_memory(bool save_ss)
 {
 	mem_save_counter = 0;
 	ss_save_counter = 0;
@@ -1417,12 +1425,17 @@ void real_auto_save_game(bool save_ss)
 	if (save_ss) {
 		int dx, dy, dw, dh;
 		get_screen_offset_size(&dx, &dy, &dw, &dh);
-		//m_draw_scaled_bitmap(buffer, 0, 0, BW, BH, 0, 0,
 		m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW/2, BH/2, screenshot);
+	}
+	else {
+		ALLEGRO_BITMAP *old = al_get_target_bitmap();
+		m_set_target_bitmap(screenshot);
+		al_clear_to_color(blue);
+		al_set_target_bitmap(old);
 	}
 }
 	
-void Area::auto_save_game(int step, bool ignoreCount, bool save_ss)
+void Area::auto_save_game_to_memory(int step, bool ignoreCount, bool save_ss)
 {
 	if (!battle && !player_scripted && !manChooser && !timer_on && name != "tutorial" && oldArea == area && global_can_save) {
 		mem_save_counter += step;
@@ -1437,7 +1450,7 @@ void Area::auto_save_game(int step, bool ignoreCount, bool save_ss)
 			&& !onAnyObject(o->getId(), o->getX(), o->getY())
 		)
 		{
-			real_auto_save_game(save_ss);
+			real_auto_save_game_to_memory(save_ss);
 		}
 	}
 }
@@ -1539,7 +1552,7 @@ void Area::update(int step)
 			update_count = 1;
 		}
 		else {
-			auto_save_game(step);
+			//auto_save_game_to_memory(step);
 		}
 	}
 	else

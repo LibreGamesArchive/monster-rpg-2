@@ -693,6 +693,7 @@ void SparklySpiral::draw()
 	int cx = m_get_bitmap_width(bitmap)/2;
 	int cy = m_get_bitmap_height(bitmap)/2;
 
+	al_hold_bitmap_drawing(true);
 	for (int i = 0; i < (int)sparkles.size(); i++) {
 		int dx = x + cos(sparkles[i].angle) * sparkles[i].radius;
 		int dy = y + sin(sparkles[i].angle) * sparkles[i].radius;
@@ -701,6 +702,7 @@ void SparklySpiral::draw()
 		m_draw_rotated_bitmap(bitmap, cx, cy,
 			dx, dy, sparkles[i].angle, 0);
 	}
+	al_hold_bitmap_drawing(false);
 }
 
 
@@ -758,6 +760,7 @@ void Smoke::draw()
 	int half_w = m_get_bitmap_width(bitmap)/2;
 	int half_h = m_get_bitmap_height(bitmap)/2;
 
+	al_hold_bitmap_drawing(true);
 	for (int i = 0; i < NUM_PUFFS; i++) {
 		dx = x + cos((puffs[i].height / MAX_HEIGHT) * (M_PI*2) + puffs[i].add) * 5;
 		dy = y - puffs[i].height;
@@ -765,6 +768,7 @@ void Smoke::draw()
 		dy -= area->getOriginY();
 		m_draw_bitmap(bitmap, dx-half_w, dy-half_h, 0);
 	}
+	al_hold_bitmap_drawing(false);
 }
 
 

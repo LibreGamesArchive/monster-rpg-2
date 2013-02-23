@@ -1247,9 +1247,8 @@ static int CBattleLost(lua_State *stack)
 
 static int CStartBattle(lua_State *stack)
 {
-	// FIXME: make sure this works. It's a hack to avoid
-	// activating a chest or person and then immediately
-	// going into battle.
+	// It's a hack to avoid activating a chest or person
+	// and then immediately going into battle.
 	if (speechDialog)
 		return 0;
 
@@ -1283,6 +1282,8 @@ static int CStartBattle(lua_State *stack)
 	if (area->getName() == "jungle") {
 		playAmbience("");
 	}
+
+	real_auto_save_game_to_memory(true);
 
 	loadPlayDestroy("battle.ogg");
 	

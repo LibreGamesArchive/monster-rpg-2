@@ -579,6 +579,10 @@ void tguiAddWidget(TGUIWidget* widget)
  */
 TGUIWidget* tguiUpdate()
 {
+	if (show_item_info_on_flip >= 0) {
+		return NULL;
+	}
+
 	long currTime = tguiCurrentTimeMillis();
 	long elapsed = currTime - tguiLastUpdate;
 	if (elapsed > 50) {

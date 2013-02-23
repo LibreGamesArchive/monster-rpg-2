@@ -584,6 +584,17 @@ top:
 			getInput()->handle_event(&event);
 		al_unlock_mutex(input_mutex);
 
+#ifdef ALLEGRO_RASPBERRYPI
+		if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT) {
+			printf("switch out\n");
+			playPreloadedSample("nooskewl.ogg");
+		}
+		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN) {
+			printf("switch in\n");
+			playPreloadedSample("HolyWater.ogg");
+		}
+		else
+#endif
 		if (event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY) {
 			al_hide_mouse_cursor(display);
 			mouse_in_display = true;
@@ -1081,7 +1092,7 @@ top:
 			if (in_shooter && shooter_paused) {
 				break_shooter_pause = true;
 			}
-			save_memory(false);
+			save_auto_save_to_disk();
 #if defined ALLEGRO_IPHONE
 			if (!isMultitaskingSupported()) {
 				if (!sound_was_playing_at_program_start)
@@ -1381,10 +1392,10 @@ void do_close(bool quit)
 {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (mapWidget) {
-		mapWidget->auto_save(0, true);
+		mapWidget->auto_save_game_to_memory(0, true);
 	}
 	else if (area && !shouldDoMap) {
-		area->auto_save_game(0, true, false);
+		area->auto_save_game_to_memory(0, true, false);
 	}
 	if (close_pressed_for_configure) {
 		close_pressed_for_configure = false;
@@ -1392,17 +1403,17 @@ void do_close(bool quit)
 		config_menu();
 	}
 	else {
-		save_memory(true);
+		save_auto_save_to_disk();
 		config.write();
 		if (quit)
 			throw QuitError();
 	}
 #else
 	if (mapWidget) {
-		mapWidget->auto_save(0, true);
+		mapWidget->auto_save_game_to_memory(0, true);
 	}
 	else if (area && !shouldDoMap) {
-		area->auto_save_game(0, true, false);
+		area->auto_save_game_to_memory(0, true, false);
 	}
 	if (close_pressed_for_configure) {
 		close_pressed_for_configure = false;
@@ -2232,7 +2243,6 @@ int main(int argc, char *argv[])
 		}
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		else if (choice == 4) {
-			save_memory(true);
 			config.write();
 #ifdef ALLEGRO_ANDROID
 			openURL("http://www.monster-rpg.com");
@@ -2252,7 +2262,7 @@ int main(int argc, char *argv[])
 
 		run();
 
-		save_memory(true);
+		save_auto_save_to_disk();
 
 		if (manChooser) {
 			delete manChooser;
