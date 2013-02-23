@@ -996,7 +996,6 @@ start:
 					int tw = m_text_length(game_font, _t(pause_text));
 					int th = m_text_height(game_font);
 					al_set_target_backbuffer(display);
-					//m_set_target_bitmap(buffer);
 					m_draw_rectangle(BW/2-tw/2-5, BH/2-th/2-5, BW/2+tw/2+5, BH/2+th/2+5, black, M_FILLED);
 					m_draw_rectangle(BW/2-tw/2-5+0.5, BH/2-th/2-5+0.5, BW/2+tw/2+5, BH/2+th/2+5, white, M_OUTLINED);
 					mTextout_simple(_t(pause_text), BW/2-tw/2, BH/2-th/2, white);
@@ -1145,7 +1144,6 @@ start:
 			draw_counter = 0;
 
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			m_clear(m_map_rgb(105, 115, 145));
 	
 			draw(x, o);
@@ -1218,7 +1216,6 @@ done:
 	}
 
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 	m_clear(black);
 	m_rest(5);
 

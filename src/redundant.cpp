@@ -36,157 +36,6 @@ static void null_lb(LoadedBitmap *lb)
 	lb->delayed = 0;
 }
 
-/* my_do_line: copied from Allegro
- */
-#if 0
-void my_do_line(int x1, int y1, int x2, int y2, void *data, void (*proc)(int, int, void *))
-{
-   int dx = x2-x1;
-   int dy = y2-y1;
-   int i1, i2;
-   int x, y;
-   int dd;
-
-   /* worker macro */
-   #define DO_LINE(pri_sign, pri_c, pri_cond, sec_sign, sec_c, sec_cond)     \
-   {                                                                         \
-      if (d##pri_c == 0) {                                                   \
-	 proc(x1, y1, data);                                                 \
-	 return;                                                             \
-      }                                                                      \
-									     \
-      i1 = 2 * d##sec_c;                                                     \
-      dd = i1 - (sec_sign (pri_sign d##pri_c));                              \
-      i2 = dd - (sec_sign (pri_sign d##pri_c));                              \
-									     \
-      x = x1;                                                                \
-      y = y1;                                                                \
-									     \
-      while (pri_c pri_cond pri_c##2) {                                      \
-	 proc(x, y, data);                                                   \
-									     \
-	 if (dd sec_cond 0) {                                                \
-	    sec_c = sec_c sec_sign 1;                                        \
-	    dd += i2;                                                        \
-	 }                                                                   \
-	 else                                                                \
-	    dd += i1;                                                        \
-									     \
-	 pri_c = pri_c pri_sign 1;                                           \
-      }                                                                      \
-   }
-
-   if (dx >= 0) {
-      if (dy >= 0) {
-	 if (dx >= dy) {
-	    /* (x1 <= x2) && (y1 <= y2) && (dx >= dy) */
-	    DO_LINE(+, x, <=, +, y, >=);
-	 }
-	 else {
-	    /* (x1 <= x2) && (y1 <= y2) && (dx < dy) */
-	    DO_LINE(+, y, <=, +, x, >=);
-	 }
-      }
-      else {
-	 if (dx >= -dy) {
-	    /* (x1 <= x2) && (y1 > y2) && (dx >= dy) */
-	    DO_LINE(+, x, <=, -, y, <=);
-	 }
-	 else {
-	    /* (x1 <= x2) && (y1 > y2) && (dx < dy) */
-	    DO_LINE(-, y, >=, +, x, >=);
-	 }
-      }
-   }
-   else {
-      if (dy >= 0) {
-	 if (-dx >= dy) {
-	    /* (x1 > x2) && (y1 <= y2) && (dx >= dy) */
-	    DO_LINE(-, x, >=, +, y, >=);
-	 }
-	 else {
-	    /* (x1 > x2) && (y1 <= y2) && (dx < dy) */
-	    DO_LINE(+, y, <=, -, x, <=);
-	 }
-      }
-      else {
-	 if (-dx >= -dy) {
-	    /* (x1 > x2) && (y1 > y2) && (dx >= dy) */
-	    DO_LINE(-, x, >=, -, y, <=);
-	 }
-	 else {
-	    /* (x1 > x2) && (y1 > y2) && (dx < dy) */
-	    DO_LINE(-, y, >=, -, x, <=);
-	 }
-      }
-   }
-
-   #undef DO_LINE
-}
-#endif
-
-
-/* Copied from do_circle
- *  Helper function for the circle drawing routines. Calculates the points
- *  in a circle of radius r around point x, y, and calls the specified 
- *  routine for each one. The output proc will be passed first a copy of
- *  the bmp parameter, then the x, y point, then a copy of the d parameter
- *  (so putpixel() can be used as the callback).
- */
-#if 0
-void my_do_circle(int x, int y, int radius, MCOLOR d,
-	void (*proc)(int, int, MCOLOR))
-{
-   int cx = 0;
-   int cy = radius;
-   int df = 1 - radius; 
-   int d_e = 3;
-   int d_se = -2 * radius + 5;
-
-   do {
-      proc(x+cx, y+cy, d); 
-
-      if (cx) 
-	 proc(x-cx, y+cy, d); 
-
-      if (cy) 
-	 proc(x+cx, y-cy, d);
-
-      if ((cx) && (cy)) 
-	 proc(x-cx, y-cy, d); 
-
-      if (cx != cy) {
-	 proc(x+cy, y+cx, d); 
-
-	 if (cx) 
-	    proc(x+cy, y-cx, d);
-
-	 if (cy) 
-	    proc(x-cy, y+cx, d); 
-
-	 if (cx && cy) 
-	    proc(x-cy, y-cx, d); 
-      }
-
-      if (df < 0)  {
-	 df += d_e;
-	 d_e += 2;
-	 d_se += 2;
-      }
-      else { 
-	 df += d_se;
-	 d_e += 2;
-	 d_se += 4;
-	 cy--;
-      } 
-
-      cx++; 
-
-   } while (cx <= cy);
-}
-#endif
-
-
 MCOLOR m_map_rgba(int r, int g, int b, int a)
 {
 	return al_map_rgba(r, g, b, a);
@@ -667,8 +516,6 @@ void m_flip_display(void)
 		al_set_target_bitmap(target);
 	}
 
-	//m_clear(black);
-
 	fps_frames++;
 	double elapsed = al_get_time() - fps_counter;
 	if (fps_on && elapsed > 2) {
@@ -956,20 +803,6 @@ float my_get_opengl_version(void)
       return 1.3;
 }
 
-void set_linear_mag_filter(MBITMAP *bitmap, bool onoff)
-{
-#ifdef A5_OGL
-	GLuint tex = al_get_opengl_texture(bitmap->bitmap);
-	glBindTexture(GL_TEXTURE_2D, tex);
-	if (onoff) {
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	}
-	else {
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	}
-#endif
-}
-
 void m_set_blender(int s, int d, MCOLOR c)
 {
 	_blend_color = c;
@@ -1250,5 +1083,15 @@ void m_draw_scaled_backbuffer(int sx, int sy, int sw, int sh, int dx, int dy, in
 	);
 	m_destroy_bitmap(tmp);
 	al_set_target_bitmap(old_target);
+}
+
+void m_draw_bitmap_identity_view(MBITMAP *bmp, int x, int y, int flags)
+{
+	ALLEGRO_TRANSFORM backup, t;
+	al_copy_transform(&backup, al_get_current_transform());
+	al_identity_transform(&t);
+	al_use_transform(&t);
+	m_draw_bitmap(bmp, x, y, flags);
+	al_use_transform(&backup);
 }
 

@@ -39,18 +39,6 @@ enum PauseSection {
 
 static void draw_tiny_tri(int x, int y, int height, int dir, ALLEGRO_COLOR c)
 {
-/*
-	al_lock_bitmap_region(
-		al_get_target_bitmap(),
-		x - (1 + (height-1)*2)/2,
-		y - (dir < 0 ? height-1 : 0),
-		1 + (height-1)*2,
-		1 + (height-1)*2,
-		ALLEGRO_PIXEL_FORMAT_ANY,
-		ALLEGRO_LOCK_READWRITE
-	);
-*/
-
 	for (int i = 0; i < height; i++) {
 		int yy = y + (dir * i);
 		int w = 1 + (i*2);
@@ -59,8 +47,6 @@ static void draw_tiny_tri(int x, int y, int height, int dir, ALLEGRO_COLOR c)
 			m_draw_pixel(xx+j, yy, c);
 		}
 	}
-
-//	al_unlock_bitmap(al_get_target_bitmap());
 }
 
 
@@ -225,7 +211,6 @@ static void showMusicToggle(void)
 		if (draw_counter > 0) {
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			m_clear(black);
 			tguiDraw();
 			drawBufferToScreen();
@@ -379,7 +364,6 @@ static void showIpodControls(void)
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			//m_set_target_bitmap(buffer);
 			al_set_target_backbuffer(display);
 			m_clear(black);
 			tguiDraw();
@@ -431,10 +415,13 @@ void showSaveStateInfo(const char *basename)
 	int x = (BW-w)/2;
 	int y = (BH-h)/2;
 
-	MBITMAP *tmp = m_create_bitmap(BW, BH);
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW, BH, tmp);
+	int flags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+	MBITMAP *tmp = m_create_bitmap(dw, dh);
+	al_set_new_bitmap_flags(flags);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmp);
 
 #ifdef ALLEGRO_ANDROID
 	al_set_standard_file_interface();
@@ -458,9 +445,6 @@ void showSaveStateInfo(const char *basename)
 	bool updating = false;
 
 	while (1) {
-		al_set_target_backbuffer(display);
-		//m_set_target_bitmap(buffer);
-		
 		al_wait_cond(wait_cond, wait_mutex);
 		int tmp_counter = logic_counter;
 		logic_counter = 0;
@@ -504,8 +488,10 @@ void showSaveStateInfo(const char *basename)
 		
 		if (draw_counter > 0) {
 			draw_counter = 0;
+		
+			al_set_target_backbuffer(display);
 
-			m_draw_bitmap(tmp, 0, 0, 0);
+			m_draw_bitmap_identity_view(tmp, dx, dy, 0);
 
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
@@ -578,9 +564,11 @@ void showItemInfo(int index, bool preserve_buffer)
 
 	MBITMAP *tmp = NULL;
 	if (preserve_buffer) {
-		//tmp = m_clone_bitmap(buffer);
-		tmp = m_create_bitmap(BW, BH);
-		m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW, BH, tmp);
+		int flags = al_get_new_bitmap_flags();
+		al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+		tmp = m_create_bitmap(dw, dh);
+		al_set_new_bitmap_flags(flags);
+		m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmp);
 	}
 	
 	int w = 200;
@@ -750,10 +738,9 @@ void showItemInfo(int index, bool preserve_buffer)
 		if (draw_counter > 0) {
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			if (preserve_buffer) {
 				m_clear(m_map_rgb(0, 0, 0));
-				m_draw_bitmap(tmp, 0, 0, 0);
+				m_draw_bitmap_identity_view(tmp, dx, dy, 0);
 			}
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
@@ -1266,7 +1253,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				itemSelector->setTop(0);
 				tguiAddWidget(itemSelector);
 				al_set_target_backbuffer(display);
-				//m_set_target_bitmap(buffer);
 				tguiDraw();
 				maybeShowItemHelp();
 				tguiSetFocus(partySelectorTop);
@@ -1490,7 +1476,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				spellSelector->setTop(0);
 				tguiAddWidget(spellSelector);
 				al_set_target_backbuffer(display);
-				//m_set_target_bitmap(buffer);
 				tguiDraw();
 				// draw
 				tguiSetFocus(partySelectorTop2);
@@ -1807,7 +1792,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 		if (break_for_fade_after_draw || draw_counter > 0) {
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			m_clear(black);
 			tguiDraw();
 			drawBufferToScreen();
@@ -1928,7 +1912,6 @@ void doMap(std::string startPlace, std::string prefix)
 	tguiSetFocus(mapWidget);
 
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 	tguiDraw();
 	drawBufferToScreen();
 	fadeIn(black);
@@ -1965,7 +1948,6 @@ void doMap(std::string startPlace, std::string prefix)
 		if (draw_counter > 0) {
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			m_clear(black);
 			// Draw the GUI
 			tguiDraw();
@@ -2001,7 +1983,6 @@ void doShop(std::string name, const char *imageName, int nItems,
 {
 #define DRAW \
 	al_set_target_backbuffer(display); \
-	/*m_set_target_bitmap(buffer);*/ \
 	m_clear(black); \
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white); \
 	mDrawFrame(3, 3, BW-6, 40-6); \
@@ -2059,7 +2040,6 @@ void doShop(std::string name, const char *imageName, int nItems,
 	tguiSetFocus(shop);
 
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 	mDrawFrame(3, 3, BW-6, 40-6);
 	m_draw_bitmap(face, 5, 20-16, 0);
 	char s[100];
@@ -2250,7 +2230,6 @@ void into_the_sun(void)
 	AnimationSet *explosion = new AnimationSet(getResource("media/explosion.png"));
 
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 	m_draw_bitmap(bg, 0, 0, 0);
 	drawBufferToScreen();
 	fadeIn(black);
@@ -2267,7 +2246,6 @@ void into_the_sun(void)
 
 	while (true) {
 		al_set_target_backbuffer(display);
-		//m_set_target_bitmap(buffer);
 
 		al_wait_cond(wait_cond, wait_mutex);
 		int tmp_counter = logic_counter;
@@ -2329,14 +2307,12 @@ void into_the_sun(void)
 	}
 done:
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 	m_draw_bitmap(bg, 0, 0, 0);
 	drawBufferToScreen();
 	m_flip_display();
 	m_rest(5);
 	
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 	m_draw_bitmap(bg, 0, 0, 0);
 	drawBufferToScreen();
 	fadeOut(black);
@@ -2539,7 +2515,6 @@ void credits(void)
 		start = now;
 		offset += 0.01f * step;
 		al_set_target_backbuffer(display);
-		//m_set_target_bitmap(buffer);
 		m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, white);
 		m_draw_bitmap(bg, 0, 0, 0);
 		m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, white);
@@ -2951,7 +2926,6 @@ done:
 			}
 			
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 
 			al_clear_to_color(al_map_rgb_f(0, 0, 0));
 
@@ -3080,7 +3054,6 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 		if (draw_counter > 0) {
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 		
 			tguiDraw();
 			
@@ -3335,7 +3308,6 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 	tguiLowerWidget(frame);
 			
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 	m_clear(black);
 	tguiDraw();
 	drawBufferToScreen();
@@ -3540,7 +3512,6 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 			draw_counter = 0;
 
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			m_clear(black);
 			tguiDraw();
 
@@ -3698,32 +3669,6 @@ bool config_menu(bool start_on_fullscreen)
 	y += 13;
 #endif
 
-	std::vector<std::string> filter_type_choices;
-	std::vector<int> filter_type_values;
-	filter_type_choices.push_back("{027} No filtering");
-	filter_type_values.push_back(FILTER_NONE);
-	filter_type_choices.push_back("{027} Linear filtering");
-	filter_type_values.push_back(FILTER_LINEAR);
-	if (use_programmable_pipeline) {
-		filter_type_choices.push_back("{027} Scale2x shader");
-		filter_type_values.push_back(FILTER_SCALE2X);
-	}
-
-	MSingleToggle *filter_type_toggle;
-	int curr_filter_type = 0;
-	int start_filter_type = 0;
-	
-	filter_type_toggle = new MSingleToggle(xx, y, filter_type_choices);
-	for (unsigned int i = 0; i < filter_type_values.size(); i++) {
-		if (filter_type_values[i] == config.getFilterType()) {
-			start_filter_type = i;
-			break;
-		}
-	}
-	curr_filter_type = start_filter_type;
-	filter_type_toggle->setSelected(curr_filter_type);
-	y += 13;
-
 	#define aspect_real_to_option(c) (c == ASPECT_FILL_SCREEN ? 1 : (c == ASPECT_MAINTAIN_RATIO ? 2 : 0))
 	#define aspect_option_to_real(c) (c == 0 ? ASPECT_INTEGER : (c == 1 ? ASPECT_FILL_SCREEN : ASPECT_MAINTAIN_RATIO))
 
@@ -3795,8 +3740,6 @@ bool config_menu(bool start_on_fullscreen)
 	tguiAddWidget(flip_screen_toggle);
 #endif
 
-	tguiAddWidget(filter_type_toggle);
-
 	tguiAddWidget(aspect_toggle);
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
@@ -3823,7 +3766,6 @@ bool config_menu(bool start_on_fullscreen)
 #endif
 
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 	tguiDraw();
 	drawBufferToScreen();
 	fadeIn(black);
@@ -3876,7 +3818,6 @@ bool config_menu(bool start_on_fullscreen)
 					type = config_input(type);
 					if (type == 0) {
 						al_set_target_backbuffer(display);
-						//m_set_target_bitmap(buffer);
 						tguiDraw();
 						drawBufferToScreen();
 						fadeIn(black);
@@ -4022,12 +3963,6 @@ bool config_menu(bool start_on_fullscreen)
 			set_screen_params();
 		}
 
-		sel = filter_type_toggle->getSelected();
-		if (config.getFilterType() != sel) {
-			config.setFilterType(sel);
-			//create_buffers();
-		}
-
 #if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE && !defined ALLEGRO_RASPBERRYPI
 		bool fs = fullscreen_toggle->getSelected();
 		if (fs != (bool)start_fullscreen) {
@@ -4041,7 +3976,6 @@ bool config_menu(bool start_on_fullscreen)
 			draw_counter = 0;
 
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 
 			tguiDraw();
 
@@ -4065,8 +3999,6 @@ done:
 	delete difficulty_toggle;
 	delete tuning_toggle;
 	delete aspect_toggle;
-
-	delete filter_type_toggle;
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (input_toggle)
@@ -4209,7 +4141,6 @@ static void hqm_menu(void)
 			draw_counter = 0;
 
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 		
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
@@ -4284,7 +4215,6 @@ done:
 static void title_draw(MBITMAP *bg, bool first_frame)
 {
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
@@ -4706,7 +4636,6 @@ void debug_start(DEBUG_DATA *d)
 			break;
 		}
 		al_set_target_backbuffer(display);
-		//m_set_target_bitmap(buffer);
 		m_clear(m_map_rgb(0, 0, 0));
 
 		tguiDraw();
@@ -4740,7 +4669,6 @@ void debug_start(DEBUG_DATA *d)
 			break;
 		}
 		al_set_target_backbuffer(display);
-		//m_set_target_bitmap(buffer);
 		m_clear(m_map_rgb(0, 0, 0));
 
 		tguiDraw();
@@ -4982,7 +4910,6 @@ void debug_start(DEBUG_DATA *d)
 			break;
 		}
 		al_set_target_backbuffer(display);
-		//m_set_target_bitmap(buffer);
 		m_clear(m_map_rgb(0, 0, 0));
 
 		tguiDraw();

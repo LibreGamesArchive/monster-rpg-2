@@ -39,14 +39,6 @@ enum CFG_SHAKE_ACTION
 	CFG_SHAKE_CHANGE_SONG = 1
 };
 
-enum CFG_FILTER_TYPE
-{
-	FILTER_NONE = 0,
-	FILTER_LINEAR,
-	FILTER_SCALE2X,
-	NUM_FILTER_TYPES
-};
-
 class Configuration {
 public:
 	ScreenDescriptor* getWantedGraphicsMode();
@@ -129,14 +121,6 @@ public:
 	int getShakeAction(void) { return cfg_shake_action; }
 	void setShakeAction(int t) { cfg_shake_action = t; }
 #endif
-	int getFilterType(void) {
-		return cfg_filter_type;
-	}
-	void setFilterType(int t) {
-		cfg_filter_type = t;
-		if (!display)
-			return;
-	}
 #ifdef ALLEGRO_IPHONE
 	int getAutoRotation(void) {
 		return cfg_auto_rotation;
@@ -224,7 +208,6 @@ private:
 	bool xbox360;
 	int cfg_tuning;
 	int cfg_difficulty;
-	int cfg_filter_type;
 	int cfg_maintain_aspect_ratio;
 	int language;
 	bool fixed_language;

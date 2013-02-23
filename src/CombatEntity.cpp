@@ -2365,7 +2365,6 @@ void BeamP1Effect::draw(void)
 
 	color.a = 0.2f;
 	
-//#define tmp buffer
 #define tmp NULL
 
 	m_draw_precise_line(tmp, sx, sy, dx, dy, color);
@@ -2448,7 +2447,6 @@ void BeamP2Effect::draw(void)
 
 	color.a = 0.2f;
 
-//#define tmp buffer
 #define tmp NULL
 
 	m_draw_precise_line(tmp, sx, sy, dx, dy, color);
@@ -3949,7 +3947,6 @@ void BlazeEffect::draw(void)
 
 
 	MBITMAP *target;
-	//target = buffer;
 	target = NULL;
 
 	MCOLOR color = m_map_rgb(255, 0, 0);
@@ -4097,7 +4094,6 @@ void LaserEffect::draw(void)
 
 
 	MBITMAP *target;
-	//target = buffer;
 	target = NULL;
 
 	MCOLOR color = m_map_rgb(0, 200, 255);
@@ -4490,7 +4486,6 @@ void SwallowEffect::draw(void)
 
 	color.a = 0.2f;
 
-//#define tmp buffer
 #define tmp NULL
 
 	m_draw_precise_line(tmp, dx, dy, cx, cy, color);

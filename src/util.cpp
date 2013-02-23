@@ -203,7 +203,6 @@ void native_error(const char *msg, const char *msg2)
 	if (inited) {
 		if (prompt(msg, "Continue anyway?", 1, 0, ss ? ss : "", NULL, true)) {
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			m_clear(al_map_rgb_f(0, 0, 0));
 			drawBufferToScreen();
 			m_flip_display();

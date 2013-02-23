@@ -177,10 +177,6 @@ ALLEGRO_SHADER *tinter;
 ALLEGRO_SHADER *warp;
 ALLEGRO_SHADER *shadow_shader;
 ALLEGRO_SHADER *brighten;
-ALLEGRO_SHADER *scale2x;
-//MBITMAP *buffer = 0;
-//MBITMAP *overlay = 0;
-//MBITMAP *scaleXX_buffer = 0;
 MBITMAP *screenshot = 0;
 MBITMAP *tilemap = 0;
 bool *tileTransparent = 0;
@@ -324,17 +320,6 @@ void load_fonts(void)
 	// NOTE: This has to be after display creation and loading of fonts
 	load_translation(get_language_name(config.getLanguage()).c_str());
 }
-
-/*
-void get_buffer_true_size(int *buffer_true_w, int *buffer_true_h)
-{
-#ifdef A5_OGL
-	al_get_opengl_texture_size(buffer->bitmap, buffer_true_w, buffer_true_h);
-#else
-	al_get_d3d_texture_size(buffer->bitmap, buffer_true_w, buffer_true_h);
-#endif
-}
-*/
 
 static void create_shadows(MBITMAP *bmp, RecreateData *data)
 {
@@ -835,37 +820,6 @@ void init_shaders(void)
 		"   gl_Position = projview_matrix * pos;\n"
 		"}\n";
 		
-		static const char *scale2x_vertex_source =
-		"attribute vec4 pos;\n"
-		"attribute vec2 texcoord;\n"
-		"uniform mat4 projview_matrix;\n"
-		"uniform mat4 tex_matrix;\n"
-                "uniform bool use_tex_matrix;\n"
-		"uniform float hstep;\n"
-		"uniform float vstep;\n"
-		"varying vec2 varying_texcoord;\n"
-		"varying vec2 tB;\n"
-		"varying vec2 tD;\n"
-		"varying vec2 tF;\n"
-		"varying vec2 tH;\n"
-		"void main()\n"
-		"{\n"
-		"   if (use_tex_matrix) {\n"
-		"     vec4 uv = tex_matrix * vec4(texcoord, 0, 1);\n"
-		"     varying_texcoord = vec2(uv.x, uv.y);\n"
-		"   }\n"
-		"   else\n"
-		"     varying_texcoord = texcoord;\n"
-		"   tB = vec2(texcoord.s,       texcoord.t+vstep);\n"
-		"   tD = vec2(texcoord.s-hstep, texcoord.t);\n"
-		"   tF = vec2(texcoord.s+hstep, texcoord.t);\n"
-		"   tH = vec2(texcoord.s,       texcoord.t-vstep);\n"
-#ifndef __linux__
-		"   gl_PointSize = 1.0;\n"
-#endif
-		"   gl_Position = projview_matrix * pos;\n"
-		"}\n";
-		
 		static const char *default_pixel_source =
 #ifdef ALLEGRO_CFG_OPENGLES
 		"precision mediump float;\n"
@@ -987,72 +941,11 @@ void init_shaders(void)
 		"   }\n"
 		"}";
 		
-		const char *scale2x_pixel_source =
-#if defined OPENGLES
-		"precision mediump float;\n"
-#endif
-		"uniform sampler2D tex;\n"
-		"varying vec2 varying_texcoord;\n"
-		"uniform " LOWP " float offset_x;\n"
-		"uniform " LOWP " float offset_y;\n"
-		"varying vec2 tB;\n"
-		"varying vec2 tD;\n"
-		"varying vec2 tF;\n"
-		"varying vec2 tH;\n"
-		"void main() {\n"
-		"	" LOWP " vec4 B = texture2D(tex, tB);\n"
-		"	" LOWP " vec4 E = texture2D(tex, varying_texcoord);\n"
-		"	" LOWP " vec4 H = texture2D(tex, tH);\n"
-		"	" LOWP " vec4 D = texture2D(tex, tD);\n"
-		"	" LOWP " vec4 F = texture2D(tex, tF);\n"
-		"	if ((B.r != H.r || B.g != H.g || B.b != H.b || B.a != H.a) &&\n"
-		"           (D.r != F.r || D.g != F.g || D.b != F.b || D.a != F.a)) {\n"
-		"		" LOWP " float y = mod(gl_FragCoord.t-offset_x, 2.0);\n"
-		"		" LOWP " float x = mod(gl_FragCoord.s-offset_y, 2.0);\n"
-		"		if (x < 1.0 && y < 1.0) {\n"
-		"			if (D.r == B.r && D.g == B.g && D.b == B.b && D.a == B.a) {\n"
-		"				gl_FragColor = D;\n"
-		"			}\n"
-		"			else {\n"
-		"				gl_FragColor = E;\n"
-		"			}\n"
-		"		}\n"
-		"		else if (x < 1.0 && y >= 1.0) {\n"
-		"			if (D.r == H.r && D.g == H.g && D.b == H.b && D.a == H.a) {\n"
-		"				gl_FragColor = D;\n"
-		"			}\n"
-		"			else {\n"
-		"				gl_FragColor = E;\n"
-		"			}\n"
-		"		}\n"
-		"		else if (x >= 1.0 && y < 1.0) {\n"
-		"			if (B.r == F.r && B.g == F.g && B.b == F.b && B.a == F.a) {\n"
-		"				gl_FragColor = F;\n"
-		"			}\n"
-		"			else {\n"
-		"				gl_FragColor = E;\n"
-		"			}\n"
-		"		}\n"
-		"		else{\n"
-		"			if (H.r == F.r && H.g == F.g && H.b == F.b && H.a == F.a) {\n"
-		"				gl_FragColor = F;\n"
-		"			}\n"
-		"			else {\n"
-		"				gl_FragColor = E;\n"
-		"			}\n"
-		"		}\n"
-		"	}\n"
-		"	else {\n"
-		"		gl_FragColor = E;\n"
-		"	}\n"
-		"}\n";
-		
 		default_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
 		tinter = al_create_shader(ALLEGRO_SHADER_GLSL);
 		warp = al_create_shader(ALLEGRO_SHADER_GLSL);
 		shadow_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
 		brighten = al_create_shader(ALLEGRO_SHADER_GLSL);
-		scale2x = al_create_shader(ALLEGRO_SHADER_GLSL);
 
 		al_attach_shader_source(
 					default_shader,
@@ -1085,11 +978,6 @@ void init_shaders(void)
 					);
 
 		al_attach_shader_source(
-					scale2x,
-					ALLEGRO_VERTEX_SHADER,
-					scale2x_vertex_source
-					);
-		al_attach_shader_source(
 					default_shader,
 					ALLEGRO_PIXEL_SHADER,
 					default_pixel_source
@@ -1118,11 +1006,6 @@ void init_shaders(void)
 					ALLEGRO_PIXEL_SHADER,
 					brighten_pixel_source
 					);
-		al_attach_shader_source(
-					scale2x,
-					ALLEGRO_PIXEL_SHADER,
-					scale2x_pixel_source
-					);
 
 		const char *shader_log;
 
@@ -1146,12 +1029,6 @@ void init_shaders(void)
 		if ((shader_log = al_get_shader_log(brighten))[0] != 0) {
 			printf("5. %s\n", shader_log);
 		}
-#ifndef A5_D3D
-		al_link_shader(scale2x);
-		if ((shader_log = al_get_shader_log(scale2x))[0] != 0) {
-			printf("6. %s\n", shader_log);
-		}
-#endif
 		
 #ifdef A5_OGL
 		al_set_opengl_program_object(display, al_get_opengl_program_object(default_shader));
@@ -1172,24 +1049,11 @@ void init_shaders(void)
 void init2_shaders(void)
 {
 	if (use_programmable_pipeline) {
-		/*
-		int buffer_true_w, buffer_true_h;
-		get_buffer_true_size(&buffer_true_w, &buffer_true_h);
-
-		al_set_shader_float(scale2x, "hstep", 1.0/buffer_true_w);
-		al_set_shader_float(scale2x, "vstep", 1.0/buffer_true_h);
-		al_set_shader_float(scale2x, "offset_x", 1);
-		al_set_shader_float(scale2x, "offset_y", 0);
-		al_set_shader_sampler(scale2x, "tex", scaleXX_buffer->bitmap, 0);
-		*/
-		
 		al_set_shader_bool(default_shader, "use_tex_matrix", false);
 		al_set_shader_bool(tinter, "use_tex_matrix", false);
 		al_set_shader_bool(warp, "use_tex_matrix", false);
 		al_set_shader_bool(shadow_shader, "use_tex_matrix", false);
 		al_set_shader_bool(brighten, "use_tex_matrix", false);
-		//al_set_shader_bool(scale2x, "use_tex_matrix", false);
-		
 #ifndef A5_OGL
 		//al_set_shader_float(warp, "cx", ((float)BW/buffer_true_w)/2);
 		//al_set_shader_float(warp, "cy", ((float)BH/buffer_true_h)/2);
@@ -1205,7 +1069,6 @@ void destroy_shaders(void)
 		al_destroy_shader(brighten);
 		al_destroy_shader(warp);
 		al_destroy_shader(shadow_shader);
-		al_destroy_shader(scale2x);
 	}	
 }
 
@@ -1230,35 +1093,7 @@ static void draw_loading_screen(MBITMAP *tmp, int percent, ScreenDescriptor *sd)
 	m_flip_display();
 }
 
-void create_buffers(void)
-{
-/*
-	ALLEGRO_DEBUG("destroying old buffers\n");
-	if (buffer)
-		m_destroy_bitmap(buffer);
-	if (overlay)
-		m_destroy_bitmap(overlay);
-	int flags = al_get_new_bitmap_flags();
-	if (config.getFilterType() == FILTER_LINEAR) {
-		al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | NO_PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
-	}
-	else
-		al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
-	ALLEGRO_DEBUG("creating buffer\n");
-	buffer = m_create_bitmap(BW, BH); // check
-	ALLEGRO_DEBUG("creating overlay\n");
-	overlay = m_create_bitmap(BW, BH); // check
-	al_set_new_bitmap_flags(flags);
-*/
-}
-
-// FIXME FIXME FIXME FIXME FIXME
 #ifdef ALLEGRO_ANDROID
-int my_crap_atexit(void (*crap)(void))
-{
-	return 0;
-}
-
 void android_assert_handler(char const *expr,
 	char const *file, int line, char const *func)
 {
@@ -1816,25 +1651,12 @@ bool init(int *argc, char **argv[])
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 #endif
 
-	//ALLEGRO_DEBUG("creating buffers\n");
-
-	//create_buffers();
-
 	ALLEGRO_DEBUG("creating screenshot buffer\n");
 
 	flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
 	screenshot = m_create_bitmap(BW/2, BH/2); // check
 	al_set_new_bitmap_flags(flags);
-
-	if (use_programmable_pipeline) {
-		/*
-		int flags = al_get_new_bitmap_flags();
-		al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE);
-		scaleXX_buffer = m_create_bitmap(BW*2, BH*2); // check
-		al_set_new_bitmap_flags(flags);
-		*/
-	}
 
 	ALLEGRO_DEBUG("initing shader variables\n");
 
@@ -1848,15 +1670,6 @@ bool init(int *argc, char **argv[])
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 #endif
 
-	/*
-	if (!buffer) {
-		native_error("Failed to create buffer.");
-	}
-	*/
-
-	config.setFilterType(config.getFilterType());
-	
-	
 	if (!screenshot) {
 		native_error("Failed to create SS buffer.");
 	}
@@ -1978,8 +1791,6 @@ bool init(int *argc, char **argv[])
 	debug_message("Loading icons\n");
 	icon_bmp = m_load_bitmap_redraw(getResource("media/icons.png"), loadIcons, NULL);
 
-	//m_set_target_bitmap(buffer);
-	
 	inited = true;
 
 	m_clear(black);
@@ -2033,14 +1844,6 @@ void destroy(void)
 		cached_bitmap = NULL;
 		cached_bitmap_filename = "";
 	}
-
-	/*
-	m_destroy_bitmap(buffer);
-	m_destroy_bitmap(overlay);
-	if (scaleXX_buffer) {
-		m_destroy_bitmap(scaleXX_buffer);
-	}
-	*/
 
 	m_destroy_bitmap(tile);
 	destroyIcons();

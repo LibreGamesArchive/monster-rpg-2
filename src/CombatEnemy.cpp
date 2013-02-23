@@ -414,7 +414,6 @@ static void dragon_blackAnd0(AnimationSet *a, AnimationSet *a2)
 		else
 			c = white;
 
-		//m_set_target_bitmap(buffer);
 		al_set_target_backbuffer(display);
 
 		m_clear(c);
@@ -429,7 +428,6 @@ static void dragon_blackAnd0(AnimationSet *a, AnimationSet *a2)
 
 static void dragon_normal(AnimationSet *a, AnimationSet *a2, int frame)
 {
-	//m_set_target_bitmap(buffer);
 	al_set_target_backbuffer(display);
 	char animName[100];
 	sprintf(animName, "transform%d", frame);
@@ -466,7 +464,6 @@ static void dragon_flash(AnimationSet *a, AnimationSet *a2, int frame, float sta
 		float alpha = 1.0 - ((1.0/6.0) * ((float)elapsed/125));
 		alpha += startAlpha;
 
-		//m_set_target_bitmap(buffer);
 		al_set_target_backbuffer(display);
 
 		m_clear(m_map_rgba(255, 255, 255, 255*alpha));
@@ -501,7 +498,6 @@ static void dragon_fade(AnimationSet *a, AnimationSet *a2, int fullframe, int fa
 		if (elapsed > 125) elapsed = 125;
 		float alpha = 1.0 - (elapsed/125.0);
 
-		//m_set_target_bitmap(buffer);
 		al_set_target_backbuffer(display);
 		m_clear(black);
 
@@ -534,7 +530,6 @@ static void dragon_players(AnimationSet *a, AnimationSet *a2)
 
 	long start = tguiCurrentTimeMillis();
 	while (tguiCurrentTimeMillis() < (unsigned long)start+2000) {
-		//m_set_target_bitmap(buffer);
 		al_set_target_backbuffer(display);
 		m_clear(black);
 		a->draw(dragon_x, dragon_y-a->getHeight(), dragon_flags);

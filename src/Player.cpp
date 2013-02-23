@@ -1,96 +1,5 @@
 #include "monster2.hpp"
 
-/*
-struct BattleAnim
-{
-	std::string name;
-	void *this_ptr;
-	AnimationSet *anim;
-};
-
-static std::vector<BattleAnim> battleAnims;
-std::string baseAnimName(std::string name)
-{
-	std::string tmp = name;
-	size_t idx;
-	if ((idx = tmp.find(".png")) != std::string::npos) {
-		tmp = tmp.substr(0, idx);
-	}
-	if ((idx = tmp.rfind("/")) != std::string::npos) {
-		tmp = tmp.substr(idx+1);
-	}
-	if ((idx = tmp.rfind("\\")) != std::string::npos) {
-		tmp = tmp.substr(idx+1);
-	}
-	return tmp;
-}
-static bool shouldReference(std::string name)
-{
-	return true;
-}
-void referenceBattleAnim(std::string name, void *this_ptr)
-{
-	name = baseAnimName(name);
-	ALLEGRO_DEBUG("ref %s", name.c_str());
-
-	if (!shouldReference(name))
-		return;
-	for (size_t i = 0; i < battleAnims.size(); i++) {
-		if (battleAnims[i].name == name) {
-			BattleAnim b;
-			b.name = name;
-			b.this_ptr = this_ptr;
-			b.anim = battleAnims[i].anim->clone(CLONE_FULL);
-			if (b.anim != NULL) {
-				battleAnims.push_back(b);
-			}
-			ALLEGRO_DEBUG("1");
-			return;
-		}
-	}
-
-	ALLEGRO_DEBUG("2");
-
-	BattleAnim b;
-	b.name = name;
-	b.this_ptr = this_ptr;
-	b.anim = new AnimationSet(getResource("combat_media/%s.png", name.c_str()));
-	if (b.anim != NULL) {
-		battleAnims.push_back(b);
-	}
-}
-void unreferenceBattleAnim(std::string name, void *this_ptr)
-{
-	name = baseAnimName(name);
-	ALLEGRO_DEBUG("unref %s", name.c_str());
-	if (!shouldReference(name))
-		return;
-	for (size_t i = 0; i < battleAnims.size(); i++) {
-		if (battleAnims[i].name == name && battleAnims[i].this_ptr == this_ptr) {
-			delete battleAnims[i].anim;
-			battleAnims.erase(battleAnims.begin() + i);
-			return;
-		}
-	}
-	ALLEGRO_DEBUG("unref not found");
-}
-AnimationSet *findBattleAnim(std::string name, void *this_ptr)
-{
-	name = baseAnimName(name);
-	ALLEGRO_DEBUG("find %s", name.c_str());
-	for (size_t i = 0; i < battleAnims.size(); i++) {
-		if (battleAnims[i].name == name && battleAnims[i].this_ptr == this_ptr) {
-	ALLEGRO_DEBUG("found");
-			return battleAnims[i].anim;
-		}
-	}
-	ALLEGRO_DEBUG("find NULL");
-
-	return NULL;
-}
-*/
-
-
 Player *party[MAX_PARTY] = {
 	NULL,
 };
@@ -658,11 +567,13 @@ static void levelUpCallback(int selected, LEVEL_UP_CALLBACK_DATA *d)
 		orig_values = ov2;
 	}
 
-	//MBITMAP *tmp = m_clone_bitmap(buffer);
-	MBITMAP *tmp = m_create_bitmap(BW, BH);
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW, BH, tmp);
+	int flags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+	MBITMAP *tmp = m_create_bitmap(dw, dh);
+	al_set_new_bitmap_flags(flags);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmp);
 
 	MFrame_NormalDraw *frame = new MFrame_NormalDraw(x, y, width, height, true);
 
@@ -840,8 +751,7 @@ static void levelUpCallback(int selected, LEVEL_UP_CALLBACK_DATA *d)
 		if (draw_counter > 0) {
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
-			m_draw_bitmap(tmp, 0, 0, 0);
+			m_draw_bitmap_identity_view(tmp, dx, dy, 0);
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 			// Draw the GUI
 			tguiDraw();
@@ -959,7 +869,6 @@ bool levelUp(Player *player, int bonus)
 	tguiSetFocus(multiChooser);
 
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 	tguiDraw();
 	drawBufferToScreen();
@@ -1017,7 +926,6 @@ bool levelUp(Player *player, int bonus)
 			}
 			if (multiChooser->getTapped() >= 0) {
 				al_set_target_backbuffer(display);
-				//m_set_target_bitmap(buffer);
 				m_clear(black);
 				m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 				// Draw the GUI
@@ -1037,7 +945,6 @@ bool levelUp(Player *player, int bonus)
 		if (draw_counter > 0) {
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			m_clear(black);
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 			// Draw the GUI
@@ -1050,7 +957,6 @@ bool levelUp(Player *player, int bonus)
 done:
 
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 	m_clear(black);
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 	// Draw the GUI
@@ -1073,7 +979,6 @@ done:
 	setMusicVolume(1);
 			
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 	m_clear(black);
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 	// Draw the GUI

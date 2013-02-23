@@ -893,11 +893,6 @@ bool Configuration::read()
 	if (!fullscreen) { delete xml; throw ReadError(); }
 	XMLData* vsync = gfx->find("vsync");
 	if (!vsync) { delete xml; throw ReadError(); }
-	XMLData *xml_filter_type = gfx->find("filter_type");
-	if (xml_filter_type) {
-		int ft = atoi(xml_filter_type->getValue().c_str());
-		setFilterType(ft >= NUM_FILTER_TYPES ? 0 : ft);
-	}
 	XMLData *xml_aspect = gfx->find("maintain_aspect_ratio");
 	if (xml_aspect) {
 		setMaintainAspectRatio(atoi(xml_aspect->getValue().c_str()));
@@ -1042,13 +1037,11 @@ void Configuration::write()
 	XMLData *height = new XMLData("height", my_itoa(config_save_height));
 	XMLData* fullscreen = new XMLData("fullscreen", my_itoa(sd->fullscreen));
 	XMLData* vsync = new XMLData("vsync", my_itoa(getWaitForVsync()));
-	XMLData *xml_filter_type = new XMLData("filter_type", my_itoa(getFilterType()));
 	XMLData *xml_aspect = new XMLData("maintain_aspect_ratio", my_itoa(getMaintainAspectRatio()));
 	gfx->add(width);
 	gfx->add(height);
 	gfx->add(fullscreen);
 	gfx->add(vsync);
-	gfx->add(xml_filter_type);
 	gfx->add(xml_aspect);
 
 	XMLData* sound = new XMLData("sound", "");
@@ -1132,7 +1125,6 @@ Configuration::Configuration() :
 	xbox360(false)
 	,cfg_tuning(CFG_TUNING_BALANCED)
 	,cfg_difficulty(CFG_DIFFICULTY_NORMAL)
-	,cfg_filter_type(FILTER_NONE)
 	,cfg_maintain_aspect_ratio(0)
 	,language(0)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID

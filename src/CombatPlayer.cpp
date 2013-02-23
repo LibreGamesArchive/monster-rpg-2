@@ -783,7 +783,6 @@ ActionHandler *AttackHandler::act(int step, Battle *b)
 			win = false;
 		}
 		al_set_target_backbuffer(display);
-		//m_set_target_bitmap(buffer);
 		m_draw_bitmap(bmp, 0, 0, 0);
 		dpad_off();
 		drawBufferToScreen();

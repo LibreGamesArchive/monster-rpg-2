@@ -335,7 +335,6 @@ top:
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			
 			m_draw_bitmap(sky_bmp, 0, 0, 0);
 			m_draw_bitmap(land_bmp, 0, 0, 0);

@@ -42,12 +42,10 @@ void init_shaders(void);
 void destroy_shaders(void);
 
 ScreenSize small_screen(void);
-//void get_buffer_true_size(int *buffer_true_w, int *buffer_true_h);
 
 void init_big_depth_surface(void);
 
 bool imperfect_aspect(void);
-//void create_buffers(void);
 void destroy_fonts(void);
 void load_fonts(void);
 
@@ -79,19 +77,6 @@ extern ALLEGRO_SHADER *tinter;
 extern ALLEGRO_SHADER *warp;
 extern ALLEGRO_SHADER *shadow_shader;
 extern ALLEGRO_SHADER *brighten;
-extern ALLEGRO_SHADER *scale2x;
-extern ALLEGRO_SHADER *scale2x_flipped;
-extern ALLEGRO_SHADER *scale3x;
-extern ALLEGRO_SHADER *scale3x_flipped;
-extern ALLEGRO_SHADER *scale2x_linear;
-extern ALLEGRO_SHADER *scale2x_linear_flipped;
-extern ALLEGRO_SHADER *scale3x_linear;
-extern ALLEGRO_SHADER *scale3x_linear_flipped;
-/*
-extern MBITMAP *buffer;
-extern MBITMAP *overlay;
-extern MBITMAP *scaleXX_buffer;
-*/
 extern int shadow_buf_w, shadow_buf_h;
 extern int shadow_buf_x, shadow_buf_y;
 extern MBITMAP *screenshot;

@@ -761,7 +761,6 @@ static int CDoDialogue(lua_State *stack)
 		if (draw_counter) {
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			MCOLOR color = black;
 			m_clear(color);
 			/* draw the Area */
@@ -873,7 +872,6 @@ static int CDoShakeDialogue(lua_State *stack)
 		
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			//m_set_target_bitmap(buffer);
 			al_set_target_backbuffer(display);
 			MCOLOR color = black;
 			m_clear(color);
@@ -915,14 +913,13 @@ bool anotherDoDialogue(const char *text, bool clearbuf, bool top, bool draw_area
 		hide_mouse_cursor();
 	}
 
-	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-	MBITMAP *tmp = m_create_bitmap(BW, BH); // check
-	al_set_new_bitmap_flags(flags);
-	//m_draw_bitmap(buffer, 0, 0, 0);
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW, BH, tmp);
+	int flags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+	MBITMAP *tmp = m_create_bitmap(dw, dh);
+	al_set_new_bitmap_flags(flags);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmp);
 	
 	clear_input_events();
 
@@ -964,12 +961,11 @@ bool anotherDoDialogue(const char *text, bool clearbuf, bool top, bool draw_area
 		if (draw_counter > 0) {
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			if (clearbuf) {
 				m_clear(black);
 			}
 			else {
-				m_draw_bitmap(tmp, 0, 0, 0);
+				m_draw_bitmap_identity_view(tmp, dx, dy, 0);
 			}
 			// Draw the GUI
 			tguiDraw();
@@ -1323,7 +1319,6 @@ static int CInBattle(lua_State *stack)
 static int CDrawArea(lua_State *stack)
 {
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 	area->draw();
 	return 0;
 }
@@ -1357,7 +1352,6 @@ static int CClearBuffer(lua_State *stack)
 	
 	ALLEGRO_BITMAP *oldTarget = al_get_target_bitmap();
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 	m_clear(m_map_rgb(r, g, b));
 	al_set_target_bitmap(oldTarget);
 
@@ -1369,7 +1363,6 @@ static int CClearBuffer(lua_State *stack)
 static int CSetBufferTarget(lua_State *stack)
 {
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 
 	return 0;
 }
@@ -2920,7 +2913,6 @@ static int CDoItemTutorial(lua_State *stack)
 	tguiSetFocus(partySelectorTop);
 
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 	tguiDraw();
 	drawBufferToScreen();
 	m_flip_display();
@@ -3104,7 +3096,6 @@ static int CDoItemTutorial(lua_State *stack)
 		if (draw_counter > 0) {
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			m_clear(black);
 			tguiDraw();
 			
@@ -3172,7 +3163,6 @@ static int CDoMapTutorial(lua_State *stack)
 	tguiSetFocus(mapWidget);
 
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 	tguiDraw();
 	drawBufferToScreen();
 	m_flip_display();
@@ -3237,13 +3227,11 @@ static int CDoMapTutorial(lua_State *stack)
 		if (draw_counter > 0) {
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			MCOLOR color = black;
 			m_clear(color);
 			// Draw the GUI
 			tguiDraw();
 			drawBufferToScreen();
-			 // FIXME
 			m_flip_display();
 		}
 	}
@@ -3265,7 +3253,6 @@ done:
 	dpad_on();
 
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 	m_clear(black);
 	area->draw();
 	drawBufferToScreen();
@@ -3399,7 +3386,6 @@ static int CDoKingKingAlbertLook(lua_State *stack)
 		if (draw_counter > 0) {
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			m_draw_bitmap(bmp, 0, 0, 0);
 			tguiDraw();
 			drawBufferToScreen();
@@ -3514,7 +3500,6 @@ static int CDoKeepLook(lua_State *stack)
 			draw_counter = 0;
 
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			m_draw_bitmap(bmp, 0, 0, 0);
 			if (show_shine) {
 				m_save_blender();

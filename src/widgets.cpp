@@ -109,12 +109,6 @@ static void mTextout_real(MFONT *font, const char *text, int x, int y,
 {
 	float inc = 1.0f;
 
-#ifdef ALLEGRO_IPHONE
-	if (config.getFilterType() == FILTER_SCALE2X && shadowType == WGT_TEXT_DROP_SHADOW) {
-		shadowType = WGT_TEXT_SQUARE_BORDER;
-	}
-#endif
-
 	const char *ctext;
 	char buf[100];
 
@@ -348,11 +342,13 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 	
 	bool delayed = false;
 
-	//MBITMAP *tmp = m_clone_bitmap(buffer);
-	MBITMAP *tmp = m_create_bitmap(BW, BH);
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW, BH, tmp);
+	int flags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+	MBITMAP *tmp = m_create_bitmap(dw, dh);
+	al_set_new_bitmap_flags(flags);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmp);
 
 	int w = 230;
 	int h = 100;
@@ -418,8 +414,7 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 			draw_counter = 0;
 
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
-			m_draw_bitmap(tmp, 0, 0, 0);
+			m_draw_bitmap_identity_view(tmp, dx, dy, 0);
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
 			draw_callback(x, y, w, h, data);
@@ -570,15 +565,13 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 
 	dpad_off();
 
-	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-	MBITMAP *tmp = m_create_bitmap(BW, BH); // check
-	al_set_new_bitmap_flags(flags);
-	ALLEGRO_BITMAP *oldTarget = al_get_target_bitmap();
-	//m_draw_bitmap(buffer, 0, 0, 0);
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW, BH, tmp);
+	int flags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+	MBITMAP *tmp = m_create_bitmap(dw, dh);
+	al_set_new_bitmap_flags(flags);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmp);
 	
 	int w = 200;
 	int h = 65;
@@ -634,9 +627,8 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 		if (draw_counter > 0) {
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			m_clear(m_map_rgb(0, 0, 0));
-			m_draw_bitmap(tmp, 0, 0, 0);
+			m_draw_bitmap_identity_view(tmp, dx, dy, 0);
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
 			// Draw messages
@@ -692,11 +684,13 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 {
 	dpad_off();
 	
-	//MBITMAP *tmp = m_clone_bitmap(buffer);
-	MBITMAP *tmp = m_create_bitmap(BW, BH);
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW, BH, tmp);
+	int flags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+	MBITMAP *tmp = m_create_bitmap(dw, dh);
+	al_set_new_bitmap_flags(flags);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmp);
 	
 	int w = 230;
 	int h = 100;
@@ -787,9 +781,8 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 		if (draw_counter > 0) {
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			m_clear(m_map_rgb(0, 0, 0));
-			m_draw_bitmap(tmp, 0, 0, 0);
+			m_draw_bitmap_identity_view(tmp, dx, dy, 0);
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
 			// Draw messages
@@ -858,11 +851,13 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 {
 	dpad_off();
 
-	//MBITMAP *tmp = m_clone_bitmap(buffer);
-	MBITMAP *tmp = m_create_bitmap(BW, BH);
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW, BH, tmp);
+	int flags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+	MBITMAP *tmp = m_create_bitmap(dw, dh);
+	al_set_new_bitmap_flags(flags);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmp);
 	
 	int w;
 	if (wide) {
@@ -963,9 +958,8 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 		if (draw_counter) {
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			m_clear(m_map_rgb(0, 0, 0));
-			m_draw_bitmap(tmp, 0, 0, 0);
+			m_draw_bitmap_identity_view(tmp, dx, dy, 0);
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
 			// Draw messages
@@ -1092,7 +1086,6 @@ int config_input(int type)
 
 	tguiSetFocus(getters[0]);
 
-	//m_set_target_bitmap(buffer);
 	al_set_target_backbuffer(display);
 	tguiDraw();
 	drawBufferToScreen();
@@ -1193,7 +1186,6 @@ int config_input(int type)
 		if (draw_counter) {
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			tguiDraw();
 			drawBufferToScreen();
 			m_flip_display();
@@ -2743,7 +2735,6 @@ int MMap::update(int millis)
 				int curr_y = p * target_y;
 
 				al_set_target_backbuffer(display);
-				//m_set_target_bitmap(buffer);
 				/*
 				 * For some unknown reason m_draw_scaled_bitmap
 				 * sets an alpha blender, and I don't want to
@@ -2777,7 +2768,6 @@ int MMap::update(int millis)
 		startArea(points[selected].dest_area);
 		ALLEGRO_BITMAP *oldTarget = al_get_target_bitmap();
 		al_set_target_backbuffer(display);
-		//m_set_target_bitmap(buffer);
 		m_clear(black);
 		al_set_target_bitmap(oldTarget);
 
@@ -2786,7 +2776,6 @@ int MMap::update(int millis)
 
 		area->update(1);
 		al_set_target_backbuffer(display);
-		//m_set_target_bitmap(buffer);
 		area->draw();
 		drawBufferToScreen();
 		transitionIn();

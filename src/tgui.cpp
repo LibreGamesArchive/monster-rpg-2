@@ -980,8 +980,6 @@ bool tguiPop()
 	std::vector<TGUI*>::iterator it = tguiStack.begin() + tguiStack.size() - 1;
 	tguiStack.erase(it);
 	tguiSetFocus(activeGUI->focus);
-	//tguiClearMouseEvents();
-	//tguiClearKeybuffer();
 	return true;
 }
 

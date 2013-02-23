@@ -207,7 +207,6 @@ void connect_second_display(void)
 	airplay_logo = m_load_alpha_bitmap(getResource("media/m2_controller_logo.png"));
 	
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 
 	config.setMusicVolume(mvol);
 	config.setSFXVolume(svol);
@@ -230,26 +229,6 @@ static void set_transform()
    int BB_H = al_get_display_height(display);
 
    glViewport(0, 0, BB_W, BB_H);
-
-/*
-#if defined ALLEGRO_ANDROID
-   float r = BB_W / 960.0f;
-   BB_W /= r;
-   BB_H /= r;
-   al_identity_transform(&t);
-   al_scale_transform(&t, r, r);
-   al_use_transform(&t);
-   setScale(r);
-#elif defined ALLEGRO_IPHONE
-   float r = BB_W / 1024.0f;
-   BB_W /= r;
-   BB_H /= r;
-   al_identity_transform(&t);
-   al_scale_transform(&t, r, r);
-   al_use_transform(&t);
-   setScale(r);
-#endif
-*/
 }
 
 static bool should_pause_game(void)
@@ -1318,7 +1297,6 @@ top:
 			set_screen_params();
 	
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			
 			config.setMusicVolume(mvol);
 			config.setSFXVolume(svol);
@@ -1444,7 +1422,6 @@ static bool playerCanLevel(std::string name)
 void main_draw(bool draw_cursor)
 {
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 	
 	/* draw the Area */
 	if (battle) {
@@ -1454,7 +1431,6 @@ void main_draw(bool draw_cursor)
 		if (gonna_fade_in_red)
 			m_clear(m_map_rgb(255, 0, 0));
 		else {
-			//m_clear(black);
 			area->draw();
 		}
 	}
@@ -1611,7 +1587,6 @@ static void run()
 						fadeOut(m_map_rgb(255, 0, 0));
 					}
 					al_set_target_backbuffer(display);
-					//m_set_target_bitmap(buffer);
 					m_clear(m_map_rgb(255, 0, 0));
 					hide_mouse_cursor();
 					drawBufferToScreen();
@@ -1799,7 +1774,6 @@ static void run()
 							}
 							
 							al_set_target_backbuffer(display);
-							//m_set_target_bitmap(buffer);
 							m_clear(black);
 							area->draw();
 							drawBufferToScreen();
@@ -1971,11 +1945,6 @@ int main(int argc, char *argv[])
 	bool fps_save = fps_on;
 	fps_on = false;
 	
-	//MBITMAP *oldbuf = buffer;
-	//buffer = m_create_bitmap(disp_w, disp_h);
-
-	//m_set_target_bitmap(buffer);
-
 	ALLEGRO_TRANSFORM backup, t;
 	al_copy_transform(&backup, al_get_current_transform());
 	al_identity_transform(&t);
@@ -1995,7 +1964,6 @@ int main(int argc, char *argv[])
 
 	if (!cancelled) {
 		al_set_target_backbuffer(display);
-		//m_set_target_bitmap(buffer);
 		m_clear(black);
 		al_use_transform(&t);
 		al_draw_bitmap(
@@ -2031,11 +1999,7 @@ int main(int argc, char *argv[])
 	}
 	al_destroy_bitmap(nooskewl);
 
-	//m_destroy_bitmap(buffer);
-	//buffer = oldbuf;
-
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 	al_use_transform(&backup);
 	
 	fps_on = fps_save;
@@ -2088,7 +2052,7 @@ int main(int argc, char *argv[])
 	//playMusic("volcano.ogg"); volcano_scene();
 	//do_lander(); 
 	//archery(false);
-	//shooter(false);
+	shooter(false);
 	//credits();
 	
 	fps_counter = al_get_time();
@@ -2117,7 +2081,6 @@ int main(int argc, char *argv[])
 		
 		m_push_target_bitmap();
 		al_set_target_backbuffer(display);
-		//m_set_target_bitmap(buffer);
 		m_clear(m_map_rgb(0, 0, 0));
 		m_pop_target_bitmap();
 
@@ -2141,7 +2104,6 @@ int main(int argc, char *argv[])
 					}
 					else {
 						al_set_target_backbuffer(display);
-						//m_set_target_bitmap(buffer);
 						area->draw();
 						drawBufferToScreen();
 						transitionIn();
@@ -2163,7 +2125,6 @@ int main(int argc, char *argv[])
 			choose_savestate(&num, &exists, &isAuto);
 
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 			m_clear(black);
 			drawBufferToScreen();
 			m_flip_display();
@@ -2183,7 +2144,6 @@ int main(int argc, char *argv[])
 						}
 						else {
 							al_set_target_backbuffer(display);
-							//m_set_target_bitmap(buffer);
 							area->draw();
 							drawBufferToScreen();
 							transitionIn();

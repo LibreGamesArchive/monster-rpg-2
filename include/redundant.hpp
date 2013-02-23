@@ -118,8 +118,6 @@ void m_set_blender(int s, int d, MCOLOR c);
 void m_save_blender(void);
 void m_restore_blender(void);
 
-void set_linear_mag_filter(MBITMAP *bitmap, bool on);
-
 #define m_get_pixel(b, x, y) al_get_pixel(b->bitmap, x, y)
 #define m_draw_pixel m_draw_trans_pixel
 
@@ -174,5 +172,6 @@ void m_draw_bitmap_to_self(MBITMAP *b, int x, int y, int flags);
 void m_draw_bitmap_region_to_self(MBITMAP *b, int sx, int sy, int sw, int sh, int dx, int dy, int flags);
 
 void m_draw_scaled_backbuffer(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, MBITMAP *dest);
+void m_draw_bitmap_identity_view(MBITMAP *bmp, int x, int y, int flags);
 
 #endif

@@ -606,7 +606,6 @@ static int real_archery(int *accuracy_pts)
 	al_set_mouse_xy(display, current_mouse_x, current_mouse_y);
 #endif
 	
-	//m_set_target_bitmap(buffer);
 	al_set_target_backbuffer(display);
 	m_clear(m_map_rgb(0, 0, 0));
 
@@ -852,7 +851,6 @@ static int real_archery(int *accuracy_pts)
 			disable_zbuffer();
 			
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 
 			float yrot = (target_x / BW - 0.5f) * max_xrot;
 			float xrot = (target_y / BH - 0.5f) * max_yrot;
@@ -1000,7 +998,6 @@ done:
 	disable_zbuffer();
 	
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 
 	goblins.clear();
 
@@ -1039,7 +1036,6 @@ bool archery(bool for_points)
 	}
 
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 	m_clear(m_map_rgb(0, 0, 0));
 
 	if (dpad_type != DPAD_TOTAL_1 && dpad_type != DPAD_TOTAL_2)
@@ -1182,7 +1178,6 @@ void volcano_scene(void)
 	dpad_off();
 
 	al_set_target_backbuffer(display);
-	//m_set_target_bitmap(buffer);
 	m_clear(m_map_rgb(0, 0, 0));
 
 	enum {
@@ -1206,6 +1201,14 @@ void volcano_scene(void)
 	float staff_oz = 0.0f;
 	float staff_dz = 0.015f;
 	float staff_a = 0;
+
+#ifdef ALLEGRO_RASPBERRYPI
+	float staff_z_translate = 0.4f;
+	float land_z_translate = 0.05f;
+#else
+	float staff_z_translate = 0.0f;
+	float land_z_translate = 0.0f;
+#endif
 
 	MBITMAP *stars, *moon, *ring_texture;
 
@@ -1319,7 +1322,6 @@ void volcano_scene(void)
 
 			disable_zbuffer();
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
@@ -1338,8 +1340,6 @@ void volcano_scene(void)
 
 			drawBufferToScreen(false);
 
-			//al_set_target_backbuffer(display);
-			
 			clear_zbuffer();
 
 			ALLEGRO_TRANSFORM proj_push, view_push;
@@ -1369,7 +1369,7 @@ void volcano_scene(void)
 			al_identity_transform(&view_transform);
 			al_rotate_transform_3d(&view_transform, 1, 0, 0, M_PI/2);
 			al_rotate_transform_3d(&view_transform, 0, 1, 0, land_angle);
-			al_translate_transform_3d(&view_transform, 0, 0.1+staff_oy, -0.33);
+			al_translate_transform_3d(&view_transform, 0, 0.1f+staff_oy, -(0.33f+land_z_translate));
 			al_scale_transform_3d(&view_transform, 50, 50, 50);
 			al_use_transform(&view_transform);
 			draw_model_tex(land_model, land_texture);
@@ -1378,12 +1378,11 @@ void volcano_scene(void)
 			enable_cull_face(false);
 
 			al_identity_transform(&view_transform);
-			//al_scale_transform_3d(&view_transform, 50, 50, 50);
 			al_rotate_transform_3d(&view_transform, 0, 1, 0, -land_angle);
 			al_rotate_transform_3d(&view_transform, 1, 0, 0, M_PI);
 			al_rotate_transform_3d(&view_transform, 1, 0, 0, staff_a);
-			al_translate_transform_3d(&view_transform, 0, 0, -1.25);
-			al_translate_transform_3d(&view_transform, 0, 0.25, -staff_oz);
+			al_translate_transform_3d(&view_transform, 0, 0, -1.25f);
+			al_translate_transform_3d(&view_transform, 0, 0.25f, -(staff_oz+staff_z_translate));
 			al_rotate_transform_3d(&view_transform, 0, 1, 0, -land_angle);
 #ifdef A5_D3D
 			al_translate_transform_3d(&view_transform, 0.5f, 0.5f, 0.0f);

@@ -1343,7 +1343,6 @@ void Area::draw(int bw, int bh)
 			// draw circle
 			m_draw_bitmap(orb_bmp, x1, y1, 0);
 			al_set_target_backbuffer(display);
-			//m_set_target_bitmap(buffer);
 		}
 		else {
 			m_draw_rectangle(0, 0, BW, BH, black, M_FILLED);
