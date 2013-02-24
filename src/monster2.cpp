@@ -563,17 +563,6 @@ top:
 			getInput()->handle_event(&event);
 		al_unlock_mutex(input_mutex);
 
-#ifdef ALLEGRO_RASPBERRYPI
-		if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT) {
-			printf("switch out\n");
-			playPreloadedSample("nooskewl.ogg");
-		}
-		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN) {
-			printf("switch in\n");
-			playPreloadedSample("HolyWater.ogg");
-		}
-		else
-#endif
 		if (event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY) {
 			al_hide_mouse_cursor(display);
 			mouse_in_display = true;
@@ -1926,8 +1915,9 @@ int main(int argc, char *argv[])
 	const float svg_w = 362;
 	float wanted = dw * 0.75f;
 	float scale = wanted / svg_w;
-	ALLEGRO_BITMAP *nooskewl = load_svg(getResource("media/nooskewl.svg"), scale);
 
+	ALLEGRO_BITMAP *nooskewl = load_svg(getResource("media/nooskewl.svg"), scale);
+	
 #ifndef ALLEGRO_ANDROID
 	if ((n = check_arg(argc, argv, "-stick")) != -1) {
 		int stick = atoi(argv[n+1]);
@@ -2046,13 +2036,11 @@ int main(int argc, char *argv[])
 */
 
 
-
-
 	// FIXME
 	//playMusic("volcano.ogg"); volcano_scene();
 	//do_lander(); 
 	//archery(false);
-	shooter(false);
+	//shooter(false);
 	//credits();
 	
 	fps_counter = al_get_time();

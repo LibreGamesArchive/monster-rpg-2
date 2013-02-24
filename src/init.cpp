@@ -73,7 +73,7 @@ void init_big_depth_surface(void)
 	al_get_monitor_info(config.getAdapter(), &mi);
 	int w = mi.x2 - mi.x1;
 	int h = mi.y2 - mi.y1;
-	int size = 1024;
+	int size = 4096;
 	while (size < w || size < h)
 		size = size * 2;
 

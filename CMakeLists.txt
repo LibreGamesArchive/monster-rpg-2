@@ -165,6 +165,7 @@ if(WIN32)
 		"wsock32"
 		"ws2_32"
 		"freetype"
+		"png"
 		"z"
 	)
 	SET(MAIN_LIBS 

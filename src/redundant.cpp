@@ -1055,20 +1055,21 @@ void m_draw_scaled_backbuffer(int sx, int sy, int sw, int sh, int dx, int dy, in
 	MBITMAP *tmp = m_create_bitmap(sw, sh);
 	int scr_w = al_get_display_width(display);
 	int scr_h = al_get_display_height(display);
-	if (sx+sw >= scr_w) {
-		sw = scr_w-sx-1;
+	if (sx+sw > scr_w) {
+		sw = scr_w-sx;
 	}
 	else if (sx < 0) {
 		sw -= sx;
 		sx = 0;
 	}
-	if (sy+sh >= scr_h) {
-		sh = scr_h-sy-1;
+	if (sy+sh > scr_h) {
+		sh = scr_h-sy;
 	}
 	else if (sy < 0) {
 		sh -= sy;
 		sy = 0;
 	}
+#ifdef ALLEGRO_RASPBERYPI
 	ALLEGRO_LOCKED_REGION *lr1 = al_lock_bitmap(tmp->bitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
 	ALLEGRO_LOCKED_REGION *lr2 = al_lock_bitmap_region(
 		al_get_backbuffer(display),
@@ -1084,6 +1085,10 @@ void m_draw_scaled_backbuffer(int sx, int sy, int sw, int sh, int dx, int dy, in
 	}
 	al_unlock_bitmap(tmp->bitmap);
 	al_unlock_bitmap(al_get_backbuffer(display));
+#else
+	al_set_target_bitmap(tmp->bitmap);
+	al_draw_bitmap_region(al_get_backbuffer(display), sx, sy, sw, sh, 0, 0, 0);
+#endif
 	al_set_target_bitmap(dest->bitmap);
 	al_draw_scaled_bitmap(
 		tmp->bitmap,
@@ -1093,6 +1098,7 @@ void m_draw_scaled_backbuffer(int sx, int sy, int sw, int sh, int dx, int dy, in
 	);
 	m_destroy_bitmap(tmp);
 	al_set_target_bitmap(old_target);
+	al_set_new_bitmap_format(old_format);
 }
 
 void m_draw_bitmap_identity_view(MBITMAP *bmp, int x, int y, int flags)
