@@ -508,6 +508,16 @@ void m_flip_display(void)
 
 	al_flip_display();
 
+	int xxx, yyy, www, hhh;
+	al_get_clipping_rectangle(&xxx, &yyy, &www, &hhh);
+	al_set_clipping_rectangle(
+		0, 0,
+		al_get_display_width(display),
+		al_get_display_height(display)
+	);
+	m_clear(black);
+	al_set_clipping_rectangle(xxx, yyy, www, hhh);
+
 	if (controller_display)
 	{
 		ALLEGRO_BITMAP *target = al_get_target_bitmap();

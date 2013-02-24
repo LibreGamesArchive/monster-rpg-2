@@ -520,9 +520,12 @@ static void draw(double cx, double cy, bool draw_objects = true)
 	al_copy_transform(&proj_push, al_get_projection_transform(display));
 	al_copy_transform(&view_push, al_get_current_transform());
 
+	int dx, dy, dw, dh;
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
+
 	al_identity_transform(&view);
 	al_use_transform(&view);
-
+	
 	al_identity_transform(&proj);
 	al_rotate_transform_3d(&proj, 1, 0, 0, D2R(1));
 	al_translate_transform_3d(&proj, 0, 137, -1);
@@ -530,18 +533,22 @@ static void draw(double cx, double cy, bool draw_objects = true)
 	al_perspective_transform(&proj, -BW/2, -BH/2, 1, BW/2, BH/2, 1000);
 	al_set_projection_transform(display, &proj);
 
-	#ifdef A5_D3D
+#ifdef A5_D3D
 	D3DVIEWPORT9 backup_vp;
 	al_get_d3d_device(display)->GetViewport(&backup_vp);
 	D3DVIEWPORT9 vp;
-	vp.X = 0;
-	vp.Y = 0;
-	vp.Width = BW;
-	vp.Height = BH;
+	vp.X = dx;
+	vp.Y = dy;
+	vp.Width = dw;
+	vp.Height = dh;
 	vp.MinZ = 0;
 	vp.MaxZ = 1;
 	al_get_d3d_device(display)->SetViewport(&vp);
-	#endif
+#else
+	GLint vp[4];
+	glGetIntegerv(GL_VIEWPORT, vp);
+	glViewport(dx, dy, dw, dh);
+#endif
 
 	disable_cull_face();
 	disable_zbuffer();
@@ -552,9 +559,11 @@ static void draw(double cx, double cy, bool draw_objects = true)
 	al_set_projection_transform(display, &proj_push);
 	al_use_transform(&view_push);
 	
-	#ifdef A5_D3D
+#ifdef A5_D3D
 	al_get_d3d_device(display)->SetViewport(&backup_vp);
-	#endif
+#else
+	glViewport(vp[0], vp[1], vp[2], vp[3]);
+#endif
 
 	if (!draw_objects) return;
 
