@@ -695,7 +695,6 @@ static void levelUpCallback(int selected, LEVEL_UP_CALLBACK_DATA *d)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -891,7 +890,6 @@ bool levelUp(Player *player, int bonus)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}

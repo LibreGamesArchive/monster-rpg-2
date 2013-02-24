@@ -1968,18 +1968,7 @@ int SprayEffect::getLifetime(void)
 
 void SprayEffect::draw(void)
 {
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
-	if (use_programmable_pipeline) {
-		_blend_color = white;
-		al_set_separate_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_ALPHA,
-			ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ONE);
-	}
-	else {
-#endif
 	m_set_blender(ALLEGRO_ALPHA, ALLEGRO_ALPHA, white);
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
-	}
-#endif
 	
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	int count = 0;

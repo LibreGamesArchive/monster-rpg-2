@@ -245,7 +245,6 @@ void showIpod(void)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -649,7 +648,6 @@ static bool gen_event(ALLEGRO_EVENT *e, char c)
 }
 - (void)textViewDidChange:(UITextView *)textView
 {
-printf("TVDC!!!!!!!!!\n");
 	while ([textView.text length] > 0) {
 		NSString *first = [textView.text substringToIndex:1];
 		NSString *remain = [textView.text substringFromIndex:1];

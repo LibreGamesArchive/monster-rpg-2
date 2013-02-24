@@ -728,7 +728,6 @@ static int CDoDialogue(lua_State *stack)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -828,7 +827,6 @@ static int CDoShakeDialogue(lua_State *stack)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				lua_pushboolean(stack, false);
 				tguiDeleteWidget(speechDialog);
@@ -938,7 +936,6 @@ bool anotherDoDialogue(const char *text, bool clearbuf, bool top, bool draw_area
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -2956,7 +2953,6 @@ static int CDoItemTutorial(lua_State *stack)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -3204,7 +3200,6 @@ static int CDoMapTutorial(lua_State *stack)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -3357,7 +3352,6 @@ static int CDoKingKingAlbertLook(lua_State *stack)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -3469,7 +3463,6 @@ static int CDoKeepLook(lua_State *stack)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}

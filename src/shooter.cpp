@@ -640,6 +640,51 @@ static void draw_all(void)
 	do_swap = false;
 	old_yoffset = -1;
 }
+	
+static int crabs_destroyed;
+static int sharks_destroyed;
+MBITMAP *shark_icon;
+MBITMAP *crab_icon;
+MBITMAP *sub_icon;
+static int starty;
+
+void draw_everything()
+{
+	m_clear(m_map_rgb(105, 115, 145));
+
+	draw(x, o);
+
+	tguiDraw();
+
+	m_save_blender();
+	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
+	m_draw_bitmap(crab_icon, 0, 0, 0);
+	m_draw_bitmap(shark_icon, 0, 16, 0);
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+	m_draw_alpha_bitmap(pause_icon, BW-m_get_bitmap_width(pause_icon)-4, 3);
+#endif
+	char buf[100];
+	sprintf(buf, "%d", crabs_destroyed);
+	mTextout_simple(buf, 18, 2, white);
+	sprintf(buf, "%d", sharks_destroyed);
+	mTextout_simple(buf, 18, 16+2, white);
+
+	double total_length = ((h*TILE_SIZE)-starty)-(TILE_SIZE*140);
+	double progress = -(o - total_length);
+	progress /= total_length;
+	m_draw_line(BW/2-50, 8, BW/2+50, 8, black);
+	int progx = (progress*100-50)+BW/2;
+	m_draw_bitmap(
+		sub_icon,
+		progx-m_get_bitmap_width(sub_icon)/2,
+		0,
+		M_FLIP_HORIZONTAL
+	);
+
+	m_restore_blender();
+	
+	drawBufferToScreen();
+}
 
 bool shooter(bool for_points)
 {
@@ -671,9 +716,6 @@ bool shooter(bool for_points)
 
 	dpad_off();
 
-	int crabs_destroyed;
-	int sharks_destroyed;
-
 	underwater = m_load_bitmap(getResource("media/underwater.png"));
 
 	sub_bmp = m_load_bitmap(getResource("media/sub.png"));
@@ -688,11 +730,11 @@ bool shooter(bool for_points)
 	crab_bmp = crab->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 	shark_bmp = shark_anim->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 
-	MBITMAP *shark_icon = m_load_bitmap(getResource("media/shark_icon.png"));
-	MBITMAP *crab_icon = m_load_bitmap(getResource("media/crab_icon.png"));
+	shark_icon = m_load_bitmap(getResource("media/shark_icon.png"));
+	crab_icon = m_load_bitmap(getResource("media/crab_icon.png"));
 	
 	MBITMAP *pause_icon = m_load_alpha_bitmap(getResource("media/sub_pause.png"));
-	MBITMAP *sub_icon = m_load_bitmap(getResource("media/shooter/sub_small.png"));
+	sub_icon = m_load_bitmap(getResource("media/shooter/sub_small.png"));
 
 	const int pause_icon_w = m_get_bitmap_width(pause_icon);
 	const int pause_icon_h = m_get_bitmap_height(pause_icon);
@@ -763,7 +805,7 @@ start:
 	crabs = crabs_start;
 	sharks = sharks_start;
 
-	int starty = 176;
+	starty = 176;
 	int startx = 0;
 
 	o = (h*TILE_SIZE)-starty;
@@ -802,7 +844,6 @@ start:
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -985,11 +1026,13 @@ start:
 			if (!use_dpad) {
 				state.buttons = !released;
 			}
-			else
 #endif
-				state.buttons = 0;
 			InputDescriptor in = getInput()->getDescriptor();
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			if (state.buttons || in.button2) {
+#else
+			if (in.button2) {
+#endif
 				int press_x = state.x;
 				int press_y = state.y;
 				if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN)
@@ -1001,13 +1044,22 @@ start:
 				double dist = sqrt((float)dx*dx + dy*dy);
 				if (dist < pause_icon_w/2 || in.button2) {
 					// pause
+					draw_everything();
+					int dx, dy, dw, dh;
+					get_screen_offset_size(&dx, &dy, &dw, &dh);
+					int flags = al_get_new_bitmap_flags();
+					al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+					MBITMAP *tmp = m_create_bitmap(dw, dh);
+					al_set_new_bitmap_flags(flags);
+					m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmp);
+
 					const char *pause_text = "Paused";
 					int tw = m_text_length(game_font, _t(pause_text));
 					int th = m_text_height(game_font);
 					al_set_target_backbuffer(display);
 					m_draw_rectangle(BW/2-tw/2-5, BH/2-th/2-5, BW/2+tw/2+5, BH/2+th/2+5, black, M_FILLED);
 					m_draw_rectangle(BW/2-tw/2-5+0.5, BH/2-th/2-5+0.5, BW/2+tw/2+5, BH/2+th/2+5, white, M_OUTLINED);
-					mTextout_simple(_t(pause_text), BW/2-tw/2, BH/2-th/2, white);
+					mTextout_simple(_t(pause_text), BW/2-tw/2, BH/2-th/2+2, white);
 					drawBufferToScreen();
 					m_flip_display();
 
@@ -1026,7 +1078,6 @@ start:
 							do_close();
 							close_pressed = false;
 						}
-						// WARNING
 						if (break_main_loop) {
 							goto done;
 						}
@@ -1056,16 +1107,27 @@ start:
 								break;
 							}
 						}
+						al_set_target_backbuffer(display);
+						m_draw_bitmap_identity_view(tmp, dx, dy, 0);
+						m_draw_rectangle(BW/2-tw/2-5, BH/2-th/2-5, BW/2+tw/2+5, BH/2+th/2+5, black, M_FILLED);
+						m_draw_rectangle(BW/2-tw/2-5+0.5, BH/2-th/2-5+0.5, BW/2+tw/2+5, BH/2+th/2+5, white, M_OUTLINED);
+						mTextout_simple(_t(pause_text), BW/2-tw/2, BH/2-th/2+2, white);
 						drawBufferToScreen();
 						m_flip_display();
 						m_rest(0.005);
 					}
 
+					m_destroy_bitmap(tmp);
+
 					al_start_timer(logic_timer);
 
 					shooter_paused = false;
 
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 					al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
+					last_mouse_x = al_get_display_width(display)/2;
+					al_rest(0.5);
+#endif
 				}
 			}
 
@@ -1153,40 +1215,8 @@ start:
 			draw_counter = 0;
 
 			al_set_target_backbuffer(display);
-			m_clear(m_map_rgb(105, 115, 145));
-	
-			draw(x, o);
 
-			tguiDraw();
-		
-			m_save_blender();
-			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-			m_draw_bitmap(crab_icon, 0, 0, 0);
-			m_draw_bitmap(shark_icon, 0, 16, 0);
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-			m_draw_alpha_bitmap(pause_icon, BW-m_get_bitmap_width(pause_icon)-4, 3);
-#endif
-			char buf[100];
-			sprintf(buf, "%d", crabs_destroyed);
-			mTextout_simple(buf, 18, 2, white);
-			sprintf(buf, "%d", sharks_destroyed);
-			mTextout_simple(buf, 18, 16+2, white);
-
-			double total_length = ((h*TILE_SIZE)-starty)-(TILE_SIZE*140);
-			double progress = -(o - total_length);
-			progress /= total_length;
-			m_draw_line(BW/2-50, 8, BW/2+50, 8, black);
-			int progx = (progress*100-50)+BW/2;
-			m_draw_bitmap(
-				sub_icon,
-				progx-m_get_bitmap_width(sub_icon)/2,
-				0,
-				M_FLIP_HORIZONTAL
-			);
-	
-			m_restore_blender();
-			
-			drawBufferToScreen();
+			draw_everything();
 
 			if (o < TILE_SIZE*140) {
 				break_for_fade_after_draw = true;
@@ -1194,7 +1224,21 @@ start:
 			if (break_for_fade_after_draw) {
 				break;
 			}
+
+			bool reset_mouse = false;
+			if (prompt_for_close_on_next_flip) {
+				reset_mouse = true;
+			}
+
 			m_flip_display();
+
+			if (reset_mouse) {
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+				al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
+				last_mouse_x = al_get_display_width(display)/2;
+				al_rest(0.5);
+#endif
+			}
 		}
 	}
 done:

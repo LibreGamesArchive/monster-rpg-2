@@ -358,7 +358,7 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 	int tw = m_text_length(game_font, _t("OK"));
 
 	tguiPush();
-	FakeWidget *w1 = new FakeWidget(BW/2-tw/2, (y+h-15)-th, tw, 16);
+	FakeWidget *w1 = new FakeWidget(BW/2-tw/2, (y+h-15)-th/2-2, tw, 16);
 	MRectangle *fullscreenRect = new MRectangle(0, 0, BW, BH,
 		m_map_rgba(0, 0, 0, 0), 0);
 	tguiSetParent(0);
@@ -384,7 +384,6 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -577,6 +576,7 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 	int h = 65;
 	int x = (BW-w)/2;
 	int y = (BH-h)/2;
+	int th = m_text_height(game_font);
 
 	tguiClearMouseEvents();
 
@@ -584,7 +584,7 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 
 	MRectangle *fullscreenRect = new MRectangle(0, 0, BW, BH,
 		m_map_rgba(0, 0, 0, 0), 0);
-	FakeWidget *w1 = new FakeWidget(BW/2-6, y+53-6, 12, 12);
+	FakeWidget *w1 = new FakeWidget(BW/2-6, y+53-th/2-2, 12, 12);
 	tguiSetParent(0);
 	tguiAddWidget(fullscreenRect);
 	tguiSetParent(fullscreenRect);
@@ -607,7 +607,6 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -719,9 +718,9 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 	tguiPush();
 	MRectangle *fullscreenRect = new MRectangle(0, 0, BW, BH,
 		m_map_rgba(0, 0, 0, 0), 0);
-	FakeWidget *w1 = new FakeWidget(x1-l1/2, ty+th/2-8, l1, 16);
-	FakeWidget *w2 = new FakeWidget(x2-l2/2, ty+th/2-8, l2, 16);
-	FakeWidget *w3 = new FakeWidget(x3-l3/2, ty+th/2-8, l3, 16);
+	FakeWidget *w1 = new FakeWidget(x1-l1/2, ty-th/2-2, l1, 16);
+	FakeWidget *w2 = new FakeWidget(x2-l2/2, ty-th/2-2, l2, 16);
+	FakeWidget *w3 = new FakeWidget(x3-l3/2, ty-th/2-2, l3, 16);
 	tguiSetParent(0);
 	tguiAddWidget(fullscreenRect);
 	tguiSetParent(fullscreenRect);
@@ -746,7 +745,6 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -889,9 +887,9 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 
 	MRectangle *fullscreenRect = new MRectangle(0, 0, BW, BH,
 		m_map_rgba(0, 0, 0, 0), 0);
-	FakeWidget *w1 = new FakeWidget(BW/2-w/4-(len_1/2), (y+43)+th/2-8,
+	FakeWidget *w1 = new FakeWidget(BW/2-w/4-(len_1/2), (y+43)-th/2-2,
 		len_1, 16);
-	FakeWidget *w2 = new FakeWidget(BW/2+w/4-(len_2/2), (y+43)+th/2-8,
+	FakeWidget *w2 = new FakeWidget(BW/2+w/4-(len_2/2), (y+43)-th/2-2,
 		len_2, 16);
 	tguiSetParent(0);
 	tguiAddWidget(fullscreenRect);
@@ -929,7 +927,6 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 					do_close();
 					close_pressed = false;
 				}
-				// WARNING
 				if (break_main_loop) {
 					goto done;
 				}
@@ -1108,7 +1105,6 @@ int config_input(int type)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -2724,7 +2720,6 @@ int MMap::update(int millis)
 					do_close();
 					close_pressed = false;
 				}
-				// WARNING
 				if (break_main_loop) {
 					break;
 				}
@@ -7410,7 +7405,7 @@ MTab::MTab(std::string text, int x, int y) {
 	clicked = false;
 	int flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-	bmp = m_create_bitmap(width, 14); // check
+	bmp = m_create_bitmap(width, 14);
 	al_set_new_bitmap_flags(flags);
 	m_push_target_bitmap();
 	m_set_target_bitmap(bmp);

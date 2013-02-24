@@ -685,7 +685,6 @@ static int real_archery(int *accuracy_pts)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -1261,7 +1260,6 @@ void volcano_scene(void)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}

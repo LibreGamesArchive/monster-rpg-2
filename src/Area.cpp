@@ -2015,7 +2015,6 @@ void Area::loadAnimation(int index, bool addIndex)
 	al_set_physfs_file_interface();
 	MBITMAP *tmp = m_load_bitmap(nm);
 	al_set_standard_file_interface();
-	al_save_bitmap("test.png", tmp->bitmap);
 #endif
 	int xx = tm_used % tm_w;
 	int yy = tm_used / tm_w;

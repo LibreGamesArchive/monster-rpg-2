@@ -31,7 +31,6 @@ static inline ALLEGRO_BITMAP *my_load_bitmap(
 	ALLEGRO_BITMAP *b = NULL;
 
 	if (fp) {
-	printf("in my_load al_get_new_bitmap_format=%d\n", al_get_new_bitmap_format());
 		b = al_load_bitmap_f(fp, ext);
 		al_fclose(fp);
 	}

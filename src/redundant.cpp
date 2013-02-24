@@ -484,6 +484,8 @@ void m_destroy_bitmap(MBITMAP *bmp, bool internals_only)
 
 void m_flip_display(void)
 {
+	bool skip_flip = false;
+
 	if (prompt_for_close_on_next_flip) {
 		bool hide = is_cursor_hidden();
 		show_mouse_cursor();
@@ -498,6 +500,7 @@ void m_flip_display(void)
 		else if (r == 1) {
 			do_close_exit_game();
 		}
+		skip_flip = true;
 	}
 
 	if (show_item_info_on_flip >= 0) {
@@ -506,7 +509,9 @@ void m_flip_display(void)
 		showItemInfo(tmp, true);
 	}
 
-	al_flip_display();
+	if (!skip_flip) {
+		al_flip_display();
+	}
 
 	int xxx, yyy, www, hhh;
 	al_get_clipping_rectangle(&xxx, &yyy, &www, &hhh);
@@ -558,7 +563,6 @@ void m_rest(double seconds)
 			do_close();
 			close_pressed = false;
 		}
-		// WARNING
 		if (break_main_loop) {
 			break;
 		}
@@ -599,9 +603,16 @@ void m_set_target_bitmap(MBITMAP *bmp)
 
 void m_set_clip(int x1, int y1, int x2, int y2)
 {
-	int dx, dy, dw, dh;
-	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	al_set_clipping_rectangle(dx+x1*screenScaleX, dy+y1*screenScaleY, (x2-x1)*screenScaleX, (y2-y1)*screenScaleY);
+	if (al_get_target_bitmap() == al_get_backbuffer(display)) {
+		int dx, dy, dw, dh;
+		get_screen_offset_size(&dx, &dy, &dw, &dh);
+		al_set_clipping_rectangle(dx+x1*screenScaleX, dy+y1*screenScaleY, (x2-x1)*screenScaleX, (y2-y1)*screenScaleY);
+	}
+	else {
+		al_set_clipping_rectangle(
+			x1, y1, x2-x1, y2-y1
+		);
+	}
 }
 
 
@@ -823,14 +834,12 @@ void m_save_blender(void)
 {
 	SAVED_BLENDER sb;
 
-	al_get_separate_blender(
+	al_get_blender(
 		&sb.oldColorOp,
 		&sb.oldSrcColorFactor,
-		&sb.oldDestColorFactor,
-		&sb.oldAlphaOp,
-		&sb.oldSrcAlphaFactor,
-		&sb.oldDestAlphaFactor
+		&sb.oldDestColorFactor
 	);
+
 	sb.oldBlendColor = _blend_color;
 
 	blender_stack.push(sb);
@@ -842,14 +851,12 @@ void m_restore_blender(void)
 	SAVED_BLENDER sb = blender_stack.top();
 	blender_stack.pop();
 
-	al_set_separate_blender(
+	al_set_blender(
 		sb.oldColorOp,
 		sb.oldSrcColorFactor,
-		sb.oldDestColorFactor,
-		sb.oldAlphaOp,
-		sb.oldSrcAlphaFactor,
-		sb.oldDestAlphaFactor
+		sb.oldDestColorFactor
 	);
+
 	_blend_color = sb.oldBlendColor;
 }
 
@@ -1026,6 +1033,8 @@ static MBITMAP *clone_sub_bitmap(MBITMAP *b)
 	m_set_target_bitmap(clone);
 	m_clear(al_map_rgba_f(0, 0, 0, 0));
 
+	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+
 	m_draw_bitmap(b, 0, 0, 0);
 
 	al_restore_state(&st);
@@ -1069,7 +1078,7 @@ void m_draw_scaled_backbuffer(int sx, int sy, int sw, int sh, int dx, int dy, in
 		sh -= sy;
 		sy = 0;
 	}
-#ifdef ALLEGRO_RASPBERYPI
+#ifdef ALLEGRO_RASPBERRYPI
 	ALLEGRO_LOCKED_REGION *lr1 = al_lock_bitmap(tmp->bitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
 	ALLEGRO_LOCKED_REGION *lr2 = al_lock_bitmap_region(
 		al_get_backbuffer(display),

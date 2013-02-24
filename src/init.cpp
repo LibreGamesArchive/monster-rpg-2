@@ -321,6 +321,7 @@ void load_fonts(void)
 	load_translation(get_language_name(config.getLanguage()).c_str());
 }
 
+#if 0
 static void create_shadows(MBITMAP *bmp, RecreateData *data)
 {
 	(void)data;
@@ -363,20 +364,9 @@ static void create_shadows(MBITMAP *bmp, RecreateData *data)
 	m_unlock_bitmap(shadow_corners[2]);
 #endif
 	_blend_color = white;
-	
-	if (use_programmable_pipeline) {
-		al_set_separate_blender(
-			ALLEGRO_ADD,
-			ALLEGRO_ONE,
-			ALLEGRO_ZERO,
-			ALLEGRO_ADD,
-			ALLEGRO_ONE,
-			ALLEGRO_ONE
-		);
-	}
-	else {
-		al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
-	}
+
+	//al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA);
+	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
 
 	// Can't draw bitmaps to themselves except MEMORY or locked ones, so lock it
 
@@ -399,7 +389,10 @@ static void create_shadows(MBITMAP *bmp, RecreateData *data)
 		m_destroy_bitmap(shadow_corners[i]);
 		m_destroy_bitmap(shadow_sides[i]);
 	}
+
+	al_save_bitmap("test.png", bmp->bitmap);
 }
+#endif
 
 static void destroy_shadows(MBITMAP *bmp)
 {
@@ -1573,8 +1566,9 @@ bool init(int *argc, char **argv[])
 	else {
 		al_hide_mouse_cursor(display);
 	}
-#endif
+#else
 	show_mouse_cursor();
+#endif
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (sd->fullscreen) {
@@ -1754,7 +1748,8 @@ bool init(int *argc, char **argv[])
 
 	al_set_new_bitmap_flags(ALLEGRO_CONVERT_BITMAP);
 
-	shadow_sheet = m_create_alpha_bitmap(4*16, 2*16, create_shadows, NULL, destroy_shadows);
+	//shadow_sheet = m_create_alpha_bitmap(4*16, 2*16, create_shadows, NULL, destroy_shadows);
+	shadow_sheet = m_load_alpha_bitmap(getResource("media/shadows.png"));
 	draw_loading_screen(tmp, 100, sd);
 
 	m_destroy_bitmap(tmp);
@@ -2165,6 +2160,8 @@ void show_mouse_cursor()
 {
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
 	custom_mouse_cursor = custom_mouse_cursor_saved;
+#elif defined ALLEGRO_RASPBERRYPI
+	al_show_mouse_cursor(display);
 #endif
 }
 
@@ -2172,6 +2169,8 @@ void hide_mouse_cursor()
 {
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
 	custom_mouse_cursor = NULL;
+#elif defined ALLEGRO_RASPBERRYPI
+	al_hide_mouse_cursor(display);
 #endif
 }
 

@@ -172,7 +172,6 @@ static void showMusicToggle(void)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -293,7 +292,6 @@ static void showIpodControls(void)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -458,7 +456,6 @@ void showSaveStateInfo(const char *basename)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -709,7 +706,6 @@ void showItemInfo(int index, bool preserve_buffer)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -1218,7 +1214,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				if (section == CHOOSER) {
 					tguiDeleteWidget(formChooser_target);
@@ -1932,7 +1927,6 @@ void doMap(std::string startPlace, std::string prefix)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -2073,7 +2067,6 @@ void doShop(std::string name, const char *imageName, int nItems,
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -2263,7 +2256,6 @@ void into_the_sun(void)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -2506,7 +2498,6 @@ void credits(void)
 			do_close();
 			close_pressed = false;
 		}
-		// WARNING
 		if (break_main_loop) {
 			goto done;
 		}
@@ -2850,7 +2841,6 @@ done:
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done2;
 			}
@@ -3019,7 +3009,6 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -3331,7 +3320,6 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				*num = -1;
 				goto done;
@@ -3790,7 +3778,6 @@ bool config_menu(bool start_on_fullscreen)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
@@ -4072,7 +4059,6 @@ static void hqm_menu(void)
 				do_close();
 				close_pressed = false;
 			}
-			// WARNING
 			if (break_main_loop) {
 				goto done;
 			}
