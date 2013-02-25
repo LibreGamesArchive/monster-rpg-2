@@ -986,7 +986,8 @@ void battleTransition(void)
 		int phases = rand() % 3 + 1;
 		int *phase_lengths = new int[phases];
 		int *phase_peaks = new int[phases];
-		int max = 0;
+		int max = INT_MIN;
+		int min = INT_MAX;
 		for (int i = 0; i < phases; i++) {
 			phase_lengths[i] = BW/phases;
 		}
@@ -997,8 +998,12 @@ void battleTransition(void)
 		}
 		for (int i = 0; i < phases; i++) {
 			phase_peaks[i] = rand() % 30 + 25;
-			if (phase_peaks[i] > max)
+			if (phase_peaks[i] > max) {
 				max = phase_peaks[i];
+			}
+			else if (phase_peaks[i] < min) {
+				min = phase_peaks[i];
+			}
 		}
 		int n = 0;
 		for (int i = 0; i < phases; i++) {
@@ -1023,7 +1028,7 @@ void battleTransition(void)
 				al_hold_bitmap_drawing(true);
 				for (int i = 0; i < BW; i++) {
 					float p = (float)elapsed/length;
-					int h = (heights[i] + p*(BH+max)) - max;
+					int h = (heights[i] + p*(BH+max));
 					if (h > 0)
 						m_draw_bitmap_region(bufcopy2,
 							i, 0, 1, h, i, 0, 0);

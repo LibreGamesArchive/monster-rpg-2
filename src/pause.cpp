@@ -1443,7 +1443,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 									tguiDraw();
 									hide_mouse_cursor();
 									drawBufferToScreen();
-									hide_mouse_cursor();
+									show_mouse_cursor();
 									notify("You have no", "room in your", "inventory.");
 								}
 							}
@@ -2091,11 +2091,13 @@ void doShop(std::string name, const char *imageName, int nItems,
 						sprintf(s2, "1: %d", costs[sel]);
 						sprintf(s3, "5: %d", 5*costs[sel]);
 						int choice;
+						DRAW
 						if ((choice = triple_prompt(s1, s2, s3, "Buy 1", "Buy 5", "Cancel", 2)) != 2) {
 							int q = choice == 0 ? 1 : 5;
 							int total_cost = costs[sel]*q;
 							if (total_cost > gold) {
 								playPreloadedSample("error.ogg");
+								DRAW
 								notify("You don't have", "enough gold to buy that!", "");
 							}
 							else {
@@ -2113,6 +2115,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 									}
 								}
 								if (slot < 0) {
+									DRAW
 									notify("You don't have room", "for that!", "");
 								}
 								else {
@@ -2120,6 +2123,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 									inventory[slot].index = shop_inventory[sel].index;
 									inventory[slot].quantity += q;
 									loadPlayDestroy("chest.ogg");
+									DRAW
 									notify("", "Thank you!", "");
 								}
 							}
@@ -2144,6 +2148,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 						char s2[100];
 						if (inventory[sel].quantity > 1) {
 							sprintf(s1, _t("Sell all %d?"), inventory[sel].quantity);
+							DRAW
 							if (prompt(s1, "", 0, 0)) {
 								sell_quantity = inventory[sel].quantity;
 							}
@@ -2151,6 +2156,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 						int total_cost = getResaleValue(inventory[sel].index) * sell_quantity;
 						sprintf(s1, _t("Really sell %d"), sell_quantity);
 						sprintf(s2, _t("for %d gold?"), total_cost);
+						DRAW
 						if (prompt(s1, s2, 0, 0)) {
 							inventory[sel].quantity -= sell_quantity;
 							if (inventory[sel].quantity <= 0) {
@@ -2158,6 +2164,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 								inventory[sel].index = -1;
 							}
 							loadPlayDestroy("chest.ogg");
+							DRAW
 							notify("", "Thank you!", "");
 							gold += total_cost;
 						}
@@ -2165,6 +2172,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 					else {
 						playPreloadedSample("error.ogg");
 						if (items[inventory[sel].index].type == ITEM_TYPE_SPECIAL) {
+							DRAW
 							notify("You may", "need that...", "");
 						}
 					}

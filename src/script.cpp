@@ -892,7 +892,6 @@ static int CDoShakeDialogue(lua_State *stack)
 }
 
 
-// returns true if shaken
 bool anotherDoDialogue(const char *text, bool clearbuf, bool top, bool draw_area)
 {
 	bool ret = false;
@@ -908,7 +907,7 @@ bool anotherDoDialogue(const char *text, bool clearbuf, bool top, bool draw_area
 		area->draw();
 		hide_mouse_cursor();
 		drawBufferToScreen();
-		hide_mouse_cursor();
+		show_mouse_cursor();
 	}
 
 	int dx, dy, dw, dh;
@@ -946,13 +945,6 @@ bool anotherDoDialogue(const char *text, bool clearbuf, bool top, bool draw_area
 				goto done;
 			}
 	
-			INPUT_EVENT ie = get_next_input_event();
-			if (iphone_shaken(0.1) || ie.button2 == DOWN) {
-				use_input_event();
-				iphone_clear_shaken();
-				ret = true;
-				goto done;
-			}
 		}
 
 		if (draw_counter > 0) {
@@ -3212,10 +3204,6 @@ static int CDoMapTutorial(lua_State *stack)
 				if (mapWidget->getSelected() == "seaside") {
 					goto done;
 				}
-			}
-
-			if (iphone_shaken(0.1)) {
-				iphone_clear_shaken();
 			}
 		}
 

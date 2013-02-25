@@ -4790,7 +4790,6 @@ void MItemSelector::mouseDownAbs(int xx, int yy, int b)
 #endif
 
 	if (down || maybe_scrolling) {
-		printf("scrolling=%d dragging=%d\n", scrolling, dragging);
 		if (!scrolling && !dragging) {
 			down2X = xx+x;
 			down2Y = yy+y;
@@ -5082,8 +5081,8 @@ int MItemSelector::update(int millis)
 					playPreloadedSample("select.ogg");
 					int index = inventory[selected].index;
 					reset();
-					//showItemInfo(index, true);
 					show_item_info_on_flip = index;
+					maybe_scrolling = false;
 				}
 			}
 		}
@@ -5251,7 +5250,6 @@ int MItemSelector::update(int millis)
 		if (index >= 0) {
 			playPreloadedSample("select.ogg");
 			show_item_info_on_flip = index;
-			//showItemInfo(index, true);
 		}
 		else {
 			playPreloadedSample("error.ogg");
@@ -5271,7 +5269,6 @@ int MItemSelector::update(int millis)
 					int index = inventory[selected].index;
 					reset();
 					show_item_info_on_flip = index;
-					//showItemInfo(index, true);
 				}
 				else {
 					reset();
@@ -6362,7 +6359,6 @@ int MPartySelector::update(int millis)
 						down = false;
 						playPreloadedSample("select.ogg");
 						show_item_info_on_flip = index;
-						//showItemInfo(*toUnequip, true);
 					}
 				}
 				down = false;

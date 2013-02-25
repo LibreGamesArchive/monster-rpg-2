@@ -507,6 +507,7 @@ void m_flip_display(void)
 		int tmp = show_item_info_on_flip;
 		show_item_info_on_flip = -1;
 		showItemInfo(tmp, true);
+		skip_flip = true;
 	}
 
 	if (!skip_flip) {

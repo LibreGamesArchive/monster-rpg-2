@@ -1110,6 +1110,7 @@ int WhirlpoolEffect::getLifetime(void)
 
 void WhirlpoolEffect::draw(void)
 {
+	/*
 	int i = 0;
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
@@ -1134,6 +1135,66 @@ void WhirlpoolEffect::draw(void)
 	}
 
 	m_draw_prim(verts, 0, 0, 0, i, ALLEGRO_PRIM_POINT_LIST);
+	*/
+
+	int dx, dy, dw, dh;
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
+
+	int spx = target->getX();
+	int spy = target->getY();
+
+	int vpw = w*screenScaleX;
+	int vph = h*screenScaleY;
+	int vpx = dx + (spx*screenScaleX) - vpw/2;
+	/* 8 is the depth of the water! */
+	int vpy = dy + (spy*screenScaleY) + vph/2 - (8*screenScaleY);
+
+#ifdef A5_D3D
+	D3DVIEWPORT9 backup_vp;
+	al_get_d3d_device(display)->GetViewport(&backup_vp);
+	D3DVIEWPORT9 vp;
+	vp.X = vpx;
+	vp.Y = vpy;
+	vp.Width = vpw;
+	vp.Height = vph;
+	vp.MinZ = 0;
+	vp.MaxZ = 1;
+	al_get_d3d_device(display)->SetViewport(&vp);
+#else
+	GLint vp[4];
+	glGetIntegerv(GL_VIEWPORT, vp);
+	glViewport(vpx, al_get_display_height(display)-vpy, vpw, vph);
+#endif
+
+	ALLEGRO_TRANSFORM proj_backup, view_backup, t;
+	al_copy_transform(&proj_backup, al_get_projection_transform(display));
+	al_copy_transform(&view_backup, al_get_current_transform());
+
+	al_identity_transform(&t);
+
+	al_use_transform(&t);
+
+	al_rotate_transform_3d(&t, 1, 0, 0, D2R(1));
+	al_scale_transform_3d(&t, 1, 0.5f, 1);
+	al_translate_transform_3d(&t, 0, 0, -1.75);
+	al_perspective_transform(&t, -w/2, -h/2, 1, w/2, h/2, 1000);
+	al_set_projection_transform(display, &t);
+
+	al_draw_rotated_bitmap(
+		spiral->bitmap,
+		w/2, h/2,
+		0, 0,
+		angle, 0
+	);
+
+	al_set_projection_transform(display, &proj_backup);
+	al_use_transform(&view_backup);
+
+#ifdef A5_D3D
+	al_get_d3d_device(display)->SetViewport(&backup_vp);
+#else
+	glViewport(vp[0], vp[1], vp[2], vp[3]);
+#endif
 }
 
 
@@ -1164,15 +1225,19 @@ WhirlpoolEffect::WhirlpoolEffect(Combatant *target) :
 
 	this->target = target;
 
+	/*
 	for (int i = 0; i < SINTABSIZE; i++) {
 		float f = (float)i / SINTABSIZE * M_PI*2;
 		costable[i] = cos(f);
 		sintable[i] = sin(f);
 	}
+	*/
 
-	MBITMAP *spiral = m_load_alpha_bitmap(getResource("combat_media/Whirlpool.png"));
+	spiral = m_load_alpha_bitmap(getResource("combat_media/Whirlpool.png"));
 	w = m_get_bitmap_width(spiral);
 	h = m_get_bitmap_height(spiral);
+	
+	/*
 	colors = new ALLEGRO_COLOR[w*h];
 	atans = new float[w*h];
 	roots = new float[w*h];
@@ -1185,18 +1250,21 @@ WhirlpoolEffect::WhirlpoolEffect(Combatant *target) :
 		}
 	}
 	m_unlock_bitmap(spiral);
-	m_destroy_bitmap(spiral);
 	
 	verts = new ALLEGRO_VERTEX[w*h];
+	*/
 }
 
 
 WhirlpoolEffect::~WhirlpoolEffect(void)
 {
+	/*
 	delete[] colors;
 	delete[] atans;
 	delete[] roots;
 	delete[] verts;
+	*/
+	m_destroy_bitmap(spiral);
 }
 
 

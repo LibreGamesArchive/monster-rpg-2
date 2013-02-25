@@ -331,10 +331,13 @@ protected:
 	int count;
 	float angle;
 	int w, h;
+	/*
 	ALLEGRO_COLOR *colors;
 	float *atans;
 	float *roots;
         ALLEGRO_VERTEX *verts;
+	*/
+	MBITMAP *spiral;
 };
 
 

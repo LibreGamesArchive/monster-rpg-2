@@ -1747,10 +1747,9 @@ static void run()
 				if (area && party[heroSpot] && party[heroSpot]->getName() == "Eny" && party[heroSpot]->getObject()->getInput()->isPlayerControlled() &&
 						!speechDialog && !path_head) {
 					InputDescriptor ie = getInput()->getDescriptor();
-					if (ie.button2 || iphone_shaken(0.1)) {
-						waitForRelease(4);
-
-						if (area->getName() != "tutorial") {
+					if (area->getName() != "tutorial") {
+						if (ie.button2 || iphone_shaken(0.1)) {
+							waitForRelease(4);
 							iphone_clear_shaken();
 							int posx, posy;
 							party[heroSpot]->getObject()->getPosition(&posx, &posy);
