@@ -321,6 +321,7 @@ void load_fonts(void)
 	load_translation(get_language_name(config.getLanguage()).c_str());
 }
 
+/* KEEPME: If ever need to regen shadows.png, this is it */
 #if 0
 static void create_shadows(MBITMAP *bmp, RecreateData *data)
 {
@@ -389,15 +390,8 @@ static void create_shadows(MBITMAP *bmp, RecreateData *data)
 		m_destroy_bitmap(shadow_corners[i]);
 		m_destroy_bitmap(shadow_sides[i]);
 	}
-
-	al_save_bitmap("test.png", bmp->bitmap);
 }
 #endif
-
-static void destroy_shadows(MBITMAP *bmp)
-{
-	al_destroy_bitmap(bmp->bitmap);
-}
 
 ScreenSize small_screen(void)
 {

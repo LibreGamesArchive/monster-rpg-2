@@ -2906,8 +2906,6 @@ static int CDoItemTutorial(lua_State *stack)
 	drawBufferToScreen();
 	m_flip_display();
 
-	MBITMAP *tmp;
-
 	#define DLG(t, c) \
 		al_set_target_backbuffer(display); \
 		m_clear(black); \

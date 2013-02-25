@@ -4290,7 +4290,6 @@ int title_menu(void)
 	debug_message("doing title loop\n");
 
 	bool first_frame = true;
-	bool nofade = false;
 	
 	bool break_for_fade_after_draw = false;
 
@@ -4363,7 +4362,6 @@ int title_menu(void)
 
 			INPUT_EVENT ie = get_next_input_event();
 			if (ie.button2 == DOWN || iphone_shaken(0.1)) {
-				nofade = true;
 				selected = 0xBEEF;
 				goto done;
 			}

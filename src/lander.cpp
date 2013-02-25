@@ -402,8 +402,6 @@ top:
 		}
 	}
 
-done:
-
 	if (break_for_fade_after_draw) {
 		break_for_fade_after_draw = false;
 		fadeOut(black);

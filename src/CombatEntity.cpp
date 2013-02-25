@@ -15,10 +15,6 @@ static MBITMAP **bolt2_bmps;
 static int bolt2_bmp_ref_count = 0;
 static int num_bolt2_bmps;
 
-#define SINTABSIZE 100
-static float costable[SINTABSIZE];
-static float sintable[SINTABSIZE];
-
 extern "C" {
 void _al_blend_memory(ALLEGRO_COLOR *, ALLEGRO_BITMAP *, int, int, ALLEGRO_COLOR *);
 }
@@ -1110,33 +1106,6 @@ int WhirlpoolEffect::getLifetime(void)
 
 void WhirlpoolEffect::draw(void)
 {
-	/*
-	int i = 0;
-	for (int y = 0; y < h; y++) {
-		for (int x = 0; x < w; x++) {
-			int xx = x - w/2;
-			int yy = y - h/2;
-			float a  = angle + atans[y*w+x];
-			while (a < 0) a += M_PI*2;
-			while (a >= M_PI*2) a -= M_PI*2;
-			float radius = roots[y*w+x];
-			float s = 0.75 + ((float)(y+1)/h)*0.25;
-			int o = (w - (w*s))/2.0;
-			xx = w/2 + costable[(int)(a/(M_PI*2)*SINTABSIZE)] * radius;
-			yy = h/2 + sintable[(int)(a/(M_PI*2)*SINTABSIZE)] * radius;
-			if (xx >= 0 && yy >= 0 && xx < w && yy < h) {
-				verts[i].x = ((target->getX()-w/2+(x*s)) + o) + 0.5;
-				verts[i].y = (target->getY()-8-(h/6)+(y/3)) + 0.5;
-				verts[i].z = 0;
-				verts[i].color = colors[xx+yy*w];
-				i++;
-			}
-		}
-	}
-
-	m_draw_prim(verts, 0, 0, 0, i, ALLEGRO_PRIM_POINT_LIST);
-	*/
-
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
 
@@ -1147,7 +1116,11 @@ void WhirlpoolEffect::draw(void)
 	int vph = h*screenScaleY;
 	int vpx = dx + (spx*screenScaleX) - vpw/2;
 	/* 8 is the depth of the water! */
+#ifdef A5_D3D
+	int vpy = dy + (spy*screenScaleY) - vph/2 - (8*screenScaleY);
+#else
 	int vpy = dy + (spy*screenScaleY) + vph/2 - (8*screenScaleY);
+#endif
 
 #ifdef A5_D3D
 	D3DVIEWPORT9 backup_vp;
@@ -1225,45 +1198,14 @@ WhirlpoolEffect::WhirlpoolEffect(Combatant *target) :
 
 	this->target = target;
 
-	/*
-	for (int i = 0; i < SINTABSIZE; i++) {
-		float f = (float)i / SINTABSIZE * M_PI*2;
-		costable[i] = cos(f);
-		sintable[i] = sin(f);
-	}
-	*/
-
 	spiral = m_load_alpha_bitmap(getResource("combat_media/Whirlpool.png"));
 	w = m_get_bitmap_width(spiral);
 	h = m_get_bitmap_height(spiral);
-	
-	/*
-	colors = new ALLEGRO_COLOR[w*h];
-	atans = new float[w*h];
-	roots = new float[w*h];
-	m_lock_bitmap(spiral, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
-	for (int y = 0; y < h; y++) {
-		for (int x = 0; x < w; x++) {
-			colors[x+y*w] = m_get_pixel(spiral, x, y);
-			atans[x+y*w] = atan2((y-h/2), (x-w/2));
-			roots[x+y*w] = sqrtf(((x-w/2)*(x-w/2)) + ((y-h/2)*(y-h/2)));
-		}
-	}
-	m_unlock_bitmap(spiral);
-	
-	verts = new ALLEGRO_VERTEX[w*h];
-	*/
 }
 
 
 WhirlpoolEffect::~WhirlpoolEffect(void)
 {
-	/*
-	delete[] colors;
-	delete[] atans;
-	delete[] roots;
-	delete[] verts;
-	*/
 	m_destroy_bitmap(spiral);
 }
 
