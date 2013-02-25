@@ -1371,17 +1371,17 @@ void do_close(bool quit)
 	else if (area && !shouldDoMap) {
 		area->auto_save_game_to_memory(0, true, false);
 	}
-	if (close_pressed_for_configure) {
-		close_pressed_for_configure = false;
-		close_pressed = false;
-		config_menu();
-	}
 	if (forced_closed) {
 		forced_closed = false;
 		save_auto_save_to_disk();
 		config.write();
 		if (quit)
 			throw QuitError();
+	}
+	if (close_pressed_for_configure) {
+		close_pressed_for_configure = false;
+		close_pressed = false;
+		config_menu();
 	}
 #else
 	if (mapWidget) {
@@ -1395,9 +1395,8 @@ void do_close(bool quit)
 		close_pressed = false;
 		config_menu();
 	}
-	else
 #endif
-	{
+	else {
 		if (on_title_screen) {
 			do_close_exit_game();
 		}

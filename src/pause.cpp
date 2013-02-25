@@ -3893,6 +3893,9 @@ bool config_menu(bool start_on_fullscreen)
 				}
 				if (use_dpad) {
 					if (config.getTellUserToUseDpad()) {
+						al_set_target_backbuffer(display);
+						tguiDraw();
+						drawBufferToScreen();
 						notify("Use the on-screen directional", "pad and buttons to navigate.", "");
 						config.setTellUserToUseDpad(false);
 					}
