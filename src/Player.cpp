@@ -900,6 +900,10 @@ bool levelUp(Player *player, int bonus)
 				std::vector<int> &v = multiChooser->getSelected();
 				if (v.size() <= 0) {
 					bool cancelled = false;
+					al_set_target_backbuffer(display);
+					m_clear(black);
+					tguiDraw();
+					drawBufferToScreen();
 					bool prompt_ret = prompt("Reset and", "start over?", 0, 0, "", &cancelled);
 					if (!cancelled) {
 						if (prompt_ret == true) {
@@ -925,12 +929,8 @@ bool levelUp(Player *player, int bonus)
 			if (multiChooser->getTapped() >= 0) {
 				al_set_target_backbuffer(display);
 				m_clear(black);
-				m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-				// Draw the GUI
 				tguiDraw();
 				drawBufferToScreen();
-				m_flip_display();
-
 				levelUpCallback(multiChooser->getTapped(), &levelUpData);
 				multiChooser->setTapped(false);
 
@@ -944,8 +944,6 @@ bool levelUp(Player *player, int bonus)
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
 			m_clear(black);
-			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-			// Draw the GUI
 			tguiDraw();
 			drawBufferToScreen();
 			m_flip_display();
@@ -964,6 +962,10 @@ done:
 
 	bool ret;
 	bool prompt_ret;
+	al_set_target_backbuffer(display);
+	m_clear(black);
+	tguiDraw();
+	drawBufferToScreen();
 	prompt_ret = prompt("Keep changes?", "Select no to reset...", 0, 0);
 	if (prompt_ret) {
 		ret = false;

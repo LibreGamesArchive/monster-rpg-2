@@ -502,12 +502,17 @@ void m_flip_display(void)
 		}
 		skip_flip = true;
 	}
-
-	if (show_item_info_on_flip >= 0) {
+	else if (show_item_info_on_flip >= 0) {
 		int tmp = show_item_info_on_flip;
 		show_item_info_on_flip = -1;
 		showItemInfo(tmp, true);
 		skip_flip = true;
+	}
+	else if (save_ss_on_flip) {
+		save_ss_on_flip = false;
+		int dx, dy, dw, dh;
+		get_screen_offset_size(&dx, &dy, &dw, &dh);
+		m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW/2, BH/2, screenshot);
 	}
 
 	if (!skip_flip) {

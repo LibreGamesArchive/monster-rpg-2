@@ -975,21 +975,22 @@ void battleTransition(void)
 		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
 		int flags = al_get_new_bitmap_flags();
 		al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE);
-		MBITMAP *bufcopy2 = m_create_bitmap(BW, BH);
+		MBITMAP *bufcopy2 = m_create_bitmap(dw, dh);
 		al_set_new_bitmap_flags(flags);
 		al_set_new_bitmap_format(format);
 
-		m_set_target_bitmap(bufcopy2);
+		al_set_target_backbuffer(display);
 		battle->draw();
 
-		float heights[BW];
+		m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, bufcopy2);
+
+		float heights[dw];
 		int phases = rand() % 3 + 1;
 		int *phase_lengths = new int[phases];
 		int *phase_peaks = new int[phases];
 		int max = INT_MIN;
-		int min = INT_MAX;
 		for (int i = 0; i < phases; i++) {
-			phase_lengths[i] = BW/phases;
+			phase_lengths[i] = dw/phases;
 		}
 		for (int i = 0; i < phases-1; i++) {
 			int d = (rand()%60-30);
@@ -997,12 +998,9 @@ void battleTransition(void)
 			phase_lengths[i+1] -= d;
 		}
 		for (int i = 0; i < phases; i++) {
-			phase_peaks[i] = rand() % 30 + 25;
+			phase_peaks[i] = (rand() % (int)(30*screenScaleY)) + (25*screenScaleY);
 			if (phase_peaks[i] > max) {
 				max = phase_peaks[i];
-			}
-			else if (phase_peaks[i] < min) {
-				min = phase_peaks[i];
 			}
 		}
 		int n = 0;
@@ -1019,19 +1017,25 @@ void battleTransition(void)
 		long start = tguiCurrentTimeMillis();
 		int step = 0;
 
+		ALLEGRO_TRANSFORM backup, t;
+		al_set_target_backbuffer(display);
+		al_copy_transform(&backup, al_get_current_transform());
+		al_identity_transform(&t);
+		al_use_transform(&t);
+
 		while (elapsed < length) {
 			if (step) {
 				al_set_target_backbuffer(display);
 
-				m_draw_bitmap_identity_view(tmp, dx, dy, 0);
+				m_draw_bitmap(tmp, dx, dy, 0);
 
 				al_hold_bitmap_drawing(true);
-				for (int i = 0; i < BW; i++) {
+				for (int i = 0; i < dw; i++) {
 					float p = (float)elapsed/length;
-					int h = (heights[i] + p*(BH+max));
+					int h = (heights[i] + p*(dh+max));
 					if (h > 0)
 						m_draw_bitmap_region(bufcopy2,
-							i, 0, 1, h, i, 0, 0);
+							i, 0, 1, h, dx+i, dy, 0);
 				}
 				al_hold_bitmap_drawing(false);
 
@@ -1045,6 +1049,8 @@ void battleTransition(void)
 			elapsed += step;
 			start = end;
 		}
+
+		al_use_transform(&backup);
 		
 		dpad_on();
 		global_draw_red = true;

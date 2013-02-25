@@ -13,6 +13,7 @@ static bool compare_node_pointer(Node *n1, Node *n2)
 Area* area = 0;
 long roaming = 0;
 bool dpad_panning = false;
+bool save_ss_on_flip = false;
 
 const float ORB_RADIUS = 40.0f;
 
@@ -130,11 +131,13 @@ static void *save_auto_save_to_disk_thread(void *save_ss)
 		}
 	}
 
-	if (all_dead)
+	if (all_dead) {
 		return NULL;
+	}
 
-	if (!memory_saved)
+	if (!memory_saved) {
 		return NULL;
+	}
 
 	shift_auto_saves();
 	gzFile f = gzopen(getUserResource("auto0.save"), "wb9");
@@ -144,6 +147,9 @@ static void *save_auto_save_to_disk_thread(void *save_ss)
 		}
 		gzclose(f);
 	}
+
+	memory_saved = false;
+
 	if (screenshot && save_screenshot) {
 #ifdef ALLEGRO_ANDROID
 		al_set_standard_file_interface();
@@ -1422,9 +1428,7 @@ void real_auto_save_game_to_memory(bool save_ss)
 	memory_saved = true;
 
 	if (save_ss) {
-		int dx, dy, dw, dh;
-		get_screen_offset_size(&dx, &dy, &dw, &dh);
-		m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW/2, BH/2, screenshot);
+		save_ss_on_flip = true;
 	}
 	else {
 		ALLEGRO_BITMAP *old = al_get_target_bitmap();
@@ -1551,7 +1555,7 @@ void Area::update(int step)
 			update_count = 1;
 		}
 		else {
-			//auto_save_game_to_memory(step);
+			auto_save_game_to_memory(step);
 		}
 	}
 	else

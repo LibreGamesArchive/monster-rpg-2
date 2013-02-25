@@ -1268,7 +1268,7 @@ static int CStartBattle(lua_State *stack)
 		playAmbience("");
 	}
 
-	real_auto_save_game_to_memory(true);
+	area->auto_save_game_to_memory(0, true, true);
 
 	loadPlayDestroy("battle.ogg");
 	
