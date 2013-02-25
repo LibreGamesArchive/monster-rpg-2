@@ -29,6 +29,8 @@ bool wifiConnected(void);
 void disableMic(void);
 void initiOSKeyboard();
 
+extern ALLEGRO_KEYBOARD_STATE icade_keyboard_state;
+
 #ifdef __cplusplus
 }
 #endif

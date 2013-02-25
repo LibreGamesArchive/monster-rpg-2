@@ -3805,8 +3805,14 @@ bool config_menu(bool start_on_fullscreen)
 			if (w && w == controls) {
 				int type = MInputGetter::TYPE_KB;
 #if defined ALLEGRO_IPHONE
+				al_set_target_backbuffer(display);
+				tguiDraw();
+				drawBufferToScreen();
 				notify("These controls are for", "iCade only!", "");
 #elif defined ALLEGRO_ANDROID
+				al_set_target_backbuffer(display);
+				tguiDraw();
+				drawBufferToScreen();
 				notify("For Bluetooth keyboards use the", "RawInputIME input method", "");
 #endif
 				while (true) {
@@ -3969,11 +3975,8 @@ bool config_menu(bool start_on_fullscreen)
 
 		if (break_for_fade_after_draw || draw_counter > 0) {
 			draw_counter = 0;
-
 			al_set_target_backbuffer(display);
-
 			tguiDraw();
-
 			drawBufferToScreen();
 			if (break_for_fade_after_draw) {
 				break;

@@ -1115,6 +1115,9 @@ int config_input(int type)
 					bool dup = false;
 					for (int i = 0; i < num_getters; i++) {
 						for (int j = i+1; j < num_getters; j++) {
+							if (getters[i]->getValue() == 0) {
+								continue;
+							}
 							if (getters[i]->getValue() == getters[j]->getValue()) {
 								dup = true;
 								break;
@@ -1125,6 +1128,9 @@ int config_input(int type)
 						}
 					}
 					if (dup) {
+						al_set_target_backbuffer(display);
+						tguiDraw();
+						drawBufferToScreen();
 						notify("Duplicate values", "Please correct", "");
 					}
 					else {
@@ -1150,6 +1156,9 @@ int config_input(int type)
 							config.setJoyButton2(getters[1]->getValue());
 							config.setJoyButton3(getters[2]->getValue());
 						}
+						al_set_target_backbuffer(display);
+						tguiDraw();
+						drawBufferToScreen();
 						notify("", "Done", "");
 					}
 				}
@@ -1765,7 +1774,11 @@ int MInputGetter::update(int millis)
 			}
 			else {
 				ALLEGRO_KEYBOARD_STATE state;
+#ifdef ALLEGRO_IPHONE
+				memcpy(&state, &icade_keyboard_state, sizeof state);
+#else
 				al_get_keyboard_state(&state);
+#endif
 				if (type == TYPE_KB) {
 					for (int i = 0; i < ALLEGRO_KEY_MAX; i++) {
 						if (al_key_down(&state, i)) {
@@ -1778,7 +1791,11 @@ int MInputGetter::update(int millis)
 							mode = NORMAL;
 							getting_input_config = false;
 							do {
-								al_get_keyboard_state(&state);
+#ifdef ALLEGRO_IPHONE
+				memcpy(&state, &icade_keyboard_state, sizeof state);
+#else
+				al_get_keyboard_state(&state);
+#endif
 							} while (al_key_down(&state, value));
 							clear_input_events();
 							break;

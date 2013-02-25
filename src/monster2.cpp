@@ -24,6 +24,7 @@ static bool zeemote_enabled = false;
 #include "svg.hpp"
 
 bool mouse_in_display = true;
+bool forced_closed = false;
 
 static int last_mouse_x = -1, last_mouse_y;
 static int total_mouse_x, total_mouse_y;
@@ -1199,14 +1200,20 @@ top:
 			}
 		}
 			
-		if ((((event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN) && event.keyboard.keycode == config.getKeyQuit()) || event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) && !shooter_paused) {
+		if ((((event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN) && event.keyboard.keycode == config.getKeyQuit() && !getting_input_config) || event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) && !shooter_paused) {
 #ifdef ALLEGRO_IPHONE
 			if (!sound_was_playing_at_program_start)
 				iPodStop();
-#endif
+			if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+				forced_closed = true;
+			}
+			else {
+				forced_closed = false;
+			}
 			close_pressed = true;
-#ifdef ALLEGRO_IPHONE
 			break;
+#else
+			close_pressed = true;
 #endif
 		}
 	}
@@ -1369,7 +1376,8 @@ void do_close(bool quit)
 		close_pressed = false;
 		config_menu();
 	}
-	else {
+	if (forced_closed) {
+		forced_closed = false;
 		save_auto_save_to_disk();
 		config.write();
 		if (quit)
@@ -1387,7 +1395,9 @@ void do_close(bool quit)
 		close_pressed = false;
 		config_menu();
 	}
-	else {
+	else
+#endif
+	{
 		if (on_title_screen) {
 			do_close_exit_game();
 		}
@@ -1396,7 +1406,6 @@ void do_close(bool quit)
 			prompt_for_close_on_next_flip = true;
 		}
 	}
-#endif
 }
 
 
@@ -1963,14 +1972,7 @@ int main(int argc, char *argv[])
 		);
 		drawBufferToScreen();
 		m_flip_display();
-		
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-			if (is_close_pressed()) {
-				config.setMaintainAspectRatio(ma);
-				throw QuitError();
-			}
-#endif
-			
+					
 		//loadPlayDestroy("nooskewl.ogg");
 		m_rest(1.5);
 		m_clear(black);

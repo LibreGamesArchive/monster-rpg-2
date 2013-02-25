@@ -623,6 +623,8 @@ static bool gen_event(ALLEGRO_EVENT *e, char c)
 	return true;
 }
 
+ALLEGRO_KEYBOARD_STATE icade_keyboard_state;
+
 @interface KBDelegate : NSObject<UITextViewDelegate>
 - (void)start;
 - (void)textViewDidChange:(UITextView *)textView;
@@ -646,6 +648,7 @@ static bool gen_event(ALLEGRO_EVENT *e, char c)
 	[window addSubview:text_view];
 	[text_view becomeFirstResponder];
 }
+
 - (void)textViewDidChange:(UITextView *)textView
 {
 	while ([textView.text length] > 0) {
@@ -660,6 +663,10 @@ static bool gen_event(ALLEGRO_EVENT *e, char c)
 				e2 = (ALLEGRO_EVENT *)malloc(sizeof(ALLEGRO_EVENT));
 				e2->user.type = USER_KEY_CHAR;
 				e2->keyboard.keycode = e->keyboard.keycode;
+				_AL_KEYBOARD_STATE_SET_KEY_DOWN(icade_keyboard_state, e->keyboard.keycode);
+			}
+			else {
+				_AL_KEYBOARD_STATE_CLEAR_KEY_DOWN(icade_keyboard_state, e->keyboard.keycode);
 			}
 			al_emit_user_event(&user_event_source, e, destroy_event);
 			if (e2) {
@@ -679,5 +686,6 @@ void initiOSKeyboard()
 {
 	text_delegate = [[KBDelegate alloc] init];
 	[text_delegate performSelectorOnMainThread: @selector(start) withObject:nil waitUntilDone:YES];
+	memset(&icade_keyboard_state, 0, sizeof icade_keyboard_state);
 }
 

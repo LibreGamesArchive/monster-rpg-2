@@ -646,6 +646,7 @@ static int sharks_destroyed;
 MBITMAP *shark_icon;
 MBITMAP *crab_icon;
 MBITMAP *sub_icon;
+MBITMAP *pause_icon;
 static int starty;
 
 void draw_everything()
@@ -733,7 +734,7 @@ bool shooter(bool for_points)
 	shark_icon = m_load_bitmap(getResource("media/shark_icon.png"));
 	crab_icon = m_load_bitmap(getResource("media/crab_icon.png"));
 	
-	MBITMAP *pause_icon = m_load_alpha_bitmap(getResource("media/sub_pause.png"));
+	pause_icon = m_load_alpha_bitmap(getResource("media/sub_pause.png"));
 	sub_icon = m_load_bitmap(getResource("media/shooter/sub_small.png"));
 
 	const int pause_icon_w = m_get_bitmap_width(pause_icon);
@@ -880,8 +881,8 @@ start:
 			int tx = (int)(x/TILE_SIZE);
 			int ty = (int)(py/TILE_SIZE);
 
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 			ALLEGRO_MOUSE_STATE state;
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 			al_get_mouse_state(&state);
 #endif
 
