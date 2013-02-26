@@ -97,8 +97,8 @@ protected:
 
 class LightningEffect : public CombatEntity {
 public:
-	static const int LIFETIME = 1000;
-	static const int NUM_BITMAPS = 3;
+	static const int LIFETIME = 1500;
+	static const int NUM_BITMAPS = 9;
 	bool act(int step, Battle *battle) { return false; }
 	bool update(int step);
 	void draw(void);
