@@ -52,6 +52,7 @@ long runtime_start;
 bool dont_draw_now = false;
 
 bool break_main_loop = false;
+static bool broke_with_manchooser = false;
 bool quit_game = false;
 
 bool timer_on = false;
@@ -1735,6 +1736,9 @@ static void run()
 					dont_draw_now = true;
 
 				if (break_main_loop) {
+					if (manChooser) {
+						broke_with_manchooser = true;
+					}
 					break_main_loop = false;
 					return;
 				}
@@ -1790,6 +1794,9 @@ static void run()
 		}
 
 		if (break_main_loop) {
+			if (manChooser) {
+				broke_with_manchooser = true;
+			}
 			break_main_loop = false;
 			return;
 		}
@@ -1814,6 +1821,12 @@ static void run()
 		ALLEGRO_KEYBOARD_STATE state;
 		al_get_keyboard_state(&state);
 #endif
+	}
+
+	if (break_main_loop) {
+		if (manChooser) {
+			broke_with_manchooser = true;
+		}
 	}
 
 	break_main_loop = false;
@@ -2213,6 +2226,12 @@ int main(int argc, char *argv[])
 		save_auto_save_to_disk();
 
 		if (manChooser) {
+			if (broke_with_manchooser) {
+				broke_with_manchooser = false;
+				tguiDeleteWidget(manChooser);
+				destroy_guards();
+				pop_players();
+			}
 			delete manChooser;
 			manChooser = NULL;
 			dpad_on();

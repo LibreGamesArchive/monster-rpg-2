@@ -10,6 +10,11 @@ function start()
 		guards = {}
 		for i=0,4 do
 			guards[i+1] = Object:new{x=2+(i*2), y=3, anim_set="Guard", person=true, direction=DIRECTION_SOUTH}
+			setObjectSubAnimation(guards[i+1].id, "sleep")
+		end
+		updateArea()
+		for i=1,5 do
+			setObjectSubAnimation(guards[i].id, "sleep")
 		end
 	end
 end

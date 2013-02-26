@@ -1,7 +1,7 @@
 #ifndef COMBAT_PLAYER_HPP
 #define COMBAT_PLAYER_HPP
 
-
+class Player;
 class CombatPlayer;
 
 class ActionHandler {
@@ -65,6 +65,8 @@ private:
 	MBITMAP *stone_bmp;
 };
 
+extern bool show_player_info_on_flip;
+extern Player *player_to_show_info_of_on_flip;
 
 #endif
 

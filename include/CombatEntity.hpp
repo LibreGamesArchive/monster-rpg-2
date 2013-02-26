@@ -379,7 +379,7 @@ struct Fire2Pixel {
 
 class Fire2Effect : public CombatEntity {
 public:
-	static const int NUM_PIXELS = 3;
+	static const float NUM_PIXELS;
 	static const float RISE_SPEED;
 
 	bool update(int step);

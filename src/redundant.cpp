@@ -508,6 +508,11 @@ void m_flip_display(void)
 		showItemInfo(tmp, true);
 		skip_flip = true;
 	}
+	else if (show_player_info_on_flip) {
+		show_player_info_on_flip = false;
+		showPlayerInfo_ptr(player_to_show_info_of_on_flip);
+		skip_flip = true;
+	}
 	else if (save_ss_on_flip) {
 		save_ss_on_flip = false;
 		int dx, dy, dw, dh;
@@ -868,21 +873,6 @@ void m_restore_blender(void)
 
 void m_draw_prim (const void* vtxs, const ALLEGRO_VERTEX_DECL* decl, MBITMAP* texture, int start, int end, int type)
 {
-/*
-#if !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
-#if defined __linux__
-	// work around for nvidia+gallium
-	if (!is_intel_gpu_on_desktop_linux && type == ALLEGRO_PRIM_POINT_LIST) {
-		ALLEGRO_VERTEX *verts = (ALLEGRO_VERTEX *)vtxs;
-		for (int i = start; i < end; i++) {
-			m_draw_trans_pixel(verts[i].x, verts[i].y, verts[i].color);
-		}
-		return;
-	}
-#endif
-#endif
-*/
-#if 1//defined ALLEGRO_RASPBERRYPI || defined ALLEGRO_ANDROID
 	if (type == ALLEGRO_PRIM_POINT_LIST) {
 		int n = end-start;
 		ALLEGRO_VERTEX *v = new ALLEGRO_VERTEX[n*6];
@@ -916,9 +906,41 @@ void m_draw_prim (const void* vtxs, const ALLEGRO_VERTEX_DECL* decl, MBITMAP* te
 		al_draw_prim(v, 0, 0, 0, n*6, ALLEGRO_PRIM_TRIANGLE_LIST);
 		delete[] v;
 	}
+	else if (type == ALLEGRO_PRIM_LINE_LIST) {
+		int n = (end-start)/2;
+		ALLEGRO_VERTEX *v = new ALLEGRO_VERTEX[n*6];
+		ALLEGRO_VERTEX *verts = (ALLEGRO_VERTEX *)vtxs;
+		for (int i = 0; i < n; i++) {
+			v[i*6+0].x = verts[(i*2+0)+start].x;
+			v[i*6+0].y = verts[(i*2+0)+start].y;
+			v[i*6+0].z = 0;
+			v[i*6+0].color = verts[(i*2+0)+start].color;
+			v[i*6+1].x = verts[(i*2+1)+start].x;
+			v[i*6+1].y = verts[(i*2+0)+start].y;
+			v[i*6+1].z = 0;
+			v[i*6+1].color = verts[(i*2+0)+start].color;
+			v[i*6+2].x = verts[(i*2+1)+start].x;
+			v[i*6+2].y = verts[(i*2+1)+start].y+1;
+			v[i*6+2].z = 0;
+			v[i*6+2].color = verts[(i*2+0)+start].color;
+			v[i*6+3].x = verts[(i*2+0)+start].x;
+			v[i*6+3].y = verts[(i*2+1)+start].y+1;
+			v[i*6+3].z = 0;
+			v[i*6+3].color = verts[(i*2+0)+start].color;
+			v[i*6+4].x = verts[(i*2+0)+start].x;
+			v[i*6+4].y = verts[(i*2+0)+start].y;
+			v[i*6+4].z = 0;
+			v[i*6+4].color = verts[(i*2+0)+start].color;
+			v[i*6+5].x = verts[(i*2+1)+start].x;
+			v[i*6+5].y = verts[(i*2+1)+start].y+1;
+			v[i*6+5].z = 0;
+			v[i*6+5].color = verts[(i*2+0)+start].color;
+		}
+		al_draw_prim(v, 0, 0, 0, n*6, ALLEGRO_PRIM_TRIANGLE_LIST);
+		delete[] v;
+	}
 	else
-#endif
-	al_draw_prim(vtxs, decl, (texture ? texture->bitmap : NULL), start, end, type);
+		al_draw_prim(vtxs, decl, (texture ? texture->bitmap : NULL), start, end, type);
 }
 
 MBITMAP *m_create_sub_bitmap(MBITMAP *parent, int x, int y, int w, int h) // check

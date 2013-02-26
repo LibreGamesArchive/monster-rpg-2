@@ -5539,15 +5539,13 @@ void MManSelector::draw()
 	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
 	m_set_target_bitmap(tmp);
 	al_clear_to_color(al_map_rgba_f(0, 0, 0, 0));
-	al_lock_bitmap(tmp->bitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READWRITE);
 	ALLEGRO_COLOR yellow = al_map_rgb_f(1, 1, 0);
 	for (int i = 1; i < 15; i++) {
-		al_put_pixel(i, 1, yellow);
-		al_put_pixel(1, i, yellow);
-		al_put_pixel(i, 14, yellow);
-		al_put_pixel(14, i, yellow);
+		m_draw_pixel(i, 1, yellow);
+		m_draw_pixel(1, i, yellow);
+		m_draw_pixel(i, 14, yellow);
+		m_draw_pixel(14, i, yellow);
 	}
-	al_unlock_bitmap(tmp->bitmap);
 	al_set_target_bitmap(old_target);
 
 	al_hold_bitmap_drawing(true);

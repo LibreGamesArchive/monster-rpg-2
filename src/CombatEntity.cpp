@@ -9,6 +9,7 @@ const float SlimeEffect::SPEED = 0.032f;
 const float Bolt3Effect::MAX_DIST = 36;
 const float Bolt3Effect::MAX_AMPLITUDE = 10;
 const float AttackSwoosh::SPEED = 0.5f;
+const float Fire2Effect::NUM_PIXELS = 0.5f;
 const float Fire2Effect::RISE_SPEED = 0.05f;
 
 static MBITMAP **bolt2_bmps;
@@ -700,7 +701,7 @@ void Ice2Effect::draw(void)
 			verts[i*3+2].color = color;
 		}
 		
-		al_draw_prim(verts, 0, 0, 0, numshards*3, ALLEGRO_PRIM_TRIANGLE_LIST);
+		m_draw_prim(verts, 0, 0, 0, numshards*3, ALLEGRO_PRIM_TRIANGLE_LIST);
 	}
 }
 
@@ -1495,8 +1496,11 @@ Fire2Effect::Fire2Effect(Combatant *target)
 	count = 0;
 
 	type = COMBATENTITY_TYPE_FRILL;
+		
+	int anim_w = target->getAnimationSet()->getWidth();
+	int anim_h = target->getAnimationSet()->getHeight();
 
-	numPixels = (int)(NUM_PIXELS * target->getAnimationSet()->getHeight());
+	numPixels = (int)(NUM_PIXELS * sqrt(anim_w*anim_w + anim_h*anim_h));
 
 	pixels = new Fire2Pixel[numPixels];
 
@@ -2063,7 +2067,7 @@ void SprayEffect::draw(void)
 	}
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
-	al_draw_prim(verts, 0, 0, 0, count, ALLEGRO_PRIM_LINE_LIST);
+	m_draw_prim(verts, 0, 0, 0, count, ALLEGRO_PRIM_LINE_LIST);
 #endif
 	
 	m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, white);
@@ -2275,7 +2279,7 @@ void TorrentEffect::draw(void)
 	}
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
-	al_draw_prim(verts, 0, 0, 0, NUM_DROPS*2, ALLEGRO_PRIM_LINE_LIST);
+	m_draw_prim(verts, 0, 0, 0, NUM_DROPS*2, ALLEGRO_PRIM_LINE_LIST);
 #endif
 }
 

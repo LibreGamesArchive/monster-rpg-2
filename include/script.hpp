@@ -19,6 +19,9 @@ void setObjectDirection(Object *o, int direction);
 bool anotherDoDialogue(const char *text, bool clearbuf = true, bool top = false, bool draw_area = true);
 int CDeScriptifyPlayer(lua_State *stack); // doesn't use stack
 
+void pop_players();
+void destroy_guards();
+
 extern bool player_scripted;
 
 extern bool shouldDoMap;

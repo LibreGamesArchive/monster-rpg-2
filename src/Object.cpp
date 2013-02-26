@@ -845,12 +845,14 @@ void Fish::draw()
 
 	m_clear(m_map_rgba(0, 0, 0, 0));
 
+	al_hold_bitmap_drawing(true);
 	for (int i = 0; i < w; i++) {
 		int a = wiggle;
 		a += (float)i/w * (M_PI*2);
 		int o = sin((float)a) * MAX_WIGGLE;
 		m_draw_bitmap_region(bmp, i, 0, 1, h, i, MAX_WIGGLE+o, 0);
 	}
+	al_hold_bitmap_drawing(false);
 
 	m_pop_target_bitmap();
 	m_save_blender();

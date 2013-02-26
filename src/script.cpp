@@ -2319,15 +2319,17 @@ static int CPushPlayers(lua_State *stack)
 	return 0;
 }
 
-
-
-static int CPopPlayers(lua_State *stack)
+void pop_players()
 {
 	for (int i = 0; i < MAX_PARTY; i++) {
 		party[i] = pushed_players[i];
 		pushed_players[i] = NULL;
 	}
+}
 
+static int CPopPlayers(lua_State *stack)
+{
+	pop_players();
 	return 0;
 }
 
@@ -2396,8 +2398,7 @@ static int CCreateGuards(lua_State *stack)
 	return 0;
 }
 
-
-static int CDestroyGuards(lua_State *stack)
+void destroy_guards()
 {
 	for (int i = 0; i < 8; i++) {
 		delete strategy_players[i];
@@ -2405,6 +2406,11 @@ static int CDestroyGuards(lua_State *stack)
 
 	delete[] strategy_players;
 
+}
+
+static int CDestroyGuards(lua_State *stack)
+{
+	destroy_guards();
 	return 0;
 }
 
@@ -3546,16 +3552,20 @@ static int CShowBeachBattleInfo(lua_State *stack)
 	int who = lua_tonumber(stack, 1);
 
 	if (who < 4) {
-		showPlayerInfo_ptr(strategy_players[who]);
+		show_player_info_on_flip = true;
+		player_to_show_info_of_on_flip = strategy_players[who];
 	}
 	else if (who >= 8) {
-		showPlayerInfo_ptr(strategy_players[who-4]);
+		show_player_info_on_flip = true;
+		player_to_show_info_of_on_flip = strategy_players[who-4];
 	}
 	else if (who >= 4 && who < 8) {
 		int n = who - 4;
 		Player *p = get_beach_battle_player(n);
-		if (p)
-			showPlayerInfo_ptr(p);
+		if (p) {
+			show_player_info_on_flip = true;
+			player_to_show_info_of_on_flip = p;
+		}
 	}
 
 	return 0;

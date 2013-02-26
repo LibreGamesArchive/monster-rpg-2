@@ -2297,7 +2297,7 @@ void into_the_sun(void)
 				else {
 					v[0].color = black;
 				}
-				al_draw_prim(v, NULL, NULL, 0, 1, ALLEGRO_PRIM_POINT_LIST);
+				m_draw_prim(v, NULL, NULL, 0, 1, ALLEGRO_PRIM_POINT_LIST);
 				al_restore_state(&st);
 			}
 
