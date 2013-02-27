@@ -2345,7 +2345,7 @@ void credits(void)
 	const int times[S_COUNT] = { 1000, 5000, 2000 };
 	
 	int section = 0;
-	const int sections = 10;
+	const int sections = 12;
 
 	const char *section_text[sections][16] = {
 		{
@@ -2384,6 +2384,12 @@ void credits(void)
 			NULL
 		},
 		{
+			"PROGRAMMING",
+			" ",
+			"TRENT GAMBLIN",
+			NULL
+		},
+		{
 			"TESTING",
 			" ",
 			"ATTILIO CAROTENUTO",
@@ -2391,26 +2397,25 @@ void credits(void)
 			"MICHAL CICHON",
 			"MICHAEL CROFT",
 			"KUMAR DARYANANI",
-			"PATRICK DAVID",
-			"MONCOMBLE FLORIAN",
 			NULL
 		},
 		{
 			"TESTING",
 			" ",
+			"PATRICK DAVID",
+			"MONCOMBLE FLORIAN",
 			"CANTIDIO O FONTES",
 			"TRENT GAMBLIN",
 			"JOAO GONCALVES",
+			NULL
+		},
+		{
+			"TESTING",
+			" ",
 			"TONY HUISMAN",
 			"SERGEY LATYSHEV",
 			"FABIO NOBREGA",
 			"ELIAS PSCHERNIG",
-			NULL
-		},
-		{
-			"PROGRAMMING",
-			" ",
-			"TRENT GAMBLIN",
 			NULL
 		},
 		{
@@ -2420,15 +2425,22 @@ void credits(void)
 			"ARMANDO M CERASOLI",
 			"MICHAL CICHON",
 			"PATRICK DAVID",
-			"MONCOMBLE FLORIAN",
 			NULL
 		},
 		{
 			"TRANSLATIONS",
 			" ",
+			"THOMAS FAUST",
+			"MONCOMBLE FLORIAN",
 			"CANTIDIO O FONTES",
 			"JOAO GONCALVES",
+			NULL
+		},
+		{
+			"TRANSLATIONS",
+			" ",
 			"SERGEY LATYSHEV",
+			"ANDREA PROVASI",
 			"ELIAS PSCHERNIG",
 			"SAMUEL VAN DER WAA",
 			NULL
