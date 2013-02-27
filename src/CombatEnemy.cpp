@@ -461,12 +461,13 @@ static void dragon_flash(AnimationSet *a, AnimationSet *a2, int frame, float sta
 	while (tguiCurrentTimeMillis() < (unsigned long)start+125) {
 		long elapsed = tguiCurrentTimeMillis() - start;
 		if (elapsed > 125) elapsed = 125;
+		// alpha is a bad name here
 		float alpha = 1.0 - ((1.0/6.0) * ((float)elapsed/125));
 		alpha += startAlpha;
 
 		al_set_target_backbuffer(display);
 
-		m_clear(m_map_rgba(255, 255, 255, 255*alpha));
+		m_clear(m_map_rgba(255*alpha, 255*alpha, 255*alpha, 255));
 		a->draw(dragon_x, dragon_y-a->getHeight(), dragon_flags);
 		
 		drawBufferToScreen();

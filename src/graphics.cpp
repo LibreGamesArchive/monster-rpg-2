@@ -717,7 +717,7 @@ void m_draw_precise_line(MBITMAP *bitmap, float x1, float y1, float x2, float y2
 
 static void draw_mouse_patch()
 {
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID //&& !defined ALLEGRO_RASPBERRYPI
 	if (mouse_patch_x < 0) return;
 	if (is_cursor_hidden()) return;
 	al_set_target_backbuffer(display);

@@ -603,7 +603,7 @@ static int real_archery(int *accuracy_pts)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	current_mouse_x = BW/2;
 	current_mouse_y = BH/2;
-	al_set_mouse_xy(display, current_mouse_x, current_mouse_y);
+	//al_set_mouse_xy(display, current_mouse_x, current_mouse_y);
 #endif
 	
 	al_set_target_backbuffer(display);

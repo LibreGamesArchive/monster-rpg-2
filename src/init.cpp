@@ -1560,10 +1560,10 @@ bool init(int *argc, char **argv[])
 	custom_mouse_cursor_saved = m_load_bitmap(getResource("media/mouse_cursor.png"));
 	custom_cursor_w = m_get_bitmap_width(custom_mouse_cursor_saved);
 	custom_cursor_h = m_get_bitmap_height(custom_mouse_cursor_saved);
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID //&& !defined ALLEGRO_RASPBERRYPI
 	custom_mouse_patch = m_create_bitmap(custom_cursor_w, custom_cursor_h);
 	al_hide_mouse_cursor(display);
-#elif defined ALLEGRO_RASPBERRYPI
+#elif defined ALLEGRO_RASPBERRYPI_XXX
 	if (have_mouse) {
 		ALLEGRO_MOUSE_CURSOR *tmp_cursor = al_create_mouse_cursor(custom_mouse_cursor_saved->bitmap, 0, 0);
 		al_set_mouse_cursor(display, tmp_cursor);
@@ -1572,9 +1572,8 @@ bool init(int *argc, char **argv[])
 	else {
 		al_hide_mouse_cursor(display);
 	}
-#else
-	show_mouse_cursor();
 #endif
+	show_mouse_cursor();
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (sd->fullscreen) {
@@ -1584,8 +1583,10 @@ bool init(int *argc, char **argv[])
 #endif
 
 	if (have_mouse) {
-		int mousex = al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor_saved->bitmap)-20;
-		int mousey = al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor_saved->bitmap)-20;
+		int dx, dy, dw, dh;
+		get_screen_offset_size(&dx, &dy, &dw, &dh);
+		int mousex = al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor_saved->bitmap)-20-dx;
+		int mousey = al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor_saved->bitmap)-20-dy;
 		al_set_mouse_xy(display, mousex, mousey);
 	}
 
@@ -1899,7 +1900,9 @@ void destroy(void)
 	al_shutdown_ttf_addon();
 
 	// OK?
-	//al_destroy_display(display);
+#ifdef ALLEGRO_RASPBERRYPI
+	al_destroy_display(display);
+#endif
 
 	if (saveFilename)
 		free(saveFilename);
@@ -2126,7 +2129,11 @@ void toggle_fullscreen()
 		al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
 	}
 	else if (custom_mouse_cursor) {
-		al_set_mouse_xy(display, al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor_saved->bitmap)-20, al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor_saved->bitmap)-20);
+		int dx, dy, dw, dh;
+		get_screen_offset_size(&dx, &dy, &dw, &dh);
+		int mousex = al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor_saved->bitmap)-20-dx;
+		int mousey = al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor_saved->bitmap)-20-dy;
+		al_set_mouse_xy(display, mousex, mousey);
 	}
 
 	al_hide_mouse_cursor(display);
@@ -2162,15 +2169,15 @@ void unlock_joypad_mutex(void)
 	al_unlock_mutex(joypad_mutex);
 }
 
-#ifdef ALLEGRO_RASPBERRYPI
+#ifdef ALLEGRO_RASPBERRYPI_XXX
 static bool cursor_hidden = false;
 #endif
 
 void show_mouse_cursor()
 {
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID //&& !defined ALLEGRO_RASPBERRYPI
 	custom_mouse_cursor = custom_mouse_cursor_saved;
-#elif defined ALLEGRO_RASPBERRYPI
+#elif defined ALLEGRO_RASPBERRYPI_XXX
 	al_show_mouse_cursor(display);
 	cursor_hidden = false;
 #endif
@@ -2178,9 +2185,9 @@ void show_mouse_cursor()
 
 void hide_mouse_cursor()
 {
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID //&& !defined ALLEGRO_RASPBERRYPI
 	custom_mouse_cursor = NULL;
-#elif defined ALLEGRO_RASPBERRYPI
+#elif defined ALLEGRO_RASPBERRYPI_XXX
 	al_hide_mouse_cursor(display);
 	cursor_hidden = true;
 #endif
@@ -2188,7 +2195,7 @@ void hide_mouse_cursor()
 
 bool is_cursor_hidden()
 {
-#ifdef ALLEGRO_RASPBERRYPI
+#ifdef ALLEGRO_RASPBERRYPI_XXX
 	return cursor_hidden;
 #else
 	return custom_mouse_cursor == NULL;

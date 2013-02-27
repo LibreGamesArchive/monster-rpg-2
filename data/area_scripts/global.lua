@@ -744,9 +744,11 @@ end
 function change_areas(area, x, y, dir, trans_in)
 	ChangedAreasJustNow = true -- stop battle from happening immediately after entering a room (even a room with no battles defined)
 	stopObject(0)
-	drawArea()
-	drawBufferToScreen()
-	transitionOut()
+	if (not (area == "moon_landing")) then
+		drawArea()
+		drawBufferToScreen()
+		transitionOut()
+	end
 	if (area == "portal" and not getMilestone(MS_DONE_CREDITS)) then
 		setMilestone(MS_DONE_CREDITS, true)
 		credits()
