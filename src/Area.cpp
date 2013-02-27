@@ -1412,8 +1412,8 @@ void Area::copyTile(int x, int y, Tile *t)
        areaTile->setSolid(t->isSolid());
 }
 
-static int ss_save_counter = 10000;
-static int mem_save_counter = 10000;
+static int ss_save_counter = 5000;
+static int mem_save_counter = 5000;
 
 void real_auto_save_game_to_memory(bool save_ss)
 {
@@ -1454,6 +1454,11 @@ void Area::auto_save_game_to_memory(int step, bool ignoreCount, bool save_ss)
 		)
 		{
 			real_auto_save_game_to_memory(save_ss);
+	
+			if (auto_save_to_disk_counter % 6 == 0) { // save to disk every minute
+				save_auto_save_to_disk();
+			}
+			auto_save_to_disk_counter++;
 		}
 	}
 }
@@ -2339,8 +2344,8 @@ Area::Area(void)
 	follow = true;
 	last_player_x = -1;
 	last_player_y = -1;
-	mem_save_counter = 10000;
-	ss_save_counter = 10000;
+	mem_save_counter = 5000;
+	ss_save_counter = 5000;
 	down = false;
 	panned = false;
 	start_mx = 0;
@@ -2360,6 +2365,8 @@ Area::Area(void)
 		verts[i].z = 0;
 	
 	update_count = 0;
+
+	auto_save_to_disk_counter = 0;
 }
 
 

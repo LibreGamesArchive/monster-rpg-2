@@ -1355,6 +1355,9 @@ void do_close_exit_game()
 	m_flip_display();
 	m_clear(al_map_rgb(0, 0, 0));
 	m_flip_display();
+	if (!is_cursor_hidden()) {
+		hide_mouse_cursor();
+	}
 #ifdef ALLEGRO_WINDOWS
 	throw QuitError();
 #else
@@ -1366,10 +1369,7 @@ void do_close_exit_game()
 void do_close(bool quit)
 {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	if (mapWidget) {
-		mapWidget->auto_save_game_to_memory(0, true);
-	}
-	else if (area && !shouldDoMap) {
+	if (area && !shouldDoMap) {
 		area->auto_save_game_to_memory(0, true, false);
 	}
 	if (forced_closed) {
@@ -1385,10 +1385,7 @@ void do_close(bool quit)
 		config_menu();
 	}
 #else
-	if (mapWidget) {
-		mapWidget->auto_save_game_to_memory(0, true);
-	}
-	else if (area && !shouldDoMap) {
+	if (area && !shouldDoMap) {
 		area->auto_save_game_to_memory(0, true, false);
 	}
 	if (close_pressed_for_configure) {

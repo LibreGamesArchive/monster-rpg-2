@@ -1288,7 +1288,6 @@ struct MapPoint {
 
 class MMap : public TGUIWidget {
 public:
-	void auto_save_game_to_memory(int millis, bool force);
 	bool isTransitioning(void);
 	std::string getSelected(void);
 	void setSelected(std::string s);
@@ -1326,8 +1325,6 @@ protected:
 	std::string prefix;
 	bool clicked;
 	bool shouldFlash;
-	int mem_save_counter;
-	int ss_save_counter;
 	int l_pressed, r_pressed, u_pressed, d_pressed;
 	bool mouse_down;
 	int downX, downY;

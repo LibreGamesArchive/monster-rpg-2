@@ -400,7 +400,13 @@ void LightningEffect::draw(void)
 {
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
-	int bmpIndex = count / (LIFETIME/(NUM_BITMAPS+1));
+	int bmpIndex;
+	if (count < (LIFETIME/3)) {
+		bmpIndex = (float)count/(LIFETIME/3) * NUM_FAST;
+	}
+	else {
+		bmpIndex = NUM_FAST + (float)(count-(LIFETIME/3))/(LIFETIME/2) * (NUM_BITMAPS-NUM_FAST);
+	}
 	if (bmpIndex >= NUM_BITMAPS)
 		bmpIndex = NUM_BITMAPS-1;
 	int dx = (int)(target->getX() - (m_get_bitmap_width(bitmaps[0])/2));

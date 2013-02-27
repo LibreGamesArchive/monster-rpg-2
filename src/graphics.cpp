@@ -654,11 +654,11 @@ void draw_clock(int cx, int cy, int r, bool reverse)
 	float mx = cx + (cos(ma)*(r-3));
 	float my = cy + (sin(ma)*(r-3));
 	
-	float hx = cx + (cos(ha)*(r-3));
-	float hy = cy + (sin(ha)*(r-3));
+	float hx = cx + (cos(ha)*(r-4));
+	float hy = cy + (sin(ha)*(r-4));
 
-	m_draw_line(cx, cy, mx, my, black);
-	m_draw_line(cx, cy, hx, hy, black);
+	al_draw_line(cx, cy, mx, my, black, 1);
+	al_draw_line(cx, cy, hx, hy, black, 1);
 }
 
 

@@ -2831,7 +2831,7 @@ static int CGetPlatform(lua_State *stack)
 static int CGetPlayerDest(lua_State *stack)
 {
 	Node *tail = get_path_tail();
-	if (tail) {
+	if (path_head && tail) {
 		lua_pushnumber(stack, tail->x);
 		lua_pushnumber(stack, tail->y);
 		return 2;

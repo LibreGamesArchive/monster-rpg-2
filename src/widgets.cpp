@@ -2589,24 +2589,8 @@ void MMap::draw()
 
 }
 
-void MMap::auto_save_game_to_memory(int millis, bool force)
-{
-	if (!shouldFlash) {
-		if (!force) {
-			mem_save_counter += millis;
-			ss_save_counter += millis;
-		}
-		if (mem_save_counter >= 10000 || force) {
-			mem_save_counter = ss_save_counter = 0;
-			real_auto_save_game_to_memory(true);
-		}
-	}
-}
-
 int MMap::update(int millis)
 {
-	auto_save_game_to_memory(millis, false);
-
 	crap_map_quadrant_global_count += millis;
 
 	if (this != tguiActiveWidget) {
@@ -3137,8 +3121,6 @@ MMap::MMap(std::string start, std::string prefix)
 	clicked = false;
 
 	shouldFlash = false;
-	mem_save_counter = 1000;
-	ss_save_counter = 1000;
 
 	l_pressed =
 	r_pressed =

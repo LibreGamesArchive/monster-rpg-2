@@ -1215,9 +1215,6 @@ bool init(int *argc, char **argv[])
 			}
 			al_rest(0.25);
 		}
-		if (i < 10 && failed) {
-			printf("SUCCESS?!???\n");
-		}
 	}
 #endif
 

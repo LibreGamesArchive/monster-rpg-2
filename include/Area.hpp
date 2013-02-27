@@ -137,6 +137,7 @@ public:
 	std::map<int, int> newmap;
 	std::vector<int> tileAnimationNums;
 	std::vector<Animation *> tileAnimations;
+	int auto_save_to_disk_counter;
 };
 
 
