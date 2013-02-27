@@ -1339,9 +1339,15 @@ done:
 			increaseGold(crabs_destroyed * crab_value);
 			if (sharks_destroyed > 0) {
 				for (int i = 0; i < MAX_PARTY; i++) {
+					if (break_main_loop) {
+						break;
+					}
 					if (party[i])
-					 while (levelUp(party[i], sharks_destroyed*shark_value))
-						;
+					while (levelUp(party[i], sharks_destroyed*shark_value)) {
+						if (break_main_loop) {
+							break;
+						}
+					}
 				}
 			}
 		}

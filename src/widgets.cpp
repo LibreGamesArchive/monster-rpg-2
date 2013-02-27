@@ -3205,8 +3205,20 @@ void MSpellSelector::setFocus(bool f)
 	TGUIWidget::setFocus(f);
 }
 
-void MSpellSelector::mouseMove(int xx, int yy)
+void MSpellSelector::mouseMove(int xx, int yy, int zz)
 {
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	ALLEGRO_MOUSE_STATE state;
+	al_get_mouse_state(&state);
+	if (xx >= x && yy >= y && xx < x+width && yy < y+height) {
+		int diff = state.z - last_z;
+		if (abs(diff) > 0) {
+			scrollwheel_dir = -diff;
+		}
+	}
+	last_z = state.z;
+#endif
+
 	if (first_finger_x < 0) return;
 
 	int tmpx = xx - first_finger_x;
@@ -3647,10 +3659,15 @@ int MSpellSelector::update(int millis)
 			selected++;
 		}
 	}
-	else if (ie.up == DOWN) {
+	else if (ie.up == DOWN || scrollwheel_dir < 0) {
 		use_input_event();
 		playPreloadedSample("blip.ogg");
-		if (selected > 1) {
+		if (scrollwheel_dir < 0) {
+			scrollwheel_dir++;
+			if (top >= 2)
+				top -= 2;
+		}
+		else if (selected > 1) {
 			selected -= 2;
 			if (selected < top) {
 				top -= 2;
@@ -3660,10 +3677,15 @@ int MSpellSelector::update(int millis)
 			tguiFocusPrevious();
 		}
 	}
-	else if (ie.down == DOWN) {
+	else if (ie.down == DOWN || scrollwheel_dir > 0) {
 		use_input_event();
 		playPreloadedSample("blip.ogg");
-		if (selected < (MAX_SPELLS_IN_THIS_GAME-2)) {
+		if (scrollwheel_dir > 0) {
+			scrollwheel_dir--;
+			if ((top+(rows*2)) < MAX_SPELLS_IN_THIS_GAME)
+				top += 2;
+		}
+		else if (selected < (MAX_SPELLS_IN_THIS_GAME-2)) {
 			selected += 2;
 			if (((selected - top) / 2) >= rows) {
 				top += 2;
@@ -3816,6 +3838,13 @@ MSpellSelector::MSpellSelector(int y1, int y2, int top, int selected,
 	dragBmp = NULL;
 	maybe_scrolling = false;
 	was_dragged = false;
+
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	ALLEGRO_MOUSE_STATE state;
+	al_get_mouse_state(&state);
+	last_z = state.z;
+#endif
+	scrollwheel_dir = 0;
 }
 
 
@@ -3839,7 +3868,7 @@ void MToggleList::setFocus(bool f)
 	TGUIWidget::setFocus(f);
 }
 
-void MToggleList::mouseMove(int xx, int yy)
+void MToggleList::mouseMove(int xx, int yy, int zz)
 {
 	if (first_finger_x < 0) return;
 
@@ -4243,8 +4272,20 @@ void MScrollingList::setFocus(bool f)
 	TGUIWidget::setFocus(f);
 }
 
-void MScrollingList::mouseMove(int xx, int yy)
+void MScrollingList::mouseMove(int xx, int yy, int zz)
 {
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	ALLEGRO_MOUSE_STATE state;
+	al_get_mouse_state(&state);
+	if (xx >= x && yy >= y && xx < x+width && yy < y+height) {
+		int diff = state.z - last_z;
+		if (abs(diff) > 0) {
+			scrollwheel_dir = -diff;
+		}
+	}
+	last_z = state.z;
+#endif
+
 	if (first_finger_x < 0) return;
 
 	int tmpx = xx - first_finger_x;
@@ -4535,6 +4576,21 @@ int MScrollingList::update(int millis)
 		}
 	}
 
+	if (scrollwheel_dir < 0) {
+		scrollwheel_dir++;
+		if (top > 0) {
+			top--;
+		}
+		playPreloadedSample("blip.ogg");
+	}
+	if (scrollwheel_dir > 0) {
+		scrollwheel_dir--;
+		if (top+rows < (int)items.size()) {
+			top++;
+		}
+		playPreloadedSample("blip.ogg");
+	}
+
 	if (this == tguiActiveWidget) {
 		INPUT_EVENT ie = get_next_input_event();
 		InputDescriptor id = getInput()->getDescriptor();
@@ -4711,6 +4767,13 @@ MScrollingList::MScrollingList(int x, int y, int w, int h, void (*drop_callback)
 	dragBmp = NULL;
 	holdTime = -1;
 	this->do_prompt = do_prompt;
+
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	ALLEGRO_MOUSE_STATE state;
+	al_get_mouse_state(&state);
+	last_z = state.z;
+#endif
+	scrollwheel_dir = 0;
 }
 
 
@@ -4751,8 +4814,20 @@ void MItemSelector::setFocus(bool f)
 	TGUIWidget::setFocus(f);
 }
 
-void MItemSelector::mouseMove(int xx, int yy)
+void MItemSelector::mouseMove(int xx, int yy, int zz)
 {
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	ALLEGRO_MOUSE_STATE state;
+	al_get_mouse_state(&state);
+	if (xx >= x && yy >= y && xx < x+width && yy < y+height) {
+		int diff = state.z - last_z;
+		if (abs(diff) > 0) {
+			scrollwheel_dir = -diff;
+		}
+	}
+	last_z = state.z;
+#endif
+
 	if (first_finger_x < 0) return;
 
 	int tmpx = xx - first_finger_x;
@@ -5232,9 +5307,16 @@ int MItemSelector::update(int millis)
 			tguiFocusNext();
 		}
 	}
-	else if (ie.up == DOWN) {
+	else if (ie.up == DOWN || scrollwheel_dir < 0) {
 		use_input_event();
-		if (selected > 1) {
+		if (scrollwheel_dir < 0) {
+			scrollwheel_dir++;
+			if (top >= 2) {
+				top -= 2;
+			}
+			playPreloadedSample("blip.ogg");
+		}
+		else if (selected > 1) {
 			playPreloadedSample("blip.ogg");
 			selected -= 2;
 			if (selected < top) {
@@ -5246,9 +5328,16 @@ int MItemSelector::update(int millis)
 			tguiFocusPrevious();
 		}
 	}
-	else if (ie.down == DOWN) {
+	else if (ie.down == DOWN || scrollwheel_dir > 0) {
 		use_input_event();
-		if (selected < (MAX_INVENTORY-2)) {
+		if (scrollwheel_dir > 0) {
+			scrollwheel_dir--;
+			if ((top+(rows*2)) < MAX_INVENTORY) {
+				top += 2;
+			}
+			playPreloadedSample("blip.ogg");
+		}
+		else if (selected < (MAX_INVENTORY-2)) {
 			playPreloadedSample("blip.ogg");
 			selected += 2;
 			if (((selected - top) / 2) >= rows) {
@@ -5467,6 +5556,13 @@ MItemSelector::MItemSelector(int y1, int y2, int top, int selected,
 	drop_x = -1;
 	drop_y = -1;
 	was_dragged = false;
+
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	ALLEGRO_MOUSE_STATE state;
+	al_get_mouse_state(&state);
+	last_z = state.z;
+#endif
+	scrollwheel_dir = 0;
 }
 
 
@@ -5869,6 +5965,9 @@ void MMultiChooser::mouseUp(int xx, int yy, int b)
 
 void MMultiChooser::draw()
 {
+	static bool show = false;
+	show = !show;
+
 	for (unsigned int i = 0; i < points.size(); i++) {
 		m_save_blender();
 		int alpha = 100;
@@ -5904,7 +6003,7 @@ void MMultiChooser::draw()
 			}
 		}
 		if (current.size() > 1 && points[current[0]].west == p->west && alpha == 255) {
-			if (((unsigned)tguiCurrentTimeMillis() % 100) < 50) {
+			if (show) {
 				m_draw_bitmap(arrow, draw_x, draw_y, flags);
 			}
 		}

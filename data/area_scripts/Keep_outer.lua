@@ -91,6 +91,9 @@ function update(step)
 		local for_points = (not getMilestone(MS_BEAT_ARCHERY))
 		local doit = true;
 		if (not for_points) then
+			--updateArea()
+			clearBuffer()
+			drawBufferToScreen()
 			doit = prompt("Shoot up", "some baddies?", 0, 0)
 			clearBuffer()
 		end
@@ -103,8 +106,6 @@ function update(step)
 				gameOver()
 			end
 		end
-		-- ?
-		--dpad_on()
 		updateArea()
 		drawArea()
 		drawBufferToScreen()
@@ -113,6 +114,8 @@ function update(step)
 		CRAP = true
 	elseif (getMilestone(MS_GONE_TO_ARCHERY_TOWER) and not done_look_already) then
 		done_look_already = true
+		drawArea()
+		drawBufferToScreen()
 		local should_look = prompt("Take a look", "around?", 0, 1)
 		if (should_look) then
 			doKeepLook()

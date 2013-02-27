@@ -54,7 +54,7 @@ MSESTATE tguiMouseState;
 static std::vector<int> pressedHotkeys;
 
 struct MouseEvent {
-	int b, x, y;
+	int b, x, y, z;
 };
 
 static std::vector<MouseEvent *> mouseDownEvents;
@@ -605,27 +605,26 @@ TGUIWidget* tguiUpdate()
 			continue;
 		}
 		if (!(ignore & TGUI_MOUSE)) {
-			if (mouse_downs > 0) {
-				if (event.type == ALLEGRO_EVENT_MOUSE_AXES) {
-					tguiMouseState.x = EV.x;
-					tguiMouseState.y = EV.y;
-					MouseEvent *e = new MouseEvent;
-					e->x = EV.x;
-					e->y = EV.y;
-					tguiConvertMousePosition(&e->x, &e->y, tgui_screen_offset_x, tgui_screen_offset_y, tgui_screen_ratio_x, tgui_screen_ratio_y);
-					e->b = 0;
-					mouseMoveEvents.push_back(e);
-				}
-				else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-					mouse_downs--;
-					MouseEvent *e = new MouseEvent;
-					e->x = EV.x;
-					e->y = EV.y;
-					tguiConvertMousePosition(&e->x, &e->y, tgui_screen_offset_x, tgui_screen_offset_y, tgui_screen_ratio_x, tgui_screen_ratio_y);
-					e->b = EV.BUTTON;
-					mouseUpEvents.push_back(e);
-					tguiMouseState.buttons &= (~EV.BUTTON);
-				}
+			if (event.type == ALLEGRO_EVENT_MOUSE_AXES) {
+				tguiMouseState.x = EV.x;
+				tguiMouseState.y = EV.y;
+				MouseEvent *e = new MouseEvent;
+				e->x = EV.x;
+				e->y = EV.y;
+				e->z = EV.z;
+				tguiConvertMousePosition(&e->x, &e->y, tgui_screen_offset_x, tgui_screen_offset_y, tgui_screen_ratio_x, tgui_screen_ratio_y);
+				e->b = 0;
+				mouseMoveEvents.push_back(e);
+			}
+			else if (mouse_downs > 0 && event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
+				mouse_downs--;
+				MouseEvent *e = new MouseEvent;
+				e->x = EV.x;
+				e->y = EV.y;
+				tguiConvertMousePosition(&e->x, &e->y, tgui_screen_offset_x, tgui_screen_offset_y, tgui_screen_ratio_x, tgui_screen_ratio_y);
+				e->b = EV.BUTTON;
+				mouseUpEvents.push_back(e);
+				tguiMouseState.buttons &= (~EV.BUTTON);
 			}
 			if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
 				mouse_downs++;
@@ -778,13 +777,14 @@ TGUIWidget* tguiUpdate()
 	for (int i = 0; i < (int)mouseMoveEvents.size(); i++) {
 		int saved_mouse_x = mouseMoveEvents[0]->x;
 		int saved_mouse_y = mouseMoveEvents[0]->y;
+		int saved_mouse_z = mouseMoveEvents[0]->z;
 		delete mouseMoveEvents[0];
 		mouseMoveEvents.erase(mouseMoveEvents.begin());
 		if (!(ignore & TGUI_MOUSE)) {
 			for (int i = 0; i < (int)activeGUI->widgets.size(); i++) {
 				if (activeGUI->widgets[i]->getAllClear() && !tguiIsDisabled(activeGUI->widgets[i])) {
 					activeGUI->widgets[i]->mouseMove(saved_mouse_x,
-						saved_mouse_y);
+						saved_mouse_y, saved_mouse_z);
 				}
 			}
 		}

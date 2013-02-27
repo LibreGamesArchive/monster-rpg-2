@@ -494,7 +494,7 @@ public:
 	void draw(void);
 	int update(int millis);
 	bool acceptsFocus(void);
-	void mouseMove(int x, int y);
+	void mouseMove(int x, int y, int z);
 	void mouseUpAbs(int x, int y, int b);
 	void mouseDownAbs(int x, int y, int b);
 	int getSelected(void);
@@ -551,7 +551,7 @@ public:
 	void draw(void);
 	int update(int millis);
 	bool acceptsFocus(void);
-	void mouseMove(int x, int y);
+	void mouseMove(int x, int y, int z);
 	void mouseUpAbs(int x, int y, int b);
 	void mouseDownAbs(int x, int y, int b);
 	int getSelected(void);
@@ -596,6 +596,8 @@ protected:
 	long holdTime;
 	bool do_prompt;
 	bool was_down;
+	int last_z;
+	int scrollwheel_dir;
 };
 
 
@@ -678,7 +680,7 @@ public:
 		}
 	}
 	
-	void mouseMove(int x, int y) {
+	void mouseMove(int x, int y, int z) {
 		if (!(x >= this->x && y >= this->y && x < this->x+width && y < this->y+height))
 			mouse_is_down = false;
 	}
@@ -1146,7 +1148,7 @@ public:
 
 	void mouseUpAbs(int x, int y, int b);
 	void mouseDownAbs(int x, int y, int b);
-	void mouseMove(int x, int y);
+	void mouseMove(int x, int y, int z);
 
 	void setFocus(bool f);
 	bool acceptsFocus(void);
@@ -1201,6 +1203,8 @@ protected:
 	bool raiseOnFocus;
 	bool maybe_scrolling;
 	bool was_dragged;
+	int last_z;
+	int scrollwheel_dir;
 };
 
 
@@ -1212,7 +1216,7 @@ public:
 	void mouseUpAbs(int x, int y, int b);
 	void mouseDownAbs(int x, int y, int b);
 	void setFocus(bool f);
-	void mouseMove(int x, int y);
+	void mouseMove(int x, int y, int z);
 
 	bool acceptsFocus(void);
 	void draw(void);
@@ -1254,6 +1258,8 @@ protected:
 	bool changed;
 	bool maybe_scrolling;
 	bool was_dragged;
+	int last_z;
+	int scrollwheel_dir;
 };
 
 

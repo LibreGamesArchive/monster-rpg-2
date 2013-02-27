@@ -82,7 +82,7 @@ public:
 	/*
 	 * Mouse move event gives absolute mouse coordinates
 	 */
-	virtual void mouseMove(int mx, int my) {}
+	virtual void mouseMove(int mx, int my, int mz) {}
 	/*
 	 * The mouse was clicked on the widget.
 	 * tguiActiveWidgetClickedPoint holds the position of the

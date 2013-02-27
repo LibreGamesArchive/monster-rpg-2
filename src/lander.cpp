@@ -460,9 +460,16 @@ top:
 	}
 	else {
 		for (int i = 0; i < MAX_PARTY; i++) {
-			if (party[i])
-			 while (levelUp(party[i], 50))
-			 	;
+			if (break_main_loop) {
+				break;
+			}
+			if (party[i]) {
+				while (levelUp(party[i], 50)) {
+					if (break_main_loop) {
+						break;
+					}
+				}
+			}
 		}
 		dpad_on();
 		return true;

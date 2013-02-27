@@ -1047,6 +1047,8 @@ bool archery(bool for_points)
 			return 2;
 		}
 
+		al_set_target_backbuffer(display);
+		m_clear(black);
 		m_rest(0.5);
 
 		if (dead) {
@@ -1076,9 +1078,16 @@ bool archery(bool for_points)
 		else {
 			if (for_points) {
 				for (int i = 0; i < MAX_PARTY; i++) {
-					if (party[i])
-						while(levelUp(party[i], 30+accuracy_pts))
-							;
+					if (break_main_loop) {
+						break;
+					}
+					if (party[i]) {
+						while (levelUp(party[i],  30+accuracy_pts)) {
+							if (break_main_loop) {
+								break;
+							}
+						}
+					}
 				}
 			}
 			return true;

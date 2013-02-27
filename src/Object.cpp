@@ -313,6 +313,7 @@ void Object::drawUpper()
 		col.r = tmp.r * tmp.a;
 		col.g = tmp.g * tmp.a;
 		col.b = tmp.b * tmp.a;
+		col.a = tmp.a;
 		m_set_blender(M_ONE, M_INVERSE_ALPHA, col);
 		m_draw_bitmap(poison_bmp_tmp2, dx-5, dy-5, 0);
 		m_restore_blender();

@@ -1203,7 +1203,22 @@ bool init(int *argc, char **argv[])
 	}
 
 #if !defined ALLEGRO_IPHONE
-	al_install_keyboard();
+	{
+		bool failed = false;
+		int i;
+		for (i = 0; i < 10; i++) {
+			if (!al_install_keyboard()) {
+				failed = true;
+			}
+			else {
+				break;
+			}
+			al_rest(0.25);
+		}
+		if (i < 10 && failed) {
+			printf("SUCCESS?!???\n");
+		}
+	}
 #endif
 
 #ifdef ALLEGRO_ANDROID
@@ -2150,12 +2165,17 @@ void unlock_joypad_mutex(void)
 	al_unlock_mutex(joypad_mutex);
 }
 
+#ifdef ALLEGRO_RASPBERRYPI
+static bool cursor_hidden = false;
+#endif
+
 void show_mouse_cursor()
 {
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
 	custom_mouse_cursor = custom_mouse_cursor_saved;
 #elif defined ALLEGRO_RASPBERRYPI
 	al_show_mouse_cursor(display);
+	cursor_hidden = false;
 #endif
 }
 
@@ -2165,10 +2185,15 @@ void hide_mouse_cursor()
 	custom_mouse_cursor = NULL;
 #elif defined ALLEGRO_RASPBERRYPI
 	al_hide_mouse_cursor(display);
+	cursor_hidden = true;
 #endif
 }
 
 bool is_cursor_hidden()
 {
+#ifdef ALLEGRO_RASPBERRYPI
+	return cursor_hidden;
+#else
 	return custom_mouse_cursor == NULL;
+#endif
 }

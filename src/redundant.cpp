@@ -903,7 +903,7 @@ void m_draw_prim (const void* vtxs, const ALLEGRO_VERTEX_DECL* decl, MBITMAP* te
 			v[i*6+5].z = 0;
 			v[i*6+5].color = verts[i+start].color;
 		}
-		al_draw_prim(v, 0, 0, 0, n*6, ALLEGRO_PRIM_TRIANGLE_LIST);
+		al_draw_prim(v, decl, (texture ? texture->bitmap : NULL), start, n*6, ALLEGRO_PRIM_TRIANGLE_LIST);
 		delete[] v;
 	}
 	else if (type == ALLEGRO_PRIM_LINE_LIST) {
@@ -911,32 +911,65 @@ void m_draw_prim (const void* vtxs, const ALLEGRO_VERTEX_DECL* decl, MBITMAP* te
 		ALLEGRO_VERTEX *v = new ALLEGRO_VERTEX[n*6];
 		ALLEGRO_VERTEX *verts = (ALLEGRO_VERTEX *)vtxs;
 		for (int i = 0; i < n; i++) {
-			v[i*6+0].x = verts[(i*2+0)+start].x;
-			v[i*6+0].y = verts[(i*2+0)+start].y;
+			float x1 = verts[(i*2+0)+start].x;
+			float y1 = verts[(i*2+0)+start].y;
+			float x2 = verts[(i*2+1)+start].x;
+			float y2 = verts[(i*2+1)+start].y;
+			float dx = x2 - x1;
+			float dy = y2 - y1;
+			float a = atan2(dy, dx);
+			float a1 = a + M_PI/2;
+			float a2 = a - M_PI/2;
+			float newx1 = x1 + cos(a1);
+			float newy1 = y1 + sin(a1);
+			float newx2 = x1 + cos(a2);
+			float newy2 = y1 + sin(a2);
+			float newx3 = x2 + cos(a1);
+			float newy3 = y2 + sin(a1);
+			float newx4 = x2 + cos(a2);
+			float newy4 = y2 + sin(a2);
+			float u1 = verts[(i*2+0)+start].u;
+			float v1 = verts[(i*2+0)+start].v;
+			float u2 = verts[(i*2+1)+start].u;
+			float v2 = verts[(i*2+1)+start].v;
+			v[i*6+0].x = newx1;
+			v[i*6+0].y = newy1;
 			v[i*6+0].z = 0;
+			v[i*6+0].u = u1;
+			v[i*6+0].v = v1;
 			v[i*6+0].color = verts[(i*2+0)+start].color;
-			v[i*6+1].x = verts[(i*2+1)+start].x;
-			v[i*6+1].y = verts[(i*2+0)+start].y;
+			v[i*6+1].x = newx3;
+			v[i*6+1].y = newy3;
 			v[i*6+1].z = 0;
 			v[i*6+1].color = verts[(i*2+0)+start].color;
-			v[i*6+2].x = verts[(i*2+1)+start].x;
-			v[i*6+2].y = verts[(i*2+1)+start].y+1;
+			v[i*6+1].u = u2;
+			v[i*6+1].v = v2;
+			v[i*6+2].x = newx4;
+			v[i*6+2].y = newy4;
 			v[i*6+2].z = 0;
 			v[i*6+2].color = verts[(i*2+0)+start].color;
-			v[i*6+3].x = verts[(i*2+0)+start].x;
-			v[i*6+3].y = verts[(i*2+1)+start].y+1;
+			v[i*6+2].u = u2;
+			v[i*6+2].v = v2;
+			v[i*6+3].x = newx1;
+			v[i*6+3].y = newy1;
 			v[i*6+3].z = 0;
 			v[i*6+3].color = verts[(i*2+0)+start].color;
-			v[i*6+4].x = verts[(i*2+0)+start].x;
-			v[i*6+4].y = verts[(i*2+0)+start].y;
+			v[i*6+3].u = u1;
+			v[i*6+3].v = v1;
+			v[i*6+4].x = newx2;
+			v[i*6+4].y = newy2;
 			v[i*6+4].z = 0;
 			v[i*6+4].color = verts[(i*2+0)+start].color;
-			v[i*6+5].x = verts[(i*2+1)+start].x;
-			v[i*6+5].y = verts[(i*2+1)+start].y+1;
+			v[i*6+4].u = u1;
+			v[i*6+4].v = v1;
+			v[i*6+5].x = newx4;
+			v[i*6+5].y = newy4;
 			v[i*6+5].z = 0;
 			v[i*6+5].color = verts[(i*2+0)+start].color;
+			v[i*6+5].u = u2;
+			v[i*6+5].v = v2;
 		}
-		al_draw_prim(v, 0, 0, 0, n*6, ALLEGRO_PRIM_TRIANGLE_LIST);
+		al_draw_prim(v, decl, (texture ? texture->bitmap : NULL), start, n*6, ALLEGRO_PRIM_TRIANGLE_LIST);
 		delete[] v;
 	}
 	else

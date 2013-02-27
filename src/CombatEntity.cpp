@@ -2335,7 +2335,7 @@ TorrentEffect::TorrentEffect(Combatant *caster) :
 		drops[i].speed = 0.2*r + 0.2;
 		r = (float)(rand() % RAND_MAX) / RAND_MAX;
 		float r2 = (float)(rand() % RAND_MAX) / RAND_MAX;
-		drops[i].color = m_map_rgba(220+r*35, 220+r*35, 255, 100+r2*100);
+		drops[i].color = m_map_rgba(220+r*35, 220+r*35, 255, 50+r2*150);
 	}
 }
 
@@ -3055,12 +3055,14 @@ void TwisterEffect::draw(void)
 	float fl = ((float)count / getLifetime()) * (M_PI*6);
 	int dx = x - w/2;
 	int dy = y - h;
+	al_hold_bitmap_drawing(true);
 	for (int i = 0; i < h; i++, dy++) {
 		float f = fl + (((float)i/h) * (M_PI*2));
 		int new_dx = dx + (sin(f)*6);
 		m_draw_bitmap_region(bmp,
 			0, i, w, 1, new_dx, dy, 0);
 	}
+	al_hold_bitmap_drawing(false);
 }
 
 

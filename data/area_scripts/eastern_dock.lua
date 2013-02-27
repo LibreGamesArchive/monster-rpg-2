@@ -101,7 +101,8 @@ function remove_rider()
 end
 
 function end_sub_scene()
-	--
+	drawArea()
+	drawBufferToScreen()
 	local result = prompt("Skip", "this mini game?", 0, 0)
 	if (result == true) then
 		bonusPoints()
@@ -109,7 +110,6 @@ function end_sub_scene()
 		setObjectSolid(0, true)
 		change_areas("fort_start", 36, 47, DIRECTION_SOUTH)
 	else
-	--
 		dpad_off()
 		drawArea()
 		dpad_on()
@@ -288,6 +288,8 @@ function activate(activator, activated)
 		elseif (getMilestone(MS_BEAT_GIRL_DRAGON)) then
 			doDialogue("Gunnar: No, I've never built a space craft... but I know someone who has.\nGunnar: Odd thing is he's a simple farmer!\n", true);
 		end
+		drawArea()
+		drawBufferToScreen()
 		local choice = triple_prompt(
 			"Would you like to go through",
 			"the trench again, or take the",

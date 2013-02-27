@@ -1658,8 +1658,11 @@ static void run()
 							if (party[i] && playerCanLevel(party[i]->getName())) {
 								int newLevel = getLevel(party[i]->getInfo().experience);
 								for (int l = levels[i]; l < newLevel; l++) {
-									while (levelUp(party[i]))
-										;
+									while (levelUp(party[i])) {
+										if (break_main_loop) {
+											break;
+										}
+									}
 								}
 							}
 						}

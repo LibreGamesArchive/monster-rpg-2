@@ -2646,7 +2646,7 @@ static int CAreaTileToTilemap(lua_State *stack)
 
 	std::vector<int> &animNums = area->getAnimationNums();
 
-	if (tileNum < (int)animNums.size()) {
+	if (tileNum >= (int)animNums.size()) {
 		lua_pushnumber(stack, -1);
 	}
 	else {
@@ -2836,7 +2836,6 @@ static int CGetPlayerDest(lua_State *stack)
 		lua_pushnumber(stack, tail->y);
 		return 2;
 	}
-	/* FIXME: MAYBE UNCOMMENT THIS
 	if (area) {
 		Object *o = area->findObject(0);
 		if (o) {
@@ -2845,7 +2844,6 @@ static int CGetPlayerDest(lua_State *stack)
 			return 2;
 		}
 	}
-	*/
 
 	lua_pushnil(stack);
 	lua_pushnil(stack);

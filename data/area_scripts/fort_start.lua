@@ -451,6 +451,8 @@ end
 
 function activate(activator, activated)
 	if (activated == gunnar.id) then
+		drawArea()
+		drawBufferToScreen()
 		local v = prompt("Board submarine?", "", 0, 1)
 		if (v) then
 			setMilestone(MS_DOCK_TO_FORT, false)
