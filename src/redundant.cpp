@@ -510,14 +510,22 @@ void m_flip_display(void)
 	}
 	else if (show_player_info_on_flip) {
 		show_player_info_on_flip = false;
-		showPlayerInfo_ptr(player_to_show_info_of_on_flip);
+		if (player_to_show_on_flip) {
+			showPlayerInfo_ptr(player_to_show_on_flip);
+			player_to_show_on_flip = NULL;
+		}
+		else {
+			showPlayerInfo_number(player_number_to_show_on_flip);
+		}
 		skip_flip = true;
 	}
 	else if (save_ss_on_flip) {
 		save_ss_on_flip = false;
 		int dx, dy, dw, dh;
 		get_screen_offset_size(&dx, &dy, &dw, &dh);
+		al_lock_mutex(ss_mutex);
 		m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW/2, BH/2, screenshot);
+		al_unlock_mutex(ss_mutex);
 	}
 
 	if (!skip_flip) {

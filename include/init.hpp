@@ -71,6 +71,7 @@ extern ALLEGRO_DISPLAY *display;
 extern ALLEGRO_DISPLAY *controller_display;
 extern ALLEGRO_COND *wait_cond;
 extern ALLEGRO_MUTEX *wait_mutex;
+extern ALLEGRO_MUTEX *ss_mutex;
 extern int exit_event_thread;
 extern ALLEGRO_SHADER *default_shader;
 extern ALLEGRO_SHADER *tinter;

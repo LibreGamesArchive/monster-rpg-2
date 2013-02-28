@@ -170,6 +170,7 @@ ALLEGRO_DISPLAY *display = 0;
 ALLEGRO_DISPLAY *controller_display = 0;
 ALLEGRO_COND *wait_cond;
 ALLEGRO_MUTEX *wait_mutex;
+ALLEGRO_MUTEX *ss_mutex;
 ALLEGRO_MUTEX *joypad_mutex;
 int exit_event_thread = 0;
 ALLEGRO_SHADER *default_shader;
@@ -669,6 +670,8 @@ static void *loader_proc(void *arg)
 	wait_cond = al_create_cond();
 	wait_mutex = al_create_mutex();
 	al_lock_mutex(wait_mutex);
+
+	ss_mutex = al_create_mutex();
 	
 	joypad_mutex = al_create_mutex_recursive();
 
@@ -1836,6 +1839,8 @@ void destroy(void)
 	}
 	al_destroy_cond(wait_cond);
 	al_destroy_mutex(wait_mutex);
+
+	al_destroy_mutex(ss_mutex);
 	
 	al_destroy_mutex(joypad_mutex);
 

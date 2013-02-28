@@ -154,7 +154,9 @@ static void *save_auto_save_to_disk_thread(void *save_ss)
 #ifdef ALLEGRO_ANDROID
 		al_set_standard_file_interface();
 #endif
+		al_lock_mutex(ss_mutex);
 		al_save_bitmap(getUserResource("auto0.bmp"), screenshot->bitmap);
+		al_unlock_mutex(ss_mutex);
 #ifdef ALLEGRO_ANDROID
 		al_android_set_apk_file_interface();
 #endif
@@ -1431,10 +1433,12 @@ void real_auto_save_game_to_memory(bool save_ss)
 		save_ss_on_flip = true;
 	}
 	else {
+		al_lock_mutex(ss_mutex);
 		ALLEGRO_BITMAP *old = al_get_target_bitmap();
 		m_set_target_bitmap(screenshot);
 		al_clear_to_color(blue);
 		al_set_target_bitmap(old);
+		al_unlock_mutex(ss_mutex);
 	}
 }
 	
@@ -1783,6 +1787,8 @@ void Area::update(int step)
 
 	if (shouldDoMap) {
 		draw(BW, BH);
+		drawBufferToScreen();
+		fadeOut(black);
 		if (mapPrefix == "<none>")
 			doMap(mapStartPlace);
 		else

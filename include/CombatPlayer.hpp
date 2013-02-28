@@ -66,7 +66,8 @@ private:
 };
 
 extern bool show_player_info_on_flip;
-extern Player *player_to_show_info_of_on_flip;
+extern int player_number_to_show_on_flip;
+extern Player *player_to_show_on_flip;
 
 #endif
 

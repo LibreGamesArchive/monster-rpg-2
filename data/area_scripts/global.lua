@@ -744,7 +744,7 @@ end
 function change_areas(area, x, y, dir, trans_in)
 	ChangedAreasJustNow = true -- stop battle from happening immediately after entering a room (even a room with no battles defined)
 	stopObject(0)
-	if (not (area == "moon_landing")) then
+	if (not (area == "moon_landing" or (area == "fort_start" and not (string.sub(getAreaName(), 0, 4) == "fort")))) then
 		drawArea()
 		drawBufferToScreen()
 		transitionOut()

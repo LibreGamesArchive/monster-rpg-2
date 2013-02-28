@@ -3858,6 +3858,8 @@ bool config_menu(bool start_on_fullscreen)
 			load_translation(get_language_name(config.getLanguage()).c_str());
 			if (reset_game_center) {
 				reset_game_center->setX(BW-2-(m_text_length(game_font, _t(reset_str))+m_get_bitmap_width(cursor)+1));
+			}
+			if (controls) {
 				controls->setX(BW-2-(m_text_length(game_font, _t(reset_str))+m_get_bitmap_width(cursor)+1));
 			}
 		}

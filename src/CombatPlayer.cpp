@@ -27,7 +27,8 @@ enum ConfirmReason {
 ActionHandler *createMainHandler(CombatPlayer *p, std::string name);
 
 bool show_player_info_on_flip = false;
-Player *player_to_show_info_of_on_flip;
+int player_number_to_show_on_flip;
+Player *player_to_show_on_flip;
 
 static std::vector<Combatant *> attacked;
 static int itemIndex = -1;
@@ -81,7 +82,7 @@ public:
 					formWidget->getHoldStart()+600UL < tguiCurrentTimeMillis()) {
 				playPreloadedSample("select.ogg");
 				show_player_info_on_flip = true;
-				player_to_show_info_of_on_flip = party[i];
+				player_number_to_show_on_flip = i;
 				formWidget->reset();
 				return NULL;
 			}

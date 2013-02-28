@@ -1104,20 +1104,26 @@ void battleTransition(void)
 		ALLEGRO_STATE s;
 		al_store_state(&s, ALLEGRO_STATE_TARGET_BITMAP);
 		al_set_target_backbuffer(display);
+		ALLEGRO_TRANSFORM backup, t;
+		al_copy_transform(&backup, al_get_current_transform());
+		al_identity_transform(&t);
+		al_use_transform(&t);
 		al_set_shader(display, warp);
 		al_set_shader_float(warp, "angle", angle);
 		float tex_bot = 1;
 		al_set_shader_float(warp, "tex_bot", tex_bot);
 		al_set_shader_sampler(warp, "tex", xfade_buf->bitmap, 0);
 		al_use_shader(warp, true);
-		m_draw_bitmap(xfade_buf, 0, 0, 0);
+		m_draw_bitmap(xfade_buf, dx, dy, 0);
 		al_use_shader(warp, false);
 		al_set_shader(display, default_shader);
 		al_restore_state(&s);
 		drawBufferToScreen(/*buffer*/NULL, true);
 		m_flip_display();
+		al_use_transform(&backup);
 		now = tguiCurrentTimeMillis();
 	}
+
 
 	m_destroy_bitmap(xfade_buf);
 	m_destroy_bitmap(battle_buf);

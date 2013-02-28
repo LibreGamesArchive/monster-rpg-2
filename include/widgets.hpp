@@ -23,7 +23,7 @@ void mTextout(MFONT *font, const char *text, int x, int y,
 		MCOLOR text_color, MCOLOR shadow_color,
 		int shadowType, bool center);
 void mTextout_simple(const char *text, int x, int y, MCOLOR color);
-void showPlayerInfo(int who);
+void showPlayerInfo_number(int who);
 void showPlayerInfo_ptr(Player *p);
 
 struct MultiPoint {

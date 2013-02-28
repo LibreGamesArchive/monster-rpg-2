@@ -500,17 +500,13 @@ static void _drawSimpleStatus(Player *p, int x, int y)
 	_drawSimpleStatus_real(p, x, y, info);
 }
 
-
-
 static void drawSimpleStatus(int partyMember, int x, int y)
 {
 	Player *p = party[partyMember];
 	_drawSimpleStatus(p, x, y);
 }
 
-
-
-static void playerMiniInfoDraw(int x, int y, int w, int h, void *data)
+static void playerMiniInfoDraw_battle(int x, int y, int w, int h, void *data)
 {
 	int who = (int)(int64_t)data;
 	CombatantInfo info = battle->findPlayer(who)->getInfo();
@@ -528,11 +524,10 @@ static void playerMiniInfoDraw(int x, int y, int w, int h, void *data)
 		WGT_TEXT_DROP_SHADOW, false);
 }
 
-
-static void playerMiniInfoDraw_ptr(int x, int y, int w, int h, void *data)
+static void playerMiniInfoDraw_nobattle(int x, int y, int w, int h, void *data)
 {
 	Player *p = (Player *)data;
-	CombatantInfo info = p->getInfo();
+	CombatantInfo &info = p->getInfo();
 	_drawSimpleStatus_real(p, x+5, y+5, info);
 	char text[100];
 	if (info.abilities.hp <= 0) {
@@ -547,15 +542,14 @@ static void playerMiniInfoDraw_ptr(int x, int y, int w, int h, void *data)
 		WGT_TEXT_DROP_SHADOW, false);
 }
 
-
-void showPlayerInfo(int who)
+void showPlayerInfo_number(int who)
 {
-	notify(playerMiniInfoDraw, (void *)who);
+	notify(playerMiniInfoDraw_battle, (void *)(int64_t)who);
 }
 
 void showPlayerInfo_ptr(Player *p)
 {
-	notify(playerMiniInfoDraw_ptr, (void *)p);
+	notify(playerMiniInfoDraw_nobattle, p);
 }
 
 void notify(std::string msg1, std::string msg2, std::string msg3)
@@ -3627,6 +3621,8 @@ int MSpellSelector::update(int millis)
 		ie = get_next_input_event();
 	}
 
+	bool play_sound = true;
+
 	if (ie.left == DOWN) {
 		use_input_event();
 		playPreloadedSample("blip.ogg");
@@ -3692,13 +3688,16 @@ int MSpellSelector::update(int millis)
 			if (info.spells[selected] != "") {
 				pressed = selected;
 				playPreloadedSample("select.ogg");
+				play_sound = false;
 			}
 			else {
 				down = false;
 			}
 		}
 		if (tmp >= 0 || (!canArrange && !clicked)) {
-			playPreloadedSample("select.ogg");
+			if (play_sound) {
+				playPreloadedSample("select.ogg");
+			}
 			// Use
 			if (pressed == selected) {
 				clicked = false;

@@ -787,6 +787,7 @@ start:
 	int scr_w = al_get_display_width(display);
 	int scr_h = al_get_display_height(display);
 	al_set_mouse_xy(display, scr_w/2, scr_h/2);
+	al_rest(0.5);
 	int last_mouse_x = scr_w/2;
 
 	bool replay = false;

@@ -3551,18 +3551,18 @@ static int CShowBeachBattleInfo(lua_State *stack)
 
 	if (who < 4) {
 		show_player_info_on_flip = true;
-		player_to_show_info_of_on_flip = strategy_players[who];
+		player_to_show_on_flip = strategy_players[who];
 	}
 	else if (who >= 8) {
 		show_player_info_on_flip = true;
-		player_to_show_info_of_on_flip = strategy_players[who-4];
+		player_to_show_on_flip = strategy_players[who-4];
 	}
 	else if (who >= 4 && who < 8) {
 		int n = who - 4;
 		Player *p = get_beach_battle_player(n);
 		if (p) {
 			show_player_info_on_flip = true;
-			player_to_show_info_of_on_flip = p;
+			player_to_show_on_flip = p;
 		}
 	}
 
@@ -3807,6 +3807,17 @@ int CDestroyStream(lua_State *stack)
 	destroyStream(s);
 	
 	return 0;
+}
+
+int CGetAreaName(lua_State *stack)
+{
+	if (area) {
+		lua_pushstring(stack, area->getName().c_str());
+		return 1;
+	}
+	else {
+		return 0;
+	}
 }
 
 /*
@@ -4404,5 +4415,8 @@ void registerCFunctions(lua_State* luaState)
 	
 	lua_pushcfunction(luaState, CDestroyStream);
 	lua_setglobal(luaState, "destroy_stream");
+	
+	lua_pushcfunction(luaState, CGetAreaName);
+	lua_setglobal(luaState, "getAreaName");
 }
 
