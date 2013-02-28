@@ -1054,10 +1054,10 @@ int config_input(int type)
 		getters[2] = new MInputGetter(type, 3, 25, 170, _t("View Button"), config.getJoyButton3());
 	}
 
-	MTextButton *apply = new MTextButton(180, 125, "Apply");
+	MTextButton *apply = new MTextButton(175, 125, "Apply");
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	MTextButton *other = new MTextButton(180, 145, type == MInputGetter::TYPE_KB ? "Gamepad" : "Keyboard");
+	MTextButton *other = new MTextButton(175, 145, type == MInputGetter::TYPE_KB ? "Gamepad" : "Keyboard");
 #endif
 
 	int ret = 0;
