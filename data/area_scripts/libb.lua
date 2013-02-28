@@ -129,12 +129,12 @@ function activate(activator, activated)
 	local i
 	for i=1,#books do
 		if (activated == books[i].id) then
-			doDialogue("Eny: \"" .. texts[i] .. "\"...\n")
+			doDialogue(_t("Eny") .. ": \"" .. _t(texts[i]) .. "\"...\n")
 		end
 	end
 	for i=1,#books2 do
 		if (activated == books2[i].id) then
-			doDialogue("Eny: \"" .. texts[i] .. "\"...\n")
+			doDialogue(_t("Eny") .. ": \"" .. _t(texts[i]) .. "\"...\n")
 		end
 	end
 end

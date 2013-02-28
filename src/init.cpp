@@ -1029,8 +1029,9 @@ void init_shaders(void)
 			printf("5. %s\n", shader_log);
 		}
 		
+		al_set_shader(display, default_shader);
 #ifdef A5_OGL
-		al_set_opengl_program_object(display, al_get_opengl_program_object(default_shader));
+		//al_set_opengl_program_object(display, al_get_opengl_program_object(default_shader));
 		ALLEGRO_TRANSFORM tr;
 		al_identity_transform(&tr);
 		al_use_transform(&tr);
@@ -1038,7 +1039,7 @@ void init_shaders(void)
 		al_set_projection_transform(display, &tr);
 #else
 #ifndef A5_D3D
-		al_set_direct3d_effect(display, al_get_direct3d_effect(default_shader));
+		//al_set_direct3d_effect(display, al_get_direct3d_effect(default_shader));
 #endif
 
 #endif

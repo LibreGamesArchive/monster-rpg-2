@@ -177,7 +177,6 @@ if(WIN32)
 		allegro_dialog${ALLEG_SUFFIX}
 		allegro_memfile${ALLEG_SUFFIX}
 		allegro_image${ALLEG_SUFFIX}
-		allegro_shader${ALLEG_SUFFIX}
 		allegro_physfs${ALLEG_SUFFIX}
 		allegro${ALLEG_SUFFIX}
 		${ALLEGRO_MAIN_LIB}
@@ -212,7 +211,6 @@ if(APPLE)
 		allegro_dialog${ALLEG_SUFFIX}
 		allegro_memfile${ALLEG_SUFFIX}
 		allegro_image${ALLEG_SUFFIX}
-		allegro_shader${ALLEG_SUFFIX}
 		allegro_physfs${ALLEG_SUFFIX}
 		allegro${ALLEG_SUFFIX} ${ALLEGRO_MAIN_LIB}
 		${EXTRA_LIBS}
@@ -220,6 +218,8 @@ if(APPLE)
 		JoypadMac
 		curl
 		physfs
+		png
+		jpeg
 	)
 
 	if(KCM_AUDIO)
@@ -238,7 +238,6 @@ else(APPLE)
 		allegro_primitives${ALLEG_SUFFIX}
 		allegro_memfile${ALLEG_SUFFIX}
 		allegro_image${ALLEG_SUFFIX}
-		allegro_shader${ALLEG_SUFFIX}
 		allegro_physfs${ALLEG_SUFFIX}
 		allegro_color${ALLEG_SUFFIX}
 		allegro${ALLEG_SUFFIX}

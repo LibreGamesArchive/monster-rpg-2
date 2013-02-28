@@ -1031,33 +1031,33 @@ int config_input(int type)
 	
 	if (type == MInputGetter::TYPE_KB) {
 		num_getters = 15;
-		getters[0] = new MInputGetter(type, 3, 5, 170, _t("Action Key"), config.getKey1());
-		getters[1] = new MInputGetter(type, 3, 15, 170, _t("Back Key"), config.getKey2());
-		getters[2] = new MInputGetter(type, 3, 25, 170, _t("View Key"), config.getKey3());
-		getters[3] = new MInputGetter(type, 3, 35, 170, _t("Left Key"), config.getKeyLeft());
-		getters[4] = new MInputGetter(type, 3, 45, 170, _t("Right Key"), config.getKeyRight());
-		getters[5] = new MInputGetter(type, 3, 55, 170, _t("Up Key"), config.getKeyUp());
-		getters[6] = new MInputGetter(type, 3, 65, 170, _t("Down Key"), config.getKeyDown());
-		getters[7] = new MInputGetter(type, 3, 75, 170, _t("Settings Key"), config.getKeySettings());
-		getters[8] = new MInputGetter(type, 3, 85, 170, _t("Fullscreen Key"), config.getKeyFullscreen());
-		getters[9] = new MInputGetter(type, 3, 95, 170, _t("SFX Up Key"), config.getKeySFXUp());
-		getters[10] = new MInputGetter(type, 3, 105, 170, _t("SFX Down Key"), config.getKeySFXDown());
-		getters[11] = new MInputGetter(type, 3, 115, 170, _t("Music Up Key"), config.getKeyMusicUp());
-		getters[12] = new MInputGetter(type, 3, 125, 170, _t("Music Down Key"), config.getKeyMusicDown());
-		getters[13] = new MInputGetter(type, 3, 135, 170, _t("Quit Key"), config.getKeyQuit());
-		getters[14] = new MInputGetter(type, 3, 145, 170, _t("Sort Items Key"), config.getKeySortItems());
+		getters[0] = new MInputGetter(type, 1, 5, 170, _t("Action Key"), config.getKey1());
+		getters[1] = new MInputGetter(type, 1, 15, 170, _t("Back Key"), config.getKey2());
+		getters[2] = new MInputGetter(type, 1, 25, 170, _t("View Key"), config.getKey3());
+		getters[3] = new MInputGetter(type, 1, 35, 170, _t("Left Key"), config.getKeyLeft());
+		getters[4] = new MInputGetter(type, 1, 45, 170, _t("Right Key"), config.getKeyRight());
+		getters[5] = new MInputGetter(type, 1, 55, 170, _t("Up Key"), config.getKeyUp());
+		getters[6] = new MInputGetter(type, 1, 65, 170, _t("Down Key"), config.getKeyDown());
+		getters[7] = new MInputGetter(type, 1, 75, 170, _t("Settings Key"), config.getKeySettings());
+		getters[8] = new MInputGetter(type, 1, 85, 170, _t("Fullscreen Key"), config.getKeyFullscreen());
+		getters[9] = new MInputGetter(type, 1, 95, 170, _t("SFX Up Key"), config.getKeySFXUp());
+		getters[10] = new MInputGetter(type, 1, 105, 170, _t("SFX Down Key"), config.getKeySFXDown());
+		getters[11] = new MInputGetter(type, 1, 115, 170, _t("Music Up Key"), config.getKeyMusicUp());
+		getters[12] = new MInputGetter(type, 1, 125, 170, _t("Music Down Key"), config.getKeyMusicDown());
+		getters[13] = new MInputGetter(type, 1, 135, 170, _t("Quit Key"), config.getKeyQuit());
+		getters[14] = new MInputGetter(type, 1, 145, 170, _t("Sort Items Key"), config.getKeySortItems());
 	}
 	else {
 		num_getters= 3;
-		getters[0] = new MInputGetter(type, 3, 5, 170, _t("Action Button"), config.getJoyButton1());
-		getters[1] = new MInputGetter(type, 3, 15, 170, _t("Back Button"), config.getJoyButton2());
-		getters[2] = new MInputGetter(type, 3, 25, 170, _t("View Button"), config.getJoyButton3());
+		getters[0] = new MInputGetter(type, 1, 5, 170, _t("Action Button"), config.getJoyButton1());
+		getters[1] = new MInputGetter(type, 1, 15, 170, _t("Back Button"), config.getJoyButton2());
+		getters[2] = new MInputGetter(type, 1, 25, 170, _t("View Button"), config.getJoyButton3());
 	}
 
-	MTextButton *apply = new MTextButton(175, 125, "Apply");
+	MTextButton *apply = new MTextButton(172, 125, "Apply");
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	MTextButton *other = new MTextButton(175, 145, type == MInputGetter::TYPE_KB ? "Gamepad" : "Keyboard");
+	MTextButton *other = new MTextButton(172, 145, type == MInputGetter::TYPE_KB ? "Gamepad" : "Keyboard");
 #endif
 
 	int ret = 0;

@@ -999,10 +999,10 @@ Corrigez s'il vous plaît
 Clavier
 Manette
 Contrôles
-Tape à l'écran ou sur une touche pour annuler
-Tape à l'écran ou sur un bouton pour annuler
-Tape sur une touche ou cliquer pour annuler
-Tape sur un bouton ou cliquer pour annuler
+Annuler:Tape à l'écran ou au clavier
+Annuler:Tape à l'écran ou un bouton
+Annuler:Cliquer ou taper
+Annuler:Tape à un bouton ou cliquer
 Action
 Retour
 Montre-info
@@ -1022,7 +1022,8 @@ Action
 Retour
 Montre-info
 Ces controles sont pour
-iCade seulment! 
+iCade seulement! 
 Pour claviers Bluetooth, utiliser
 RawInputIME input method
 Reçu un(e) 
+Tiggy
