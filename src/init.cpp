@@ -766,59 +766,64 @@ void init_shaders(void)
 {
 	if (use_programmable_pipeline) {
 		static const char *default_vertex_source =
-		"attribute vec4 pos;\n"
-		"attribute vec4 color;\n"
-		"attribute vec2 texcoord;\n"
-		"uniform mat4 projview_matrix;\n"
-		"uniform bool use_tex_matrix;\n"
-		"uniform mat4 tex_matrix;\n"
+		"attribute vec4 " ALLEGRO_SHADER_VAR_POS ";\n"
+		"attribute vec4 " ALLEGRO_SHADER_VAR_COLOR ";\n"
+		"attribute vec2 " ALLEGRO_SHADER_VAR_TEXCOORD ";\n"
+		"uniform mat4 " ALLEGRO_SHADER_VAR_PROJVIEW_MATRIX ";\n"
+		"uniform bool " ALLEGRO_SHADER_VAR_USE_TEX_MATRIX ";\n"
+		"uniform mat4 " ALLEGRO_SHADER_VAR_TEX_MATRIX ";\n"
 		"varying vec4 varying_color;\n"
 		"varying vec2 varying_texcoord;\n"
 		"void main()\n"
 		"{\n"
-		"  varying_color = color;\n"
-		"  if (use_tex_matrix) {\n"
-		"    vec4 uv = tex_matrix * vec4(texcoord, 0, 1);\n"
+		"  varying_color = " ALLEGRO_SHADER_VAR_COLOR ";\n"
+		"  if (" ALLEGRO_SHADER_VAR_USE_TEX_MATRIX ") {\n"
+		"    vec4 uv = " ALLEGRO_SHADER_VAR_TEX_MATRIX " * vec4(" ALLEGRO_SHADER_VAR_TEXCOORD ", 0, 1);\n"
 		"    varying_texcoord = vec2(uv.x, uv.y);\n"
 		"  }\n"
 		"  else\n"
-		"    varying_texcoord = texcoord;\n"
-		"  gl_Position = projview_matrix * pos;\n"
+		"    varying_texcoord = " ALLEGRO_SHADER_VAR_TEXCOORD ";\n"
+#ifndef __linux__
+		"  gl_PointSize = 1.0;\n"
+#endif
+		"  gl_Position = " ALLEGRO_SHADER_VAR_PROJVIEW_MATRIX " * " ALLEGRO_SHADER_VAR_POS ";\n"
 		"}\n";
 
 		static const char *warp_vertex_source =
-		"attribute vec4 pos;\n"
-		"attribute vec2 texcoord;\n"
-		"uniform mat4 projview_matrix;\n"
-		"uniform mat4 tex_matrix;\n"
-                "uniform bool use_tex_matrix;\n"
+		"attribute vec4 " ALLEGRO_SHADER_VAR_POS ";\n"
+		"attribute vec4 " ALLEGRO_SHADER_VAR_COLOR ";\n"
+		"attribute vec2 " ALLEGRO_SHADER_VAR_TEXCOORD ";\n"
+		"uniform mat4 " ALLEGRO_SHADER_VAR_PROJVIEW_MATRIX ";\n"
+		"uniform bool " ALLEGRO_SHADER_VAR_USE_TEX_MATRIX ";\n"
+		"uniform mat4 " ALLEGRO_SHADER_VAR_TEX_MATRIX ";\n"
+		"varying vec4 varying_color;\n"
 		"varying vec2 varying_texcoord;\n"
 		"void main()\n"
 		"{\n"
-		"   if (use_tex_matrix) {\n"
-		"     vec4 uv = tex_matrix * vec4(texcoord, 0, 1);\n"
+		"   if (" ALLEGRO_SHADER_VAR_USE_TEX_MATRIX ") {\n"
+		"     vec4 uv = " ALLEGRO_SHADER_VAR_TEX_MATRIX " * vec4(" ALLEGRO_SHADER_VAR_TEXCOORD ", 0, 1);\n"
 		"     varying_texcoord = vec2(uv.x, uv.y);\n"
 		"   }\n"
 		"   else\n"
-		"     varying_texcoord = texcoord;\n"
+		"     varying_texcoord = " ALLEGRO_SHADER_VAR_TEXCOORD ";\n"
 #ifndef __linux__
 		"   gl_PointSize = 1.0;\n"
 #endif
-		"   gl_Position = projview_matrix * pos;\n"
+		"   gl_Position = " ALLEGRO_SHADER_VAR_PROJVIEW_MATRIX " * " ALLEGRO_SHADER_VAR_POS ";\n"
 		"}\n";
 		
 		static const char *default_pixel_source =
 #ifdef ALLEGRO_CFG_OPENGLES
 		"precision mediump float;\n"
 #endif
-		"uniform sampler2D tex;\n"
-		"uniform bool use_tex;\n"
+		"uniform sampler2D " ALLEGRO_SHADER_VAR_TEX ";\n"
+		"uniform bool " ALLEGRO_SHADER_VAR_USE_TEX ";\n"
 		"varying vec4 varying_color;\n"
 		"varying vec2 varying_texcoord;\n"
 		"void main()\n"
 		"{\n"
-		"  if (use_tex)\n"
-		"    gl_FragColor = varying_color * texture2D(tex, varying_texcoord);\n"
+		"  if (" ALLEGRO_SHADER_VAR_USE_TEX ")\n"
+		"    gl_FragColor = varying_color * texture2D(" ALLEGRO_SHADER_VAR_TEX ", varying_texcoord);\n"
 		"  else\n"
 		"    gl_FragColor = varying_color;\n"
 		"}\n";
@@ -827,8 +832,8 @@ void init_shaders(void)
 #if defined OPENGLES
 		"precision mediump float;\n"
 #endif
-		"uniform bool use_tex;\n"
-		"uniform sampler2D tex;\n"
+		"uniform sampler2D " ALLEGRO_SHADER_VAR_TEX ";\n"
+		"uniform bool " ALLEGRO_SHADER_VAR_USE_TEX ";\n"
 		"varying vec4 varying_color;\n"
 		"varying vec2 varying_texcoord;\n"
 		"uniform float r;\n"
@@ -839,7 +844,7 @@ void init_shaders(void)
 		"   float avg, dr, dg, db;\n"
 		"   vec4 color = varying_color;\n"
 		"   vec4 coord = vec4(varying_texcoord, 0.0, 1.0);\n"
-		"   color *= texture2D(tex, coord.st);\n"
+		"   color *= texture2D(" ALLEGRO_SHADER_VAR_TEX ", coord.st);\n"
 		"   avg = (color.r + color.g + color.b) / 3.0;\n"
 		"   dr = avg * r;\n"
 		"   dg = avg * g;\n"
@@ -854,7 +859,9 @@ void init_shaders(void)
 #if defined OPENGLES
 		"precision mediump float;\n"
 #endif
-		"uniform sampler2D tex;\n"
+		"uniform sampler2D " ALLEGRO_SHADER_VAR_TEX ";\n"
+		"uniform bool " ALLEGRO_SHADER_VAR_USE_TEX ";\n"
+		"varying vec4 varying_color;\n"
 		"varying vec2 varying_texcoord;\n"
 		"uniform float angle;\n"
 		"uniform float tex_bot;\n"
@@ -868,13 +875,15 @@ void init_shaders(void)
 		"   if (o < 0.0 || o > tex_bot)\n"
 		"      gl_FragColor = vec4(0, 0, 0, 1);\n"
 		"   else\n"
-		"      gl_FragColor = texture2D(tex, vec2(varying_texcoord.x, o));\n"
+		"      gl_FragColor = texture2D(" ALLEGRO_SHADER_VAR_TEX ", vec2(varying_texcoord.x, o));\n"
 		"}\n";
 		
 		const char *shadow_pixel_source =
 #if defined OPENGLES
 		"precision mediump float;\n"
 #endif
+		"uniform sampler2D " ALLEGRO_SHADER_VAR_TEX ";\n"
+		"uniform bool " ALLEGRO_SHADER_VAR_USE_TEX ";\n"
 		"varying vec4 varying_color;\n"
 		"varying vec2 varying_texcoord;\n"
 		"uniform float x1;\n"
@@ -902,16 +911,16 @@ void init_shaders(void)
 #if defined OPENGLES
 		"precision mediump float;\n"
 #endif
-		"uniform sampler2D tex;\n"
+		"uniform sampler2D " ALLEGRO_SHADER_VAR_TEX ";\n"
+		"uniform bool " ALLEGRO_SHADER_VAR_USE_TEX ";\n"
 		"varying vec4 varying_color;\n"
 		"varying vec2 varying_texcoord;\n"
 		"uniform float brightness;\n"
-		"uniform bool use_tex;\n"
 		"void main() {\n"
 		"   vec4 coord = vec4(varying_texcoord, 0.0, 1.0);\n"
 		"   vec4 color = varying_color;\n"
-		"   if (use_tex) {\n"
-		"      color *= texture2D(tex, coord.st);\n"
+		"   if (" ALLEGRO_SHADER_VAR_USE_TEX ") {\n"
+		"      color *= texture2D(" ALLEGRO_SHADER_VAR_TEX ", coord.st);\n"
 		"   }\n"
 		"   if (color.a == 0.0) {\n"
 		"      gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);\n"
@@ -1035,6 +1044,7 @@ void init_shaders(void)
 
 void init2_shaders(void)
 {
+/*
 	if (use_programmable_pipeline) {
 		al_set_shader_bool(default_shader, "use_tex_matrix", false);
 		al_set_shader_bool(tinter, "use_tex_matrix", false);
@@ -1046,6 +1056,7 @@ void init2_shaders(void)
 		//al_set_shader_float(warp, "cy", ((float)BH/buffer_true_h)/2);
 #endif
 	}	
+*/
 }
 
 void destroy_shaders(void)
