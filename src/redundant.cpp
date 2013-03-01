@@ -553,7 +553,7 @@ void m_flip_display(void)
 	fps_frames++;
 	double elapsed = al_get_time() - fps_counter;
 	if (fps_on && elapsed > 2) {
-		fps = (int)((float)fps_frames/elapsed);
+		fps = (int)(round((float)fps_frames/elapsed));
 		fps_counter = al_get_time();
 		fps_frames = 0;
 	}

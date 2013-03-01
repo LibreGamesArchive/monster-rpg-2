@@ -16,6 +16,8 @@
 		9609BD8E13636F270068EB38 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7A13636EDE0068EB38 /* MobileCoreServices.framework */; };
 		9609BD8F13636F270068EB38 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7B13636EDE0068EB38 /* OpenGLES.framework */; };
 		9609BD9013636F270068EB38 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7C13636EDE0068EB38 /* QuartzCore.framework */; };
+		960C9CA316E0A4FD00ABC0FA /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 960C9CA116E0A4AA00ABC0FA /* init.cpp */; };
+		960C9CA416E0A4FE00ABC0FA /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 960C9CA116E0A4AA00ABC0FA /* init.cpp */; };
 		960DB499154C82EA000869BD /* NetReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB489154C82EA000869BD /* NetReachability.m */; };
 		960DB49A154C82EA000869BD /* NetServiceBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB48B154C82EA000869BD /* NetServiceBrowser.m */; };
 		960DB49B154C82EA000869BD /* NetUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB48D154C82EA000869BD /* NetUtilities.m */; };
@@ -98,7 +100,6 @@
 		96729A8016CADBDD00C094D5 /* libwapcaplet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96729A7A16CADBDD00C094D5 /* libwapcaplet.a */; };
 		9677118016C21DF10092EE0A /* liballegro_physfs-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9677117E16C21DF10092EE0A /* liballegro_physfs-static.a */; };
 		9677118116C21DF10092EE0A /* libphysfs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9677117F16C21DF10092EE0A /* libphysfs.a */; };
-		967976AC13BE8690006BCE29 /* init.mm in Sources */ = {isa = PBXBuildFile; fileRef = 967976AB13BE8690006BCE29 /* init.mm */; };
 		968C1E5B13BBB51D00615225 /* libbass.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 968C1E5A13BBB51D00615225 /* libbass.a */; };
 		968C1E5D13BBB55900615225 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 968C1E5C13BBB55900615225 /* CFNetwork.framework */; };
 		968C1E7A13BCED5E00615225 /* libbassflac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 968C1E7913BCED5D00615225 /* libbassflac.a */; };
@@ -164,7 +165,6 @@
 		96B4B130143BBBF300ACA64C /* xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224274103D96D400756C5B /* xml.cpp */; };
 		96B4B139143BBEDC00ACA64C /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0D0143BBA8400ACA64C /* libfreetype.a */; };
 		96B4B13B143BBEDC00ACA64C /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0D3143BBA8400ACA64C /* libz.a */; };
-		96B4B144143BC0A000ACA64C /* init.mm in Sources */ = {isa = PBXBuildFile; fileRef = 967976AB13BE8690006BCE29 /* init.mm */; };
 		96B7D08613D09EF7004D7ED6 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B7D08413D09EF7004D7ED6 /* libz.a */; };
 		96C2C90816C0A53C004EBAB9 /* liballegro_dialog-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96C2C90616C0A53B004EBAB9 /* liballegro_dialog-static.a */; };
 		96C2C90916C0A53C004EBAB9 /* liblua5.2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96C2C90716C0A53C004EBAB9 /* liblua5.2.a */; };
@@ -225,6 +225,7 @@
 		9609BD7C13636EDE0068EB38 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		9609BD7D13636EDE0068EB38 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		960A8B3315CB90AE0073CF82 /* Monster RPG 2.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Monster RPG 2.entitlements"; sourceTree = "<group>"; };
+		960C9CA116E0A4AA00ABC0FA /* init.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; name = init.cpp; path = ../../src/init.cpp; sourceTree = "<group>"; };
 		960DB488154C82EA000869BD /* NetReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NetReachability.h; path = ../../src/NetworkingSupport/NetReachability.h; sourceTree = "<group>"; };
 		960DB489154C82EA000869BD /* NetReachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NetReachability.m; path = ../../src/NetworkingSupport/NetReachability.m; sourceTree = "<group>"; };
 		960DB48A154C82EA000869BD /* NetServiceBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NetServiceBrowser.h; path = ../../src/NetworkingSupport/NetServiceBrowser.h; sourceTree = "<group>"; };
@@ -331,7 +332,6 @@
 		96729A7A16CADBDD00C094D5 /* libwapcaplet.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwapcaplet.a; path = ../../../iphone_libs_r/libwapcaplet.a; sourceTree = "<group>"; };
 		9677117E16C21DF10092EE0A /* liballegro_physfs-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_physfs-static.a"; path = "../../../local/lib/liballegro_physfs-static.a"; sourceTree = "<group>"; };
 		9677117F16C21DF10092EE0A /* libphysfs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libphysfs.a; path = ../../../local/lib/libphysfs.a; sourceTree = "<group>"; };
-		967976AB13BE8690006BCE29 /* init.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = init.mm; path = ../../src/init.mm; sourceTree = "<group>"; };
 		967C33CB15CBA765003FD960 /* Monster RPG 2 Lite.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Monster RPG 2 Lite.entitlements"; sourceTree = "<group>"; };
 		967C33CF15CC4A1A003FD960 /* Default-Landscape~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape~ipad.png"; sourceTree = "<group>"; };
 		967C33D115CC4A1E003FD960 /* Default-Landscape@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape@2x~ipad.png"; sourceTree = "<group>"; };
@@ -521,6 +521,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				960C9CA116E0A4AA00ABC0FA /* init.cpp */,
 				965070C116CE553900E6E9D4 /* Mo. RPG 2.entitlements */,
 				9692632016CC7BFF00E09689 /* icon.icns */,
 				96729A7516CADBDD00C094D5 /* libdom.a */,
@@ -603,7 +604,6 @@
 				9659CD8D143A29DF0007757E /* full icons */,
 				96B7D08313D09EF7004D7ED6 /* libpng.a */,
 				96B7D08413D09EF7004D7ED6 /* libz.a */,
-				967976AB13BE8690006BCE29 /* init.mm */,
 				968C1E7913BCED5D00615225 /* libbassflac.a */,
 				968C1E5C13BBB55900615225 /* CFNetwork.framework */,
 				968C1E5A13BBB51D00615225 /* libbass.a */,
@@ -966,7 +966,6 @@
 				96224298103D96D400756C5B /* xml.cpp in Sources */,
 				9639C4361152D3A900804984 /* iphone.mm in Sources */,
 				96D175A813351F06008462BB /* translate.cpp in Sources */,
-				967976AC13BE8690006BCE29 /* init.mm in Sources */,
 				9659CDA1143A426C0007757E /* joypad.mm in Sources */,
 				9659CDA4143A42C50007757E /* joypad_handler.m in Sources */,
 				96A4D270154A7EA0009ECD44 /* tftp_get.c in Sources */,
@@ -980,6 +979,7 @@
 				960DB4A0154C82EA000869BD /* UDPSocket.m in Sources */,
 				9610AF8216C4BDFD0050372E /* Area.cpp in Sources */,
 				9636676F16C9FC8200A24B46 /* svg.cpp in Sources */,
+				960C9CA316E0A4FD00ABC0FA /* init.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -991,7 +991,6 @@
 				9636675916C9858E00A24B46 /* Area.cpp in Sources */,
 				96E3D50516C0D06C00A4A973 /* mygamecentervc.m in Sources */,
 				96C2C90B16C0A595004EBAB9 /* gamecenter.mm in Sources */,
-				96B4B144143BC0A000ACA64C /* init.mm in Sources */,
 				9636677016C9FF0A00A24B46 /* svg.cpp in Sources */,
 				969A9E3E16083F6700F4DBE2 /* ftpget.cpp in Sources */,
 				96B4B0E2143BBBF300ACA64C /* joypad_handler.m in Sources */,
@@ -1032,6 +1031,7 @@
 				96B4B12E143BBBF300ACA64C /* util.cpp in Sources */,
 				96B4B12F143BBBF300ACA64C /* widgets.cpp in Sources */,
 				96B4B130143BBBF300ACA64C /* xml.cpp in Sources */,
+				960C9CA416E0A4FE00ABC0FA /* init.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

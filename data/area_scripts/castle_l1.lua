@@ -108,6 +108,7 @@ function update(step)
 		setInventory(slot, ITEM_JUICE, 1)
 		setObjectSubAnimation(chef.id, "prepare")
 		setMilestone(MS_GOT_FRUIT, false)
+		doDialogue(_t("Got a ") .. getItemIcon(ITEM_JUICE) .. _t("Juice") .. "\n", true)
 		descriptifyPlayer()
 	end
 

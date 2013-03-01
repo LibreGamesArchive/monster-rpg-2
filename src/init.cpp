@@ -1677,13 +1677,18 @@ bool init(int *argc, char **argv[])
 	
 	ALLEGRO_DEBUG("creating tmpbuffer\n");
 
-	flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-	tmpbuffer = m_create_bitmap(
-		al_get_display_width(display),
-		al_get_display_height(display)
-	);
-	al_set_new_bitmap_flags(flags);
+	{
+		flags = al_get_new_bitmap_flags();
+		al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+		ALLEGRO_MONITOR_INFO mi;
+		al_get_monitor_info(config.getAdapter(), &mi);
+		int w = mi.x2 - mi.x1;
+		int h = mi.y2 - mi.y1;
+		tmpbuffer = m_create_bitmap(
+			w, h
+		);
+		al_set_new_bitmap_flags(flags);
+	}
 
 	ALLEGRO_DEBUG("initing shader variables\n");
 
