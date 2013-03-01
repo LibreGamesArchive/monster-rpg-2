@@ -2418,15 +2418,16 @@ void credits(void)
 			"ARMANDO M CERASOLI",
 			"MICHAL CICHON",
 			"PATRICK DAVID",
+			"THOMAS FAUST",
 			NULL
 		},
 		{
 			"TRANSLATIONS",
 			" ",
-			"THOMAS FAUST",
 			"MONCOMBLE FLORIAN",
 			"CANTIDIO O FONTES",
 			"JOAO GONCALVES",
+			"LORENZ JOLLING",
 			"SERGEY LATYSHEV",
 			NULL
 		},
