@@ -1712,14 +1712,6 @@ void MInputGetter::draw()
 {
 	MCOLOR color;
 
-	// Draw cursor
-	if (this == tguiActiveWidget) {
-		int tick = (unsigned)tguiCurrentTimeMillis() % 1000;
-		if (tick < 800) {
-			m_draw_bitmap(cursor, x, y, 0);
-		}
-	}
-
 	// draw text
 
 	if (mode == GETTING) {
@@ -1740,6 +1732,14 @@ void MInputGetter::draw()
 #endif
 	}
 	else {
+		// Draw cursor
+		if (this == tguiActiveWidget) {
+			int tick = (unsigned)tguiCurrentTimeMillis() % 1000;
+			if (tick < 800) {
+				m_draw_bitmap(cursor, x, y, 0);
+			}
+		}
+
 		if (this == tguiActiveWidget) {
 			color = white;
 		}

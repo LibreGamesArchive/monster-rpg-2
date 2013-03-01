@@ -2421,6 +2421,7 @@ void credits(void)
 		{
 			"TRANSLATIONS",
 			" ",
+			"EDUARDO \"RYUKEN\" ARAUJO",
 			"ATTILIO CAROTENUTO",
 			"ARMANDO M CERASOLI",
 			"MICHAL CICHON",
@@ -2443,6 +2444,7 @@ void credits(void)
 			"ANDREA PROVASI",
 			"ELIAS PSCHERNIG",
 			"SAMUEL VAN DER WAA",
+			"SEAWASP MESH AND MUSIC",
 			NULL
 		},
 		{

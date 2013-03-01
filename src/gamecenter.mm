@@ -197,7 +197,10 @@ volatile bool modalViewShowing = false;
 
 void showAchievements(void)
 {
-// FIXME: Do OS X
+	al_set_target_backbuffer(display);
+	m_clear(black);
+	drawBufferToScreen();
+
 #ifdef ALLEGRO_IPHONE
 	MyGameCenterVC *uv = [[MyGameCenterVC alloc] initWithNibName:nil bundle:nil];
 	[uv performSelectorOnMainThread: @selector(showAchievements) withObject:nil waitUntilDone:YES];
