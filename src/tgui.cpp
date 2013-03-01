@@ -82,7 +82,7 @@ static std::vector<TGUIWidget *> disabledWidgets;
 
 #define KEEP_TIME 1.0
 
-void *queue_emptier(void *crap)
+static void *queue_emptier(void *crap)
 {
 	int own_mouse_downs = 0;
 
@@ -223,7 +223,7 @@ TGUIWidget::TGUIWidget()
  */
 static TGUIWidget* tguiFindPixelOwner(int x, int y)
 {
-	for (int i = activeGUI->widgets.size()-1; i >= 0; i--) {
+	for (int i = (int)activeGUI->widgets.size()-1; i >= 0; i--) {
 		TGUIWidget* widget = activeGUI->widgets[i];
 		if (tguiPointOnWidget(widget, &x, &y)) {
 			return widget;
@@ -396,7 +396,7 @@ void tguiSetFocus(TGUIWidget* widget)
 //			if (oldActive) {
 //				oldActive->setFocus(false);
 //			}
-			activeGUI->focus = i;
+			activeGUI->focus = (int)i;
 			tguiActiveWidget = w;
 			return;
 		}
@@ -437,7 +437,7 @@ void tguiFocusPrevious()
 
 	// If there is no previous widget, find the last and focus it
 
-	for (focus = activeGUI->widgets.size()-1; focus >= 0; focus--) {
+	for (focus = (int)activeGUI->widgets.size()-1; focus >= 0; focus--) {
 		if (activeGUI->widgets[focus]->acceptsFocus()) {
 			if (activeGUI->widgets[focus]->getParent() ==
 					activeGUI->widgets[activeGUI->focus]->getParent()) {
@@ -611,7 +611,9 @@ TGUIWidget* tguiUpdate()
 				MouseEvent *e = new MouseEvent;
 				e->x = EV.x;
 				e->y = EV.y;
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 				e->z = EV.z;
+#endif
 				tguiConvertMousePosition(&e->x, &e->y, tgui_screen_offset_x, tgui_screen_offset_y, tgui_screen_ratio_x, tgui_screen_ratio_y);
 				e->b = 0;
 				mouseMoveEvents.push_back(e);
@@ -732,7 +734,7 @@ TGUIWidget* tguiUpdate()
 		}
 		if (tguiIsDisabled(widget))
 			continue;
-		unsigned int retVal = widget->update(elapsed);
+		unsigned int retVal = widget->update((int)elapsed);
 		switch (retVal) {
 			case TGUI_CONTINUE:
 				break;
@@ -1145,7 +1147,7 @@ void tguiLowerSingleWidget(TGUIWidget* widgetToLower)
  * Move all the widgets in a group forward to the front
  * of the display (end of vector).
  */
-void tguiLowerSingleWidgetBelow(TGUIWidget* widgetToLower,
+static void tguiLowerSingleWidgetBelow(TGUIWidget* widgetToLower,
 		TGUIWidget* widgetAbove)
 {
 	std::vector<TGUIWidget*> widgets;

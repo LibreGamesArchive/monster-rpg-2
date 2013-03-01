@@ -90,7 +90,7 @@ void save_url(const char *filename, const char *buf)
 		return;
 	}
 
-	int half = strlen(buf)/2;
+	int half = (int)strlen(buf)/2;
 
 	for (int i = 0; i < half; i++) {
 		char b1 = *buf;
@@ -1628,7 +1628,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 						int cx, cy;
 						cx = 30;
 						cy = (BH/8)+(BH/4)*v[i];
-						applyWhiteMagicSpell(spellName, party[v[i]]->getInfo(), v.size(), sound, NULL, cx, cy);
+						applyWhiteMagicSpell(spellName, party[v[i]]->getInfo(), (int)v.size(), sound, NULL, cx, cy);
 						sound = false;
 					}
 					party[who]->getInfo().abilities.mp -= getSpellCost(spellName);
@@ -2476,7 +2476,7 @@ void credits(void)
 		int y = BH/2-(10*n)/2;
 		std::vector<std::vector<std::pair<MPoint, MPoint> > > lines;
 		for (int j = 0; j < n; j++) {
-			int x = BW/2-(10*strlen(section_text[s][j]))/2;
+			int x = BW/2-(10*(int)strlen(section_text[s][j]))/2;
 			std::vector<std::pair<MPoint, MPoint> > string_points;
 			for (unsigned int i = 0; i < strlen(section_text[s][j]); i++) {
 				MPoint start, dest;
@@ -2524,7 +2524,7 @@ void credits(void)
 			goto done;
 		}
 		long now = tguiCurrentTimeMillis();
-		int step = now - start;
+		int step = (int)(now - start);
 		start = now;
 		offset += 0.01f * step;
 		al_set_target_backbuffer(display);
@@ -2867,7 +2867,7 @@ done:
 				goto done2;
 			}
 			long now = tguiCurrentTimeMillis();
-			int step = now - start;
+			int step = (int)(now - start);
 			start = now;
 
 			scroll_amount += 0.01 * step;
@@ -2875,7 +2875,7 @@ done:
 			vcount = 0;
 			int y = BH-scroll_amount;
 			for (int line = 0; line < nlines; line++, y += 10) {
-				int x = BW/2 - strlen(lines[line])*10/2;
+				int x = BW/2 - (int)strlen(lines[line])*10/2;
 				for (int c = 0; lines[line][c]; c++, x += 10) {
 					int letter = lines[line][c];
 					int u;

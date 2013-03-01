@@ -38,7 +38,7 @@ void iputl(long l, gzFile f)
 /*
  * Read 32 bits, little endian
  */
-long igetl(gzFile f)
+uint32_t igetl(gzFile f)
 {
 	int c1 = gzgetc(f);
 	if (c1 == -1) throw ReadError();
@@ -48,7 +48,7 @@ long igetl(gzFile f)
 	if (c3 == -1) throw ReadError();
 	int c4 = gzgetc(f);
 	if (c4 == -1) throw ReadError();
-	return (long)c1 | ((long)c2 << 8) | ((long)c3 << 16) | ((long)c4 << 24);
+	return (uint32_t)((long)c1 | ((long)c2 << 8) | ((long)c3 << 16) | ((long)c4 << 24));
 }
 
 void my_pack_putc(int c, gzFile f)
@@ -86,7 +86,7 @@ const char* readString(gzFile f)
 
 void writeString(const char* s, gzFile f)
 {
-	int length = strlen(s);
+	int length = (int)strlen(s);
 
 	iputl(length, f);
 

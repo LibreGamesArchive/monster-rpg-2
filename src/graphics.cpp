@@ -761,7 +761,7 @@ static void fade(int startAlpha, int endAlpha, int length, MCOLOR color)
 
 	while (total < length) {
 		long now = tguiCurrentTimeMillis();
-		int elapsed = now - start;
+		int elapsed = (int)(now - start);
 		total += elapsed;
 		start = now;
 		float p = (float)total / length;
@@ -876,7 +876,7 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 			}
 		}
 		now = (unsigned long)(al_get_time()*1000);
-		int elapsed = now - start;
+		int elapsed = (int)(now - start);
 		float p = (float)elapsed / length;
 		if (p > 1) p = 1;
 		if (p < 0) p = 0;
@@ -1045,7 +1045,7 @@ void battleTransition(void)
 			}
 
 			long end = tguiCurrentTimeMillis();
-			step = end - start;
+			step = (int)(end - start);
 			elapsed += step;
 			start = end;
 		}
@@ -1087,7 +1087,7 @@ void battleTransition(void)
 	float angle = 0;
 
 	while ((now - start) < (length*2)) {
-		int elapsed = now - start;
+		int elapsed = (int)(now - start);
 		angle = ((double)elapsed / (length*2.0)) * (M_PI*2);
 
 		ALLEGRO_STATE state;

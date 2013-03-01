@@ -30,6 +30,8 @@ extern "C" {
 
 #include <vector>
 
+#include "svg.hpp"
+
 extern ALLEGRO_DISPLAY *display;
 
 ALLEGRO_DEBUG_CHANNEL("Mo2SVG")
@@ -159,7 +161,7 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 		glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT, ColorBufferID);
 		glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, DepthBufferID);
 		glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, DepthBufferID);
-		GLint status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+		glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 
 		glGetIntegerv(GL_VIEWPORT, old_vp);
 
@@ -332,7 +334,7 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 				v[k*3+2].z = 0;
 				v[k*3+2].color = al_map_rgb_f(1, 1, 1);
 			}
-			al_draw_prim(v, 0, 0, 0, (points[j].size()/2-1)*3, ALLEGRO_PRIM_TRIANGLE_LIST);
+			al_draw_prim(v, 0, 0, 0, (int)(points[j].size()/2-1)*3, ALLEGRO_PRIM_TRIANGLE_LIST);
 			delete[] v;
 		}
 
@@ -357,7 +359,7 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 #endif
 
 		for (size_t j = 0; j < points.size(); j++) {
-			al_draw_polyline(&points[j][0], points[j].size()/2, ALLEGRO_LINE_JOIN_MITER, ALLEGRO_LINE_CAP_ROUND, stroke, stroke_width, 4.0);
+			al_draw_polyline(&points[j][0], (int)points[j].size()/2, ALLEGRO_LINE_JOIN_MITER, ALLEGRO_LINE_CAP_ROUND, stroke, stroke_width, 4.0);
 		}
 	}
 

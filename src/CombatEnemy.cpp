@@ -407,7 +407,7 @@ static void dragon_blackAnd0(AnimationSet *a, AnimationSet *a2)
 	long start = tguiCurrentTimeMillis();
 	while (tguiCurrentTimeMillis() < (unsigned long)start+1000) {
 		long elapsed = tguiCurrentTimeMillis() - start;
-		int i = elapsed / 100;
+		int i = (int)(elapsed / 100);
 		MCOLOR c;
 		if (i % 2 == 1)
 			c = black;

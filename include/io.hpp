@@ -13,7 +13,7 @@ struct SaveStateInfo
 
 
 extern void iputl(long l, gzFile f);
-extern long igetl(gzFile f);
+extern uint32_t igetl(gzFile f);
 extern void my_pack_putc(int c, gzFile f);
 extern int my_pack_getc(gzFile f);
 extern const char *readString(gzFile f);

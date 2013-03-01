@@ -37,7 +37,7 @@ extern "C" {
 #include <bcm_host.h>
 #endif
 
-uint32_t parse_version(const char *v)
+static uint32_t parse_version(const char *v)
 {
 	char buf1[100];
 	char buf2[100];

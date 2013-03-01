@@ -2740,7 +2740,7 @@ int MMap::update(int millis)
 				m_flip_display();
 
 				now = tguiCurrentTimeMillis();
-				elapsed = now-start;
+				elapsed = (int)(now-start);
 				start = now;
 				totalElapsed += elapsed;
 			}
@@ -4046,7 +4046,7 @@ void MToggleList::draw()
 			}
 		}
 		else {
-			count = strlen(items[r].c_str());
+			count = (int)strlen(items[r].c_str());
 		}
 
 		strncpy(buf, _t(items[r].c_str()), count);
@@ -4102,7 +4102,7 @@ int MToggleList::update(int millis)
 		if (d) {
 			int n = top + d;
 			if (n < 0) n = 0;
-			else if (n+rows > (int)items.size()) n = items.size() - rows;
+			else if (n+rows > (int)items.size()) n = (int)items.size() - rows;
 			top /*= selected*/ = n;
 		}
 		scroll_offs %= 15;
@@ -4501,7 +4501,7 @@ int MScrollingList::update(int millis)
 		if (d) {
 			int n = top + d;
 			if (n < 0) n = 0;
-			else if (n+rows > (int)items.size()) n = items.size() - rows;
+			else if (n+rows > (int)items.size()) n = (int)items.size() - rows;
 			top = selected = n;
 		}
 		scroll_offs %= 15;
@@ -4587,7 +4587,7 @@ int MScrollingList::update(int millis)
 			holdTime = tguiCurrentTimeMillis();
 		}
 		else if (id.button1) {
-			int elapsed = tguiCurrentTimeMillis() - holdTime;
+			int elapsed = (int)(tguiCurrentTimeMillis() - holdTime);
 			if (hold_callback && elapsed > 600) {
 				playPreloadedSample("select.ogg");
 				al_set_target_backbuffer(display);
@@ -6027,7 +6027,7 @@ int MMultiChooser::update(int millis)
 		playPreloadedSample("blip.ogg");
 		// reverse order hack
 		if (points.size() >= 1) {
-			for (int i = points.size()-1; i >= 0; i--) {
+			for (int i = (int)points.size()-1; i >= 0; i--) {
 				if (points[i].y < points[current[0]].y &&
 					points[i].west == points[current[0]].west) {
 					possibilities.push_back(i);
@@ -6824,7 +6824,7 @@ int MSingleToggle::update(int millis)
 		use_input_event();
 		playPreloadedSample("blip.ogg");
 		selected--;
-		if (selected < 0) selected = options.size()-1;
+		if (selected < 0) selected = (int)options.size()-1;
 	}
 	else if (ie.right == DOWN) {
 		use_input_event();

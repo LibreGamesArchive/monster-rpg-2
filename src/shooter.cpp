@@ -649,7 +649,7 @@ MBITMAP *sub_icon;
 MBITMAP *pause_icon;
 static int starty;
 
-void draw_everything()
+static void draw_everything()
 {
 	m_clear(m_map_rgb(105, 115, 145));
 

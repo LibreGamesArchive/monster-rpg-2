@@ -66,5 +66,5 @@ int getfile(const char *url, const char *outfilename)
 
   curl_global_cleanup();
 
-  return ftpfile.written;
+  return (int)ftpfile.written;
 }

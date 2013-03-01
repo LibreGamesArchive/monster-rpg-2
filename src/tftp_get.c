@@ -73,7 +73,7 @@ static socklen_t saddr_len;
 
 static int get(char *buf, int len)
 {
-	int n = recvfrom(
+	int n = (int)recvfrom(
 		sock,
 		buf,
 		len,
@@ -91,7 +91,7 @@ static int get(char *buf, int len)
 
 static int put(const char *buf, int len)
 {
-	int n = sendto(
+	int n = (int)sendto(
 		sock,
 		buf,
 		len,
@@ -162,7 +162,7 @@ static int get_rrq(char *buf, const char *filename)
 	strcpy(buf, bsize);
 	buf[strlen(bsize)] = 0;
 
-	return strlen(filename) + strlen("octet") + strlen("blksize") + strlen(bsize) + 6;
+	return (int)(strlen(filename) + strlen("octet") + strlen("blksize") + strlen(bsize) + 6);
 }
 
 static void mkack(char *buf)
@@ -201,7 +201,7 @@ static int download_file(const char *filename)
 	}
 
 	// read option acknowledgement
-	sz = get(buf, 2+strlen("blksize")+1+strlen(BLKSIZE_S)+1);
+	sz = get(buf, 2+(int)(strlen("blksize")+1+strlen(BLKSIZE_S)+1));
 	if ((sz != (2+strlen("blksize")+1+strlen(BLKSIZE_S)+1)) || get16bits(buf) != 6) {
 		shutdown_connection();
 		debug_message("no option ack");
@@ -326,7 +326,7 @@ static bool download_all(void)
 		sprintf(fn2, "%s/%s", DOWNLOAD_PATH, fn);
 		f2 = al_fopen(fn2, "rb");
 		if (f2) {
-			int sz2 = al_fsize(f2);
+			int sz2 = (int)al_fsize(f2);
 			al_fclose(f2);
 			if (sz2 == sz) {
 				continue;
@@ -506,7 +506,7 @@ int hqm_get_status(float *percent)
 		sprintf(fn2, "%s/%s", DOWNLOAD_PATH, fn);
 		f2 = al_fopen(fn2, "rb");
 		if (f2) {
-			int sz2 = al_fsize(f2);
+			int sz2 = (int)al_fsize(f2);
 			al_fclose(f2);
 			if (sz2 != sz) {
 				if (count == 0) {

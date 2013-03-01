@@ -30,7 +30,7 @@ BOOL isGameCenterAPIAvailable()
 	osVersionSupported = ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending);
 #else
 	OSErr err;
-	SInt32 systemVersion, versionMajor, versionMinor, versionBugFix;
+	SInt32 systemVersion;
 	if ((err = Gestalt(gestaltSystemVersion, &systemVersion)) == noErr) {
 		if (systemVersion >= 0x1080) {
 			osVersionSupported = TRUE;

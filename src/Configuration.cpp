@@ -1,5 +1,4 @@
 #include "monster2.hpp"
-
 #include <sys/stat.h>
 
 #ifdef ALLEGRO_WINDOWS
@@ -71,25 +70,25 @@ const char *keynames[] =
 	"F10",
 	"F11",
 	"F12",
-	"ESCAPE",
-	"TILDE",
-	"MINUS",
-	"EQUALS",
-	"BACKSPACE",
+	"ESC",
+	"~",
+	"-",
+	"=",
+	"BACKSPC",
 	"TAB",
-	"OPENBRACE",
-	"CLOSEBRACE",
+	"[",
+	"]",
 	"ENTER",
-	"SEMICOLON",
-	"QUOTE",
-	"BACKSLASH",
-	"BACKSLASH2",
-	"COMMA",
-	"FULLSTOP",
-	"SLASH",
+	";",
+	"'",
+	"\\",
+	"\\2",
+	",",
+	".",
+	"/",
 	"SPACE",
-	"INSERT",
-	"DELETE",
+	"INS",
+	"DEL",
 	"HOME",
 	"END",
 	"PGUP",
@@ -98,13 +97,13 @@ const char *keynames[] =
 	"RIGHT",
 	"UP",
 	"DOWN",
-	"PAD_SLASH",
-	"PAD_ASTERISK",
-	"PAD_MINUS",
-	"PAD_PLUS",
-	"PAD_DELETE",
-	"PAD_ENTER",
-	"PRINTSCREEN",
+	"PAD /",
+	"PAD *",
+	"PAD -",
+	"PAD +",
+	"PAD DEL",
+	"PAD ENTER",
+	"PRTSCR",
 	"PAUSE",
 	"ABNT_C1",
 	"YEN",
@@ -115,15 +114,15 @@ const char *keynames[] =
 	"CIRCUMFLEX",
 	"COLON2",
 	"KANJI",
-	"PAD_EQUALS",
-	"BACKQUOTE",
-	"SEMICOLON2",
+	"PAD =",
+	"`",
+	";2",
 	"COMMAND",
 	"BACK",
-	"VOLUME_UP",
-	"VOLUME_DOWN",
+	"VOL. UP",
+	"VOL. DN",
 	"SEARCH",
-	"DPAD_CENTER",
+	"DPAD",
 	"BUTTON_X",
 	"BUTTON_Y",
 	"DPAD_UP",
@@ -236,9 +235,9 @@ const char *keynames[] =
 	"LWIN",
 	"RWIN",
 	"MENU",
-	"SCROLLLOCK",
-	"NUMLOCK",
-	"CAPSLOCK",
+	"SCRLLK",
+	"NUMLK",
+	"CAPSLK",
 	"227",
 	"228",
 	"229",
@@ -290,7 +289,7 @@ const char *keycode_to_keyname(int i)
 	return keynames[i];
 }
 
-void wait_for_no_keys_or_buttons()
+static void wait_for_no_keys_or_buttons()
 {
 	while (true) {
 		al_rest(0.001);
@@ -315,7 +314,7 @@ void wait_for_no_keys_or_buttons()
 	}
 }
 
-int wait_for_key()
+static int wait_for_key()
 {	
 	double time = al_get_time();
 
@@ -337,7 +336,7 @@ int wait_for_key()
 	}
 }
 
-int wait_for_joystick_button()
+static int wait_for_joystick_button()
 {
 	double time = al_get_time();
 

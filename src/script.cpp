@@ -47,7 +47,7 @@ unsigned char *slurp_file(std::string filename, int *ret_size)
 	bytes[size] = 0;
 
 	if (ret_size)
-		*ret_size = size;
+		*ret_size = (int)size;
 
 	return bytes;
 }
@@ -213,7 +213,7 @@ void callLua(lua_State* luaState, const char *func, const char *sig, ...)
 endwhile:
 
 	/* do the call */
-	nres = strlen(sig);  /* number of expected results */
+	nres = (int)strlen(sig);  /* number of expected results */
 	if (lua_pcall(luaState, narg, nres /*LUA_MULTRET*/, 0) != 0) {
 		debug_message("error running function `f': %s", lua_tostring(luaState, 1));
 	}
@@ -3773,13 +3773,13 @@ static int CPreloadSpellSFX(lua_State *stack)
 	return 0;
 }
 
-int CDebug(lua_State *stack)
+static int CDebug(lua_State *stack)
 {
 	printf("%s\n", lua_tostring(stack, 1));
 	return 0;
 }
 
-int CAddStream(lua_State *stack)
+static int CAddStream(lua_State *stack)
 {
 	const char *name = lua_tostring(stack, 1);
 
@@ -3790,7 +3790,7 @@ int CAddStream(lua_State *stack)
 	return 1;
 }
 
-int CSetStreamVolume(lua_State *stack)
+static int CSetStreamVolume(lua_State *stack)
 {
 	MSAMPLE s = (MSAMPLE)(int64_t)lua_touserdata(stack, 1);
 	float vol = lua_tonumber(stack, 2);
@@ -3800,7 +3800,7 @@ int CSetStreamVolume(lua_State *stack)
 	return 0;
 }
 
-int CDestroyStream(lua_State *stack)
+static int CDestroyStream(lua_State *stack)
 {
 	MSAMPLE s = (MSAMPLE)(int64_t)lua_touserdata(stack, 1);
 
@@ -3809,7 +3809,7 @@ int CDestroyStream(lua_State *stack)
 	return 0;
 }
 
-int CGetAreaName(lua_State *stack)
+static int CGetAreaName(lua_State *stack)
 {
 	if (area) {
 		lua_pushstring(stack, area->getName().c_str());

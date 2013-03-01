@@ -120,7 +120,6 @@
 		96A4D264154A7DFB009ECD44 /* liballegro_main-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D25C154A7DFA009ECD44 /* liballegro_main-static.a */; };
 		96A4D265154A7DFB009ECD44 /* liballegro_memfile-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D25D154A7DFA009ECD44 /* liballegro_memfile-static.a */; };
 		96A4D266154A7DFB009ECD44 /* liballegro_primitives-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D25E154A7DFA009ECD44 /* liballegro_primitives-static.a */; };
-		96A4D267154A7DFB009ECD44 /* liballegro_shader-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D25F154A7DFA009ECD44 /* liballegro_shader-static.a */; };
 		96A4D268154A7DFB009ECD44 /* liballegro_ttf-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D260154A7DFA009ECD44 /* liballegro_ttf-static.a */; };
 		96A4D269154A7DFB009ECD44 /* liballegro-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D261154A7DFA009ECD44 /* liballegro-static.a */; };
 		96A4D26B154A7E21009ECD44 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D26A154A7E21009ECD44 /* IOKit.framework */; };
@@ -491,7 +490,6 @@
 				96A4D264154A7DFB009ECD44 /* liballegro_main-static.a in Frameworks */,
 				96A4D265154A7DFB009ECD44 /* liballegro_memfile-static.a in Frameworks */,
 				96A4D266154A7DFB009ECD44 /* liballegro_primitives-static.a in Frameworks */,
-				96A4D267154A7DFB009ECD44 /* liballegro_shader-static.a in Frameworks */,
 				96A4D268154A7DFB009ECD44 /* liballegro_ttf-static.a in Frameworks */,
 				96A4D269154A7DFB009ECD44 /* liballegro-static.a in Frameworks */,
 				96A4D258154A7D55009ECD44 /* Cocoa.framework in Frameworks */,
