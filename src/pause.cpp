@@ -415,11 +415,7 @@ void showSaveStateInfo(const char *basename)
 
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-	MBITMAP *tmp = m_create_bitmap(dw, dh);
-	al_set_new_bitmap_flags(flags);
-	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmp);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmpbuffer);
 
 #ifdef ALLEGRO_ANDROID
 	al_set_standard_file_interface();
@@ -488,7 +484,8 @@ void showSaveStateInfo(const char *basename)
 		
 			al_set_target_backbuffer(display);
 
-			m_draw_bitmap_identity_view(tmp, dx, dy, 0);
+			get_screen_offset_size(&dx, &dy, &dw, &dh);
+			m_draw_bitmap_identity_view(tmpbuffer, dx, dy, 0);
 
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
@@ -530,8 +527,6 @@ void showSaveStateInfo(const char *basename)
 	
 done:
 
-	m_destroy_bitmap(tmp);
-
 	dpad_on();
 
 	if (ss) {
@@ -561,11 +556,7 @@ void showItemInfo(int index, bool preserve_buffer)
 
 	MBITMAP *tmp = NULL;
 	if (preserve_buffer) {
-		int flags = al_get_new_bitmap_flags();
-		al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-		tmp = m_create_bitmap(dw, dh);
-		al_set_new_bitmap_flags(flags);
-		m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmp);
+		m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmpbuffer);
 	}
 	
 	int w = 200;
@@ -736,7 +727,8 @@ void showItemInfo(int index, bool preserve_buffer)
 			al_set_target_backbuffer(display);
 			if (preserve_buffer) {
 				m_clear(m_map_rgb(0, 0, 0));
-				m_draw_bitmap_identity_view(tmp, dx, dy, 0);
+				get_screen_offset_size(&dx, &dy, &dw, &dh);
+				m_draw_bitmap_identity_view(tmpbuffer, dx, dy, 0);
 			}
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
@@ -3810,6 +3802,9 @@ bool config_menu(bool start_on_fullscreen)
 			if (w && w == reset_game_center) {
 				char buf[200];
 				sprintf(buf, "%s?", _t("Reset achievements"));
+				al_set_target_backbuffer(display);
+				tguiDraw();
+				drawBufferToScreen();
 				if (prompt(buf, "", false, false)) {
 					resetAchievements();
 				}
@@ -4281,8 +4276,12 @@ int title_menu(void)
 	buttons[curr_button++] = new MTextButtonFullShadow(5, oy+45, "Visit WWW site");
 #endif
 
-	MTextButton *hqm_button = new MTextButtonFullShadow(240-95, oy+30, "HQ sound track");
-	MTextButton *config_button = new MTextButtonFullShadow(240-95, oy+45, "Options");
+	int len1 = m_text_length(game_font, _t("HQ sound track"));
+	int len2 = m_text_length(game_font, _t("Options"));
+	int len = len1 > len2 ? len1 : len2;
+	len += m_text_height(game_font) + 2;
+	MTextButton *hqm_button = new MTextButtonFullShadow(BW-len-2, oy+30, "HQ sound track");
+	MTextButton *config_button = new MTextButtonFullShadow(BW-len-2, oy+45, "Options");
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 	MIcon *joypad = NULL;
@@ -4352,6 +4351,12 @@ int title_menu(void)
 				hqm_menu();
 				on_title_screen = true;
 				tguiPop();
+				int len1 = m_text_length(game_font, _t("HQ sound track"));
+				int len2 = m_text_length(game_font, _t("Options"));
+				int len = len1 > len2 ? len1 : len2;
+				len += m_text_height(game_font) + 2;
+				hqm_button->setX(BW-len-2);
+				config_button->setX(BW-len-2);
 			}
 			if (widget == config_button) {
 				title_draw(bg, false);
@@ -4362,6 +4367,12 @@ int title_menu(void)
 				bool result = config_menu();
 				on_title_screen = true;
 				tguiPop();
+				int len1 = m_text_length(game_font, _t("HQ sound track"));
+				int len2 = m_text_length(game_font, _t("Options"));
+				int len = len1 > len2 ? len1 : len2;
+				len += m_text_height(game_font) + 2;
+				hqm_button->setX(BW-len-2);
+				config_button->setX(BW-len-2);
 				if (result == true) {
 					selected = 0xDEAD;
 					break_for_fade_after_draw = true;

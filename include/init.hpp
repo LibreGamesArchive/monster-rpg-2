@@ -81,6 +81,7 @@ extern ALLEGRO_SHADER *brighten;
 extern int shadow_buf_w, shadow_buf_h;
 extern int shadow_buf_x, shadow_buf_y;
 extern MBITMAP *screenshot;
+extern MBITMAP *tmpbuffer;
 extern MBITMAP *tilemap;
 extern bool *tileTransparent;
 extern int numTiles;

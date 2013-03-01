@@ -344,11 +344,7 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-	MBITMAP *tmp = m_create_bitmap(dw, dh);
-	al_set_new_bitmap_flags(flags);
-	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmp);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmpbuffer);
 
 	int w = 230;
 	int h = 100;
@@ -413,7 +409,8 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 			draw_counter = 0;
 
 			al_set_target_backbuffer(display);
-			m_draw_bitmap_identity_view(tmp, dx, dy, 0);
+			get_screen_offset_size(&dx, &dy, &dw, &dh);
+			m_draw_bitmap_identity_view(tmpbuffer, dx, dy, 0);
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
 			draw_callback(x, y, w, h, data);
@@ -448,8 +445,6 @@ done:
 
 	tguiPop();
 
-	m_destroy_bitmap(tmp);
-	
 	waitForRelease(4);
 	waitForRelease(5);
 	clear_input_events();
@@ -560,11 +555,7 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-	MBITMAP *tmp = m_create_bitmap(dw, dh);
-	al_set_new_bitmap_flags(flags);
-	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmp);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmpbuffer);
 	
 	int w = 200;
 	int h = 65;
@@ -621,7 +612,8 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
 			m_clear(m_map_rgb(0, 0, 0));
-			m_draw_bitmap_identity_view(tmp, dx, dy, 0);
+			get_screen_offset_size(&dx, &dy, &dw, &dh);
+			m_draw_bitmap_identity_view(tmpbuffer, dx, dy, 0);
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
 			// Draw messages
@@ -660,8 +652,6 @@ done:
 	
 	dpad_on();
 	
-	m_destroy_bitmap(tmp);
-	
 	if (use_dpad) {
 		waitForRelease(4);
 	}
@@ -679,11 +669,7 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 	
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-	MBITMAP *tmp = m_create_bitmap(dw, dh);
-	al_set_new_bitmap_flags(flags);
-	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmp);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmpbuffer);
 	
 	int w = 230;
 	int h = 100;
@@ -774,7 +760,8 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
 			m_clear(m_map_rgb(0, 0, 0));
-			m_draw_bitmap_identity_view(tmp, dx, dy, 0);
+			get_screen_offset_size(&dx, &dy, &dw, &dh);
+			m_draw_bitmap_identity_view(tmpbuffer, dx, dy, 0);
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
 			// Draw messages
@@ -830,8 +817,6 @@ done:
 
 	dpad_on();
 	
-	m_destroy_bitmap(tmp);
-		
 	waitForRelease(4);
 
 	return choice;
@@ -845,11 +830,7 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-	MBITMAP *tmp = m_create_bitmap(dw, dh);
-	al_set_new_bitmap_flags(flags);
-	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmp);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmpbuffer);
 	
 	int w;
 	if (wide) {
@@ -950,7 +931,8 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
 			m_clear(m_map_rgb(0, 0, 0));
-			m_draw_bitmap_identity_view(tmp, dx, dy, 0);
+			get_screen_offset_size(&dx, &dy, &dw, &dh);
+			m_draw_bitmap_identity_view(tmpbuffer, dx, dy, 0);
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
 			// Draw messages
@@ -1007,8 +989,6 @@ done:
 	tguiPop();
 
 	dpad_on();
-
-	m_destroy_bitmap(tmp);
 
 	if (use_dpad) {
 		waitForRelease(4);

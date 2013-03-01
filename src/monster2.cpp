@@ -1140,7 +1140,7 @@ top:
 		if (!getting_input_config && (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN)) {
 
 			if (event.keyboard.keycode == config.getKeyFullscreen()) {
-				if (!pause_f_to_toggle_fullscreen) {
+				if (!pause_f_to_toggle_fullscreen && !transitioning) {
 					do_toggle_fullscreen = true;
 				}
 			}

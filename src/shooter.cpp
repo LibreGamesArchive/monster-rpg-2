@@ -1049,11 +1049,7 @@ start:
 					draw_everything();
 					int dx, dy, dw, dh;
 					get_screen_offset_size(&dx, &dy, &dw, &dh);
-					int flags = al_get_new_bitmap_flags();
-					al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-					MBITMAP *tmp = m_create_bitmap(dw, dh);
-					al_set_new_bitmap_flags(flags);
-					m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmp);
+					m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmpbuffer);
 
 					const char *pause_text = "Paused";
 					int tw = m_text_length(game_font, _t(pause_text));
@@ -1110,7 +1106,8 @@ start:
 							}
 						}
 						al_set_target_backbuffer(display);
-						m_draw_bitmap_identity_view(tmp, dx, dy, 0);
+						get_screen_offset_size(&dx, &dy, &dw, &dh);
+						m_draw_bitmap_identity_view(tmpbuffer, dx, dy, 0);
 						m_draw_rectangle(BW/2-tw/2-5, BH/2-th/2-5, BW/2+tw/2+5, BH/2+th/2+5, black, M_FILLED);
 						m_draw_rectangle(BW/2-tw/2-5+0.5, BH/2-th/2-5+0.5, BW/2+tw/2+5, BH/2+th/2+5, white, M_OUTLINED);
 						mTextout_simple(_t(pause_text), BW/2-tw/2, BH/2-th/2+2, white);
@@ -1118,8 +1115,6 @@ start:
 						m_flip_display();
 						m_rest(0.005);
 					}
-
-					m_destroy_bitmap(tmp);
 
 					al_start_timer(logic_timer);
 

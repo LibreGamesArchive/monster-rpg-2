@@ -179,6 +179,7 @@ ALLEGRO_SHADER *warp;
 ALLEGRO_SHADER *shadow_shader;
 ALLEGRO_SHADER *brighten;
 MBITMAP *screenshot = 0;
+MBITMAP *tmpbuffer = 0;
 MBITMAP *tilemap = 0;
 bool *tileTransparent = 0;
 int numTiles = 0;
@@ -1671,7 +1672,17 @@ bool init(int *argc, char **argv[])
 
 	flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
-	screenshot = m_create_bitmap(BW/2, BH/2); // check
+	screenshot = m_create_bitmap(BW/2, BH/2);
+	al_set_new_bitmap_flags(flags);
+	
+	ALLEGRO_DEBUG("creating tmpbuffer\n");
+
+	flags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+	tmpbuffer = m_create_bitmap(
+		al_get_display_width(display),
+		al_get_display_height(display)
+	);
 	al_set_new_bitmap_flags(flags);
 
 	ALLEGRO_DEBUG("initing shader variables\n");
@@ -2098,6 +2109,9 @@ void toggle_fullscreen()
 	return;
 #endif
 
+	int dx, dy, dw, dh;
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
+
 	pause_joystick_repeat_events = true;
 	ScreenDescriptor *sd = config.getWantedGraphicsMode();
 
@@ -2155,6 +2169,19 @@ void toggle_fullscreen()
 
 	al_hide_mouse_cursor(display);
 #endif
+
+	if (tmpbuffer) {
+		// redo tmpbuffer
+		int dx2, dy2, dw2, dh2;
+		get_screen_offset_size(&dx2, &dy2, &dw2, &dh2);
+		ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
+		ALLEGRO_BITMAP *tmp = al_create_bitmap(dw, dh);
+		al_set_target_bitmap(tmp);
+		al_draw_bitmap(tmpbuffer->bitmap, 0, 0, 0);
+		al_set_target_bitmap(tmpbuffer->bitmap);
+		al_draw_scaled_bitmap(tmp, 0, 0, dw, dh, 0, 0, dw2, dh2, 0);
+		al_set_target_bitmap(old_target);
+	}
 }
 
 bool imperfect_aspect(void)

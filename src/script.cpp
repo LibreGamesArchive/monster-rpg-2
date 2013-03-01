@@ -912,11 +912,7 @@ bool anotherDoDialogue(const char *text, bool clearbuf, bool top, bool draw_area
 
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-	MBITMAP *tmp = m_create_bitmap(dw, dh);
-	al_set_new_bitmap_flags(flags);
-	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmp);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmpbuffer);
 	
 	clear_input_events();
 
@@ -954,7 +950,8 @@ bool anotherDoDialogue(const char *text, bool clearbuf, bool top, bool draw_area
 				m_clear(black);
 			}
 			else {
-				m_draw_bitmap_identity_view(tmp, dx, dy, 0);
+				get_screen_offset_size(&dx, &dy, &dw, &dh);
+				m_draw_bitmap_identity_view(tmpbuffer, dx, dy, 0);
 			}
 			// Draw the GUI
 			tguiDraw();
@@ -969,7 +966,6 @@ done:
 	delete speechDialog;
 	speechDialog = NULL;
 	dpad_on();
-	m_destroy_bitmap(tmp);
 
 	tguiPop();
 

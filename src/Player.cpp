@@ -569,11 +569,7 @@ static void levelUpCallback(int selected, LEVEL_UP_CALLBACK_DATA *d)
 
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-	MBITMAP *tmp = m_create_bitmap(dw, dh);
-	al_set_new_bitmap_flags(flags);
-	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmp);
+	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmpbuffer);
 
 	MFrame_NormalDraw *frame = new MFrame_NormalDraw(x, y, width, height, true);
 
@@ -750,7 +746,8 @@ static void levelUpCallback(int selected, LEVEL_UP_CALLBACK_DATA *d)
 		if (draw_counter > 0) {
 			draw_counter = 0;
 			al_set_target_backbuffer(display);
-			m_draw_bitmap_identity_view(tmp, dx, dy, 0);
+			get_screen_offset_size(&dx, &dy, &dw, &dh);
+			m_draw_bitmap_identity_view(tmpbuffer, dx, dy, 0);
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 			// Draw the GUI
 			tguiDraw();
@@ -768,8 +765,6 @@ done:
 	delete up;
 	delete down;
 	delete ok;
-
-	m_destroy_bitmap(tmp);
 
 	tguiPop();
 
