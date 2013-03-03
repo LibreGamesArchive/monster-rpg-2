@@ -1659,16 +1659,15 @@ void SludgeEffect::draw()
 
 		int xx;
 
+		if (left_pixels[frame][i] < 0)
+			continue;
+
 		if (target->getLocation() == LOCATION_RIGHT) {
-			if (left_pixels[frame][i] < 0)
-				continue;
 			xx = target->getX() - target->getAnimationSet()->getWidth()/2 + left_pixels[frame][i];
 			xinc = 1;
 		}
 		else {
-			if (right_pixels[frame][i] < 0)
-				continue;
-			xx = target->getX() - target->getAnimationSet()->getWidth()/2 + right_pixels[frame][i];
+			xx = target->getX() - target->getAnimationSet()->getWidth()/2 + target->getAnimationSet()->getWidth() - left_pixels[frame][i];
 			xinc = -1;
 		}
 
@@ -1676,12 +1675,12 @@ void SludgeEffect::draw()
 		endx = xx + size*xinc;
 
 		verts[vcount].x = startx;
-		verts[vcount].y = yy+i;
+		verts[vcount].y = yy+i+0.5f;
 		verts[vcount].z = 0;
 		verts[vcount].color = color;
 		vcount++;
 		verts[vcount].x = endx;
-		verts[vcount].y = yy+i;
+		verts[vcount].y = yy+i+0.5f;
 		verts[vcount].z = 0;
 		verts[vcount].color = color;
 		vcount++;

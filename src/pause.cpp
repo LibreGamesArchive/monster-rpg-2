@@ -2418,7 +2418,7 @@ void credits(void)
 			"ARMANDO M CERASOLI",
 			"MICHAL CICHON",
 			"PATRICK DAVID",
-			"DIOGO",
+			"SERGIO M. A. PEREIRA",
 			NULL
 		},
 		{
@@ -4042,6 +4042,8 @@ done:
 	waitForRelease(4);
 	waitForRelease(5);
 	clear_input_events();
+
+	config.write();
 
 	return false;
 }
