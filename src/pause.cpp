@@ -2418,7 +2418,7 @@ void credits(void)
 			"ARMANDO M CERASOLI",
 			"MICHAL CICHON",
 			"PATRICK DAVID",
-			"SERGIO M. A. PEREIRA",
+			"THOMAS FAUST",
 			NULL
 		},
 		{
@@ -2435,12 +2435,12 @@ void credits(void)
 		{
 			"TRANSLATIONS",
 			" ",
-			"THOMAS FAUST",
+			"SERGIO M. A. PEREIRA",
 			"ANDREA PROVASI",
 			"IRAKLIS PSAROUDAKIS",
 			"ELIAS PSCHERNIG",
-			"SAMUEL VAN DER WAA",
 			"SEAWASP MESH AND MUSIC",
+			"SAMUEL VAN DER WAA",
 			NULL
 		},
 		{
