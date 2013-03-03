@@ -2424,8 +2424,8 @@ BeamP1Effect::BeamP1Effect(Combatant *target, Combatant *caster) :
 	float dist = sqrt(distx*distx+disty*disty);
 	float angle = atan2(disty, distx);
 
-	dx = sx + cos(angle) * (dist/2+2);
-	dy = sy + sin(angle) * (dist/2+2);
+	dx = sx + cos(angle) * (dist/2+0.5f);
+	dy = sy + sin(angle) * (dist/2+0.5f);
 
 	x = 0;
 	y = caster->getY()+1;
@@ -2536,8 +2536,8 @@ BeamP2Effect::BeamP2Effect(Combatant *target, Combatant *caster) :
 	float dist = sqrt(distx*distx+disty*disty);
 	float angle = atan2(disty, distx) + M_PI;
  
-	sx = dx + cos(angle) * (dist/2+2);
-	sy = dy + sin(angle) * (dist/2+2);
+	sx = dx + cos(angle) * (dist/2);
+	sy = dy + sin(angle) * (dist/2);
 
 	x = 0;
 	y = target->getY()+1;
