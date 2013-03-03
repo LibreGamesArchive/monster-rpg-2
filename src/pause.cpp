@@ -2418,7 +2418,7 @@ void credits(void)
 			"ARMANDO M CERASOLI",
 			"MICHAL CICHON",
 			"PATRICK DAVID",
-			"THOMAS FAUST",
+			"DIOGO",
 			NULL
 		},
 		{
@@ -2428,12 +2428,14 @@ void credits(void)
 			"CANTIDIO O FONTES",
 			"JOAO GONCALVES",
 			"LORENZ JOLLING",
+			"KIMMYB",
 			"SERGEY LATYSHEV",
 			NULL
 		},
 		{
 			"TRANSLATIONS",
 			" ",
+			"THOMAS FAUST",
 			"ANDREA PROVASI",
 			"IRAKLIS PSAROUDAKIS",
 			"ELIAS PSCHERNIG",
