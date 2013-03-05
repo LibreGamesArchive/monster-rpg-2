@@ -328,8 +328,8 @@ bool is_close_pressed(bool pump_events_only = false);
 
 void connect_second_display(void);
 extern int old_control_mode;
-void connect_airplay_controls(void);
-void disconnect_airplay_controls(void);
+void connect_airplay_controls(bool really_airplay = false);
+void disconnect_airplay_controls(bool really_airplay = false);
 void clear_touches();
 
 void main_draw(bool draw_cursor = true);

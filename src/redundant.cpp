@@ -643,12 +643,7 @@ void m_put_pixel(int x, int y, MCOLOR color)
 
 void m_draw_trans_pixel(int x, int y, MCOLOR color)
 {
-#if defined A5_D3D || defined ALLEGRO_IPHONE
-	al_draw_pixel(x, y, color);
-#else
-	// Workaround for some OpenGL drivers
 	m_draw_rectangle(x, y, x+1, y+1, color, M_FILLED);
-#endif
 }
 
 // -angle?!?! really?!
@@ -1147,7 +1142,7 @@ void m_draw_scaled_backbuffer(int sx, int sy, int sw, int sh, int dx, int dy, in
 		sh -= sy;
 		sy = 0;
 	}
-#ifdef ALLEGRO_RASPBERRYPI
+#if defined ALLEGRO_RASPBERRYPI || defined ALLEGRO_IPHONE
 	ALLEGRO_LOCKED_REGION *lr1 = al_lock_bitmap(tmp->bitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
 	ALLEGRO_LOCKED_REGION *lr2 = al_lock_bitmap_region(
 		al_get_backbuffer(display),

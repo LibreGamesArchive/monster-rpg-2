@@ -1454,6 +1454,8 @@ void CombatPlayer::draw(void)
 	else {
 		flags = 0;
 	}
+	
+	int web_dir = location == LOCATION_RIGHT ? 1 : -1;
 
 	int w = animSet->getWidth();
 	int h = animSet->getHeight();
@@ -1493,6 +1495,27 @@ void CombatPlayer::draw(void)
 			else {
 				MBITMAP *bmp = whiteAnimSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 				m_draw_bitmap(bmp, x-(w/2), y-h, flags);
+			}
+		}
+
+		if (info.condition == CONDITION_WEBBED)
+			m_draw_bitmap(
+				webbed,
+				x-m_get_bitmap_width(webbed)/2+3*web_dir,
+				y-m_get_bitmap_height(webbed),
+				0
+			);
+		if (info.condition == CONDITION_QUICK || info.condition == CONDITION_SLOW
+			|| info.condition == CONDITION_CHARMED) {
+			int cx = location == LOCATION_LEFT ? x+w/2 : x-w/2;
+			if (info.condition == CONDITION_QUICK) {
+				draw_clock(cx, y-h/2, 7, false);
+			}
+			else if (info.condition == CONDITION_SLOW) {
+				draw_clock(cx, y-h/2, 7, true);
+			}
+			else if (info.condition == CONDITION_CHARMED) {
+				charmAnim->draw(cx-15, y-(h*3)/4-5, 0);
 			}
 		}
 		
@@ -1583,7 +1606,12 @@ void CombatPlayer::draw(void)
 				al_set_clipping_rectangle(savex, savey, savew, saveh);
 			
 			if (info.condition == CONDITION_WEBBED)
-				m_draw_bitmap(webbed, x-16, y-32, 0);
+				m_draw_bitmap(
+					webbed,
+					x-m_get_bitmap_width(webbed)/2+3*web_dir,
+					y-m_get_bitmap_height(webbed),
+					0
+				);
 			if (info.condition == CONDITION_QUICK || info.condition == CONDITION_SLOW
 				|| info.condition == CONDITION_CHARMED) {
 				int cx = location == LOCATION_LEFT ? x+w/2 : x-w/2;

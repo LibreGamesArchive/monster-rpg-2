@@ -25,9 +25,11 @@ BOOL isGameCenterAPIAvailable()
 
 #ifdef ALLEGRO_IPHONE
 	// The device must be running iOS 4.1 or later.
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	NSString *reqSysVer = @"4.1";
 	NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
 	osVersionSupported = ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending);
+	[pool drain];
 #else
 	OSErr err;
 	SInt32 systemVersion;

@@ -627,6 +627,7 @@ ALLEGRO_KEYBOARD_STATE icade_keyboard_state;
 
 @interface KBDelegate : NSObject<UITextViewDelegate>
 - (void)start;
+- (void)switch_in;
 - (void)textViewDidChange:(UITextView *)textView;
 @end
 @implementation KBDelegate
@@ -649,6 +650,14 @@ ALLEGRO_KEYBOARD_STATE icade_keyboard_state;
 	[text_view becomeFirstResponder];
 }
 
+- (void)switch_in
+{
+	[text_view removeFromSuperview];
+	UIWindow *window = al_iphone_get_window(display);
+	[window addSubview:text_view];
+	[text_view becomeFirstResponder];
+}
+
 - (void)textViewDidChange:(UITextView *)textView
 {
 	while ([textView.text length] > 0) {
@@ -658,23 +667,81 @@ ALLEGRO_KEYBOARD_STATE icade_keyboard_state;
 		const char *txt = [first UTF8String];
 		ALLEGRO_EVENT *e = (ALLEGRO_EVENT *)malloc(sizeof(ALLEGRO_EVENT));
 		ALLEGRO_EVENT *e2 = NULL;
+		bool emit = false;
 		if (gen_event(e, toupper(txt[0]))) {
+			TripleInput *i = getInput();
+			if (i) {
+				i->handle_event(e);
+			}
 			if (e->type == USER_KEY_DOWN) {
 				e2 = (ALLEGRO_EVENT *)malloc(sizeof(ALLEGRO_EVENT));
 				e2->user.type = USER_KEY_CHAR;
 				e2->keyboard.keycode = e->keyboard.keycode;
 				_AL_KEYBOARD_STATE_SET_KEY_DOWN(icade_keyboard_state, e->keyboard.keycode);
+
+				if (e->keyboard.keycode == config.getKey1()) {
+					joy_b1_down();
+				}
+				else if (e->keyboard.keycode == config.getKey2()) {
+					joy_b2_down();
+				}
+				else if (e->keyboard.keycode == config.getKey3()) {
+					joy_b3_down();
+				}
+				else if (e->keyboard.keycode == config.getKeyLeft()) {
+					joy_l_down();
+				}
+				else if (e->keyboard.keycode == config.getKeyRight()) {
+					joy_r_down();
+				}
+				else if (e->keyboard.keycode == config.getKeyUp()) {
+					joy_u_down();
+				}
+				else if (e->keyboard.keycode == config.getKeyDown()) {
+					joy_d_down();
+				}
+				else {
+					emit = true;
+				}
 			}
 			else {
 				_AL_KEYBOARD_STATE_CLEAR_KEY_DOWN(icade_keyboard_state, e->keyboard.keycode);
+
+				if (e->keyboard.keycode == config.getKey1()) {
+					joy_b1_up();
+				}
+				else if (e->keyboard.keycode == config.getKey2()) {
+					joy_b2_up();
+				}
+				else if (e->keyboard.keycode == config.getKey3()) {
+					joy_b3_up();
+				}
+				else if (e->keyboard.keycode == config.getKeyLeft()) {
+					joy_l_up();
+				}
+				else if (e->keyboard.keycode == config.getKeyRight()) {
+					joy_r_up();
+				}
+				else if (e->keyboard.keycode == config.getKeyUp()) {
+					joy_u_up();
+				}
+				else if (e->keyboard.keycode == config.getKeyDown()) {
+					joy_d_up();
+				}
+				else {
+					emit = true;
+				}
 			}
-			al_emit_user_event(&user_event_source, e, destroy_event);
-			if (e2) {
-				al_emit_user_event(&user_event_source, e2, destroy_event);
+			if (emit) {
+				al_emit_user_event(&user_event_source, e, destroy_event);
+				if (e2) {
+					al_emit_user_event(&user_event_source, e2, destroy_event);
+				}
 			}
 		}
-		else {
-			delete e;
+		if (!emit) {
+			free(e);
+			free(e2);
 		}
 	}
 }
@@ -689,3 +756,7 @@ void initiOSKeyboard()
 	memset(&icade_keyboard_state, 0, sizeof icade_keyboard_state);
 }
 
+void switchiOSKeyboardIn()
+{
+	[text_delegate performSelectorOnMainThread: @selector(switch_in) withObject:nil waitUntilDone:YES];
+}

@@ -449,6 +449,10 @@ static void drawOverlay(bool draw_controls, ALLEGRO_COLOR tint)
 #endif
 
 	draw_the_controls(draw_controls, tint);
+
+	if (controller_display) {
+		al_set_target_backbuffer(display);
+	}
 }
 
 static void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
@@ -904,12 +908,12 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 		
 		drawBufferToScreen(/*buffer*/NULL, true);
 
-		if ((now - start) >= (unsigned long)length) {
-			done = true;
-		}
-
 		if (done) {
 			break;
+		}
+
+		if ((now - start) >= (unsigned long)length) {
+			done = true;
 		}
 
 		m_flip_display();

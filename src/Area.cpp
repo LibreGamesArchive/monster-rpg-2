@@ -1414,8 +1414,8 @@ void Area::copyTile(int x, int y, Tile *t)
        areaTile->setSolid(t->isSolid());
 }
 
-static int ss_save_counter = 5000;
-static int mem_save_counter = 5000;
+static int ss_save_counter = 0;
+static int mem_save_counter = 0;
 
 void real_auto_save_game_to_memory(bool save_ss)
 {
@@ -1450,7 +1450,7 @@ void Area::auto_save_game_to_memory(int step, bool ignoreCount, bool save_ss)
 		Object *o = party[heroSpot]->getObject();
 		if (
 		
-			(ignoreCount || mem_save_counter >= 10000 || had_battle || totalUpdates < 5)
+			(ignoreCount || mem_save_counter >= 10000 || had_battle)
 
 
 			// FIXME: is this bad news?
@@ -2350,8 +2350,8 @@ Area::Area(void)
 	follow = true;
 	last_player_x = -1;
 	last_player_y = -1;
-	mem_save_counter = 5000;
-	ss_save_counter = 5000;
+	mem_save_counter = 0;
+	ss_save_counter = 0;
 	down = false;
 	panned = false;
 	start_mx = 0;

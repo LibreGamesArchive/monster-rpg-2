@@ -1680,10 +1680,15 @@ bool init(int *argc, char **argv[])
 	{
 		flags = al_get_new_bitmap_flags();
 		al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+#ifdef ALLEGRO_IPHONE
+		int w = al_get_display_width(display);
+		int h = al_get_display_height(display);
+#else
 		ALLEGRO_MONITOR_INFO mi;
 		al_get_monitor_info(config.getAdapter(), &mi);
 		int w = mi.x2 - mi.x1;
 		int h = mi.y2 - mi.y1;
+#endif
 		tmpbuffer = m_create_bitmap(
 			w, h
 		);

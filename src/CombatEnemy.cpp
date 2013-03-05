@@ -763,6 +763,22 @@ void CombatEnemy::draw(void)
 				MBITMAP *bmp = whiteAnimSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 				m_draw_bitmap(bmp, ox+x-(w/2), oy+y-h, flags);
 			}
+
+			if (info.condition == CONDITION_QUICK || info.condition == CONDITION_SLOW
+					|| info.condition == CONDITION_CHARMED) {
+				int cx = location == LOCATION_LEFT ? x+((w/2))+8 : x-(w/2)-8;
+				int clock_y = y+oy-(h*3)/4;
+				if (clock_y < 10) clock_y = 10;
+				if (info.condition == CONDITION_QUICK) {
+					draw_clock(cx+ox, clock_y, 7, false);
+				}
+				else if (info.condition == CONDITION_SLOW) {
+					draw_clock(cx+ox, clock_y, 7, true);
+				}
+				else if (info.condition == CONDITION_CHARMED) {
+					charmAnim->draw(cx+ox-10, y+oy-(h*3)/4, 0);
+				}
+			}
 		}
 		else {
 			if (info.condition == CONDITION_PARALYZED && ((unsigned)tguiCurrentTimeMillis() % 200 < 100)) {
@@ -822,6 +838,7 @@ void CombatEnemy::draw(void)
 					animSet->draw(x+ox-(w/2), y+oy-h, flags);
 				else
 					animSet->drawRotated(x+ox, y+oy-h/2, angle, flags);
+
 				if (info.condition == CONDITION_QUICK || info.condition == CONDITION_SLOW
 						|| info.condition == CONDITION_CHARMED) {
 					int cx = location == LOCATION_LEFT ? x+((w/2))+8 : x-(w/2)-8;

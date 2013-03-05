@@ -2733,7 +2733,6 @@ int MMap::update(int millis)
 			fadeOut(black);
 		}
 
-
 		Object *o = party[heroSpot]->getObject();
 		o->setPosition(points[selected].dest_x, points[selected].dest_y);
 		setObjectDirection(o, points[selected].dest_dir);
@@ -3676,7 +3675,7 @@ int MSpellSelector::update(int millis)
 				down = false;
 			}
 		}
-		if (tmp >= 0 || (!canArrange && !clicked)) {
+		if (tmp >= 0 || (!canArrange && (!clicked || !changed))) {
 			if (play_sound) {
 				playPreloadedSample("select.ogg");
 			}
@@ -3728,7 +3727,7 @@ int MSpellSelector::update(int millis)
 		use_input_event();
 		iphone_clear_shaken();
 		playPreloadedSample("select.ogg");
-		if (pressed < 0) {
+		if (pressed < 0 || !canArrange) {
 			selected = -1;
 			return TGUI_RETURN;
 		}
@@ -5681,7 +5680,6 @@ int MManSelector::update(int millis)
 		holdTime -= millis;
 		if (holdTime <= 0) {
 			bool used = false;
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 			ALLEGRO_MOUSE_STATE s;
 			m_get_mouse_state(&s);
 			if (abs(s.x-holdx) < 10 && abs(s.y-holdy) < 10 && holdi != 6)  {
@@ -5690,7 +5688,6 @@ int MManSelector::update(int millis)
 				used = true;
 				holdx = holdy = -1000;
 			}
-#endif
 			if (!used && pos != 6) {
 				int p = pos;
 				if (p > 6) p--;
@@ -5929,7 +5926,11 @@ void MMultiChooser::mouseUp(int xx, int yy, int b)
 void MMultiChooser::draw()
 {
 	static bool show = false;
-	show = !show;
+	double now = al_get_time();
+	if (now-last_flicker > 1.5/60.0) { // don't flicker too fast
+		last_flicker = now;
+		show = !show;
+	}
 
 	for (unsigned int i = 0; i < points.size(); i++) {
 		m_save_blender();
@@ -6205,6 +6206,7 @@ MMultiChooser::MMultiChooser(std::vector<MultiPoint> points, bool can_multi)
 	closest = -1;
 	inset = false;
 	down = false;
+	last_flicker = al_get_time();
 }
 
 
@@ -6649,19 +6651,19 @@ void MIcon::draw()
 	}
 	if (down && show_name) {
 		m_draw_rectangle(
-			x+m_get_bitmap_width(bitmap)+10,
+			x+m_get_bitmap_width(bitmap)/2,
 			y-25,
-			x+112+10,
+			x+110,
 			y-10,
 			black, M_FILLED);
 		m_draw_rectangle(
-			x+m_get_bitmap_width(bitmap)+10+0.5,
+			x+m_get_bitmap_width(bitmap)/2+0.5,
 			y-25+0.5,
-			x+112+10+0.5,
+			x+110+0.5,
 			y-10+0.5,
 			white, 0);
 
-		mTextout_simple(_t(name), x+m_get_bitmap_width(bitmap)+6+10, y-7-m_text_height(game_font)/2-9,
+		mTextout_simple(_t(name), x+m_get_bitmap_width(bitmap)/2+5, y-m_text_height(game_font)/2-15,
 			white);
 	}
 }

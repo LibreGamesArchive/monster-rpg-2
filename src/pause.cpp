@@ -554,7 +554,6 @@ void showItemInfo(int index, bool preserve_buffer)
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
 
-	MBITMAP *tmp = NULL;
 	if (preserve_buffer) {
 		m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmpbuffer);
 	}
@@ -852,10 +851,6 @@ done:
 
 	tguiPop();
 
-	if (preserve_buffer) {
-		m_destroy_bitmap(tmp);
-	}
-	
 	waitForRelease(4);
 	waitForRelease(5);
 	clear_input_events();
@@ -4028,6 +4023,7 @@ done:
 	if (reset_game_center)
 		delete reset_game_center;	
 #endif
+	delete controls;
 #elif !defined ALLEGRO_RASPBERRYPI
 	delete fullscreen_toggle;
 #endif

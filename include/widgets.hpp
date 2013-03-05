@@ -1080,6 +1080,7 @@ protected:
 	int closest;
 	bool inset;
 	bool down;
+	double last_flicker;
 };
 
 

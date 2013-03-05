@@ -1025,7 +1025,7 @@ void Configuration::write()
 #endif
 	game->add(xml_difficulty);
 	game->add(xml_tuning);
-#ifdef IPHONE
+#ifdef ALLEGRO_IPHONE
 	game->add(xml_shake_action);
 	game->add(xml_auto_rotate);
 #endif

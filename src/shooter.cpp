@@ -547,7 +547,7 @@ static void draw(double cx, double cy, bool draw_objects = true)
 #else
 	GLint vp[4];
 	glGetIntegerv(GL_VIEWPORT, vp);
-	glViewport(dx, dy, dw, dh);
+	glViewport(dx, al_get_display_height(display)-(dy+dh), dw, dh);
 #endif
 
 	disable_cull_face();
@@ -883,9 +883,7 @@ start:
 			int ty = (int)(py/TILE_SIZE);
 
 			ALLEGRO_MOUSE_STATE state;
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 			al_get_mouse_state(&state);
-#endif
 
 			if (!dead && solid[tx+ty*w]) {
 				dead = true;

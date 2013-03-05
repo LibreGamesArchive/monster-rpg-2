@@ -26,6 +26,8 @@ static bool zeemote_enabled = false;
 bool mouse_in_display = true;
 bool forced_closed = false;
 
+bool was_switched_out = false;
+
 static int last_mouse_x = -1, last_mouse_y;
 static int total_mouse_x, total_mouse_y;
 
@@ -96,15 +98,17 @@ int old_control_mode = -1;
 
 bool prompt_for_close_on_next_flip = false;
 
-void connect_airplay_controls(void)
+void connect_airplay_controls(bool really_airplay)
 {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_lock_mutex(dpad_mutex);
 	getInput()->reset();
 #if !defined ALLEGRO_ANDROID
-	old_control_mode = config.getDpadType();
-	config.setDpadType(DPAD_TOTAL_2);
-	dpad_type = DPAD_TOTAL_2;
+	if (really_airplay) {
+		old_control_mode = config.getDpadType();
+		config.setDpadType(DPAD_TOTAL_2);
+		dpad_type = DPAD_TOTAL_2;
+	}
 #endif
 	joystick_repeat_started[JOY_REPEAT_AXIS0] = false;
 	joystick_repeat_started[JOY_REPEAT_AXIS1] = false;
@@ -118,14 +122,16 @@ void connect_airplay_controls(void)
 #endif
 }
 
-void disconnect_airplay_controls(void)
+void disconnect_airplay_controls(bool really_airplay)
 {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_lock_mutex(dpad_mutex);
 	getInput()->reset();
 #if !defined ALLEGRO_ANDROID
-	config.setDpadType(old_control_mode);
-	dpad_type = old_control_mode;
+	if (really_airplay) {
+		config.setDpadType(old_control_mode);
+		dpad_type = old_control_mode;
+	}
 #endif
 	joystick_repeat_started[JOY_REPEAT_AXIS0] = false;
 	joystick_repeat_started[JOY_REPEAT_AXIS1] = false;
@@ -153,7 +159,9 @@ void connect_second_display(void)
 
 	al_set_target_bitmap(NULL);
 
-	connect_airplay_controls();
+	connect_airplay_controls(true);
+	
+	m_destroy_bitmap(tmpbuffer);
 	
 	_destroy_loaded_bitmaps();
 	destroy_fonts();
@@ -179,6 +187,17 @@ void connect_second_display(void)
 	init2_shaders();
 	
 	set_screen_params();
+
+	{
+		int flags = al_get_new_bitmap_flags();
+		al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+		int w = al_get_display_width(display);
+		int h = al_get_display_height(display);
+		tmpbuffer = m_create_bitmap(
+			w, h
+		);
+		al_set_new_bitmap_flags(flags);
+	}
 
 	al_set_new_display_adapter(0);
 	int flgs = al_get_new_display_flags();
@@ -1013,7 +1032,7 @@ top:
 			do_acknowledge_resize = true;
 		}
 #endif
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID // ANDROID Here too? FIXME
 		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT)
 		{
 			do_pause_game = should_pause_game();
@@ -1027,12 +1046,16 @@ top:
 			}
 			setMusicVolume(0.0);
 			setAmbienceVolume(0.0);
+			was_switched_out = true;
 			do_close(false);
 		}
 		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN)
 		{
 			setMusicVolume(backup_music_volume);
 			setAmbienceVolume(backup_ambience_volume);
+#ifdef ALLEGRO_IPHONE
+			switchiOSKeyboardIn();
+#endif
 		}
 #endif
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -1255,8 +1278,10 @@ top:
 			int mvol = config.getMusicVolume();
 			int svol = config.getSFXVolume();
 
-			disconnect_airplay_controls();
-			
+			disconnect_airplay_controls(true);
+		
+			m_destroy_bitmap(tmpbuffer);
+
 			_destroy_loaded_bitmaps();
 			destroy_fonts();
 			destroyIcons();
@@ -1293,6 +1318,17 @@ top:
 
 			set_screen_params();
 	
+			{
+				int flags = al_get_new_bitmap_flags();
+				al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+				int w = al_get_display_width(display);
+				int h = al_get_display_height(display);
+				tmpbuffer = m_create_bitmap(
+					w, h
+				);
+				al_set_new_bitmap_flags(flags);
+			}
+
 			al_set_target_backbuffer(display);
 			
 			config.setMusicVolume(mvol);
@@ -1394,7 +1430,7 @@ void do_close(bool quit)
 		config_menu();
 	}
 #endif
-	else {
+	else if (!was_switched_out) {
 		if (on_title_screen) {
 			do_close_exit_game();
 		}
@@ -1403,6 +1439,7 @@ void do_close(bool quit)
 			prompt_for_close_on_next_flip = true;
 		}
 	}
+	was_switched_out = false;
 }
 
 
