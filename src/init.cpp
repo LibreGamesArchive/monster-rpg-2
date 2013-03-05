@@ -817,7 +817,7 @@ void init_shaders(void)
 		"}\n";
 		
 		static const char *default_pixel_source =
-#ifdef ALLEGRO_CFG_OPENGLES
+#ifdef OPENGLES
 		"precision mediump float;\n"
 #endif
 		"uniform sampler2D " ALLEGRO_SHADER_VAR_TEX ";\n"
@@ -1341,7 +1341,11 @@ bool init(int *argc, char **argv[])
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 8, ALLEGRO_REQUIRE);
 #endif
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_RASPBERRYPI
+	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 16, ALLEGRO_REQUIRE);
+#else
 	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 32, ALLEGRO_REQUIRE);
+#endif
 #endif
 
 #if !defined(ALLEGRO_IPHONE) && !defined(ALLEGRO_ANDROID)
@@ -1678,7 +1682,11 @@ bool init(int *argc, char **argv[])
 	ALLEGRO_DEBUG("creating tmpbuffer\n");
 
 	{
-		flags = al_get_new_bitmap_flags();
+		int flags = al_get_new_bitmap_flags();
+#if defined OPENGLES
+		int format = al_get_new_bitmap_format();
+		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
+#endif
 		al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 #ifdef ALLEGRO_IPHONE
 		int w = al_get_display_width(display);
@@ -1693,6 +1701,9 @@ bool init(int *argc, char **argv[])
 			w, h
 		);
 		al_set_new_bitmap_flags(flags);
+#if defined OPENGLES
+		al_set_new_bitmap_format(format);
+#endif
 	}
 
 	ALLEGRO_DEBUG("initing shader variables\n");

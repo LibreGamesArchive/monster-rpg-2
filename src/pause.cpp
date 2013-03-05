@@ -959,10 +959,12 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	MIcon *game_center = NULL;
+#if !defined NO_GAMECENTER
 	if (isGameCenterAPIAvailable()) {
 		game_center = new MIcon(128, yyy, getResource("game_center.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
 		yyy += 26;
 	}
+#endif
 #endif
 	
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
@@ -3705,7 +3707,7 @@ bool config_menu(bool start_on_fullscreen)
 	y += 13;
 	
 	MTextButton *reset_game_center = NULL;
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+#if (defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX) && (!defined NO_GAMECENTER)
 	const char *reset_str = "Reset achievements";
 	if (isGameCenterAPIAvailable()) {
 		reset_game_center = new MTextButton(BW-2-(m_text_length(game_font, _t(reset_str))+m_get_bitmap_width(cursor)+1), BH-2-26, reset_str);
@@ -4396,7 +4398,7 @@ int title_menu(void)
 #endif
 
 			INPUT_EVENT ie = get_next_input_event();
-			if (ie.button2 == DOWN || iphone_shaken(0.1)) {
+			if (ie.button2 == DOWN) {
 				selected = 0xBEEF;
 				goto done;
 			}

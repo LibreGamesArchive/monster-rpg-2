@@ -931,7 +931,7 @@ top:
 							hot_corner_touched = true;
 							if (al_current_time() > next_shake) {
 								iphone_shake_time = al_current_time();
-								next_shake = al_current_time()+0.5;
+								next_shake = al_current_time()+0.25;
 							}
 						}
 					}

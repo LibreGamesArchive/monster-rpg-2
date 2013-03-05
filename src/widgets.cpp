@@ -4633,7 +4633,7 @@ int MScrollingList::update(int millis)
 			up_selected = -1;
 			return TGUI_RETURN;
 		}
-		else {
+		else if (up_selected < 0) {
 			playPreloadedSample("select.ogg");
 			al_set_target_backbuffer(display);
 			m_clear(black);

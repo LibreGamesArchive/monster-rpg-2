@@ -30,7 +30,7 @@ extern "C" {
 
 #include <vector>
 
-#include "svg.hpp"
+#include "monster2.hpp"
 
 extern ALLEGRO_DISPLAY *display;
 
@@ -115,7 +115,7 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 	 * Open source drivers claim to support the extension but simply
 	 * crash when it's used. So disable it altogether on Linux.
 	 */
-#if defined A5_D3D || defined __linux__
+#if defined A5_D3D || defined __linux__ || defined OPENGLES
 	bool multisample = false;
 #else
 	bool multisample = al_have_opengl_extension("GL_EXT_framebuffer_multisample");
@@ -363,10 +363,10 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 		}
 	}
 
-	al_set_target_bitmap(out);
-	
 	if (multisample) {
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined A5_D3D && !defined ALLEGRO_RASPBERRYPI
+		al_set_target_bitmap(out);
+
 		glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fb);
 		glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, al_get_opengl_fbo(out));
 
@@ -381,12 +381,9 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 #endif
 	}
 	else {
-		al_draw_bitmap_region(
-			al_get_backbuffer(al_get_current_display()),
-			0, 0, diagram_w, diagram_h,
-			0, 0,
-			0
-		);
+		MBITMAP *tmp = new_mbitmap(out);
+		m_draw_scaled_backbuffer(0, 0, diagram_w, diagram_h, 0, 0, diagram_w, diagram_h, tmp);
+		delete tmp;
 	}
 
 	svgtiny_free(diagram);
@@ -396,8 +393,6 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 		glViewport(old_vp[0], old_vp[1], old_vp[2], old_vp[3]);
 #endif
 	}
-
-	al_set_target_backbuffer(al_get_current_display());
 
 	if (multisample) {
 		al_set_target_bitmap(old_target);
