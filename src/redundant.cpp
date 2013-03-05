@@ -1,15 +1,6 @@
 #include "monster2.hpp"
 
-// FIXME: oh boy
-#define ASSERT ALLEGRO_ASSERT
-#include <allegro5/internal/aintern_bitmap.h>
-#include <allegro5/internal/aintern.h>
-#include <allegro5/internal/aintern_convert.h>
-#include <allegro5/internal/aintern_display.h>
-
-#ifdef A5_OGL
-#include "allegro5/internal/aintern_opengl.h"
-#endif
+#include <allegro5/allegro_opengl.h>
 
 static std::vector<LoadedBitmap *> loaded_bitmaps;
 

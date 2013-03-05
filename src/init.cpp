@@ -4,19 +4,8 @@
 
 #include "monster2.hpp"
 
-#define ASSERT ALLEGRO_ASSERT
-#include <allegro5/internal/aintern_bitmap.h>
-#include <allegro5/internal/aintern_display.h>
-#ifdef ALLEGRO_IPHONE
-#include <allegro5/platform/aintiphone.h>
-extern "C" {
-#include <allegro5/internal/aintern_iphone.h>
-}
-#endif
-
 #ifdef A5_D3D
 #include <allegro5/allegro_direct3d.h>
-#include <allegro5/allegro_shader_hlsl.h>
 #endif
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
@@ -37,6 +26,7 @@ extern "C" {
 #include <bcm_host.h>
 #endif
 
+#ifdef ALLEGRO_ANDROID
 static uint32_t parse_version(const char *v)
 {
 	char buf1[100];
@@ -61,6 +51,7 @@ static uint32_t parse_version(const char *v)
 
 	return (atoi(buf1) << 16) | atoi(buf2);
 }
+#endif
 
 #ifdef A5_D3D
 LPDIRECT3DSURFACE9 big_depth_surface = NULL;
@@ -1220,13 +1211,8 @@ bool init(int *argc, char **argv[])
 
 #if !defined ALLEGRO_IPHONE
 	{
-		bool failed = false;
-		int i;
-		for (i = 0; i < 10; i++) {
-			if (!al_install_keyboard()) {
-				failed = true;
-			}
-			else {
+		for (int i = 0; i < 10; i++) {
+			if (al_install_keyboard()) {
 				break;
 			}
 			al_rest(0.25);

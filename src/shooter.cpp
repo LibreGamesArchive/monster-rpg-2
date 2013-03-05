@@ -1,9 +1,9 @@
 #include "monster2.hpp"
-#define ASSERT ALLEGRO_ASSERT
-#ifdef ALLEGRO_IPHONE
-#include <allegro5/allegro_iphone.h>
+
+#include <allegro5/allegro_opengl.h>
+#ifdef A5_D3D
+#include <allegro5/allegro_direct3d.h>
 #endif
-#include <allegro5/internal/aintern_opengl.h>
 
 bool in_shooter = false;
 bool break_shooter_pause = false;

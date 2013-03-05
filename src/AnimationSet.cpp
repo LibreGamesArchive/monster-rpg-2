@@ -1,10 +1,5 @@
 #include "monster2.hpp"
 
-#define ASSERT ALLEGRO_ASSERT
-#include <allegro5/internal/aintern_opengl.h>
-
-#include "quantize.hpp"
-
 void AnimationSet::setSubAnimation(int anim)
 {
 	currAnim = anim;
@@ -303,17 +298,5 @@ AnimationSet *AnimationSet::clone(int type)
 	a->destroy = destroy;
 
 	return a;
-}
-
-void AnimationSet::post_reset(void)
-{
-	for (size_t i = 0; i < anims.size(); i++) {
-		int n = anims[i]->getNumFrames();
-		for (int j = 0; j < n; j++) {
-			MBITMAP *bmp = anims[i]->getFrame(j)->getImage()->getBitmap();
-			ALLEGRO_BITMAP_EXTRA_OPENGL *extra = (ALLEGRO_BITMAP_EXTRA_OPENGL *)bmp->bitmap->extra;
-			extra->texture = al_get_opengl_texture(bitmap->bitmap);
-		}
-	}
 }
 

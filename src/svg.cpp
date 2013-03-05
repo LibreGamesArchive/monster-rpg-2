@@ -6,20 +6,13 @@
 
 // Allegro conversion by Trent Gamblin <trent@nooskewl.com>
 
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <cmath>
+#include <cstddef>
 
 extern "C" {
 #include "svgtiny.h"
 }
 
-#define ALLEGRO_STATICLINK
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_primitives.h>
+#include "monster2.hpp"
 #include <allegro5/allegro_color.h>
 
 #ifdef A5_D3D
@@ -27,10 +20,6 @@ extern "C" {
 #else
 #include <allegro5/allegro_opengl.h>
 #endif
-
-#include <vector>
-
-#include "monster2.hpp"
 
 extern ALLEGRO_DISPLAY *display;
 

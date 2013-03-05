@@ -1147,37 +1147,6 @@ void tguiLowerSingleWidget(TGUIWidget* widgetToLower)
  * Move all the widgets in a group forward to the front
  * of the display (end of vector).
  */
-static void tguiLowerSingleWidgetBelow(TGUIWidget* widgetToLower,
-		TGUIWidget* widgetAbove)
-{
-	std::vector<TGUIWidget*> widgets;
-
-	for (size_t i = 0; i < activeGUI->widgets.size(); i++) {
-		TGUIWidget* widget = activeGUI->widgets[i];
-		if (widget == widgetAbove) {
-			widgets.push_back(widgetToLower);
-			widgets.push_back(widgetAbove);
-		}
-		else if (widget != widgetToLower) {
-			widgets.push_back(widget);
-		}
-	}
-
-	activeGUI->widgets.clear();
-
-	for (int i = 0; i < (int)widgets.size(); i++) {
-		activeGUI->widgets.push_back(widgets[i]);
-	}
-
-	widgets.clear();
-
-	tguiFindFocus();
-}
-
-/*
- * Move all the widgets in a group forward to the front
- * of the display (end of vector).
- */
 void tguiRaiseWidget(TGUIWidget* widgetToRaise)
 {
 	std::vector<TGUIWidget*> targetWidgets;

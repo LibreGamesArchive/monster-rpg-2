@@ -1,17 +1,5 @@
 #include "monster2.hpp"
 
-#define ASSERT ALLEGRO_ASSERT
-// ugh FIXME
-#include <allegro5/internal/aintern.h>
-#include <allegro5/internal/aintern_bitmap.h>
-#include <allegro5/internal/aintern_opengl.h>
-
-#ifdef ALLEGRO_IPHONE
-extern "C" {
-#include <allegro5/internal/aintern_iphone.h>
-}
-#endif
-
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 #include "joypad.hpp"
 #endif
