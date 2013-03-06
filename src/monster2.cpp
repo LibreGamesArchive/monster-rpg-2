@@ -244,12 +244,12 @@ void connect_second_display(void)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 static void set_transform()
 {
-   ALLEGRO_TRANSFORM t;
+	ALLEGRO_TRANSFORM t;
 
-   int BB_W = al_get_display_width(display);
-   int BB_H = al_get_display_height(display);
+	int BB_W = al_get_display_width(display);
+	int BB_H = al_get_display_height(display);
 
-   glViewport(0, 0, BB_W, BB_H);
+	glViewport(0, 0, BB_W, BB_H);
 }
 
 static bool should_pause_game(void)
@@ -1032,7 +1032,7 @@ top:
 			do_acknowledge_resize = true;
 		}
 #endif
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID // ANDROID Here too? FIXME
+#if defined ALLEGRO_IPHONE
 		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT)
 		{
 			do_pause_game = should_pause_game();
@@ -1093,6 +1093,8 @@ top:
 				exit(0);
 			}
 #elif defined ALLEGRO_ANDROID
+			int cx, cy, cw, ch;
+			al_get_clipping_rectangle(&cx, &cy, &cw, &ch);
 			_destroy_loaded_bitmaps();
 			destroy_fonts();
 			destroyIcons();
@@ -1128,6 +1130,17 @@ top:
 			if (in_shooter) {
 				shooter_restoring = true;
 			}
+			ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
+			int dx, dy, dw, dh;
+			get_screen_offset_size(&dx, &dy, &dw, &dh);
+			al_set_target_backbuffer(display);
+			ALLEGRO_TRANSFORM t;
+			al_identity_transform(&t);
+			al_scale_transform(&t, screenScaleX, screenScaleY);
+			al_translate_transform(&t, dx, dy);
+			al_use_transform(&t);
+			al_set_target_bitmap(old_target);
+			al_set_clipping_rectangle(cx, cy, cw, ch);
 #endif
 			glDisable(GL_DITHER);
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
@@ -1374,8 +1387,9 @@ top:
 
 #ifdef ALLEGRO_ANDROID	
 	if (!switched_in) {
-		al_rest(0.005);
-		goto top;
+		// FIXME:
+		//al_rest(0.005);
+		//goto top;
 	}
 #endif
 
@@ -1973,7 +1987,15 @@ int main(int argc, char *argv[])
 	float wanted = dw * 0.75f;
 	float scale = wanted / svg_w;
 
+	if (use_programmable_pipeline) {
+		al_set_shader(display, logo_shader);
+		al_use_shader(logo_shader, true);
+	}
 	ALLEGRO_BITMAP *nooskewl = load_svg(getResource("media/nooskewl.svg"), scale);
+	if (use_programmable_pipeline) {
+		al_use_shader(logo_shader, false);
+		al_set_shader(display, default_shader);
+	}
 	
 #ifndef ALLEGRO_ANDROID
 	if ((n = check_arg(argc, argv, "-stick")) != -1) {
@@ -2010,6 +2032,8 @@ int main(int argc, char *argv[])
 	bool cancelled = transitionIn(true, false);
 
 	if (!cancelled) {
+
+
 		al_set_target_backbuffer(display);
 		m_clear(black);
 		al_use_transform(&t);
@@ -2019,7 +2043,9 @@ int main(int argc, char *argv[])
 			dy+dh/2-al_get_bitmap_height(nooskewl)/2,
 			0
 		);
+		transitioning = true; // hide controls on touchscreen & mouse?
 		drawBufferToScreen();
+		transitioning = false;
 		m_flip_display();
 					
 		//loadPlayDestroy("nooskewl.ogg");

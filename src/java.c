@@ -509,14 +509,6 @@ void zeemote_disconnect(void)
 	disconnect_external_controls();
 }
 
-JNIEXPORT bool JNICALL Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeZeemoteShouldAutoconnect(JNIEnv *env, jobject obj)
-{
-	(void)env;
-	(void)obj;
-
-	return zeemote_should_autoconnect();
-}
-
 JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeZeemoteConnect(JNIEnv *env, jobject obj)
 {
 	(void)env;

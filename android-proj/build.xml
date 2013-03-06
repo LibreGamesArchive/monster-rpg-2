@@ -83,7 +83,6 @@
 
 	<!-- tmg -->
     <target name="-package-resources" depends="-crunch">
-        <!-- only package resources if *not* a library project -->
         <do-only-if-not-library elseText="Library project: do not package resources..." >
             <aapt executable="${aapt}"
                     command="package"
@@ -105,7 +104,6 @@
                 <res path="${out.res.absolute.dir}" />
                 <res path="${resource.absolute.dir}" />
                 <nocompress />
-                <!-- <nocompress extension="xml" /> forces no compression on specific file extensions in assets and res/raw -->
             </aapt>
         </do-only-if-not-library>
     </target>

@@ -376,15 +376,10 @@ MFONT *m_load_font(const char *name)
 
 void my_clear_bitmap(MBITMAP *b)
 {
-	ALLEGRO_DEBUG("setting target in my_clear_bitmap!\n");
 	ALLEGRO_BITMAP *target = al_get_target_bitmap();
-	ALLEGRO_DEBUG("setting target to b\n");
 	m_set_target_bitmap(b);
-	ALLEGRO_DEBUG("calling m_clear!\n");
 	m_clear(al_map_rgba(0, 0, 0, 0));
-	ALLEGRO_DEBUG("resetting target\n");
 	al_set_target_bitmap(target);
-	ALLEGRO_DEBUG("my_clear_bitmap done\n");
 }
 
 
@@ -396,12 +391,10 @@ MBITMAP *m_create_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateD
 	int new_flags = flags;
 
 	if (!config.getUseOnlyMemoryBitmaps()) {
-		ALLEGRO_DEBUG("calling al_create_bitmap (!use memory bitmaps)\n");
 		al_set_new_bitmap_flags(new_flags);
 		bitmap = al_create_bitmap(w, h);
 	}
 	if (!bitmap) {
-		ALLEGRO_DEBUG("!bitmap, trying memory\n");
 		al_set_new_bitmap_flags(new_flags|ALLEGRO_MEMORY_BITMAP);
 		bitmap = al_create_bitmap(w, h);
 	}
@@ -413,15 +406,10 @@ MBITMAP *m_create_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateD
 		return NULL;
 	}
 
-	ALLEGRO_DEBUG("creating mbitmap\n");
-
 	MBITMAP *m = new_mbitmap(bitmap);
 
-	ALLEGRO_DEBUG("clearing it\n");
 	my_clear_bitmap(m);
 
-	ALLEGRO_DEBUG("cleared!\n");
-	
 	if (create) {
 		create(m, data);
 	}
@@ -451,8 +439,6 @@ MBITMAP *m_create_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateD
 #if defined ALLEGRO_ANDROID || defined A5_D3D
 	}
 #endif
-
-	ALLEGRO_DEBUG("returning from m_create_bitmap\n");
 
 	return m;
 }
@@ -1142,7 +1128,8 @@ void m_draw_scaled_backbuffer(int sx, int sy, int sw, int sh, int dx, int dy, in
 		sh -= sy;
 		sy = 0;
 	}
-#if defined ALLEGRO_RASPBERRYPI || defined ALLEGRO_IPHONE
+
+#if defined ALLEGRO_RASPBERRYPI || defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	ALLEGRO_LOCKED_REGION *lr1 = al_lock_bitmap(tmp->bitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
 	ALLEGRO_LOCKED_REGION *lr2 = al_lock_bitmap_region(
 		al_get_backbuffer(display),

@@ -4398,7 +4398,12 @@ int title_menu(void)
 #endif
 
 			INPUT_EVENT ie = get_next_input_event();
+#ifdef ALLEGRO_ANDROID
+			// Back button on android is a shake
+			if (ie.button2 == DOWN || iphone_shaken(0.1)) {
+#else
 			if (ie.button2 == DOWN) {
+#endif
 				selected = 0xBEEF;
 				goto done;
 			}

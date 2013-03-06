@@ -174,6 +174,7 @@ ALLEGRO_MUTEX *ss_mutex;
 ALLEGRO_MUTEX *joypad_mutex;
 int exit_event_thread = 0;
 ALLEGRO_SHADER *default_shader;
+ALLEGRO_SHADER *logo_shader;
 ALLEGRO_SHADER *tinter;
 ALLEGRO_SHADER *warp;
 ALLEGRO_SHADER *shadow_shader;
@@ -815,7 +816,31 @@ void init_shaders(void)
 #endif
 		"   gl_Position = " ALLEGRO_SHADER_VAR_PROJVIEW_MATRIX " * " ALLEGRO_SHADER_VAR_POS ";\n"
 		"}\n";
-		
+
+
+/*
+		static const char *default_pixel_source =
+#ifdef OPENGLES
+		"precision mediump float;\n"
+#endif
+		"uniform sampler2D " ALLEGRO_SHADER_VAR_TEX ";\n"
+		"uniform bool " ALLEGRO_SHADER_VAR_USE_TEX ";\n"
+		"varying vec4 varying_color;\n"
+		"varying vec2 varying_texcoord;\n"
+		"void main()\n"
+		"{\n"
+		"  vec4 tmp;\n"
+		"  if (" ALLEGRO_SHADER_VAR_USE_TEX ")\n"
+		"    tmp = varying_color * texture2D(" ALLEGRO_SHADER_VAR_TEX ", varying_texcoord);\n"
+		"  else\n"
+		"    tmp = varying_color;\n"
+		"  if (tmp.a == 0.0) {\n"
+		"    discard;\n"
+		"  }\n"
+		"  gl_FragColor = tmp;\n"
+		"}\n";
+*/
+
 		static const char *default_pixel_source =
 #ifdef OPENGLES
 		"precision mediump float;\n"
@@ -942,6 +967,7 @@ void init_shaders(void)
 		"}";
 		
 		default_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
+		logo_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
 		tinter = al_create_shader(ALLEGRO_SHADER_GLSL);
 		warp = al_create_shader(ALLEGRO_SHADER_GLSL);
 		shadow_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
@@ -949,6 +975,12 @@ void init_shaders(void)
 
 		al_attach_shader_source(
 					default_shader,
+					ALLEGRO_VERTEX_SHADER,
+					default_vertex_source
+					);
+		
+		al_attach_shader_source(
+					logo_shader,
 					ALLEGRO_VERTEX_SHADER,
 					default_vertex_source
 					);
@@ -984,6 +1016,13 @@ void init_shaders(void)
 					);
 		
 		al_attach_shader_source(
+					logo_shader,
+					ALLEGRO_PIXEL_SHADER,
+					//logo_pixel_source
+					default_pixel_source
+					);
+		
+		al_attach_shader_source(
 					tinter,
 					ALLEGRO_PIXEL_SHADER,
 					tinter_pixel_source
@@ -1012,6 +1051,10 @@ void init_shaders(void)
 		al_link_shader(default_shader);
 		if ((shader_log = al_get_shader_log(default_shader))[0] != 0) {
 			printf("1. %s\n", shader_log);
+		}
+		al_link_shader(logo_shader);
+		if ((shader_log = al_get_shader_log(logo_shader))[0] != 0) {
+			printf("1.1. %s\n", shader_log);
 		}
 		al_link_shader(tinter);
 		if ((shader_log = al_get_shader_log(tinter))[0] != 0) {
@@ -1423,7 +1466,7 @@ bool init(int *argc, char **argv[])
 	touch_mutex = al_create_mutex();
 
 	// Android because it's very slow switching back in on some devices
-#if defined A5_D3D || defined ALLEGRO_RASPBERRYPI
+#if defined A5_D3D || defined ALLEGRO_RASPBERRYPI || defined ALLEGRO_ANDROID
 #ifdef ALLEGRO_RASPBERRYPI
 	if (check_arg(*argc, *argv, "-programmable-pipeline") <= 0)
 #endif
@@ -1688,7 +1731,7 @@ bool init(int *argc, char **argv[])
 		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
 #endif
 		al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		int w = al_get_display_width(display);
 		int h = al_get_display_height(display);
 #else
@@ -1735,6 +1778,7 @@ bool init(int *argc, char **argv[])
 	bg_loader = m_load_bitmap(getResource("media/bg-loader.png"));
 	bar_loader = m_load_bitmap(getResource("media/bar-loader.png"));
 	loading_loader = m_load_bitmap(getResource("media/loading-loader.png"));
+	ALLEGRO_DEBUG("FUCK: %d\n", al_get_bitmap_format(loading_loader->bitmap));
 
 	int flogs = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flogs | NO_PRESERVE_TEXTURE);

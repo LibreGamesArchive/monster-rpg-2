@@ -34,8 +34,6 @@ extern "C" {
 
 extern ALLEGRO_DISPLAY *display;
 
-ALLEGRO_DEBUG_CHANNEL("Mo2SVG")
-
 ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 {
 	ALLEGRO_FILE *fd;

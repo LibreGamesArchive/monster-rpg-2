@@ -134,19 +134,26 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
    public native void nativeZeemoteAxis(float x, float y);
    public native void nativeZeemoteButtonDown(int num);
    public native void nativeZeemoteButtonUp(int num);
-   public native boolean nativeZeemoteShouldAutoconnect();
    
    /* load allegro */
    static {
 		/* FIXME: see if we can't load the allegro library name, or type from the manifest here */
+	/*
       System.loadLibrary("allegro-debug");
       System.loadLibrary("allegro_memfile-debug");
       System.loadLibrary("allegro_primitives-debug");
       System.loadLibrary("allegro_image-debug");
       System.loadLibrary("allegro_font-debug");
       System.loadLibrary("allegro_ttf-debug");
-      System.loadLibrary("allegro_shader-debug");
       System.loadLibrary("allegro_color-debug");
+      */
+      System.loadLibrary("allegro");
+      System.loadLibrary("allegro_memfile");
+      System.loadLibrary("allegro_primitives");
+      System.loadLibrary("allegro_image");
+      System.loadLibrary("allegro_font");
+      System.loadLibrary("allegro_ttf");
+      System.loadLibrary("allegro_color");
       System.loadLibrary("bass");
       System.loadLibrary("bassflac");
       System.loadLibrary("monsterrpg2");
@@ -279,7 +286,13 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
    public String getSDCardPrivateDir()
    {
    	//return Environment.getExternalStorageDirectory().getAbsolutePath();
-   	return getExternalFilesDir(null).getAbsolutePath();
+   	File f = getExternalFilesDir(null);
+	if (f != null) {
+		return f.getAbsolutePath();
+	}
+	else {
+		return getFilesDir().getAbsolutePath();
+	}
    }
    
    public String getResourcesDir()
@@ -697,10 +710,6 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
       
       nativeOnResume();
      
-      //if (nativeZeemoteShouldAutoconnect()) {
-      //   controllerUi.startConnectionProcess();
-      //}
-
       Log.d("AllegroActivity", "onResume end");
    }
    
