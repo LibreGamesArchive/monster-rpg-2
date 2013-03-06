@@ -4,6 +4,16 @@
 
 static std::vector<LoadedBitmap *> loaded_bitmaps;
 
+ALLEGRO_BITMAP *my_al_create_bitmap(int w, int h)
+{
+	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
+	ALLEGRO_BITMAP *bmp = al_create_bitmap(w, h);
+	al_set_target_bitmap(bmp);
+	al_use_shader(default_shader);
+	al_set_target_bitmap(old_target);
+	return bmp;
+}
+
 static float get_trap_peak(int topw, int bottomw, int length)
 {
 	int w = (bottomw - topw) / 2.0f;
@@ -63,10 +73,10 @@ MBITMAP *m_create_alpha_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, Rec
 
 	if (config.getUseOnlyMemoryBitmaps()) {
 		al_set_new_bitmap_flags(new_flags|ALLEGRO_MEMORY_BITMAP);
-		bitmap = al_create_bitmap(w, h);
+		bitmap = my_al_create_bitmap(w, h);
 	}
 	else {
-		bitmap = al_create_bitmap(w, h);
+		bitmap = my_al_create_bitmap(w, h);
 	}
 
 	al_set_new_bitmap_flags(flags);
@@ -383,11 +393,11 @@ MBITMAP *m_create_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateD
 
 	if (!config.getUseOnlyMemoryBitmaps()) {
 		al_set_new_bitmap_flags(new_flags);
-		bitmap = al_create_bitmap(w, h);
+		bitmap = my_al_create_bitmap(w, h);
 	}
 	if (!bitmap) {
 		al_set_new_bitmap_flags(new_flags|ALLEGRO_MEMORY_BITMAP);
-		bitmap = al_create_bitmap(w, h);
+		bitmap = my_al_create_bitmap(w, h);
 	}
 
 	al_set_new_bitmap_flags(flags);
@@ -1019,7 +1029,7 @@ void _reload_loaded_bitmaps(void)
 			}
 			else { // create
 				Recreate *d = &loaded_bitmaps[i]->recreate;
-				m->bitmap = al_create_bitmap(d->w, d->h);
+				m->bitmap = my_al_create_bitmap(d->w, d->h);
 				if (d->func) { // recreate with func
 					d->func(m, d->data);
 				}
@@ -1049,7 +1059,7 @@ void _reload_loaded_bitmaps_delayed(void)
 			}
 			else { // create
 				Recreate *d = &loaded_bitmaps[i]->recreate;
-				m->bitmap = al_create_bitmap(d->w, d->h);
+				m->bitmap = my_al_create_bitmap(d->w, d->h);
 				if (d->func) { // recreate with func
 					d->func(m, d->data);
 				}

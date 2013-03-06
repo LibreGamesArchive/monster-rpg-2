@@ -108,7 +108,7 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 	bool multisample = al_have_opengl_extension("GL_EXT_framebuffer_multisample");
 #endif
 
-	ALLEGRO_BITMAP *out = al_create_bitmap(diagram_w, diagram_h);
+	ALLEGRO_BITMAP *out = my_al_create_bitmap(diagram_w, diagram_h);
 
 #if !defined A5_D3D
 	GLint old_vp[4];
@@ -353,6 +353,7 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 	if (multisample) {
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined A5_D3D && !defined ALLEGRO_RASPBERRYPI
 		al_set_target_bitmap(out);
+		al_use_shader(default_shader);
 
 		glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fb);
 		glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, al_get_opengl_fbo(out));

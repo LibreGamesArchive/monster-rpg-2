@@ -1478,14 +1478,12 @@ void CombatPlayer::draw(void)
 			m_set_clip(cx, cy, cx+cw, cy+ch);
 
 		if (use_programmable_pipeline) {
-			al_set_shader(display, brighten);
 			MBITMAP *sb = animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 			al_set_shader_sampler(brighten, "tex", sb->bitmap, 0);
 			al_set_shader_float(brighten, "brightness", amountF);
-			al_use_shader(brighten, true);
+			al_use_shader(brighten);
 			m_draw_tinted_bitmap(sb, vcol, x-(w/2), y-h, flags);
-			al_use_shader(brighten, false);
-			al_set_shader(display, default_shader);
+			al_use_shader(default_shader);
 		}
 		else {
 			if (info.condition == CONDITION_SHADOW) {

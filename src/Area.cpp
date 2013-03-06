@@ -577,17 +577,15 @@ void Area::drawObject(int index)
 			dy -= depth;
 			if (tinting) {
 				if (use_programmable_pipeline) {
-				al_set_shader(display, tinter);
-				al_set_shader_sampler(tinter, "tex", bmp->bitmap, 0);
-				al_set_shader_float(tinter, "ratio", tint_ratio);
-				al_set_shader_float(tinter, "r", targetTint.r);
-				al_set_shader_float(tinter, "g", targetTint.g);
-				al_set_shader_float(tinter, "b", targetTint.b);
-				al_use_shader(tinter, true);
-				m_draw_bitmap_region(bmp, 0, TILE_SIZE-depth, TILE_SIZE,
-					depth, dx, dy, 0);
-				al_use_shader(tinter, false);
-				al_set_shader(display, default_shader);
+					al_set_shader_sampler(tinter, "tex", bmp->bitmap, 0);
+					al_set_shader_float(tinter, "ratio", tint_ratio);
+					al_set_shader_float(tinter, "r", targetTint.r);
+					al_set_shader_float(tinter, "g", targetTint.g);
+					al_set_shader_float(tinter, "b", targetTint.b);
+					al_use_shader(tinter);
+					m_draw_bitmap_region(bmp, 0, TILE_SIZE-depth, TILE_SIZE,
+						depth, dx, dy, 0);
+					al_use_shader(default_shader);
 				}
 				else
 				{
@@ -1221,18 +1219,16 @@ void Area::draw(int bw, int bh)
 #ifndef NO_SHADERS
 	if (num_quads > 0) {
 		if (tinting && use_programmable_pipeline) {
-			al_set_shader(display, tinter);
 			al_set_shader_float(tinter, "ratio", tint_ratio);
 			al_set_shader_float(tinter, "r", targetTint.r);
 			al_set_shader_float(tinter, "g", targetTint.g);
 			al_set_shader_float(tinter, "b", targetTint.b);
-			al_use_shader(tinter, true);
+			al_use_shader(tinter);
 		}
 		m_draw_prim(verts, 0, partial_tm, 0, num_quads*6,
 			ALLEGRO_PRIM_TRIANGLE_LIST);
 		if (tinting && use_programmable_pipeline) {
-			al_use_shader(tinter, false);
-			al_set_shader(display, default_shader);
+			al_use_shader(default_shader);
 		}
 	}
 
@@ -1304,18 +1300,16 @@ void Area::draw(int bw, int bh)
 #ifndef NO_SHADERS
 	if (num_quads > 0) {
 		if (tinting && use_programmable_pipeline) {
-			al_set_shader(display, tinter);
 			al_set_shader_float(tinter, "ratio", tint_ratio);
 			al_set_shader_float(tinter, "r", targetTint.r);
 			al_set_shader_float(tinter, "g", targetTint.g);
 			al_set_shader_float(tinter, "b", targetTint.b);
-			al_use_shader(tinter, true);
+			al_use_shader(tinter);
 		}
 		m_draw_prim(verts, 0, partial_tm, 0, num_quads*6,
 			ALLEGRO_PRIM_TRIANGLE_LIST);
 		if (tinting && use_programmable_pipeline) {
-			al_use_shader(tinter, false);
-			al_set_shader(display, default_shader);
+			al_use_shader(default_shader);
 		}
 	}
 #endif

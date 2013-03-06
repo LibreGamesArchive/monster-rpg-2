@@ -1977,15 +1977,7 @@ int main(int argc, char *argv[])
 	float wanted = dw * 0.75f;
 	float scale = wanted / svg_w;
 
-	if (use_programmable_pipeline) {
-		al_set_shader(display, logo_shader);
-		al_use_shader(logo_shader, true);
-	}
 	ALLEGRO_BITMAP *nooskewl = load_svg(getResource("media/nooskewl.svg"), scale);
-	if (use_programmable_pipeline) {
-		al_use_shader(logo_shader, false);
-		al_set_shader(display, default_shader);
-	}
 	
 #ifndef ALLEGRO_ANDROID
 	if ((n = check_arg(argc, argv, "-stick")) != -1) {
@@ -2103,10 +2095,10 @@ int main(int argc, char *argv[])
 
 
 	// FIXME
-	playMusic("volcano.ogg"); volcano_scene();
+	//playMusic("volcano.ogg"); volcano_scene();
 	//do_lander(); 
-	archery(false);
-	shooter(false);
+	//archery(false);
+	//shooter(false);
 	//credits();
 	
 	fps_counter = al_get_time();

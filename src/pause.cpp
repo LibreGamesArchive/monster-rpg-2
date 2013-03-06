@@ -420,7 +420,7 @@ void showSaveStateInfo(const char *basename)
 #ifdef ALLEGRO_ANDROID
 	al_set_standard_file_interface();
 #endif
-	MBITMAP *ss = new_mbitmap(al_load_bitmap(getUserResource("%s.bmp", basename)));
+	MBITMAP *ss = m_load_bitmap(getUserResource("%s.bmp", basename));
 #ifdef ALLEGRO_ANDROID
 	al_android_set_apk_file_interface();
 #endif

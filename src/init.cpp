@@ -712,6 +712,7 @@ static void *loader_proc(void *arg)
 
 	loading_done = true;
 
+	al_set_target_bitmap(NULL);
 	m_destroy_bitmap(deter_display_access_bmp);
 	
 	show_progress(95);
@@ -1063,8 +1064,9 @@ void init_shaders(void)
 		if ((shader_log = al_get_shader_log(brighten))[0] != 0) {
 			printf("5. %s\n", shader_log);
 		}
-		
-		al_set_shader(display, default_shader);
+	
+		al_set_target_backbuffer(display);
+		al_use_shader(default_shader);
 #ifdef A5_OGL
 		//al_set_opengl_program_object(display, al_get_opengl_program_object(default_shader));
 		ALLEGRO_TRANSFORM tr;
@@ -1968,7 +1970,7 @@ void destroy(void)
 		delete area;
 
 	#if !defined A5_D3D
-	destroy_shaders();
+	//destroy_shaders();
 	#endif
 
 	#ifdef A5_D3D
@@ -2226,8 +2228,9 @@ void toggle_fullscreen()
 		int dx2, dy2, dw2, dh2;
 		get_screen_offset_size(&dx2, &dy2, &dw2, &dh2);
 		ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
-		ALLEGRO_BITMAP *tmp = al_create_bitmap(dw, dh);
+		ALLEGRO_BITMAP *tmp = my_al_create_bitmap(dw, dh);
 		al_set_target_bitmap(tmp);
+		al_use_shader(default_shader);
 		al_draw_bitmap(tmpbuffer->bitmap, 0, 0, 0);
 		al_set_target_bitmap(tmpbuffer->bitmap);
 		al_draw_scaled_bitmap(tmp, 0, 0, dw, dh, 0, 0, dw2, dh2, 0);

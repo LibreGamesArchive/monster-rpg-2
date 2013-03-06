@@ -37,5 +37,12 @@ static inline ALLEGRO_BITMAP *my_load_bitmap(
 
 	delete[] bytes;
 
+	if (b) {
+		ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
+		al_set_target_bitmap(b);
+		al_use_shader(default_shader);
+		al_set_target_bitmap(old_target);
+	}
+
 	return b;
 }

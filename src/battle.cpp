@@ -398,15 +398,13 @@ void Battle::draw(void)
 {
 	m_set_blender(M_ONE, M_ZERO, white);
 	if (superpower && use_programmable_pipeline) {
-		al_set_shader(display, tinter);
 		al_set_shader_float(tinter, "ratio", 1);
 		al_set_shader_float(tinter, "r", 0.8);
 		al_set_shader_float(tinter, "g", 0);
 		al_set_shader_float(tinter, "b", 0);
-		al_use_shader(tinter, true);
+		al_use_shader(tinter);
 		m_draw_bitmap(bg, 0, 0, 0);
-		al_use_shader(tinter, false);
-		al_set_shader(display, default_shader);
+		al_use_shader(default_shader);
 	}
 	else {
 		m_draw_bitmap(bg, 0, 0, 0);

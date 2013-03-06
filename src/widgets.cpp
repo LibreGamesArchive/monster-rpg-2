@@ -223,7 +223,6 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 	if (use_programmable_pipeline && shadow) {
 		int dx, dy, dw, dh;
 		get_screen_offset_size(&dx, &dy, &dw, &dh);
-		al_set_shader(display, shadow_shader);
 		al_set_shader_float(shadow_shader, "x1", dx+x*screenScaleX);
 		al_set_shader_float(shadow_shader, "y1", dy+y*screenScaleY);
 		al_set_shader_float(shadow_shader, "x2", dx+(x+w)*screenScaleX);
@@ -231,10 +230,9 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 		al_set_shader_float(shadow_shader, "BW", al_get_display_width(display));
 		al_set_shader_float(shadow_shader, "BH", al_get_display_height(display));
 		al_set_shader_float(shadow_shader, "radius", screenScaleX*10);
-		al_use_shader(shadow_shader, true);
+		al_use_shader(shadow_shader);
 		m_draw_rectangle(x-10, y-10, x+w+10, y+h+10, black, M_FILLED);
-		al_use_shader(shadow_shader, false);
-		al_set_shader(display, default_shader);
+		al_use_shader(default_shader);
 	}
 
 

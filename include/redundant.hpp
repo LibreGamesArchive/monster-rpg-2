@@ -174,4 +174,6 @@ void m_draw_bitmap_region_to_self(MBITMAP *b, int sx, int sy, int sw, int sh, in
 void m_draw_scaled_backbuffer(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, MBITMAP *dest);
 void m_draw_bitmap_identity_view(MBITMAP *bmp, int x, int y, int flags);
 
+ALLEGRO_BITMAP *my_al_create_bitmap(int w, int h);
+
 #endif
