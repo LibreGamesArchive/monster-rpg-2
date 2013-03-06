@@ -290,6 +290,7 @@ const char *keycode_to_keyname(int i)
 	return keynames[i];
 }
 
+<<<<<<< HEAD
 static void wait_for_no_keys_or_buttons()
 {
 	while (true) {

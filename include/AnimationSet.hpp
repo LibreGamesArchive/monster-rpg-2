@@ -24,7 +24,6 @@ public:
 	int update(int step);
 
 	AnimationSet *clone(int type);
-	void post_reset(void);
 
 	AnimationSet(void);
 	AnimationSet(const char *filename, bool alpha = false);

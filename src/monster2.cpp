@@ -1,15 +1,5 @@
 #include "monster2.hpp"
 
-// FIXME
-#define ASSERT ALLEGRO_ASSERT
-#include <allegro5/internal/aintern_bitmap.h>
-#include <allegro5/internal/aintern_display.h>
-#include <allegro5/internal/aintern_opengl.h>
-
-#ifdef KINDLEFIRE
-#include <allegro5/internal/aintern_android.h>
-#endif
-
 #include "tftp_get.h"
 
 #ifdef ALLEGRO_ANDROID
@@ -2113,10 +2103,10 @@ int main(int argc, char *argv[])
 
 
 	// FIXME
-	//playMusic("volcano.ogg"); volcano_scene();
+	playMusic("volcano.ogg"); volcano_scene();
 	//do_lander(); 
-	//archery(false);
-	//shooter(false);
+	archery(false);
+	shooter(false);
 	//credits();
 	
 	fps_counter = al_get_time();
