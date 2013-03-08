@@ -697,6 +697,7 @@ bool shooter(bool for_points)
 	int shark_value, crab_value;
 
 	int flags = al_get_new_bitmap_flags();
+	
 	al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
 	bbot = m_create_bitmap(1024, 1024); // check
 	btop = m_create_bitmap(1024, 1024); // check
@@ -717,16 +718,22 @@ bool shooter(bool for_points)
 
 	dpad_off();
 
-	underwater = m_load_bitmap(getResource("media/underwater.png"));
-
 	sub_bmp = m_load_bitmap(getResource("media/sub.png"));
 	bullet = m_load_bitmap(getResource("media/bullet.png"));
 	for (int i = 0; i < EXP_POOL_SIZE; i++) {
 		explosion_pool[i] = new AnimationSet(getResource("media/explosion.png"));
 	}
 
+	int mipmap = 0;
+#if !defined OPENGLES
+	mipmap = ALLEGRO_MIPMAP;
+#endif
+
+	al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | mipmap);
 	crab = new AnimationSet(getResource("media/crab.png"));
 	shark_anim = new AnimationSet(getResource("media/shark.png"));
+	underwater = m_load_bitmap(getResource("media/underwater.png"));
+	al_set_new_bitmap_flags(flags);
 
 	crab_bmp = crab->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 	shark_bmp = shark_anim->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
@@ -1011,6 +1018,7 @@ start:
 				deadCount += LOGIC_MILLIS;
 				if (deadCount > 2000) {
 					break_for_fade_after_draw = true;
+					prepareForScreenGrab1();
 					break;
 				}
 			}
@@ -1044,22 +1052,22 @@ start:
 				double dist = sqrt((float)dx*dx + dy*dy);
 				if (dist < pause_icon_w/2 || in.button2) {
 					// pause
-					draw_everything();
-					int dx, dy, dw, dh;
-					get_screen_offset_size(&dx, &dy, &dw, &dh);
-					m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmpbuffer);
+					al_stop_timer(logic_timer);
 
+					prepareForScreenGrab1();
+					draw_everything();
+					prepareForScreenGrab2();
+
+					draw_everything();
 					const char *pause_text = "Paused";
 					int tw = m_text_length(game_font, _t(pause_text));
 					int th = m_text_height(game_font);
-					al_set_target_backbuffer(display);
+					set_target_backbuffer();
 					m_draw_rectangle(BW/2-tw/2-5, BH/2-th/2-5, BW/2+tw/2+5, BH/2+th/2+5, black, M_FILLED);
 					m_draw_rectangle(BW/2-tw/2-5+0.5, BH/2-th/2-5+0.5, BW/2+tw/2+5, BH/2+th/2+5, white, M_OUTLINED);
 					mTextout_simple(_t(pause_text), BW/2-tw/2, BH/2-th/2+2, white);
 					drawBufferToScreen();
 					m_flip_display();
-
-					al_stop_timer(logic_timer);
 
 					shooter_paused = true;
 					al_rest(0.5);
@@ -1103,7 +1111,8 @@ start:
 								break;
 							}
 						}
-						al_set_target_backbuffer(display);
+						set_target_backbuffer();
+						int dx, dy, dw, dh;
 						get_screen_offset_size(&dx, &dy, &dw, &dh);
 						m_draw_bitmap_identity_view(tmpbuffer, dx, dy, 0);
 						m_draw_rectangle(BW/2-tw/2-5, BH/2-th/2-5, BW/2+tw/2+5, BH/2+th/2+5, black, M_FILLED);
@@ -1114,8 +1123,6 @@ start:
 						m_rest(0.005);
 					}
 
-					al_start_timer(logic_timer);
-
 					shooter_paused = false;
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
@@ -1123,6 +1130,8 @@ start:
 					last_mouse_x = al_get_display_width(display)/2;
 					al_rest(0.5);
 #endif
+					
+					al_start_timer(logic_timer);
 				}
 			}
 
@@ -1209,15 +1218,19 @@ start:
 		if (break_for_fade_after_draw || draw_counter > 0) {
 			draw_counter = 0;
 
-			al_set_target_backbuffer(display);
+			if (!break_for_fade_after_draw) {
+				set_target_backbuffer();
+			}
 
 			draw_everything();
 
-			if (o < TILE_SIZE*140) {
-				break_for_fade_after_draw = true;
-			}
 			if (break_for_fade_after_draw) {
 				break;
+			}
+
+			if (o < TILE_SIZE*140) {
+				break_for_fade_after_draw = true;
+				prepareForScreenGrab1();
 			}
 
 			bool reset_mouse = false;
@@ -1260,11 +1273,13 @@ done:
 	
 	if (break_for_fade_after_draw) {
 		break_for_fade_after_draw = false;
+		prepareForScreenGrab2();
 		fadeOut(black);
 	}
 
-	al_set_target_backbuffer(display);
+	prepareForScreenGrab1();
 	m_clear(black);
+	prepareForScreenGrab2();
 	m_rest(5);
 
 	playMusic("underwater_final.ogg");

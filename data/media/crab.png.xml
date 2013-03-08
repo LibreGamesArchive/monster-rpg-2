@@ -5,8 +5,8 @@
 	<height>16</height>
 	<frames>2</frames>
 	<delays>
-		<0>333</0>
-		<1>333</1>
+		<0>250</0>
+		<1>250</1>
 	</delays>
 </only>
 

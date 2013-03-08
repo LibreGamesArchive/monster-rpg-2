@@ -92,8 +92,10 @@ function update(step)
 		local doit = true;
 		if (not for_points) then
 			--updateArea()
+			prepareForScreenGrab1()
 			clearBuffer()
 			drawBufferToScreen()
+			prepareForScreenGrab2()
 			doit = prompt("Shoot up", "some baddies?", 0, 0)
 			clearBuffer()
 		end
@@ -107,16 +109,20 @@ function update(step)
 			end
 		end
 		updateArea()
+		prepareForScreenGrab1()
 		drawArea()
 		drawBufferToScreen()
+		prepareForScreenGrab2()
 		transitionIn()
 	elseif (not CRAP) then
 		CRAP = true
 	elseif (getMilestone(MS_GONE_TO_ARCHERY_TOWER) and not done_look_already) then
 		done_look_already = true
+		prepareForScreenGrab1()
 		drawArea()
 		drawBufferToScreen()
 		local should_look = prompt("Take a look", "around?", 0, 1)
+		prepareForScreenGrab2()
 		if (should_look) then
 			doKeepLook()
 			setMilestone(MS_LOOKED_FROM_KEEP, true)

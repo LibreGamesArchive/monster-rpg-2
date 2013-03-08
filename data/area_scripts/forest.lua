@@ -45,9 +45,11 @@ end
 
 function fade_in()
 	dpad_off()
+	prepareForScreenGrab1()
 	drawArea()
 	dpad_on()
 	drawBufferToScreen()
+	prepareForScreenGrab2()
 	fadeIn(255, 0, 0)
 	setGonnaFadeInRed(false)
 end
@@ -66,8 +68,10 @@ end
 
 function fade_out()
 	reviveAllPlayers()
+	prepareForScreenGrab1()
 	drawArea()
 	drawBufferToScreen()
+	prepareForScreenGrab2()
 	fadeOut(0, 0, 0, 5)
 	clearBuffer(0, 0, 0)
 	setMilestone(MS_OPENING_SCENE, true)
@@ -76,9 +80,11 @@ function fade_out()
 	setObjectSubAnimation(0, "unconscious")
 	updateArea()
 	dpad_off()
+	prepareForScreenGrab1()
 	drawArea()
 	dpad_on()
 	drawBufferToScreen()
+	prepareForScreenGrab2()
 	fadeIn(0, 0, 0)
 end
 

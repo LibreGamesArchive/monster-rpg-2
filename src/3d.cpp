@@ -598,7 +598,6 @@ static int real_archery(int *accuracy_pts)
 
 	int num_shots = 0;
 
-	bool really_done = false;
 	bool clicked = false;
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	current_mouse_x = BW/2;
@@ -606,7 +605,7 @@ static int real_archery(int *accuracy_pts)
 	//al_set_mouse_xy(display, current_mouse_x, current_mouse_y);
 #endif
 	
-	al_set_target_backbuffer(display);
+	set_target_backbuffer();
 	m_clear(m_map_rgb(0, 0, 0));
 
 	playMusic("shmup2.ogg");
@@ -620,7 +619,13 @@ static int real_archery(int *accuracy_pts)
 	float target_y = BH/2;
 
 	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
+
+	int mipmap = 0;
+#if !defined OPENGLES
+	mipmap = ALLEGRO_MIPMAP;
+#endif
+
+	al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | mipmap);
 	MBITMAP *bow_tex = m_load_bitmap(getResource("models/bow.png"));
 	MBITMAP *arrow_tex =
 		m_load_bitmap(getResource("models/arrow.png"));
@@ -665,6 +670,8 @@ static int real_archery(int *accuracy_pts)
 	int hiddenCount = 0;
 	bool dead = false;
 
+	bool really_done = false;
+
 	playPreloadedSample("bow_draw.ogg");
 
 	bool break_for_fade_after_draw = false;
@@ -705,6 +712,9 @@ static int real_archery(int *accuracy_pts)
 			}
 			else if (total_goblins >= NUM_GOBLINS && goblins.size() == 0) {
 				really_done = true;
+				break_for_fade_after_draw = true;
+				prepareForScreenGrab1();
+				continue;
 			}
 
 			goblin_animSet->update(LOGIC_MILLIS);
@@ -718,6 +728,7 @@ static int real_archery(int *accuracy_pts)
 
 			if (dead) {
 				break_for_fade_after_draw = true;
+				prepareForScreenGrab1();
 				continue;
 			}
 
@@ -848,8 +859,10 @@ static int real_archery(int *accuracy_pts)
 			draw_counter = 0;
 
 			disable_zbuffer();
-			
-			al_set_target_backbuffer(display);
+		
+			if (!break_for_fade_after_draw) {
+				set_target_backbuffer();
+			}
 
 			float yrot = (target_x / BW - 0.5f) * max_xrot;
 			float xrot = (target_y / BH - 0.5f) * max_yrot;
@@ -903,9 +916,6 @@ static int real_archery(int *accuracy_pts)
 					 m_map_rgb(255, 0, 0), M_FILLED);
 			m_draw_bitmap(progress, 2, 2, 0);
 
-			drawBufferToScreen();
-			al_set_target_backbuffer(display);
-
 			ALLEGRO_TRANSFORM proj_push;
 			ALLEGRO_TRANSFORM view_push;
 			ALLEGRO_TRANSFORM view_transform;
@@ -914,7 +924,7 @@ static int real_archery(int *accuracy_pts)
 
 			set_projection(1, 1000);
 
-			#ifdef A5_D3D
+#ifdef A5_D3D
 			D3DVIEWPORT9 backup_vp;
 			al_get_d3d_device(display)->GetViewport(&backup_vp);
 			D3DVIEWPORT9 vp;
@@ -925,7 +935,7 @@ static int real_archery(int *accuracy_pts)
 			vp.MinZ = 0;
 			vp.MaxZ = 1;
 			al_get_d3d_device(display)->SetViewport(&vp);
-			#endif
+#endif
 
 			// without this the feathers sometimes go invisible
 			float old_xrot = xrot;
@@ -975,10 +985,6 @@ static int real_archery(int *accuracy_pts)
 
 			drawBufferToScreen();
 
-			if (really_done) {
-				break_for_fade_after_draw = true;
-			}
-			
 			if (break_for_fade_after_draw) {
 				break;
 			}
@@ -991,12 +997,13 @@ done:
 
 	if (break_for_fade_after_draw) {
 		break_for_fade_after_draw = false;
+		prepareForScreenGrab2();
 		fadeOut(black);
 	}
 
 	disable_zbuffer();
 	
-	al_set_target_backbuffer(display);
+	set_target_backbuffer();
 
 	goblins.clear();
 
@@ -1034,8 +1041,9 @@ bool archery(bool for_points)
 		anotherDoDialogue("Faelon: Here comes the horde! Let's have some fun!...\n", true);
 	}
 
-	al_set_target_backbuffer(display);
+	prepareForScreenGrab1();
 	m_clear(m_map_rgb(0, 0, 0));
+	prepareForScreenGrab2();
 
 	if (dpad_type != DPAD_TOTAL_1 && dpad_type != DPAD_TOTAL_2)
 		notify("Drag your bow into", "position and release", "to fire...");
@@ -1047,12 +1055,14 @@ bool archery(bool for_points)
 			return 2;
 		}
 
-		al_set_target_backbuffer(display);
+		prepareForScreenGrab1();
 		m_clear(black);
 		m_rest(0.5);
 
 		if (dead) {
-			if (prompt("G A M E O V E R", "Try Again?", 1, 1))
+			bool ret = prompt("G A M E O V E R", "Try Again?", 1, 1);
+			prepareForScreenGrab2();
+			if (ret)
 				continue;
 		}
 		else {
@@ -1066,6 +1076,7 @@ bool archery(bool for_points)
 			}
 
 			bool again = prompt("V I C T O R Y !", "Try Again?", 0, 0, std::string(buf));
+			prepareForScreenGrab2();
 
 			if (again)
 				continue;
@@ -1185,7 +1196,7 @@ void volcano_scene(void)
 
 	dpad_off();
 
-	al_set_target_backbuffer(display);
+	set_target_backbuffer();
 	m_clear(m_map_rgb(0, 0, 0));
 
 	enum {
@@ -1225,7 +1236,13 @@ void volcano_scene(void)
 	ring_texture = m_load_alpha_bitmap(getResource("media/ring_texture.png"));
 
 	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
+
+	int mipmap = 0;
+#if !defined OPENGLES
+	mipmap = ALLEGRO_MIPMAP;
+#endif
+
+	al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | mipmap);
 	MBITMAP *land_texture = m_load_bitmap(getResource("media/volcano_texture.png"));
 	MBITMAP *staff_tex = m_load_bitmap(getResource("models/staff.png"));
 	al_set_new_bitmap_flags(flags);
@@ -1255,13 +1272,15 @@ void volcano_scene(void)
 
 	clear_input_events();
 
+	bool break_for_fade_after_draw = false;
+
 	while  (1) {
 		al_wait_cond(wait_cond, wait_mutex);
 		int tmp_counter = logic_counter;
 		logic_counter = 0;
 		if (tmp_counter > 10)
 			tmp_counter = 1;
-		while  (tmp_counter > 0) {
+		while  (!break_for_fade_after_draw && tmp_counter > 0) {
 			next_input_event_ready = true;
 
 			tmp_counter--;
@@ -1323,12 +1342,24 @@ void volcano_scene(void)
 				}
 			}
 		}
+			
+		if (stage == STAGE_POOFING) {
+			ring_z += ring_z_delta * LOGIC_MILLIS;
+			if (!break_for_fade_after_draw && count > 5000) {
+				break_for_fade_after_draw = true;
+				prepareForScreenGrab1();
+				continue;
+			}
+		}
 
-		if (draw_counter > 0) {
+		if (break_for_fade_after_draw || draw_counter > 0) {
 			draw_counter = 0;
 
 			disable_zbuffer();
-			al_set_target_backbuffer(display);
+
+			if (!break_for_fade_after_draw) {
+				set_target_backbuffer();
+			}
 
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
@@ -1416,20 +1447,20 @@ void volcano_scene(void)
 #ifdef A5_D3D
 			device->SetViewport(&old);
 #endif
-			
-			if (stage == STAGE_POOFING) {
-				ring_z += ring_z_delta * LOGIC_MILLIS;
-				if (count > 5000) {
-					goto done;
-				}
+			if (break_for_fade_after_draw) {
+				break;
 			}
-
+			
 			m_flip_display();
 		}
 	}
 done:
 
-	fadeOut(black);
+	if (break_for_fade_after_draw) {
+		break_for_fade_after_draw = false;
+		prepareForScreenGrab2();
+		fadeOut(black);
+	}
 
 #if defined A5_OGL
 	disable_cull_face();

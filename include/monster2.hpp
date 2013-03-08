@@ -322,17 +322,17 @@ void do_close_exit_game();
 //extern std::vector<std::pair<int, bool> > forced_milestones;
 extern bool gonna_fade_in_red;
 
-void update_orientation(void);
+void update_orientation();
 bool is_close_pressed(bool pump_events_only = false);
 #define pump_events() is_close_pressed(true)
 
-void connect_second_display(void);
+void connect_second_display();
 extern int old_control_mode;
 void connect_airplay_controls(bool really_airplay = false);
 void disconnect_airplay_controls(bool really_airplay = false);
 void clear_touches();
 
-void main_draw(bool draw_cursor = true);
+void main_draw();
 
 extern bool dont_draw_now;
 

@@ -1,8 +1,7 @@
 #ifndef GRAPHICS_HPP
 #define GRAPHICS_HPP
 
-void drawBufferToScreen(void);
-void drawBufferToScreen(bool draw_controls);
+void drawBufferToScreen(bool draw_controls = true);
 void draw_clock(int cx, int cy, int r, bool reverse);
 void draw_shadow(MBITMAP *bmp, int x, int y, bool hflip = false);
 void m_put_alpha_pixel(MBITMAP *bmp, int x, int y, MCOLOR c);
@@ -12,10 +11,10 @@ void fadeIn(MCOLOR color);
 void fadeOut(MCOLOR color);
 bool transitionIn(bool can_cancel = false, bool toggle_dpad = true);
 void transitionOut(bool toggle_dpad = true);
-void battleTransition(void);
+void battleTransition();
 
 void addOmnipotentText(std::string text, int cx, int cy, MCOLOR color);
-void stopAllOmni(void);
+void stopAllOmni();
 void add_blit(MBITMAP *src, int x, int y, MCOLOR color, float amount, int flags);
 void death_blit_region(MBITMAP *src, int x, int y, int w, int h, int dx, int dy, MCOLOR color, int flags);
 

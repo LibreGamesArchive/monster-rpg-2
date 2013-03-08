@@ -103,9 +103,11 @@ function update(step)
 				anotherDoDialogue("Congratulations! You didn't win, but you should know enough to get started!\n")
 			end
 			dpad_off()
+			prepareForScreenGrab1()
 			drawArea()
 			dpad_on()
 			drawBufferToScreen()
+			prepareForScreenGrab2()
 			fadeOut(0, 0, 0)
 		end
 	end

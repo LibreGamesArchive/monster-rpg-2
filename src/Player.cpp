@@ -567,10 +567,6 @@ static void levelUpCallback(int selected, LEVEL_UP_CALLBACK_DATA *d)
 		orig_values = ov2;
 	}
 
-	int dx, dy, dw, dh;
-	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmpbuffer);
-
 	MFrame_NormalDraw *frame = new MFrame_NormalDraw(x, y, width, height, true);
 
 	std::vector<std::vector<MTableData> > tableData;
@@ -745,7 +741,8 @@ static void levelUpCallback(int selected, LEVEL_UP_CALLBACK_DATA *d)
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
+			int dx, dy, dw, dh;
 			get_screen_offset_size(&dx, &dy, &dw, &dh);
 			m_draw_bitmap_identity_view(tmpbuffer, dx, dy, 0);
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
@@ -862,10 +859,11 @@ bool levelUp(Player *player, int bonus)
 	tguiAddWidget(multiChooser);
 	tguiSetFocus(multiChooser);
 
-	al_set_target_backbuffer(display);
+	prepareForScreenGrab1();
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 	tguiDraw();
-	drawBufferToScreen();
+	drawBufferToScreen(false);
+	prepareForScreenGrab2();
 	fadeIn(black);
 
 	clear_input_events();
@@ -895,10 +893,11 @@ bool levelUp(Player *player, int bonus)
 				std::vector<int> &v = multiChooser->getSelected();
 				if (v.size() <= 0) {
 					bool cancelled = false;
-					al_set_target_backbuffer(display);
+					prepareForScreenGrab1();
 					m_clear(black);
 					tguiDraw();
-					drawBufferToScreen();
+					drawBufferToScreen(false);
+					prepareForScreenGrab2();
 					bool prompt_ret = prompt("Reset and", "start over?", 0, 0, "", &cancelled);
 					if (!cancelled) {
 						if (prompt_ret == true) {
@@ -922,10 +921,11 @@ bool levelUp(Player *player, int bonus)
 				}
 			}
 			if (multiChooser->getTapped() >= 0) {
-				al_set_target_backbuffer(display);
+				prepareForScreenGrab1();
 				m_clear(black);
 				tguiDraw();
-				drawBufferToScreen();
+				drawBufferToScreen(false);
+				prepareForScreenGrab2();
 				levelUpCallback(multiChooser->getTapped(), &levelUpData);
 				multiChooser->setTapped(false);
 
@@ -937,7 +937,7 @@ bool levelUp(Player *player, int bonus)
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
 			m_clear(black);
 			tguiDraw();
 			drawBufferToScreen();
@@ -947,20 +947,20 @@ bool levelUp(Player *player, int bonus)
 
 done:
 
-	al_set_target_backbuffer(display);
+	set_target_backbuffer();
 	m_clear(black);
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-	// Draw the GUI
 	tguiDraw();
 	drawBufferToScreen();
 	m_flip_display();
 
 	bool ret;
 	bool prompt_ret;
-	al_set_target_backbuffer(display);
+	prepareForScreenGrab1();
 	m_clear(black);
 	tguiDraw();
-	drawBufferToScreen();
+	drawBufferToScreen(false);
+	prepareForScreenGrab2();
 	prompt_ret = prompt("Keep changes?", "Select no to reset...", 0, 0);
 	if (prompt_ret) {
 		ret = false;
@@ -973,12 +973,12 @@ done:
 	
 	setMusicVolume(1);
 			
-	al_set_target_backbuffer(display);
+	prepareForScreenGrab1();
 	m_clear(black);
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-	// Draw the GUI
 	tguiDraw();
-	drawBufferToScreen();
+	drawBufferToScreen(false);
+	prepareForScreenGrab2();
 	fadeOut(black);
 
 	tguiDeleteWidget(fullscreenRect);

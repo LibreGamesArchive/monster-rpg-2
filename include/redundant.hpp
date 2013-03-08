@@ -176,4 +176,14 @@ void m_draw_bitmap_identity_view(MBITMAP *bmp, int x, int y, int flags);
 
 ALLEGRO_BITMAP *my_al_create_bitmap(int w, int h);
 
+void m_draw_scaled_target(MBITMAP *src, int sx, int sy, int sw, int sh,
+	int dx, int dy, int dw, int dh, MBITMAP *dst);
+
+void prepareForScreenGrab1();
+void prepareForScreenGrab2();
+
+void set_target_backbuffer();
+
+extern bool preparingForScreenGrab;
+
 #endif

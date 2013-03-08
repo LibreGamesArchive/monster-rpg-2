@@ -1,7 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	android:versionCode="1"
+	android:versionName="1.0"
         package="com.nooskewl.rawinput">
 
-    <application android:label="RawInputIME">
+    <application android:label="RawInputIME" android:icon="@drawable/icon">
 
         <!-- Declares the input method service -->
         <service android:name="RawInputIME"

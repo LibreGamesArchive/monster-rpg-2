@@ -640,9 +640,10 @@ BattleResult Battle::update(int step)
 
 	if (running && messages.size() <= 0) {
 		storeStats(false);
-		al_set_target_backbuffer(display);
+		prepareForScreenGrab1();
 		draw();
-		drawBufferToScreen();
+		drawBufferToScreen(false);
+		prepareForScreenGrab2();
 		fadeOut(black);
 		return BATTLE_PLAYER_RUN;
 	}
@@ -651,16 +652,15 @@ BattleResult Battle::update(int step)
 		playersAllDeadCount += step;
 		if (playersAllDeadCount > 2000) {
 			debug_message("player loses\n");
-			al_set_target_backbuffer(display);
+			prepareForScreenGrab1();
 			draw();
-			drawBufferToScreen();
+			drawBufferToScreen(false);
+			prepareForScreenGrab2();
 			fadeOut(m_map_rgb(255, 0, 0));
 			if (name != "first_battle" && name != "2Statues" && !manChooser && !(area && area->getName() == "tutorial")) {
-				al_set_target_backbuffer(display);
+				set_target_backbuffer();
 				m_clear(m_map_rgb(255, 0, 0));
-				hide_mouse_cursor();
-				drawBufferToScreen();
-				show_mouse_cursor();
+				drawBufferToScreen(false);
 				anotherDoDialogue("You were defeated in battle...\nRestore your game and save the world!\n", false, true, false);
 			}
 			return BATTLE_ENEMY_WIN;
@@ -712,9 +712,10 @@ BattleResult Battle::update(int step)
 			else {
 				// Keep battle stats
 				storeStats(true);
-				al_set_target_backbuffer(display);
+				prepareForScreenGrab1();
 				draw();
-				drawBufferToScreen();
+				drawBufferToScreen(false);
+				prepareForScreenGrab2();
 				fadeOut(black);
 				return BATTLE_PLAYER_WIN;
 			}

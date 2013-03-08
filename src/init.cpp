@@ -260,11 +260,8 @@ int versionMinor = 0;
 bool switched_out = false;
 uint32_t my_opengl_version;
 
-static MBITMAP *custom_mouse_cursor_saved = NULL;
-MBITMAP *custom_mouse_patch = NULL;
-int mouse_patch_x, mouse_patch_y;
+static ALLEGRO_MOUSE_CURSOR *custom_mouse_cursor;
 int custom_cursor_w, custom_cursor_h;
-MBITMAP *custom_mouse_cursor = NULL;
 
 void destroy_fonts(void)
 {
@@ -701,6 +698,9 @@ static void *loader_proc(void *arg)
 	m_rest(0.5);
 
 	if (safemode) {
+		prepareForScreenGrab1();
+		m_clear(black);
+		prepareForScreenGrab2();
 		notify("Desired mode could not be", "set. Using default", "(safe) mode...");
 	}
 	
@@ -1065,7 +1065,7 @@ void init_shaders(void)
 			printf("5. %s\n", shader_log);
 		}
 	
-		al_set_target_backbuffer(display);
+		set_target_backbuffer();
 		al_use_shader(default_shader);
 #ifdef A5_OGL
 		//al_set_opengl_program_object(display, al_get_opengl_program_object(default_shader));
@@ -1126,7 +1126,7 @@ static void draw_loading_screen(MBITMAP *tmp, int percent, ScreenDescriptor *sd)
 	m_draw_bitmap_region(bar_loader, 0, 0, bw*(percent/100.0f), bh, bx, by, 0);
 	eny_loader->draw(BH/2-eny_loader->getWidth()/2-25, BW-eny_loader->getHeight()-35, 0);
 	dot_loader->draw(118, 24, 0);
-	al_set_target_backbuffer(display);
+	set_target_backbuffer();
 	m_clear(black);
 	m_draw_scaled_bitmap(tmp, 0, 0, BH, BW, 0, 0, BH*BH/BW, BH, 0);
 	m_flip_display();
@@ -1608,23 +1608,20 @@ bool init(int *argc, char **argv[])
 	authenticatePlayer();
 #endif
 	
-	custom_mouse_cursor_saved = m_load_bitmap(getResource("media/mouse_cursor.png"));
-	custom_cursor_w = m_get_bitmap_width(custom_mouse_cursor_saved);
-	custom_cursor_h = m_get_bitmap_height(custom_mouse_cursor_saved);
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID //&& !defined ALLEGRO_RASPBERRYPI
-	custom_mouse_patch = m_create_bitmap(custom_cursor_w, custom_cursor_h);
-	al_hide_mouse_cursor(display);
-#elif defined ALLEGRO_RASPBERRYPI_XXX
+	MBITMAP *tmpcurs = m_load_bitmap(getResource("media/mouse_cursor.png"));
+	custom_cursor_w = m_get_bitmap_width(tmpcurs);
+	custom_cursor_h = m_get_bitmap_height(tmpcurs);
 	if (have_mouse) {
-		ALLEGRO_MOUSE_CURSOR *tmp_cursor = al_create_mouse_cursor(custom_mouse_cursor_saved->bitmap, 0, 0);
-		al_set_mouse_cursor(display, tmp_cursor);
-		al_destroy_mouse_cursor(tmp_cursor);
+		custom_mouse_cursor = al_create_mouse_cursor(tmpcurs->bitmap, 0, 0);
+		al_set_mouse_cursor(display, custom_mouse_cursor);
 	}
+#ifdef ALLEGRO_RASPBERRYPI
 	else {
 		al_hide_mouse_cursor(display);
 	}
 #endif
 	show_mouse_cursor();
+	m_destroy_bitmap(tmpcurs);
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (sd->fullscreen) {
@@ -1636,8 +1633,8 @@ bool init(int *argc, char **argv[])
 	if (have_mouse) {
 		int dx, dy, dw, dh;
 		get_screen_offset_size(&dx, &dy, &dw, &dh);
-		int mousex = al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor_saved->bitmap)-20-dx;
-		int mousey = al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor_saved->bitmap)-20-dy;
+		int mousex = al_get_display_width(display)-custom_cursor_w-20-dx;
+		int mousey = al_get_display_height(display)-custom_cursor_h-20-dy;
 		al_set_mouse_xy(display, mousex, mousey);
 	}
 
@@ -1704,11 +1701,20 @@ bool init(int *argc, char **argv[])
 #endif
 
 	ALLEGRO_DEBUG("creating screenshot buffer\n");
-
-	flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
-	screenshot = m_create_bitmap(BW/2, BH/2);
-	al_set_new_bitmap_flags(flags);
+	
+	{
+		ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
+		flags = al_get_new_bitmap_flags();
+		al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
+		screenshot = m_create_bitmap(BW/2, BH/2);
+		al_set_target_bitmap(screenshot->bitmap);
+		ALLEGRO_TRANSFORM t;
+		al_identity_transform(&t);
+		al_scale_transform(&t, 0.5f, 0.5f);
+		al_use_transform(&t);
+		al_set_new_bitmap_flags(flags);
+		al_set_target_bitmap(old_target);
+	}
 	
 	ALLEGRO_DEBUG("creating tmpbuffer\n");
 
@@ -1766,7 +1772,6 @@ bool init(int *argc, char **argv[])
 	bg_loader = m_load_bitmap(getResource("media/bg-loader.png"));
 	bar_loader = m_load_bitmap(getResource("media/bar-loader.png"));
 	loading_loader = m_load_bitmap(getResource("media/loading-loader.png"));
-	ALLEGRO_DEBUG("FUCK: %d\n", al_get_bitmap_format(loading_loader->bitmap));
 
 	int flogs = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flogs | NO_PRESERVE_TEXTURE);
@@ -2123,7 +2128,7 @@ void set_screen_params(void)
 		tguiSetTolerance(3);
 	}
 
-	al_set_target_backbuffer(display);
+	set_target_backbuffer();
 
 	int dw, dh;
 	int dx, dy;
@@ -2173,7 +2178,7 @@ void toggle_fullscreen()
 		height_before_fullscreen = sd->height;
 	}
 
-	al_set_target_backbuffer(display);
+	set_target_backbuffer();
 	al_clear_to_color(black);
 	al_flip_display();
 
@@ -2198,7 +2203,7 @@ void toggle_fullscreen()
 	_reload_loaded_bitmaps();
 	_reload_loaded_bitmaps_delayed();
 #endif
-	al_set_target_backbuffer(display);
+	set_target_backbuffer();
 	set_screen_params();
 #ifdef A5_D3D
 	if (in_shooter) {
@@ -2209,18 +2214,19 @@ void toggle_fullscreen()
 	pause_joystick_repeat_events = false;
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-	if (in_shooter) {
-		al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
+	if (have_mouse) {
+		al_set_mouse_cursor(display, custom_mouse_cursor);
+		if (in_shooter) {
+			al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
+		}
+		else {
+			int dx, dy, dw, dh;
+			get_screen_offset_size(&dx, &dy, &dw, &dh);
+			int mousex = al_get_display_width(display)-custom_cursor_w-20-dx;
+			int mousey = al_get_display_height(display)-custom_cursor_h-20-dy;
+			al_set_mouse_xy(display, mousex, mousey);
+		}
 	}
-	else if (custom_mouse_cursor) {
-		int dx, dy, dw, dh;
-		get_screen_offset_size(&dx, &dy, &dw, &dh);
-		int mousex = al_get_display_width(display)-al_get_bitmap_width(custom_mouse_cursor_saved->bitmap)-20-dx;
-		int mousey = al_get_display_height(display)-al_get_bitmap_height(custom_mouse_cursor_saved->bitmap)-20-dy;
-		al_set_mouse_xy(display, mousex, mousey);
-	}
-
-	al_hide_mouse_cursor(display);
 #endif
 
 	if (tmpbuffer) {
@@ -2267,35 +2273,25 @@ void unlock_joypad_mutex(void)
 	al_unlock_mutex(joypad_mutex);
 }
 
-#ifdef ALLEGRO_RASPBERRYPI_XXX
 static bool cursor_hidden = false;
-#endif
 
 void show_mouse_cursor()
 {
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID //&& !defined ALLEGRO_RASPBERRYPI
-	custom_mouse_cursor = custom_mouse_cursor_saved;
-#elif defined ALLEGRO_RASPBERRYPI_XXX
-	al_show_mouse_cursor(display);
-	cursor_hidden = false;
-#endif
+	if (have_mouse) {
+		al_show_mouse_cursor(display);
+		cursor_hidden = false;
+	}
 }
 
 void hide_mouse_cursor()
 {
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID //&& !defined ALLEGRO_RASPBERRYPI
-	custom_mouse_cursor = NULL;
-#elif defined ALLEGRO_RASPBERRYPI_XXX
-	al_hide_mouse_cursor(display);
-	cursor_hidden = true;
-#endif
+	if (have_mouse) {
+		al_hide_mouse_cursor(display);
+		cursor_hidden = true;
+	}
 }
 
 bool is_cursor_hidden()
 {
-#ifdef ALLEGRO_RASPBERRYPI_XXX
 	return cursor_hidden;
-#else
-	return custom_mouse_cursor == NULL;
-#endif
 }

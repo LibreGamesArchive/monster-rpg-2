@@ -200,9 +200,13 @@ void native_error(const char *msg, const char *msg2)
 		ss += 5;
 	}
 
+	prepareForScreenGrab1();
+	m_clear(black);
+	prepareForScreenGrab2();
+
 	if (inited) {
 		if (prompt(msg, "Continue anyway?", 1, 0, ss ? ss : "", NULL, true)) {
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
 			m_clear(al_map_rgb_f(0, 0, 0));
 			drawBufferToScreen();
 			m_flip_display();
@@ -211,13 +215,6 @@ void native_error(const char *msg, const char *msg2)
 		else {
 			exit(1);
 		}
-	}
-
-	MBITMAP *tmp = custom_mouse_cursor;
-	ScreenDescriptor *sd = config.getWantedGraphicsMode();
-	if (sd->fullscreen) {
-		custom_mouse_cursor = NULL;
-		al_show_mouse_cursor(display);
 	}
 
 #if !defined(__linux__)
@@ -229,12 +226,6 @@ void native_error(const char *msg, const char *msg2)
 #else
 	int button = al_show_native_message_box(display, crap, ss ? ss : ":(", buf, NULL, ALLEGRO_MESSAGEBOX_YES_NO);
 #endif
-	if (sd->fullscreen) {
-		al_hide_mouse_cursor(display);
-		custom_mouse_cursor = tmp;
-	}
-
-	custom_mouse_cursor = tmp;
 
 	if (button == 1) return;
 	else {

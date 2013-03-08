@@ -101,9 +101,11 @@ function remove_rider()
 end
 
 function end_sub_scene()
+	prepareForScreenGrab1()
 	drawArea()
 	drawBufferToScreen()
 	local result = prompt("Skip", "this mini game?", 0, 0)
+	prepareForScreenGrab2()
 	if (result == true) then
 		bonusPoints()
 		setObjectHidden(0, false)
@@ -111,9 +113,11 @@ function end_sub_scene()
 		change_areas("fort_start", 36, 47, DIRECTION_SOUTH)
 	else
 		dpad_off()
+		prepareForScreenGrab1()
 		drawArea()
 		dpad_on()
 		drawBufferToScreen()
+		prepareForScreenGrab2()
 		fadeOut(0, 0, 0)
 		setObjectHidden(0, false)
 		setObjectSolid(0, true)
@@ -288,6 +292,7 @@ function activate(activator, activated)
 		elseif (getMilestone(MS_BEAT_GIRL_DRAGON)) then
 			doDialogue("Gunnar: No, I've never built a space craft... but I know someone who has.\nGunnar: Odd thing is he's a simple farmer!\n", true);
 		end
+		prepareForScreenGrab1()
 		drawArea()
 		drawBufferToScreen()
 		local choice = triple_prompt(
@@ -295,6 +300,7 @@ function activate(activator, activated)
 			"the trench again, or take the",
 			"longer, safer route?",
 			"Trench", "Safe", "Cancel", 2)
+		prepareForScreenGrab2()
 		setObjectDirection(gunnar.id, _d)
 		if (choice == 0) then
 			if (doShooter(false)) then

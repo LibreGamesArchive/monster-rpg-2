@@ -144,7 +144,6 @@ public:
 extern Area *area;
 extern Area* oldArea;
 extern std::string prevAreaName;
-extern bool save_ss_on_flip;
 
 
 void startArea(std::string name);

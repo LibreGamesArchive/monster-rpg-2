@@ -217,13 +217,10 @@ extern bool d3d_halted;
 extern bool should_reset;
 extern bool is_fs_toggle;
 
-extern MBITMAP *custom_mouse_cursor;
-extern MBITMAP *custom_mouse_patch;
-extern int mouse_patch_x, mouse_patch_y;
-extern int custom_cursor_w, custom_cursor_h;
 void show_mouse_cursor();
 void hide_mouse_cursor();
 bool is_cursor_hidden();
+extern int custom_cursor_w, custom_cursor_h;
 
 extern int width_before_fullscreen;
 extern int height_before_fullscreen;

@@ -759,7 +759,7 @@ static int CDoDialogue(lua_State *stack)
 
 		if (draw_counter) {
 			draw_counter = 0;
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
 			MCOLOR color = black;
 			m_clear(color);
 			/* draw the Area */
@@ -870,7 +870,7 @@ static int CDoShakeDialogue(lua_State *stack)
 		
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
 			MCOLOR color = black;
 			m_clear(color);
 			/* draw the Area */
@@ -903,17 +903,12 @@ bool anotherDoDialogue(const char *text, bool clearbuf, bool top, bool draw_area
 	doDialogue(textS, top, 4, 10, false);
 
 	if (area && draw_area) {
-		al_set_target_backbuffer(display);
+		prepareForScreenGrab1();
 		area->draw();
-		hide_mouse_cursor();
-		drawBufferToScreen();
-		show_mouse_cursor();
+		drawBufferToScreen(false);
+		prepareForScreenGrab2();
 	}
 
-	int dx, dy, dw, dh;
-	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmpbuffer);
-	
 	clear_input_events();
 
 	for (;;) {
@@ -945,11 +940,12 @@ bool anotherDoDialogue(const char *text, bool clearbuf, bool top, bool draw_area
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
 			if (clearbuf) {
 				m_clear(black);
 			}
 			else {
+				int dx, dy, dw, dh;
 				get_screen_offset_size(&dx, &dy, &dw, &dh);
 				m_draw_bitmap_identity_view(tmpbuffer, dx, dy, 0);
 			}
@@ -1275,9 +1271,10 @@ static int CStartBattle(lua_State *stack)
 	
 	debug_message("battle->start called\n");
 
-	al_set_target_backbuffer(display);
+	prepareForScreenGrab1();
 	area->draw();
-	drawBufferToScreen();
+	drawBufferToScreen(false);
+	prepareForScreenGrab2();
 	battleTransition();
 
 	clear_input_events();
@@ -1303,7 +1300,6 @@ static int CInBattle(lua_State *stack)
 
 static int CDrawArea(lua_State *stack)
 {
-	al_set_target_backbuffer(display);
 	area->draw();
 	return 0;
 }
@@ -1335,10 +1331,7 @@ static int CClearBuffer(lua_State *stack)
 	int g = (int)lua_tonumber(stack, 2);
 	int b = (int)lua_tonumber(stack, 3);
 	
-	ALLEGRO_BITMAP *oldTarget = al_get_target_bitmap();
-	al_set_target_backbuffer(display);
 	m_clear(m_map_rgb(r, g, b));
-	al_set_target_bitmap(oldTarget);
 
 	return 0;
 }
@@ -1347,7 +1340,7 @@ static int CClearBuffer(lua_State *stack)
 
 static int CSetBufferTarget(lua_State *stack)
 {
-	al_set_target_backbuffer(display);
+	set_target_backbuffer();
 
 	return 0;
 }
@@ -1654,7 +1647,9 @@ static int CDoShop(lua_State *stack)
 		costs[i] = cost;
 	}
 
+	prepareForScreenGrab1();
 	main_draw();
+	prepareForScreenGrab2();
 	fadeOut(black);
 
 	static char buf[100];
@@ -2663,7 +2658,8 @@ static int CRest(lua_State *stack)
 
 static int CDrawBufferToScreen(lua_State *stack)
 {
-	drawBufferToScreen();
+	bool draw_controls = lua_toboolean(stack, 1);
+	drawBufferToScreen(draw_controls);
 	return 0;
 }
 
@@ -2719,9 +2715,10 @@ static int CGiveGold(lua_State *stack)
 static int CGameOver(lua_State *stack)
 {
 	if (saveFilename) saveTime(saveFilename);
-	al_set_target_backbuffer(display);
+	prepareForScreenGrab1();
 	al_clear_to_color(al_map_rgb_f(1, 0, 0));
-	drawBufferToScreen();
+	drawBufferToScreen(false);
+	prepareForScreenGrab2();
 	fadeOut(m_map_rgb(255, 0, 0));
 	break_main_loop = true;
 	return 0;
@@ -2901,18 +2898,20 @@ static int CDoItemTutorial(lua_State *stack)
 	tguiAddWidget(itemSelector);
 	tguiSetFocus(partySelectorTop);
 
-	al_set_target_backbuffer(display);
+	set_target_backbuffer();
 	tguiDraw();
 	drawBufferToScreen();
 	m_flip_display();
 
+	prepareForScreenGrab1();
+	prepareForScreenGrab2();
+
 	#define DLG(t, c) \
-		al_set_target_backbuffer(display); \
+		prepareForScreenGrab1(); \
 		m_clear(black); \
 		tguiDraw(); \
-		hide_mouse_cursor(); \
-		drawBufferToScreen(); \
-		show_mouse_cursor(); \
+		drawBufferToScreen(false); \
+		prepareForScreenGrab2(); \
 		anotherDoDialogue(t, c, !c, false)
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
@@ -3081,7 +3080,7 @@ static int CDoItemTutorial(lua_State *stack)
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
 			m_clear(black);
 			tguiDraw();
 			
@@ -3148,14 +3147,13 @@ static int CDoMapTutorial(lua_State *stack)
 	tguiAddWidget(mapWidget);
 	tguiSetFocus(mapWidget);
 
-	al_set_target_backbuffer(display);
 	tguiDraw();
 	drawBufferToScreen();
 	m_flip_display();
+	prepareForScreenGrab1();
 	tguiDraw();
-	hide_mouse_cursor();
-	drawBufferToScreen();
-	show_mouse_cursor();
+	drawBufferToScreen(false);
+	prepareForScreenGrab2();
 	
 	#define DLG(t, c, draw_area) anotherDoDialogue(t, c, !c, draw_area)
 
@@ -3207,7 +3205,7 @@ static int CDoMapTutorial(lua_State *stack)
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
 			MCOLOR color = black;
 			m_clear(color);
 			// Draw the GUI
@@ -3233,7 +3231,7 @@ done:
 
 	dpad_on();
 
-	al_set_target_backbuffer(display);
+	set_target_backbuffer();
 	m_clear(black);
 	area->draw();
 	drawBufferToScreen();
@@ -3365,7 +3363,7 @@ static int CDoKingKingAlbertLook(lua_State *stack)
 		
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
 			m_draw_bitmap(bmp, 0, 0, 0);
 			tguiDraw();
 			drawBufferToScreen();
@@ -3478,7 +3476,7 @@ static int CDoKeepLook(lua_State *stack)
 		if (draw_counter > 0) {
 			draw_counter = 0;
 
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
 			m_draw_bitmap(bmp, 0, 0, 0);
 			if (show_shine) {
 				m_save_blender();
@@ -3547,10 +3545,12 @@ static int CShowBeachBattleInfo(lua_State *stack)
 
 	if (who < 4) {
 		show_player_info_on_flip = true;
+		prepareForScreenGrab1();
 		player_to_show_on_flip = strategy_players[who];
 	}
 	else if (who >= 8) {
 		show_player_info_on_flip = true;
+		prepareForScreenGrab1();
 		player_to_show_on_flip = strategy_players[who-4];
 	}
 	else if (who >= 4 && who < 8) {
@@ -3558,6 +3558,7 @@ static int CShowBeachBattleInfo(lua_State *stack)
 		Player *p = get_beach_battle_player(n);
 		if (p) {
 			show_player_info_on_flip = true;
+			prepareForScreenGrab1();
 			player_to_show_on_flip = p;
 		}
 	}
@@ -3814,6 +3815,18 @@ static int CGetAreaName(lua_State *stack)
 	else {
 		return 0;
 	}
+}
+
+static int CPrepareForScreenGrab1(lua_State *stack)
+{
+	prepareForScreenGrab1();
+	return 0;
+}
+
+static int CPrepareForScreenGrab2(lua_State *stack)
+{
+	prepareForScreenGrab2();
+	return 0;
 }
 
 /*
@@ -4414,5 +4427,11 @@ void registerCFunctions(lua_State* luaState)
 	
 	lua_pushcfunction(luaState, CGetAreaName);
 	lua_setglobal(luaState, "getAreaName");
+
+	lua_pushcfunction(luaState, CPrepareForScreenGrab1);
+	lua_setglobal(luaState, "prepareForScreenGrab1");
+
+	lua_pushcfunction(luaState, CPrepareForScreenGrab2);
+	lua_setglobal(luaState, "prepareForScreenGrab2");
 }
 

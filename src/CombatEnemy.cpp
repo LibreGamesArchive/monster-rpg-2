@@ -414,12 +414,12 @@ static void dragon_blackAnd0(AnimationSet *a, AnimationSet *a2)
 		else
 			c = white;
 
-		al_set_target_backbuffer(display);
+		set_target_backbuffer();
 
 		m_clear(c);
 		a->draw(dragon_x, dragon_y-a->getHeight(), dragon_flags);
 
-		drawBufferToScreen();
+		drawBufferToScreen(false);
 		m_flip_display();
 		
 		m_rest(0.001);
@@ -428,7 +428,7 @@ static void dragon_blackAnd0(AnimationSet *a, AnimationSet *a2)
 
 static void dragon_normal(AnimationSet *a, AnimationSet *a2, int frame)
 {
-	al_set_target_backbuffer(display);
+	set_target_backbuffer();
 	char animName[100];
 	sprintf(animName, "transform%d", frame);
 	a->setSubAnimation(std::string(animName));
@@ -439,7 +439,7 @@ static void dragon_normal(AnimationSet *a, AnimationSet *a2, int frame)
 	m_clear(black);
 	a->draw(dragon_x, dragon_y-a->getHeight(), dragon_flags);
 	
-	drawBufferToScreen();
+	drawBufferToScreen(false);
 	m_flip_display();
 
 	long start = tguiCurrentTimeMillis();
@@ -465,12 +465,12 @@ static void dragon_flash(AnimationSet *a, AnimationSet *a2, int frame, float sta
 		float alpha = 1.0 - ((1.0/6.0) * ((float)elapsed/125));
 		alpha += startAlpha;
 
-		al_set_target_backbuffer(display);
+		set_target_backbuffer();
 
 		m_clear(m_map_rgba(255*alpha, 255*alpha, 255*alpha, 255));
 		a->draw(dragon_x, dragon_y-a->getHeight(), dragon_flags);
 		
-		drawBufferToScreen();
+		drawBufferToScreen(false);
 		m_flip_display();
 		
 		m_rest(0.001);
@@ -499,7 +499,7 @@ static void dragon_fade(AnimationSet *a, AnimationSet *a2, int fullframe, int fa
 		if (elapsed > 125) elapsed = 125;
 		float alpha = 1.0 - (elapsed/125.0);
 
-		al_set_target_backbuffer(display);
+		set_target_backbuffer();
 		m_clear(black);
 
 		m_save_blender();
@@ -509,7 +509,7 @@ static void dragon_fade(AnimationSet *a, AnimationSet *a2, int fullframe, int fa
 
 		m_draw_bitmap(full, dragon_x, dragon_y-a->getHeight(), dragon_flags);
 		
-		drawBufferToScreen();
+		drawBufferToScreen(false);
 		m_flip_display();
 		
 		m_rest(0.001);
@@ -531,7 +531,7 @@ static void dragon_players(AnimationSet *a, AnimationSet *a2)
 
 	long start = tguiCurrentTimeMillis();
 	while (tguiCurrentTimeMillis() < (unsigned long)start+2000) {
-		al_set_target_backbuffer(display);
+		set_target_backbuffer();
 		m_clear(black);
 		a->draw(dragon_x, dragon_y-a->getHeight(), dragon_flags);
 		int elapsed = (int)(tguiCurrentTimeMillis()-start);
@@ -544,7 +544,7 @@ static void dragon_players(AnimationSet *a, AnimationSet *a2)
 			}
 		}
 
-		drawBufferToScreen();
+		drawBufferToScreen(false);
 		m_flip_display();
 		
 		m_rest(0.001);

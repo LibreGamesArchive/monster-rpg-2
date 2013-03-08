@@ -745,8 +745,10 @@ function change_areas(area, x, y, dir, trans_in)
 	ChangedAreasJustNow = true -- stop battle from happening immediately after entering a room (even a room with no battles defined)
 	stopObject(0)
 	if (not (area == "moon_landing" or (area == "fort_start" and not (string.sub(getAreaName(), 0, 4) == "fort")))) then
+		prepareForScreenGrab1()
 		drawArea()
 		drawBufferToScreen()
+		prepareForScreenGrab2()
 		transitionOut()
 	end
 	if (area == "portal" and not getMilestone(MS_DONE_CREDITS)) then
@@ -756,10 +758,11 @@ function change_areas(area, x, y, dir, trans_in)
 	setObjectPosition(0, x, y)
 	startArea(area)
 	setObjectDirection(0, dir)
-	clearBuffer()
 	updateArea()
 	-- hack for Archery game
 	if (getBreakMainLoop()) then return end
+	prepareForScreenGrab1()
+	clearBuffer()
 	drawArea()
 	drawBufferToScreen()
 	if (trans_in == nil) then
@@ -767,6 +770,7 @@ function change_areas(area, x, y, dir, trans_in)
 		transitionIn()
 		dpad_on()
 	end
+	prepareForScreenGrab2()
 end
 
 -- get direction to face player

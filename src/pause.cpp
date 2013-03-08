@@ -209,7 +209,7 @@ static void showMusicToggle(void)
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
 			m_clear(black);
 			tguiDraw();
 			drawBufferToScreen();
@@ -362,7 +362,7 @@ static void showIpodControls(void)
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
 			m_clear(black);
 			tguiDraw();
 			drawBufferToScreen();
@@ -413,14 +413,10 @@ void showSaveStateInfo(const char *basename)
 	int x = (BW-w)/2;
 	int y = (BH-h)/2;
 
-	int dx, dy, dw, dh;
-	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmpbuffer);
-
 #ifdef ALLEGRO_ANDROID
 	al_set_standard_file_interface();
 #endif
-	MBITMAP *ss = m_load_bitmap(getUserResource("%s.bmp", basename));
+	ALLEGRO_BITMAP *ss = al_load_bitmap(getUserResource("%s.bmp", basename));
 #ifdef ALLEGRO_ANDROID
 	al_android_set_apk_file_interface();
 #endif
@@ -482,8 +478,9 @@ void showSaveStateInfo(const char *basename)
 		if (draw_counter > 0) {
 			draw_counter = 0;
 		
-			al_set_target_backbuffer(display);
-
+			set_target_backbuffer();
+	
+			int dx, dy, dw, dh;
 			get_screen_offset_size(&dx, &dy, &dw, &dh);
 			m_draw_bitmap_identity_view(tmpbuffer, dx, dy, 0);
 
@@ -492,8 +489,8 @@ void showSaveStateInfo(const char *basename)
 			// Draw info
 
 			// draw ss and date
-			if (ss && ss->bitmap) {
-				m_draw_bitmap(ss, BW/2-BW/4, BH/3-BH/4, 0);
+			if (ss) {
+				al_draw_bitmap(ss, BW/2-BW/4, BH/3-BH/4, 0);
 			}
 			else {
 				mTextout(game_font, _t("<No Screenshot>"), BW/2, BH/3,
@@ -530,7 +527,7 @@ done:
 	dpad_on();
 
 	if (ss) {
-		m_destroy_bitmap(ss);
+		al_destroy_bitmap(ss);
 	}
 	
 	tguiDeleteWidget(w1);
@@ -554,10 +551,6 @@ void showItemInfo(int index, bool preserve_buffer)
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
 
-	if (preserve_buffer) {
-		m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmpbuffer);
-	}
-	
 	int w = 200;
 	int h = 120;
 	int x = (BW-w)/2;
@@ -723,7 +716,7 @@ void showItemInfo(int index, bool preserve_buffer)
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
 			if (preserve_buffer) {
 				m_clear(m_map_rgb(0, 0, 0));
 				get_screen_offset_size(&dx, &dy, &dw, &dh);
@@ -883,11 +876,6 @@ static bool choose_save_slot(int num, bool exists, void *data)
 					delete_file(getUserResource("%d.png", num));
 				}
 
-				al_set_target_backbuffer(display);
-				tguiDraw();
-				hide_mouse_cursor();
-				drawBufferToScreen();
-				show_mouse_cursor();
 				notify("Your game", "has been saved...", "");
 			}
 		}
@@ -1174,9 +1162,10 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	tguiAddWidget(mainGold);
 	tguiSetFocus(mainItem);
 
-	al_set_target_backbuffer(display);
+	prepareForScreenGrab1();
 	tguiDraw();
-	drawBufferToScreen();
+	drawBufferToScreen(false);
+	prepareForScreenGrab2();
 	fadeIn(black);
 
 	PauseSection section = MAIN;
@@ -1236,8 +1225,9 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				itemSelector->setSelected(0);
 				itemSelector->setTop(0);
 				tguiAddWidget(itemSelector);
-				al_set_target_backbuffer(display);
+				prepareForScreenGrab1();
 				tguiDraw();
+				prepareForScreenGrab2();
 				maybeShowItemHelp();
 				tguiSetFocus(partySelectorTop);
 				section = ITEM;
@@ -1268,22 +1258,20 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 							}
 							int index = partySelectorTop->getSelected();
 							if (index >= MAX_PARTY) {
-								al_set_target_backbuffer(display);
+								prepareForScreenGrab1();
 								m_clear(black);
 								tguiDraw();
-								hide_mouse_cursor();
-								drawBufferToScreen();
-								show_mouse_cursor();
+								drawBufferToScreen(false);
+								prepareForScreenGrab2();
 								use(NULL, sel, true);
 							}
 							else if (party[index]) {
 								Combatant *c = party[index]->makeCombatant(index);
-								al_set_target_backbuffer(display);
+								prepareForScreenGrab1();
 								m_clear(black);
 								tguiDraw();
-								hide_mouse_cursor();
-								drawBufferToScreen();
-								show_mouse_cursor();
+								drawBufferToScreen(false);
+								prepareForScreenGrab2();
 								use(c, sel, true);
 								memcpy(&party[index]->getInfo(), &c->getInfo(), sizeof(CombatantInfo));
 								delete c;
@@ -1357,12 +1345,11 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 									}
 								}
 								else {
-									al_set_target_backbuffer(display);
+									prepareForScreenGrab1();
 									m_clear(black);
 									tguiDraw();
-									hide_mouse_cursor();
-									drawBufferToScreen();
-									show_mouse_cursor();
+									drawBufferToScreen(false);
+									prepareForScreenGrab2();
 									notify("You have no", "room in your", "inventory.");
 								}
 							}
@@ -1427,12 +1414,11 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 									}
 								}
 								else {
-									al_set_target_backbuffer(display);
+									prepareForScreenGrab1();
 									m_clear(black);
 									tguiDraw();
-									hide_mouse_cursor();
-									drawBufferToScreen();
-									show_mouse_cursor();
+									drawBufferToScreen(false);
+									prepareForScreenGrab2();
 									notify("You have no", "room in your", "inventory.");
 								}
 							}
@@ -1459,7 +1445,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				spellSelector->setSelected(0);
 				spellSelector->setTop(0);
 				tguiAddWidget(spellSelector);
-				al_set_target_backbuffer(display);
+				set_target_backbuffer();
 				tguiDraw();
 				// draw
 				tguiSetFocus(partySelectorTop2);
@@ -1554,12 +1540,11 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				goto done;
 			}
 			else if (widget == mainQuit) {
-				al_set_target_backbuffer(display);
+				prepareForScreenGrab1();
 				m_clear(black);
 				tguiDraw();
-				hide_mouse_cursor();
-				drawBufferToScreen();
-				show_mouse_cursor();
+				drawBufferToScreen(false);
+				prepareForScreenGrab2();
 				if (prompt("Really quit?", "", 0, 0)) {
 					ret = false;
 					goto done;
@@ -1704,12 +1689,11 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 
 			else if (widget == fairy)
 			{
-				al_set_target_backbuffer(display);
+				prepareForScreenGrab1();
 				m_clear(black);
 				tguiDraw();
-				hide_mouse_cursor();
-				drawBufferToScreen();
-				show_mouse_cursor();
+				drawBufferToScreen(false);
+				prepareForScreenGrab2();
 				if (need_gold) {
 					gold = 250;
 					anotherDoDialogue(_t("Fairy: I see you're low on gold. I can help a bit...\n"), false, true, false);
@@ -1769,13 +1753,16 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 			if (section == MAIN && ie.button2 == DOWN) {
 				use_input_event();
 				break_for_fade_after_draw = true;
+				prepareForScreenGrab1();
 				break;
 			}
 		}
 
 		if (break_for_fade_after_draw || draw_counter > 0) {
 			draw_counter = 0;
-			al_set_target_backbuffer(display);
+			if (!break_for_fade_after_draw) {
+				set_target_backbuffer();
+			}
 			m_clear(black);
 			tguiDraw();
 			drawBufferToScreen();
@@ -1790,6 +1777,7 @@ done:
 	
 	if (break_for_fade_after_draw) {
 		break_for_fade_after_draw = false;
+		prepareForScreenGrab2();
 		fadeOut(black);
 	}
 
@@ -1895,9 +1883,10 @@ void doMap(std::string startPlace, std::string prefix)
 	tguiAddWidget(mapWidget);
 	tguiSetFocus(mapWidget);
 
-	al_set_target_backbuffer(display);
+	prepareForScreenGrab1();
 	tguiDraw();
-	drawBufferToScreen();
+	drawBufferToScreen(false);
+	prepareForScreenGrab2();
 	fadeIn(black);
 
 	clear_input_events();
@@ -1930,7 +1919,7 @@ void doMap(std::string startPlace, std::string prefix)
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
 			m_clear(black);
 			// Draw the GUI
 			tguiDraw();
@@ -1965,7 +1954,9 @@ void doShop(std::string name, const char *imageName, int nItems,
 	int *indexes, int *costs)
 {
 #define DRAW \
-	al_set_target_backbuffer(display); \
+	if (!break_for_fade_after_draw) { \
+		set_target_backbuffer(); \
+	} \
 	m_clear(black); \
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white); \
 	mDrawFrame(3, 3, BW-6, 40-6); \
@@ -2022,7 +2013,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 	tguiAddWidget(isel);
 	tguiSetFocus(shop);
 
-	al_set_target_backbuffer(display);
+	prepareForScreenGrab1();
 	mDrawFrame(3, 3, BW-6, 40-6);
 	m_draw_bitmap(face, 5, 20-16, 0);
 	char s[100];
@@ -2034,7 +2025,8 @@ void doShop(std::string name, const char *imageName, int nItems,
 	mTextout_simple(_t(s), BW-5-m_text_length(game_font, _t(s)),
 		22, grey);
 	tguiDraw();
-	drawBufferToScreen();
+	drawBufferToScreen(false);
+	prepareForScreenGrab2();
 	fadeIn(black);
 	
 	bool break_for_fade_after_draw = false;
@@ -2067,6 +2059,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 				int sel = shop->getSelected();
 				if (sel < 0) {
 					break_for_fade_after_draw = true;
+					prepareForScreenGrab1();
 					break;
 				}
 				shop->getDropLocation(&drop_x, &drop_y);
@@ -2080,13 +2073,17 @@ void doShop(std::string name, const char *imageName, int nItems,
 						sprintf(s2, "1: %d", costs[sel]);
 						sprintf(s3, "5: %d", 5*costs[sel]);
 						int choice;
+						prepareForScreenGrab1();
 						DRAW
+						prepareForScreenGrab1();
 						if ((choice = triple_prompt(s1, s2, s3, "Buy 1", "Buy 5", "Cancel", 2)) != 2) {
 							int q = choice == 0 ? 1 : 5;
 							int total_cost = costs[sel]*q;
 							if (total_cost > gold) {
 								playPreloadedSample("error.ogg");
+								prepareForScreenGrab1();
 								DRAW
+								prepareForScreenGrab2();
 								notify("You don't have", "enough gold to buy that!", "");
 							}
 							else {
@@ -2104,7 +2101,9 @@ void doShop(std::string name, const char *imageName, int nItems,
 									}
 								}
 								if (slot < 0) {
+									prepareForScreenGrab1();
 									DRAW
+									prepareForScreenGrab2();
 									notify("You don't have room", "for that!", "");
 								}
 								else {
@@ -2112,7 +2111,9 @@ void doShop(std::string name, const char *imageName, int nItems,
 									inventory[slot].index = shop_inventory[sel].index;
 									inventory[slot].quantity += q;
 									loadPlayDestroy("chest.ogg");
+									prepareForScreenGrab1();
 									DRAW
+									prepareForScreenGrab2();
 									notify("", "Thank you!", "");
 								}
 							}
@@ -2124,6 +2125,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 				int sel = isel->getSelected();
 				if (sel < 0) {
 					break_for_fade_after_draw = true;
+					prepareForScreenGrab1();
 					break;
 				}
 				isel->getDropLocation(&drop_x, &drop_y);
@@ -2137,7 +2139,9 @@ void doShop(std::string name, const char *imageName, int nItems,
 						char s2[100];
 						if (inventory[sel].quantity > 1) {
 							sprintf(s1, _t("Sell all %d?"), inventory[sel].quantity);
+							prepareForScreenGrab1();
 							DRAW
+							prepareForScreenGrab2();
 							if (prompt(s1, "", 0, 0)) {
 								sell_quantity = inventory[sel].quantity;
 							}
@@ -2145,7 +2149,9 @@ void doShop(std::string name, const char *imageName, int nItems,
 						int total_cost = getResaleValue(inventory[sel].index) * sell_quantity;
 						sprintf(s1, _t("Really sell %d"), sell_quantity);
 						sprintf(s2, _t("for %d gold?"), total_cost);
+						prepareForScreenGrab1();
 						DRAW
+						prepareForScreenGrab2();
 						if (prompt(s1, s2, 0, 0)) {
 							inventory[sel].quantity -= sell_quantity;
 							if (inventory[sel].quantity <= 0) {
@@ -2153,7 +2159,9 @@ void doShop(std::string name, const char *imageName, int nItems,
 								inventory[sel].index = -1;
 							}
 							loadPlayDestroy("chest.ogg");
+							prepareForScreenGrab1();
 							DRAW
+							prepareForScreenGrab2();
 							notify("", "Thank you!", "");
 							gold += total_cost;
 						}
@@ -2161,7 +2169,9 @@ void doShop(std::string name, const char *imageName, int nItems,
 					else {
 						playPreloadedSample("error.ogg");
 						if (items[inventory[sel].index].type == ITEM_TYPE_SPECIAL) {
+							prepareForScreenGrab1();
 							DRAW
+							prepareForScreenGrab2();
 							notify("You may", "need that...", "");
 						}
 					}
@@ -2186,6 +2196,7 @@ done:
 	
 	if (break_for_fade_after_draw) {
 		break_for_fade_after_draw = false;
+		prepareForScreenGrab2();
 		fadeOut(black);
 	}
 
@@ -2219,9 +2230,10 @@ void into_the_sun(void)
 
 	AnimationSet *explosion = new AnimationSet(getResource("media/explosion.png"));
 
-	al_set_target_backbuffer(display);
+	prepareForScreenGrab1();
 	m_draw_bitmap(bg, 0, 0, 0);
-	drawBufferToScreen();
+	drawBufferToScreen(false);
+	prepareForScreenGrab2();
 	fadeIn(black);
 
 	int count = 0;
@@ -2235,7 +2247,7 @@ void into_the_sun(void)
 	clear_input_events();
 
 	while (true) {
-		al_set_target_backbuffer(display);
+		set_target_backbuffer();
 
 		al_wait_cond(wait_cond, wait_mutex);
 		int tmp_counter = logic_counter;
@@ -2290,20 +2302,21 @@ void into_the_sun(void)
 				al_restore_state(&st);
 			}
 
-			drawBufferToScreen();
+			drawBufferToScreen(false);
 			m_flip_display();
 		}
 	}
 done:
-	al_set_target_backbuffer(display);
+	set_target_backbuffer();
 	m_draw_bitmap(bg, 0, 0, 0);
-	drawBufferToScreen();
+	drawBufferToScreen(false);
 	m_flip_display();
 	m_rest(5);
 	
-	al_set_target_backbuffer(display);
+	prepareForScreenGrab1();
 	m_draw_bitmap(bg, 0, 0, 0);
-	drawBufferToScreen();
+	drawBufferToScreen(false);
+	prepareForScreenGrab2();
 	fadeOut(black);
 
 	m_destroy_bitmap(bg);
@@ -2508,6 +2521,8 @@ void credits(void)
 
 	clear_input_events();
 
+	bool break_for_fade_after_draw = false;
+
 	for (;;) {
 		if (is_close_pressed()) {
 			do_close();
@@ -2520,7 +2535,11 @@ void credits(void)
 		int step = (int)(now - start);
 		start = now;
 		offset += 0.01f * step;
-		al_set_target_backbuffer(display);
+
+		if (!break_for_fade_after_draw) {
+			set_target_backbuffer();
+		}
+
 		m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, white);
 		m_draw_bitmap(bg, 0, 0, 0);
 		m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, white);
@@ -2769,15 +2788,28 @@ void credits(void)
 				}
 			}
 		}
-		drawBufferToScreen();
-		if (section >= sections) {
+
+		drawBufferToScreen(false);
+
+		if (break_for_fade_after_draw) {
 			break;
+		}
+
+		if (section >= sections) {
+			section--;
+			break_for_fade_after_draw = true;
+			prepareForScreenGrab1();
+			continue;
 		}
 		m_flip_display();
 		m_rest(0.001);
 	}
 
-	fadeOut(black);
+	if (break_for_fade_after_draw) {
+		break_for_fade_after_draw = false;
+		prepareForScreenGrab2();
+		fadeOut(black);
+	}
 
 done:
 	
@@ -2930,23 +2962,36 @@ done:
 				}
 			}
 			
-			al_set_target_backbuffer(display);
+			if (!break_for_fade_after_draw) {
+				set_target_backbuffer();
+			}
 
 			al_clear_to_color(al_map_rgb_f(0, 0, 0));
 
 			m_draw_prim(verts, 0, font, 0, vcount, ALLEGRO_PRIM_TRIANGLE_LIST);
 
-			drawBufferToScreen();
+			drawBufferToScreen(false);
 			
-			if (scroll_amount > scroll_size)
+			if (break_for_fade_after_draw) {
 				break;
+			}
+			
+			if (scroll_amount > scroll_size) {
+				break_for_fade_after_draw = true;
+				prepareForScreenGrab1();
+				continue;
+			}
 
 			m_flip_display();
 			m_rest(0.001);
 		}
 	}
 	
-	fadeOut(black);
+	if (break_for_fade_after_draw) {
+		break_for_fade_after_draw = false;
+		prepareForScreenGrab2();
+		fadeOut(black);
+	}
 	
 done2:
 	delete[] verts;
@@ -2972,6 +3017,9 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 	}
 	catch (ReadError e) {
 		(void)e;
+		prepareForScreenGrab1();
+		m_clear(black);
+		prepareForScreenGrab2();
 		notify("Corrupt save state found.", "Delete it and", "Try again...");
 		callback(-1, false, data);
 		return;
@@ -3032,11 +3080,10 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 
 			for (int i = 0; i < 10; i++) {
 				if (widget == buttons[i]) {
-					al_set_target_backbuffer(display);
+					prepareForScreenGrab1();
 					tguiDraw();
-					hide_mouse_cursor();
-					drawBufferToScreen();
-					show_mouse_cursor();
+					drawBufferToScreen(false);
+					prepareForScreenGrab2();
 					if (callback(i, (infos[i].exp == 0 && infos[i].gold == 0 && infos[i].time == 0) ? false : true, data)) {
 						goto done;
 					}
@@ -3057,7 +3104,7 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 
 		if (draw_counter > 0) {
 			draw_counter = 0;
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
 		
 			tguiDraw();
 			
@@ -3190,6 +3237,10 @@ static bool choose_copy_state(int n, bool exists, void *data)
 {
 	(void)data;
 
+	prepareForScreenGrab1();
+	m_clear(black);
+	prepareForScreenGrab2();
+
 	if (n >= 0) {
 		if (exists) {
 #ifdef ALLEGRO_ANDROID
@@ -3311,10 +3362,11 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 	tguiLowerWidget(save_tab);
 	tguiLowerWidget(frame);
 			
-	al_set_target_backbuffer(display);
+	prepareForScreenGrab1();
 	m_clear(black);
 	tguiDraw();
-	drawBufferToScreen();
+	drawBufferToScreen(false);
+	prepareForScreenGrab2();
 	fadeIn(black);
 
 	bool break_for_fade_after_draw = false;
@@ -3419,6 +3471,7 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 				if (break_main_loop) {
 					*num = -1;
 					break_for_fade_after_draw = true;
+					prepareForScreenGrab1();
 					break;
 				}
 				int sel = save_list->getSelected();
@@ -3436,12 +3489,14 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 						*existing = true;
 						*isAuto = false;
 						break_for_fade_after_draw = true;
+						prepareForScreenGrab1();
 						break;
 					}
 				}
 				else {
 					*num = -1;
 					break_for_fade_after_draw = true;
+					prepareForScreenGrab1();
 					break;
 				}
 			}
@@ -3449,6 +3504,7 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 				if (break_main_loop) {
 					*num = -1;
 					break_for_fade_after_draw = true;
+					prepareForScreenGrab1();
 					break;
 				}
 				int sel = auto_list->getSelected();
@@ -3466,12 +3522,14 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 						*existing = true;
 						*isAuto = true;
 						break_for_fade_after_draw = true;
+						prepareForScreenGrab1();
 						break;
 					}
 				}
 				else {
 					*num = -1;
 					break_for_fade_after_draw = true;
+					prepareForScreenGrab1();
 					break;
 				}
 			}
@@ -3479,6 +3537,7 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 				*num = 0;
 				*existing = false;
 				break_for_fade_after_draw = true;
+				prepareForScreenGrab1();
 				break;
 			}
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -3495,6 +3554,7 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 					*existing = i.existing;
 					*isAuto = i.isAuto;
 					break_for_fade_after_draw = true;
+					prepareForScreenGrab1();
 					break;
 				}
 			}
@@ -3506,6 +3566,7 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 				iphone_clear_shaken();
 				*num = -1;
 				break_for_fade_after_draw = true;
+				prepareForScreenGrab1();
 				break;
 			}
 		}
@@ -3514,7 +3575,10 @@ void choose_savestate(int *num, bool *existing, bool *isAuto)
 		if (break_for_fade_after_draw || draw_counter > 0) {
 			draw_counter = 0;
 
-			al_set_target_backbuffer(display);
+			if (!break_for_fade_after_draw) {
+				set_target_backbuffer();
+			}
+
 			m_clear(black);
 			tguiDraw();
 
@@ -3532,6 +3596,7 @@ done:
 	
 	if (break_for_fade_after_draw) {
 		break_for_fade_after_draw = false;
+		prepareForScreenGrab2();
 		fadeOut(black);
 	}
 
@@ -3573,7 +3638,7 @@ done:
 bool config_menu(bool start_on_fullscreen)
 {
 	dpad_off();
-	
+
 	pause_f_to_toggle_fullscreen = true;
 
 	tguiPush();
@@ -3768,9 +3833,10 @@ bool config_menu(bool start_on_fullscreen)
 	}
 #endif
 
-	al_set_target_backbuffer(display);
+	prepareForScreenGrab1();
 	tguiDraw();
-	drawBufferToScreen();
+	drawBufferToScreen(false);
+	prepareForScreenGrab2();
 	fadeIn(black);
 
 	bool break_for_fade_after_draw = false;
@@ -3803,9 +3869,10 @@ bool config_menu(bool start_on_fullscreen)
 			if (w && w == reset_game_center) {
 				char buf[200];
 				sprintf(buf, "%s?", _t("Reset achievements"));
-				al_set_target_backbuffer(display);
+				prepareForScreenGrab1();
 				tguiDraw();
-				drawBufferToScreen();
+				drawBufferToScreen(false);
+				prepareForScreenGrab2();
 				if (prompt(buf, "", false, false)) {
 					resetAchievements();
 				}
@@ -3815,22 +3882,25 @@ bool config_menu(bool start_on_fullscreen)
 			if (w && w == controls) {
 				int type = MInputGetter::TYPE_KB;
 #if defined ALLEGRO_IPHONE
-				al_set_target_backbuffer(display);
+				prepareForScreenGrab2();
 				tguiDraw();
-				drawBufferToScreen();
+				drawBufferToScreen(false);
+				prepareForScreenGrab2();
 				notify("These controls are for", "iCade only!", "");
 #elif defined ALLEGRO_ANDROID
-				al_set_target_backbuffer(display);
+				prepareForScreenGrab2();
 				tguiDraw();
-				drawBufferToScreen();
+				drawBufferToScreen(false);
+				prepareForScreenGrab2();
 				notify("For Bluetooth keyboards use the", "RawInputIME input method", "");
 #endif
 				while (true) {
 					type = config_input(type);
 					if (type == 0) {
-						al_set_target_backbuffer(display);
+						prepareForScreenGrab1();
 						tguiDraw();
-						drawBufferToScreen();
+						drawBufferToScreen(false);
+						prepareForScreenGrab2();
 						fadeIn(black);
 						waitForRelease(5);
 						clear_input_events();
@@ -3846,6 +3916,7 @@ bool config_menu(bool start_on_fullscreen)
 				iphone_clear_shaken();
 				getInput()->waitForReleaseOr(5, 1000);
 				break_for_fade_after_draw = true;
+				prepareForScreenGrab1();
 				break;
 			}
 		}
@@ -3905,9 +3976,10 @@ bool config_menu(bool start_on_fullscreen)
 				}
 				if (use_dpad) {
 					if (config.getTellUserToUseDpad()) {
-						al_set_target_backbuffer(display);
+						prepareForScreenGrab1();
 						tguiDraw();
-						drawBufferToScreen();
+						drawBufferToScreen(false);
+						prepareForScreenGrab2();
 						notify("Use the on-screen directional", "pad and buttons to navigate.", "");
 						config.setTellUserToUseDpad(false);
 					}
@@ -3982,7 +4054,7 @@ bool config_menu(bool start_on_fullscreen)
 #if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE && !defined ALLEGRO_RASPBERRYPI
 		bool fs = fullscreen_toggle->getSelected();
 		if (fs != (bool)start_fullscreen) {
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
 			toggle_fullscreen();
 			start_fullscreen = fs;
 		}
@@ -3990,7 +4062,9 @@ bool config_menu(bool start_on_fullscreen)
 
 		if (break_for_fade_after_draw || draw_counter > 0) {
 			draw_counter = 0;
-			al_set_target_backbuffer(display);
+			if (!break_for_fade_after_draw) {
+				set_target_backbuffer();
+			}
 			tguiDraw();
 			drawBufferToScreen();
 			if (break_for_fade_after_draw) {
@@ -4002,6 +4076,7 @@ bool config_menu(bool start_on_fullscreen)
 done:
 	if (break_for_fade_after_draw) {
 		break_for_fade_after_draw = false;
+		prepareForScreenGrab2();
 		fadeOut(black);
 	}
 
@@ -4046,6 +4121,41 @@ done:
 	return false;
 }
 
+static void hqm_draw(MBITMAP *bg)
+{
+	m_draw_bitmap(bg, 0, 0, 0);
+
+	tguiDraw();
+
+	// top descriptions
+	const char *text = "Free HQ soundtrack download";
+	const char *trans = _t(text);
+	mTextout_simple(trans, (BW-m_text_length(game_font, trans))/2, 15, m_map_rgb(255, 255, 0));
+
+	// draw status
+	float percent;
+	int status = hqm_get_status(&percent);
+	const char *status_txt = hqm_status_string(status);
+	char buf[100];
+	char s[100];
+	char s2[100];
+	strcpy(s, hqm_is_downloading() ? _t("Downloading") : _t("Stopped"));
+	strcpy(s2, _t(status_txt));
+	sprintf(buf, _t("Status: %s. %s. (%d%%)"), s2, s, (int)(percent * 100));
+	mTextout(
+		game_font,
+		buf,
+		BW/2,
+		125,
+		black,
+		m_map_rgb(65, 65, 65),
+		WGT_TEXT_SQUARE_BORDER,
+		true
+	);
+	
+	drawBufferToScreen();
+}
+
 static void hqm_menu(void)
 {
 	dpad_off();
@@ -4067,7 +4177,10 @@ static void hqm_menu(void)
 
 	tguiSetFocus(buttons[3]);
 
-	bool first_frame = true;
+	prepareForScreenGrab1();
+	hqm_draw(bg);
+	prepareForScreenGrab2();
+	fadeIn(black);
 
 	bool break_for_fade_after_draw = false;
 
@@ -4102,6 +4215,10 @@ static void hqm_menu(void)
 						hqm_go();
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 					else {
+						prepareForScreenGrab1();
+						hqm_draw(bg);
+						prepareForScreenGrab2();
+
 						notify(
 							"Can only download",
 							"over wifi.",
@@ -4117,6 +4234,9 @@ static void hqm_menu(void)
 				}
 			}
 			else if (widget == buttons[2]) {
+				prepareForScreenGrab1();
+				hqm_draw(bg);
+				prepareForScreenGrab2();
 				if (prompt("Really delete flacs directory", "and all contents?", 0, 0)) {
 					std::string old_music_name = musicName;
 					std::string old_ambience_name = ambienceName;
@@ -4140,6 +4260,7 @@ static void hqm_menu(void)
 			}
 			else if (widget == buttons[3]) {
 				break_for_fade_after_draw = true;
+				prepareForScreenGrab1();
 				break;
 			}
 
@@ -4148,6 +4269,7 @@ static void hqm_menu(void)
 				use_input_event();
 				iphone_clear_shaken();
 				break_for_fade_after_draw = true;
+				prepareForScreenGrab1();
 				break;
 			}
 		}
@@ -4155,52 +4277,16 @@ static void hqm_menu(void)
 		if (break_for_fade_after_draw || draw_counter > 0) {
 			draw_counter = 0;
 
-			al_set_target_backbuffer(display);
-		
-			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
+			if (!break_for_fade_after_draw) {
+				set_target_backbuffer();
+			}
 
-			m_draw_bitmap(bg, 0, 0, 0);
-
-			tguiDraw();
-
-			// top descriptions
-			const char *text = "Free HQ soundtrack download";
-			const char *trans = _t(text);
-			mTextout_simple(trans, (BW-m_text_length(game_font, trans))/2, 15, m_map_rgb(255, 255, 0));
-
-			// draw status
-			float percent;
-			int status = hqm_get_status(&percent);
-			const char *status_txt = hqm_status_string(status);
-			char buf[100];
-			char s[100];
-			char s2[100];
-			strcpy(s, hqm_is_downloading() ? _t("Downloading") : _t("Stopped"));
-			strcpy(s2, _t(status_txt));
-			sprintf(buf, _t("Status: %s. %s. (%d%%)"), s2, s, (int)(percent * 100));
-			mTextout(
-				game_font,
-				buf,
-				BW/2,
-				125,
-				black,
-				m_map_rgb(65, 65, 65),
-				WGT_TEXT_SQUARE_BORDER,
-				true
-			);
-			
-			drawBufferToScreen();
+			hqm_draw(bg);
 	
-			if (first_frame) {
-				fadeIn(black);
-				first_frame = false;
+			if (break_for_fade_after_draw) {
+				break;
 			}
-			else {
-				if (break_for_fade_after_draw) {
-					break;
-				}
-				m_flip_display();
-			}
+			m_flip_display();
 		}
 	}
 
@@ -4208,6 +4294,7 @@ done:
 
 	if (break_for_fade_after_draw) {
 		break_for_fade_after_draw = false;
+		prepareForScreenGrab2();
 		fadeOut(black);
 	}
 
@@ -4227,10 +4314,8 @@ done:
 	clear_input_events();
 }
 
-static void title_draw(MBITMAP *bg, bool first_frame)
+static void title_draw(MBITMAP *bg)
 {
-	al_set_target_backbuffer(display);
-
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
 	m_draw_bitmap(bg, 0, 0, 0);
@@ -4242,10 +4327,6 @@ static void title_draw(MBITMAP *bg, bool first_frame)
 		2, white, black, WGT_TEXT_SQUARE_BORDER, false);
 
 	drawBufferToScreen();
-
-	if (first_frame) {
-		fadeIn(black);
-	}
 }
 
 int title_menu(void)
@@ -4314,8 +4395,11 @@ int title_menu(void)
 
 	debug_message("doing title loop\n");
 
-	bool first_frame = true;
-	
+	prepareForScreenGrab1();
+	title_draw(bg);
+	prepareForScreenGrab2();
+	fadeIn(black);
+
 	bool break_for_fade_after_draw = false;
 
 	clear_input_events();
@@ -4342,14 +4426,16 @@ int title_menu(void)
 				if (widget == buttons[i]) {
 					selected = i;
 					break_for_fade_after_draw = true;
+					prepareForScreenGrab1();
 					break;
 				}
 			}
 
 			if (widget == hqm_button) {
-				title_draw(bg, false);
+				prepareForScreenGrab1();
+				title_draw(bg);
+				prepareForScreenGrab2();
 				fadeOut(black);
-				first_frame = true;
 				tguiPush();
 				on_title_screen = false;
 				hqm_menu();
@@ -4361,11 +4447,16 @@ int title_menu(void)
 				len += m_text_height(game_font) + 2;
 				hqm_button->setX(BW-len-2);
 				config_button->setX(BW-len-2);
+				prepareForScreenGrab1();
+				title_draw(bg);
+				prepareForScreenGrab2();
+				fadeIn(black);
 			}
 			if (widget == config_button) {
-				title_draw(bg, false);
+				prepareForScreenGrab1();
+				title_draw(bg);
+				prepareForScreenGrab2();
 				fadeOut(black);
-				first_frame = true;
 				tguiPush();
 				on_title_screen = false;
 				bool result = config_menu();
@@ -4380,8 +4471,13 @@ int title_menu(void)
 				if (result == true) {
 					selected = 0xDEAD;
 					break_for_fade_after_draw = true;
+					prepareForScreenGrab1();
 					break;
 				}
+				prepareForScreenGrab1();
+				title_draw(bg);
+				prepareForScreenGrab2();
+				fadeIn(black);
 			}
 			break_main_loop = false; // AGAIN (SEE ABOVE)
 
@@ -4412,12 +4508,11 @@ int title_menu(void)
 		if (break_for_fade_after_draw || draw_counter > 0) {
 			draw_counter = 0;
 
-			title_draw(bg, first_frame);
-
-			if (first_frame) {
-				first_frame = false;
-				continue;
+			if (!break_for_fade_after_draw) {
+				set_target_backbuffer();
 			}
+
+			title_draw(bg);
 
 			if (break_for_fade_after_draw) {
 				break;
@@ -4430,6 +4525,7 @@ done:
 
 	if (break_for_fade_after_draw) {
 		break_for_fade_after_draw = false;
+		prepareForScreenGrab2();
 		fadeOut(black);
 	}
 
@@ -4669,7 +4765,7 @@ void debug_start(DEBUG_DATA *d)
 			d->area = std::string(area_names[area_list->getSelected()]);
 			break;
 		}
-		al_set_target_backbuffer(display);
+		set_target_backbuffer();
 		m_clear(m_map_rgb(0, 0, 0));
 
 		tguiDraw();
@@ -4702,7 +4798,7 @@ void debug_start(DEBUG_DATA *d)
 		if (w == button) {
 			break;
 		}
-		al_set_target_backbuffer(display);
+		set_target_backbuffer();
 		m_clear(m_map_rgb(0, 0, 0));
 
 		tguiDraw();
@@ -4943,7 +5039,7 @@ void debug_start(DEBUG_DATA *d)
 		if (w == button) {
 			break;
 		}
-		al_set_target_backbuffer(display);
+		set_target_backbuffer();
 		m_clear(m_map_rgb(0, 0, 0));
 
 		tguiDraw();

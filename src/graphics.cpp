@@ -1,5 +1,7 @@
 #include "monster2.hpp"
 
+#include <allegro5/internal/aintern_bitmap.h>
+
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 #include "joypad.hpp"
 #endif
@@ -21,7 +23,7 @@ MBITMAP *black_button;
 MBITMAP *airplay_logo;
 double blueblock_times[7] = { -1.0, };
 
-void stopAllOmni(void)
+void stopAllOmni()
 {
 	for (int i = 0; i < MAX_PARTY; i++) {
 		omnipotentTexts[i].stop();
@@ -49,14 +51,14 @@ static void draw_the_controls(bool draw_controls, ALLEGRO_COLOR tint)
 {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 #if defined ALLEGRO_IPHONE
-	if ((airplay_connected || config.getDpadType() == DPAD_TOTAL_1 || config.getDpadType() == DPAD_TOTAL_2) || (use_dpad && dpad_buttons && draw_controls && global_draw_controls)) {
+	if (airplay_connected || (use_dpad && dpad_buttons && draw_controls && global_draw_controls)) {
 		if (controller_display) {
 			if (joypad_connected()) {
 				mTextout(game_font_second_display, "Joypad connected...", 2, 2, white, black, WGT_TEXT_NORMAL, false);
 			}
 			else {	
 #else
-	if ((config.getDpadType() == DPAD_TOTAL_1 || config.getDpadType() == DPAD_TOTAL_2) || (use_dpad && dpad_buttons && draw_controls && global_draw_controls)) {
+	if (use_dpad && dpad_buttons && draw_controls && global_draw_controls) {
 		if (false) {
 			if (false) {
 #endif
@@ -392,7 +394,7 @@ static void draw_the_controls(bool draw_controls, ALLEGRO_COLOR tint)
 
 static void drawOverlay(bool draw_controls, ALLEGRO_COLOR tint)
 {
-	if (transitioning) {
+	if (transitioning || preparingForScreenGrab) {
 		return;
 	}
 
@@ -439,16 +441,16 @@ static void drawOverlay(bool draw_controls, ALLEGRO_COLOR tint)
 	draw_the_controls(draw_controls, tint);
 
 	if (controller_display) {
-		al_set_target_backbuffer(display);
+		set_target_backbuffer();
 	}
 }
 
-static void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
+void drawBufferToScreen(bool draw_controls)
 {
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
 
-	al_set_target_backbuffer(display);
+	set_target_backbuffer();
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	bool on = ((unsigned)tguiCurrentTimeMillis() % 1000) < 500;
@@ -537,32 +539,11 @@ static void drawBufferToScreen(MBITMAP *buf, bool draw_controls)
 	if (fps_on && !transitioning) {
 		al_draw_textf(game_font, al_map_rgb_f(1, 1, 0), 1, 1, 0, "%d", fps);
 	}
-
-#if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE
-	if (custom_mouse_cursor && mouse_in_display && !transitioning && !prompt_for_close_on_next_flip && !show_item_info_on_flip >= 0) {
-		ALLEGRO_MOUSE_STATE state;
-		al_get_mouse_state(&state);
-		m_draw_scaled_backbuffer(state.x, state.y, custom_cursor_w, custom_cursor_h, 0, 0, custom_cursor_w, custom_cursor_h, custom_mouse_patch);
-		mouse_patch_x = state.x;
-		mouse_patch_y = state.y;
-		ALLEGRO_TRANSFORM backup, t;
-		al_copy_transform(&backup, al_get_current_transform());
-		al_identity_transform(&t);
-		al_use_transform(&t);
-		al_draw_bitmap(custom_mouse_cursor->bitmap, state.x, state.y, 0);
-		al_use_transform(&backup);
-	}
-#endif
 }
 
-void drawBufferToScreen(void)
+void drawBufferToScreen()
 {
-	drawBufferToScreen(NULL,/*buffer*/ true);
-}
-
-void drawBufferToScreen(bool draw_controls)
-{
-	drawBufferToScreen(/*buffer*/NULL, draw_controls);
+	drawBufferToScreen(true);
 }
 
 void draw_shadow(MBITMAP *bmp, int x, int y, bool hflip)
@@ -709,18 +690,6 @@ void m_draw_precise_line(MBITMAP *bitmap, float x1, float y1, float x2, float y2
 
 static void draw_mouse_patch()
 {
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID //&& !defined ALLEGRO_RASPBERRYPI
-	if (mouse_patch_x < 0) return;
-	if (is_cursor_hidden()) return;
-	al_set_target_backbuffer(display);
-	ALLEGRO_TRANSFORM backup, t;
-	al_copy_transform(&backup, al_get_current_transform());
-	al_identity_transform(&t);
-	al_use_transform(&t);
-	m_draw_bitmap(custom_mouse_patch, mouse_patch_x, mouse_patch_y, 0);
-	al_use_transform(&backup);
-	mouse_patch_x = -1;
-#endif
 }
 
 static void fade(int startAlpha, int endAlpha, int length, MCOLOR color)
@@ -742,7 +711,7 @@ static void fade(int startAlpha, int endAlpha, int length, MCOLOR color)
 	al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
 	MBITMAP *tmp = m_create_bitmap(dw, dh);
 	al_set_new_bitmap_flags(flags);
-	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmp);
+	m_draw_scaled_target(tmpbuffer, dx, dy, dw, dh, 0, 0, dw, dh, tmp);
 
 	ALLEGRO_TRANSFORM backup, t;
 	al_copy_transform(&backup, al_get_current_transform());
@@ -763,13 +732,13 @@ static void fade(int startAlpha, int endAlpha, int length, MCOLOR color)
 		g = (int)(color.g*a);
 		b = (int)(color.b*a);
 
-		al_set_target_backbuffer(display);
+		set_target_backbuffer();
 	
 		m_draw_bitmap(tmp, dx, dy, 0);
 
 		al_draw_filled_rectangle(dx, dy, dx+dw, dy+dh, al_map_rgba(r, g, b, a));
 		
-		drawBufferToScreen(/*tmp*/NULL, true);
+		drawBufferToScreen(false);
 		
 		m_flip_display();
 	}
@@ -780,7 +749,7 @@ static void fade(int startAlpha, int endAlpha, int length, MCOLOR color)
 	else {
 		m_draw_bitmap(tmp, dx, dy, 0);
 	}
-	drawBufferToScreen(/*tmp*/NULL, true);
+	drawBufferToScreen(false);
 	m_flip_display();
 
 	al_use_transform(&backup);
@@ -833,7 +802,7 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 	al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE);
 	MBITMAP *tmp = m_create_bitmap(disp_w, disp_h);
 	MBITMAP *bufdup = m_create_bitmap(disp_w, disp_h);
-	m_draw_scaled_backbuffer(0, 0, disp_w, disp_h, 0, 0, disp_w, disp_h, bufdup);
+	m_draw_scaled_target(tmpbuffer, 0, 0, disp_w, disp_h, 0, 0, disp_w, disp_h, bufdup);
 	al_set_new_bitmap_flags(flags);
 
 	ALLEGRO_TRANSFORM backup, t;
@@ -859,7 +828,7 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 				dpad_on();
 				m_destroy_bitmap(tmp);
 				m_destroy_bitmap(bufdup);
-				al_set_target_backbuffer(display);
+				set_target_backbuffer();
 				global_draw_red = true;
 				global_draw_controls = true;
 				transitioning = false;
@@ -885,7 +854,7 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 		m_set_target_bitmap(tmp);
 		al_draw_scaled_bitmap(bufdup->bitmap, dx, dy, dw, dh, 0, 0, dw/size, dh/size, 0);
 
-		al_set_target_backbuffer(display);
+		set_target_backbuffer();
 		m_clear(black);
 
 		al_set_clipping_rectangle(dx+(dw-rectw)/2, dy+(dh-recth)/2, rectw, recth);
@@ -894,7 +863,7 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 
 		al_set_clipping_rectangle(cx, cy, cw, ch);
 		
-		drawBufferToScreen(/*buffer*/NULL, true);
+		drawBufferToScreen(false);
 
 		if (done) {
 			break;
@@ -908,7 +877,7 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 	}
 
 	if (!focusing) {
-		al_set_target_backbuffer(display);
+		set_target_backbuffer();
 		m_clear(black);
 		m_flip_display();
 	}
@@ -916,7 +885,7 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 	m_destroy_bitmap(tmp);
 	m_destroy_bitmap(bufdup);
 
-	al_set_target_backbuffer(display);
+	set_target_backbuffer();
 	al_use_transform(&backup);
 
 	dpad_on();
@@ -944,7 +913,7 @@ void transitionOut(bool toggle_dpad)
 }
 
 
-void battleTransition(void)
+void battleTransition()
 {
 	transitioning = true;
 	
@@ -956,7 +925,7 @@ void battleTransition(void)
 	al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE);
 	MBITMAP *tmp = m_create_bitmap(dw, dh);
 	al_set_new_bitmap_flags(flags);
-	m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, tmp);
+	m_draw_scaled_target(tmpbuffer, dx, dy, dw, dh, 0, 0, dw, dh, tmp);
 
 	if (!use_programmable_pipeline) {
 		dpad_off();
@@ -971,10 +940,11 @@ void battleTransition(void)
 		al_set_new_bitmap_flags(flags);
 		al_set_new_bitmap_format(format);
 
-		al_set_target_backbuffer(display);
+		prepareForScreenGrab1();
 		battle->draw();
+		prepareForScreenGrab2();
 
-		m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, dw, dh, bufcopy2);
+		m_draw_scaled_target(tmpbuffer, dx, dy, dw, dh, 0, 0, dw, dh, bufcopy2);
 
 		float heights[dw];
 		int phases = rand() % 3 + 1;
@@ -1010,14 +980,14 @@ void battleTransition(void)
 		int step = 0;
 
 		ALLEGRO_TRANSFORM backup, t;
-		al_set_target_backbuffer(display);
+		set_target_backbuffer();
 		al_copy_transform(&backup, al_get_current_transform());
 		al_identity_transform(&t);
 		al_use_transform(&t);
 
 		while (elapsed < length) {
 			if (step) {
-				al_set_target_backbuffer(display);
+				set_target_backbuffer();
 
 				m_draw_bitmap(tmp, dx, dy, 0);
 
@@ -1031,7 +1001,7 @@ void battleTransition(void)
 				}
 				al_hold_bitmap_drawing(false);
 
-				drawBufferToScreen();
+				drawBufferToScreen(false);
 
 				m_flip_display();
 			}
@@ -1095,7 +1065,7 @@ void battleTransition(void)
 
 		ALLEGRO_STATE s;
 		al_store_state(&s, ALLEGRO_STATE_TARGET_BITMAP);
-		al_set_target_backbuffer(display);
+		set_target_backbuffer();
 		ALLEGRO_TRANSFORM backup, t;
 		al_copy_transform(&backup, al_get_current_transform());
 		al_identity_transform(&t);
@@ -1108,7 +1078,7 @@ void battleTransition(void)
 		m_draw_bitmap(xfade_buf, dx, dy, 0);
 		al_use_shader(default_shader);
 		al_restore_state(&s);
-		drawBufferToScreen(/*buffer*/NULL, true);
+		drawBufferToScreen(false);
 		m_flip_display();
 		al_use_transform(&backup);
 		now = tguiCurrentTimeMillis();

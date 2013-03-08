@@ -13,7 +13,6 @@ static bool compare_node_pointer(Node *n1, Node *n2)
 Area* area = 0;
 long roaming = 0;
 bool dpad_panning = false;
-bool save_ss_on_flip = false;
 
 const float ORB_RADIUS = 40.0f;
 
@@ -1183,6 +1182,8 @@ static void insertObject(Object *o, std::vector<Object *>& sorted)
 
 void Area::draw(int bw, int bh)
 {
+	m_clear(black);
+
 	num_quads = 0;
 
 	if (bg) {
@@ -1344,7 +1345,7 @@ void Area::draw(int bw, int bh)
 			m_draw_rectangle(x1, y2, x2, y2+BH, black, M_FILLED);
 			// draw circle
 			m_draw_bitmap(orb_bmp, x1, y1, 0);
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
 		}
 		else {
 			m_draw_rectangle(0, 0, BW, BH, black, M_FILLED);
@@ -1424,15 +1425,12 @@ void real_auto_save_game_to_memory(bool save_ss)
 	memory_saved = true;
 
 	if (save_ss) {
-		save_ss_on_flip = true;
-	}
-	else {
-		al_lock_mutex(ss_mutex);
-		ALLEGRO_BITMAP *old = al_get_target_bitmap();
-		m_set_target_bitmap(screenshot);
-		al_clear_to_color(blue);
-		al_set_target_bitmap(old);
-		al_unlock_mutex(ss_mutex);
+		if (area) {
+			ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
+			al_set_target_bitmap(screenshot->bitmap);
+			area->draw();
+			al_set_target_bitmap(old_target);
+		}
 	}
 }
 	
@@ -1780,8 +1778,10 @@ void Area::update(int step)
 	}
 
 	if (shouldDoMap) {
+		prepareForScreenGrab1();
 		draw(BW, BH);
-		drawBufferToScreen();
+		drawBufferToScreen(false);
+		prepareForScreenGrab2();
 		fadeOut(black);
 		if (mapPrefix == "<none>")
 			doMap(mapStartPlace);

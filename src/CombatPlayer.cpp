@@ -82,6 +82,7 @@ public:
 					formWidget->getHoldStart()+600UL < tguiCurrentTimeMillis()) {
 				playPreloadedSample("select.ogg");
 				show_player_info_on_flip = true;
+				prepareForScreenGrab1();
 				player_number_to_show_on_flip = i;
 				formWidget->reset();
 				return NULL;
@@ -786,10 +787,10 @@ ActionHandler *AttackHandler::act(int step, Battle *b)
 			loadPlayDestroy("ching.ogg");
 			win = false;
 		}
-		al_set_target_backbuffer(display);
+		set_target_backbuffer();
 		m_draw_bitmap(bmp, 0, 0, 0);
 		dpad_off();
-		drawBufferToScreen();
+		drawBufferToScreen(false);
 		m_flip_display();
 		m_rest(5);
 		dpad_on();

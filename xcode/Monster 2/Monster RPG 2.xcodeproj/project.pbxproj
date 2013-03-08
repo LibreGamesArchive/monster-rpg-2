@@ -409,7 +409,7 @@
 		963AF9031585AA80007E85D5 /* MoRPG2-lite-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "MoRPG2-lite-Info.plist"; path = "MoRPG2-lite/MoRPG2-lite-Info.plist"; sourceTree = "<group>"; };
 		96490EB9136368C500B2FBAF /* Mo. RPG 2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mo. RPG 2.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		964D7FC715CCF44600D6F9AF /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcurl.a; path = ../../../iphone_libs_r/libcurl.a; sourceTree = "<group>"; };
-		964FB85B16E6051600F4BBA4 /* Monster RPG 2 copy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Monster RPG 2 copy.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		964FB85B16E6051600F4BBA4 /* Monster RPG 2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Monster RPG 2.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		964FB85C16E6051600F4BBA4 /* Monster RPG 2 copy2-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Monster RPG 2 copy2-Info.plist"; path = "/Users/trent/code/monster-rpg-2/xcode/Monster 2/Monster RPG 2 copy2-Info.plist"; sourceTree = "<absolute>"; };
 		965070C116CE553900E6E9D4 /* Mo. RPG 2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Mo. RPG 2.entitlements"; sourceTree = "<group>"; };
 		96581D701585710D006BF72E /* tftp_get.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = tftp_get.c; path = ../../src/tftp_get.c; sourceTree = "<group>"; };
@@ -656,7 +656,7 @@
 			children = (
 				96490EB9136368C500B2FBAF /* Mo. RPG 2.app */,
 				96B4B09E143BB83100ACA64C /* Monster RPG 2.app */,
-				964FB85B16E6051600F4BBA4 /* Monster RPG 2 copy.app */,
+				964FB85B16E6051600F4BBA4 /* Monster RPG 2.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1011,7 +1011,7 @@
 			);
 			name = "Monster RPG 2 not MAS";
 			productName = "Monster RPG 2";
-			productReference = 964FB85B16E6051600F4BBA4 /* Monster RPG 2 copy.app */;
+			productReference = 964FB85B16E6051600F4BBA4 /* Monster RPG 2.app */;
 			productType = "com.apple.product-type.application";
 		};
 		96B4B09D143BB83100ACA64C /* Monster RPG 2 */ = {
@@ -1727,7 +1727,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Monster RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1772,7 +1772,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Monster RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1820,7 +1820,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Monster RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1865,7 +1865,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Monster RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";

@@ -217,7 +217,7 @@ void connect_second_display(void)
 	black_button = m_load_alpha_bitmap(getResource("media/blackbutton.png"));
 	airplay_logo = m_load_alpha_bitmap(getResource("media/m2_controller_logo.png"));
 	
-	al_set_target_backbuffer(display);
+	set_target_backbuffer();
 
 	config.setMusicVolume(mvol);
 	config.setSFXVolume(svol);
@@ -429,18 +429,29 @@ static void process_touch(int x, int y, int touch_id, int type)
 	else if (type == MOUSE_UP) {
 		if (curr_touches > 0) {
 			int idx = find_touch(touch_id);
-			for (; idx < MAX_TOUCHES-1; idx++) {
-				touches[idx].x = touches[idx+1].x;
-				touches[idx].y = touches[idx+1].y;
-				touches[idx].touch_id = touches[idx+1].touch_id;
+			if (idx >= 0) {
+				for (; idx < curr_touches; idx++) {
+					touches[idx].x = touches[idx+1].x;
+					touches[idx].y = touches[idx+1].y;
+					touches[idx].touch_id = touches[idx+1].touch_id;
+				}
 			}
 			curr_touches--;
+			for (int i = curr_touches; i < MAX_TOUCHES; i++) {
+				touches[i].x = -1;
+				touches[i].y = -1;
+				touches[i].touch_id = -1;
+			}
 		}
 	}
 	else { // MOVE
-		int idx = find_touch(touch_id);
-		touches[idx].x = x;
-		touches[idx].y = y;
+		if (curr_touches > 0) {
+			int idx = find_touch(touch_id);
+			if (idx >= 0) {
+				touches[idx].x = x;
+				touches[idx].y = y;
+			}
+		}
 	}
 	al_unlock_mutex(touch_mutex);
 }
@@ -575,11 +586,9 @@ top:
 		al_unlock_mutex(input_mutex);
 
 		if (event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY) {
-			al_hide_mouse_cursor(display);
 			mouse_in_display = true;
 		}
 		else if (event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY) {
-			al_show_mouse_cursor(display);
 			mouse_in_display = false;
 		}
 		else if (event.type == ALLEGRO_EVENT_KEY_CHAR || event.type == USER_KEY_CHAR) {
@@ -1123,7 +1132,7 @@ top:
 			ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
 			int dx, dy, dw, dh;
 			get_screen_offset_size(&dx, &dy, &dw, &dh);
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
 			ALLEGRO_TRANSFORM t;
 			al_identity_transform(&t);
 			al_scale_transform(&t, screenScaleX, screenScaleY);
@@ -1332,7 +1341,7 @@ top:
 				al_set_new_bitmap_flags(flags);
 			}
 
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
 			
 			config.setMusicVolume(mvol);
 			config.setSFXVolume(svol);
@@ -1395,9 +1404,7 @@ void do_close_exit_game()
 	m_flip_display();
 	m_clear(al_map_rgb(0, 0, 0));
 	m_flip_display();
-	if (!is_cursor_hidden()) {
-		hide_mouse_cursor();
-	}
+	hide_mouse_cursor(); // for Pi
 #ifdef ALLEGRO_WINDOWS
 	throw QuitError();
 #else
@@ -1441,6 +1448,7 @@ void do_close(bool quit)
 		else {
 			close_pressed = false;
 			prompt_for_close_on_next_flip = true;
+			prepareForScreenGrab1();
 		}
 	}
 	was_switched_out = false;
@@ -1455,10 +1463,8 @@ static bool playerCanLevel(std::string name)
 	return true;
 }
 
-void main_draw(bool draw_cursor)
+void main_draw()
 {
-	al_set_target_backbuffer(display);
-	
 	/* draw the Area */
 	if (battle) {
 		battle->draw();
@@ -1485,14 +1491,7 @@ void main_draw(bool draw_cursor)
 	if (!manChooser || battle)
 		tguiDraw();
 
-	MBITMAP *tmp = custom_mouse_cursor;
-	if (!draw_cursor) {
-		custom_mouse_cursor = NULL;
-	}
 	drawBufferToScreen();
-	if (!draw_cursor) {
-		custom_mouse_cursor = tmp;
-	}
 }
 
 static void run()
@@ -1556,7 +1555,9 @@ static void run()
 				do_pause_game = false;
 				bool ret = pause(true, false);
 				if (!ret) {
+					prepareForScreenGrab1();
 					main_draw();
+					prepareForScreenGrab2();
 					fadeOut(black);
 					return;
 				}
@@ -1619,14 +1620,14 @@ static void run()
 					}
 
 					if (!battle) {
+						prepareForScreenGrab1();
 						main_draw();
+						prepareForScreenGrab2();
 						fadeOut(m_map_rgb(255, 0, 0));
 					}
-					al_set_target_backbuffer(display);
+					set_target_backbuffer();
 					m_clear(m_map_rgb(255, 0, 0));
-					hide_mouse_cursor();
-					drawBufferToScreen();
-					show_mouse_cursor();
+					drawBufferToScreen(false);
 
 					if (battle) {
 						delete battle;
@@ -1652,7 +1653,7 @@ static void run()
 				// dont want tapping away a dialog to make
 				// you move once it's closed
 				// HERE
-				tguiMakeFresh();
+				//tguiMakeFresh();
 			}
 			// update battle
 			if (battle) {
@@ -1807,17 +1808,20 @@ static void run()
 							int posx, posy;
 							party[heroSpot]->getObject()->getPosition(&posx, &posy);
 							bool can_save = true;
+							prepareForScreenGrab1();
 							main_draw();
+							prepareForScreenGrab2();
 							fadeOut(black);
 							bool ret = pause(can_save);
 							if (!ret) {
 								return;
 							}
 							
-							al_set_target_backbuffer(display);
+							prepareForScreenGrab1();
 							m_clear(black);
 							area->draw();
-							drawBufferToScreen();
+							drawBufferToScreen(false);
+							prepareForScreenGrab2();
 							fadeIn(black);
 
 							if (party[heroSpot]) {
@@ -1845,6 +1849,7 @@ static void run()
 		if (draw_counter > 0 && !dont_draw_now) {
 			draw_counter = 0;
 
+			set_target_backbuffer();
 			main_draw();
 
 			m_flip_display();
@@ -1854,7 +1859,9 @@ static void run()
 
 		if (!battle && party[heroSpot] && party[heroSpot]->getName() == "Eny" && party[heroSpot]->getObject()->getPoisoned() && !gameInfo.milestones[MS_FIRST_POISON]) {
 			gameInfo.milestones[MS_FIRST_POISON] = true;
-			main_draw(false);
+			prepareForScreenGrab1();
+			main_draw();
+			prepareForScreenGrab2();
 			anotherDoDialogue("Oh, no! Someone is poisoned. They'll lose health every turn until they're healed.\n", false, true);
 		}
 
@@ -1959,12 +1966,6 @@ int main(int argc, char *argv[])
 	hqm_set_download_path(getUserResource("flacs"));
 #endif
 
-#ifdef ALLEGRO_ANDROID
-	if (config.getAutoconnectToZeemote()) {
-		autoconnect_zeemote();
-	}
-#endif
-
 #ifdef ALLEGRO_IPHONE
 	initiOSKeyboard();
 	al_register_event_source(input_event_queue, &user_event_source);
@@ -1977,7 +1978,7 @@ int main(int argc, char *argv[])
 	float wanted = dw * 0.75f;
 	float scale = wanted / svg_w;
 
-	ALLEGRO_BITMAP *nooskewl = load_svg(getResource("media/nooskewl.svg"), scale);
+	MBITMAP *nooskewl = new_mbitmap(load_svg(getResource("media/nooskewl.svg"), scale));
 	
 #ifndef ALLEGRO_ANDROID
 	if ((n = check_arg(argc, argv, "-stick")) != -1) {
@@ -1996,59 +1997,50 @@ int main(int argc, char *argv[])
 	bool fps_save = fps_on;
 	fps_on = false;
 	
-	ALLEGRO_TRANSFORM backup, t;
-	al_copy_transform(&backup, al_get_current_transform());
-	al_identity_transform(&t);
-	al_use_transform(&t);
-
-	al_set_target_backbuffer(display);
+	prepareForScreenGrab1();
 	m_clear(black);
-	al_draw_bitmap(
+	m_draw_bitmap_identity_view(
 		nooskewl,
-		dx+dw/2-al_get_bitmap_width(nooskewl)/2,
-		dy+dh/2-al_get_bitmap_height(nooskewl)/2,
+		dx+dw/2-m_get_bitmap_width(nooskewl)/2,
+		dy+dh/2-m_get_bitmap_height(nooskewl)/2,
 		0
 	);
-	drawBufferToScreen();
-
+	drawBufferToScreen(false);
+	prepareForScreenGrab2();
 	bool cancelled = transitionIn(true, false);
 
 	if (!cancelled) {
-
-
-		al_set_target_backbuffer(display);
 		m_clear(black);
-		al_use_transform(&t);
-		al_draw_bitmap(
+		m_draw_bitmap_identity_view(
 			nooskewl,
-			dx+dw/2-al_get_bitmap_width(nooskewl)/2,
-			dy+dh/2-al_get_bitmap_height(nooskewl)/2,
+			dx+dw/2-m_get_bitmap_width(nooskewl)/2,
+			dy+dh/2-m_get_bitmap_height(nooskewl)/2,
 			0
 		);
 		transitioning = true; // hide controls on touchscreen & mouse?
-		drawBufferToScreen();
+		drawBufferToScreen(false);
 		transitioning = false;
 		m_flip_display();
 					
-		//loadPlayDestroy("nooskewl.ogg");
 		m_rest(1.5);
+		prepareForScreenGrab1();
 		m_clear(black);
-		al_draw_bitmap(
+		m_draw_bitmap_identity_view(
 			nooskewl,
-			dx+dw/2-al_get_bitmap_width(nooskewl)/2,
-			dy+dh/2-al_get_bitmap_height(nooskewl)/2,
+			dx+dw/2-m_get_bitmap_width(nooskewl)/2,
+			dy+dh/2-m_get_bitmap_height(nooskewl)/2,
 			0
 		);
-		drawBufferToScreen();
+		drawBufferToScreen(false);
+		prepareForScreenGrab2();
 		transitionOut(false);
 	}
 	else {
 		m_rest(1);
 	}
-	al_destroy_bitmap(nooskewl);
+	m_destroy_bitmap(nooskewl);
 
-	al_set_target_backbuffer(display);
-	al_use_transform(&backup);
+	set_target_backbuffer();
 	
 	fps_on = fps_save;
 
@@ -2126,7 +2118,7 @@ int main(int argc, char *argv[])
 		choice = title_menu();
 		
 		m_push_target_bitmap();
-		al_set_target_backbuffer(display);
+		set_target_backbuffer();
 		m_clear(m_map_rgb(0, 0, 0));
 		m_pop_target_bitmap();
 
@@ -2149,9 +2141,10 @@ int main(int argc, char *argv[])
 						was_in_map = false;
 					}
 					else {
-						al_set_target_backbuffer(display);
+						prepareForScreenGrab1();
 						area->draw();
-						drawBufferToScreen();
+						drawBufferToScreen(false);
+						prepareForScreenGrab2();
 						transitionIn();
 					}
 				}
@@ -2159,6 +2152,9 @@ int main(int argc, char *argv[])
 			}
 			catch (ReadError e) {
 				(void)e;
+				prepareForScreenGrab1();
+				m_clear(black);
+				prepareForScreenGrab2();
 				notify("No auto-save", "yet recorded...", "");
 				continue;
 			}
@@ -2170,9 +2166,9 @@ int main(int argc, char *argv[])
 
 			choose_savestate(&num, &exists, &isAuto);
 
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
 			m_clear(black);
-			drawBufferToScreen();
+			drawBufferToScreen(false);
 			m_flip_display();
 
 			if (num < 0) {
@@ -2189,9 +2185,10 @@ int main(int argc, char *argv[])
 							was_in_map = false;
 						}
 						else {
-							al_set_target_backbuffer(display);
+							prepareForScreenGrab1();
 							area->draw();
-							drawBufferToScreen();
+							drawBufferToScreen(false);
+							prepareForScreenGrab2();
 							transitionIn();
 						}
 					}
@@ -2200,6 +2197,9 @@ int main(int argc, char *argv[])
 				}
 				catch (ReadError e) {
 					(void)e;
+					prepareForScreenGrab1();
+					m_clear(black);
+					prepareForScreenGrab2();
 					notify("Error loading...", "", "");
 					continue;
 				}

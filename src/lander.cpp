@@ -334,7 +334,9 @@ top:
 
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
-			al_set_target_backbuffer(display);
+			if (!break_for_fade_after_draw) {
+				set_target_backbuffer();
+			}
 			
 			m_draw_bitmap(sky_bmp, 0, 0, 0);
 			m_draw_bitmap(land_bmp, 0, 0, 0);
@@ -378,16 +380,14 @@ top:
 
 			drawBufferToScreen();
 
-			if (!dead && green > 3) {
-				break_for_fade_after_draw = true;
-			}
-			else if (explode_count > 3000) {
-				break_for_fade_after_draw = true;
+			if (break_for_fade_after_draw) {
+				break;
 			}
 
-			if (break_for_fade_after_draw) {
-				drawBufferToScreen();
-				break;
+			if ((!dead && green > 3) ||  (explode_count > 3000)) {
+				break_for_fade_after_draw = true;
+				prepareForScreenGrab1();
+				continue;
 			}
 
 			m_flip_display();
@@ -404,6 +404,7 @@ top:
 
 	if (break_for_fade_after_draw) {
 		break_for_fade_after_draw = false;
+		prepareForScreenGrab2();
 		fadeOut(black);
 	}
 
@@ -426,8 +427,9 @@ top:
 	m_destroy_bitmap(lander_mem);
 	delete explosion;
 
-	al_set_target_backbuffer(display);
+	prepareForScreenGrab1();
 	m_clear(black);
+	prepareForScreenGrab2();
 	m_rest(5);
 
 	playMusic("");
@@ -440,7 +442,8 @@ top:
 	playMusic("underwater_final.ogg");
 
 	if (dead) {
-		if (prompt("G A M E O V E R", "Try Again?", 1, 1))
+		bool ret = prompt("G A M E O V E R", "Try Again?", 1, 1);
+		if (ret)
 			goto top;
 	}
 	else {

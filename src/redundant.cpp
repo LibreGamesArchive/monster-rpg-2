@@ -473,14 +473,13 @@ void m_flip_display(void)
 {
 	bool skip_flip = false;
 
+	int dx, dy, dw, dh;
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
+
 	if (prompt_for_close_on_next_flip) {
-		bool hide = is_cursor_hidden();
-		show_mouse_cursor();
 		prompt_for_close_on_next_flip = false;
+		prepareForScreenGrab2();
 		int r = triple_prompt("", "Really quit game or return to menu?", "", "Menu", "Quit", "Cancel", 2, true);
-		if (hide) {
-			hide_mouse_cursor();
-		}
 		if (r == 0) {
 			break_main_loop = true;
 		}
@@ -492,11 +491,13 @@ void m_flip_display(void)
 	else if (show_item_info_on_flip >= 0) {
 		int tmp = show_item_info_on_flip;
 		show_item_info_on_flip = -1;
+		prepareForScreenGrab2();
 		showItemInfo(tmp, true);
 		skip_flip = true;
 	}
 	else if (show_player_info_on_flip) {
 		show_player_info_on_flip = false;
+		prepareForScreenGrab2();
 		if (player_to_show_on_flip) {
 			showPlayerInfo_ptr(player_to_show_on_flip);
 			player_to_show_on_flip = NULL;
@@ -505,14 +506,6 @@ void m_flip_display(void)
 			showPlayerInfo_number(player_number_to_show_on_flip);
 		}
 		skip_flip = true;
-	}
-	else if (save_ss_on_flip) {
-		save_ss_on_flip = false;
-		int dx, dy, dw, dh;
-		get_screen_offset_size(&dx, &dy, &dw, &dh);
-		al_lock_mutex(ss_mutex);
-		m_draw_scaled_backbuffer(dx, dy, dw, dh, 0, 0, BW/2, BH/2, screenshot);
-		al_unlock_mutex(ss_mutex);
 	}
 
 	if (!skip_flip) {
@@ -532,7 +525,7 @@ void m_flip_display(void)
 	if (controller_display)
 	{
 		ALLEGRO_BITMAP *target = al_get_target_bitmap();
-		al_set_target_backbuffer(controller_display);
+		set_target_backbuffer();
 		al_flip_display();
 		al_set_target_bitmap(target);
 	}
@@ -609,7 +602,7 @@ void m_set_target_bitmap(MBITMAP *bmp)
 
 void m_set_clip(int x1, int y1, int x2, int y2)
 {
-	if (al_get_target_bitmap() == al_get_backbuffer(display)) {
+	if (al_get_target_bitmap() == al_get_backbuffer(display) || al_get_target_bitmap() == tmpbuffer->bitmap) {
 		int dx, dy, dw, dh;
 		get_screen_offset_size(&dx, &dy, &dw, &dh);
 		al_set_clipping_rectangle(dx+x1*screenScaleX, dy+y1*screenScaleY, (x2-x1)*screenScaleX, (y2-y1)*screenScaleY);
@@ -1172,3 +1165,44 @@ void m_draw_bitmap_identity_view(MBITMAP *bmp, int x, int y, int flags)
 	al_use_transform(&backup);
 }
 
+void m_draw_scaled_target(MBITMAP *src, int sx, int sy, int sw, int sh,
+	int dx, int dy, int dw, int dh, MBITMAP *dst)
+{
+	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
+	al_set_target_bitmap(dst->bitmap);
+	al_draw_scaled_bitmap(src->bitmap, sx, sy, sw, sh, dx, dy, dw, dh, 0);
+	al_set_target_bitmap(old_target);
+}
+
+static ALLEGRO_TRANSFORM prepareForScreenGrabBackup;
+static ALLEGRO_BITMAP *prepareForScreenGrabBackupBitmap;
+bool preparingForScreenGrab = false;
+
+void prepareForScreenGrab1()
+{
+	prepareForScreenGrabBackupBitmap = al_get_target_bitmap();
+	int dx, dy, dw, dh;
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
+	m_set_target_bitmap(tmpbuffer);
+	ALLEGRO_TRANSFORM t;
+	al_copy_transform(&prepareForScreenGrabBackup, al_get_current_transform());
+	al_identity_transform(&t);
+	al_scale_transform(&t, screenScaleX, screenScaleY);
+	al_translate_transform(&t, dx, dy);
+	al_use_transform(&t);
+	preparingForScreenGrab = true;
+}
+
+void prepareForScreenGrab2()
+{
+	al_use_transform(&prepareForScreenGrabBackup);
+	al_set_target_bitmap(prepareForScreenGrabBackupBitmap);
+	preparingForScreenGrab = false;
+}
+
+void set_target_backbuffer()
+{
+	if (!prompt_for_close_on_next_flip && show_item_info_on_flip < 0 && !show_player_info_on_flip) {
+		al_set_target_backbuffer(display);
+	}
+}

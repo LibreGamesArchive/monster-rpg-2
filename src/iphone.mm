@@ -66,14 +66,14 @@ void showIpod(void)
 	global_draw_red = false;
 
 	MBITMAP *bg = m_load_bitmap(getResource("media/options_bg.png"));
-	al_set_target_backbuffer(display);
+	set_target_backbuffer();
 	m_clear(m_map_rgb(0, 0, 0));
 
 	mTextout_simple("Please wait...",
 		BW/2-m_text_length(game_font, "Please wait...")/2,
 		BH/2-m_text_height(game_font)/2, m_map_rgb(255, 255, 255));
 	
-	drawBufferToScreen();
+	drawBufferToScreen(false);
 	m_flip_display();
 
 	std::vector<std::string> all_names;
@@ -392,7 +392,7 @@ void showIpod(void)
 		if (draw_counter > 0) {
 			draw_counter = 0;
 
-			al_set_target_backbuffer(display);
+			set_target_backbuffer();
 
 			al_draw_tinted_bitmap(bg->bitmap, al_map_rgba(64, 64, 64, 255), 0, 0, 0);
 

@@ -197,11 +197,13 @@ void do_milestone(int num, bool visual)
 
 volatile bool modalViewShowing = false;
 
+extern bool show_item_info_on_flip; // FIXME
+
 void showAchievements(void)
 {
-	al_set_target_backbuffer(display);
+	set_target_backbuffer();
 	m_clear(black);
-	drawBufferToScreen();
+	drawBufferToScreen(false);
 
 #ifdef ALLEGRO_IPHONE
 	MyGameCenterVC *uv = [[MyGameCenterVC alloc] initWithNibName:nil bundle:nil];
@@ -222,7 +224,7 @@ void showAchievements(void)
 	bool was_fullscreen = sd->fullscreen;
 	if (sd->fullscreen) {
 		toggle_fullscreen();
-		drawBufferToScreen();
+		m_clear(blue);
 		m_flip_display();
 	}
 
