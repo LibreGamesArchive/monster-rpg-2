@@ -353,7 +353,6 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 	if (multisample) {
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined A5_D3D && !defined ALLEGRO_RASPBERRYPI
 		al_set_target_bitmap(out);
-		al_use_shader(default_shader);
 
 		glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fb);
 		glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, al_get_opengl_fbo(out));

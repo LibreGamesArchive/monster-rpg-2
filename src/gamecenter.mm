@@ -203,7 +203,7 @@ void showAchievements(void)
 {
 	set_target_backbuffer();
 	m_clear(black);
-	drawBufferToScreen(false);
+	m_flip_display();
 
 #ifdef ALLEGRO_IPHONE
 	MyGameCenterVC *uv = [[MyGameCenterVC alloc] initWithNibName:nil bundle:nil];
@@ -224,7 +224,8 @@ void showAchievements(void)
 	bool was_fullscreen = sd->fullscreen;
 	if (sd->fullscreen) {
 		toggle_fullscreen();
-		m_clear(blue);
+		set_target_backbuffer();
+		m_clear(black);
 		m_flip_display();
 	}
 

@@ -27,5 +27,6 @@ extern MBITMAP *black_button;
 extern MBITMAP *airplay_logo;
 extern double blueblock_times[7];
 extern bool transitioning;
+extern MBITMAP *battle_buf;
 
 #endif

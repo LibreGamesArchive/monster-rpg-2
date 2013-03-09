@@ -602,10 +602,13 @@ void m_set_target_bitmap(MBITMAP *bmp)
 
 void m_set_clip(int x1, int y1, int x2, int y2)
 {
+	int dx, dy, dw, dh;
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
 	if (al_get_target_bitmap() == al_get_backbuffer(display) || al_get_target_bitmap() == tmpbuffer->bitmap) {
-		int dx, dy, dw, dh;
-		get_screen_offset_size(&dx, &dy, &dw, &dh);
 		al_set_clipping_rectangle(dx+x1*screenScaleX, dy+y1*screenScaleY, (x2-x1)*screenScaleX, (y2-y1)*screenScaleY);
+	}
+	else if (battle_buf && al_get_target_bitmap() == battle_buf->bitmap) {
+		al_set_clipping_rectangle(x1*screenScaleX, y1*screenScaleY, (x2-x1)*screenScaleX, (y2-y1)*screenScaleY);
 	}
 	else {
 		al_set_clipping_rectangle(
@@ -715,6 +718,10 @@ void m_destroy_font(MFONT *f)
 MBITMAP *m_clone_bitmap(MBITMAP *b)
 {
 	ALLEGRO_BITMAP *bmp = al_clone_bitmap(b->bitmap);
+	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
+	al_set_target_bitmap(bmp);
+	al_use_shader(default_shader);
+	al_set_target_bitmap(old_target);
 	MBITMAP *m = new_mbitmap(bmp);
 	return m;
 }
@@ -722,26 +729,23 @@ MBITMAP *m_clone_bitmap(MBITMAP *b)
 MBITMAP *m_make_display_bitmap(MBITMAP *b)
 {
 	if (!b) return NULL;
-	ALLEGRO_BITMAP *tmp = al_clone_bitmap(b->bitmap);
-	al_destroy_bitmap(b->bitmap);
-	b->bitmap = tmp;
-	return b;
+	MBITMAP *bmp = m_clone_bitmap(b);
+	m_destroy_bitmap(b);
+	return bmp;
 }
 
 MBITMAP *m_make_alpha_display_bitmap(MBITMAP *in)
 {
-	MBITMAP *bitmap = 0;
-
 	int old = al_get_new_bitmap_format();
 	al_set_new_bitmap_format(ALPHA_FMT);
 
-	bitmap = m_clone_bitmap(in);
+	MBITMAP *bmp = m_clone_bitmap(in);
 
 	al_set_new_bitmap_format(old);
 
 	m_destroy_bitmap(in);
 
-	return bitmap;
+	return bmp;
 }
 
 
@@ -1140,10 +1144,10 @@ void m_draw_scaled_backbuffer(int sx, int sy, int sw, int sh, int dx, int dy, in
 	al_unlock_bitmap(tmp->bitmap);
 	al_unlock_bitmap(al_get_backbuffer(display));
 #else
-	al_set_target_bitmap(tmp->bitmap);
+	m_set_target_bitmap(tmp);
 	al_draw_bitmap_region(al_get_backbuffer(display), sx, sy, sw, sh, 0, 0, 0);
 #endif
-	al_set_target_bitmap(dest->bitmap);
+	m_set_target_bitmap(dest);
 	al_draw_scaled_bitmap(
 		tmp->bitmap,
 		0, 0, sw, sh,
@@ -1169,7 +1173,7 @@ void m_draw_scaled_target(MBITMAP *src, int sx, int sy, int sw, int sh,
 	int dx, int dy, int dw, int dh, MBITMAP *dst)
 {
 	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
-	al_set_target_bitmap(dst->bitmap);
+	m_set_target_bitmap(dst);
 	al_draw_scaled_bitmap(src->bitmap, sx, sy, sw, sh, dx, dy, dw, dh, 0);
 	al_set_target_bitmap(old_target);
 }

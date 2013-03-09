@@ -10,6 +10,8 @@
 #include "java.h"
 #endif
 
+MBITMAP *battle_buf = NULL;
+
 bool transitioning;
 
 bool global_draw_controls = true;
@@ -1031,7 +1033,7 @@ void battleTransition()
 	flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE);
 	MBITMAP *xfade_buf = m_create_bitmap(dw, dh);
-	MBITMAP *battle_buf = m_create_bitmap(dw, dh);
+	battle_buf = m_create_bitmap(dw, dh);
 	al_set_new_bitmap_flags(flags);
 
 	m_set_target_bitmap(battle_buf);
@@ -1087,6 +1089,7 @@ void battleTransition()
 
 	m_destroy_bitmap(xfade_buf);
 	m_destroy_bitmap(battle_buf);
+	battle_buf = NULL;
 	m_destroy_bitmap(tmp);
 
 	dpad_on();

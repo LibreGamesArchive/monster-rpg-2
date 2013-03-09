@@ -221,6 +221,7 @@ void show_mouse_cursor();
 void hide_mouse_cursor();
 bool is_cursor_hidden();
 extern int custom_cursor_w, custom_cursor_h;
+extern ALLEGRO_MOUSE_CURSOR *custom_mouse_cursor;
 
 extern int width_before_fullscreen;
 extern int height_before_fullscreen;

@@ -260,7 +260,7 @@ int versionMinor = 0;
 bool switched_out = false;
 uint32_t my_opengl_version;
 
-static ALLEGRO_MOUSE_CURSOR *custom_mouse_cursor;
+ALLEGRO_MOUSE_CURSOR *custom_mouse_cursor;
 int custom_cursor_w, custom_cursor_h;
 
 void destroy_fonts(void)
@@ -1707,7 +1707,7 @@ bool init(int *argc, char **argv[])
 		flags = al_get_new_bitmap_flags();
 		al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
 		screenshot = m_create_bitmap(BW/2, BH/2);
-		al_set_target_bitmap(screenshot->bitmap);
+		m_set_target_bitmap(screenshot);
 		ALLEGRO_TRANSFORM t;
 		al_identity_transform(&t);
 		al_scale_transform(&t, 0.5f, 0.5f);
@@ -2238,9 +2238,10 @@ void toggle_fullscreen()
 		al_set_target_bitmap(tmp);
 		al_use_shader(default_shader);
 		al_draw_bitmap(tmpbuffer->bitmap, 0, 0, 0);
-		al_set_target_bitmap(tmpbuffer->bitmap);
+		m_set_target_bitmap(tmpbuffer);
 		al_draw_scaled_bitmap(tmp, 0, 0, dw, dh, 0, 0, dw2, dh2, 0);
 		al_set_target_bitmap(old_target);
+		al_destroy_bitmap(tmp);
 	}
 }
 

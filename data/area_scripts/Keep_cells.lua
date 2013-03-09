@@ -39,6 +39,7 @@ function start()
 			{ event_type=EVENT_REST, delay=3000 },
 			{ event_type=EVENT_GESTURE, name="stand_s" },
 			{ event_type=EVENT_SPEAK, text="Ohh, my head. This is bad! I've got to save Tiggy from that evil staff, and I'll probably need all the help I can get to do so!\nFirst things first, how do I get out of here?\n" },
+			{ event_type=EVENT_WAIT_FOR_SPEECH },
 			{ event_type=EVENT_DESCRIPTIFY },
 			{ event_type=EVENT_CUSTOM, callback=done },
 		}

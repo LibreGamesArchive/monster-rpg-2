@@ -1741,9 +1741,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				al_stop_timer(logic_timer);
 				al_stop_timer(draw_timer);
 				showAchievements();
-				while (modalViewShowing) {
-					al_rest(0.001);
-				}
 				al_start_timer(logic_timer);
 				al_start_timer(draw_timer);
 			}
@@ -1954,9 +1951,6 @@ void doShop(std::string name, const char *imageName, int nItems,
 	int *indexes, int *costs)
 {
 #define DRAW \
-	if (!break_for_fade_after_draw) { \
-		set_target_backbuffer(); \
-	} \
 	m_clear(black); \
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white); \
 	mDrawFrame(3, 3, BW-6, 40-6); \
@@ -2181,6 +2175,9 @@ void doShop(std::string name, const char *imageName, int nItems,
 		
 		if (break_for_fade_after_draw || draw_counter > 0) {
 			draw_counter = 0;
+			if (!break_for_fade_after_draw) {
+				set_target_backbuffer();
+			}
 			DRAW
 			drawBufferToScreen();
 			if (break_for_fade_after_draw) {

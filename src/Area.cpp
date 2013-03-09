@@ -1427,7 +1427,7 @@ void real_auto_save_game_to_memory(bool save_ss)
 	if (save_ss) {
 		if (area) {
 			ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
-			al_set_target_bitmap(screenshot->bitmap);
+			m_set_target_bitmap(screenshot);
 			area->draw();
 			al_set_target_bitmap(old_target);
 		}

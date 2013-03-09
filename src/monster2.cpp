@@ -587,9 +587,11 @@ top:
 
 		if (event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY) {
 			mouse_in_display = true;
+			al_set_mouse_cursor(display, custom_mouse_cursor);
 		}
 		else if (event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY) {
 			mouse_in_display = false;
+			al_set_system_mouse_cursor(display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
 		}
 		else if (event.type == ALLEGRO_EVENT_KEY_CHAR || event.type == USER_KEY_CHAR) {
 			INPUT_EVENT ie = EMPTY_INPUT_EVENT;
@@ -1380,7 +1382,7 @@ top:
 	
 	if (do_toggle_fullscreen) {
 		do_toggle_fullscreen = false;
-		al_set_target_bitmap(al_get_backbuffer(display));
+		set_target_backbuffer();
 		toggle_fullscreen();
 	}
 
@@ -1399,7 +1401,7 @@ void do_close_exit_game()
 {
 	if (saveFilename) saveTime(saveFilename);
 	config.write();
-	al_set_target_bitmap(al_get_backbuffer(display));
+	set_target_backbuffer();
 	m_clear(al_map_rgb(0, 0, 0));
 	m_flip_display();
 	m_clear(al_map_rgb(0, 0, 0));
@@ -2323,7 +2325,7 @@ int main(int argc, char *argv[])
 		
 	} catch (QuitError e) {
 		(void)e;
-		al_set_target_bitmap(al_get_backbuffer(display));
+		set_target_backbuffer();
 		m_clear(al_map_rgb(0, 0, 0));
 		m_flip_display();
 		m_clear(al_map_rgb(0, 0, 0));
