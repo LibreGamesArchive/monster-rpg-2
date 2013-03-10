@@ -1038,7 +1038,7 @@ done:
 bool archery(bool for_points)
 {
 	if (for_points) {
-		anotherDoDialogue("Faelon: Here comes the horde! Let's have some fun!...\n", true);
+		anotherDoDialogue("Faelon: Here comes the horde! Let's have some fun!...\n", true, false, false);
 	}
 
 	prepareForScreenGrab1();

@@ -6,7 +6,7 @@
 #include <sys/stat.h>
 
 
-static int get_tile_pos(int tn)
+int get_tile_atlas_pos(int tn)
 {
 	return tn*TILE_SIZE + 1 + 2*tn;
 }
@@ -576,12 +576,12 @@ void Area::drawObject(int index)
 			dy -= depth;
 			if (tinting) {
 				if (use_programmable_pipeline) {
-					al_set_shader_sampler(tinter, "tex", bmp->bitmap, 0);
-					al_set_shader_float(tinter, "ratio", tint_ratio);
-					al_set_shader_float(tinter, "r", targetTint.r);
-					al_set_shader_float(tinter, "g", targetTint.g);
-					al_set_shader_float(tinter, "b", targetTint.b);
 					al_use_shader(tinter);
+					al_set_shader_sampler("tex", bmp->bitmap, 0);
+					al_set_shader_float("ratio", tint_ratio);
+					al_set_shader_float("r", targetTint.r);
+					al_set_shader_float("g", targetTint.g);
+					al_set_shader_float("b", targetTint.b);
 					m_draw_bitmap_region(bmp, 0, TILE_SIZE-depth, TILE_SIZE,
 						depth, dx, dy, 0);
 					al_use_shader(NULL);
@@ -1220,11 +1220,11 @@ void Area::draw(int bw, int bh)
 #ifndef NO_SHADERS
 	if (num_quads > 0) {
 		if (tinting && use_programmable_pipeline) {
-			al_set_shader_float(tinter, "ratio", tint_ratio);
-			al_set_shader_float(tinter, "r", targetTint.r);
-			al_set_shader_float(tinter, "g", targetTint.g);
-			al_set_shader_float(tinter, "b", targetTint.b);
 			al_use_shader(tinter);
+			al_set_shader_float("ratio", tint_ratio);
+			al_set_shader_float("r", targetTint.r);
+			al_set_shader_float("g", targetTint.g);
+			al_set_shader_float("b", targetTint.b);
 		}
 		m_draw_prim(verts, 0, partial_tm, 0, num_quads*6,
 			ALLEGRO_PRIM_TRIANGLE_LIST);
@@ -1301,11 +1301,11 @@ void Area::draw(int bw, int bh)
 #ifndef NO_SHADERS
 	if (num_quads > 0) {
 		if (tinting && use_programmable_pipeline) {
-			al_set_shader_float(tinter, "ratio", tint_ratio);
-			al_set_shader_float(tinter, "r", targetTint.r);
-			al_set_shader_float(tinter, "g", targetTint.g);
-			al_set_shader_float(tinter, "b", targetTint.b);
 			al_use_shader(tinter);
+			al_set_shader_float("ratio", tint_ratio);
+			al_set_shader_float("r", targetTint.r);
+			al_set_shader_float("g", targetTint.g);
+			al_set_shader_float("b", targetTint.b);
 		}
 		m_draw_prim(verts, 0, partial_tm, 0, num_quads*6,
 			ALLEGRO_PRIM_TRIANGLE_LIST);
@@ -1895,8 +1895,8 @@ Tile* Area::loadTile(ALLEGRO_FILE *f)
 			anims[i] = al_fread32le(f);
 			if (anims[i] >= 0) {
 				int n = newmap[tileAnimationNums[anims[i]]];
-				tu[i] = get_tile_pos(n % tm_w);
-				tv[i] = get_tile_pos(n / tm_w);
+				tu[i] = get_tile_atlas_pos(n % tm_w);
+				tv[i] = get_tile_atlas_pos(n / tm_w);
 			}
 		}
 		bool solid = al_fgetc(f);
@@ -2089,8 +2089,8 @@ void Area::loadAnimation(int index, bool addIndex)
 	tm_used++;
 	m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, white);
 	m_set_target_bitmap(partial_tm);
-	draw_tile_with_borders(tmp, get_tile_pos(xx), get_tile_pos(yy));
-	MBITMAP *subbmp = m_create_sub_bitmap(partial_tm, get_tile_pos(xx), get_tile_pos(yy), TILE_SIZE, TILE_SIZE); // check
+	draw_tile_with_borders(tmp, get_tile_atlas_pos(xx), get_tile_atlas_pos(yy));
+	MBITMAP *subbmp = m_create_sub_bitmap(partial_tm, get_tile_atlas_pos(xx), get_tile_atlas_pos(yy), TILE_SIZE, TILE_SIZE); // check
 	m_destroy_bitmap(tmp);
 	al_restore_state(&st);
 	image = new Image();
@@ -2120,8 +2120,8 @@ void Area::loadAnimation(int index, bool addIndex)
 	std::vector<int> tu;
 	std::vector<int> tv;
 
-	tu.push_back(get_tile_pos(xx));
-	tv.push_back(get_tile_pos(yy));
+	tu.push_back(get_tile_atlas_pos(xx));
+	tv.push_back(get_tile_atlas_pos(yy));
 
 	int i = 2;
 
@@ -2154,8 +2154,8 @@ void Area::loadAnimation(int index, bool addIndex)
 		tm_used++;
 		m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, white);
 		m_set_target_bitmap(partial_tm);
-		draw_tile_with_borders(tmp, get_tile_pos(xx), get_tile_pos(yy));
-		MBITMAP *subbmp = m_create_sub_bitmap(partial_tm, get_tile_pos(xx), get_tile_pos(yy), TILE_SIZE, TILE_SIZE); // check
+		draw_tile_with_borders(tmp, get_tile_atlas_pos(xx), get_tile_atlas_pos(yy));
+		MBITMAP *subbmp = m_create_sub_bitmap(partial_tm, get_tile_atlas_pos(xx), get_tile_atlas_pos(yy), TILE_SIZE, TILE_SIZE); // check
 		m_destroy_bitmap(tmp);
 		al_restore_state(&st);
 		image = new Image();
@@ -2164,8 +2164,8 @@ void Area::loadAnimation(int index, bool addIndex)
 		al_set_new_bitmap_flags(flags);
 		frame = new Frame(image, delay);
 		animation->addFrame(frame);
-		tu.push_back(get_tile_pos(xx));
-		tv.push_back(get_tile_pos(yy));
+		tu.push_back(get_tile_atlas_pos(xx));
+		tv.push_back(get_tile_atlas_pos(yy));
 
 		i++;
 	}

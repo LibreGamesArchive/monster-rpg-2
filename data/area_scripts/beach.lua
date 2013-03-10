@@ -142,19 +142,21 @@ deads = {
 
 battle_started = false
 
-function done()
-	removeObject(rios.id)
-	removePlayer("Rios")
-	setMilestone(MS_RIOS_LEFT, true)
-	--descriptifyPlayer();
-	do_rios_thing = false
-	setObjectDirection(0, DIRECTION_SOUTH)
+function stand()
 	for i=1,12 do
 		if (i <= 4 or i >= 9) then
 			setObjectSubAnimation(dudes[i].obj.id, "stand_s")
 		end
 	end
+	setObjectDirection(0, DIRECTION_SOUTH)
 	setObjectSubAnimation(0, "stand_s")
+end
+
+function done()
+	removeObject(rios.id)
+	removePlayer("Rios")
+	setMilestone(MS_RIOS_LEFT, true)
+	do_rios_thing = false
 end
 
 function next_enemy()
@@ -285,14 +287,6 @@ function go()
 
 	for i=1,#forward do
 		local x, y = getObjectPosition(dudes[forward[i]].obj.id)
-		local n
-		if (forward[i] > 6) then
-			n = forward[i]
-		else
-			n = forward[i]-1
-		end
-		markMan(n, true, false)
-		dudes[forward[i]].used = true
 		if (dudes[forward[i]].anim_set == "Guard") then
 			if (forward[i] > 6) then
 				addGuard(forward[i]-4-1)
@@ -302,7 +296,6 @@ function go()
 		else
 			addPlayer(dudes[forward[i]].anim_set)
 		end
-		setObjectPosition(dudes[forward[i]].obj.id, x, 2)
 		if (y == 3) then
 			setPlayerFormation(i-1, FORMATION_BACK)
 		else
@@ -311,6 +304,19 @@ function go()
 	end
 
 	startBattle(battles[curr_battle], false)
+
+	for i=1,#forward do
+		local x, y = getObjectPosition(dudes[forward[i]].obj.id)
+		local n
+		if (forward[i] > 6) then
+			n = forward[i]
+		else
+			n = forward[i]-1
+		end
+		markMan(n, true, false)
+		dudes[forward[i]].used = true
+		setObjectPosition(dudes[forward[i]].obj.id, x, 2)
+	end
 
 	battle_started = true
 
@@ -500,6 +506,7 @@ function update(step)
 				do_rios_thing = true
 
 				rios.scripted_events = {
+					{ event_type=EVENT_CUSTOM, callback=stand },
 					{ event_type=EVENT_SPEAK, text="Rios: Well, I guess I have to honor my promise... to go back to Flowey and recreate the history of Seaside...\nEny: Take good care, perhaps we will see you again!\nRios: I think that is highly likely!\nEny: Goodbye...\n" },
 					{ event_type=EVENT_WAIT_FOR_SPEECH },
 					{ event_type=EVENT_WALK, dest_x=8, dest_y=2 },

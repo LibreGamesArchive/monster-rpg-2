@@ -398,11 +398,11 @@ void Battle::draw(void)
 {
 	m_set_blender(M_ONE, M_ZERO, white);
 	if (superpower && use_programmable_pipeline) {
-		al_set_shader_float(tinter, "ratio", 1);
-		al_set_shader_float(tinter, "r", 0.8);
-		al_set_shader_float(tinter, "g", 0);
-		al_set_shader_float(tinter, "b", 0);
 		al_use_shader(tinter);
+		al_set_shader_float("ratio", 1);
+		al_set_shader_float("r", 0.8);
+		al_set_shader_float("g", 0);
+		al_set_shader_float("b", 0);
 		m_draw_bitmap(bg, 0, 0, 0);
 		al_use_shader(NULL);
 	}
@@ -658,9 +658,10 @@ BattleResult Battle::update(int step)
 			prepareForScreenGrab2();
 			fadeOut(m_map_rgb(255, 0, 0));
 			if (name != "first_battle" && name != "2Statues" && !manChooser && !(area && area->getName() == "tutorial")) {
-				set_target_backbuffer();
+				prepareForScreenGrab1();
 				m_clear(m_map_rgb(255, 0, 0));
 				drawBufferToScreen(false);
+				prepareForScreenGrab2();
 				anotherDoDialogue("You were defeated in battle...\nRestore your game and save the world!\n", false, true, false);
 			}
 			return BATTLE_ENEMY_WIN;

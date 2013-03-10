@@ -169,6 +169,7 @@ void astar_stop(void);
 Node *get_path_tail(void);
 void save_auto_save_to_disk();
 void delete_file(const char *s);
+int get_tile_atlas_pos(int tn);
 extern long roaming;
 extern bool dpad_panning;
 extern bool pan_centered_x;

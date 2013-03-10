@@ -1071,11 +1071,10 @@ void battleTransition()
 		al_copy_transform(&backup, al_get_current_transform());
 		al_identity_transform(&t);
 		al_use_transform(&t);
-		al_set_shader_float(warp, "angle", angle);
-		float tex_bot = 1;
-		al_set_shader_float(warp, "tex_bot", tex_bot);
-		al_set_shader_sampler(warp, "tex", xfade_buf->bitmap, 0);
 		al_use_shader(warp);
+		al_set_shader_float("angle", angle);
+		al_set_shader_float("tex_bot", 1);
+		al_set_shader_sampler("tex", xfade_buf->bitmap, 0);
 		m_draw_bitmap(xfade_buf, dx, dy, 0);
 		al_use_shader(NULL);
 		al_restore_state(&s);

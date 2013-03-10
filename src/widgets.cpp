@@ -223,14 +223,14 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 	if (use_programmable_pipeline && shadow) {
 		int dx, dy, dw, dh;
 		get_screen_offset_size(&dx, &dy, &dw, &dh);
-		al_set_shader_float(shadow_shader, "x1", dx+x*screenScaleX);
-		al_set_shader_float(shadow_shader, "y1", dy+y*screenScaleY);
-		al_set_shader_float(shadow_shader, "x2", dx+(x+w)*screenScaleX);
-		al_set_shader_float(shadow_shader, "y2", dy+(y+h)*screenScaleY);
-		al_set_shader_float(shadow_shader, "BW", al_get_display_width(display));
-		al_set_shader_float(shadow_shader, "BH", al_get_display_height(display));
-		al_set_shader_float(shadow_shader, "radius", screenScaleX*10);
 		al_use_shader(shadow_shader);
+		al_set_shader_float("x1", dx+x*screenScaleX);
+		al_set_shader_float("y1", dy+y*screenScaleY);
+		al_set_shader_float("x2", dx+(x+w)*screenScaleX);
+		al_set_shader_float("y2", dy+(y+h)*screenScaleY);
+		al_set_shader_float("BW", al_get_display_width(display));
+		al_set_shader_float("BH", al_get_display_height(display));
+		al_set_shader_float("radius", screenScaleX*10);
 		m_draw_rectangle(x-10, y-10, x+w+10, y+h+10, black, M_FILLED);
 		al_use_shader(NULL);
 	}
@@ -2679,6 +2679,7 @@ int MMap::update(int millis)
 			dpad_off();
 
 			bool break_for_fade_after_draw = false;
+			bool redraw_so_its_the_same = false;
 		
 			while (true) {
 				if (is_close_pressed()) {
@@ -2694,7 +2695,9 @@ int MMap::update(int millis)
 				int curr_x = start_x - (p * start_x);
 				int curr_y = p * target_y;
 
-				set_target_backbuffer();
+				if (!break_for_fade_after_draw) {
+					set_target_backbuffer();
+				}
 				/*
 				 * For some unknown reason m_draw_scaled_bitmap
 				 * sets an alpha blender, and I don't want to
@@ -2708,11 +2711,15 @@ int MMap::update(int millis)
 				if (break_for_fade_after_draw) {
 					break;
 				}
-			
-				if  (now >= end) {
+
+				if (redraw_so_its_the_same) {
 					break_for_fade_after_draw = true;
 					prepareForScreenGrab1();
 					continue;
+				}
+			
+				if  (now >= end) {
+					redraw_so_its_the_same = true;
 				}
 
 				m_flip_display();
@@ -2722,14 +2729,15 @@ int MMap::update(int millis)
 				start = now;
 				totalElapsed += elapsed;
 			}
+			al_rest(5.0);
 			dpad_on();
 			m_pop_blender();
-			m_destroy_bitmap(bmp);
 			if (break_for_fade_after_draw) {
 				break_for_fade_after_draw = false;
 				prepareForScreenGrab2();
 				fadeOut(black);
 			}
+			m_destroy_bitmap(bmp);
 		}
 
 		Object *o = party[heroSpot]->getObject();
@@ -5589,19 +5597,6 @@ void MManSelector::mouseUp(int x, int y, int b)
 
 void MManSelector::draw()
 {
-	MBITMAP *tmp = m_create_bitmap(16, 16);
-	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
-	m_set_target_bitmap(tmp);
-	al_clear_to_color(al_map_rgba_f(0, 0, 0, 0));
-	ALLEGRO_COLOR yellow = al_map_rgb_f(1, 1, 0);
-	for (int i = 1; i < 15; i++) {
-		m_draw_pixel(i, 1, yellow);
-		m_draw_pixel(1, i, yellow);
-		m_draw_pixel(i, 14, yellow);
-		m_draw_pixel(14, i, yellow);
-	}
-	al_set_target_bitmap(old_target);
-
 	al_hold_bitmap_drawing(true);
 
 	for (int i = 0; i < (int)mans.size(); i++) {
@@ -5610,15 +5605,13 @@ void MManSelector::draw()
 		int yy = (mans[i].y+1) * TILE_SIZE - area->getOriginY();
 		for (int k = 0; k < 3; k++) {
 			m_draw_tinted_bitmap(
-				tmp, al_map_rgba(alpha, alpha, alpha, alpha),
+				square, al_map_rgba(alpha, alpha, alpha, alpha),
 				xx, yy+k*TILE_SIZE, 0
 			);
 		}
 	}
 
 	al_hold_bitmap_drawing(false);
-
-	m_destroy_bitmap(tmp);
 
 	// Draw arrow
 	int xx = mans[pos].x * TILE_SIZE - area->getOriginX() + TILE_SIZE/2 - m_get_bitmap_width(arrow)/2;
@@ -5793,6 +5786,7 @@ MManSelector::MManSelector(std::vector<MMan> mans)
 	this->height = BH;
 	this->hotkeys = 0;
 	arrow = m_load_bitmap(getResource("media/down_arrow.png"));
+	square = m_load_bitmap(getResource("media/square.png"));
 	pos = 0;
 	this->mans = mans;
 
@@ -5814,6 +5808,7 @@ MManSelector::MManSelector(std::vector<MMan> mans)
 MManSelector::~MManSelector(void)
 {
 	m_destroy_bitmap(arrow);
+	m_destroy_bitmap(square);
 	delete go;
 }
 

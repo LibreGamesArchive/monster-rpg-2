@@ -785,7 +785,11 @@ bool shooter(bool for_points)
 	playMusic("underwater.ogg");
 	srand(7);
 	generate();
-	
+
+	prepareForScreenGrab1();
+	m_clear(black);
+	drawBufferToScreen(false);
+	prepareForScreenGrab2();
 	anotherDoDialogue("Gunnar: Oh, no, the throttle jammed! Eny, you steer.\nMel, Rider, blast anything in our path! I'll go fix the engine!\n", true);
 
 start:
@@ -1053,6 +1057,7 @@ start:
 				if (dist < pause_icon_w/2 || in.button2) {
 					// pause
 					al_stop_timer(logic_timer);
+					al_stop_timer(draw_timer);
 
 					prepareForScreenGrab1();
 					draw_everything();
@@ -1132,6 +1137,7 @@ start:
 #endif
 					
 					al_start_timer(logic_timer);
+					al_start_timer(draw_timer);
 				}
 			}
 

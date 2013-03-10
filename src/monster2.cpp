@@ -1611,9 +1611,11 @@ static void run()
 						prepareForScreenGrab2();
 						fadeOut(m_map_rgb(255, 0, 0));
 					}
-					set_target_backbuffer();
+
+					prepareForScreenGrab1();
 					m_clear(m_map_rgb(255, 0, 0));
 					drawBufferToScreen(false);
+					prepareForScreenGrab2();
 
 					if (battle) {
 						delete battle;

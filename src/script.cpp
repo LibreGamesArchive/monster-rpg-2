@@ -2591,8 +2591,8 @@ static int CSetTileLayer(lua_State *stack)
 	if (v != -1) {
 		std::vector<int>& tileAnimationNums = area->getAnimationNums();
 		int n = area->newmap[tileAnimationNums[v]];
-		t->setTU(l, (n % area->tm_w) * TILE_SIZE);
-		t->setTV(l, (n / area->tm_w) * TILE_SIZE);
+		t->setTU(l, get_tile_atlas_pos(n % area->tm_w));
+		t->setTV(l, get_tile_atlas_pos(n / area->tm_w));
 	}
 
 	return 0;
@@ -3272,9 +3272,27 @@ static int CSetSpecialWalkable(lua_State *stack)
 static int CAnotherDoDialogue(lua_State *stack)
 {
 	const char *text = lua_tostring(stack, 1);
-	bool clear_buf = lua_toboolean(stack, 2);
+	
+	int nargs = lua_gettop(stack);
 
-	lua_pushboolean(stack, anotherDoDialogue(text, clear_buf, !clear_buf));
+	bool clear_buf;
+	bool draw_area;
+
+	if (nargs > 1) {
+		clear_buf = lua_toboolean(stack, 2);
+	}
+	else {
+		clear_buf = false;
+	}
+
+	if (nargs > 2) {
+		draw_area = lua_toboolean(stack, 3);
+	}
+	else {
+		draw_area = true;
+	}
+
+	lua_pushboolean(stack, anotherDoDialogue(text, clear_buf, !clear_buf, draw_area));
 
 	return 1;
 }

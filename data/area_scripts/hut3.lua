@@ -39,7 +39,7 @@ function update(step)
 		eny.scripted_events = {
 			{ event_type=EVENT_WALK, dest_x=3, dest_y=5 },
 			{ event_type=EVENT_CUSTOM, callback=do_tint },
-			{ event_type=EVENT_GESTURE, name="sleep" },
+			{ event_type=EVENT_GESTURE, name="sleep_floor" },
 			{ event_type=EVENT_REST, delay=6000 },
 			{ event_type=EVENT_CUSTOM, callback=undo_tint },
 			{ event_type=EVENT_CUSTOM, callback=done },

@@ -693,11 +693,11 @@ void CombatEnemy::draw(void)
 		float fl = ((float)deadCount / DIE_TIME) * (M_PI*2);
 #if (defined A5_OGL || A5_D3D)
 		if (use_programmable_pipeline) {
-			al_set_shader_float(tinter, "ratio", 1);
-			al_set_shader_float(tinter, "r", 0.8);
-			al_set_shader_float(tinter, "g", 0);
-			al_set_shader_float(tinter, "b", 0.8);
 			al_use_shader(tinter);
+			al_set_shader_float("ratio", 1);
+			al_set_shader_float("r", 0.8);
+			al_set_shader_float("g", 0);
+			al_set_shader_float("b", 0.8);
 			int dx = (int)(x - (w/2));
 			int dy = (int)(y - h);
 			for (int i = 0; i < h; i++, dy++) {
@@ -750,8 +750,8 @@ void CombatEnemy::draw(void)
 		bright = ((unsigned)tguiCurrentTimeMillis() % 500 < 250);
 		if (thinkCount < 1000 && bright) {
 			if (use_programmable_pipeline) {
-				al_set_shader_float(brighten, "brightness", 0.7);
 				al_use_shader(brighten);
+				al_set_shader_float("brightness", 0.7);
 				animSet->draw(x+ox-(w/2), y+oy-h, flags);
 				al_use_shader(NULL);
 			}
@@ -779,11 +779,11 @@ void CombatEnemy::draw(void)
 		else {
 			if (info.condition == CONDITION_PARALYZED && ((unsigned)tguiCurrentTimeMillis() % 200 < 100)) {
 				if (use_programmable_pipeline) {
-					al_set_shader_float(tinter, "ratio", 1);
-					al_set_shader_float(tinter, "r", 0.5);
-					al_set_shader_float(tinter, "g", 0.5);
-					al_set_shader_float(tinter, "b", 0.5);
 					al_use_shader(tinter);
+					al_set_shader_float("ratio", 1);
+					al_set_shader_float("r", 0.5);
+					al_set_shader_float("g", 0.5);
+					al_set_shader_float("b", 0.5);
 					if (angle == 0)
 						animSet->draw(x-(w/2), y-h, flags);
 					else
@@ -1231,11 +1231,11 @@ void CombatEnemyTode::draw(void)
 		MBITMAP *bmp = i->getBitmap();
 		float fl = ((float)deadCount / DIE_TIME) * (M_PI*2);
 		if (use_programmable_pipeline) {
-			al_set_shader_float(tinter, "ratio", 1);
-			al_set_shader_float(tinter, "r", 0.8);
-			al_set_shader_float(tinter, "g", 0);
-			al_set_shader_float(tinter, "b", 0.8);
 			al_use_shader(tinter);
+			al_set_shader_float("ratio", 1);
+			al_set_shader_float("r", 0.8);
+			al_set_shader_float("g", 0);
+			al_set_shader_float("b", 0.8);
 			int dx = (int)(x - w/2);
 			int dy = (int)(y - h);
 			for (int i = 0; i < h; i++, dy++) {
@@ -1291,8 +1291,8 @@ void CombatEnemyTode::draw(void)
 		bright = ((unsigned)tguiCurrentTimeMillis() % 500 < 250);
 		if (thinkCount < 1000 && bright) {
 			if (use_programmable_pipeline) {
-				al_set_shader_float(brighten, "brightness", 0.7);
 				al_use_shader(brighten);
+				al_set_shader_float("brightness", 0.7);
 				animSet->draw(x+ox-(w/2), y+oy-h, flags);
 				al_use_shader(NULL);
 			}

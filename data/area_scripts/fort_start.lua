@@ -40,9 +40,9 @@ function fall(fx, fy)
 	dpad_off()
 	prepareForScreenGrab1()
 	drawArea()
-	dpad_on()
 	drawBufferToScreen()
 	prepareForScreenGrab2()
+	dpad_on()
 	fadeOut()
 	setObjectHidden(0, false)
 	setObjectPosition(0, 52, 8)
@@ -82,7 +82,11 @@ function fall(fx, fy)
 		fadeIn()
 		doDialogue("Eny: Ow...\n")
 	else
-		anotherDoDialogue("You drown in the cold sea...\n", true)
+		prepareForScreenGrab1()
+		clearBuffer()
+		drawBufferToScreen()
+		prepareForScreenGrab2()
+		anotherDoDialogue("You drown in the cold sea...\n", true, false)
 	end
 end
 

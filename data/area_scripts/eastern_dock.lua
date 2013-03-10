@@ -115,9 +115,9 @@ function end_sub_scene()
 		dpad_off()
 		prepareForScreenGrab1()
 		drawArea()
-		dpad_on()
 		drawBufferToScreen()
 		prepareForScreenGrab2()
+		dpad_on()
 		fadeOut(0, 0, 0)
 		setObjectHidden(0, false)
 		setObjectSolid(0, true)
@@ -295,12 +295,12 @@ function activate(activator, activated)
 		prepareForScreenGrab1()
 		drawArea()
 		drawBufferToScreen()
+		prepareForScreenGrab2()
 		local choice = triple_prompt(
 			"Would you like to go through",
 			"the trench again, or take the",
 			"longer, safer route?",
 			"Trench", "Safe", "Cancel", 2)
-		prepareForScreenGrab2()
 		setObjectDirection(gunnar.id, _d)
 		if (choice == 0) then
 			if (doShooter(false)) then

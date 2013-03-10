@@ -237,6 +237,8 @@ void showAchievements(void)
 	}
 	[vc release];
 
+	al_rest(1.0);
+
 	if (was_fullscreen) {
 		toggle_fullscreen();
 	}

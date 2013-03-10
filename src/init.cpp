@@ -2033,6 +2033,8 @@ void toggle_fullscreen()
 
 	if (tmpbuffer) {
 		// redo tmpbuffer
+		m_destroy_bitmap(tmpbuffer);
+		create_tmpbuffer();
 		int dx2, dy2, dw2, dh2;
 		get_screen_offset_size(&dx2, &dy2, &dw2, &dh2);
 		ALLEGRO_BITMAP *old_target = al_get_target_bitmap();

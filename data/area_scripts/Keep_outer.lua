@@ -86,12 +86,10 @@ function update(step)
 
 
 	if (getMilestone(MS_GONE_TO_ARCHERY_TOWER) and not done_archery_already) then
-		clearBuffer()
 		done_archery_already = true
 		local for_points = (not getMilestone(MS_BEAT_ARCHERY))
 		local doit = true;
 		if (not for_points) then
-			--updateArea()
 			prepareForScreenGrab1()
 			clearBuffer()
 			drawBufferToScreen()
@@ -100,6 +98,10 @@ function update(step)
 			clearBuffer()
 		end
 		if (doit) then
+			prepareForScreenGrab1()
+			clearBuffer()
+			drawBufferToScreen()
+			prepareForScreenGrab2()
 			local b = doArchery(for_points)
 			if (b) then
 				setMilestone(MS_BEAT_ARCHERY, true)

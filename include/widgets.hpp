@@ -1129,6 +1129,7 @@ protected:
 	int holdi, holdj;
 	bool need_release;
 	bool was_down;
+	MBITMAP *square;
 };
 
 
