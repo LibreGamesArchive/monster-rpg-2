@@ -657,7 +657,7 @@ static void draw_everything()
 
 	tguiDraw();
 
-	m_save_blender();
+	m_push_blender();
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 	m_draw_bitmap(crab_icon, 0, 0, 0);
 	m_draw_bitmap(shark_icon, 0, 16, 0);
@@ -682,7 +682,7 @@ static void draw_everything()
 		M_FLIP_HORIZONTAL
 	);
 
-	m_restore_blender();
+	m_pop_blender();
 	
 	drawBufferToScreen();
 }

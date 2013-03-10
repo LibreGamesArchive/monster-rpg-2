@@ -115,8 +115,8 @@ extern std::stack<SAVED_BLENDER> blender_stack;
 extern ALLEGRO_COLOR _blend_color;
 
 void m_set_blender(int s, int d, MCOLOR c);
-void m_save_blender(void);
-void m_restore_blender(void);
+void m_push_blender(void);
+void m_pop_blender(void);
 
 #define m_get_pixel(b, x, y) al_get_pixel(b->bitmap, x, y)
 #define m_draw_pixel m_draw_trans_pixel

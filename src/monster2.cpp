@@ -81,7 +81,6 @@ bool global_can_save = true;
 bool tutorial_started = false;
 bool gonna_fade_in_red = false;
 
-// FIXME:
 void check_some_stuff_in_shooter(void);
 
 int old_control_mode = -1;
@@ -147,7 +146,7 @@ void connect_second_display(void)
 	int mvol = config.getMusicVolume();
 	int svol = config.getSFXVolume();
 
-	al_set_target_bitmap(NULL);
+	//al_set_target_bitmap(NULL);
 
 	connect_airplay_controls(true);
 	
@@ -156,44 +155,42 @@ void connect_second_display(void)
 	_destroy_loaded_bitmaps();
 	destroy_fonts();
 	destroyIcons();
-	
 	destroy_shaders();
 	al_destroy_display(display);
 	
+	int flags = al_get_new_display_flags();
+
+	al_set_new_display_adapter(1);
+	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_USE_PROGRAMMABLE_PIPELINE);
+	display = al_create_display(1, 1);
+
+	/*
+	ALLEGRO_TRANSFORM t;
+	al_identity_transform(&t);
+	al_scale_transform(&t, (float)al_get_display_width(display)/BW, (float)al_get_display_height(display)/BH);
+	al_use_transform(&t);
+	*/
+	
+	al_set_new_display_flags(flags);
+
+	//printf("w=%d h=%d\n", al_get_display_width(display), al_get_display_height(display));
+	
+	init_shaders();
+
+	set_screen_params();
+
 	_reload_loaded_bitmaps();
 	load_fonts();
 	icon_bmp = m_load_bitmap_redraw(getResource("media/icons.png"), loadIcons, NULL);
-    
-	al_set_new_display_adapter(1);
-	int flags = al_get_new_display_flags();
-	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_USE_PROGRAMMABLE_PIPELINE | flags);
-	al_set_new_display_option(ALLEGRO_AUTO_CONVERT_BITMAPS, 1, ALLEGRO_REQUIRE);
-	display = al_create_display(1, 1);
-	al_set_new_display_flags(flags);
-	init_shaders();
 
 	_reload_loaded_bitmaps_delayed();
 
-	init2_shaders();
-	
-	set_screen_params();
-
-	{
-		int flags = al_get_new_bitmap_flags();
-		al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-		int w = al_get_display_width(display);
-		int h = al_get_display_height(display);
-		tmpbuffer = m_create_bitmap(
-			w, h
-		);
-		al_set_new_bitmap_flags(flags);
-	}
+	create_tmpbuffer();
 
 	al_set_new_display_adapter(0);
-	int flgs = al_get_new_display_flags();
-	al_set_new_display_flags((flgs & ~ALLEGRO_USE_PROGRAMMABLE_PIPELINE) | ALLEGRO_FULLSCREEN_WINDOW);
+	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
 	controller_display = al_create_display(1, 1);
-	al_set_new_display_flags(flgs);
+	al_set_new_display_flags(flags);
 	register_display(controller_display);
 	int w = al_get_display_width(controller_display);
 	int h = al_get_display_height(controller_display);
@@ -216,8 +213,9 @@ void connect_second_display(void)
 	white_button = m_load_alpha_bitmap(getResource("media/whitebutton.png"));
 	black_button = m_load_alpha_bitmap(getResource("media/blackbutton.png"));
 	airplay_logo = m_load_alpha_bitmap(getResource("media/m2_controller_logo.png"));
-	
+
 	set_target_backbuffer();
+	
 
 	config.setMusicVolume(mvol);
 	config.setSFXVolume(svol);
@@ -930,7 +928,7 @@ top:
 					if (global_draw_red || red_off_press_on) {
 						if (this_x < 16 && this_y < 16) {
 							hot_corner_touched = true;
-							if (al_current_time() > next_shake) {
+							if (al_current_time() > next_shake && !on_title_screen) {
 								iphone_shake_time = al_current_time();
 								next_shake = al_current_time()+0.25;
 							}
@@ -1121,9 +1119,11 @@ top:
 			switched_in = true;
 
 			// resume
-			al_acknowledge_drawing_resume(display, _reload_loaded_bitmaps);
+			al_acknowledge_drawing_resume(display);
+			//al_rest(1.0); FIXME: needed?
 #ifdef ALLEGRO_ANDROID
 			init_shaders();
+			_reload_loaded_bitmaps();
 			_reload_loaded_bitmaps_delayed();
 			init2_shaders();
 			load_fonts();
@@ -1140,6 +1140,8 @@ top:
 			al_scale_transform(&t, screenScaleX, screenScaleY);
 			al_translate_transform(&t, dx, dy);
 			al_use_transform(&t);
+			m_set_target_bitmap(tmpbuffer);
+			m_clear(black);
 			al_set_target_bitmap(old_target);
 			al_set_clipping_rectangle(cx, cy, cw, ch);
 #endif
@@ -1300,7 +1302,7 @@ top:
 			destroy_fonts();
 			destroyIcons();
 
-			destroy_shaders();
+			//destroy_shaders();
 			al_destroy_display(display);
 
 			_reload_loaded_bitmaps();
@@ -1315,11 +1317,11 @@ top:
 			m_destroy_bitmap(airplay_logo);
 			al_destroy_display(controller_display);
 			controller_display = NULL;
-			
+
 			al_set_new_display_adapter(0);
 			al_set_new_display_option(ALLEGRO_AUTO_CONVERT_BITMAPS, 1, ALLEGRO_REQUIRE);
 			int flags = al_get_new_display_flags();
-			al_set_new_display_flags(flags | ALLEGRO_FULLSCREEN_WINDOW);
+			al_set_new_display_flags(flags | ALLEGRO_USE_PROGRAMMABLE_PIPELINE | ALLEGRO_FULLSCREEN_WINDOW);
 			display = al_create_display(1, 1);
 			al_set_new_display_flags(flags);
 			register_display(display);
@@ -1332,16 +1334,7 @@ top:
 
 			set_screen_params();
 	
-			{
-				int flags = al_get_new_bitmap_flags();
-				al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-				int w = al_get_display_width(display);
-				int h = al_get_display_height(display);
-				tmpbuffer = m_create_bitmap(
-					w, h
-				);
-				al_set_new_bitmap_flags(flags);
-			}
+			create_tmpbuffer();
 
 			set_target_backbuffer();
 			
@@ -1385,14 +1378,6 @@ top:
 		set_target_backbuffer();
 		toggle_fullscreen();
 	}
-
-#ifdef ALLEGRO_ANDROID	
-	if (!switched_in) {
-		// FIXME:
-		//al_rest(0.005);
-		//goto top;
-	}
-#endif
 
 	return close_pressed;
 }
@@ -1584,7 +1569,6 @@ static void run()
 			}
 #endif
 			
-			// FIXME:
 			long now = tguiCurrentTimeMillis();
 			runtime_ms += now - runtime_start;
 			runtime_start = now;
@@ -2046,47 +2030,11 @@ int main(int argc, char *argv[])
 	
 	fps_on = fps_save;
 
-/*
-	#ifdef DEBUG_XXX
-	DEBUG_DATA d;
-	char *xS;
-	char *yS;
-	if (prompt("warp?", "", 0, 0)) {
-		debug_start(&d);
-		xS = strdup(my_itoa(d.x));
-		yS = strdup(my_itoa(d.y));
-		argc = 5;
-		argv = new char *[6];
-		argv[0] = "MoRPG2";
-		argv[1] = "-warp";
-		argv[2] = (char *)d.area.c_str();
-		argv[3] = xS;
-		argv[4] = yS;
-		argv[5] = NULL;
-		for (int i = 0; i < (int)d.milestones.size(); i++) {
-			forced_milestones.push_back(d.milestones[i]);
-		}
-	}
-	#endif
-*/
-
-	
-   
 #if defined ALLEGRO_IPHONE
 	if (al_get_num_video_adapters() > 1) {
 		connect_second_display();
 	}
 #endif
-
-
-
-/*
-	// FIXME:
-	while (true) {
-		is_close_pressed();
-	}
-*/
-
 
 	// FIXME
 	//playMusic("volcano.ogg"); volcano_scene();

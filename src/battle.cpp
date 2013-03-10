@@ -404,7 +404,7 @@ void Battle::draw(void)
 		al_set_shader_float(tinter, "b", 0);
 		al_use_shader(tinter);
 		m_draw_bitmap(bg, 0, 0, 0);
-		al_use_shader(default_shader);
+		al_use_shader(NULL);
 	}
 	else {
 		m_draw_bitmap(bg, 0, 0, 0);

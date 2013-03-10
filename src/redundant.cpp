@@ -6,11 +6,7 @@ static std::vector<LoadedBitmap *> loaded_bitmaps;
 
 ALLEGRO_BITMAP *my_al_create_bitmap(int w, int h)
 {
-	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
 	ALLEGRO_BITMAP *bmp = al_create_bitmap(w, h);
-	al_set_target_bitmap(bmp);
-	al_use_shader(default_shader);
-	al_set_target_bitmap(old_target);
 	return bmp;
 }
 
@@ -201,11 +197,11 @@ void m_draw_scaled_bitmap(MBITMAP *bmp, float sx, float sy, float sw, float sh,
 void m_draw_scaled_bitmap(MBITMAP *bmp, float sx, float sy, float sw, float sh,
 	float dx, float dy, float dw, float dh, int flags, float alpha)
 {
-	m_save_blender();
+	m_push_blender();
 	float alpha_f = alpha/255.0;
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, al_map_rgba_f(alpha_f, alpha_f, alpha_f, alpha_f));
 	al_draw_tinted_scaled_bitmap(bmp->bitmap, _blend_color, sx, sy, sw, sh, dx, dy, dw, dh, flags);
-	m_restore_blender();
+	m_pop_blender();
 }
 
 
@@ -511,7 +507,7 @@ void m_flip_display(void)
 	if (!skip_flip) {
 		al_flip_display();
 	}
-
+	
 	int xxx, yyy, www, hhh;
 	al_get_clipping_rectangle(&xxx, &yyy, &www, &hhh);
 	al_set_clipping_rectangle(
@@ -522,10 +518,11 @@ void m_flip_display(void)
 	m_clear(black);
 	al_set_clipping_rectangle(xxx, yyy, www, hhh);
 
-	if (controller_display)
+	if (controller_display && controller_display_drawn_to)
 	{
+		controller_display_drawn_to = false;
 		ALLEGRO_BITMAP *target = al_get_target_bitmap();
-		set_target_backbuffer();
+		al_set_target_backbuffer(controller_display);
 		al_flip_display();
 		al_set_target_bitmap(target);
 	}
@@ -582,7 +579,6 @@ int m_get_display_height(void)
 	return al_get_display_height(display);
 }
 
-
 void m_clear(MCOLOR color)
 {
 	al_clear_to_color(color);
@@ -597,6 +593,7 @@ static int m_text_length_real(const MFONT *font, const char *text)
 void m_set_target_bitmap(MBITMAP *bmp)
 {
 	al_set_target_bitmap(bmp->bitmap);
+	//al_use_shader(NULL);
 }
 
 
@@ -700,13 +697,13 @@ MBITMAP *create_trapezoid(int dir, int topw, int bottomw, int length, MCOLOR col
 
 void m_draw_trans_bitmap(MBITMAP *b, int x, int y, int alpha)
 {
-	m_save_blender();
+	m_push_blender();
 
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, m_map_rgba(alpha, alpha, alpha, alpha));
 
 	m_draw_bitmap(b, x, y, 0);
 
-	m_restore_blender();
+	m_pop_blender();
 }
 
 
@@ -720,7 +717,7 @@ MBITMAP *m_clone_bitmap(MBITMAP *b)
 	ALLEGRO_BITMAP *bmp = al_clone_bitmap(b->bitmap);
 	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
 	al_set_target_bitmap(bmp);
-	al_use_shader(default_shader);
+	al_use_shader(NULL);
 	al_set_target_bitmap(old_target);
 	MBITMAP *m = new_mbitmap(bmp);
 	return m;
@@ -822,40 +819,54 @@ float my_get_opengl_version(void)
       return 1.3;
 }
 
+static int curr_blend_s = ALLEGRO_ONE;
+static int curr_blend_d = ALLEGRO_INVERSE_ALPHA;
+static ALLEGRO_COLOR curr_blend_color = { 1, 1, 1, 1 };
+
 void m_set_blender(int s, int d, MCOLOR c)
 {
+	curr_blend_s = s;
+	curr_blend_d = d;
+	curr_blend_color = c;
+
 	_blend_color = c;
+#if !defined ALLEGRO_ANDROID
 	al_set_blender(ALLEGRO_ADD, s, d);
+#else
+	// From allegro ogl_draw.c
+	const int blend_modes[8] = {
+		GL_ZERO, GL_ONE, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA,
+		GL_SRC_COLOR, GL_DST_COLOR, GL_ONE_MINUS_SRC_COLOR,
+		GL_ONE_MINUS_DST_COLOR
+	};
+
+	glEnable(GL_BLEND);
+	glBlendFunc(blend_modes[s], blend_modes[d]);
+#endif
 }
 
-void m_save_blender(void)
+void m_push_blender(void)
 {
 	SAVED_BLENDER sb;
 
-	al_get_blender(
-		&sb.oldColorOp,
-		&sb.oldSrcColorFactor,
-		&sb.oldDestColorFactor
-	);
-
-	sb.oldBlendColor = _blend_color;
+	sb.oldSrcColorFactor = curr_blend_s;
+	sb.oldDestColorFactor = curr_blend_d;
+	sb.oldBlendColor = curr_blend_color;
 
 	blender_stack.push(sb);
 }
 
 
-void m_restore_blender(void)
+void m_pop_blender(void)
 {
 	SAVED_BLENDER sb = blender_stack.top();
 	blender_stack.pop();
 
-	al_set_blender(
-		sb.oldColorOp,
+	m_set_blender(
 		sb.oldSrcColorFactor,
-		sb.oldDestColorFactor
+		sb.oldDestColorFactor,
+		sb.oldBlendColor
 	);
-
-	_blend_color = sb.oldBlendColor;
 }
 
 void m_draw_prim (const void* vtxs, const ALLEGRO_VERTEX_DECL* decl, MBITMAP* texture, int start, int end, int type)
@@ -1031,6 +1042,7 @@ void _reload_loaded_bitmaps(void)
 					d->func(m, d->data);
 				}
 			}
+			al_use_shader(NULL);
 		}
 	}
 
@@ -1061,6 +1073,7 @@ void _reload_loaded_bitmaps_delayed(void)
 					d->func(m, d->data);
 				}
 			}
+			al_use_shader(NULL);
 		}
 	}
 
@@ -1081,7 +1094,7 @@ static MBITMAP *clone_sub_bitmap(MBITMAP *b)
 	m_set_target_bitmap(clone);
 	m_clear(al_map_rgba_f(0, 0, 0, 0));
 
-	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+	m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, white);
 
 	m_draw_bitmap(b, 0, 0, 0);
 
@@ -1199,6 +1212,7 @@ void prepareForScreenGrab1()
 
 void prepareForScreenGrab2()
 {
+	m_set_target_bitmap(tmpbuffer);
 	al_use_transform(&prepareForScreenGrabBackup);
 	al_set_target_bitmap(prepareForScreenGrabBackupBitmap);
 	preparingForScreenGrab = false;

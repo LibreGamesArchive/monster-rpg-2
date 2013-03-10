@@ -10,6 +10,8 @@
 #include "java.h"
 #endif
 
+bool controller_display_drawn_to = false;
+
 MBITMAP *battle_buf = NULL;
 
 bool transitioning;
@@ -55,94 +57,89 @@ static void draw_the_controls(bool draw_controls, ALLEGRO_COLOR tint)
 #if defined ALLEGRO_IPHONE
 	if (airplay_connected || (use_dpad && dpad_buttons && draw_controls && global_draw_controls)) {
 		if (controller_display) {
-			if (joypad_connected()) {
-				mTextout(game_font_second_display, "Joypad connected...", 2, 2, white, black, WGT_TEXT_NORMAL, false);
-			}
-			else {	
+			controller_display_drawn_to = true;
 #else
 	if (use_dpad && dpad_buttons && draw_controls && global_draw_controls) {
 		if (false) {
-			if (false) {
 #endif
-				ALLEGRO_STATE state;
-				al_store_state(&state, ALLEGRO_STATE_BLENDER);
-				al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ONE);
-				
-				// 4 because the screen is scaled to have 960x640 "pixels" when created (960/240 = 4 etc)
-				float scalex = 4;
-				float scaley = 4;
-				
-				const int BUFW = BW*scalex;
-				const int BUFH = BH*scaley;
-				const int BSZX = BUTTON_SIZE*scalex;
-				const int BSZY = BUTTON_SIZE*scaley;
+			ALLEGRO_STATE state;
+			al_store_state(&state, ALLEGRO_STATE_BLENDER);
+			m_set_blender(ALLEGRO_ONE, ALLEGRO_ONE, white);
+			
+			// 4 because the screen is scaled to have 960x640 "pixels" when created (960/240 = 4 etc)
+			float scalex = 4;
+			float scaley = 4;
+			
+			const int BUFW = BW*scalex;
+			const int BUFH = BH*scaley;
+			const int BSZX = BUTTON_SIZE*scalex;
+			const int BSZY = BUTTON_SIZE*scaley;
 
-				int padx = 10*scalex, pady;
-				int b1x = BUFW-BSZX*2-25*scalex, b2y;
-				int b2x = BUFW-BSZX-20*scalex, b1y;
+			int padx = 10*scalex, pady;
+			int b1x = BUFW-BSZX*2-25*scalex, b2y;
+			int b2x = BUFW-BSZX-20*scalex, b1y;
 
-				if (dpad_at_top) {
-					pady = 5*scaley;
-					b1y = 5*scaley;
-					b2y = 5*scaley;
+			if (dpad_at_top) {
+				pady = 5*scaley;
+				b1y = 5*scaley;
+				b2y = 5*scaley;
+			}
+			else {
+				pady = BUFH-BSZY*3-5*scaley;
+				b1y = BUFH-BSZY-5*scaley;
+				b2y = BUFH-BSZY-5*scaley;
+			}
+
+			if (config.getSwapButtons()) {
+				int tx = b1x;
+				int ty = b1y;
+				b1x = b2x;
+				b1y = b2y;
+				b2x = tx;
+				b2y = ty;
+			}
+
+			int centers[6][2] = {
+				{ padx+BSZX/2, pady+BSZY*3/2 },
+				{ padx+BSZX*2.5, pady+BSZY*3/2 },
+				{ padx+BSZX*3/2, pady+BSZY/2 },
+				{ padx+BSZX*3/2, pady+BSZY*2.5 },
+				{ b1x+BSZX/2, b1y+BSZY/2 },
+				{ b2x+BSZX/2, b2y+BSZY/2 }
+			};
+
+			double now = al_get_time();
+			
+			for (int i = 0; i < 6; i++) {
+				double t = now - blueblock_times[i];
+				if (t >= 0.5) {
+					blueblock_times[i] = -1;
+					continue;
 				}
-				else {
-					pady = BUFH-BSZY*3-5*scaley;
-					b1y = BUFH-BSZY-5*scaley;
-					b2y = BUFH-BSZY-5*scaley;
-				}
-
-				if (config.getSwapButtons()) {
-					int tx = b1x;
-					int ty = b1y;
-					b1x = b2x;
-					b1y = b2y;
-					b2x = tx;
-					b2y = ty;
-				}
-
-				int centers[6][2] = {
-					{ padx+BSZX/2, pady+BSZY*3/2 },
-					{ padx+BSZX*2.5, pady+BSZY*3/2 },
-					{ padx+BSZX*3/2, pady+BSZY/2 },
-					{ padx+BSZX*3/2, pady+BSZY*2.5 },
-					{ b1x+BSZX/2, b1y+BSZY/2 },
-					{ b2x+BSZX/2, b2y+BSZY/2 }
-				};
-
-				double now = al_get_time();
-				
-				for (int i = 0; i < 6; i++) {
-					double t = now - blueblock_times[i];
-					if (t >= 1.0) {
-						blueblock_times[i] = -1;
-						continue;
-					}
-					if (t < 0)
-						continue;
-					int frame = (t / 1.0) * 8;
-					float alpha = 1.0;
-					int sizex = m_get_bitmap_width(blueblocks[frame]);
-					int sizey = m_get_bitmap_height(blueblocks[frame]);
-					al_draw_tinted_bitmap(blueblocks[frame]->bitmap,
-						al_map_rgba_f(alpha, alpha, alpha, alpha),
-						centers[i][0]-sizex/2, centers[i][1]-sizey/2,
-						0
-					);
-				}
-				
-				al_restore_state(&state);
-
-				al_draw_bitmap(airplay_dpad->bitmap, padx, pady, 0);
-				al_draw_bitmap(white_button->bitmap, b1x, b1y, 0);
-				al_draw_bitmap(black_button->bitmap, b2x, b2y, 0);
-				
-				al_draw_bitmap(airplay_logo->bitmap,
-					960/2-m_get_bitmap_width(airplay_logo)/2,
-					640/2-m_get_bitmap_height(airplay_logo)/2-100,
+				if (t < 0)
+					continue;
+				int frame = (t / 0.5) * 8;
+				float alpha = 1.0;
+				int sizex = m_get_bitmap_width(blueblocks[frame]);
+				int sizey = m_get_bitmap_height(blueblocks[frame]);
+				al_draw_tinted_bitmap(blueblocks[frame]->bitmap,
+					al_map_rgba_f(alpha, alpha, alpha, alpha),
+					centers[i][0]-sizex/2, centers[i][1]-sizey/2,
 					0
 				);
 			}
+			
+			al_restore_state(&state);
+
+			al_draw_bitmap(airplay_dpad->bitmap, padx, pady, 0);
+			al_draw_bitmap(white_button->bitmap, b1x, b1y, 0);
+			al_draw_bitmap(black_button->bitmap, b2x, b2y, 0);
+			
+			al_draw_bitmap(airplay_logo->bitmap,
+				960/2-m_get_bitmap_width(airplay_logo)/2,
+				640/2-m_get_bitmap_height(airplay_logo)/2-100,
+				0
+			);
 		}
 		else if ((dpad_type == DPAD_TOTAL_2 || dpad_type == DPAD_HYBRID_2)) {
 			ALLEGRO_COLOR light = al_map_rgba(100*tint.r, 200*tint.g, 100*tint.b, 255*tint.a);
@@ -442,9 +439,11 @@ static void drawOverlay(bool draw_controls, ALLEGRO_COLOR tint)
 
 	draw_the_controls(draw_controls, tint);
 
+#ifdef ALLEGRO_IPHONE
 	if (controller_display) {
 		set_target_backbuffer();
 	}
+#endif
 }
 
 void drawBufferToScreen(bool draw_controls)
@@ -668,7 +667,7 @@ void m_draw_precise_line(MBITMAP *bitmap, float x1, float y1, float x2, float y2
 	color.g *= color.a;
 	color.b *= color.a;
 
-	m_save_blender();
+	m_push_blender();
 	m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, white);
 
 	for (float i = 0; i < dist && vcount < nverts; i += step) {
@@ -685,7 +684,7 @@ void m_draw_precise_line(MBITMAP *bitmap, float x1, float y1, float x2, float y2
 		m_draw_prim(verts, 0, 0, 0, vcount, ALLEGRO_PRIM_POINT_LIST);
 	}
 
-	m_restore_blender();
+	m_pop_blender();
 
 	delete[] verts;
 }
@@ -1056,14 +1055,14 @@ void battleTransition()
 
 		ALLEGRO_STATE state;
 		al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
-		m_save_blender();
+		m_push_blender();
 		m_set_target_bitmap(xfade_buf);
 		m_draw_bitmap(tmp, 0, 0, 0);
 		float alpha = angle / (M_PI*2);
 		m_set_blender(M_ONE, M_INVERSE_ALPHA, al_map_rgba_f(alpha, alpha, alpha, alpha));
 		m_draw_bitmap(battle_buf, 0, 0, 0);
 		al_restore_state(&state);
-		m_restore_blender();
+		m_pop_blender();
 
 		ALLEGRO_STATE s;
 		al_store_state(&s, ALLEGRO_STATE_TARGET_BITMAP);
@@ -1078,7 +1077,7 @@ void battleTransition()
 		al_set_shader_sampler(warp, "tex", xfade_buf->bitmap, 0);
 		al_use_shader(warp);
 		m_draw_bitmap(xfade_buf, dx, dy, 0);
-		al_use_shader(default_shader);
+		al_use_shader(NULL);
 		al_restore_state(&s);
 		drawBufferToScreen(false);
 		m_flip_display();

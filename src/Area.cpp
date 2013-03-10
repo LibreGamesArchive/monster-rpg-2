@@ -5,6 +5,12 @@
 
 #include <sys/stat.h>
 
+
+static int get_tile_pos(int tn)
+{
+	return tn*TILE_SIZE + 1 + 2*tn;
+}
+
 static bool compare_node_pointer(Node *n1, Node *n2)
 {
 	return n1->TotalCost < n2->TotalCost;
@@ -118,9 +124,10 @@ static void shift_auto_saves()
 }
 #endif
 
-static void *save_auto_save_to_disk_thread(void *save_ss)
+
+void save_auto_save_to_disk()
 {
-	bool save_screenshot = (save_ss != NULL);
+	bool save_screenshot = true;
 	bool all_dead = true;
 	for (int i = 0; i < MAX_PARTY; i++) {
 		if (party[i] &&
@@ -131,11 +138,11 @@ static void *save_auto_save_to_disk_thread(void *save_ss)
 	}
 
 	if (all_dead) {
-		return NULL;
+		return;
 	}
 
 	if (!memory_saved) {
-		return NULL;
+		return;
 	}
 
 	shift_auto_saves();
@@ -160,13 +167,6 @@ static void *save_auto_save_to_disk_thread(void *save_ss)
 		al_android_set_apk_file_interface();
 #endif
 	}
-
-	return NULL;
-}
-
-void save_auto_save_to_disk()
-{
-	al_run_detached_thread(save_auto_save_to_disk_thread, (void *)1);
 }
 
 static int sign(float f)
@@ -584,11 +584,11 @@ void Area::drawObject(int index)
 					al_use_shader(tinter);
 					m_draw_bitmap_region(bmp, 0, TILE_SIZE-depth, TILE_SIZE,
 						depth, dx, dy, 0);
-					al_use_shader(default_shader);
+					al_use_shader(NULL);
 				}
 				else
 				{
-				m_save_blender();
+				m_push_blender();
 				float d, r, g, b;
 				d = targetTint.r - 1;
 				r = 1+(tint_ratio*d);
@@ -599,7 +599,7 @@ void Area::drawObject(int index)
 				m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, al_map_rgb_f(r, g, b));
 				m_draw_bitmap_region(bmp, 0, TILE_SIZE-depth, TILE_SIZE,
 					depth, dx, dy, 0);
-				m_restore_blender();
+				m_pop_blender();
 				}
 			}
 			else {
@@ -1189,14 +1189,14 @@ void Area::draw(int bw, int bh)
 	if (bg) {
 		int bgox = (float)getOriginX() / (sizex*TILE_SIZE) * (m_get_bitmap_width(bg)-BW);
 		int bgoy = (float)getOriginY() / (sizey*TILE_SIZE) * (m_get_bitmap_height(bg)-BH);
-		m_save_blender();
+		m_push_blender();
 		m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, white);
 		m_draw_bitmap_region(bg, bgox, bgoy, BW, BH, 0, 0, 0);
-		m_restore_blender();
+		m_pop_blender();
 	}
 
 	if (tinting) {
-		m_save_blender();
+		m_push_blender();
 		float d, r, g, b;
 		d = targetTint.r - 1;
 		r = 1+(tint_ratio*d);
@@ -1209,7 +1209,7 @@ void Area::draw(int bw, int bh)
 			drawLayer(j, bw, bh);
 		}
 		
-		m_restore_blender();
+		m_pop_blender();
 	}
 	else {
 		for (int i = 0; i < TILE_LAYERS/2; i++) {
@@ -1229,7 +1229,7 @@ void Area::draw(int bw, int bh)
 		m_draw_prim(verts, 0, partial_tm, 0, num_quads*6,
 			ALLEGRO_PRIM_TRIANGLE_LIST);
 		if (tinting && use_programmable_pipeline) {
-			al_use_shader(default_shader);
+			al_use_shader(NULL);
 		}
 	}
 
@@ -1278,7 +1278,7 @@ void Area::draw(int bw, int bh)
 
 
 	if (tinting) {
-		m_save_blender();
+		m_push_blender();
 		float d, r, g, b;
 		d = targetTint.r - 1;
 		r = 1+(tint_ratio*d);
@@ -1290,7 +1290,7 @@ void Area::draw(int bw, int bh)
 		for (int j = TILE_LAYERS/2; j < TILE_LAYERS; j++) {
 			drawLayer(j, bw, bh);
 		}
-		m_restore_blender();
+		m_pop_blender();
 	}
 	else {
 		for (int i = TILE_LAYERS/2; i < TILE_LAYERS; i++) {
@@ -1310,7 +1310,7 @@ void Area::draw(int bw, int bh)
 		m_draw_prim(verts, 0, partial_tm, 0, num_quads*6,
 			ALLEGRO_PRIM_TRIANGLE_LIST);
 		if (tinting && use_programmable_pipeline) {
-			al_use_shader(default_shader);
+			al_use_shader(NULL);
 		}
 	}
 #endif
@@ -1895,8 +1895,8 @@ Tile* Area::loadTile(ALLEGRO_FILE *f)
 			anims[i] = al_fread32le(f);
 			if (anims[i] >= 0) {
 				int n = newmap[tileAnimationNums[anims[i]]];
-				tu[i] = (n % tm_w) * TILE_SIZE;
-				tv[i] = (n / tm_w) * TILE_SIZE;
+				tu[i] = get_tile_pos(n % tm_w);
+				tv[i] = get_tile_pos(n / tm_w);
 			}
 		}
 		bool solid = al_fgetc(f);
@@ -1977,11 +1977,70 @@ unsigned int Area::getHeight(void)
 	return (uint)sizey;
 }
 
+void draw_tile_with_borders(MBITMAP *tile, int x, int y)
+{
+	int sides[4][6] = {
+		{ /* src */ 0, 0, TILE_SIZE, 1, /* dest */ 0, -1 }, // top
+		{ /* src */ 0, TILE_SIZE-1, TILE_SIZE, 1, /* dest */ 0, TILE_SIZE }, // bottom
+		{ /* src */ 0, 0, 1, TILE_SIZE, /* dest */ -1, 0 }, // left
+		{ /* src */ TILE_SIZE-1, 0, 1, TILE_SIZE, /* dest */ TILE_SIZE, 0 } // right
+	};
+
+	int corners[4][4] = {
+		{ /* src */ 0, 0, /* dest */ -1, -1 }, // top left
+		{ /* src */ TILE_SIZE-1, 0, /* dest */ TILE_SIZE, -1 }, // top right
+		{ /* src */ 0, TILE_SIZE-1, /* dest */ -1, TILE_SIZE }, // bottom left
+		{ /* src */ TILE_SIZE-1, TILE_SIZE-1, /* dest */ TILE_SIZE, TILE_SIZE } // bottom right
+	};
+
+	// do sides
+	for (int i = 0; i < 4; i++) {
+		al_draw_bitmap_region(
+			tile->bitmap,
+			sides[i][0],
+			sides[i][1],
+			sides[i][2],
+			sides[i][3],
+			x+sides[i][4],
+			y+sides[i][5],
+			0
+		);
+	}
+
+	// do corners
+	for (int i = 0; i < 4; i++) {
+		al_draw_bitmap_region(
+			tile->bitmap,
+			corners[i][0],
+			corners[i][1],
+			1,
+			1,
+			x+corners[i][2],
+			y+corners[i][3],
+			0
+		);
+	}
+
+	al_draw_bitmap(tile->bitmap, x, y, 0);
+}
+
 void Area::loadAnimation(int index, bool addIndex)
 {
 	// FIXME hardcoded
 	if (index < 0 || index >= ((512/16)*(2048/16))/*>= numTiles*/)
 		return;
+
+	int offs[9][2] = {
+		{ -1, -1 },
+		{ -1, 1 },
+		{ 1, 1 },
+		{ 1, -1 },
+		{ -1, 0 },
+		{ 1 , 0 },
+		{ 0, -1 },
+		{ 0, 1 },
+		{ 0, 0 }
+	};
 
 	char n[100];
 	sprintf(n, "%d", index);
@@ -2028,10 +2087,10 @@ void Area::loadAnimation(int index, bool addIndex)
 	int xx = tm_used % tm_w;
 	int yy = tm_used / tm_w;
 	tm_used++;
-	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+	m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, white);
 	m_set_target_bitmap(partial_tm);
-	m_draw_bitmap(tmp, xx*TILE_SIZE, yy*TILE_SIZE, 0);
-	MBITMAP *subbmp = m_create_sub_bitmap(partial_tm, xx*TILE_SIZE, yy*TILE_SIZE, TILE_SIZE, TILE_SIZE); // check
+	draw_tile_with_borders(tmp, get_tile_pos(xx), get_tile_pos(yy));
+	MBITMAP *subbmp = m_create_sub_bitmap(partial_tm, get_tile_pos(xx), get_tile_pos(yy), TILE_SIZE, TILE_SIZE); // check
 	m_destroy_bitmap(tmp);
 	al_restore_state(&st);
 	image = new Image();
@@ -2061,8 +2120,8 @@ void Area::loadAnimation(int index, bool addIndex)
 	std::vector<int> tu;
 	std::vector<int> tv;
 
-	tu.push_back(xx*TILE_SIZE);
-	tv.push_back(yy*TILE_SIZE);
+	tu.push_back(get_tile_pos(xx));
+	tv.push_back(get_tile_pos(yy));
 
 	int i = 2;
 
@@ -2093,10 +2152,10 @@ void Area::loadAnimation(int index, bool addIndex)
 		int xx = tm_used % tm_w;
 		int yy = tm_used / tm_w;
 		tm_used++;
-		al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+		m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, white);
 		m_set_target_bitmap(partial_tm);
-		m_draw_bitmap(tmp, xx*TILE_SIZE, yy*TILE_SIZE, 0);
-		MBITMAP *subbmp = m_create_sub_bitmap(partial_tm, xx*TILE_SIZE, yy*TILE_SIZE, TILE_SIZE, TILE_SIZE); // check
+		draw_tile_with_borders(tmp, get_tile_pos(xx), get_tile_pos(yy));
+		MBITMAP *subbmp = m_create_sub_bitmap(partial_tm, get_tile_pos(xx), get_tile_pos(yy), TILE_SIZE, TILE_SIZE); // check
 		m_destroy_bitmap(tmp);
 		al_restore_state(&st);
 		image = new Image();
@@ -2105,8 +2164,8 @@ void Area::loadAnimation(int index, bool addIndex)
 		al_set_new_bitmap_flags(flags);
 		frame = new Frame(image, delay);
 		animation->addFrame(frame);
-		tu.push_back(xx*TILE_SIZE);
-		tv.push_back(yy*TILE_SIZE);
+		tu.push_back(get_tile_pos(xx));
+		tv.push_back(get_tile_pos(yy));
 
 		i++;
 	}
@@ -2175,7 +2234,7 @@ bool Area::load(std::string filename)
 
 	int flgs = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flgs & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-	partial_tm = m_create_alpha_bitmap(tm_w*TILE_SIZE, tm_h*TILE_SIZE); // check
+	partial_tm = m_create_alpha_bitmap(tm_w*TILE_SIZE+tm_w*2, tm_h*TILE_SIZE+tm_h*2); // check
 	al_set_new_bitmap_flags(flgs);
 
 	char tmp[MAX_AREA_NAME];

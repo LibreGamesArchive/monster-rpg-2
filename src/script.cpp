@@ -3479,12 +3479,12 @@ static int CDoKeepLook(lua_State *stack)
 			set_target_backbuffer();
 			m_draw_bitmap(bmp, 0, 0, 0);
 			if (show_shine) {
-				m_save_blender();
+				m_push_blender();
 				m_set_blender(M_ALPHA, M_ONE, white);
 				for (int i = 0; i < 7; i++) {
 					m_draw_pixel(x[i], y[i], c[i]);
 				}
-				m_restore_blender();
+				m_pop_blender();
 			}
 			tguiDraw();
 			drawBufferToScreen();

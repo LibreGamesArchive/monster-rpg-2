@@ -119,10 +119,10 @@ static void mTextout_real(MFONT *font, const char *text, int x, int y,
 			num[i] = text[i+1];
 		}
 		int index = atoi(num);
-		m_save_blender();
+		m_push_blender();
 		m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 		m_draw_bitmap(icons[index], x, y-2, 0);
-		m_restore_blender();
+		m_pop_blender();
 		x += m_text_height(font)+2;
 		strcpy(buf, text+5);
 		ctext = buf;
@@ -216,7 +216,7 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 {
 	h = h - 1; // hack for compatibility
 
-	m_save_blender();
+	m_push_blender();
 
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
@@ -232,7 +232,7 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 		al_set_shader_float(shadow_shader, "radius", screenScaleX*10);
 		al_use_shader(shadow_shader);
 		m_draw_rectangle(x-10, y-10, x+w+10, y+h+10, black, M_FILLED);
-		al_use_shader(default_shader);
+		al_use_shader(NULL);
 	}
 
 
@@ -328,7 +328,7 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 		al_draw_bitmap_region(shadow_sheet->bitmap, SHADOW_CORNER_SIZE*3, 16, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x-2-SHADOW_CORNER_SIZE, y+h+2, 0);
 	}
 
-	m_restore_blender();
+	m_pop_blender();
 }
 
 
@@ -2662,7 +2662,7 @@ int MMap::update(int millis)
 		if (points[selected].dest_area == "Keep_outer") {
 			playMusic("keep.ogg");
 			MBITMAP *bmp = m_load_bitmap(getResource("media/keep.png"));
-			m_save_blender();
+			m_push_blender();
 			int w = m_get_bitmap_width(bmp);
 			int h = m_get_bitmap_height(bmp);
 			const int start_x = (w-BW)/2;
@@ -2723,7 +2723,7 @@ int MMap::update(int millis)
 				totalElapsed += elapsed;
 			}
 			dpad_on();
-			m_restore_blender();
+			m_pop_blender();
 			m_destroy_bitmap(bmp);
 			if (break_for_fade_after_draw) {
 				break_for_fade_after_draw = false;
@@ -3429,14 +3429,14 @@ loop:
 	if (dragging) {
 		ALLEGRO_MOUSE_STATE state;
 		m_get_mouse_state(&state);
-		m_save_blender();
+		m_push_blender();
 		m_set_blender(M_ONE, M_INVERSE_ALPHA, al_map_rgba(128, 128, 128, 128));
 		int w = m_get_bitmap_width(dragBmp);
 		int h = m_get_bitmap_height(dragBmp);
 		m_draw_scaled_bitmap(dragBmp, 0, 0, w, h,
 			state.x-w, state.y-h,
 			w*2, h*2, 0, 255);
-		m_restore_blender();
+		m_pop_blender();
 	}
 
 	if (use_dpad && this != tguiActiveWidget)
@@ -4052,14 +4052,14 @@ void MToggleList::draw()
 	if (dragging) {
 		ALLEGRO_MOUSE_STATE state;
 		m_get_mouse_state(&state);
-		m_save_blender();
+		m_push_blender();
 		m_set_blender(M_ONE, M_INVERSE_ALPHA, al_map_rgba(128, 128, 128, 128));
 		int w = m_get_bitmap_width(dragBmp);
 		int h = m_get_bitmap_height(dragBmp);
 		m_draw_scaled_bitmap(dragBmp, 0, 0, w, h,
 			state.x-w, state.y-h,
 			w*2, h*2, 0, 255);
-		m_restore_blender();
+		m_pop_blender();
 	}
 
 	int dx, dy;
@@ -4413,14 +4413,14 @@ void MScrollingList::post_draw()
 	if (dragging) {
 		ALLEGRO_MOUSE_STATE state;
 		m_get_mouse_state(&state);
-		m_save_blender();
+		m_push_blender();
 		m_set_blender(M_ONE, M_INVERSE_ALPHA, al_map_rgba(128, 128, 128, 128));
 		int w = m_get_bitmap_width(dragBmp);
 		int h = m_get_bitmap_height(dragBmp);
 		m_draw_scaled_bitmap(dragBmp, 0, 0, w, h,
 			state.x-w, state.y-h,
 			w*2, h*2, 0, 255);
-		m_restore_blender();
+		m_pop_blender();
 	}
 }
 
@@ -5035,14 +5035,14 @@ loop:
 	if (dragging) {
 		ALLEGRO_MOUSE_STATE state;
 		m_get_mouse_state(&state);
-		m_save_blender();
+		m_push_blender();
 		m_set_blender(M_ONE, M_INVERSE_ALPHA, al_map_rgba(128, 128, 128, 128));
 		int w = m_get_bitmap_width(dragBmp);
 		int h = m_get_bitmap_height(dragBmp);
 		m_draw_scaled_bitmap(dragBmp, 0, 0, w, h,
 			state.x-w, state.y-h,
 			w*2, h*2, 0, 255);
-		m_restore_blender();
+		m_pop_blender();
 	}
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
@@ -5929,7 +5929,7 @@ void MMultiChooser::draw()
 	}
 
 	for (unsigned int i = 0; i < points.size(); i++) {
-		m_save_blender();
+		m_push_blender();
 		int alpha = 100;
 		std::vector<int>::iterator it = std::find(current.begin(), current.end(), i);
 		if (it != current.end()) {
@@ -5972,7 +5972,7 @@ void MMultiChooser::draw()
 			m_draw_bitmap(arrow, draw_x, draw_y, flags);
 		}
 
-		m_restore_blender();
+		m_pop_blender();
 	}
 }
 
@@ -6307,14 +6307,14 @@ void MPartySelector::draw()
 	if (dragging) {
 		ALLEGRO_MOUSE_STATE state;
 		m_get_mouse_state(&state);
-		m_save_blender();
+		m_push_blender();
 		m_set_blender(M_ONE, M_INVERSE_ALPHA, al_map_rgba(128, 128, 128, 128));
 		int w = m_get_bitmap_width(dragBmp);
 		int h = m_get_bitmap_height(dragBmp);
 		m_draw_scaled_bitmap(dragBmp, 0, 0, w, h,
 			state.x-w, state.y-h,
 			w*2, h*2, 0, 255);
-		m_restore_blender();
+		m_pop_blender();
 	}
 }
 
@@ -6638,13 +6638,13 @@ void MIcon::draw()
 {
 	m_draw_tinted_bitmap(bitmap, tint, x, y, 0);
 	if (this == tguiActiveWidget && show_focus) {
-		m_save_blender();
-		al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ONE);
+		m_push_blender();
+		m_set_blender(ALLEGRO_ONE, ALLEGRO_ONE, white);
 		double t = fmod(al_get_time(), 1.0);
 		if (t >= 0.5) t = 0.5 - (t-0.5);
 		float a = t / 0.5;
 		al_draw_tinted_bitmap(bitmap->bitmap, al_map_rgba_f(a, a, a, a), x, y, 0);
-		m_restore_blender();
+		m_pop_blender();
 	}
 	if (down && show_name) {
 		m_draw_rectangle(

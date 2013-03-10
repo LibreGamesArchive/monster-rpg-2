@@ -502,10 +502,10 @@ static void dragon_fade(AnimationSet *a, AnimationSet *a2, int fullframe, int fa
 		set_target_backbuffer();
 		m_clear(black);
 
-		m_save_blender();
+		m_push_blender();
 		m_set_blender(M_ONE, M_INVERSE_ALPHA, m_map_rgba(255*alpha, 255*alpha, 255*alpha, 255*alpha));
 		m_draw_bitmap(fade, dragon_x, dragon_y-a->getHeight(), dragon_flags);
-		m_restore_blender();
+		m_pop_blender();
 
 		m_draw_bitmap(full, dragon_x, dragon_y-a->getHeight(), dragon_flags);
 		
@@ -716,7 +716,7 @@ void CombatEnemy::draw(void)
 					}
 				}
 			}
-			al_use_shader(default_shader);
+			al_use_shader(NULL);
 		}
 		else {
 			int dx = (int)(x - (w/2));
@@ -753,7 +753,7 @@ void CombatEnemy::draw(void)
 				al_set_shader_float(brighten, "brightness", 0.7);
 				al_use_shader(brighten);
 				animSet->draw(x+ox-(w/2), y+oy-h, flags);
-				al_use_shader(default_shader);
+				al_use_shader(NULL);
 			}
 			else {
 				MBITMAP *bmp = whiteAnimSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
@@ -788,10 +788,10 @@ void CombatEnemy::draw(void)
 						animSet->draw(x-(w/2), y-h, flags);
 					else
 						animSet->drawRotated(x+ox, y+oy-h/2, angle, flags);
-					al_use_shader(default_shader);
+					al_use_shader(NULL);
 				}
 				else {
-					m_save_blender();
+					m_push_blender();
 					float  r, g, b;
 					r = 0.5f;
 					g = 0.5f;
@@ -803,7 +803,7 @@ void CombatEnemy::draw(void)
 					}
 					else
 						animSet->drawRotated(x+ox, y+oy-h/2, angle, flags);
-					m_restore_blender();
+					m_pop_blender();
 				}
 			}
 			else {
@@ -1254,11 +1254,11 @@ void CombatEnemyTode::draw(void)
 					}
 				}
 			}
-			al_use_shader(default_shader);
+			al_use_shader(NULL);
 		}
 		else {
 			{
-			m_save_blender();
+			m_push_blender();
 			float  r, g, b;
 			r = 0.8f;
 			g = 0.0f;
@@ -1282,7 +1282,7 @@ void CombatEnemyTode::draw(void)
 					}
 				}
 			}
-			m_restore_blender();
+			m_pop_blender();
 			}
 		}
 	}
@@ -1294,7 +1294,7 @@ void CombatEnemyTode::draw(void)
 				al_set_shader_float(brighten, "brightness", 0.7);
 				al_use_shader(brighten);
 				animSet->draw(x+ox-(w/2), y+oy-h, flags);
-				al_use_shader(default_shader);
+				al_use_shader(NULL);
 			}
 			else {
 				MBITMAP *bmp = whiteAnimSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();

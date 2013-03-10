@@ -64,6 +64,8 @@ void set_user_joystick(void);
 
 void get_screen_offset_size(int *dx, int *dy, int *dw, int *dh);
 
+void create_tmpbuffer();
+
 // FIXME: TONNES OF GLOBALS
 
 extern ALLEGRO_TIMER *logic_timer, *draw_timer;
@@ -74,7 +76,6 @@ extern ALLEGRO_MUTEX *wait_mutex;
 extern ALLEGRO_MUTEX *ss_mutex;
 extern int exit_event_thread;
 extern ALLEGRO_SHADER *default_shader;
-extern ALLEGRO_SHADER *logo_shader;
 extern ALLEGRO_SHADER *tinter;
 extern ALLEGRO_SHADER *warp;
 extern ALLEGRO_SHADER *shadow_shader;

@@ -138,7 +138,6 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
    /* load allegro */
    static {
 		/* FIXME: see if we can't load the allegro library name, or type from the manifest here */
-	/*
       System.loadLibrary("allegro-debug");
       System.loadLibrary("allegro_memfile-debug");
       System.loadLibrary("allegro_primitives-debug");
@@ -146,7 +145,7 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
       System.loadLibrary("allegro_font-debug");
       System.loadLibrary("allegro_ttf-debug");
       System.loadLibrary("allegro_color-debug");
-      */
+      /*
       System.loadLibrary("allegro");
       System.loadLibrary("allegro_memfile");
       System.loadLibrary("allegro_primitives");
@@ -154,6 +153,7 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
       System.loadLibrary("allegro_font");
       System.loadLibrary("allegro_ttf");
       System.loadLibrary("allegro_color");
+      */
       System.loadLibrary("bass");
       System.loadLibrary("bassflac");
       System.loadLibrary("monsterrpg2");

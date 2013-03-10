@@ -2284,7 +2284,7 @@ void into_the_sun(void)
 				m_unmap_rgba(c, &r, &g, &b, &a);
 				ALLEGRO_STATE st;
 				al_store_state(&st, ALLEGRO_STATE_BLENDER);
-				al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+				m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, white);
 				ALLEGRO_VERTEX v[1];
 				v[0].x = cx;
 				v[0].y = cy;
@@ -4331,7 +4331,7 @@ int title_menu(void)
 	on_title_screen = true;
 	
 	break_main_loop = false;
-
+	
 	dpad_off();
 	
 	tguiEnableHotZone(false);
@@ -4391,6 +4391,7 @@ int title_menu(void)
 	tguiSetFocus(buttons[0]);
 
 	debug_message("doing title loop\n");
+	
 
 	prepareForScreenGrab1();
 	title_draw(bg);
@@ -4491,12 +4492,8 @@ int title_menu(void)
 #endif
 
 			INPUT_EVENT ie = get_next_input_event();
-#ifdef ALLEGRO_ANDROID
-			// Back button on android is a shake
+			// Back button on android is a shake. other shakes (hot corner) suppressed on this menu (see monster2.cpp)
 			if (ie.button2 == DOWN || iphone_shaken(0.1)) {
-#else
-			if (ie.button2 == DOWN) {
-#endif
 				selected = 0xBEEF;
 				goto done;
 			}

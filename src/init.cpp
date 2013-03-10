@@ -1,4 +1,4 @@
- #if defined __APPLE__
+#if defined __APPLE__
 #import <Foundation/Foundation.h>
 #endif
 
@@ -25,6 +25,32 @@ extern "C" {
 #ifdef ALLEGRO_RASPBERRYPI
 #include <bcm_host.h>
 #endif
+
+void create_tmpbuffer()
+{
+	int flags = al_get_new_bitmap_flags();
+#if defined OPENGLES
+	int format = al_get_new_bitmap_format();
+	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
+#endif
+	al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+	int w = al_get_display_width(display);
+	int h = al_get_display_height(display);
+#else
+	ALLEGRO_MONITOR_INFO mi;
+	al_get_monitor_info(config.getAdapter(), &mi);
+	int w = mi.x2 - mi.x1;
+	int h = mi.y2 - mi.y1;
+#endif
+	tmpbuffer = m_create_bitmap(
+		w, h
+	);
+	al_set_new_bitmap_flags(flags);
+#if defined OPENGLES
+	al_set_new_bitmap_format(format);
+#endif
+}
 
 #ifdef ALLEGRO_ANDROID
 static uint32_t parse_version(const char *v)
@@ -164,8 +190,6 @@ ALLEGRO_MUTEX *wait_mutex;
 ALLEGRO_MUTEX *ss_mutex;
 ALLEGRO_MUTEX *joypad_mutex;
 int exit_event_thread = 0;
-ALLEGRO_SHADER *default_shader;
-ALLEGRO_SHADER *logo_shader;
 ALLEGRO_SHADER *tinter;
 ALLEGRO_SHADER *warp;
 ALLEGRO_SHADER *shadow_shader;
@@ -311,78 +335,6 @@ void load_fonts(void)
 	// NOTE: This has to be after display creation and loading of fonts
 	load_translation(get_language_name(config.getLanguage()).c_str());
 }
-
-/* KEEPME: If ever need to regen shadows.png, this is it */
-#if 0
-static void create_shadows(MBITMAP *bmp, RecreateData *data)
-{
-	(void)data;
-	MBITMAP *shadow_corners[4]; // top left then clockwise
-	MBITMAP *shadow_sides[4]; // top then clockwise
-
-	ALLEGRO_BITMAP *__old_target__ = al_get_target_bitmap();
-	m_save_blender();
-	m_set_target_bitmap(bmp);
-	m_clear(al_map_rgba(0, 0, 0, 0));
-
-	shadow_sides[0] = m_create_sub_bitmap(bmp, 16*0, 0, 16, SHADOW_CORNER_SIZE);
-	shadow_sides[1] = m_create_sub_bitmap(bmp, 16*1, 0, SHADOW_CORNER_SIZE, 16);
-	shadow_sides[2] = m_create_sub_bitmap(bmp, 16*2, 0, 16, SHADOW_CORNER_SIZE);
-	shadow_sides[3] = m_create_sub_bitmap(bmp, 16*3, 0, SHADOW_CORNER_SIZE, 16);
-	
-	for (int i = 0; i < 4; i++) {
-		shadow_corners[i] = m_create_sub_bitmap(bmp, i*SHADOW_CORNER_SIZE, 16, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE);
-	}
-
-	m_set_target_bitmap(shadow_corners[2]);
-#ifdef ALLEGRO_ANDROID
-	al_lock_bitmap(shadow_corners[2]->bitmap->parent, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
-#else
-	m_lock_bitmap(shadow_corners[2], ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
-#endif
-	for (int yy = 0; yy < SHADOW_CORNER_SIZE; yy++) {
-		for (int xx = 0; xx < SHADOW_CORNER_SIZE; xx++) {
-			int dx = xx;
-			int dy = yy;
- 			float dist = (float)sqrt((float)dx*dx + dy*dy) + 1;
-			if (dist > SHADOW_CORNER_SIZE) dist = SHADOW_CORNER_SIZE;
-			float a = (1.0f-(dist/SHADOW_CORNER_SIZE))*255;
-			m_put_pixel(xx, yy, m_map_rgba(0, 0, 0, a));
-		}
-	}
-#ifdef ALLEGRO_ANDROID
-	al_unlock_bitmap(shadow_corners[2]->bitmap->parent);
-#else
-	m_unlock_bitmap(shadow_corners[2]);
-#endif
-	_blend_color = white;
-
-	//al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA);
-	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
-
-	// Can't draw bitmaps to themselves except MEMORY or locked ones, so lock it
-
-	m_set_target_bitmap(bmp);
-
-	m_draw_bitmap_to_self(shadow_corners[2], 0, 16, M_FLIP_HORIZONTAL|M_FLIP_VERTICAL);
-	m_draw_bitmap_to_self(shadow_corners[2], 10, 16, M_FLIP_VERTICAL);
-	m_draw_bitmap_to_self(shadow_corners[2], 30, 16, M_FLIP_HORIZONTAL);
-	m_draw_bitmap_region_to_self(shadow_corners[0], SHADOW_CORNER_SIZE-1, 0, 1, SHADOW_CORNER_SIZE, 0, 0, 0);
-	m_draw_bitmap_region_to_self(shadow_corners[0], 0, SHADOW_CORNER_SIZE-1, SHADOW_CORNER_SIZE, 1, 48, 0, 0);
-	m_draw_bitmap_to_self(shadow_sides[0], 32, 0, M_FLIP_VERTICAL);
-	m_draw_bitmap_to_self(shadow_sides[3], 16, 0, M_FLIP_HORIZONTAL);
-	
-	m_restore_blender();
-	al_set_target_bitmap(__old_target__);
-
-	ALLEGRO_DEBUG("created shadows in callback thing");
-
-	for (int i = 0; i < 4; i++) {
-		m_destroy_bitmap(shadow_corners[i]);
-		m_destroy_bitmap(shadow_sides[i]);
-	}
-}
-#endif
 
 ScreenSize small_screen(void)
 {
@@ -666,7 +618,7 @@ static void *loader_proc(void *arg)
 	joypad_mutex = al_create_mutex_recursive();
 
 	m_push_target_bitmap();
-	m_save_blender();
+	m_push_blender();
 	orb_bmp = m_create_alpha_bitmap(80, 80);
 	m_set_target_bitmap(orb_bmp);
 	m_set_blender(M_ONE, M_ZERO, white);
@@ -690,7 +642,7 @@ static void *loader_proc(void *arg)
 			m_put_pixel(xx, yy, c);
 		}
 	}
-	m_restore_blender();
+	m_pop_blender();
 	m_pop_target_bitmap();
 
 	// FIXME
@@ -762,30 +714,6 @@ bool loadTilemap(void)
 void init_shaders(void)
 {
 	if (use_programmable_pipeline) {
-		static const char *default_vertex_source =
-		"attribute vec4 " ALLEGRO_SHADER_VAR_POS ";\n"
-		"attribute vec4 " ALLEGRO_SHADER_VAR_COLOR ";\n"
-		"attribute vec2 " ALLEGRO_SHADER_VAR_TEXCOORD ";\n"
-		"uniform mat4 " ALLEGRO_SHADER_VAR_PROJVIEW_MATRIX ";\n"
-		"uniform bool " ALLEGRO_SHADER_VAR_USE_TEX_MATRIX ";\n"
-		"uniform mat4 " ALLEGRO_SHADER_VAR_TEX_MATRIX ";\n"
-		"varying vec4 varying_color;\n"
-		"varying vec2 varying_texcoord;\n"
-		"void main()\n"
-		"{\n"
-		"  varying_color = " ALLEGRO_SHADER_VAR_COLOR ";\n"
-		"  if (" ALLEGRO_SHADER_VAR_USE_TEX_MATRIX ") {\n"
-		"    vec4 uv = " ALLEGRO_SHADER_VAR_TEX_MATRIX " * vec4(" ALLEGRO_SHADER_VAR_TEXCOORD ", 0, 1);\n"
-		"    varying_texcoord = vec2(uv.x, uv.y);\n"
-		"  }\n"
-		"  else\n"
-		"    varying_texcoord = " ALLEGRO_SHADER_VAR_TEXCOORD ";\n"
-#ifndef __linux__
-		"  gl_PointSize = 1.0;\n"
-#endif
-		"  gl_Position = " ALLEGRO_SHADER_VAR_PROJVIEW_MATRIX " * " ALLEGRO_SHADER_VAR_POS ";\n"
-		"}\n";
-
 		static const char *warp_vertex_source =
 		"attribute vec4 " ALLEGRO_SHADER_VAR_POS ";\n"
 		"attribute vec4 " ALLEGRO_SHADER_VAR_COLOR ";\n"
@@ -809,46 +737,6 @@ void init_shaders(void)
 		"   gl_Position = " ALLEGRO_SHADER_VAR_PROJVIEW_MATRIX " * " ALLEGRO_SHADER_VAR_POS ";\n"
 		"}\n";
 
-
-/*
-		static const char *default_pixel_source =
-#ifdef OPENGLES
-		"precision mediump float;\n"
-#endif
-		"uniform sampler2D " ALLEGRO_SHADER_VAR_TEX ";\n"
-		"uniform bool " ALLEGRO_SHADER_VAR_USE_TEX ";\n"
-		"varying vec4 varying_color;\n"
-		"varying vec2 varying_texcoord;\n"
-		"void main()\n"
-		"{\n"
-		"  vec4 tmp;\n"
-		"  if (" ALLEGRO_SHADER_VAR_USE_TEX ")\n"
-		"    tmp = varying_color * texture2D(" ALLEGRO_SHADER_VAR_TEX ", varying_texcoord);\n"
-		"  else\n"
-		"    tmp = varying_color;\n"
-		"  if (tmp.a == 0.0) {\n"
-		"    discard;\n"
-		"  }\n"
-		"  gl_FragColor = tmp;\n"
-		"}\n";
-*/
-
-		static const char *default_pixel_source =
-#ifdef OPENGLES
-		"precision mediump float;\n"
-#endif
-		"uniform sampler2D " ALLEGRO_SHADER_VAR_TEX ";\n"
-		"uniform bool " ALLEGRO_SHADER_VAR_USE_TEX ";\n"
-		"varying vec4 varying_color;\n"
-		"varying vec2 varying_texcoord;\n"
-		"void main()\n"
-		"{\n"
-		"  if (" ALLEGRO_SHADER_VAR_USE_TEX ")\n"
-		"    gl_FragColor = varying_color * texture2D(" ALLEGRO_SHADER_VAR_TEX ", varying_texcoord);\n"
-		"  else\n"
-		"    gl_FragColor = varying_color;\n"
-		"}\n";
-	
 		const char *tinter_pixel_source =
 #if defined OPENGLES
 		"precision mediump float;\n"
@@ -876,7 +764,7 @@ void init_shaders(void)
 		"   gl_FragColor = color;\n"
 		"}";
 		
-		const char *warp2_pixel_source =
+		const char *warp_pixel_source =
 #if defined OPENGLES
 		"precision mediump float;\n"
 #endif
@@ -958,29 +846,15 @@ void init_shaders(void)
 		"   }\n"
 		"}";
 		
-		default_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
-		logo_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
 		tinter = al_create_shader(ALLEGRO_SHADER_GLSL);
 		warp = al_create_shader(ALLEGRO_SHADER_GLSL);
 		shadow_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
 		brighten = al_create_shader(ALLEGRO_SHADER_GLSL);
 
 		al_attach_shader_source(
-					default_shader,
-					ALLEGRO_VERTEX_SHADER,
-					default_vertex_source
-					);
-		
-		al_attach_shader_source(
-					logo_shader,
-					ALLEGRO_VERTEX_SHADER,
-					default_vertex_source
-					);
-		
-		al_attach_shader_source(
 					tinter,
 					ALLEGRO_VERTEX_SHADER,
-					default_vertex_source
+					al_get_default_vertex_shader(ALLEGRO_SHADER_GLSL)
 					);
 		
 		al_attach_shader_source(
@@ -992,28 +866,15 @@ void init_shaders(void)
 		al_attach_shader_source(
 					shadow_shader,
 					ALLEGRO_VERTEX_SHADER,
-					default_vertex_source
+					al_get_default_vertex_shader(ALLEGRO_SHADER_GLSL)
 					);
 		
 		al_attach_shader_source(
 					brighten,
 					ALLEGRO_VERTEX_SHADER,
-					default_vertex_source
+					al_get_default_vertex_shader(ALLEGRO_SHADER_GLSL)
 					);
 
-		al_attach_shader_source(
-					default_shader,
-					ALLEGRO_PIXEL_SHADER,
-					default_pixel_source
-					);
-		
-		al_attach_shader_source(
-					logo_shader,
-					ALLEGRO_PIXEL_SHADER,
-					//logo_pixel_source
-					default_pixel_source
-					);
-		
 		al_attach_shader_source(
 					tinter,
 					ALLEGRO_PIXEL_SHADER,
@@ -1023,7 +884,7 @@ void init_shaders(void)
 		al_attach_shader_source(
 					warp,
 					ALLEGRO_PIXEL_SHADER,
-					warp2_pixel_source
+					warp_pixel_source
 					);
 		
 		al_attach_shader_source(
@@ -1040,70 +901,32 @@ void init_shaders(void)
 
 		const char *shader_log;
 
-		al_link_shader(default_shader);
-		if ((shader_log = al_get_shader_log(default_shader))[0] != 0) {
-			printf("1. %s\n", shader_log);
-		}
-		al_link_shader(logo_shader);
-		if ((shader_log = al_get_shader_log(logo_shader))[0] != 0) {
-			printf("1.1. %s\n", shader_log);
-		}
 		al_link_shader(tinter);
 		if ((shader_log = al_get_shader_log(tinter))[0] != 0) {
-			printf("2. %s\n", shader_log);
+			printf("1. %s\n", shader_log);
 		}
 		al_link_shader(warp);
 		if ((shader_log = al_get_shader_log(warp))[0] != 0) {
-			printf("3. %s\n", shader_log);
+			printf("2. %s\n", shader_log);
 		}
 		al_link_shader(shadow_shader);
 		if ((shader_log = al_get_shader_log(shadow_shader))[0] != 0) {
-			printf("4. %s\n", shader_log);
+			printf("3. %s\n", shader_log);
 		}
 		al_link_shader(brighten);
 		if ((shader_log = al_get_shader_log(brighten))[0] != 0) {
-			printf("5. %s\n", shader_log);
+			printf("4. %s\n", shader_log);
 		}
-	
-		set_target_backbuffer();
-		al_use_shader(default_shader);
-#ifdef A5_OGL
-		//al_set_opengl_program_object(display, al_get_opengl_program_object(default_shader));
-		ALLEGRO_TRANSFORM tr;
-		al_identity_transform(&tr);
-		al_use_transform(&tr);
-		al_ortho_transform(&tr, 0, al_get_display_width(display), al_get_display_height(display), 0, -1, 1);
-		al_set_projection_transform(display, &tr);
-#else
-#ifndef A5_D3D
-		//al_set_direct3d_effect(display, al_get_direct3d_effect(default_shader));
-#endif
-
-#endif
 	}
 }
 
 void init2_shaders(void)
 {
-/*
-	if (use_programmable_pipeline) {
-		al_set_shader_bool(default_shader, "use_tex_matrix", false);
-		al_set_shader_bool(tinter, "use_tex_matrix", false);
-		al_set_shader_bool(warp, "use_tex_matrix", false);
-		al_set_shader_bool(shadow_shader, "use_tex_matrix", false);
-		al_set_shader_bool(brighten, "use_tex_matrix", false);
-#ifndef A5_OGL
-		//al_set_shader_float(warp, "cx", ((float)BW/buffer_true_w)/2);
-		//al_set_shader_float(warp, "cy", ((float)BH/buffer_true_h)/2);
-#endif
-	}	
-*/
 }
 
 void destroy_shaders(void)
 {
 	if (use_programmable_pipeline) {
-		al_destroy_shader(default_shader);
 		al_destroy_shader(tinter);
 		al_destroy_shader(brighten);
 		al_destroy_shader(warp);
@@ -1454,7 +1277,7 @@ bool init(int *argc, char **argv[])
 	touch_mutex = al_create_mutex();
 
 	// Android because it's very slow switching back in on some devices
-#if defined A5_D3D || defined ALLEGRO_RASPBERRYPI || defined ALLEGRO_ANDROID
+#if defined A5_D3D || defined ALLEGRO_RASPBERRYPI //|| defined ALLEGRO_ANDROID
 #ifdef ALLEGRO_RASPBERRYPI
 	if (check_arg(*argc, *argv, "-programmable-pipeline") <= 0)
 #endif
@@ -1595,7 +1418,7 @@ bool init(int *argc, char **argv[])
 		is_android_lessthan_2_3 = true;
 	}
 #endif
-	
+
 	initSound();
 
 	al_set_new_bitmap_flags(PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
@@ -1611,10 +1434,12 @@ bool init(int *argc, char **argv[])
 	MBITMAP *tmpcurs = m_load_bitmap(getResource("media/mouse_cursor.png"));
 	custom_cursor_w = m_get_bitmap_width(tmpcurs);
 	custom_cursor_h = m_get_bitmap_height(tmpcurs);
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (have_mouse) {
 		custom_mouse_cursor = al_create_mouse_cursor(tmpcurs->bitmap, 0, 0);
 		al_set_mouse_cursor(display, custom_mouse_cursor);
 	}
+#endif
 #ifdef ALLEGRO_RASPBERRYPI
 	else {
 		al_hide_mouse_cursor(display);
@@ -1718,30 +1543,7 @@ bool init(int *argc, char **argv[])
 	
 	ALLEGRO_DEBUG("creating tmpbuffer\n");
 
-	{
-		int flags = al_get_new_bitmap_flags();
-#if defined OPENGLES
-		int format = al_get_new_bitmap_format();
-		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
-#endif
-		al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-		int w = al_get_display_width(display);
-		int h = al_get_display_height(display);
-#else
-		ALLEGRO_MONITOR_INFO mi;
-		al_get_monitor_info(config.getAdapter(), &mi);
-		int w = mi.x2 - mi.x1;
-		int h = mi.y2 - mi.y1;
-#endif
-		tmpbuffer = m_create_bitmap(
-			w, h
-		);
-		al_set_new_bitmap_flags(flags);
-#if defined OPENGLES
-		al_set_new_bitmap_format(format);
-#endif
-	}
+	create_tmpbuffer();
 
 	ALLEGRO_DEBUG("initing shader variables\n");
 
@@ -2134,7 +1936,7 @@ void set_screen_params(void)
 	int dx, dy;
 
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	
+
 	ALLEGRO_TRANSFORM t;
 	al_identity_transform(&t);
 	al_scale_transform(&t, screenScaleX, screenScaleY);
@@ -2163,7 +1965,7 @@ void get_screen_offset_size(int *dx, int *dy, int *dw, int *dh)
 
 void toggle_fullscreen()
 {
-#ifdef ALLEGRO_RASPBERRYPI
+#if defined ALLEGRO_RASPBERRYPI || defined ALLEGRO_ANDROID || defined ALLEGRO_IPHONE
 	return;
 #endif
 
@@ -2236,7 +2038,6 @@ void toggle_fullscreen()
 		ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
 		ALLEGRO_BITMAP *tmp = my_al_create_bitmap(dw, dh);
 		al_set_target_bitmap(tmp);
-		al_use_shader(default_shader);
 		al_draw_bitmap(tmpbuffer->bitmap, 0, 0, 0);
 		m_set_target_bitmap(tmpbuffer);
 		al_draw_scaled_bitmap(tmp, 0, 0, dw, dh, 0, 0, dw2, dh2, 0);
@@ -2278,18 +2079,22 @@ static bool cursor_hidden = false;
 
 void show_mouse_cursor()
 {
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (have_mouse) {
 		al_show_mouse_cursor(display);
-		cursor_hidden = false;
 	}
+#endif
+	cursor_hidden = false;
 }
 
 void hide_mouse_cursor()
 {
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (have_mouse) {
 		al_hide_mouse_cursor(display);
-		cursor_hidden = true;
 	}
+#endif	
+	cursor_hidden = true;
 }
 
 bool is_cursor_hidden()

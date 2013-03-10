@@ -264,7 +264,7 @@ void Object::drawUpper()
 		dy -= area->getOriginY();
 		dx += (int)ox;
 		dy += (int)oy;
-		m_save_blender();
+		m_push_blender();
 		m_set_blender(M_ONE, M_ZERO, white);
 		m_push_target_bitmap();
 		m_set_target_bitmap(poison_bmp_tmp);
@@ -316,7 +316,7 @@ void Object::drawUpper()
 		col.a = tmp.a;
 		m_set_blender(M_ONE, M_INVERSE_ALPHA, col);
 		m_draw_bitmap(poison_bmp_tmp2, dx-5, dy-5, 0);
-		m_restore_blender();
+		m_pop_blender();
 	}
 }
 
@@ -808,13 +808,13 @@ bool Light::update(Area *area, int step)
 
 void Light::draw()
 {
-	m_save_blender();
+	m_push_blender();
 
 	m_set_blender(M_ALPHA, M_ONE, m_map_rgba(255, 255, 255, alpha));
 
 	m_draw_bitmap(bmp, x-area->getOriginX(), y-area->getOriginY(), 0);
 
-	m_restore_blender();
+	m_pop_blender();
 }
 
 Light::Light(float x, float y, int dir, int topw, int bottomw, int length, MCOLOR color) :
@@ -856,14 +856,14 @@ void Fish::draw()
 	al_hold_bitmap_drawing(false);
 
 	m_pop_target_bitmap();
-	m_save_blender();
+	m_push_blender();
 
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, m_map_rgba(alpha, alpha, alpha, alpha));
 
 	m_draw_rotated_bitmap(tmpbmp, w/2, (h+MAX_WIGGLE*2)/2,
 		x-area->getOriginX(), y-area->getOriginY(), angle, 0);
 
-	m_restore_blender();
+	m_pop_blender();
 }
 
 

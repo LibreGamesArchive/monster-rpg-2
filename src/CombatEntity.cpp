@@ -1945,10 +1945,10 @@ StompEffect::StompEffect(CombatLocation l) :
 	for (int i = 0; i < m_get_bitmap_width(tmp); i += 16) {
 		MBITMAP *b = m_create_alpha_bitmap(16, 16); // check
 		m_set_target_bitmap(b);
-		m_save_blender();
+		m_push_blender();
 		m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, al_map_rgb(255, 255, 255));
 		m_draw_bitmap_region(tmp, i, 0, i+16, 16, 0, 0, 0);
-		m_restore_blender();
+		m_pop_blender();
 		puffs.push_back(b);
 	}
 	m_pop_target_bitmap();
@@ -3359,13 +3359,13 @@ int VampireEffect::getLifetime(void)
 
 void VampireEffect::draw(void)
 {
-	m_save_blender();
+	m_push_blender();
 	MBITMAP *bmp = 
 		target->getAnimationSet()->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, m_map_rgba(alpha, alpha, alpha, alpha));
 	m_draw_bitmap(bmp, cx, cy, target->getLocation() == LOCATION_LEFT ?
 		M_FLIP_HORIZONTAL : 0);
-	m_restore_blender();
+	m_pop_blender();
 }
 
 

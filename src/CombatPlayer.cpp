@@ -1484,7 +1484,7 @@ void CombatPlayer::draw(void)
 			al_set_shader_float(brighten, "brightness", amountF);
 			al_use_shader(brighten);
 			m_draw_tinted_bitmap(sb, vcol, x-(w/2), y-h, flags);
-			al_use_shader(default_shader);
+			al_use_shader(NULL);
 		}
 		else {
 			if (info.condition == CONDITION_SHADOW) {
@@ -1586,7 +1586,7 @@ void CombatPlayer::draw(void)
 			int amountF = -1.0f;
 			(void)amountF;
 			{
-			m_save_blender();
+			m_push_blender();
 			float  r, g, b;
 			r = 0.0f;
 			g = 0.0f;
@@ -1594,7 +1594,7 @@ void CombatPlayer::draw(void)
 			m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, al_map_rgb_f(r, g, b));
 			MBITMAP *sb = animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 			m_draw_tinted_bitmap(sb, m_map_rgb(r, g, b), x-(w/2), y-h, flags);
-			m_restore_blender();
+			m_pop_blender();
 			}
 		}
 		else {
