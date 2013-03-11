@@ -552,7 +552,7 @@ static bool is_input_event(ALLEGRO_EVENT *e)
 // called from everywhere
 bool is_close_pressed(bool pump_events_only)
 {
-	/* This is a bit of a hack, to make sure input events don't
+	/* This is a bit of a hack, to make sure "input events" don't
 	 * stack up forever in places that don't use them.
 	 */
 	get_next_input_event();

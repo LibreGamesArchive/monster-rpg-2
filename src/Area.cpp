@@ -2030,18 +2030,6 @@ void Area::loadAnimation(int index, bool addIndex)
 	if (index < 0 || index >= ((512/16)*(2048/16))/*>= numTiles*/)
 		return;
 
-	int offs[9][2] = {
-		{ -1, -1 },
-		{ -1, 1 },
-		{ 1, 1 },
-		{ 1, -1 },
-		{ -1, 0 },
-		{ 1 , 0 },
-		{ 0, -1 },
-		{ 0, 1 },
-		{ 0, 0 }
-	};
-
 	char n[100];
 	sprintf(n, "%d", index);
 	std::string number(n);

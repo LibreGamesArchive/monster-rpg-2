@@ -184,6 +184,8 @@ void prepareForScreenGrab2();
 
 void set_target_backbuffer();
 
+void m_set_mouse_xy(ALLEGRO_DISPLAY *display, int x, int y);
+
 extern bool preparingForScreenGrab;
 
 #endif

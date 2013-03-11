@@ -17,6 +17,7 @@ static float get_trap_peak(int topw, int bottomw, int length)
 	return tan(a) * (topw/2.0f);
 }
 
+#if defined ALLEGRO_ANDROID || defined A5_D3D
 static void null_lb(LoadedBitmap *lb)
 {
 	lb->load_type = (LoadType)0;
@@ -32,6 +33,7 @@ static void null_lb(LoadedBitmap *lb)
 	lb->format = 0;
 	lb->delayed = 0;
 }
+#endif
 
 MCOLOR m_map_rgba(int r, int g, int b, int a)
 {
@@ -1224,3 +1226,9 @@ void set_target_backbuffer()
 		al_set_target_backbuffer(display);
 	}
 }
+
+void m_set_mouse_xy(ALLEGRO_DISPLAY *display, int x, int y)
+{
+	al_set_mouse_xy(display, x, y);
+}
+

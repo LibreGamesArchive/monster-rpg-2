@@ -564,7 +564,7 @@ static int real_archery(int *accuracy_pts)
 
 	int scr_w = al_get_display_width(display);
 	int scr_h = al_get_display_height(display);
-	al_set_mouse_xy(display, scr_w/2, scr_h/2);
+	m_set_mouse_xy(display, scr_w/2, scr_h/2);
 	int last_mouse_x = scr_w/2;
 	int last_mouse_y = scr_h/2;
 
@@ -602,7 +602,6 @@ static int real_archery(int *accuracy_pts)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	current_mouse_x = BW/2;
 	current_mouse_y = BH/2;
-	//al_set_mouse_xy(display, current_mouse_x, current_mouse_y);
 #endif
 	
 	set_target_backbuffer();

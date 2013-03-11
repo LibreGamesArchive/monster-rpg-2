@@ -797,7 +797,7 @@ start:
 	hide_mouse_cursor();
 	int scr_w = al_get_display_width(display);
 	int scr_h = al_get_display_height(display);
-	al_set_mouse_xy(display, scr_w/2, scr_h/2);
+	m_set_mouse_xy(display, scr_w/2, scr_h/2);
 	al_rest(0.5);
 	int last_mouse_x = scr_w/2;
 
@@ -921,7 +921,7 @@ start:
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 				int dx = state.x - last_mouse_x;
 				x += (float)dx / 5;
-				al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
+				m_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
 				last_mouse_x = al_get_display_width(display)/2;
 #endif
 #endif
@@ -1131,7 +1131,7 @@ start:
 					shooter_paused = false;
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-					al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
+					m_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
 					last_mouse_x = al_get_display_width(display)/2;
 					al_rest(0.5);
 #endif
@@ -1248,7 +1248,7 @@ start:
 
 			if (reset_mouse) {
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-				al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
+				m_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
 				last_mouse_x = al_get_display_width(display)/2;
 				al_rest(0.5);
 #endif

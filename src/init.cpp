@@ -34,15 +34,8 @@ void create_tmpbuffer()
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
 #endif
 	al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	int w = al_get_display_width(display);
 	int h = al_get_display_height(display);
-#else
-	ALLEGRO_MONITOR_INFO mi;
-	al_get_monitor_info(config.getAdapter(), &mi);
-	int w = mi.x2 - mi.x1;
-	int h = mi.y2 - mi.y1;
-#endif
 	tmpbuffer = m_create_bitmap(
 		w, h
 	);
@@ -1156,7 +1149,7 @@ bool init(int *argc, char **argv[])
 	else
 #endif
 	have_mouse = al_install_mouse();
-	
+
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_install_touch_input();
 	al_set_mouse_emulation_mode(ALLEGRO_MOUSE_EMULATION_5_0_x);
@@ -1460,7 +1453,7 @@ bool init(int *argc, char **argv[])
 		get_screen_offset_size(&dx, &dy, &dw, &dh);
 		int mousex = al_get_display_width(display)-custom_cursor_w-20-dx;
 		int mousey = al_get_display_height(display)-custom_cursor_h-20-dy;
-		al_set_mouse_xy(display, mousex, mousey);
+		m_set_mouse_xy(display, mousex, mousey);
 	}
 
 	if (al_install_joystick()) {
@@ -2019,14 +2012,14 @@ void toggle_fullscreen()
 	if (have_mouse) {
 		al_set_mouse_cursor(display, custom_mouse_cursor);
 		if (in_shooter) {
-			al_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
+			m_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
 		}
 		else {
 			int dx, dy, dw, dh;
 			get_screen_offset_size(&dx, &dy, &dw, &dh);
 			int mousex = al_get_display_width(display)-custom_cursor_w-20-dx;
 			int mousey = al_get_display_height(display)-custom_cursor_h-20-dy;
-			al_set_mouse_xy(display, mousex, mousey);
+			m_set_mouse_xy(display, mousex, mousey);
 		}
 	}
 #endif
