@@ -164,17 +164,8 @@ void connect_second_display(void)
 	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_USE_PROGRAMMABLE_PIPELINE);
 	display = al_create_display(1, 1);
 
-	/*
-	ALLEGRO_TRANSFORM t;
-	al_identity_transform(&t);
-	al_scale_transform(&t, (float)al_get_display_width(display)/BW, (float)al_get_display_height(display)/BH);
-	al_use_transform(&t);
-	*/
-	
 	al_set_new_display_flags(flags);
 
-	//printf("w=%d h=%d\n", al_get_display_width(display), al_get_display_height(display));
-	
 	init_shaders();
 
 	set_screen_params();
@@ -1302,7 +1293,7 @@ top:
 			destroy_fonts();
 			destroyIcons();
 
-			//destroy_shaders();
+			destroy_shaders();
 			al_destroy_display(display);
 
 			_reload_loaded_bitmaps();
@@ -1969,6 +1960,12 @@ int main(int argc, char *argv[])
 	MBITMAP *nooskewl = new_mbitmap(load_svg(getResource("media/nooskewl.svg"), scale));
 #else
 	int flags = al_get_new_bitmap_flags();
+	
+	int linear = 0;
+#if !defined OPENGLES && !defined A5_D3D
+	linear = ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR;
+#endif
+	al_set_new_bitmap_flags(linear);
 	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
 	MBITMAP *tmp = m_load_bitmap(getResource("media/nooskewl.com"));
 	al_set_new_bitmap_flags(flags);

@@ -89,12 +89,10 @@ static MODEL *load_model2(const char *filename, MBITMAP *tex)
 			splits.push_back(ntris * 3);
 		}
 		else if (line[0] == 'v' && line[1] == ' ') {
-			//printf(line);
 			sscanf(line, "v %g %g %g", &v.x, &v.y, &v.z);
 			verts.push_back(v);
 		}
 		else if (line[0] == 'v') {
-			//printf(line);
 			sscanf(line, "vt %g %g", &t.u, &t.v);
 			t.u *= true_w;
 			t.v *= true_h;;
@@ -108,31 +106,6 @@ static MODEL *load_model2(const char *filename, MBITMAP *tex)
 				&f.v[2], &f.t[2],
 				&f.v[3], &f.t[3]
 			) / 2;
-			// FIXME
-			/*
-			if (f.n == 4) {
-				printf("f %d/%d %d/%d %d/%d %d/%d\n",
-					f.v[0]-16386,
-					f.t[0],
-					f.v[1]-16386,
-					f.t[1],
-					f.v[2]-16386,
-					f.t[2],
-					f.v[3]-16386,
-					f.t[3]
-				);
-			}
-			else {
-				printf("f %d/%d %d/%d %d/%d\n",
-					f.v[0]-16386,
-					f.t[0],
-					f.v[1]-16386,
-					f.t[1],
-					f.v[2]-16386,
-					f.t[2]
-				);
-			}
-			*/
 			for (int i = 0; i < 4; i++) {
 				f.v[i]--;
 				f.t[i]--;
@@ -411,22 +384,6 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 }
 
 
-/*
-static void draw_model(MODEL *m)
-{
-	for (size_t i = 0; i < m->verts.size(); i++) {
-		m_draw_prim(
-			m->verts[i],
-			0,
-			NULL,
-			0,
-			m->num_verts[i],
-			ALLEGRO_PRIM_TRIANGLE_LIST
-		);
-	}
-}
-*/
-
 static void draw_model_tex(MODEL *m, MBITMAP *texture)
 {
 	for (size_t i = 0; i < m->verts.size(); i++) {
@@ -620,11 +577,13 @@ static int real_archery(int *accuracy_pts)
 	int flags = al_get_new_bitmap_flags();
 
 	int mipmap = 0;
-#if !defined OPENGLES
+	int linear = 0;
+#if !defined OPENGLES && !defined A5_D3D
 	mipmap = ALLEGRO_MIPMAP;
+	linear = ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR;
 #endif
 
-	al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | mipmap);
+	al_set_new_bitmap_flags(flags | linear | mipmap);
 	MBITMAP *bow_tex = m_load_bitmap(getResource("models/bow.png"));
 	MBITMAP *arrow_tex =
 		m_load_bitmap(getResource("models/arrow.png"));
@@ -975,9 +934,9 @@ static int real_archery(int *accuracy_pts)
 			xrot = old_xrot;
 			yrot = old_yrot;
 
-			#ifdef A5_D3D
+#ifdef A5_D3D
 			al_get_d3d_device(display)->SetViewport(&backup_vp);
-			#endif
+#endif
 
 			al_use_transform(&view_push);
 			al_set_projection_transform(display, &proj_push);
@@ -1237,11 +1196,13 @@ void volcano_scene(void)
 	int flags = al_get_new_bitmap_flags();
 
 	int mipmap = 0;
-#if !defined OPENGLES
+	int linear = 0;
+#if !defined OPENGLES && !defined A5_D3D
 	mipmap = ALLEGRO_MIPMAP;
+	linear = ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR;
 #endif
 
-	al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | mipmap);
+	al_set_new_bitmap_flags(flags | linear | mipmap);
 	MBITMAP *land_texture = m_load_bitmap(getResource("media/volcano_texture.png"));
 	MBITMAP *staff_tex = m_load_bitmap(getResource("models/staff.png"));
 	al_set_new_bitmap_flags(flags);

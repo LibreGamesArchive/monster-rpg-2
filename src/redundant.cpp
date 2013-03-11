@@ -477,7 +477,12 @@ void m_flip_display(void)
 	if (prompt_for_close_on_next_flip) {
 		prompt_for_close_on_next_flip = false;
 		prepareForScreenGrab2();
+		bool hidden = is_cursor_hidden();
+		show_mouse_cursor();
 		int r = triple_prompt("", "Really quit game or return to menu?", "", "Menu", "Quit", "Cancel", 2, true);
+		if (hidden) {
+			hide_mouse_cursor();
+		}
 		if (r == 0) {
 			break_main_loop = true;
 		}

@@ -725,11 +725,13 @@ bool shooter(bool for_points)
 	}
 
 	int mipmap = 0;
-#if !defined OPENGLES
+	int linear = 0;
+#if !defined OPENGLES && !defined A5_D3D
 	mipmap = ALLEGRO_MIPMAP;
+	linear = ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR;
 #endif
 
-	al_set_new_bitmap_flags(flags | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | mipmap);
+	al_set_new_bitmap_flags(flags | linear | mipmap);
 	crab = new AnimationSet(getResource("media/crab.png"));
 	shark_anim = new AnimationSet(getResource("media/shark.png"));
 	underwater = m_load_bitmap(getResource("media/underwater.png"));

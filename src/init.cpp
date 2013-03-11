@@ -75,20 +75,26 @@ static uint32_t parse_version(const char *v)
 #ifdef A5_D3D
 LPDIRECT3DSURFACE9 big_depth_surface = NULL;
 
+static int pot(int n)
+{
+	int p = 1;
+	while (p < n) {
+		p = p * 2;
+	}
+	return p;
+}
+
 void init_big_depth_surface(void)
 {
 	LPDIRECT3DDEVICE9 dev = al_get_d3d_device(display);
-	ALLEGRO_MONITOR_INFO mi;
 	
-	al_get_monitor_info(config.getAdapter(), &mi);
-	int w = mi.x2 - mi.x1;
-	int h = mi.y2 - mi.y1;
-	int size = 4096;
-	while (size < w || size < h)
-		size = size * 2;
+	int w = al_get_display_width(display);
+	int h = al_get_display_height(display);
 
+	int max = (w > h) ? w : h;
+	max = pot(max);
 	dev->CreateDepthStencilSurface(
-		size, size,
+		max, max,
 		D3DFMT_D24S8,
 		D3DMULTISAMPLE_NONE, 0,
 		true,
@@ -706,6 +712,7 @@ bool loadTilemap(void)
 
 void init_shaders(void)
 {
+#ifdef A5_OGL
 	if (use_programmable_pipeline) {
 		static const char *warp_vertex_source =
 		"attribute vec4 " ALLEGRO_SHADER_VAR_POS ";\n"
@@ -847,7 +854,7 @@ void init_shaders(void)
 		al_attach_shader_source(
 					tinter,
 					ALLEGRO_VERTEX_SHADER,
-					al_get_default_vertex_shader(ALLEGRO_SHADER_GLSL)
+					al_get_default_shader_source(ALLEGRO_SHADER_GLSL, ALLEGRO_VERTEX_SHADER)
 					);
 		
 		al_attach_shader_source(
@@ -859,13 +866,13 @@ void init_shaders(void)
 		al_attach_shader_source(
 					shadow_shader,
 					ALLEGRO_VERTEX_SHADER,
-					al_get_default_vertex_shader(ALLEGRO_SHADER_GLSL)
+					al_get_default_shader_source(ALLEGRO_SHADER_GLSL, ALLEGRO_VERTEX_SHADER)
 					);
 		
 		al_attach_shader_source(
 					brighten,
 					ALLEGRO_VERTEX_SHADER,
-					al_get_default_vertex_shader(ALLEGRO_SHADER_GLSL)
+					al_get_default_shader_source(ALLEGRO_SHADER_GLSL, ALLEGRO_VERTEX_SHADER)
 					);
 
 		al_attach_shader_source(
@@ -911,6 +918,7 @@ void init_shaders(void)
 			printf("4. %s\n", shader_log);
 		}
 	}
+#endif
 }
 
 void init2_shaders(void)
@@ -919,12 +927,14 @@ void init2_shaders(void)
 
 void destroy_shaders(void)
 {
+#ifdef A5_OGL
 	if (use_programmable_pipeline) {
 		al_destroy_shader(tinter);
 		al_destroy_shader(brighten);
 		al_destroy_shader(warp);
 		al_destroy_shader(shadow_shader);
-	}	
+	}
+#endif
 }
 
 static void draw_loading_screen(MBITMAP *tmp, int percent, ScreenDescriptor *sd)
@@ -1769,14 +1779,14 @@ void destroy(void)
 	if (area)
 		delete area;
 
-	#if !defined A5_D3D
-	//destroy_shaders();
-	#endif
+#if !defined A5_D3D
+	destroy_shaders();
+#endif
 
-	#ifdef A5_D3D
+#ifdef A5_D3D
 	al_get_d3d_device(display)->SetDepthStencilSurface(NULL);
 	big_depth_surface->Release();
-	#endif
+#endif
 
 	al_shutdown_ttf_addon();
 
@@ -1980,8 +1990,8 @@ void toggle_fullscreen()
 	sd->fullscreen = !sd->fullscreen;
 #ifdef A5_D3D
 	is_fs_toggle = true;
-	bool depth_surface_inited = big_depth_surface != NULL;
-	if (depth_surface_inited) {
+	bool inited_depth_surface = big_depth_surface != NULL;
+	if (inited_depth_surface) {
 		al_get_d3d_device(display)->SetDepthStencilSurface(NULL);
 		big_depth_surface->Release();
 	}
@@ -1992,7 +2002,7 @@ void toggle_fullscreen()
 	al_rest(0.1);
 
 #ifdef A5_D3D
-	if (depth_surface_inited) {
+	if (inited_depth_surface) {
 		init_big_depth_surface();
 	}
 	_reload_loaded_bitmaps();
