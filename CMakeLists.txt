@@ -24,14 +24,18 @@ endfunction(copy_file_to_build)
 # Option configuration
 
 if(WIN32)
+	OPTION(D3D "Build D3D version" off)
 	if(MINGW)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -fcheck-new -Wno-unknown-pragmas -Wno-comment -Wno-strict-aliasing")
-		# you must define one of A5_OGL (all platforms) or A5_D3D
-		#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DA5_D3D")
+		if(D3D)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DA5_D3D")
+			set(M2_SUFFIX "-d3d")
+		else()
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL")
+			set(M2_SUFFIX "")
+		endif()
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows")
-		#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
 	else(MINGW)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DA5_OGL")
 		#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DA5_D3D")
@@ -131,7 +135,7 @@ add_library(mo2-engine
 	${COMMON_SRCS}
 )
 
-add_executable(monster2
+add_executable(monster2${M2_SUFFIX}
 	src/monster2.cpp
 )
 
@@ -263,7 +267,7 @@ endif(APPLE)
 endif(WIN32)
 
 target_link_libraries(
-	monster2
+	monster2${M2_SUFFIX}
 	${MAIN_LIBS}
 ) 
 
