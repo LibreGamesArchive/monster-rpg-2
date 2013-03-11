@@ -122,7 +122,7 @@ endif(WIN32)
 
 set(EXTRA_LIBS "")
 
-if(WITH_SVG)
+if(WITH_SVG AND NOT D3D)
 	list(APPEND EXTRA_LIBS "allegro_color${ALLEG_SUFFIX}" "svgtiny" "hubbub" "dom" "parserutils" "wapcaplet" "expat")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DWITH_SVG -I/opt/netsurf/include")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWITH_SVG -I/opt/netsurf/include")

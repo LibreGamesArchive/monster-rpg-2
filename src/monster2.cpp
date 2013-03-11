@@ -1962,11 +1962,34 @@ int main(int argc, char *argv[])
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
 
-	const float svg_w = 362;
 	float wanted = dw * 0.75f;
+#ifdef WITH_SVG
+	const float svg_w = 362;
 	float scale = wanted / svg_w;
-
 	MBITMAP *nooskewl = new_mbitmap(load_svg(getResource("media/nooskewl.svg"), scale));
+#else
+	int flags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
+	MBITMAP *tmp = m_load_bitmap(getResource("media/nooskewl.com"));
+	al_set_new_bitmap_flags(flags);
+	MBITMAP *nooskewl = m_create_bitmap(
+		wanted,
+		((float)wanted/m_get_bitmap_width(tmp))*m_get_bitmap_height(tmp)
+	);
+	m_push_target_bitmap();
+	m_set_target_bitmap(nooskewl);
+	m_clear(m_map_rgba(0, 0, 0, 0));
+	al_draw_scaled_bitmap(
+		tmp->bitmap,
+		0, 0,
+		m_get_bitmap_width(tmp), m_get_bitmap_height(tmp),
+		0, 0,
+		m_get_bitmap_width(nooskewl), m_get_bitmap_height(nooskewl),
+		0
+	);
+	m_pop_target_bitmap();
+	m_destroy_bitmap(tmp);
+#endif
 	
 #ifndef ALLEGRO_ANDROID
 	if ((n = check_arg(argc, argv, "-stick")) != -1) {
