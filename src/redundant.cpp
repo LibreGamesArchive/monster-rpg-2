@@ -510,6 +510,28 @@ void m_flip_display(void)
 		}
 		skip_flip = true;
 	}
+	else if (close_pressed_for_configure) {
+		close_pressed_for_configure = false;
+		ALLEGRO_STATE state;
+		al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
+		al_set_new_bitmap_format(al_get_bitmap_format(tmpbuffer->bitmap));
+		al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
+		ALLEGRO_BITMAP *tmp = al_create_bitmap(
+			al_get_bitmap_width(tmpbuffer->bitmap),
+			al_get_bitmap_height(tmpbuffer->bitmap)
+		);
+		al_set_target_bitmap(tmp);
+		al_clear_to_color(black);
+		al_draw_bitmap(tmpbuffer->bitmap, 0, 0, 0);
+		al_restore_state(&state);
+		config_menu();
+		al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
+		al_set_target_bitmap(tmpbuffer->bitmap);
+		al_clear_to_color(black);
+		al_draw_bitmap(tmp, 0, 0, 0);
+		al_restore_state(&state);
+		al_destroy_bitmap(tmp);
+	}
 
 	if (!skip_flip) {
 		al_flip_display();

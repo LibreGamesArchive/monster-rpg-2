@@ -307,8 +307,8 @@ extern bool tutorial_started;
 extern Player *player;
 extern bool battle_won;
 extern bool battle_lost;
-extern volatile bool close_pressed;
-extern volatile bool close_pressed_for_configure;
+extern bool close_pressed;
+extern bool close_pressed_for_configure;
 
 extern char *saveFilename;
 

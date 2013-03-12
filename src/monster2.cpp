@@ -57,8 +57,8 @@ Player *player = NULL;
 bool battle_won = false;
 bool battle_lost = false;
 
-volatile bool close_pressed = false;
-volatile bool close_pressed_for_configure = false;
+bool close_pressed = false;
+bool close_pressed_for_configure = false;
 	
 char *saveFilename = NULL;
 
@@ -1176,7 +1176,6 @@ top:
 			if (event.keyboard.keycode == config.getKeySettings()) {
 				if (!pause_f_to_toggle_fullscreen) {
 					close_pressed_for_configure = true;
-					close_pressed = true;
 				}
 			}
 			if (event.keyboard.keycode == config.getKeyMusicDown()) {
@@ -1353,6 +1352,10 @@ top:
 		init_big_depth_surface();
 		_reload_loaded_bitmaps();
 		_reload_loaded_bitmaps_delayed();
+		ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
+		al_set_target_bitmap(tmpbuffer->bitmap);
+		m_clear(black);
+		al_set_target_bitmap(old_target);
 		if (in_shooter) {
 			shooter_restoring = true;
 		}
@@ -1400,11 +1403,6 @@ void do_close(bool quit)
 			destroy();
 			exit(0);
 		}
-	}
-	if (close_pressed_for_configure) {
-		close_pressed_for_configure = false;
-		close_pressed = false;
-		config_menu();
 	}
 #else
 	if (area && !shouldDoMap) {
