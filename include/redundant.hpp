@@ -181,7 +181,7 @@ void m_draw_scaled_target(MBITMAP *src, int sx, int sy, int sw, int sh,
 
 void prepareForScreenGrab1();
 void prepareForScreenGrab2();
-void draw_tmpbuffer(int dx, int dy, int dw, int dh);
+void draw_tmpbuffer(int dx, int dy, int dw, int dh, ALLEGRO_BITMAP *bmp = NULL);
 
 void set_target_backbuffer();
 

@@ -471,9 +471,6 @@ void m_flip_display(void)
 {
 	bool skip_flip = false;
 
-	int dx, dy, dw, dh;
-	get_screen_offset_size(&dx, &dy, &dw, &dh);
-
 	if (prompt_for_close_on_next_flip) {
 		prompt_for_close_on_next_flip = false;
 		prepareForScreenGrab2();
@@ -512,6 +509,8 @@ void m_flip_display(void)
 	}
 	else if (close_pressed_for_configure) {
 		close_pressed_for_configure = false;
+		int _dx, _dy, _dw, _dh;
+		get_screen_offset_size(&_dx, &_dy, &_dw, &_dh);
 		ALLEGRO_STATE state;
 		al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
 		al_set_new_bitmap_format(al_get_bitmap_format(tmpbuffer->bitmap));
@@ -525,10 +524,17 @@ void m_flip_display(void)
 		al_draw_bitmap(tmpbuffer->bitmap, 0, 0, 0);
 		al_restore_state(&state);
 		config_menu();
+		int __dx, __dy, __dw, __dh;
+		get_screen_offset_size(&__dx, &__dy, &__dw, &__dh);
 		al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
 		al_set_target_bitmap(tmpbuffer->bitmap);
 		al_clear_to_color(black);
-		al_draw_bitmap(tmp, 0, 0, 0);
+		al_draw_scaled_bitmap(
+			tmp,
+			_dx, _dy, _dw, _dh,
+			__dx, __dy, __dw, __dh,
+			0
+		);
 		al_restore_state(&state);
 		al_destroy_bitmap(tmp);
 	}
@@ -1259,21 +1265,3 @@ void m_set_mouse_xy(ALLEGRO_DISPLAY *display, int x, int y)
 	al_set_mouse_xy(display, x, y);
 }
 
-void draw_tmpbuffer(int dx, int dy, int dw, int dh)
-{
-	if (!tmpbuffer || !tmpbuffer->bitmap) {
-		return;
-	}
-
-	ALLEGRO_TRANSFORM backup, t;
-	al_copy_transform(&backup, al_get_current_transform());
-	al_identity_transform(&t);
-	al_use_transform(&t);
-
-	int dx2, dy2, dw2, dh2;
-	get_screen_offset_size(&dx2, &dy2, &dw2, &dh2);
-
-	al_draw_scaled_bitmap(tmpbuffer->bitmap, dx, dy, dw, dh, dx2, dy2, dw2, dh2, 0);
-
-	al_use_transform(&backup);
-}

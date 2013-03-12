@@ -894,9 +894,6 @@ static int CDoShakeDialogue(lua_State *stack)
 
 bool anotherDoDialogue(const char *text, bool clearbuf, bool top, bool draw_area)
 {
-	int _dx, _dy, _dw, _dh;
-	get_screen_offset_size(&_dx, &_dy, &_dw, &_dh);
-
 	bool ret = false;
 
 	std::string textS(text);
@@ -948,7 +945,7 @@ bool anotherDoDialogue(const char *text, bool clearbuf, bool top, bool draw_area
 				m_clear(black);
 			}
 			else {
-				draw_tmpbuffer(_dx, _dy, _dw, _dh);
+				m_draw_bitmap_identity_view(tmpbuffer, 0, 0, 0);
 			}
 			// Draw the GUI
 			tguiDraw();

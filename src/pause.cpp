@@ -404,9 +404,6 @@ static void maybeShowItemHelp(void)
 
 void showSaveStateInfo(const char *basename)
 {
-	int _dx, _dy, _dw, _dh;
-	get_screen_offset_size(&_dx, &_dy, &_dw, &_dh);
-
 	dpad_off();
 	
 	bool delayed = false;
@@ -483,7 +480,7 @@ void showSaveStateInfo(const char *basename)
 		
 			set_target_backbuffer();
 	
-			draw_tmpbuffer(_dx, _dy, _dw, _dh);
+			m_draw_bitmap_identity_view(tmpbuffer, 0, 0, 0);
 
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
@@ -545,9 +542,6 @@ done:
 
 void showItemInfo(int index, bool preserve_buffer)
 {
-	int _dx, _dy, _dw, _dh;
-	get_screen_offset_size(&_dx, &_dy, &_dw, &_dh);
-
 	dpad_off();
 	
 	bool delayed = false;
@@ -720,7 +714,7 @@ void showItemInfo(int index, bool preserve_buffer)
 			set_target_backbuffer();
 			if (preserve_buffer) {
 				m_clear(m_map_rgb(0, 0, 0));
-				draw_tmpbuffer(_dx, _dy, _dw, _dh);
+				m_draw_bitmap_identity_view(tmpbuffer, 0, 0, 0);
 			}
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);

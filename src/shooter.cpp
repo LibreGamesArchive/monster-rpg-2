@@ -1061,9 +1061,6 @@ start:
 					al_stop_timer(logic_timer);
 					al_stop_timer(draw_timer);
 
-					int _dx, _dy, _dw, _dh;
-					get_screen_offset_size(&_dx, &_dy, &_dw, &_dh);
-
 					prepareForScreenGrab1();
 					draw_everything();
 					prepareForScreenGrab2();
@@ -1122,7 +1119,7 @@ start:
 							}
 						}
 						set_target_backbuffer();
-						draw_tmpbuffer(_dx, _dy, _dw, _dh);
+						m_draw_bitmap_identity_view(tmpbuffer, 0, 0, 0);
 						m_draw_rectangle(BW/2-tw/2-5, BH/2-th/2-5, BW/2+tw/2+5, BH/2+th/2+5, black, M_FILLED);
 						m_draw_rectangle(BW/2-tw/2-5+0.5, BH/2-th/2-5+0.5, BW/2+tw/2+5, BH/2+th/2+5, white, M_OUTLINED);
 						mTextout_simple(_t(pause_text), BW/2-tw/2, BH/2-th/2+2, white);
