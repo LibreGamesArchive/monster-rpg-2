@@ -510,8 +510,11 @@ struct LEVEL_UP_CALLBACK_DATA {
 
 static void levelUpCallback(int selected, LEVEL_UP_CALLBACK_DATA *d)
 {
-	dpad_off();
+	int _dx, _dy, _dw, _dh;
+	get_screen_offset_size(&_dx, &_dy, &_dw, &_dh);
 
+	dpad_off();
+			
 	const int width = 200;
 	const int height = 50;
 	int x = (BW-width)/2;
@@ -742,9 +745,7 @@ static void levelUpCallback(int selected, LEVEL_UP_CALLBACK_DATA *d)
 		if (draw_counter > 0) {
 			draw_counter = 0;
 			set_target_backbuffer();
-			int dx, dy, dw, dh;
-			get_screen_offset_size(&dx, &dy, &dw, &dh);
-			m_draw_bitmap_identity_view(tmpbuffer, dx, dy, 0);
+			draw_tmpbuffer(_dx, _dy, _dw, _dh);
 			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 			// Draw the GUI
 			tguiDraw();

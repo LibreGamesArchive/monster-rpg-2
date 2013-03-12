@@ -894,6 +894,9 @@ static int CDoShakeDialogue(lua_State *stack)
 
 bool anotherDoDialogue(const char *text, bool clearbuf, bool top, bool draw_area)
 {
+	int _dx, _dy, _dw, _dh;
+	get_screen_offset_size(&_dx, &_dy, &_dw, &_dh);
+
 	bool ret = false;
 
 	std::string textS(text);
@@ -945,9 +948,7 @@ bool anotherDoDialogue(const char *text, bool clearbuf, bool top, bool draw_area
 				m_clear(black);
 			}
 			else {
-				int dx, dy, dw, dh;
-				get_screen_offset_size(&dx, &dy, &dw, &dh);
-				m_draw_bitmap_identity_view(tmpbuffer, dx, dy, 0);
+				draw_tmpbuffer(_dx, _dy, _dw, _dh);
 			}
 			// Draw the GUI
 			tguiDraw();
@@ -2902,9 +2903,6 @@ static int CDoItemTutorial(lua_State *stack)
 	tguiDraw();
 	drawBufferToScreen();
 	m_flip_display();
-
-	prepareForScreenGrab1();
-	prepareForScreenGrab2();
 
 	#define DLG(t, c) \
 		prepareForScreenGrab1(); \

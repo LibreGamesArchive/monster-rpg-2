@@ -1237,3 +1237,14 @@ void m_set_mouse_xy(ALLEGRO_DISPLAY *display, int x, int y)
 	al_set_mouse_xy(display, x, y);
 }
 
+void draw_tmpbuffer(int dx, int dy, int dw, int dh)
+{
+	if (!tmpbuffer || !tmpbuffer->bitmap) {
+		return;
+	}
+
+	int dx2, dy2, dw2, dh2;
+	get_screen_offset_size(&dx2, &dy2, &dw2, &dh2);
+
+	al_draw_scaled_bitmap(tmpbuffer->bitmap, dx, dy, dw, dh, dx2, dy2, dw2, dh2, 0);
+}

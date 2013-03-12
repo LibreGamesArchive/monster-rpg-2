@@ -336,6 +336,9 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 {
 	if (!inited) return;
 	
+	int _dx, _dy, _dw, _dh;
+	get_screen_offset_size(&_dx, &_dy, &_dw, &_dh);
+
 	dpad_off();
 	
 	bool delayed = false;
@@ -404,7 +407,7 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 
 			set_target_backbuffer();
 
-			m_draw_bitmap_identity_view(tmpbuffer, 0, 0, 0);
+			draw_tmpbuffer(_dx, _dy, _dw, _dh);
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
 			draw_callback(x, y, w, h, data);
@@ -545,6 +548,9 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 {
 	if (!inited) return;
 
+	int _dx, _dy, _dw, _dh;
+	get_screen_offset_size(&_dx, &_dy, &_dw, &_dh);
+
 	dpad_off();
 	
 	int w = 200;
@@ -604,7 +610,7 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 			set_target_backbuffer();
 
 			m_clear(m_map_rgb(0, 0, 0));
-			m_draw_bitmap_identity_view(tmpbuffer, 0, 0, 0);
+			draw_tmpbuffer(_dx, _dy, _dw, _dh);
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
 			// Draw messages
@@ -656,6 +662,9 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 	std::string b1text, std::string b2text, std::string b3text, int shake_action,
 	bool called_from_is_close_pressed)
 {
+	int _dx, _dy, _dw, _dh;
+	get_screen_offset_size(&_dx, &_dy, &_dw, &_dh);
+
 	dpad_off();
 	
 	int w = 230;
@@ -747,7 +756,7 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 			draw_counter = 0;
 			set_target_backbuffer();
 			m_clear(m_map_rgb(0, 0, 0));
-			m_draw_bitmap_identity_view(tmpbuffer, 0, 0, 0);
+			draw_tmpbuffer(_dx, _dy, _dw, _dh);
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
 			// Draw messages
@@ -812,6 +821,9 @@ done:
 
 bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, std::string bottom_msg, bool *cancelled, bool wide)
 {
+	int _dx, _dy, _dw, _dh;
+	get_screen_offset_size(&_dx, &_dy, &_dw, &_dh);
+
 	dpad_off();
 	
 	int w;
@@ -913,7 +925,7 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 			draw_counter = 0;
 			set_target_backbuffer();
 			m_clear(m_map_rgb(0, 0, 0));
-			m_draw_bitmap_identity_view(tmpbuffer, 0, 0, 0);
+			draw_tmpbuffer(_dx, _dy, _dw, _dh);
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
 			// Draw messages
