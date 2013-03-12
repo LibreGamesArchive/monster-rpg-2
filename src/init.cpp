@@ -1928,8 +1928,8 @@ void set_screen_params(void)
 
 	set_target_backbuffer();
 
-	int dw, dh;
 	int dx, dy;
+	int dw, dh;
 
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
 

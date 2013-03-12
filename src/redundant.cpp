@@ -542,7 +542,7 @@ void m_flip_display(void)
 	if (!skip_flip) {
 		al_flip_display();
 	}
-	
+
 	int xxx, yyy, www, hhh;
 	al_get_clipping_rectangle(&xxx, &yyy, &www, &hhh);
 	al_set_clipping_rectangle(
@@ -1255,7 +1255,7 @@ void prepareForScreenGrab2()
 
 void set_target_backbuffer()
 {
-	if (!prompt_for_close_on_next_flip && show_item_info_on_flip < 0 && !show_player_info_on_flip) {
+	if (!prompt_for_close_on_next_flip && show_item_info_on_flip < 0 && !show_player_info_on_flip && !close_pressed_for_configure) {
 		al_set_target_backbuffer(display);
 	}
 }

@@ -4987,6 +4987,9 @@ void MItemSelector::draw()
 	mDrawFrame(3, y, BW-6, height);
 	int dx;
 	int dy = y+3;
+
+	int cx, cy, cw, ch;
+	al_get_clipping_rectangle(&cx, &cy, &cw, &ch);
 	
 	m_set_clip(0, dy-4, BW, dy+height-6);
 
@@ -5022,8 +5025,7 @@ loop:
 			dy += 15;
 	}
 
-	m_set_clip(0, 0, BW, BH);
-
+	al_set_clipping_rectangle(cx, cy, cw, ch);
 
 	//draw cursor
 	if (this == tguiActiveWidget && ((unsigned)tguiCurrentTimeMillis() % 300) < 150) {
