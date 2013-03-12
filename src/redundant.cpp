@@ -1243,8 +1243,15 @@ void draw_tmpbuffer(int dx, int dy, int dw, int dh)
 		return;
 	}
 
+	ALLEGRO_TRANSFORM backup, t;
+	al_copy_transform(&backup, al_get_current_transform());
+	al_identity_transform(&t);
+	al_use_transform(&t);
+
 	int dx2, dy2, dw2, dh2;
 	get_screen_offset_size(&dx2, &dy2, &dw2, &dh2);
 
 	al_draw_scaled_bitmap(tmpbuffer->bitmap, dx, dy, dw, dh, dx2, dy2, dw2, dh2, 0);
+
+	al_use_transform(&backup);
 }
