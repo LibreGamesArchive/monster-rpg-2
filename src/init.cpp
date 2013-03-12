@@ -1968,15 +1968,15 @@ void toggle_fullscreen()
 	pause_joystick_repeat_events = true;
 
 	bool redo_tmpbuffer = tmpbuffer != NULL;
-
+	ALLEGRO_BITMAP *tmp = NULL;
+	int dx, dy, dw, dh;
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
 	if (redo_tmpbuffer) {
 		// redo tmpbuffer
-		int dx, dy, dw, dh;
-		get_screen_offset_size(&dx, &dy, &dw, &dh);
 		ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
 		int old_flags = al_get_new_bitmap_flags();
 		al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
-		ALLEGRO_BITMAP *tmp = my_al_create_bitmap(dw, dh);
+		tmp = my_al_create_bitmap(dw, dh);
 		al_set_new_bitmap_flags(old_flags);
 		al_set_target_bitmap(tmp);
 		al_draw_bitmap(tmpbuffer->bitmap, dx, dy, 0);
@@ -2046,7 +2046,7 @@ void toggle_fullscreen()
 		int dx2, dy2, dw2, dh2;
 		get_screen_offset_size(&dx2, &dy2, &dw2, &dh2);
 		create_tmpbuffer();
-		int old_target = al_get_target_bitmap();
+		ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
 		m_set_target_bitmap(tmpbuffer);
 		al_draw_scaled_bitmap(tmp, 0, 0, dw, dh, dx2, dy2, dw2, dh2, 0);
 		al_set_target_bitmap(old_target);

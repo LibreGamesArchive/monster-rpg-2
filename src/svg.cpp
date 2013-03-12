@@ -248,7 +248,7 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 					dx = spline[6] - spline[0];
 					dy = spline[7] - spline[1];
 					dist = sqrt(dx*dx + dy*dy);
-					int npts = sqrt(dist*2) * 1.3; // trial and error yields this number
+					int npts = sqrt(dist*2) * 10; // trial and error yields this number
 					if (npts > 0) {
 						float *out = (float *)malloc(npts*2*sizeof(float));
 						al_calculate_spline(out, 2*sizeof(float), spline, 0, npts);
