@@ -1953,9 +1953,6 @@ int main(int argc, char *argv[])
 	const float svg_w = 362;
 	float scale = wanted / svg_w;
 	MBITMAP *nooskewl = new_mbitmap(load_svg(getResource("media/nooskewl.svg"), scale));
-
-	// FIXME:
-	al_save_bitmap("nooskewl.png", nooskewl->bitmap);
 #else
 	int flags = al_get_new_bitmap_flags();
 	
