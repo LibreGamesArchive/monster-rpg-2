@@ -1111,7 +1111,6 @@ top:
 
 			// resume
 			al_acknowledge_drawing_resume(display);
-			//al_rest(1.0); FIXME: needed?
 #ifdef ALLEGRO_ANDROID
 			init_shaders();
 			_reload_loaded_bitmaps();
@@ -1383,12 +1382,8 @@ void do_close_exit_game()
 	m_clear(al_map_rgb(0, 0, 0));
 	m_flip_display();
 	hide_mouse_cursor(); // for Pi
-#ifdef ALLEGRO_WINDOWS
-	throw QuitError();
-#else
 	destroy();
 	exit(0);
-#endif
 }
 
 void do_close(bool quit)
@@ -1401,8 +1396,10 @@ void do_close(bool quit)
 		forced_closed = false;
 		save_auto_save_to_disk();
 		config.write();
-		if (quit)
-			throw QuitError();
+		if (quit) {
+			destroy();
+			exit(0);
+		}
 	}
 	if (close_pressed_for_configure) {
 		close_pressed_for_configure = false;
@@ -1891,8 +1888,6 @@ int main(int argc, char *argv[])
 	}
 #endif
 
-	try { // QuitError try
-
 	int n;
 
 #ifndef ALLEGRO_ANDROID
@@ -1958,6 +1953,9 @@ int main(int argc, char *argv[])
 	const float svg_w = 362;
 	float scale = wanted / svg_w;
 	MBITMAP *nooskewl = new_mbitmap(load_svg(getResource("media/nooskewl.svg"), scale));
+
+	// FIXME:
+	al_save_bitmap("nooskewl.png", nooskewl->bitmap);
 #else
 	int flags = al_get_new_bitmap_flags();
 	
@@ -2232,7 +2230,8 @@ int main(int argc, char *argv[])
 		#endif
 		else if (choice == 0xBEEF) {
 			config.write();
-			throw QuitError();
+			destroy();
+			exit(0);
 		}
 		else {
 			break;
@@ -2291,15 +2290,6 @@ int main(int argc, char *argv[])
 		resetIds();
 		initInput();
 		al_unlock_mutex(input_mutex);
-	}
-		
-	} catch (QuitError e) {
-		(void)e;
-		set_target_backbuffer();
-		m_clear(al_map_rgb(0, 0, 0));
-		m_flip_display();
-		m_clear(al_map_rgb(0, 0, 0));
-		m_flip_display();
 	}
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID

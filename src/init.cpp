@@ -1531,17 +1531,10 @@ bool init(int *argc, char **argv[])
 	ALLEGRO_DEBUG("creating screenshot buffer\n");
 	
 	{
-		ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
 		flags = al_get_new_bitmap_flags();
 		al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
 		screenshot = m_create_bitmap(BW/2, BH/2);
-		m_set_target_bitmap(screenshot);
-		ALLEGRO_TRANSFORM t;
-		al_identity_transform(&t);
-		al_scale_transform(&t, 0.5f, 0.5f);
-		al_use_transform(&t);
 		al_set_new_bitmap_flags(flags);
-		al_set_target_bitmap(old_target);
 	}
 	
 	ALLEGRO_DEBUG("creating tmpbuffer\n");

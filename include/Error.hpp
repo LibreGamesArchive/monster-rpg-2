@@ -7,7 +7,6 @@ class WriteError : public Error {};	// error writing file
 class NoMode : public Error {};		// error setting graphics mode
 class ScriptError : public Error {};
 class InitError : public Error {};
-class QuitError : public Error {};
 
 #endif
 
