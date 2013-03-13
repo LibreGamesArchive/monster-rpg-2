@@ -1979,7 +1979,7 @@ void toggle_fullscreen()
 		tmp = my_al_create_bitmap(dw, dh);
 		al_set_new_bitmap_flags(old_flags);
 		al_set_target_bitmap(tmp);
-		al_draw_bitmap(tmpbuffer->bitmap, dx, dy, 0);
+		al_draw_bitmap(tmpbuffer->bitmap, -dx, -dy, 0);
 		al_set_target_bitmap(old_target);
 		m_destroy_bitmap(tmpbuffer);
 	}
