@@ -2048,7 +2048,7 @@ int main(int argc, char *argv[])
 	// FIXME
 	//playMusic("volcano.ogg"); volcano_scene();
 	//do_lander(); 
-	//archery(false);
+	archery(false);
 	//shooter(false);
 	//credits();
 	

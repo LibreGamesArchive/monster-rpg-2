@@ -107,9 +107,6 @@ void loadIcons()
 	al_restore_state(&state);
 
 	m_destroy_bitmap(tmp);
-
-	// FIXME:
-	al_save_bitmap("ic.png", icon_bmp->bitmap);
 }
 
 void destroyIcons(void)

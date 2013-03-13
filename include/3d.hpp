@@ -32,4 +32,6 @@ bool archery(bool for_points);
 
 void volcano_scene(void);
 
+extern bool in_archery;
+
 #endif

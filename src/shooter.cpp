@@ -1241,12 +1241,17 @@ start:
 
 			bool reset_mouse = false;
 			if (prompt_for_close_on_next_flip) {
+				int dx, dy, dw, dh;
+				get_screen_offset_size(&dx, &dy, &dw, &dh);
+				int mousex = al_get_display_width(display)-custom_cursor_w-20-dx;
+				int mousey = al_get_display_height(display)-custom_cursor_h-20-dy;
+				m_set_mouse_xy(display, mousex, mousey);
 				reset_mouse = true;
 			}
 
 			m_flip_display();
 
-			if (reset_mouse) {
+			if (reset_mouse && !break_main_loop) {
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 				m_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
 				last_mouse_x = al_get_display_width(display)/2;
@@ -1291,6 +1296,11 @@ done:
 	playMusic("underwater_final.ogg");
 	
 	show_mouse_cursor();
+	int dx, dy, dw, dh;
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
+	int mousex = al_get_display_width(display)-custom_cursor_w-20-dx;
+	int mousey = al_get_display_height(display)-custom_cursor_h-20-dy;
+	m_set_mouse_xy(display, mousex, mousey);
 
 	if (dead) {
 		if (prompt("G A M E O V E R", "Try Again?", 1, 1))

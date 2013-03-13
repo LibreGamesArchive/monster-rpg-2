@@ -2029,7 +2029,7 @@ void toggle_fullscreen()
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (have_mouse) {
 		al_set_mouse_cursor(display, custom_mouse_cursor);
-		if (in_shooter) {
+		if (in_shooter || in_archery) {
 			m_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
 		}
 		else {

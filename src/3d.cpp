@@ -15,6 +15,8 @@
 
 #include <cfloat>
 
+bool in_archery = false;
+
 void disable_zbuffer(void)
 {
 	al_set_render_state(ALLEGRO_DEPTH_TEST, 0);
@@ -515,6 +517,8 @@ static int NUM_GOBLINS;
 
 static int real_archery(int *accuracy_pts)
 {
+	in_archery = true;
+
 	hide_mouse_cursor();
 
 	dpad_off();
@@ -946,8 +950,24 @@ static int real_archery(int *accuracy_pts)
 			if (break_for_fade_after_draw) {
 				break;
 			}
+
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+			bool reset_mouse = false;
+			int reset_x, reset_y;
+			if (prompt_for_close_on_next_flip) {
+				reset_mouse = true;
+				ALLEGRO_MOUSE_STATE state;
+				al_get_mouse_state(&state);
+				reset_x = state.x;
+				reset_y = state.y;
+			}
+#endif
 			
 			m_flip_display();
+
+			if (reset_mouse && !break_main_loop) {
+				m_set_mouse_xy(display, reset_x, reset_y);
+			}
 		}
 	}
 
@@ -984,6 +1004,13 @@ done:
 	dpad_on();
 
 	show_mouse_cursor();
+	int dx, dy, dw, dh;
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
+	int mousex = al_get_display_width(display)-custom_cursor_w-20-dx;
+	int mousey = al_get_display_height(display)-custom_cursor_h-20-dy;
+	m_set_mouse_xy(display, mousex, mousey);
+
+	in_archery = false;
 
 	if (break_main_loop) {
 		return 2;
