@@ -5,6 +5,11 @@ void AnimationSet::setSubAnimation(int anim)
 	currAnim = anim;
 }
 
+int AnimationSet::getNumAnims()
+{
+	return anims.size();
+}
+
 /*
  * Returns true if an animation by this name exists
  */
@@ -135,6 +140,14 @@ void AnimationSet::setPrefix(std::string prefix)
 void AnimationSet::reset(void)
 {
 	anims[currAnim]->reset();
+}
+
+AnimationSet *new_AnimationSet(const char *filename, bool alpha)
+{
+	AnimationSet *tmp = new AnimationSet(filename, alpha);
+	AnimationSet *a = tmp->clone(CLONE_FULL); // creates 1px border around every frame
+	delete tmp;
+	return a;
 }
 
 AnimationSet::AnimationSet(const char *filename, bool alpha) :
@@ -272,30 +285,57 @@ AnimationSet *AnimationSet::clone(int type)
 	AnimationSet *a = new AnimationSet();
 
 	a->filename = filename;
-	
+	a->name = name;
+	a->currAnim = currAnim;
+	a->prefix = prefix;
+	a->destroy = destroy;
+
+	MBITMAP *tmp = m_load_bitmap(filename.c_str());
+	MBITMAP *clone_from, *clone_to;
+
+	int widest = 0;
+	int total_h = anims.size()*2;
+	for (int anim = 0; anim < anims.size(); anim++) {
+		int numFrames = anims[anim]->getNumFrames();
+		int width = m_get_bitmap_width(anims[anim]->getCurrentFrame()->getImage()->getBitmap());
+		int height = m_get_bitmap_height(anims[anim]->getCurrentFrame()->getImage()->getBitmap());
+		int total_w = width*numFrames + numFrames*2;
+		if (total_w > widest) {
+			widest = total_w;
+		}
+		total_h += height;
+	}
+
 	int flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-	a->bitmap = m_load_bitmap(filename.c_str());
+	a->bitmap = m_create_bitmap(widest, total_h);
 	al_set_new_bitmap_flags(flags);
+	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
+	al_set_target_bitmap(a->bitmap->bitmap);
+	m_clear(m_map_rgba(0, 0, 0, 0));
+	al_set_target_bitmap(old_target);
 	
+	clone_from = tmp;
+	clone_to = a->bitmap;
+	
+	int y = 1;
+	for (size_t i = 0; i < anims.size(); i++) {
+		a->anims.push_back(anims[i]->clone(type, clone_from, clone_to, y));
+		y += m_get_bitmap_height(anims[i]->getCurrentFrame()->getImage()->getBitmap()) + 2;
+	}
+
+	m_destroy_bitmap(tmp);
+
 	if (type != CLONE_FULL) {
-		MBITMAP *tmp = m_clone_bitmap(a->bitmap);
+		tmp = m_clone_bitmap(a->bitmap);
 		ALLEGRO_BITMAP *target = al_get_target_bitmap();
 		m_set_target_bitmap(a->bitmap);
 		add_blit(tmp, 0, 0, white, 0.7, 0);
 		m_destroy_bitmap(tmp);
 		al_set_target_bitmap(target);
+		clone_from = a->bitmap;
+		clone_to = NULL;
 	}
-	
-	a->name = name;
-
-	for (size_t i = 0; i < anims.size(); i++) {
-		a->anims.push_back(anims[i]->clone(type, a->bitmap));
-	}
-
-	a->currAnim = currAnim;
-	a->prefix = prefix;
-	a->destroy = destroy;
 
 	return a;
 }

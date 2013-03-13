@@ -121,7 +121,7 @@ top:
 	m_draw_bitmap(lander_mem, 3, 3, 0);
 	al_restore_state(&state);
 	
-	AnimationSet *explosion = new AnimationSet(getResource("media/explosion.png"));
+	AnimationSet *explosion = new_AnimationSet(getResource("media/explosion.png"));
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	MLanderButton *left_button = NULL;

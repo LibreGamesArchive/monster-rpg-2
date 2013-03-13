@@ -78,6 +78,41 @@ Image *Image::clone(int type, MBITMAP *copy)
 	return img;
 }
 
+Image *Image::clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, int col, int y)
+{
+	int dx = w*col + 1 + col*2;
+	int dy = y;
+
+	ALLEGRO_STATE state;
+	al_store_state(&state, ALLEGRO_STATE_BLENDER | ALLEGRO_STATE_TARGET_BITMAP);
+
+	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+
+	al_set_target_bitmap(clone_to->bitmap);
+
+	al_draw_bitmap_region(
+		clone_from->bitmap,
+		x1, y1, w, h,
+		dx, dy,
+		0
+	);
+
+	al_restore_state(&state);
+
+	Image *img = new Image();
+	img->transparent = transparent;
+	img->alpha = alpha;
+	img->copy_from = clone_to;
+	img->x1 = dx;
+	img->y1 = dy;
+	img->w = w;
+	img->h = h;
+
+	img->bitmap = m_create_sub_bitmap(clone_to, dx, dy, w, h);
+
+	return img;
+}
+
 Image::Image(void)
 {
 	transparent = true;

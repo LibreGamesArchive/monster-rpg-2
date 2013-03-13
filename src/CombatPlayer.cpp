@@ -1674,7 +1674,7 @@ CombatPlayer::CombatPlayer(std::string name, int number, /*AnimationSet *animSet
 	running(false),
 	stone_bmp(NULL)
 {
-	animSet = new AnimationSet(getResource("combat_media/%s.png", name.c_str()));
+	animSet = new_AnimationSet(getResource("combat_media/%s.png", name.c_str()));
 
 	if (!use_programmable_pipeline) {
 		whiteAnimSet = animSet->clone(CLONE_PLAYER);
@@ -1695,7 +1695,7 @@ CombatPlayer::CombatPlayer(std::string name, int number, /*AnimationSet *animSet
 	spellIndex_display = -1;
 
 	#ifndef LITE
-	charmAnim = new AnimationSet(getResource("combat_media/Charm.png"));
+	charmAnim = new_AnimationSet(getResource("combat_media/Charm.png"));
 	#endif
 }
 

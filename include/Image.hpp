@@ -22,6 +22,7 @@ public:
 	void set(MBITMAP *b);
 	bool load(MBITMAP *copy_from, int x1, int y1, int x2, int y2);
 	Image *clone(int type, MBITMAP *bitmap);
+	Image *clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, int col, int y);
 	//void refresh(void);
 	
 	void draw(int x, int y, int flags = 0);

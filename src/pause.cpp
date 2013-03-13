@@ -2219,7 +2219,7 @@ void into_the_sun(void)
 	MBITMAP *bg_locked = m_load_bitmap(getResource("media/sun.png"));
 	m_lock_bitmap(bg_locked, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
 
-	AnimationSet *explosion = new AnimationSet(getResource("media/explosion.png"));
+	AnimationSet *explosion = new_AnimationSet(getResource("media/explosion.png"));
 
 	prepareForScreenGrab1();
 	m_draw_bitmap(bg, 0, 0, 0);

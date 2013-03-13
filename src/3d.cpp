@@ -603,11 +603,11 @@ static int real_archery(int *accuracy_pts)
 	grass =	m_load_bitmap(getResource("media/towergrass.png"));
 	tower = m_load_bitmap(getResource("media/towertop.png"));
 
-	goblin_animSet = new AnimationSet(getResource("objects/Goblin.png"));
+	goblin_animSet = new_AnimationSet(getResource("objects/Goblin.png"));
 	goblin_animSet->setSubAnimation("walk_s");
-	goblin_dead = new AnimationSet(getResource("objects/Goblin.png"));
+	goblin_dead = new_AnimationSet(getResource("objects/Goblin.png"));
 	goblin_dead->setSubAnimation("dead_arrow");
-	goblin_swipe = new AnimationSet(getResource("media/goblin_hand_swipe.png"));
+	goblin_swipe = new_AnimationSet(getResource("media/goblin_hand_swipe.png"));
 
 	MBITMAP *progress = m_load_bitmap(getResource("media/Goblin_meter.png"));
 

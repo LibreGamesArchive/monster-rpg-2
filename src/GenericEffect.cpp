@@ -79,7 +79,7 @@ GenericCureEffect::GenericCureEffect(Combatant *user, Combatant *target, int amo
 	this->amount = amount;
 	this->finish = finish;
 
-	animation = new AnimationSet(getResource("combat_media/%s.png", name.c_str()));
+	animation = new_AnimationSet(getResource("combat_media/%s.png", name.c_str()));
 	count = 0;
 
 	type = COMBATENTITY_TYPE_FRILL;

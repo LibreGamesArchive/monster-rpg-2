@@ -5792,7 +5792,7 @@ MManSelector::MManSelector(std::vector<MMan> mans)
 	pos = 0;
 	this->mans = mans;
 
-	go = new AnimationSet(getResource("media/go.png"));
+	go = new_AnimationSet(getResource("media/go.png"));
 
 	alpha = 255;
 	alpha_inc = -(255.0/1000.0);
@@ -7277,7 +7277,7 @@ MShop::MShop(int x, int y, int nItems, int *things, int *costs)
 	up = m_load_bitmap(getResource("media/up.png"));
 	for (int i = 0; i < MAX_PARTY; i++) {
 		if (party[i]) {
-			partyAnims[i] = new AnimationSet(getResource("objects/%s.png", party[i]->getName().c_str()));
+			partyAnims[i] = new_AnimationSet(getResource("objects/%s.png", party[i]->getName().c_str()));
 			partyAnims[i]->setSubAnimation("stand_s");
 		}
 		else {

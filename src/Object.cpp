@@ -97,7 +97,7 @@ void Object::setAnimationSet(std::string name)
 		animationSet = NULL;
 	}
 
-	animationSet = new AnimationSet(name.c_str());
+	animationSet = new_AnimationSet(name.c_str());
 
 	animationSet->setSubAnimation("stand_s");
 	Animation *a = animationSet->getCurrentAnimation();
@@ -1093,7 +1093,7 @@ Rocket::Rocket(float x, float y, std::string spriteName)
 	ox = 0;
 	high = true;
 
-	animationSet = new AnimationSet(getResource("objects/%s.png", spriteName.c_str()));
+	animationSet = new_AnimationSet(getResource("objects/%s.png", spriteName.c_str()));
 	puff = m_load_bitmap(getResource("media/exhaust_puff.png"));
 	flames = m_load_bitmap(getResource("media/exhaust_flames.png"));
 

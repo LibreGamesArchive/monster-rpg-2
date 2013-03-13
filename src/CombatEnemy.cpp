@@ -1001,7 +1001,7 @@ void CombatEnemy::construct(std::string name, int x, int y, bool alpha)
 	status.type = COMBAT_WAITING;
 
 	if (printableName == std::string(_t("Girl"))) {
-		oldAnim = new AnimationSet(getResource("combat_media/Dragon.png"));
+		oldAnim = new_AnimationSet(getResource("combat_media/Dragon.png"));
 		if (!use_programmable_pipeline) {
 			oldWhiteAnim = oldAnim->clone(CLONE_ENEMY);
 			oldWhiteAnim->setSubAnimation("stand");
@@ -1014,7 +1014,7 @@ void CombatEnemy::construct(std::string name, int x, int y, bool alpha)
 		}
 	}
 
-	charmAnim = new AnimationSet(getResource("combat_media/Charm.png"));
+	charmAnim = new_AnimationSet(getResource("combat_media/Charm.png"));
 
 	swingTime = 0;
 
@@ -1107,7 +1107,7 @@ CombatEnemy::CombatEnemy(std::string name, int x, int y, bool alpha) :
 
 	//referenceBattleAnim(s, this);
 	//animSet = findBattleAnim(s, this);
-	animSet = new AnimationSet(getResource("combat_media/%s.png", s.c_str()));
+	animSet = new_AnimationSet(getResource("combat_media/%s.png", s.c_str()));
 	animSet->setSubAnimation("stand");
 
 	construct(name, x, y, alpha);
@@ -1123,7 +1123,7 @@ CombatEnemy::CombatEnemy(std::string name, int x, int y) :
 
 	//referenceBattleAnim(s, this);
 	//animSet = findBattleAnim(s, this);
-	animSet = new AnimationSet(getResource("combat_media/%s.png", s.c_str()));
+	animSet = new_AnimationSet(getResource("combat_media/%s.png", s.c_str()));
 	animSet->setSubAnimation("stand");
 
 	construct(name, x, y, false);

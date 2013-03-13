@@ -11,13 +11,14 @@ public:
 	void setPrefix(std::string prefix);
 	bool checkSubAnimationExists(std::string subName);
 
-	std::string getSubName(void);
+	std::string getSubName();
 	int getFrame();
 	Animation* getCurrentAnimation();
 	int getWidth(); // gets width of current frame
 	int getHeight(); // gets height of current frame
+	int getNumAnims();
 
-	void reset(void);
+	void reset();
 	void draw(int x, int y, int flags = 0);
 	void drawRotated(int x, int y, float angle, int flags = 0);
 	void drawScaled(int x, int y, int w, int h, int flags = 0);
@@ -25,7 +26,7 @@ public:
 
 	AnimationSet *clone(int type);
 
-	AnimationSet(void);
+	AnimationSet();
 	AnimationSet(const char *filename, bool alpha = false);
 	~AnimationSet();
 	
@@ -39,5 +40,7 @@ private:
 	MBITMAP *bitmap;
 	std::string filename;
 };
+
+AnimationSet *new_AnimationSet(const char *filename, bool alpha = false);
 
 #endif

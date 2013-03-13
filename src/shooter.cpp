@@ -721,7 +721,7 @@ bool shooter(bool for_points)
 	sub_bmp = m_load_bitmap(getResource("media/sub.png"));
 	bullet = m_load_bitmap(getResource("media/bullet.png"));
 	for (int i = 0; i < EXP_POOL_SIZE; i++) {
-		explosion_pool[i] = new AnimationSet(getResource("media/explosion.png"));
+		explosion_pool[i] = new_AnimationSet(getResource("media/explosion.png"));
 	}
 
 	int mipmap = 0;
@@ -732,8 +732,8 @@ bool shooter(bool for_points)
 #endif
 
 	al_set_new_bitmap_flags(flags | linear | mipmap);
-	crab = new AnimationSet(getResource("media/crab.png"));
-	shark_anim = new AnimationSet(getResource("media/shark.png"));
+	crab = new_AnimationSet(getResource("media/crab.png"));
+	shark_anim = new_AnimationSet(getResource("media/shark.png"));
 	underwater = m_load_bitmap(getResource("media/underwater.png"));
 	al_set_new_bitmap_flags(flags);
 

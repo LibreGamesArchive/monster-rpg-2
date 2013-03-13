@@ -1565,8 +1565,8 @@ bool init(int *argc, char **argv[])
 		return false;
 	}
 
-	eny_loader = new AnimationSet(getResource("media/eny-loader.png"));
-	dot_loader = new AnimationSet(getResource("media/dot-loader.png"));
+	eny_loader = new_AnimationSet(getResource("media/eny-loader.png"));
+	dot_loader = new_AnimationSet(getResource("media/dot-loader.png"));
 	bg_loader = m_load_bitmap(getResource("media/bg-loader.png"));
 	bar_loader = m_load_bitmap(getResource("media/bar-loader.png"));
 	loading_loader = m_load_bitmap(getResource("media/loading-loader.png"));

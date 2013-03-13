@@ -841,7 +841,7 @@ Fire1Effect::Fire1Effect(Combatant *target) :
 
 	this->target = target;
 
-	animSet = new AnimationSet(getResource("combat_media/fire1.png"));
+	animSet = new_AnimationSet(getResource("combat_media/fire1.png"));
 }
 
 
@@ -1521,7 +1521,7 @@ Fire2Effect::Fire2Effect(Combatant *target)
 		pixels[i].dy = RISE_SPEED;
 	}
 
-	animSet = new AnimationSet(getResource("combat_media/Fire2.png"));
+	animSet = new_AnimationSet(getResource("combat_media/Fire2.png"));
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	verts = new ALLEGRO_VERTEX[numPixels*6];
 	
@@ -1842,7 +1842,7 @@ RendEffect::RendEffect(Combatant *target) :
 
 	this->target = target;
 
-	animSet = new AnimationSet(getResource("combat_media/Rend.png"));
+	animSet = new_AnimationSet(getResource("combat_media/Rend.png"));
 	LIFETIME = animSet->getCurrentAnimation()->getLength();
 }
 
@@ -2221,7 +2221,7 @@ PunchEffect::PunchEffect(Combatant *target, Combatant *caster) :
 	x = sx;
 	y = sy;
 
-	animSet = new AnimationSet(getResource("combat_media/Punch.png"));
+	animSet = new_AnimationSet(getResource("combat_media/Punch.png"));
 }
 
 
@@ -3331,7 +3331,7 @@ DaisyEffect::DaisyEffect(Combatant *target) :
 	x = 0;
 	y = target->getY()+1;
 
-	animSet = new AnimationSet(getResource("combat_media/Daisy.png"));
+	animSet = new_AnimationSet(getResource("combat_media/Daisy.png"));
 
 	if (target->getLocation() == LOCATION_RIGHT) {
 		dx = target->getX()-target->getAnimationSet()->getWidth()/2-animSet->getWidth();
@@ -3453,7 +3453,7 @@ ArcEffect::ArcEffect(Combatant *caster, Combatant *target) :
 	x = 0;
 	y = target->getY()+1;
 
-	alphaAnim = new AnimationSet(getResource("combat_media/Arc.png"), true);
+	alphaAnim = new_AnimationSet(getResource("combat_media/Arc.png"), true);
 
 	int MINDIST = 15;
 	int MAXDIST = 30;
@@ -3667,7 +3667,7 @@ FireballEffect::FireballEffect(Combatant *caster, Combatant *target) :
 	x = 0;
 	y = target->getY()+1;
 
-	animSet = new AnimationSet(getResource("combat_media/Fireball.png"));
+	animSet = new_AnimationSet(getResource("combat_media/Fireball.png"));
 
 	if (caster->getLocation() == LOCATION_LEFT) {
 		flags = M_FLIP_HORIZONTAL;
