@@ -453,87 +453,89 @@ void drawBufferToScreen(bool draw_controls)
 
 	set_target_backbuffer();
 
+	if (!transitioning) {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	bool on = ((unsigned)tguiCurrentTimeMillis() % 1000) < 500;
-	const char *text = NULL;
-	if (onscreen_swipe_to_attack) {
-		text = "SWIPE TO ATTACK!";
-	}
-	else if (onscreen_drag_to_use) {
-		text = "Drag to use!";
-	}
-	if (text && area && area->getName() != "tutorial") {
-		int len = m_text_length(medium_font, _t(text));
-		int h = m_text_height(medium_font);		
-		float scale = 32.0/(h+4);
-		if ((len+4)*scale > BW) scale = (float)BW/(len+4);
-		al_draw_filled_rectangle(0, (BH/2)-(h/2*scale+10), BW, (BH/2)+(h/2*scale+10), m_map_rgba(45, 45, 45, 160));
-		al_draw_line(0, (BH/2)-(h/2*scale+10), BW, (BH/2)-(h/2*scale+10), black, 1);
-		al_draw_line(0, (BH/2)+(h/2*scale+10), BW, (BH/2)+(h/2*scale+10), black, 1);
-	}
-	if (on && !use_dpad && area && area->getName() != "tutorial") {
-		if (text) {
+		bool on = ((unsigned)tguiCurrentTimeMillis() % 1000) < 500;
+		const char *text = NULL;
+		if (onscreen_swipe_to_attack) {
+			text = "SWIPE TO ATTACK!";
+		}
+		else if (onscreen_drag_to_use) {
+			text = "Drag to use!";
+		}
+		if (text && area && area->getName() != "tutorial") {
 			int len = m_text_length(medium_font, _t(text));
-			int h = m_text_height(medium_font);
-
-			ALLEGRO_STATE state;
-			al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
-
-			MBITMAP *tmp = m_create_alpha_bitmap(len+4, h+4); // check
-			m_set_target_bitmap(tmp);
-			m_clear(m_map_rgba(0, 0, 0, 0));
-			
-			mTextout(medium_font, _t(text), 1, 1,
-				white, black,
-				WGT_TEXT_NORMAL, false);
-
+			int h = m_text_height(medium_font);		
 			float scale = 32.0/(h+4);
 			if ((len+4)*scale > BW) scale = (float)BW/(len+4);
-			
-			al_restore_state(&state);
-
-			m_draw_scaled_bitmap(tmp, 0, 0, len+4, h+4,
-				(BW/2)-(((len+4)*scale)/2),
-				(BH/2)-(((h+4)*scale)/2),
-				(len+2)*scale, (h+2)*scale,
-				0
-			);
-
-			m_destroy_bitmap(tmp);
+			al_draw_filled_rectangle(0, (BH/2)-(h/2*scale+10), BW, (BH/2)+(h/2*scale+10), m_map_rgba(45, 45, 45, 160));
+			al_draw_line(0, (BH/2)-(h/2*scale+10), BW, (BH/2)-(h/2*scale+10), black, 1);
+			al_draw_line(0, (BH/2)+(h/2*scale+10), BW, (BH/2)+(h/2*scale+10), black, 1);
 		}
-	}
-#endif
+		if (on && !use_dpad && area && area->getName() != "tutorial") {
+			if (text) {
+				int len = m_text_length(medium_font, _t(text));
+				int h = m_text_height(medium_font);
 
-	int step;
-	if (current_time == -1) {
-		current_time = al_current_time();
-		step = 0;
-	}
-	else {
-		double now = al_current_time();
-		double diff = now - current_time;
-		current_time = now;
-		step = diff * 1000;
-	}
-	
-	for (int i = 0; i < MAX_PARTY; i++) {
-		omnipotentTexts[i].update(step);
-		omnipotentTexts[i].draw();
-	}
-	
-#if defined ALLEGRO_IPHONE
-	if (!transitioning && batteryIcon) {
-		float batteryLevel = getBatteryLevel();
-		if (batteryLevel >= 0 && batteryLevel <= 0.16) {
-			long t = tguiCurrentTimeMillis();
-			if ((unsigned)t % 2000 < 1000) {
-				m_draw_bitmap(batteryIcon,
-					BW-5-m_get_bitmap_width(batteryIcon),
-					5, 0);
+				ALLEGRO_STATE state;
+				al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
+
+				MBITMAP *tmp = m_create_alpha_bitmap(len+4, h+4); // check
+				m_set_target_bitmap(tmp);
+				m_clear(m_map_rgba(0, 0, 0, 0));
+				
+				mTextout(medium_font, _t(text), 1, 1,
+					white, black,
+					WGT_TEXT_NORMAL, false);
+
+				float scale = 32.0/(h+4);
+				if ((len+4)*scale > BW) scale = (float)BW/(len+4);
+				
+				al_restore_state(&state);
+
+				m_draw_scaled_bitmap(tmp, 0, 0, len+4, h+4,
+					(BW/2)-(((len+4)*scale)/2),
+					(BH/2)-(((h+4)*scale)/2),
+					(len+2)*scale, (h+2)*scale,
+					0
+				);
+
+				m_destroy_bitmap(tmp);
 			}
 		}
-	}
 #endif
+
+		int step;
+		if (current_time == -1) {
+			current_time = al_current_time();
+			step = 0;
+		}
+		else {
+			double now = al_current_time();
+			double diff = now - current_time;
+			current_time = now;
+			step = diff * 1000;
+		}
+		
+		for (int i = 0; i < MAX_PARTY; i++) {
+			omnipotentTexts[i].update(step);
+			omnipotentTexts[i].draw();
+		}
+		
+#if defined ALLEGRO_IPHONE
+		if (batteryIcon) {
+			float batteryLevel = getBatteryLevel();
+			if (batteryLevel >= 0 && batteryLevel <= 0.16) {
+				long t = tguiCurrentTimeMillis();
+				if ((unsigned)t % 2000 < 1000) {
+					m_draw_bitmap(batteryIcon,
+						BW-5-m_get_bitmap_width(batteryIcon),
+						5, 0);
+				}
+			}
+		}
+#endif
+	}
 
 	drawOverlay(draw_controls, al_map_rgba_f(0.5f, 0.5f, 0.5f, 0.5f));
 
