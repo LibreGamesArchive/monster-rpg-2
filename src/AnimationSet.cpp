@@ -295,7 +295,7 @@ AnimationSet *AnimationSet::clone(int type)
 
 	int widest = 0;
 	int total_h = anims.size()*2;
-	for (int anim = 0; anim < anims.size(); anim++) {
+	for (size_t anim = 0; anim < anims.size(); anim++) {
 		int numFrames = anims[anim]->getNumFrames();
 		int width = m_get_bitmap_width(anims[anim]->getCurrentFrame()->getImage()->getBitmap());
 		int height = m_get_bitmap_height(anims[anim]->getCurrentFrame()->getImage()->getBitmap());
