@@ -1169,7 +1169,7 @@ top:
 					do_toggle_fullscreen = true;
 				}
 			}
-			if (event.keyboard.keycode == config.getKeySettings()) {
+			if (event.keyboard.keycode == config.getKeySettings() && !shooter_paused) {
 				if (!pause_f_to_toggle_fullscreen) {
 					close_pressed_for_configure = true;
 				}
