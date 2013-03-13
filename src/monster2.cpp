@@ -2045,13 +2045,24 @@ int main(int argc, char *argv[])
 	}
 #endif
 
-	// FIXME
-	//playMusic("volcano.ogg"); volcano_scene();
-	//do_lander(); 
-	archery(false);
-	//shooter(false);
-	//credits();
-	
+#ifndef ALLEGRO_ANDROID
+	if (check_arg(argc, argv, "-volcano") != -1) {
+		playMusic("volcano.ogg"); volcano_scene();
+	}
+	if (check_arg(argc, argv, "-lander") != -1) {
+		do_lander();
+	}
+	if (check_arg(argc, argv, "-archery") != -1) {
+		archery(false);
+	}
+	if (check_arg(argc, argv, "-shooter") != -1) {
+		shooter(false);
+	}
+	if (check_arg(argc, argv, "-credits") != -1) {
+		credits();
+	}
+#endif
+
 	fps_counter = al_get_time();
 	fps_frames = 0;
 
