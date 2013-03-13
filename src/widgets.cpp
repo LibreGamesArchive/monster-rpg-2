@@ -23,10 +23,8 @@ bool getting_input_config = false;
 
 int show_item_info_on_flip = -1;
 
-void loadIcons(MBITMAP *bmp, RecreateData *data)
+void loadIcons()
 {
-	(void)data;
-
 	#define N 40
 	int pos[N*4] = {
 		0, 9, 9, 9,
@@ -76,20 +74,42 @@ void loadIcons(MBITMAP *bmp, RecreateData *data)
 		0, 54, 9, 9
 	};
 
-	for (size_t i = 0; i < icons.size(); i++) {
-		m_destroy_bitmap(icons[i]);
-	}
-	icons.clear();
+	MBITMAP *tmp = m_load_bitmap(getResource("media/icons.png"));
+
+	ALLEGRO_STATE state;
+	al_store_state(&state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS | ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_BLENDER);
+	al_set_new_bitmap_flags(0);
+	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+	icon_bmp = m_create_bitmap(128, 128);
+	m_set_target_bitmap(icon_bmp);
+	m_clear(m_map_rgba(0, 0, 0, 0));
 
 	for (int i = 0; i < N; i++) {
+		int cols = 128 / 16;
+		int row = i / cols;
+		int col = i % cols;
+		al_draw_bitmap_region(
+			tmp->bitmap,
+			pos[i*4+0], pos[i*4+1],
+			pos[i*4+2], pos[i*4+3],
+			col*16, row*16,
+			0
+		);
 		icons.push_back(
 			m_create_sub_bitmap(
-				bmp,
-				pos[i*4+0], pos[i*4+1],
+				icon_bmp,
+				col*16, row*16,
 				pos[i*4+2], pos[i*4+3]
 			)
 		);
 	}
+	
+	al_restore_state(&state);
+
+	m_destroy_bitmap(tmp);
+
+	// FIXME:
+	al_save_bitmap("ic.png", icon_bmp->bitmap);
 }
 
 void destroyIcons(void)

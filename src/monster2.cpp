@@ -154,7 +154,6 @@ void connect_second_display(void)
 	
 	_destroy_loaded_bitmaps();
 	destroy_fonts();
-	destroyIcons();
 	destroy_shaders();
 	al_destroy_display(display);
 	
@@ -172,7 +171,6 @@ void connect_second_display(void)
 
 	_reload_loaded_bitmaps();
 	load_fonts();
-	icon_bmp = m_load_bitmap_redraw(getResource("media/icons.png"), loadIcons, NULL);
 
 	_reload_loaded_bitmaps_delayed();
 
@@ -1087,7 +1085,6 @@ top:
 			al_get_clipping_rectangle(&cx, &cy, &cw, &ch);
 			_destroy_loaded_bitmaps();
 			destroy_fonts();
-			destroyIcons();
 			destroy_shaders();
 #endif
 			config.write();
@@ -1117,7 +1114,6 @@ top:
 			_reload_loaded_bitmaps_delayed();
 			init2_shaders();
 			load_fonts();
-			icon_bmp = m_load_bitmap_redraw(getResource("media/icons.png"), loadIcons, NULL);
 			if (in_shooter) {
 				shooter_restoring = true;
 			}
@@ -1289,7 +1285,6 @@ top:
 
 			_destroy_loaded_bitmaps();
 			destroy_fonts();
-			destroyIcons();
 
 			destroy_shaders();
 			al_destroy_display(display);
@@ -1319,7 +1314,6 @@ top:
 
 			_reload_loaded_bitmaps_delayed();
 			load_fonts();
-			icon_bmp = m_load_bitmap_redraw(getResource("media/icons.png"), loadIcons, NULL);
 
 			set_screen_params();
 	

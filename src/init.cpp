@@ -1673,7 +1673,7 @@ bool init(int *argc, char **argv[])
 	achievement_bmp = m_load_bitmap(getResource("media/trophy.png"));
 
 	debug_message("Loading icons\n");
-	icon_bmp = m_load_bitmap_redraw(getResource("media/icons.png"), loadIcons, NULL);
+	loadIcons();
 
 	inited = true;
 

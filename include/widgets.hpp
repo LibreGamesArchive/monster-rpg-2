@@ -1345,8 +1345,8 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 int config_input(int type);
 
 
-void loadIcons(MBITMAP *bmp, RecreateData *data);
-void destroyIcons(void);
+void loadIcons();
+void destroyIcons();
 
 extern MBITMAP *icon_bmp;
 
