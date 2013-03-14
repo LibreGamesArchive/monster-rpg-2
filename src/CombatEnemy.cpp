@@ -1003,7 +1003,7 @@ void CombatEnemy::construct(std::string name, int x, int y, bool alpha)
 	if (printableName == std::string(_t("Girl"))) {
 		oldAnim = new_AnimationSet(getResource("combat_media/Dragon.png"));
 		if (!use_programmable_pipeline) {
-			oldWhiteAnim = oldAnim->clone(CLONE_ENEMY);
+			oldWhiteAnim = new_AnimationSet(getResource("combat_media/Dragon.png"), false, CLONE_ENEMY);
 			oldWhiteAnim->setSubAnimation("stand");
 		}
 	}
@@ -1023,7 +1023,12 @@ void CombatEnemy::construct(std::string name, int x, int y, bool alpha)
 	work = NULL;
 
 	if (!use_programmable_pipeline) {
-		whiteAnimSet = animSet->clone(CLONE_ENEMY);
+		std::string s = name;
+		std::string::size_type loc;
+		loc = s.find("_", 0);
+		s = s.substr(0, loc);
+
+		whiteAnimSet = new_AnimationSet(getResource("combat_media/%s.png", s.c_str()), false, CLONE_ENEMY);
 		whiteAnimSet->setSubAnimation("stand");
 
 		mkdeath();
@@ -1105,8 +1110,6 @@ CombatEnemy::CombatEnemy(std::string name, int x, int y, bool alpha) :
 	loc = s.find("_", 0);
 	s = s.substr(0, loc);
 
-	//referenceBattleAnim(s, this);
-	//animSet = findBattleAnim(s, this);
 	animSet = new_AnimationSet(getResource("combat_media/%s.png", s.c_str()));
 	animSet->setSubAnimation("stand");
 
@@ -1121,8 +1124,6 @@ CombatEnemy::CombatEnemy(std::string name, int x, int y) :
 	loc = s.find("_", 0);
 	s = s.substr(0, loc);
 
-	//referenceBattleAnim(s, this);
-	//animSet = findBattleAnim(s, this);
 	animSet = new_AnimationSet(getResource("combat_media/%s.png", s.c_str()));
 	animSet->setSubAnimation("stand");
 

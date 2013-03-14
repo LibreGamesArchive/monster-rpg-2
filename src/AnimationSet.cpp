@@ -142,10 +142,10 @@ void AnimationSet::reset(void)
 	anims[currAnim]->reset();
 }
 
-AnimationSet *new_AnimationSet(const char *filename, bool alpha)
+AnimationSet *new_AnimationSet(const char *filename, bool alpha, CloneType type)
 {
 	AnimationSet *tmp = new AnimationSet(filename, alpha);
-	AnimationSet *a = tmp->clone(CLONE_FULL); // creates 1px border around every frame
+	AnimationSet *a = tmp->clone(type); // creates 1px border around every frame
 	delete tmp;
 	return a;
 }

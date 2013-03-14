@@ -41,6 +41,6 @@ private:
 	std::string filename;
 };
 
-AnimationSet *new_AnimationSet(const char *filename, bool alpha = false);
+AnimationSet *new_AnimationSet(const char *filename, bool alpha = false, CloneType type = CLONE_FULL);
 
 #endif

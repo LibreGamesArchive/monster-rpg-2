@@ -1677,7 +1677,8 @@ CombatPlayer::CombatPlayer(std::string name, int number, /*AnimationSet *animSet
 	animSet = new_AnimationSet(getResource("combat_media/%s.png", name.c_str()));
 
 	if (!use_programmable_pipeline) {
-		whiteAnimSet = animSet->clone(CLONE_PLAYER);
+		whiteAnimSet = new_AnimationSet(getResource("combat_media/%s.png", name.c_str()), false, CLONE_PLAYER);
+
 		whiteAnimSet->setSubAnimation("stand");
 	}
 	
