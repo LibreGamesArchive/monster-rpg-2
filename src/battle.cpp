@@ -398,7 +398,7 @@ void Battle::draw(void)
 {
 	m_set_blender(M_ONE, M_ZERO, white);
 	if (superpower && use_programmable_pipeline) {
-		al_use_shader(tinter);
+		use_shader(tinter);
 		al_set_shader_float("ratio", 1);
 		al_set_shader_float("r", 0.8);
 		al_set_shader_float("g", 0);

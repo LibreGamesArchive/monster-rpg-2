@@ -49,7 +49,6 @@ bool imperfect_aspect(void);
 void destroy_fonts(void);
 void load_fonts(void);
 
-void init2_shaders();
 void register_display(ALLEGRO_DISPLAY *display);
 
 extern "C" {

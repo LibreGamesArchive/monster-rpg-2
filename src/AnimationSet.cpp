@@ -333,8 +333,6 @@ AnimationSet *AnimationSet::clone(int type)
 		add_blit(tmp, 0, 0, white, 0.7, 0);
 		m_destroy_bitmap(tmp);
 		al_set_target_bitmap(target);
-		clone_from = a->bitmap;
-		clone_to = NULL;
 	}
 
 	return a;

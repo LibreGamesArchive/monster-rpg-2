@@ -965,9 +965,11 @@ static int real_archery(int *accuracy_pts)
 			
 			m_flip_display();
 
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 			if (reset_mouse && !break_main_loop) {
 				m_set_mouse_xy(display, reset_x, reset_y);
 			}
+#endif
 		}
 	}
 

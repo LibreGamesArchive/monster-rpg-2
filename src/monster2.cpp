@@ -1110,9 +1110,9 @@ top:
 			al_acknowledge_drawing_resume(display);
 #ifdef ALLEGRO_ANDROID
 			init_shaders();
+
 			_reload_loaded_bitmaps();
 			_reload_loaded_bitmaps_delayed();
-			init2_shaders();
 			load_fonts();
 			if (in_shooter) {
 				shooter_restoring = true;
@@ -1310,7 +1310,6 @@ top:
 			al_set_new_display_flags(flags);
 			register_display(display);
 			init_shaders();
-			init2_shaders();
 
 			_reload_loaded_bitmaps_delayed();
 			load_fonts();
@@ -1851,44 +1850,12 @@ static void run()
 #ifndef EDITOR
 int main(int argc, char *argv[])
 {
-#if defined ALLEGRO_WINDOWS && defined A5_OGL
-	LPTSTR cmdline = GetCommandLine();
-	argc = 1;
-	for (int i = 0; cmdline[i]; i++) {
-		if (cmdline[i] == ' ') {
-			while  (cmdline[i+1] == ' ')
-				i++;
-			argc++;
-		}
-	}
-	argv = new char *[argc];
-	char buf[256];
-	int k = 0;
-	for (int i = 0; i < argc; i++) {
-		int j = 0;
-		while  (1) {
-			buf[j++] = cmdline[k++];
-			if (cmdline[k] == ' ' || cmdline[k] == 0) {
-				while  (cmdline[k] == ' ' && cmdline[k+1] == ' ')
-					k++;
-				k++;
-				buf[j] = 0;
-				break;
-			}
-		}
-		argv[i] = strdup(buf);
-	}
-#endif
-
 	int n;
 
 #ifndef ALLEGRO_ANDROID
 	if ((n = check_arg(argc, argv, "-adapter")) != -1) {
 		config.setAdapter(atoi(argv[n+1]));
 	}
-#else
-	int argc = 0;
-	char **argv = NULL;
 #endif
 
 	if (!init(&argc, &argv)) {
@@ -2292,26 +2259,11 @@ int main(int argc, char *argv[])
 		al_unlock_mutex(input_mutex);
 	}
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-done:
-#endif
-
 #ifndef ALLEGRO_WINDOWS
 	al_unlock_mutex(wait_mutex);
 #endif
 
 	destroy();
-
-	ALLEGRO_DEBUG("AFTER LAST DESTROY\n");
-
-#if defined ALLEGRO_WINDOWS && defined A5_OGL
-	for (int i = 0; i < argc; i++) {
-		debug_message("deleting argv[%d]\n", i);
-		free(argv[i]);
-	}
-	debug_message("delete[]ing argv\n");
-	delete[] argv;
-#endif
 
 	debug_message("done\n");
 

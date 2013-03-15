@@ -31,7 +31,7 @@ void create_tmpbuffer()
 	int flags = al_get_new_bitmap_flags();
 #if defined OPENGLES
 	int format = al_get_new_bitmap_format();
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
+	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
 #endif
 	al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
 	int w = al_get_display_width(display);
@@ -752,8 +752,9 @@ void init_shaders(void)
 		"void main() {\n"
 		"   float avg, dr, dg, db;\n"
 		"   vec4 color = varying_color;\n"
-		"   vec4 coord = vec4(varying_texcoord, 0.0, 1.0);\n"
-		"   color *= texture2D(" ALLEGRO_SHADER_VAR_TEX ", coord.st);\n"
+		"   if (" ALLEGRO_SHADER_VAR_USE_TEX ") {\n"
+		"      color *= texture2D(" ALLEGRO_SHADER_VAR_TEX ", varying_texcoord);\n"
+		"   }\n"
 		"   avg = (color.r + color.g + color.b) / 3.0;\n"
 		"   dr = avg * r;\n"
 		"   dg = avg * g;\n"
@@ -846,83 +847,72 @@ void init_shaders(void)
 		"   }\n"
 		"}";
 		
-		tinter = al_create_shader(ALLEGRO_SHADER_GLSL);
-		warp = al_create_shader(ALLEGRO_SHADER_GLSL);
-		shadow_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
-		brighten = al_create_shader(ALLEGRO_SHADER_GLSL);
-
-		al_attach_shader_source(
-					tinter,
-					ALLEGRO_VERTEX_SHADER,
-					al_get_default_shader_source(ALLEGRO_SHADER_GLSL, ALLEGRO_VERTEX_SHADER)
-					);
-		
-		al_attach_shader_source(
-					warp,
-					ALLEGRO_VERTEX_SHADER,
-					warp_vertex_source
-					);
-		
-		al_attach_shader_source(
-					shadow_shader,
-					ALLEGRO_VERTEX_SHADER,
-					al_get_default_shader_source(ALLEGRO_SHADER_GLSL, ALLEGRO_VERTEX_SHADER)
-					);
-		
-		al_attach_shader_source(
-					brighten,
-					ALLEGRO_VERTEX_SHADER,
-					al_get_default_shader_source(ALLEGRO_SHADER_GLSL, ALLEGRO_VERTEX_SHADER)
-					);
-
-		al_attach_shader_source(
-					tinter,
-					ALLEGRO_PIXEL_SHADER,
-					tinter_pixel_source
-					);
-		
-		al_attach_shader_source(
-					warp,
-					ALLEGRO_PIXEL_SHADER,
-					warp_pixel_source
-					);
-		
-		al_attach_shader_source(
-					shadow_shader,
-					ALLEGRO_PIXEL_SHADER,
-					shadow_pixel_source
-					);
-		
-		al_attach_shader_source(
-					brighten,
-					ALLEGRO_PIXEL_SHADER,
-					brighten_pixel_source
-					);
-
 		const char *shader_log;
-
-		al_link_shader(tinter);
-		if ((shader_log = al_get_shader_log(tinter))[0] != 0) {
-			printf("1. %s\n", shader_log);
-		}
-		al_link_shader(warp);
+		warp = al_create_shader(ALLEGRO_SHADER_GLSL);
+		al_attach_shader_source(
+			warp,
+			ALLEGRO_VERTEX_SHADER,
+			warp_vertex_source
+		);
+		al_attach_shader_source(
+			warp,
+			ALLEGRO_PIXEL_SHADER,
+			warp_pixel_source
+		);
+		al_build_shader(warp);
 		if ((shader_log = al_get_shader_log(warp))[0] != 0) {
-			printf("2. %s\n", shader_log);
+			printf("warp: %s\n", shader_log);
 		}
-		al_link_shader(shadow_shader);
+		
+		shadow_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
+		al_attach_shader_source(
+			shadow_shader,
+			ALLEGRO_VERTEX_SHADER,
+			al_get_default_shader_source(ALLEGRO_SHADER_GLSL, ALLEGRO_VERTEX_SHADER)
+		);
+		al_attach_shader_source(
+			shadow_shader,
+			ALLEGRO_PIXEL_SHADER,
+			shadow_pixel_source
+		);
+		al_build_shader(shadow_shader);
 		if ((shader_log = al_get_shader_log(shadow_shader))[0] != 0) {
-			printf("3. %s\n", shader_log);
+			printf("shadow: %s\n", shader_log);
 		}
-		al_link_shader(brighten);
+		
+		brighten = al_create_shader(ALLEGRO_SHADER_GLSL);
+		al_attach_shader_source(
+			brighten,
+			ALLEGRO_VERTEX_SHADER,
+			al_get_default_shader_source(ALLEGRO_SHADER_GLSL, ALLEGRO_VERTEX_SHADER)
+		);
+		al_attach_shader_source(
+			brighten,
+			ALLEGRO_PIXEL_SHADER,
+			brighten_pixel_source
+		);
+		al_build_shader(brighten);
 		if ((shader_log = al_get_shader_log(brighten))[0] != 0) {
-			printf("4. %s\n", shader_log);
+			printf("brighten: %s\n", shader_log);
+		}
+		
+		tinter = al_create_shader(ALLEGRO_SHADER_GLSL);
+		al_attach_shader_source(
+			tinter,
+			ALLEGRO_VERTEX_SHADER,
+			al_get_default_shader_source(ALLEGRO_SHADER_GLSL, ALLEGRO_VERTEX_SHADER)
+		);
+		al_attach_shader_source(
+			tinter,
+			ALLEGRO_PIXEL_SHADER,
+			tinter_pixel_source
+		);
+		al_build_shader(tinter);
+		if ((shader_log = al_get_shader_log(tinter))[0] != 0) {
+			printf("tinter: %s\n", shader_log);
 		}
 	}
 #endif
-}
-
-void init2_shaders(void)
-{
 }
 
 void destroy_shaders(void)
@@ -1543,8 +1533,6 @@ bool init(int *argc, char **argv[])
 
 	ALLEGRO_DEBUG("initing shader variables\n");
 
-	init2_shaders();
-	
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGBA_4444);
 #elif defined A5_OGL

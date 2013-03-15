@@ -1480,7 +1480,7 @@ void CombatPlayer::draw(void)
 
 		if (use_programmable_pipeline) {
 			MBITMAP *sb = animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
-			al_use_shader(brighten);
+			use_shader(brighten);
 			al_set_shader_sampler("tex", sb->bitmap, 0);
 			al_set_shader_float("brightness", amountF);
 			m_draw_tinted_bitmap(sb, vcol, x-(w/2), y-h, flags);

@@ -576,8 +576,7 @@ void Area::drawObject(int index)
 			dy -= depth;
 			if (tinting) {
 				if (use_programmable_pipeline) {
-					al_use_shader(tinter);
-					al_set_shader_sampler("tex", bmp->bitmap, 0);
+					use_shader(tinter);
 					al_set_shader_float("ratio", tint_ratio);
 					al_set_shader_float("r", targetTint.r);
 					al_set_shader_float("g", targetTint.g);
@@ -1220,7 +1219,7 @@ void Area::draw(int bw, int bh)
 #ifndef NO_SHADERS
 	if (num_quads > 0) {
 		if (tinting && use_programmable_pipeline) {
-			al_use_shader(tinter);
+			use_shader(tinter);
 			al_set_shader_float("ratio", tint_ratio);
 			al_set_shader_float("r", targetTint.r);
 			al_set_shader_float("g", targetTint.g);
@@ -1301,7 +1300,7 @@ void Area::draw(int bw, int bh)
 #ifndef NO_SHADERS
 	if (num_quads > 0) {
 		if (tinting && use_programmable_pipeline) {
-			al_use_shader(tinter);
+			use_shader(tinter);
 			al_set_shader_float("ratio", tint_ratio);
 			al_set_shader_float("r", targetTint.r);
 			al_set_shader_float("g", targetTint.g);

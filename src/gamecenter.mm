@@ -18,6 +18,10 @@ NSMutableDictionary *achievementsDictionary;
 
 BOOL isGameCenterAPIAvailable()
 {
+#ifdef NO_GAMECENTER
+	return FALSE;
+#endif
+
 	// Check for presence of GKLocalPlayer class.
 	BOOL localPlayerClassAvailable = (NSClassFromString(@"GKLocalPlayer")) != nil;
 
@@ -147,6 +151,10 @@ struct Holder
 
 void do_milestone(int num, bool visual)
 {
+#ifdef NO_GAMECENTER
+	return;
+#endif
+
 	num++;
 
 	Holder holders[NUM_ACHIEVEMENTS] = {

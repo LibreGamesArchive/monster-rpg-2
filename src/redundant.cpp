@@ -628,7 +628,6 @@ static int m_text_length_real(const MFONT *font, const char *text)
 void m_set_target_bitmap(MBITMAP *bmp)
 {
 	al_set_target_bitmap(bmp->bitmap);
-	//al_use_shader(NULL);
 }
 
 
@@ -1263,5 +1262,15 @@ void set_target_backbuffer()
 void m_set_mouse_xy(ALLEGRO_DISPLAY *display, int x, int y)
 {
 	al_set_mouse_xy(display, x, y);
+}
+
+void use_shader(ALLEGRO_SHADER *shader)
+{
+//	ALLEGRO_TRANSFORM v, p;
+//	al_copy_transform(&v, al_get_current_transform());
+//	al_copy_transform(&p, al_get_projection_transform(display));
+	al_use_shader(shader);
+//	al_use_transform(&v);
+//	al_set_projection_transform(display, &p);
 }
 

@@ -691,15 +691,9 @@ void m_draw_precise_line(MBITMAP *bitmap, float x1, float y1, float x2, float y2
 	delete[] verts;
 }
 
-static void draw_mouse_patch()
-{
-}
-
 static void fade(int startAlpha, int endAlpha, int length, MCOLOR color)
 {
 	transitioning = true;
-
-	draw_mouse_patch();
 
 	dpad_off();
 	global_draw_red = false;
@@ -790,8 +784,6 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 {
 	transitioning = true;
 	
-	draw_mouse_patch();
-
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
 	int disp_w = al_get_display_width(display);
@@ -920,8 +912,6 @@ void battleTransition()
 {
 	transitioning = true;
 	
-	draw_mouse_patch();
-
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
 	int flags = al_get_new_bitmap_flags();
@@ -1073,7 +1063,7 @@ void battleTransition()
 		al_copy_transform(&backup, al_get_current_transform());
 		al_identity_transform(&t);
 		al_use_transform(&t);
-		al_use_shader(warp);
+		use_shader(warp);
 		al_set_shader_float("angle", angle);
 		al_set_shader_float("tex_bot", 1);
 		al_set_shader_sampler("tex", xfade_buf->bitmap, 0);
