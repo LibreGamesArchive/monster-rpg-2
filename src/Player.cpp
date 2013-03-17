@@ -350,10 +350,10 @@ void Player::setName(std::string name)
 }
 
 
-Combatant *Player::makeCombatant(int number)
+Combatant *Player::makeCombatant(int number, bool loadImages)
 {
 	//AnimationSet *banim = findBattleAnim(name, this);
-	CombatPlayer *c = new CombatPlayer(name, number/*, banim*/);
+	CombatPlayer *c = new CombatPlayer(name, number, "", loadImages);
 
 	copyInfo(c->getInfo(), info);
 
@@ -362,33 +362,35 @@ Combatant *Player::makeCombatant(int number)
 
 	int lid = info.equipment.lhand;
 	int rid = info.equipment.rhand;
-		
-	c->getAnimationSet()->setPrefix("");
-	if (!use_programmable_pipeline) {
-		c->getWhiteAnimationSet()->setPrefix("");
-	}
 
-	if ((lid < 0) && (rid < 0)) {
-		c->getAnimationSet()->setPrefix("noweapon_");
+	if (loadImages) {
+		c->getAnimationSet()->setPrefix("");
 		if (!use_programmable_pipeline) {
-			c->getWhiteAnimationSet()->setPrefix("noweapon_");
+			c->getWhiteAnimationSet()->setPrefix("");
 		}
-	}
-	else if ((lid >= 0 && weapons[items[lid].id].needs >= 0) ||
-		(rid >= 0 && weapons[items[rid].id].needs >= 0)) {
-		if ((lid >= 0) && !weapons[items[lid].id].ammo) {
-			if (rid < 0) {
-				c->getAnimationSet()->setPrefix("noweapon_");
-				if (!use_programmable_pipeline) {
-					c->getWhiteAnimationSet()->setPrefix("noweapon_");
-				}
+
+		if ((lid < 0) && (rid < 0)) {
+			c->getAnimationSet()->setPrefix("noweapon_");
+			if (!use_programmable_pipeline) {
+				c->getWhiteAnimationSet()->setPrefix("noweapon_");
 			}
 		}
-		else if ((rid >= 0) && !weapons[items[rid].id].ammo) {
-			if (lid < 0) {
-				c->getAnimationSet()->setPrefix("noweapon_");
-				if (!use_programmable_pipeline) {
-					c->getWhiteAnimationSet()->setPrefix("noweapon_");
+		else if ((lid >= 0 && weapons[items[lid].id].needs >= 0) ||
+			(rid >= 0 && weapons[items[rid].id].needs >= 0)) {
+			if ((lid >= 0) && !weapons[items[lid].id].ammo) {
+				if (rid < 0) {
+					c->getAnimationSet()->setPrefix("noweapon_");
+					if (!use_programmable_pipeline) {
+						c->getWhiteAnimationSet()->setPrefix("noweapon_");
+					}
+				}
+			}
+			else if ((rid >= 0) && !weapons[items[rid].id].ammo) {
+				if (lid < 0) {
+					c->getAnimationSet()->setPrefix("noweapon_");
+					if (!use_programmable_pipeline) {
+						c->getWhiteAnimationSet()->setPrefix("noweapon_");
+					}
 				}
 			}
 		}

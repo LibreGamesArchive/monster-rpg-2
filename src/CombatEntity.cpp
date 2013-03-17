@@ -4258,7 +4258,7 @@ UFOEffect::UFOEffect(Combatant *caster, Combatant *target) :
 	type = COMBATENTITY_TYPE_FRILL;
 
 	x = 0;
-	y = BH;
+	y = target->getY()+1;
 
 	this->caster = caster;
 

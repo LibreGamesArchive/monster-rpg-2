@@ -275,9 +275,20 @@ AnimationSet::~AnimationSet()
 	for (uint i = 0; i < anims.size(); i++) {
 		delete anims[i];
 	}
-	anims.clear();
 
 	m_destroy_bitmap(bitmap);
+}
+	
+struct Order {
+	int y;
+	int anim_num;
+};
+
+static int sort(const void *a, const void *b)
+{
+	Order *o1 = (Order *)a;
+	Order *o2 = (Order *)b;
+	return o1->y - o2->y;
 }
 
 AnimationSet *AnimationSet::clone(int type)
@@ -289,50 +300,87 @@ AnimationSet *AnimationSet::clone(int type)
 	a->currAnim = currAnim;
 	a->prefix = prefix;
 	a->destroy = destroy;
-
-	MBITMAP *tmp = m_load_bitmap(filename.c_str());
+	
 	MBITMAP *clone_from, *clone_to;
+	MBITMAP *tmp = NULL;
 
-	int widest = 0;
-	int total_h = anims.size()*2;
-	for (size_t anim = 0; anim < anims.size(); anim++) {
-		int numFrames = anims[anim]->getNumFrames();
-		int width = m_get_bitmap_width(anims[anim]->getCurrentFrame()->getImage()->getBitmap());
-		int height = m_get_bitmap_height(anims[anim]->getCurrentFrame()->getImage()->getBitmap());
-		int total_w = width*numFrames + numFrames*2;
-		if (total_w > widest) {
-			widest = total_w;
+	if (type == CLONE_FULL) {
+		tmp = m_load_bitmap(filename.c_str());
+
+		int extra_y = anims.size()*2; // max it can be
+		int minw = INT_MAX;
+
+		for (size_t anim = 0; anim < anims.size(); anim++) {
+			int numFrames = anims[anim]->getNumFrames();
+			for (int frame = 0; frame < numFrames; frame++) {
+				Image *img = anims[anim]->getFrame(frame)->getImage();
+				int w = img->getWidth();
+				if (w < minw) minw = w;
+			}
 		}
-		total_h += height;
+
+		int extra_x = (m_get_bitmap_width(tmp)/minw+1)*2;
+
+		int w = m_get_bitmap_width(tmp) + extra_x;
+		int h = m_get_bitmap_height(tmp) + extra_y;
+
+		int flags = al_get_new_bitmap_flags();
+		al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
+		a->bitmap = m_create_bitmap(w, h);
+		al_set_new_bitmap_flags(flags);
+		ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
+		al_set_target_bitmap(a->bitmap->bitmap);
+		m_clear(m_map_rgba(0, 0, 0, 0));
+		al_set_target_bitmap(old_target);
+		
+		clone_from = tmp;
+		clone_to = a->bitmap;
 	}
-
-	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-	a->bitmap = m_create_bitmap(widest, total_h);
-	al_set_new_bitmap_flags(flags);
-	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
-	al_set_target_bitmap(a->bitmap->bitmap);
-	m_clear(m_map_rgba(0, 0, 0, 0));
-	al_set_target_bitmap(old_target);
-	
-	clone_from = tmp;
-	clone_to = a->bitmap;
-	
-	int y = 1;
-	for (size_t i = 0; i < anims.size(); i++) {
-		a->anims.push_back(anims[i]->clone(type, clone_from, clone_to, y));
-		y += m_get_bitmap_height(anims[i]->getCurrentFrame()->getImage()->getBitmap()) + 2;
-	}
-
-	m_destroy_bitmap(tmp);
-
-	if (type != CLONE_FULL) {
-		tmp = m_clone_bitmap(a->bitmap);
+	else {
+		tmp = m_clone_bitmap(bitmap);
+		a->bitmap = m_create_bitmap(
+			m_get_bitmap_width(tmp),
+			m_get_bitmap_height(tmp)
+		);
 		ALLEGRO_BITMAP *target = al_get_target_bitmap();
 		m_set_target_bitmap(a->bitmap);
+		m_clear(m_map_rgba(0, 0, 0, 0));
 		add_blit(tmp, 0, 0, white, 0.7, 0);
 		m_destroy_bitmap(tmp);
 		al_set_target_bitmap(target);
+		clone_from = a->bitmap;
+		clone_to = a->bitmap;
+	}
+
+	Order *o = new Order[anims.size()];
+
+	for (size_t i = 0; i < anims.size(); i++) {
+		Order ord;
+		ord.y = anims[i]->getFrame(0)->getImage()->getY();
+		ord.anim_num = i;
+		o[i] = ord;
+	}
+
+	qsort(o, anims.size(), sizeof(Order), sort);
+	
+	int y = 1;
+	for (size_t i = 0; i < anims.size(); i++) {
+		Image *img = anims[i]->getFrame(0)->getImage();
+		int oidx = 0;
+		for (size_t j = 0; j < anims.size(); j++) {
+			if (o[j].anim_num == i) {
+				oidx = j;
+				break;
+			}
+		}
+		int y = img->getY() + oidx*2 + 1;
+		a->anims.push_back(anims[i]->clone(type, clone_from, clone_to, y));
+	}
+	
+	delete[] o;
+
+	if (type == CLONE_FULL) {
+		m_destroy_bitmap(tmp);
 	}
 
 	return a;

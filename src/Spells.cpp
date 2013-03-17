@@ -1350,6 +1350,7 @@ void StoneSpell::init(Combatant *caster, Combatant **targets, int numTargets)
 void StoneSpell::apply(void)
 {
 	for (int i = 0; i < numTargets; i++) {
+		targets[i]->createStoneBmp();
 		targets[i]->getInfo().condition = CONDITION_STONED;
 	}
 }

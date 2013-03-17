@@ -295,9 +295,15 @@ static void get_inputs(int x, int y, bool *l, bool *r, bool *u, bool *d, bool *b
 	}
 
 	if (dpad_at_top) {
+		if (y > BUTTON_SIZE*3+5)
+			return;
+
 		y -= 5;
 	}
 	else {
+		if (y < (BH-(BUTTON_SIZE*3+5)))
+			return;
+
 		y -= BH-(BUTTON_SIZE*3)-5;
 	}
 
@@ -359,11 +365,7 @@ struct Touch {
 	int y;
 };
 
-const int MAX_TOUCHES = 10;
-
-Touch touches[MAX_TOUCHES] = { { -1, -1, -1 }, };
-
-volatile int curr_touches = 0;
+std::vector<Touch> touches;
 
 const int MOUSE_DOWN = 1;
 const int MOUSE_UP = 2;
@@ -376,11 +378,7 @@ void myTguiIgnore(int type)
 	if (!(config.getDpadType() == DPAD_TOTAL_1 || config.getDpadType() == DPAD_TOTAL_2)) {
 		al_lock_mutex(touch_mutex);
 		// FIXME: THIS OK REMOVED??? getInput()->set(false, false, false, false, false, false, false, true);
-		for (int i = 0; i < MAX_TOUCHES; i++) {
-			touches[i].x = touches[i].y = -1;
-			touches[i].touch_id = -1;
-		}
-		curr_touches = 0;
+		touches.clear();
 		al_unlock_mutex(touch_mutex);
 	}
 #endif
@@ -388,7 +386,7 @@ void myTguiIgnore(int type)
 
 static int find_touch(int touch_id)
 {
-	for (int i = 0; i < MAX_TOUCHES; i++) {
+	for (size_t i = 0; i < touches.size(); i++) {
 		if (touches[i].touch_id == touch_id)
 			return i;
 	}
@@ -404,40 +402,23 @@ static void process_touch(int x, int y, int touch_id, int type)
 	
 	al_lock_mutex(touch_mutex);
 	if (type == MOUSE_DOWN) {
-		if (curr_touches >= MAX_TOUCHES) {
-			al_unlock_mutex(touch_mutex);
-			return;
-		}
-		touches[curr_touches].x = x;
-		touches[curr_touches].y = y;
-		touches[curr_touches].touch_id = touch_id;
-		curr_touches++;
+		Touch t;
+		t.x = x;
+		t.y = y;
+		t.touch_id = touch_id;
+		touches.push_back(t);
 	}
 	else if (type == MOUSE_UP) {
-		if (curr_touches > 0) {
-			int idx = find_touch(touch_id);
-			if (idx >= 0) {
-				for (; idx < curr_touches; idx++) {
-					touches[idx].x = touches[idx+1].x;
-					touches[idx].y = touches[idx+1].y;
-					touches[idx].touch_id = touches[idx+1].touch_id;
-				}
-			}
-			curr_touches--;
-			for (int i = curr_touches; i < MAX_TOUCHES; i++) {
-				touches[i].x = -1;
-				touches[i].y = -1;
-				touches[i].touch_id = -1;
-			}
+		int idx = find_touch(touch_id);
+		if (idx >= 0) {
+			touches.erase(touches.begin() + idx);
 		}
 	}
 	else { // MOVE
-		if (curr_touches > 0) {
-			int idx = find_touch(touch_id);
-			if (idx >= 0) {
-				touches[idx].x = x;
-				touches[idx].y = y;
-			}
+		int idx = find_touch(touch_id);
+		if (idx >= 0) {
+			touches[idx].x = x;
+			touches[idx].y = y;
 		}
 	}
 	al_unlock_mutex(touch_mutex);
@@ -445,12 +426,9 @@ static void process_touch(int x, int y, int touch_id, int type)
 
 void clear_touches()
 {
-	for (int i = 0; i < MAX_TOUCHES; i++) {
-		touches[i].touch_id = -1;
-		touches[i].x = -1;
-		touches[i].y = -1;
-	}
-	curr_touches = 0;
+	al_lock_mutex(touch_mutex);
+	touches.clear();
+	al_unlock_mutex(touch_mutex);
 }
 
 static std::list<ZONE> zones;
@@ -527,6 +505,7 @@ static bool is_input_event(ALLEGRO_EVENT *e)
 	e->type == ALLEGRO_EVENT_TOUCH_BEGIN ||
 	e->type == ALLEGRO_EVENT_TOUCH_END ||
 	e->type == ALLEGRO_EVENT_TOUCH_MOVE ||
+	e->type == ALLEGRO_EVENT_TOUCH_CANCEL ||
 	e->type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN ||
 	e->type == ALLEGRO_EVENT_MOUSE_BUTTON_UP ||
 	e->type == ALLEGRO_EVENT_MOUSE_AXES
@@ -796,8 +775,13 @@ top:
 		else if (getInput() && getInput()->isPlayerControlled() && 
 		(event.type == BEGIN ||
 		event.type == END ||
+		event.type == ALLEGRO_EVENT_TOUCH_CANCEL ||
 		(event.type == MOVE && !path_head))) {
 			al_lock_mutex(input_mutex);
+
+			if (event.type == ALLEGRO_EVENT_TOUCH_CANCEL) {
+				event.type = ALLEGRO_EVENT_TOUCH_END;
+			}
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			int this_x = event.touch.x;
@@ -848,7 +832,7 @@ top:
 
 				bool _l = false, _r = false, _u = false, _d = false, _b1 = false, _b2 = false, _b3 = false;
 
-				for (int i = 0; i < curr_touches; i++) {
+				for (size_t i = 0; i < touches.size(); i++) {
 					bool __l = false, __r = false, __u = false, __d = false, __b1 = false, __b2 = false, __b3 = false;
 					get_inputs(touches[i].x, touches[i].y,
 						&__l, &__r, &__u, &__d, &__b1, &__b2, &__b3
@@ -866,7 +850,7 @@ top:
 				
 				bool l = false, r = false, u = false, d = false, b1 = false, b2 = false, b3 = false;
 
-				for (int i = 0; i < curr_touches; i++) {
+				for (size_t i = 0; i < touches.size(); i++) {
 					bool __l = false, __r = false, __u = false, __d = false, __b1 = false, __b2 = false, __b3 = false;
 					get_inputs(touches[i].x, touches[i].y,
 						&__l, &__r, &__u, &__d, &__b1, &__b2, &__b3
@@ -927,10 +911,10 @@ top:
 				if (use_dpad) {
 					al_lock_mutex(dpad_mutex);
 					if (!zone_defined(this_x, this_y)) {
-						if (this_y < BH/3) {
+						if (this_y < BH/3 && this_x > (BW/2-25) && this_x < (BW/2+25)) {
 							dpad_at_top = true;
 						}
-						else if (this_y > (BH*2)/3) {
+						else if (this_y > (BH*2)/3 && this_x > (BW/2-25) && this_x < (BW/2+25)) {
 							dpad_at_top = false;
 						}
 					}
@@ -1697,6 +1681,7 @@ static void run()
 							}
 						}
 					}
+					logic_counter = draw_counter = 0;
 				}
 				levels.clear();
 			}

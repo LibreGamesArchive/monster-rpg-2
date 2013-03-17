@@ -864,19 +864,8 @@ void m_set_blender(int s, int d, MCOLOR c)
 	curr_blend_color = c;
 
 	_blend_color = c;
-#if !defined ALLEGRO_ANDROID
+	
 	al_set_blender(ALLEGRO_ADD, s, d);
-#else
-	// From allegro ogl_draw.c
-	const int blend_modes[8] = {
-		GL_ZERO, GL_ONE, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA,
-		GL_SRC_COLOR, GL_DST_COLOR, GL_ONE_MINUS_SRC_COLOR,
-		GL_ONE_MINUS_DST_COLOR
-	};
-
-	glEnable(GL_BLEND);
-	glBlendFunc(blend_modes[s], blend_modes[d]);
-#endif
 }
 
 void m_push_blender(void)

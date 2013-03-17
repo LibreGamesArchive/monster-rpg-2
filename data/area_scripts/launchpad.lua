@@ -64,7 +64,7 @@ function update(step)
 			if (landerSuccess()) then
 				change_areas("moon_landing", 8, 11, DIRECTION_SOUTH)
 			else
-				gameOver()
+				gameOverNoFade()
 			end
 		end
 	end

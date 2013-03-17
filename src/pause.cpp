@@ -1260,7 +1260,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 								use(NULL, sel, true);
 							}
 							else if (party[index]) {
-								Combatant *c = party[index]->makeCombatant(index);
+								Combatant *c = party[index]->makeCombatant(index, false);
 								prepareForScreenGrab1();
 								m_clear(black);
 								tguiDraw();
@@ -2002,6 +2002,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 	tguiSetFocus(shop);
 
 	prepareForScreenGrab1();
+	m_clear(black);
 	mDrawFrame(3, 3, BW-6, 40-6);
 	m_draw_bitmap(face, 5, 20-16, 0);
 	char s[100];
@@ -2063,7 +2064,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 						int choice;
 						prepareForScreenGrab1();
 						DRAW
-						prepareForScreenGrab1();
+						prepareForScreenGrab2();
 						if ((choice = triple_prompt(s1, s2, s3, "Buy 1", "Buy 5", "Cancel", 2)) != 2) {
 							int q = choice == 0 ? 1 : 5;
 							int total_cost = costs[sel]*q;
@@ -3873,13 +3874,13 @@ bool config_menu(bool start_on_fullscreen)
 			if (w && w == controls) {
 				int type = MInputGetter::TYPE_KB;
 #if defined ALLEGRO_IPHONE
-				prepareForScreenGrab2();
+				prepareForScreenGrab1();
 				tguiDraw();
 				drawBufferToScreen(false);
 				prepareForScreenGrab2();
 				notify("These controls are for", "iCade only!", "");
 #elif defined ALLEGRO_ANDROID
-				prepareForScreenGrab2();
+				prepareForScreenGrab1();
 				tguiDraw();
 				drawBufferToScreen(false);
 				prepareForScreenGrab2();

@@ -421,7 +421,7 @@ void Battle::draw(void)
 			break;
 		}
 	}
-	
+
 	std::list<CombatEntity *>::iterator it;
 	for (it = zsorted_entities.begin(); it != zsorted_entities.end(); it++) {
 		CombatEntity *e = *it;

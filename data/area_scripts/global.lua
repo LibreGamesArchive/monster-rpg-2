@@ -149,7 +149,7 @@ function Object:wander()
 	local dy = y - self.starty
 
 	if (math.abs(dx) > self.maxdist or
-			math.abs(dy) > 
+			math.abs(dy) >
 			self.maxdist) then
 		local l = false
 		local r = false
@@ -371,12 +371,12 @@ function Object:scripted_move(event)
 
 	setObjectInput(self.id, l, r, u, d, false, false)
 
-	
+
 
 --[[
 
 	if (event.current_step_x == nil or
-			((event.current_step_x == x 
+			((event.current_step_x == x
 			and event.current_step_y == y)
 			)) then
 
@@ -596,7 +596,7 @@ function Portal:new(o)
 	o.x = o.x or 0
 	o.y = o.y or 0
 	o.can_go = false
-	o.width = o.width or 1 
+	o.width = o.width or 1
 	o.height = o.height or 1
 	return o
 end
@@ -765,12 +765,12 @@ function change_areas(area, x, y, dir, trans_in)
 	clearBuffer()
 	drawArea()
 	drawBufferToScreen()
+	prepareForScreenGrab2()
 	if (trans_in == nil) then
 		dpad_off()
 		transitionIn()
 		dpad_on()
 	end
-	prepareForScreenGrab2()
 end
 
 -- get direction to face player

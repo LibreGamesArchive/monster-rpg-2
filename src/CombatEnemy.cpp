@@ -210,7 +210,6 @@ bool CombatEnemy::act(int step, Battle *b)
 					loc = MESSAGE_LEFT;
 				if (std::string(spellName) != "MachineGun")
 					battle->addMessage(loc, msg, 1500);
-				ALLEGRO_DEBUG("End of cast?");
 				break;
 			}
 			case COMBAT_ATTACKING: {
@@ -278,9 +277,7 @@ bool CombatEnemy::act(int step, Battle *b)
 				spell->init(this, targets, numTargets);
 				spellInited = true;
 			}
-			ALLEGRO_DEBUG("CALLING SPELL->UPDATE");
 			if (spell->update(step)) {
-				ALLEGRO_DEBUG("Spell->update true");
 				animSet->reset();
 				spell->apply();
 				delete spell;
@@ -294,7 +291,6 @@ bool CombatEnemy::act(int step, Battle *b)
 				}
 				return true;
 			}
-			ALLEGRO_DEBUG("Spell->update false");
 		}
 	}
 	else if (status.type == COMBAT_ATTACKING) {
@@ -338,7 +334,6 @@ bool CombatEnemy::act(int step, Battle *b)
 		}
 	}
 
-	ALLEGRO_DEBUG("Done act");
 	return false;
 }
 
@@ -1003,7 +998,7 @@ void CombatEnemy::construct(std::string name, int x, int y, bool alpha)
 	if (printableName == std::string(_t("Girl"))) {
 		oldAnim = new_AnimationSet(getResource("combat_media/Dragon.png"));
 		if (!use_programmable_pipeline) {
-			oldWhiteAnim = new_AnimationSet(getResource("combat_media/Dragon.png"), false, CLONE_ENEMY);
+			oldWhiteAnim = oldAnim->clone(CLONE_ENEMY);
 			oldWhiteAnim->setSubAnimation("stand");
 		}
 	}
@@ -1023,12 +1018,7 @@ void CombatEnemy::construct(std::string name, int x, int y, bool alpha)
 	work = NULL;
 
 	if (!use_programmable_pipeline) {
-		std::string s = name;
-		std::string::size_type loc;
-		loc = s.find("_", 0);
-		s = s.substr(0, loc);
-
-		whiteAnimSet = new_AnimationSet(getResource("combat_media/%s.png", s.c_str()), false, CLONE_ENEMY);
+		whiteAnimSet = animSet->clone(CLONE_ENEMY);
 		whiteAnimSet->setSubAnimation("stand");
 
 		mkdeath();
@@ -1158,7 +1148,6 @@ CombatEnemy::~CombatEnemy(void)
 	loc = s.find("_", 0);
 	s = s.substr(0, loc);
 
-	//unreferenceBattleAnim(s, this);
 	delete animSet;
 	if (!use_programmable_pipeline) {
 		delete whiteAnimSet;

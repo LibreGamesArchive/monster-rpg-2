@@ -195,9 +195,13 @@ void Animation::wrap(void)
 Animation *Animation::clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, int y)
 {
 	Animation *a = new Animation();
+		
+	Image *img = frames[0]->getImage();
+	int x = img->getX() + 1;
 
 	for (size_t i = 0; i < frames.size(); i++) {
-		a->frames.push_back(frames[i]->clone(type, clone_from, clone_to, i, y));
+		a->frames.push_back(frames[i]->clone(type, clone_from, clone_to, x, y));
+		x += frames[i]->getImage()->getWidth() + 2;
 	}
 
 	a->nFrames = nFrames;

@@ -48,8 +48,10 @@ public:
 	void setDrawWeapon(bool dw);
 	void setRunning(bool r) { running = r; }
 	
+	void createStoneBmp();
+	void showRect(bool show);
 
-	CombatPlayer(std::string name, int number, /*AnimationSet *animSet,*/ std::string prefix = "");
+	CombatPlayer(std::string name, int number, std::string prefix = "", bool loadImages = true);
 	virtual ~CombatPlayer(void);
 
 private:
@@ -63,6 +65,7 @@ private:
 	AnimationSet *charmAnim;
 	bool running;
 	MBITMAP *stone_bmp;
+	bool show_rect;
 };
 
 extern bool show_player_info_on_flip;

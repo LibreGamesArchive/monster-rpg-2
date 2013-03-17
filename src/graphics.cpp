@@ -544,11 +544,6 @@ void drawBufferToScreen(bool draw_controls)
 	}
 }
 
-void drawBufferToScreen()
-{
-	drawBufferToScreen(true);
-}
-
 void draw_shadow(MBITMAP *bmp, int x, int y, bool hflip)
 {
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
@@ -705,9 +700,12 @@ static void fade(int startAlpha, int endAlpha, int length, MCOLOR color)
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
 	int flags = al_get_new_bitmap_flags();
+	int format = al_get_new_bitmap_format();
 	al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
+	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
 	MBITMAP *tmp = m_create_bitmap(dw, dh);
 	al_set_new_bitmap_flags(flags);
+	al_set_new_bitmap_format(format);
 	m_draw_scaled_target(tmpbuffer, dx, dy, dw, dh, 0, 0, dw, dh, tmp);
 
 	ALLEGRO_TRANSFORM backup, t;
@@ -921,6 +919,10 @@ void battleTransition()
 	m_draw_scaled_target(tmpbuffer, dx, dy, dw, dh, 0, 0, dw, dh, tmp);
 
 	if (!use_programmable_pipeline) {
+		set_target_backbuffer();
+		m_draw_bitmap_identity_view(tmpbuffer, 0, 0, 0);
+		m_flip_display();
+
 		dpad_off();
 		global_draw_red = false;
 		global_draw_controls = false;
@@ -1144,7 +1146,6 @@ void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flag
 		src_h -= (dy+src_h) - (cy+ch);
 	}
 	
-#if 1//def ALLEGRO_ANDROID
 	ALLEGRO_BITMAP *tolock;
 	int ofsx = 0, ofsy = 0;
 	if (al_get_parent_bitmap(src->bitmap)) {
@@ -1157,13 +1158,6 @@ void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flag
 	}
 	ALLEGRO_LOCKED_REGION *sreg = al_lock_bitmap(tolock, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READONLY);
 	ALLEGRO_LOCKED_REGION *dreg = al_lock_bitmap(target, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READWRITE);
-#else
-	ALLEGRO_LOCKED_REGION *sreg = m_lock_bitmap_region(src, 0, sy, src_w, src_h, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READONLY);
-	if (!sreg) { ALLEGRO_DEBUG("!sreg returning"); return; }
-	ALLEGRO_LOCKED_REGION *dreg = al_lock_bitmap_region(target, dx, dy, src_w, src_h, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READWRITE);
-	if (!dreg) { m_unlock_bitmap(src); ALLEGRO_DEBUG("!dreg returning"); return; }
-	int ofsx = 0, ofsy = 0;
-#endif
 
 	float src_factor = 1 - amount;
 	
@@ -1172,13 +1166,8 @@ void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flag
 	float add_b = (color.b * amount) * 0xf;
 
 	for (int yy = 0; yy < src_h; yy++) {
-#if 1//def ALLEGRO_ANDROID
 		unsigned char *sptr = ((unsigned char *)sreg->data + (yy+ofsy) * sreg->pitch + (ofsx * 2));
 		unsigned char *dptr = ((unsigned char *)dreg->data + (yy+dy) * dreg->pitch + (dx * 2));
-#else
-		unsigned char *sptr = ((unsigned char *)sreg->data + yy * sreg->pitch);
-		unsigned char *dptr = ((unsigned char *)dreg->data + yy * dreg->pitch);
-#endif
 		if (flags & M_FLIP_HORIZONTAL) {
 			dptr += src_w*2 - 1;
 		}
@@ -1220,11 +1209,7 @@ void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flag
 		}
 	}
 
-#if 1//def ALLEGRO_ANDROID
 	al_unlock_bitmap(tolock);
-#else
-	m_unlock_bitmap(src);
-#endif
 	al_unlock_bitmap(target);
 }
 #else

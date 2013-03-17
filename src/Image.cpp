@@ -14,6 +14,16 @@ int Image::getHeight(void)
 	return m_get_bitmap_height(bitmap);
 }
 
+int Image::getX()
+{
+	return x1;
+}
+
+int Image::getY()
+{
+	return y1;
+}
+
 MBITMAP *Image::getBitmap(void)
 {
 	return bitmap;
@@ -78,9 +88,13 @@ Image *Image::clone(int type, MBITMAP *copy)
 	return img;
 }
 
-Image *Image::clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, int col, int y)
+Image *Image::clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, int x, int y)
 {
-	int dx = w*col + 1 + col*2;
+	if (type != CLONE_FULL) {
+		return clone(type, clone_from);
+	}
+
+	int dx = x;
 	int dy = y;
 
 	ALLEGRO_STATE state;

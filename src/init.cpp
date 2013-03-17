@@ -31,7 +31,7 @@ void create_tmpbuffer()
 	int flags = al_get_new_bitmap_flags();
 #if defined OPENGLES
 	int format = al_get_new_bitmap_format();
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
+	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
 #endif
 	al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
 	int w = al_get_display_width(display);
@@ -380,7 +380,6 @@ static int progress_percent = 0;
 static void show_progress(int percent)
 {
 	progress_percent = percent;
-	ALLEGRO_DEBUG("progress = %d\n", percent);
 }
 
 void register_display(ALLEGRO_DISPLAY *display)
@@ -504,7 +503,7 @@ static void *thread_proc(void *arg)
 
 static void load_samples_cb(int curr, int total)
 {
-	show_progress((50*curr)/total);
+	show_progress((75*curr)/total);
 }
 
 static void *loader_proc(void *arg)
@@ -529,35 +528,27 @@ static void *loader_proc(void *arg)
 	
 	config.setUseOnlyMemoryBitmaps(true);
 
-	show_progress(55);
+	show_progress(80);
 
 	MBITMAP *deter_display_access_bmp;
 
-	ALLEGRO_DEBUG("1\n");
 	deter_display_access_bmp = m_create_bitmap(16, 16); // check
-	ALLEGRO_DEBUG("1\n");
 	m_set_target_bitmap(deter_display_access_bmp);
 
-	ALLEGRO_DEBUG("1\n");
 	guiAnims.bitmap = m_load_bitmap(getResource("gui.png"));
-	ALLEGRO_DEBUG("1\n");
 
 	poison_bmp = m_load_alpha_bitmap(getResource("media/poison.png"), true);
-	ALLEGRO_DEBUG("1\n");
 	poison_bmp_tmp = m_create_alpha_bitmap( // check
 		m_get_bitmap_width(poison_bmp)+10,
 		m_get_bitmap_height(poison_bmp)+10);
-	ALLEGRO_DEBUG("1\n");
 	poison_bmp_tmp2 = m_create_alpha_bitmap( // check
 		m_get_bitmap_width(poison_bmp)+10,
 		m_get_bitmap_height(poison_bmp)+10);
-	ALLEGRO_DEBUG("1\n");
 
 	initInput();
-	ALLEGRO_DEBUG("1\n");
 	debug_message("Input initialized.\n");
 
-	show_progress(65);
+	show_progress(85);
 
 #ifdef ALLEGRO_IPHONE
 	if (iPodIsPlaying()) {
@@ -592,7 +583,6 @@ static void *loader_proc(void *arg)
 	}
 	delete water_data;
 
-	show_progress(75);
 	debug_message("water data loaded\n");
 
 	for (int i = 0; i < MAX_INVENTORY; i++) {
@@ -602,11 +592,9 @@ static void *loader_proc(void *arg)
 
 	debug_message("inventory initialized\n");
 
-	show_progress(80);
+	show_progress(95);
 
 	debug_message("Loading miscellaneous graphics\n");
-
-	show_progress(90);
 
 	wait_cond = al_create_cond();
 	wait_mutex = al_create_mutex();
@@ -1270,12 +1258,21 @@ bool init(int *argc, char **argv[])
 	touch_mutex = al_create_mutex();
 
 	// Android because it's very slow switching back in on some devices
-#if defined A5_D3D || defined ALLEGRO_RASPBERRYPI //|| defined ALLEGRO_ANDROID
+	// FIXME FIXME FIXME FIXME FIXME
+	// FIXME FIXME FIXME FIXME FIXME
+	// FIXME FIXME FIXME FIXME FIXME
+	// FIXME FIXME FIXME FIXME FIXME
+	// FIXME FIXME FIXME FIXME FIXME
+	// FIXME FIXME FIXME FIXME FIXME
+	// FIXME FIXME FIXME FIXME FIXME
+	/*
+#if defined A5_D3D || defined ALLEGRO_RASPBERRYPI || defined ALLEGRO_ANDROID
 #ifdef ALLEGRO_RASPBERRYPI
 	if (check_arg(*argc, *argv, "-programmable-pipeline") <= 0)
 #endif
+*/
 	use_fixed_pipeline = true;
-#endif
+//#endif
 	
 	if (!use_fixed_pipeline) {
 		al_set_new_display_flags(
@@ -1817,28 +1814,26 @@ void dpad_off(bool count)
 	if (dpad_count > 0 || !count) {
 		al_lock_mutex(dpad_mutex);
 		use_dpad = (dpad_type == DPAD_TOTAL_1 || dpad_type == DPAD_TOTAL_2);
-		if (true) {
-			if (use_dpad)
-				myTguiIgnore(TGUI_MOUSE);
-			else {
-				myTguiIgnore(0);
-			}
-			joystick_repeat_started[JOY_REPEAT_AXIS0] = false;
-			joystick_initial_repeat_countdown[JOY_REPEAT_AXIS0] = JOY_INITIAL_REPEAT_TIME;
-			joystick_repeat_countdown[JOY_REPEAT_AXIS0] = JOY_REPEAT_TIME;
-			joystick_repeat_started[JOY_REPEAT_AXIS1] = false;
-			joystick_initial_repeat_countdown[JOY_REPEAT_AXIS1] = JOY_INITIAL_REPEAT_TIME;
-			joystick_repeat_countdown[JOY_REPEAT_AXIS1] = JOY_REPEAT_TIME;
-			joystick_repeat_started[JOY_REPEAT_B1] = false;
-			joystick_initial_repeat_countdown[JOY_REPEAT_B1] = JOY_INITIAL_REPEAT_TIME;
-			joystick_repeat_countdown[JOY_REPEAT_B1] = JOY_REPEAT_TIME;
-			joystick_repeat_started[JOY_REPEAT_B2] = false;
-			joystick_initial_repeat_countdown[JOY_REPEAT_B2] = JOY_INITIAL_REPEAT_TIME;
-			joystick_repeat_countdown[JOY_REPEAT_B2] = JOY_REPEAT_TIME;
-			joystick_repeat_started[JOY_REPEAT_B3] = false;
-			joystick_initial_repeat_countdown[JOY_REPEAT_B3] = JOY_INITIAL_REPEAT_TIME;
-			joystick_repeat_countdown[JOY_REPEAT_B3] = JOY_REPEAT_TIME;
+		if (use_dpad)
+			myTguiIgnore(TGUI_MOUSE);
+		else {
+			myTguiIgnore(0);
 		}
+		joystick_repeat_started[JOY_REPEAT_AXIS0] = false;
+		joystick_initial_repeat_countdown[JOY_REPEAT_AXIS0] = JOY_INITIAL_REPEAT_TIME;
+		joystick_repeat_countdown[JOY_REPEAT_AXIS0] = JOY_REPEAT_TIME;
+		joystick_repeat_started[JOY_REPEAT_AXIS1] = false;
+		joystick_initial_repeat_countdown[JOY_REPEAT_AXIS1] = JOY_INITIAL_REPEAT_TIME;
+		joystick_repeat_countdown[JOY_REPEAT_AXIS1] = JOY_REPEAT_TIME;
+		joystick_repeat_started[JOY_REPEAT_B1] = false;
+		joystick_initial_repeat_countdown[JOY_REPEAT_B1] = JOY_INITIAL_REPEAT_TIME;
+		joystick_repeat_countdown[JOY_REPEAT_B1] = JOY_REPEAT_TIME;
+		joystick_repeat_started[JOY_REPEAT_B2] = false;
+		joystick_initial_repeat_countdown[JOY_REPEAT_B2] = JOY_INITIAL_REPEAT_TIME;
+		joystick_repeat_countdown[JOY_REPEAT_B2] = JOY_REPEAT_TIME;
+		joystick_repeat_started[JOY_REPEAT_B3] = false;
+		joystick_initial_repeat_countdown[JOY_REPEAT_B3] = JOY_INITIAL_REPEAT_TIME;
+		joystick_repeat_countdown[JOY_REPEAT_B3] = JOY_REPEAT_TIME;
 		al_unlock_mutex(dpad_mutex);
 	}
 #endif
@@ -1852,12 +1847,10 @@ void dpad_on(bool count)
 	if (dpad_count <= 0 || !count) {
 		al_lock_mutex(dpad_mutex);
 		use_dpad = dpad_type != DPAD_NONE;
-		if (true) {
-			if (use_dpad)
-				myTguiIgnore(TGUI_MOUSE);
-			else
-				myTguiIgnore(0);
-		}
+		if (use_dpad)
+			myTguiIgnore(TGUI_MOUSE);
+		else
+			myTguiIgnore(0);
 		al_unlock_mutex(dpad_mutex);
 	}
 #endif

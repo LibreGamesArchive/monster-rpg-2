@@ -2175,6 +2175,15 @@ std::vector<Tile *> &Area::getTiles(void)
 	return tiles;
 }
 
+static int pot(int n)
+{
+	int i = 1;
+	while (i < n) {
+		i = i * 2;
+	}
+	return i;
+}
+
 bool Area::load(std::string filename)
 {
 	ALLEGRO_FILE *f = al_fopen(filename.c_str(), "rb");
@@ -2225,7 +2234,7 @@ bool Area::load(std::string filename)
 
 	int flgs = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flgs & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-	partial_tm = m_create_alpha_bitmap(tm_w*TILE_SIZE+tm_w*2, tm_h*TILE_SIZE+tm_h*2); // check
+	partial_tm = m_create_alpha_bitmap(pot(tm_w*TILE_SIZE+tm_w*2), pot(tm_h*TILE_SIZE+tm_h*2));
 	al_set_new_bitmap_flags(flgs);
 
 	char tmp[MAX_AREA_NAME];

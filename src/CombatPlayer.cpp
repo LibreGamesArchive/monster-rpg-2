@@ -42,8 +42,8 @@ static Combatant **spellTargets;
 class ConfirmHandler : public ActionHandler {
 public:
 	ActionHandler *act(int step, Battle *b);
-	void init(void);
-	void shutdown(void);
+	void init();
+	void shutdown();
 	ConfirmHandler(CombatPlayer *p, ConfirmReason r);
 	
 protected:
@@ -57,6 +57,20 @@ protected:
 class MainHandler : public ActionHandler {
 public:
 	ActionHandler *act(int step, Battle *b) {
+		for (int i = 0; i < MAX_PARTY; i++) {
+			FakeWidget *formWidget = formWidgets[i];
+			if (formWidget) {
+				if (formWidget == tguiActiveWidget) {
+					CombatPlayer *p = battle->findPlayer(i);
+					p->showRect(true);
+				}
+				else {
+					CombatPlayer *p = battle->findPlayer(i);
+					p->showRect(false);
+				}
+			}
+		}
+
 		if (player->getInfo().condition == CONDITION_CHARMED
 		|| player->getInfo().condition == CONDITION_SHADOW)
 			return createMainHandler(player, "Attack");
@@ -78,31 +92,31 @@ public:
 
 		for (int i = 0; i < MAX_PARTY; i++) {
 			FakeWidget *formWidget = formWidgets[i];
-			if (formWidget && formWidget->getHoldStart() > 0 &&
-					formWidget->getHoldStart()+600UL < tguiCurrentTimeMillis()) {
-				playPreloadedSample("select.ogg");
-				show_player_info_on_flip = true;
-				prepareForScreenGrab1();
-				player_number_to_show_on_flip = i;
-				formWidget->reset();
-				return NULL;
-			}
-			else if (formWidget && mainWidget == formWidget
-				&& player == battle->findPlayer(i)) {
-				playPreloadedSample("select.ogg");
-				return new ConfirmHandler(player, CONFIRM_FORM);
+			if (formWidget) {
+				if (formWidget->getHoldStart() > 0 && formWidget->getHoldStart()+600UL < tguiCurrentTimeMillis()) {
+					playPreloadedSample("select.ogg");
+					show_player_info_on_flip = true;
+					player_number_to_show_on_flip = i;
+					formWidget->reset();
+					prepareForScreenGrab1();
+					return NULL;
+				}
+				else if (mainWidget == formWidget && player == battle->findPlayer(i)) {
+					playPreloadedSample("select.ogg");
+					return new ConfirmHandler(player, CONFIRM_FORM);
+				}
 			}
 		}
 		return NULL;
 	}
 
-	void init(void) {
+	void init() {
 		frame = new MFrame(3, BH-47, (BW*2)/3-6, 45);
 		shadow = new MShadow();
 		int x = 5;
 		int y;
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-		if (!use_dpad)
+		if (true/*!use_dpad*/)
 			y = BH-45;
 		else
 #endif
@@ -138,7 +152,7 @@ public:
 					disabled = true;
 				}
 			}
-			if (use_dpad) {
+			if (/*use_dpad*/false) {
 				MTextButton *b = new MTextButton(x, y, std::string(actions[i]), disabled);
 				buttons[i] = b;
 				y += 9;
@@ -174,7 +188,7 @@ public:
 		for (int i = 0; i < MAX_PARTY; i++) {
 			CombatPlayer *p = battle->findPlayer(i);
 			if (p) {
-				formWidgets[i] = new FakeWidget(p->getX()-10, p->getY()-32/*playerheight=32*/, 20, 32, true, true);
+				formWidgets[i] = new FakeWidget(p->getX()-10, p->getY()-32/*playerheight=32*/, 20, 32, true, false);
 			}
 			else {
 				formWidgets[i] = NULL;
@@ -194,7 +208,7 @@ public:
 		tguiSetFocus(buttons[0]);
 	}
 
-	void shutdown(void) {
+	void shutdown() {
 		tguiDeleteWidget(frame);
 		delete frame;
 		tguiDeleteWidget(shadow);
@@ -283,7 +297,7 @@ protected:
 
 class EndHandler : public ActionHandler {
 public:
-	bool isEnd(void) { return true; }
+	bool isEnd() { return true; }
 	EndHandler(CombatPlayer *p) :
 		ActionHandler(p)
 	{
@@ -309,8 +323,8 @@ public:
 class AttackHandler : public ActionHandler {
 public:
 	ActionHandler *act(int step, Battle *b);
-	void init(void) {}
-	void shutdown(void) {}
+	void init() {}
+	void shutdown() {}
 	AttackHandler(CombatPlayer *p);
 protected:
 	int count;
@@ -320,9 +334,9 @@ protected:
 class UseItemHandler : public ActionHandler {
 public:
 	ActionHandler *act(int step, Battle *b);
-	void init(void);
-	void shutdown(void);
-	void draw(void);
+	void init();
+	void shutdown();
+	void draw();
 	UseItemHandler(CombatPlayer *p);
 
 protected:
@@ -335,9 +349,9 @@ protected:
 class UseMagicHandler : public ActionHandler {
 public:
 	ActionHandler *act(int step, Battle *b);
-	void init(void);
-	void shutdown(void);
-	void draw(void);
+	void init();
+	void shutdown();
+	void draw();
 	UseMagicHandler(CombatPlayer *p);
 
 protected:
@@ -349,9 +363,9 @@ protected:
 class RunHandler : public ActionHandler {
 public:
 	ActionHandler *act(int step, Battle *b);
-	void init(void);
-	void shutdown(void);
-	void draw(void);
+	void init();
+	void shutdown();
+	void draw();
 	RunHandler(CombatPlayer *p);
 
 protected:
@@ -410,10 +424,10 @@ public:
 		return NULL;
 	}
 
-	void init(void) {
+	void init() {
 	}
 
-	void shutdown(void) {
+	void shutdown() {
 	}
 
 	WalkHandler(CombatPlayer *p, int dir, WalkReason reason) :
@@ -747,7 +761,7 @@ public:
 		tguiSetFocus(chooser);
 	}
 
-	virtual ~ChooseTargetHandler(void) {
+	virtual ~ChooseTargetHandler() {
 		tguiDeleteWidget(chooser);
 		tguiDeleteWidget(applyFrame);
 		tguiDeleteWidget(applyButton);
@@ -845,8 +859,8 @@ AttackHandler::AttackHandler(CombatPlayer *p) :
 class ChooseItemHandler : public ActionHandler {
 public:
 	ActionHandler *act(int step, Battle *b);
-	void init(void);
-	void shutdown(void);
+	void init();
+	void shutdown();
 	ChooseItemHandler(CombatPlayer *p);
 
 protected:
@@ -876,7 +890,7 @@ ActionHandler *ChooseItemHandler::act(int step, Battle *b)
 	return NULL;
 }
 
-void ChooseItemHandler::init(void)
+void ChooseItemHandler::init()
 {
 	tguiSetParent(0);
 	tguiAddWidget(itemSelector);
@@ -884,7 +898,7 @@ void ChooseItemHandler::init(void)
 	battle->drawWhichStatus(false, false);
 }
 
-void ChooseItemHandler::shutdown(void)
+void ChooseItemHandler::shutdown()
 {
 	tguiDeleteWidget(itemSelector);
 	delete itemSelector;
@@ -902,8 +916,8 @@ ChooseItemHandler::ChooseItemHandler(CombatPlayer *p) :
 class ChooseSpellHandler : public ActionHandler {
 public:
 	ActionHandler *act(int step, Battle *b);
-	void init(void);
-	void shutdown(void);
+	void init();
+	void shutdown();
 	ChooseSpellHandler(CombatPlayer *p);
 
 protected:
@@ -935,7 +949,7 @@ ActionHandler *ChooseSpellHandler::act(int step, Battle *b)
 	return NULL;
 }
 
-void ChooseSpellHandler::init(void)
+void ChooseSpellHandler::init()
 {
 	tguiSetParent(0);
 	tguiAddWidget(spellSelector);
@@ -943,7 +957,7 @@ void ChooseSpellHandler::init(void)
 	battle->drawWhichStatus(false, false);
 }
 
-void ChooseSpellHandler::shutdown(void)
+void ChooseSpellHandler::shutdown()
 {
 	tguiDeleteWidget(spellSelector);
 	delete spellSelector;
@@ -986,7 +1000,7 @@ ActionHandler *UseMagicHandler::act(int step, Battle *b)
 	return NULL;
 }
 
-void UseMagicHandler::init(void)
+void UseMagicHandler::init()
 {
 	player->getAnimationSet()->setSubAnimation("cast");
 	if (!use_programmable_pipeline) {
@@ -1005,12 +1019,12 @@ void UseMagicHandler::init(void)
 	battle->addMessage(loc, msg, 1500);
 }
 
-void UseMagicHandler::shutdown(void)
+void UseMagicHandler::shutdown()
 {
 	delete spell;
 }
 
-void UseMagicHandler::draw(void)
+void UseMagicHandler::draw()
 {
 }
 
@@ -1041,7 +1055,7 @@ ActionHandler *UseItemHandler::act(int step, Battle *b)
 	return NULL;
 }
 
-void UseItemHandler::init(void)
+void UseItemHandler::init()
 {
 	player->getAnimationSet()->setSubAnimation("use");
 	if (!use_programmable_pipeline) {
@@ -1066,11 +1080,11 @@ void UseItemHandler::init(void)
 	battle->addMessage(loc, msg, 1500);
 }
 
-void UseItemHandler::shutdown(void)
+void UseItemHandler::shutdown()
 {
 }
 
-void UseItemHandler::draw(void)
+void UseItemHandler::draw()
 {
 }
 
@@ -1118,7 +1132,7 @@ ActionHandler *RunHandler::act(int step, Battle *b)
 }
 
 
-void RunHandler::init(void)
+void RunHandler::init()
 {
 	success = battle->run();
 	if (!success) {
@@ -1135,7 +1149,7 @@ void RunHandler::init(void)
 
 	for (int i = 0; i < MAX_PARTY; i++) {
 		CombatPlayer *p = battle->findPlayer(i);
-		if (p && p->getInfo().abilities.hp > 0) {
+		if (p && p->getInfo().abilities.hp > 0 && !(p->getInfo().condition == CONDITION_STONED)) {
 			p->setRunning(true);
 			p->getAnimationSet()->setSubAnimation("walk");
 			if (!use_programmable_pipeline) {
@@ -1152,12 +1166,12 @@ void RunHandler::init(void)
 }
 
 
-void RunHandler::shutdown(void)
+void RunHandler::shutdown()
 {
 }
 
 
-void RunHandler::draw(void)
+void RunHandler::draw()
 {
 }
 
@@ -1241,7 +1255,7 @@ ActionHandler *ConfirmHandler::act(int step, Battle *b)
 	return NULL;
 }
 	
-void ConfirmHandler::init(void) {
+void ConfirmHandler::init() {
 	frame = new MFrame(BW/3-20, 110+(50/2)-6-5, 125, 22, true);
 	if (reason == CONFIRM_DEFEND) {
 		button = new MTextButton(62, 110+(50/2)-6+2,
@@ -1262,7 +1276,7 @@ void ConfirmHandler::init(void) {
 	tguiSetFocus(button);
 }
 	
-void ConfirmHandler::shutdown(void) {
+void ConfirmHandler::shutdown() {
 	tguiDeleteWidget(frame);
 	delete frame;
 	delete button;
@@ -1301,6 +1315,65 @@ ActionHandler *createMainHandler(CombatPlayer *p, std::string name)
 	return NULL;
 }
 
+void CombatPlayer::showRect(bool show)
+{
+	show_rect = show;
+}
+
+void CombatPlayer::createStoneBmp()
+{
+	if (!stone_bmp) {
+		work = animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
+		int ww = m_get_bitmap_width(work);
+		int wh = m_get_bitmap_height(work);
+		stone_bmp = m_create_bitmap(ww, wh);
+		ALLEGRO_BITMAP *tolock;
+		if (al_get_parent_bitmap(work->bitmap)) {
+			tolock = al_get_parent_bitmap(work->bitmap);
+		}
+		else {
+			tolock = work->bitmap;
+		}
+		al_lock_bitmap(tolock, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
+		m_lock_bitmap(stoneTexture, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
+
+		ALLEGRO_BITMAP *target = al_get_target_bitmap();
+
+		m_set_target_bitmap(stone_bmp);
+		m_clear(al_map_rgba_f(0, 0, 0, 0));
+
+		ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[ww*wh];
+		int i = 0;
+
+		for (int yy = 0; yy < wh; yy++) {
+			for (int xx = 0; xx < ww; xx++) {
+				MCOLOR c = al_get_pixel(tolock, xx, yy);
+				if (c.a != 1.0f) continue;
+				MCOLOR c2;
+				c2 = m_get_pixel(stoneTexture, xx%m_get_bitmap_width(stoneTexture), yy%m_get_bitmap_height(stoneTexture));
+				MCOLOR result;
+				float avg = (c.r + c.g + c.b) / 6.0f;
+				result.r = avg + c2.r/2;
+				result.g = avg + c2.g/2;
+				result.b = avg + c2.b/2;
+				result.a = 1.0f;
+				verts[i].x = xx;
+				verts[i].y = yy;
+				verts[i].z = 0;
+				verts[i].color = result;
+				i++;
+			}
+		}
+		al_unlock_bitmap(tolock);
+		m_unlock_bitmap(stoneTexture);
+
+		m_draw_prim(verts, 0, 0, 0, i, ALLEGRO_PRIM_POINT_LIST);
+
+		delete[] verts;
+
+		al_set_target_bitmap(target);
+	}
+}
 
 bool CombatPlayer::update(int step)
 {
@@ -1370,7 +1443,7 @@ bool CombatPlayer::act(int step, Battle *b)
 
 
 // note: only bright choosing and normal draws work with battle water
-void CombatPlayer::draw(void)
+void CombatPlayer::draw()
 {
 	if (itemIndex_display >= 0) {
 		char text[100];
@@ -1435,6 +1508,8 @@ void CombatPlayer::draw(void)
 
 	if (info.condition == CONDITION_MUSHROOM) {
 		draw_shadow(mushroom, x, y, location == LOCATION_LEFT);
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	else {
 		if (battle->isInWater())
@@ -1521,6 +1596,15 @@ void CombatPlayer::draw(void)
 		if (battle->isInWater())
 			al_set_clipping_rectangle(savex, savey, savew, saveh);
 
+		if (show_rect) {
+			int n = (unsigned)tguiCurrentTimeMillis() % 1000;
+			float p;
+			if (n < 500) p = n / 500.0f;
+			else p = (500-(n-500)) / 500.0f;
+			int a = p*255;
+			m_draw_rectangle(x-16, y-32, x+16, y,
+				m_map_rgba(0xff*a/255, 0xd8*a/255, 0, a), 0);
+		}
 	}
 	else {
 		if (info.condition != CONDITION_STONED) {
@@ -1529,54 +1613,7 @@ void CombatPlayer::draw(void)
 				stone_bmp = NULL;
 			}
 		}
-
 		if (info.condition == CONDITION_STONED) {
-			if (!stone_bmp) {
-				work = animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
-				int ww = m_get_bitmap_width(work);
-				int wh = m_get_bitmap_height(work);
-				stone_bmp = m_create_bitmap(ww, wh);
-#ifdef ALLEGRO_ANDROID
-				al_lock_bitmap(work->bitmap->parent, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
-#else
-				m_lock_bitmap(work, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
-#endif
-				m_lock_bitmap(stoneTexture, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
-
-				ALLEGRO_BITMAP *target = al_get_target_bitmap();
-				
-				m_set_target_bitmap(stone_bmp);
-				m_clear(al_map_rgba_f(0, 0, 0, 0));
-
-				m_lock_bitmap(stone_bmp, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READWRITE);
-			
-				for (int yy = 0; yy < wh; yy++) {
-					for (int xx = 0; xx < ww; xx++) {
-						MCOLOR c = m_get_pixel(work, xx, yy);
-						if (c.a != 1.0f) continue;
-						MCOLOR c2;
-						c2 = m_get_pixel(stoneTexture, xx%m_get_bitmap_width(stoneTexture), yy%m_get_bitmap_width(stoneTexture));
-						MCOLOR result;
-						float avg = (c.r + c.g + c.b) / 6.0f;
-						result.r = avg + c2.r/2;
-						result.g = avg + c2.g/2;
-						result.b = avg + c2.b/2;
-						result.a = 1.0f;
-						m_put_pixel(xx, yy, result);
-					}
-				}
-#ifdef ALLEGRO_ANDROID
-				al_unlock_bitmap(work->bitmap->parent);
-#else
-				m_unlock_bitmap(work);
-#endif
-				m_unlock_bitmap(stoneTexture);
-
-				m_unlock_bitmap(stone_bmp);
-
-				al_set_target_bitmap(target);
-			}
-
 			m_draw_bitmap(stone_bmp, x-(w/2), y-h, flags);
 		}
 		else if (info.condition == CONDITION_MUSHROOM) {
@@ -1624,6 +1661,16 @@ void CombatPlayer::draw(void)
 					charmAnim->draw(cx-15, y-(h*3)/4-5, 0);
 				}
 			}
+
+			if (show_rect) {
+				int n = (unsigned)tguiCurrentTimeMillis() % 1000;
+				float p;
+				if (n < 500) p = n / 500.0f;
+				else p = (500-(n-500)) / 500.0f;
+				int a = p*255;
+				m_draw_rectangle(x-16, y-32, x+16, y,
+					m_map_rgba(0xff*a/255, 0xd8*a/255, 0, a), 0);
+			}
 		}
 	}
 
@@ -1631,12 +1678,12 @@ void CombatPlayer::draw(void)
 		handler->draw();
 }
 
-CombatFormation CombatPlayer::getFormation(void)
+CombatFormation CombatPlayer::getFormation()
 {
 	return formation;
 }
 
-int CombatPlayer::getNumber(void)
+int CombatPlayer::getNumber()
 {
 	return number;
 }
@@ -1658,13 +1705,13 @@ void CombatPlayer::setDrawWeapon(bool dw)
 }
 
 
-bool CombatPlayer::isActing(void)
+bool CombatPlayer::isActing()
 {
 	return acting;
 }
 
 
-CombatPlayer::CombatPlayer(std::string name, int number, /*AnimationSet *animSet,*/ std::string prefix) :
+CombatPlayer::CombatPlayer(std::string name, int number, std::string prefix, bool loadImages) :
 	Combatant(name),
 	number(number),
 	handler(NULL),
@@ -1672,21 +1719,30 @@ CombatPlayer::CombatPlayer(std::string name, int number, /*AnimationSet *animSet
 	acting(false),
 	drawWeapon(false),
 	running(false),
-	stone_bmp(NULL)
+	stone_bmp(NULL),
+	show_rect(false)
 {
-	animSet = new_AnimationSet(getResource("combat_media/%s.png", name.c_str()));
+	if (loadImages) {
+		animSet = new_AnimationSet(getResource("combat_media/%s.png", name.c_str()));
 
-	if (!use_programmable_pipeline) {
-		whiteAnimSet = new_AnimationSet(getResource("combat_media/%s.png", name.c_str()), false, CLONE_PLAYER);
-
-		whiteAnimSet->setSubAnimation("stand");
-	}
-	
-	if (prefix != "") {
-		animSet->setPrefix(prefix);
 		if (!use_programmable_pipeline) {
-			whiteAnimSet->setPrefix(prefix);
+			whiteAnimSet = animSet->clone(CLONE_PLAYER);
+
+			whiteAnimSet->setSubAnimation("stand");
 		}
+		
+		if (prefix != "") {
+			animSet->setPrefix(prefix);
+			if (!use_programmable_pipeline) {
+				whiteAnimSet->setPrefix(prefix);
+			}
+		}
+
+
+		charmAnim = new_AnimationSet(getResource("combat_media/Charm.png"));
+	}
+	else {
+		animSet = whiteAnimSet = charmAnim = NULL;
 	}
 
 	type = COMBATENTITY_TYPE_PLAYER;
@@ -1694,14 +1750,10 @@ CombatPlayer::CombatPlayer(std::string name, int number, /*AnimationSet *animSet
 
 	itemIndex_display = -1;
 	spellIndex_display = -1;
-
-	#ifndef LITE
-	charmAnim = new_AnimationSet(getResource("combat_media/Charm.png"));
-	#endif
 }
 
 
-CombatPlayer::~CombatPlayer(void)
+CombatPlayer::~CombatPlayer()
 {
 	if (handler) {
 		handler->shutdown();

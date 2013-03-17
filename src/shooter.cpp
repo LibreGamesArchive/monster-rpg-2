@@ -662,7 +662,9 @@ static void draw_everything()
 	m_draw_bitmap(crab_icon, 0, 0, 0);
 	m_draw_bitmap(shark_icon, 0, 16, 0);
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	m_draw_alpha_bitmap(pause_icon, BW-m_get_bitmap_width(pause_icon)-4, 3);
+	if (!use_dpad) {
+		m_draw_alpha_bitmap(pause_icon, BW-m_get_bitmap_width(pause_icon)-4, 3);
+	}
 #endif
 	char buf[100];
 	sprintf(buf, "%d", crabs_destroyed);
@@ -810,11 +812,13 @@ start:
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	MShooterButton *button = NULL;
 	MShooterSlider *slider = NULL;
-	button = new MShooterButton();
-	slider = new MShooterSlider();
-	tguiSetParent(0);
-	tguiAddWidget(button);
-	tguiAddWidget(slider);
+	if (!use_dpad) {
+		button = new MShooterButton();
+		slider = new MShooterSlider();
+		tguiSetParent(0);
+		tguiAddWidget(button);
+		tguiAddWidget(slider);
+	}
 #endif
 
 	crabs = crabs_start;
@@ -912,7 +916,9 @@ start:
 				if (ie.right) {
 					x += LOGIC_MILLIS * 0.2;
 				}
-				x += LOGIC_MILLIS * slider->getValue()/3;
+				if (slider) {
+					x += LOGIC_MILLIS * slider->getValue()/3;
+				}
 #else
 				if (ie.left) {
 					x -= LOGIC_MILLIS * 0.2;
@@ -1033,7 +1039,9 @@ start:
 			tguiUpdate();
 			
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-			pressed = button->getPressed();
+			if (button) {
+				pressed = button->getPressed();
+			}
 #endif
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -1056,7 +1064,7 @@ start:
 				int dx = pause_pos_x - press_x;
 				int dy = pause_pos_y - press_y;
 				double dist = sqrt((float)dx*dx + dy*dy);
-				if (dist < pause_icon_w/2 || in.button2) {
+				if ((!use_dpad && dist < pause_icon_w/2) || in.button2) {
 					// pause
 					al_stop_timer(logic_timer);
 					al_stop_timer(draw_timer);
@@ -1113,7 +1121,7 @@ start:
 							int dx = pause_pos_x - press_x;
 							int dy = pause_pos_y - press_y;
 							double dist = sqrt((float)dx*dx + dy*dy);
-							if (dist < w/2 || in.button2) {
+							if ((!use_dpad && dist < w/2) || in.button2) {
 								al_rest(0.5);
 								break;
 							}
@@ -1263,10 +1271,12 @@ start:
 done:
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	tguiDeleteWidget(button);
-	tguiDeleteWidget(slider);
-	delete button;
-	delete slider;
+	if (button) {
+		tguiDeleteWidget(button);
+		tguiDeleteWidget(slider);
+		delete button;
+		delete slider;
+	}
 #endif
 
 	crabs.clear();

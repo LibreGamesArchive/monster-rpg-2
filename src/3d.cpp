@@ -1044,11 +1044,11 @@ bool archery(bool for_points)
 
 		prepareForScreenGrab1();
 		m_clear(black);
+		prepareForScreenGrab2();
 		m_rest(0.5);
 
 		if (dead) {
 			bool ret = prompt("G A M E O V E R", "Try Again?", 1, 1);
-			prepareForScreenGrab2();
 			if (ret)
 				continue;
 		}
@@ -1063,7 +1063,6 @@ bool archery(bool for_points)
 			}
 
 			bool again = prompt("V I C T O R Y !", "Try Again?", 0, 0, std::string(buf));
-			prepareForScreenGrab2();
 
 			if (again)
 				continue;

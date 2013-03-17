@@ -23,7 +23,7 @@ public:
 	void setFormation(CombatFormation f);
 	void setName(std::string name);
 
-	Combatant *makeCombatant(int number);
+	Combatant *makeCombatant(int number, bool loadImages = true);
 
 	Player(std::string name, bool putInParty = true);
 	~Player(void);

@@ -107,7 +107,7 @@ function update(step)
 				setMilestone(MS_BEAT_ARCHERY, true)
 				playMusic("keep.ogg")
 			else
-				gameOver()
+				gameOverNoFade()
 			end
 		end
 		updateArea()
@@ -123,8 +123,8 @@ function update(step)
 		prepareForScreenGrab1()
 		drawArea()
 		drawBufferToScreen()
-		local should_look = prompt("Take a look", "around?", 0, 1)
 		prepareForScreenGrab2()
+		local should_look = prompt("Take a look", "around?", 0, 1)
 		if (should_look) then
 			doKeepLook()
 			setMilestone(MS_LOOKED_FROM_KEEP, true)

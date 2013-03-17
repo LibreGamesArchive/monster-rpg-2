@@ -104,8 +104,8 @@ function end_sub_scene()
 	prepareForScreenGrab1()
 	drawArea()
 	drawBufferToScreen()
-	local result = prompt("Skip", "this mini game?", 0, 0)
 	prepareForScreenGrab2()
+	local result = prompt("Skip", "this mini game?", 0, 0)
 	if (result == true) then
 		bonusPoints()
 		setObjectHidden(0, false)
@@ -125,7 +125,7 @@ function end_sub_scene()
 		if (doShooter(true)) then
 			change_areas("fort_start", 36, 47, DIRECTION_SOUTH)
 		else
-			gameOver();
+			gameOverNoFade()
 		end
 	end
 end

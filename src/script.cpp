@@ -1262,6 +1262,14 @@ static int CStartBattle(lua_State *stack)
 
 	loadPlayDestroy("battle.ogg");
 	
+	prepareForScreenGrab1();
+	area->draw();
+	drawBufferToScreen(false);
+	prepareForScreenGrab2();
+	set_target_backbuffer();
+	m_draw_bitmap_identity_view(tmpbuffer, 0, 0, 0);
+	m_flip_display();
+
 	battle = new Battle(name, can_run);
 	debug_message("created battle object\n");
 	battle->start();
@@ -1269,10 +1277,6 @@ static int CStartBattle(lua_State *stack)
 	
 	debug_message("battle->start called\n");
 
-	prepareForScreenGrab1();
-	area->draw();
-	drawBufferToScreen(false);
-	prepareForScreenGrab2();
 	battleTransition();
 
 	clear_input_events();

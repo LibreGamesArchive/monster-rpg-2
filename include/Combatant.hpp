@@ -7,18 +7,20 @@ class Combatant : public CombatEntity {
 public:
 	AnimationSet *animSet;
 
-	CombatantInfo &getInfo(void) { return info; }
-	int getDirection(void);
-	AnimationSet *getAnimationSet(void);
-	AnimationSet *getWhiteAnimationSet(void);
-	CombatLocation getLocation(void);
-	CombatLoyalty getLoyalty(void);
-	std::string getName(void);
-	std::string getPrintableName(void);
-	bool isDefending(void);
+	CombatantInfo &getInfo() { return info; }
+	int getDirection();
+	AnimationSet *getAnimationSet();
+	AnimationSet *getWhiteAnimationSet();
+	CombatLocation getLocation();
+	CombatLoyalty getLoyalty();
+	std::string getName();
+	std::string getPrintableName();
+	bool isDefending();
 	void setDefending(bool def);
 
-	virtual void attacked(void) { };
+	virtual void attacked() {}
+
+	virtual void createStoneBmp() {}
 
 	void setDirection(int dir);
 	void setInfo(CombatantInfo &inf);
