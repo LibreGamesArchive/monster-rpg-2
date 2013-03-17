@@ -98,9 +98,7 @@ Image *Image::clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, int x, int
 	int dy = y;
 
 	ALLEGRO_STATE state;
-	al_store_state(&state, ALLEGRO_STATE_BLENDER | ALLEGRO_STATE_TARGET_BITMAP);
-
-	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+	al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
 
 	al_set_target_bitmap(clone_to->bitmap);
 

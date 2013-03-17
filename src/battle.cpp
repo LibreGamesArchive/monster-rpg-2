@@ -396,7 +396,6 @@ void Battle::drawStatus(void)
 
 void Battle::draw(void)
 {
-	m_set_blender(M_ONE, M_ZERO, white);
 	if (superpower && use_programmable_pipeline) {
 		use_shader(tinter);
 		al_set_shader_float("ratio", 1);
@@ -409,8 +408,6 @@ void Battle::draw(void)
 	else {
 		m_draw_bitmap(bg, 0, 0, 0);
 	}
-
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 		
 	bool player_acting = false;
 	for (int i = 0; i < MAX_PARTY; i++) {

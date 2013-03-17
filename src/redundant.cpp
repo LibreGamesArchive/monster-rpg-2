@@ -1117,8 +1117,6 @@ static MBITMAP *clone_sub_bitmap(MBITMAP *b)
 	m_set_target_bitmap(clone);
 	m_clear(al_map_rgba_f(0, 0, 0, 0));
 
-	m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, white);
-
 	m_draw_bitmap(b, 0, 0, 0);
 
 	al_restore_state(&st);

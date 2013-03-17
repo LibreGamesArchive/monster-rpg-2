@@ -77,9 +77,8 @@ void loadIcons()
 	MBITMAP *tmp = m_load_bitmap(getResource("media/icons.png"));
 
 	ALLEGRO_STATE state;
-	al_store_state(&state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS | ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_BLENDER);
+	al_store_state(&state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS | ALLEGRO_STATE_TARGET_BITMAP);
 	al_set_new_bitmap_flags(0);
-	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
 	icon_bmp = m_create_bitmap(128, 128);
 	m_set_target_bitmap(icon_bmp);
 	m_clear(m_map_rgba(0, 0, 0, 0));
@@ -233,10 +232,6 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 {
 	h = h - 1; // hack for compatibility
 
-	m_push_blender();
-
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-
 	if (use_programmable_pipeline && shadow) {
 		int dx, dy, dw, dh;
 		get_screen_offset_size(&dx, &dy, &dw, &dh);
@@ -251,8 +246,6 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 		m_draw_rectangle(x-10, y-10, x+w+10, y+h+10, black, M_FILLED);
 		al_use_shader(NULL);
 	}
-
-	m_set_blender(M_ONE, M_ZERO, white);
 
 	al_hold_bitmap_drawing(true);
 
@@ -278,10 +271,11 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 
 	al_hold_bitmap_drawing(false);
 
-
 	MCOLOR color = blue;
 
 	m_draw_rectangle(x, y, x+w, y+h, color, M_FILLED);
+
+	m_push_blender();
 
 	m_set_blender(M_ONE, M_INVERSE_ALPHA,
 		m_map_rgb_f(blue.r+0.1, blue.g+0.1, blue.b+0.1));
@@ -2512,17 +2506,13 @@ static int crap_map_quadrant_global_count = 0;
 
 void MMap::draw()
 {
-	m_set_blender(M_ONE, M_ZERO, white);
-
 	if (transitioning) {
 		m_draw_bitmap_region(map_bmp,
 			top_x+offset_x, top_y+offset_y, BW, BH,
 			0, 0, 0);
-		m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 	}
 	else {
 		m_draw_bitmap(map_bmp, -top_x-offset_x, -top_y-offset_y, 0);
-		m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
 		MapPoint *p = &points[selected];
 		MBITMAP *place_icon = bitmaps[points[selected].internal_name];

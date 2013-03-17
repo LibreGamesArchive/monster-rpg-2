@@ -1188,10 +1188,7 @@ void Area::draw(int bw, int bh)
 	if (bg) {
 		int bgox = (float)getOriginX() / (sizex*TILE_SIZE) * (m_get_bitmap_width(bg)-BW);
 		int bgoy = (float)getOriginY() / (sizey*TILE_SIZE) * (m_get_bitmap_height(bg)-BH);
-		m_push_blender();
-		m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, white);
 		m_draw_bitmap_region(bg, bgox, bgoy, BW, BH, 0, 0, 0);
-		m_pop_blender();
 	}
 
 	if (tinting) {
@@ -2064,7 +2061,7 @@ void Area::loadAnimation(int index, bool addIndex)
 	int suby = index / (512/TILE_SIZE);
 
 	ALLEGRO_STATE st;
-	al_store_state(&st, ALLEGRO_STATE_BLENDER | ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
+	al_store_state(&st, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
 	char nm[100];
 #ifdef ALLEGRO_ANDROID
 	sprintf(nm, "tiles/%d-%d.png", subx, suby);
@@ -2078,7 +2075,6 @@ void Area::loadAnimation(int index, bool addIndex)
 	int xx = tm_used % tm_w;
 	int yy = tm_used / tm_w;
 	tm_used++;
-	m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, white);
 	m_set_target_bitmap(partial_tm);
 	draw_tile_with_borders(tmp, get_tile_atlas_pos(xx), get_tile_atlas_pos(yy));
 	MBITMAP *subbmp = m_create_sub_bitmap(partial_tm, get_tile_atlas_pos(xx), get_tile_atlas_pos(yy), TILE_SIZE, TILE_SIZE); // check
@@ -2129,7 +2125,7 @@ void Area::loadAnimation(int index, bool addIndex)
 
 
 		ALLEGRO_STATE st;
-		al_store_state(&st, ALLEGRO_STATE_BLENDER | ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
+		al_store_state(&st, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
 
 #ifdef ALLEGRO_ANDROID
 		sprintf(nm, "tiles/%d-%d.png", subx, suby);
@@ -2143,7 +2139,6 @@ void Area::loadAnimation(int index, bool addIndex)
 		int xx = tm_used % tm_w;
 		int yy = tm_used / tm_w;
 		tm_used++;
-		m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, white);
 		m_set_target_bitmap(partial_tm);
 		draw_tile_with_borders(tmp, get_tile_atlas_pos(xx), get_tile_atlas_pos(yy));
 		MBITMAP *subbmp = m_create_sub_bitmap(partial_tm, get_tile_atlas_pos(xx), get_tile_atlas_pos(yy), TILE_SIZE, TILE_SIZE); // check
@@ -2236,6 +2231,10 @@ bool Area::load(std::string filename)
 	al_set_new_bitmap_flags(flgs & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 	partial_tm = m_create_alpha_bitmap(pot(tm_w*TILE_SIZE+tm_w*2), pot(tm_h*TILE_SIZE+tm_h*2));
 	al_set_new_bitmap_flags(flgs);
+	ALLEGRO_BITMAP *target = al_get_target_bitmap();
+	m_set_target_bitmap(partial_tm);
+	m_clear(m_map_rgba(0, 0, 0, 0));
+	al_set_target_bitmap(target);
 
 	char tmp[MAX_AREA_NAME];
 	ALLEGRO_PATH *path = al_create_path(filename.c_str());

@@ -605,10 +605,8 @@ static void *loader_proc(void *arg)
 	joypad_mutex = al_create_mutex_recursive();
 
 	m_push_target_bitmap();
-	m_push_blender();
 	orb_bmp = m_create_alpha_bitmap(80, 80);
 	m_set_target_bitmap(orb_bmp);
-	m_set_blender(M_ONE, M_ZERO, white);
 	for (int yy = 0; yy < 80; yy++) {
 		for (int xx = 0; xx < 80; xx++) {
 			float ax = xx - 40; // actual x
@@ -629,7 +627,6 @@ static void *loader_proc(void *arg)
 			m_put_pixel(xx, yy, c);
 		}
 	}
-	m_pop_blender();
 	m_pop_target_bitmap();
 
 	// FIXME
@@ -1257,27 +1254,17 @@ bool init(int *argc, char **argv[])
 	dpad_mutex = al_create_mutex();
 	touch_mutex = al_create_mutex();
 
-	// Android because it's very slow switching back in on some devices
-	// FIXME FIXME FIXME FIXME FIXME
-	// FIXME FIXME FIXME FIXME FIXME
-	// FIXME FIXME FIXME FIXME FIXME
-	// FIXME FIXME FIXME FIXME FIXME
-	// FIXME FIXME FIXME FIXME FIXME
-	// FIXME FIXME FIXME FIXME FIXME
-	// FIXME FIXME FIXME FIXME FIXME
-	/*
 #if defined A5_D3D || defined ALLEGRO_RASPBERRYPI || defined ALLEGRO_ANDROID
 #ifdef ALLEGRO_RASPBERRYPI
 	if (check_arg(*argc, *argv, "-programmable-pipeline") <= 0)
 #endif
-*/
 	use_fixed_pipeline = true;
-//#endif
+#endif
 	
 	if (!use_fixed_pipeline) {
 		al_set_new_display_flags(
 			al_get_new_display_flags() |
-			ALLEGRO_USE_PROGRAMMABLE_PIPELINE
+			ALLEGRO_PROGRAMMABLE_PIPELINE
 		);
 	}
 
@@ -1378,7 +1365,7 @@ bool init(int *argc, char **argv[])
 		use_programmable_pipeline = false;
 	}
 	else {
-		use_programmable_pipeline = al_get_display_flags(display) & ALLEGRO_USE_PROGRAMMABLE_PIPELINE;
+		use_programmable_pipeline = al_get_display_flags(display) & ALLEGRO_PROGRAMMABLE_PIPELINE;
 	}
 
 	ALLEGRO_DEBUG("initing shaders");

@@ -831,11 +831,9 @@ static int real_archery(int *accuracy_pts)
 
 			float arrow_dist = 0.1;
 
-			m_set_blender(M_ONE, M_ZERO, white);
+			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
 			m_draw_bitmap(grass, 0, 0, 0);
-
-			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
 			// Need 3 passes to draw goblins
 			for (unsigned int i = 0; i < goblins.size(); i++) {

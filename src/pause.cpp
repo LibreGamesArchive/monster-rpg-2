@@ -2277,9 +2277,6 @@ void into_the_sun(void)
 				MCOLOR c = m_get_pixel(bg_locked, cx, cy);
 				unsigned char r, g, b, a;
 				m_unmap_rgba(c, &r, &g, &b, &a);
-				ALLEGRO_STATE st;
-				al_store_state(&st, ALLEGRO_STATE_BLENDER);
-				m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, white);
 				ALLEGRO_VERTEX v[1];
 				v[0].x = cx;
 				v[0].y = cy;
@@ -2291,7 +2288,6 @@ void into_the_sun(void)
 					v[0].color = black;
 				}
 				m_draw_prim(v, NULL, NULL, 0, 1, ALLEGRO_PRIM_POINT_LIST);
-				al_restore_state(&st);
 			}
 
 			drawBufferToScreen(false);
@@ -2532,9 +2528,8 @@ void credits(void)
 			set_target_backbuffer();
 		}
 
-		m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, white);
 		m_draw_bitmap(bg, 0, 0, 0);
-		m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, white);
+
 		if (count < 0) {
 			count += step;
 			if (count > 0)

@@ -1943,12 +1943,10 @@ StompEffect::StompEffect(CombatLocation l) :
 
 	m_push_target_bitmap();
 	for (int i = 0; i < m_get_bitmap_width(tmp); i += 16) {
-		MBITMAP *b = m_create_alpha_bitmap(16, 16); // check
+		MBITMAP *b = m_create_alpha_bitmap(16, 16);
 		m_set_target_bitmap(b);
-		m_push_blender();
-		m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, al_map_rgb(255, 255, 255));
+		m_clear(m_map_rgba(0, 0, 0, 0));
 		m_draw_bitmap_region(tmp, i, 0, i+16, 16, 0, 0, 0);
-		m_pop_blender();
 		puffs.push_back(b);
 	}
 	m_pop_target_bitmap();
