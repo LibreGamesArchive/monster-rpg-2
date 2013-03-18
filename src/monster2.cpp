@@ -13,6 +13,11 @@ static bool zeemote_enabled = false;
 
 #include "svg.hpp"
 
+bool cmdline_warped = false;
+int cmdline_warp_x;
+int cmdline_warp_y;
+std::string cmdline_warp_area;
+
 bool mouse_in_display = true;
 bool forced_closed = false;
 
@@ -74,7 +79,7 @@ static int bright_dir = 1;
 #endif
 float bright_ticker = 0;
 
-//std::vector<std::pair<int, bool> > forced_milestones;
+std::vector<std::pair<int, bool> > forced_milestones;
 
 bool global_can_save = true;
 
@@ -1849,8 +1854,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-/*
-#if defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE
+#ifndef ALLEGRO_ANDROID
 	int c = argc;
 	char **p = argv;
 	while ((n = check_arg(c, p, "-ms")) != -1) {
@@ -1863,11 +1867,15 @@ int main(int argc, char *argv[])
 		c -= n+2;
 		p = &p[n+2];
 	}
-#endif
-*/
 
-	// FIXME!
-	// Easiest way to restore a save state after deleting the app
+	if ((n = check_arg(argc, argv, "-warp")) != -1) {
+		cmdline_warped = true;
+		cmdline_warp_area = argv[n+1];
+		cmdline_warp_x = atoi(argv[n+2]);
+		cmdline_warp_y = atoi(argv[n+3]);
+	}
+#endif
+
 #ifdef DEBUG_XXX
 	#include "savestate.h"
 	//#ifdef OVERWRITE_SAVE
@@ -2148,14 +2156,6 @@ int main(int argc, char *argv[])
 				debug_message("started new game\n");
 			}
 		}
-		else if (choice == 2) {
-		}
-		/*
-		else if (choice == 5) {
-			pc_help();
-			continue;
-		}
-		*/
 		else if (choice == 3) {
 			player = new Player("Eny"); // auto put in party
 			player->setObject(new Object());

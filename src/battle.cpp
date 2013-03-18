@@ -390,6 +390,7 @@ void Battle::drawStatus(void)
 		}
 	}
 
+	al_hold_bitmap_drawing(false);
 	al_hold_bitmap_drawing(held);
 }
 

@@ -594,6 +594,7 @@ static void draw(double cx, double cy, bool draw_objects = true)
 				crabs[i].y-cy+m_get_bitmap_height(crab_bmp)
 			);
 		}
+		al_hold_bitmap_drawing(false);
 		al_hold_bitmap_drawing(held);
 	}
 	// draw bullets
@@ -606,6 +607,7 @@ static void draw(double cx, double cy, bool draw_objects = true)
 			bullets[i].x-cx,
 			bullets[i].y-cy+m_get_bitmap_height(bullet)
 		);
+		al_hold_bitmap_drawing(false);
 		al_hold_bitmap_drawing(held);
 	}
 	// draw sharks
@@ -621,6 +623,7 @@ static void draw(double cx, double cy, bool draw_objects = true)
 				sharks[i].y-cy+m_get_bitmap_height(shark_bmp)
 			);
 		}
+		al_hold_bitmap_drawing(false);
 		al_hold_bitmap_drawing(held);
 	}
 }

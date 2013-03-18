@@ -60,14 +60,8 @@ public:
 		for (int i = 0; i < MAX_PARTY; i++) {
 			FakeWidget *formWidget = formWidgets[i];
 			if (formWidget) {
-				if (formWidget == tguiActiveWidget) {
-					CombatPlayer *p = battle->findPlayer(i);
-					p->showRect(true);
-				}
-				else {
-					CombatPlayer *p = battle->findPlayer(i);
-					p->showRect(false);
-				}
+				CombatPlayer *p = battle->findPlayer(i);
+				p->showRect(false);
 			}
 		}
 
@@ -107,6 +101,17 @@ public:
 				}
 			}
 		}
+		
+		for (int i = 0; i < MAX_PARTY; i++) {
+			FakeWidget *formWidget = formWidgets[i];
+			if (formWidget) {
+				if (formWidget == tguiActiveWidget) {
+					CombatPlayer *p = battle->findPlayer(i);
+					p->showRect(true);
+				}
+			}
+		}
+
 		return NULL;
 	}
 

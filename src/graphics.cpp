@@ -539,9 +539,30 @@ void drawBufferToScreen(bool draw_controls)
 
 	drawOverlay(draw_controls, al_map_rgba_f(0.5f, 0.5f, 0.5f, 0.5f));
 
-	if (fps_on && !transitioning) {
-		al_draw_textf(game_font, al_map_rgb_f(1, 1, 0), 1, 1, 0, "%d", fps);
+	if (fps_on && !preparingForScreenGrab) {
+		char buf[10];
+		sprintf(buf, "%d", fps);
+		mTextout_simple(buf, 1, 1, al_map_rgb_f(1, 1, 0));
 	}
+
+#ifdef ALLEGRO_RASPBERRYPI
+	if (!preparingForScreenGrab && !is_cursor_hidden()) {
+		ALLEGRO_BITMAP *target = al_get_target_bitmap();
+		if (target == al_get_backbuffer(display)) {
+			int cx, cy, cw, ch;
+			al_get_clipping_rectangle(&cx, &cy, &cw, &ch);
+			al_set_clipping_rectangle(
+				0, 0,
+				al_get_display_width(display),
+				al_get_display_height(display)
+			);
+			ALLEGRO_MOUSE_STATE state;
+			al_get_mouse_state(&state);
+			m_draw_bitmap_identity_view(custom_cursor_bmp, state.x, state.y, 0);
+			al_set_clipping_rectangle(cx, cy, cw, ch);
+		}
+	}
+#endif
 }
 
 void draw_shadow(MBITMAP *bmp, int x, int y, bool hflip)
@@ -702,7 +723,9 @@ static void fade(int startAlpha, int endAlpha, int length, MCOLOR color)
 	int flags = al_get_new_bitmap_flags();
 	int format = al_get_new_bitmap_format();
 	al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
+#ifdef OPENGLES
+	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
+#endif
 	MBITMAP *tmp = m_create_bitmap(dw, dh);
 	al_set_new_bitmap_flags(flags);
 	al_set_new_bitmap_format(format);
@@ -938,6 +961,9 @@ void battleTransition()
 		prepareForScreenGrab1();
 		battle->draw();
 		prepareForScreenGrab2();
+
+		// FIXME:
+		al_save_bitmap("ss.png", tmpbuffer->bitmap);
 
 		m_draw_scaled_target(tmpbuffer, dx, dy, dw, dh, 0, 0, dw, dh, bufcopy2);
 

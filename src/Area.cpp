@@ -5,7 +5,6 @@
 
 #include <sys/stat.h>
 
-
 int get_tile_atlas_pos(int tn)
 {
 	return tn*TILE_SIZE + 1 + 2*tn;

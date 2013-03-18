@@ -183,7 +183,7 @@ void TemporaryText::draw(void)
 {
 	mTextout(game_font, _t(text), cx, (int)(cy + yoffs),
 		color, black,
-		WGT_TEXT_SQUARE_BORDER, true);
+		WGT_TEXT_BORDER, true);
 }
 
 bool TemporaryText::update(int step)

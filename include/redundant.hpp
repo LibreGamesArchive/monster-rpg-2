@@ -40,7 +40,6 @@ void my_do_circle(int x, int y, int radius, MCOLOR d,
 
 int m_makecol(MCOLOR c);
 int m_makecol32(MCOLOR c);
-void m_textout_f(const MFONT *font, const char *text, float x, float y, MCOLOR color);
 void m_textout(const MFONT *font, const char *text, int x, int y, MCOLOR color);
 void m_textout_centre(const MFONT *font, const char *text, int x, int y, MCOLOR color);
 int m_text_height(const MFONT *font);
