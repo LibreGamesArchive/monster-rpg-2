@@ -29,7 +29,7 @@ extern "C" {
 void create_tmpbuffer()
 {
 	int flags = al_get_new_bitmap_flags();
-#if defined OPENGLES
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	int format = al_get_new_bitmap_format();
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
 #endif
@@ -40,7 +40,7 @@ void create_tmpbuffer()
 		w, h
 	);
 	al_set_new_bitmap_flags(flags);
-#if defined OPENGLES
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_set_new_bitmap_format(format);
 #endif
 }
@@ -713,7 +713,7 @@ void init_shaders(void)
 		const char *tinter_pixel_source =
 #if defined ALLEGRO_RASPBERRYPI
 		"precision lowp float;\n"
-#elif defined OPENGLES
+#elif defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		"precision mediump float;\n"
 #endif
 		"uniform sampler2D " ALLEGRO_SHADER_VAR_TEX ";\n"
@@ -743,7 +743,7 @@ void init_shaders(void)
 		const char *warp_pixel_source =
 #if defined ALLEGRO_RASPBERRYPI
 		"precision lowp float;\n"
-#elif defined OPENGLES
+#elif defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		"precision mediump float;\n"
 #endif
 		"uniform sampler2D " ALLEGRO_SHADER_VAR_TEX ";\n"
@@ -768,7 +768,7 @@ void init_shaders(void)
 		const char *shadow_pixel_source =
 #if defined ALLEGRO_RASPBERRYPI
 		"precision lowp float;\n"
-#elif defined OPENGLES
+#elif defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		"precision mediump float;\n"
 #endif
 		"uniform sampler2D " ALLEGRO_SHADER_VAR_TEX ";\n"
@@ -799,7 +799,7 @@ void init_shaders(void)
 		const char *brighten_pixel_source =
 #if defined ALLEGRO_RASPBERRYPI
 		"precision lowp float;\n"
-#elif defined OPENGLES
+#elif defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		"precision mediump float;\n"
 #endif
 		"uniform sampler2D " ALLEGRO_SHADER_VAR_TEX ";\n"

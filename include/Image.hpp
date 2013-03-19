@@ -16,6 +16,8 @@ public:
 	int getHeight();
 	int getX();
 	int getY();
+	int getOrigX();
+	int getOrigY();
 
 	void setTransparent(bool trans);
 	bool getTransparent();
@@ -24,7 +26,7 @@ public:
 	void set(MBITMAP *b);
 	bool load(MBITMAP *copy_from, int x1, int y1, int x2, int y2);
 	Image *clone(int type, MBITMAP *bitmap);
-	Image *clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, int x, int y);
+	Image *clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, int x, int y, bool skip_draw);
 	//void refresh();
 	
 	void draw(int x, int y, int flags = 0);
@@ -46,6 +48,7 @@ protected:
 
 	MBITMAP *copy_from;
 	int x1, y1, w, h;
+	int orig_x, orig_y;
 };
 
 extern ALLEGRO_BITMAP *cached_bitmap;

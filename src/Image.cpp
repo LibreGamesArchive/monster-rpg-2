@@ -24,22 +24,29 @@ int Image::getY()
 	return y1;
 }
 
+int Image::getOrigX()
+{
+	return orig_x;
+}
+
+int Image::getOrigY()
+{
+	return orig_y;
+}
+
 MBITMAP *Image::getBitmap(void)
 {
 	return bitmap;
 }
 
-
 void Image::setTransparent(bool trans)
 {
 }
-
 
 bool Image::getTransparent(void)
 {
 	return transparent;
 }
-
 
 void Image::set(MBITMAP *b)
 {
@@ -57,6 +64,9 @@ bool Image::load(MBITMAP *copy_from, int x1, int y1, int x2, int y2)
 	h = y2 - y1;
 
 	bitmap = m_create_sub_bitmap(copy_from, x1, y1, w, h);
+
+	orig_x = x1;
+	orig_y = y1;
 
 	return true;
 }
@@ -85,10 +95,13 @@ Image *Image::clone(int type, MBITMAP *copy)
 
 	img->bitmap = m_create_sub_bitmap(copy, x1, y1, w, h);
 
+	img->orig_x = orig_x;
+	img->orig_y = orig_y;
+
 	return img;
 }
 
-Image *Image::clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, int x, int y)
+Image *Image::clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, int x, int y, bool skip_draw)
 {
 	if (type != CLONE_FULL) {
 		return clone(type, clone_from);
@@ -97,19 +110,21 @@ Image *Image::clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, int x, int
 	int dx = x;
 	int dy = y;
 
-	ALLEGRO_STATE state;
-	al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
+	if (!skip_draw) {
+		ALLEGRO_STATE state;
+		al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
 
-	al_set_target_bitmap(clone_to->bitmap);
+		al_set_target_bitmap(clone_to->bitmap);
 
-	al_draw_bitmap_region(
-		clone_from->bitmap,
-		x1, y1, w, h,
-		dx, dy,
-		0
-	);
+		al_draw_bitmap_region(
+			clone_from->bitmap,
+			x1, y1, w, h,
+			dx, dy,
+			0
+		);
 
-	al_restore_state(&state);
+		al_restore_state(&state);
+	}
 
 	Image *img = new Image();
 	img->transparent = transparent;
@@ -121,6 +136,9 @@ Image *Image::clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, int x, int
 	img->h = h;
 
 	img->bitmap = m_create_sub_bitmap(clone_to, dx, dy, w, h);
+
+	img->orig_x = orig_x;
+	img->orig_y = orig_y;
 
 	return img;
 }

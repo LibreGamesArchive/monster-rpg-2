@@ -723,7 +723,7 @@ static void fade(int startAlpha, int endAlpha, int length, MCOLOR color)
 	int flags = al_get_new_bitmap_flags();
 	int format = al_get_new_bitmap_format();
 	al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
-#ifdef OPENGLES
+#if defined ALLEGRO_IPHONE || defined ALLERGRO_ANDROID
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
 #endif
 	MBITMAP *tmp = m_create_bitmap(dw, dh);

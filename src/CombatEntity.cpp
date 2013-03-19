@@ -8,6 +8,9 @@ const float WhirlpoolEffect::SPEED = 0.007f;
 const float SlimeEffect::SPEED = 0.032f;
 const float Bolt3Effect::MAX_DIST = 36;
 const float Bolt3Effect::MAX_AMPLITUDE = 10;
+const int Bolt3Effect::LIFETIME = 3500;
+const int Bolt3Effect::PTS_PER_ARC = 3;
+const int Bolt3Effect::MAX_RAD = 30;
 const float AttackSwoosh::SPEED = 0.5f;
 const float Fire2Effect::NUM_PIXELS = 0.5f;
 const float Fire2Effect::RISE_SPEED = 0.05f;
@@ -2911,18 +2914,24 @@ bool Bolt3Effect::update(int step)
 
 void Bolt3Effect::generate(int n)
 {
-	float angle = 1.5f; // arbitrary
+	float angle = (float)(rand()%RAND_MAX)/RAND_MAX * M_PI * 2;
 	for (int i = 0; i < n; i++) {
 		std::vector<MPoint> pts;
-		for (int i = 0; i < PTS_PER_ARC; i++) {
-			float offset = MAX_DIST/PTS_PER_ARC*i;
-			float offsety = (rand()%3-1) * ((float)(rand()%RAND_MAX)/RAND_MAX) * MAX_AMPLITUDE;
-			float x = cx + cos(angle)*offset;
-			float y = cy + sin(angle)*offset + offsety;
+		float offset = 0;
+		int ppa = PTS_PER_ARC + rand() % 3;
+		int dir = rand() % 2;
+		if (dir == 0) dir = -1;
+		for (int i = 0; i < ppa; i++) {
+			float aoffs = (float)(rand()%RAND_MAX)/RAND_MAX * 0.12f + 0.12f;
+			aoffs *= dir;
+			dir = -dir;
+			float x = cx + cos(angle+aoffs)*offset;
+			float y = cy + sin(angle+aoffs)*offset;
 			MPoint p;
 			p.x = x;
 			p.y = y;
 			pts.push_back(p);
+			offset += MAX_DIST/ppa * ((float)(rand()%RAND_MAX)/RAND_MAX*0.5+0.75);
 		}
 		arcs.push_back(pts);
 		angle += (M_PI*2)/n;
@@ -2957,12 +2966,9 @@ Bolt3Effect::Bolt3Effect(Combatant *target) :
 
 	cx = MAX_DIST;
 	cy = MAX_DIST;
-	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 	predrawn = m_create_alpha_bitmap(MAX_DIST*2, MAX_DIST*2); // check
-	al_set_new_bitmap_flags(flags);
 
-	generate(5);
+	generate(rand()%2+4);
 	
 	cx = x;
 	cy = y - target->getAnimationSet()->getHeight()/2;

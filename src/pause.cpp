@@ -506,7 +506,7 @@ void showSaveStateInfo(const char *basename)
 			int tick = (unsigned)tguiCurrentTimeMillis() % 1000;
 			if (tick < 800) {
 				int size = m_get_bitmap_width(cursor);
-				int rx = BW/2-m_text_length(game_font, _t("OK"))/2-size;
+				int rx = BW/2-m_text_length(game_font, _t("OK"))/2-size-2;
 				int ry = 140+cursor_offset(true);
 				m_draw_bitmap(cursor, rx, ry, 0);
 			}
@@ -814,7 +814,7 @@ void showItemInfo(int index, bool preserve_buffer)
 			int tick = (unsigned)tguiCurrentTimeMillis() % 1000;
 			if (tick < 800) {
 				int size = m_get_bitmap_width(cursor);
-				int rx = BW/2-m_text_length(game_font, _t("OK"))/2-size;
+				int rx = BW/2-m_text_length(game_font, _t("OK"))/2-size-2;
 				int ry = 130+cursor_offset(true);
 				m_draw_bitmap(cursor, rx, ry, 0);
 			}
@@ -1090,7 +1090,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 		MultiPoint p;
 		p.x = BW/2+10;
 		p.y = oy;
-		oy += m_text_height(game_font) + 3;
+		oy += m_text_height(game_font) + 2;
 		p.west = false;
 		equipPoints.push_back(p);
 	}

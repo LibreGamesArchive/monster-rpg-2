@@ -1909,7 +1909,7 @@ int main(int argc, char *argv[])
 	int flags = al_get_new_bitmap_flags();
 	
 	int linear = 0;
-#if !defined OPENGLES && !defined A5_D3D
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI  && !defined A5_D3D
 	linear = ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR;
 #endif
 	al_set_new_bitmap_flags(linear);

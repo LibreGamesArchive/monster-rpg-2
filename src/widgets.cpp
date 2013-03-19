@@ -372,7 +372,7 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 	int tw = m_text_length(game_font, _t("OK"));
 
 	tguiPush();
-	FakeWidget *w1 = new FakeWidget(BW/2-tw/2, (y+h-15)-th/2-2, tw, 16);
+	FakeWidget *w1 = new FakeWidget(BW/2-tw/2, (y+h-15)-th/2-2, tw, th);
 	MRectangle *fullscreenRect = new MRectangle(0, 0, BW, BH,
 		m_map_rgba(0, 0, 0, 0), 0);
 	tguiSetParent(0);
@@ -584,6 +584,7 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 	int x = (BW-w)/2;
 	int y = (BH-h)/2;
 	int th = m_text_height(game_font);
+	int tw = m_text_length(game_font, _t("OK"));
 
 	tguiClearMouseEvents();
 
@@ -591,7 +592,7 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 
 	MRectangle *fullscreenRect = new MRectangle(0, 0, BW, BH,
 		m_map_rgba(0, 0, 0, 0), 0);
-	FakeWidget *w1 = new FakeWidget(BW/2-6, y+53-th/2-2, 12, 12);
+	FakeWidget *w1 = new FakeWidget(BW/2-tw/2, y+53-th/2-2, tw, th);
 	tguiSetParent(0);
 	tguiAddWidget(fullscreenRect);
 	tguiSetParent(fullscreenRect);
@@ -721,9 +722,9 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 	tguiPush();
 	MRectangle *fullscreenRect = new MRectangle(0, 0, BW, BH,
 		m_map_rgba(0, 0, 0, 0), 0);
-	FakeWidget *w1 = new FakeWidget(x1-l1/2, ty-th/2-2, l1, 16);
-	FakeWidget *w2 = new FakeWidget(x2-l2/2, ty-th/2-2, l2, 16);
-	FakeWidget *w3 = new FakeWidget(x3-l3/2, ty-th/2-2, l3, 16);
+	FakeWidget *w1 = new FakeWidget(x1-l1/2, ty-th/2-2, l1, th);
+	FakeWidget *w2 = new FakeWidget(x2-l2/2, ty-th/2-2, l2, th);
+	FakeWidget *w3 = new FakeWidget(x3-l3/2, ty-th/2-2, l3, th);
 	tguiSetParent(0);
 	tguiAddWidget(fullscreenRect);
 	tguiSetParent(fullscreenRect);
@@ -885,9 +886,9 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 	MRectangle *fullscreenRect = new MRectangle(0, 0, BW, BH,
 		m_map_rgba(0, 0, 0, 0), 0);
 	FakeWidget *w1 = new FakeWidget(BW/2-w/4-(len_1/2), (y+43)-th/2-2,
-		len_1, 16);
+		len_1, th);
 	FakeWidget *w2 = new FakeWidget(BW/2+w/4-(len_2/2), (y+43)-th/2-2,
-		len_2, 16);
+		len_2, th);
 	tguiSetParent(0);
 	tguiAddWidget(fullscreenRect);
 	tguiSetParent(fullscreenRect);
@@ -2817,9 +2818,7 @@ int MMap::update(int millis)
 				 * sets an alpha blender, and I don't want to
 				 * find out why.
 				 */
-				m_set_blender(M_ONE, M_ZERO, white);
 				m_draw_scaled_bitmap(bmp, curr_x, curr_y, curr_w, curr_h, 0, 0, BW, BH, 0);
-				m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 				drawBufferToScreen(false);
 
 				if (break_for_fade_after_draw) {
@@ -6452,7 +6451,7 @@ void MPartySelector::draw()
 
 	if (index >= 0 && index < MAX_PARTY && party[index]) {
 		drawSimpleStatus(index, 5, y);
-		drawSimpleEquipment(index, BW/2+10, y+2, 69);
+		drawSimpleEquipment(index, BW/2+10, y+2, 67);
 		CombatantInfo &info = party[index]->getInfo();
 		char text[100];
 		if (info.abilities.hp <= 0) {
@@ -6602,28 +6601,28 @@ int MPartySelector::update(int millis)
 					
 				}
 				if (party[index] && go) {
-					int *toUnequip = 0;
+					int toShow = 0;
 					switch (chosen) {
 						case 0:
-							toUnequip = &party[index]->getInfo().equipment.lhand;
+							toShow = party[index]->getInfo().equipment.lhand;
 							break;
 						case 1:
-							toUnequip = &party[index]->getInfo().equipment.rhand;
+							toShow = party[index]->getInfo().equipment.rhand;
 							break;
 						case 2:
-							toUnequip = &party[index]->getInfo().equipment.harmor;
+							toShow = party[index]->getInfo().equipment.harmor;
 							break;
 						case 3:
-							toUnequip = &party[index]->getInfo().equipment.carmor;
+							toShow = party[index]->getInfo().equipment.carmor;
 							break;
-						case 4:
-							toUnequip = &party[index]->getInfo().equipment.farmor;
+						default:
+							toShow = party[index]->getInfo().equipment.farmor;
 							break;
 					}
-					if (*toUnequip >= 0) {
+					if (toShow >= 0) {
 						down = false;
 						playPreloadedSample("select.ogg");
-						show_item_info_on_flip = index;
+						show_item_info_on_flip = toShow;
 						prepareForScreenGrab1();
 					}
 				}

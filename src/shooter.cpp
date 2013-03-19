@@ -731,7 +731,7 @@ bool shooter(bool for_points)
 
 	int mipmap = 0;
 	int linear = 0;
-#if !defined OPENGLES && !defined A5_D3D
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI  && !defined A5_D3D
 	mipmap = ALLEGRO_MIPMAP;
 	linear = ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR;
 #endif
@@ -1083,7 +1083,7 @@ start:
 					set_target_backbuffer();
 					m_draw_rectangle(BW/2-tw/2-5, BH/2-th/2-5, BW/2+tw/2+5, BH/2+th/2+5, black, M_FILLED);
 					m_draw_rectangle(BW/2-tw/2-5+0.5, BH/2-th/2-5+0.5, BW/2+tw/2+5, BH/2+th/2+5, white, M_OUTLINED);
-					mTextout_simple(_t(pause_text), BW/2-tw/2, BH/2-th/2+2, white);
+					mTextout_simple(_t(pause_text), BW/2-tw/2, BH/2-th/2, white);
 					drawBufferToScreen();
 					m_flip_display();
 
@@ -1133,7 +1133,7 @@ start:
 						m_draw_bitmap_identity_view(tmpbuffer, 0, 0, 0);
 						m_draw_rectangle(BW/2-tw/2-5, BH/2-th/2-5, BW/2+tw/2+5, BH/2+th/2+5, black, M_FILLED);
 						m_draw_rectangle(BW/2-tw/2-5+0.5, BH/2-th/2-5+0.5, BW/2+tw/2+5, BH/2+th/2+5, white, M_OUTLINED);
-						mTextout_simple(_t(pause_text), BW/2-tw/2, BH/2-th/2+2, white);
+						mTextout_simple(_t(pause_text), BW/2-tw/2, BH/2-th/2, white);
 						drawBufferToScreen();
 						m_flip_display();
 						m_rest(0.005);

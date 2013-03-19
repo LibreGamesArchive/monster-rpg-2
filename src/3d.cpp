@@ -582,7 +582,7 @@ static int real_archery(int *accuracy_pts)
 
 	int mipmap = 0;
 	int linear = 0;
-#if !defined OPENGLES && !defined A5_D3D
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI  && !defined A5_D3D
 	mipmap = ALLEGRO_MIPMAP;
 	linear = ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR;
 #endif
@@ -1223,7 +1223,7 @@ void volcano_scene(void)
 
 	int mipmap = 0;
 	int linear = 0;
-#if !defined OPENGLES && !defined A5_D3D
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI  && !defined A5_D3D
 	mipmap = ALLEGRO_MIPMAP;
 	linear = ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR;
 #endif

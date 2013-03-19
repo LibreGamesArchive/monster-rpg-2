@@ -374,20 +374,33 @@ AnimationSet *AnimationSet::clone(int type)
 		}
 		int y = img->getY() + oidx*2 + 1;
 		int x = img->getX();
+		bool found_dup = false;
 		for (size_t j = 0; j < i; j++) {
 			Animation *anim = a->anims[j];
 			int nf = anim->getNumFrames();
-			int f = nf-1;
-			Image *img2 = anim->getFrame(f)->getImage();
-			if (y >= img2->getY()+img2->getHeight() || y+img->getHeight() <= img2->getY()) {
-				continue;
+			for (int f = 0; f < nf; f++) {
+				Image *img2 = anim->getFrame(f)->getImage();
+				if (img->getX() == img2->getOrigX() && img->getY() == img2->getOrigY()) {
+					x = img2->getX();
+					y = img2->getY();
+					found_dup = true;
+					break;
+				}
+				if (y >= img2->getY()+img2->getHeight() || y+img->getHeight() <= img2->getY()) {
+					continue;
+				}
+				if (img2->getX()+img2->getWidth() > x) {
+					x = img2->getX()+img2->getWidth();
+				}
 			}
-			if (img2->getX()+img2->getWidth() > x) {
-				x = img2->getX()+img2->getWidth();
+			if (found_dup) {
+				break;
 			}
 		}
-		x++;
-		a->anims.push_back(anims[i]->clone(type, clone_from, clone_to, x, y));
+		if (!found_dup) {
+			x++;
+		}
+		a->anims.push_back(anims[i]->clone(type, clone_from, clone_to, x, y, found_dup));
 	}
 	
 	delete[] o;

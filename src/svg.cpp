@@ -102,7 +102,7 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 	 * Open source drivers claim to support the extension but simply
 	 * crash when it's used. So disable it altogether on Linux.
 	 */
-#if defined A5_D3D || defined __linux__ || defined OPENGLES
+#if defined A5_D3D || defined __linux__ || defined OPENGLES || defined ALLEGRO_RASPBERRYPI
 	bool multisample = false;
 #else
 	bool multisample = al_have_opengl_extension("GL_EXT_framebuffer_multisample");

@@ -726,11 +726,11 @@ protected:
 
 class Bolt3Effect : public CombatEntity {
 public:
-	static const int LIFETIME = 3500;
-	static const int PTS_PER_ARC = 7;
+	static const int LIFETIME ;
+	static const int PTS_PER_ARC;
+	static const int MAX_RAD;
 	static const float MAX_DIST;
 	static const float MAX_AMPLITUDE;
-	static const int MAX_RAD = 30;
 	bool act(int step, Battle *battle) { return false; }
 	bool update(int step);
 	void draw(void);

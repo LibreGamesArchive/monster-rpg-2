@@ -2881,10 +2881,12 @@ static int CDoItemTutorial(lua_State *stack)
 	MItemSelector *itemSelector = new MItemSelector(73, BH-2, 0, 0, true);
 
 	std::vector<MultiPoint> equipPoints;
+	int oy = 5 + m_text_height(game_font)/2;
 	for (int i = 0; i < 5; i++) {
 		MultiPoint p;
 		p.x = BW/2+10;
-		p.y = 2 + (m_text_height(game_font)/2) + (m_text_height(game_font)*i) + (i*4);
+		p.y = oy;
+		oy += m_text_height(game_font) + 2;
 		p.west = false;
 		equipPoints.push_back(p);
 	}

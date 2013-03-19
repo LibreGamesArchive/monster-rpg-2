@@ -1,8 +1,8 @@
 #include "monster2.hpp"
 
-Frame *Frame::clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, int col, int y)
+Frame *Frame::clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, int col, int y, bool skip_draw)
 {
-	Frame *frame = new Frame(image->clone(type, clone_from, clone_to, col, y), delay);
+	Frame *frame = new Frame(image->clone(type, clone_from, clone_to, col, y, skip_draw), delay);
 	return frame;
 }
 

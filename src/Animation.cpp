@@ -192,14 +192,14 @@ void Animation::wrap(void)
 	}
 }
 
-Animation *Animation::clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, int x, int y)
+Animation *Animation::clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, int x, int y, bool skip_draw)
 {
 	Animation *a = new Animation();
 		
 	Image *img = frames[0]->getImage();
 
 	for (size_t i = 0; i < frames.size(); i++) {
-		a->frames.push_back(frames[i]->clone(type, clone_from, clone_to, x, y));
+		a->frames.push_back(frames[i]->clone(type, clone_from, clone_to, x, y, skip_draw));
 		x += frames[i]->getImage()->getWidth() + 2;
 	}
 
