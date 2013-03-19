@@ -130,24 +130,41 @@ void m_draw_alpha_bitmap(MBITMAP *b, int x, int y, int flags)
 
 void m_textout(const MFONT *font, const char *text, int x, int y, MCOLOR color)
 {
-	al_draw_text(font, color, x, y-2, 0, text);
-}
+	ALLEGRO_TRANSFORM old_v, v;
+	int dx, dy, dw, dh;
 
-void m_textout_f(const MFONT *font, const char *text, float x, float y, MCOLOR color)
-{
-	al_draw_text(font, color, x, y-2, 0, text);
+	if (font != huge_font) {
+		al_copy_transform(&old_v, al_get_current_transform());
+		get_screen_offset_size(&dx, &dy, &dw, &dh);
+
+		x *= screenScaleX;
+		y *= screenScaleY;
+
+		al_identity_transform(&v);
+		
+		if (al_get_target_bitmap() == al_get_backbuffer(display) || al_get_target_bitmap() == tmpbuffer->bitmap) {
+			al_translate_transform(&v, dx, dy);
+		}
+		al_use_transform(&v);
+	}
+
+	al_draw_text(font, color, x, y-2*screenScaleY, 0, text);
+
+	if (font != huge_font) {
+		al_use_transform(&old_v);
+	}
 }
 
 void m_textout_centre(const MFONT *font, const char *text, int x, int y, MCOLOR color)
 {
-	int length = al_get_text_width(font, text);
+	int length = m_text_length(font, text);
 	m_textout(font, text, x-length/2, y, color);
 }
 
 
 int m_text_height(const MFONT *font)
 {
-	return al_get_font_line_height(font);
+	return al_get_font_line_height(font)/screenScaleY;
 }
 
 static INLINE float get_factor(int operation, float alpha)
@@ -622,7 +639,7 @@ void m_clear(MCOLOR color)
 
 static int m_text_length_real(const MFONT *font, const char *text)
 {
-	return al_get_text_width(font, text);
+	return al_get_text_width(font, text)/screenScaleX;
 }
 
 void m_set_target_bitmap(MBITMAP *bmp)
@@ -795,7 +812,6 @@ static int find_char(const char *text)
 	return -1;
 }
 
-
 // find length taking into account {xxx} special icon codes
 int m_text_length(const MFONT *font, const char *text)
 {
@@ -818,7 +834,6 @@ int m_text_length(const MFONT *font, const char *text)
 
 	return length;
 }
-
 
 static ALLEGRO_BITMAP *pushed_target;
 
@@ -1117,8 +1132,6 @@ static MBITMAP *clone_sub_bitmap(MBITMAP *b)
 	m_set_target_bitmap(clone);
 	m_clear(al_map_rgba_f(0, 0, 0, 0));
 
-	m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, white);
-
 	m_draw_bitmap(b, 0, 0, 0);
 
 	al_restore_state(&st);
@@ -1255,11 +1268,6 @@ void m_set_mouse_xy(ALLEGRO_DISPLAY *display, int x, int y)
 
 void use_shader(ALLEGRO_SHADER *shader)
 {
-//	ALLEGRO_TRANSFORM v, p;
-//	al_copy_transform(&v, al_get_current_transform());
-//	al_copy_transform(&p, al_get_projection_transform(display));
 	al_use_shader(shader);
-//	al_use_transform(&v);
-//	al_set_projection_transform(display, &p);
 }
 

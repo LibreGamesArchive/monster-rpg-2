@@ -231,4 +231,6 @@ extern int config_save_height;
 extern bool f5_cheated, f6_cheated;
 extern double f5_time, f6_time;
 
+extern MBITMAP *custom_cursor_bmp;
+
 #endif

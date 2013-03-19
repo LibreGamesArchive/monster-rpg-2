@@ -725,6 +725,9 @@ void showItemInfo(int index, bool preserve_buffer)
 				WGT_TEXT_DROP_SHADOW, true);
 			callLua(luaState, "get_item_description", "i>s", index);
 			const char *desc = lua_tostring(luaState, -1);
+	
+			al_hold_bitmap_drawing(true);
+			
 			mTextout(game_font, _t(desc), BW/2, y+5+m_text_height(game_font)/2+m_text_height(game_font),
 				grey, black,
 				WGT_TEXT_DROP_SHADOW, true);
@@ -735,9 +738,9 @@ void showItemInfo(int index, bool preserve_buffer)
 					char buf[100];
 					sprintf(buf, _t("Attack: %d"), weapons[items[index].id].attack);
 					mTextout(game_font, buf,
-					BW/2, y+5+m_text_height(game_font)/2+m_text_height(game_font)*3,
-					grey, black,
-					WGT_TEXT_DROP_SHADOW, true);
+						BW/2, y+5+m_text_height(game_font)/2+m_text_height(game_font)*3,
+						grey, black,
+						WGT_TEXT_DROP_SHADOW, true);
 					break;
 				}
 				case ITEM_TYPE_HEAD_ARMOR:
@@ -758,19 +761,22 @@ void showItemInfo(int index, bool preserve_buffer)
 					char buf[100];
 					sprintf(buf, _t("Defense: %d"), a[items[index].id].defense);
 					mTextout(game_font, buf,
-					BW/2, y+5+m_text_height(game_font)/2+m_text_height(game_font)*3,
-					grey, black,
-					WGT_TEXT_DROP_SHADOW, true);
+						BW/2, y+5+m_text_height(game_font)/2+m_text_height(game_font)*3,
+						grey, black,
+						WGT_TEXT_DROP_SHADOW, true);
 					sprintf(buf, _t("MDefense: %d"), a[items[index].id].magicDefense);
 					mTextout(game_font, buf,
-					BW/2, y+5+m_text_height(game_font)/2+m_text_height(game_font)*4,
-					grey, black,
-					WGT_TEXT_DROP_SHADOW, true);
+						BW/2, y+5+m_text_height(game_font)/2+m_text_height(game_font)*4,
+						grey, black,
+						WGT_TEXT_DROP_SHADOW, true);
 					break;
 				}
 				default:
 					break;
 			}
+
+			al_hold_bitmap_drawing(false);
+
 			for (int i = 0; i < MAX_PARTY; i++) {
 				if (can_use[i] && partyBmps[i]) {
 					int x = BW/2+(i-2)*20;
@@ -799,9 +805,11 @@ void showItemInfo(int index, bool preserve_buffer)
 				}
 			}
 
+			al_hold_bitmap_drawing(true);
 			mTextout(game_font, _t("OK"), BW/2, 130,
 				grey, black,
 				WGT_TEXT_DROP_SHADOW, true);
+			al_hold_bitmap_drawing(false);
 			// Draw "cursor"
 			int tick = (unsigned)tguiCurrentTimeMillis() % 1000;
 			if (tick < 800) {
@@ -1018,33 +1026,33 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 		left_widget = fairy;
 #endif
 
-	MTextButton *mainItem = new MTextButton(162, yy, "Item", false, left_widget);
+	MTextButton *mainItem = new MTextButton(162, yy, "Item", false, left_widget, NULL, false);
 
 	yy += yinc;
-	MTextButton *mainMagic = new MTextButton(162, yy, "Magic", false, left_widget);
+	MTextButton *mainMagic = new MTextButton(162, yy, "Magic", false, left_widget, NULL, false);
 	yy += yinc;
-	MTextButton *mainForm = new MTextButton(162, yy, "Form", false, left_widget);
+	MTextButton *mainForm = new MTextButton(162, yy, "Form", false, left_widget, NULL, false);
 #if defined ALLEGRO_ANDROID || defined ALLEGRO_IPHONE
 	if (use_dpad)
 #endif
 		yy += yinc;
-	MTextButton *mainStats = new MTextButton(162, yy, "Stats", false, left_widget);
+	MTextButton *mainStats = new MTextButton(162, yy, "Stats", false, left_widget, NULL, false);
 	yy += yinc;
 	TGUIWidget *mainSave;
 	if (can_save)
-		mainSave = new MTextButton(162, yy, "Save", false, left_widget);
+		mainSave = new MTextButton(162, yy, "Save", false, left_widget, NULL, false);
 	else
 		mainSave = new MLabel(162+m_text_height(game_font)/2+2, yy, "Save", m_map_rgb(128, 128, 128));
 	yy += yinc;
-	MTextButton *mainResume = new MTextButton(162, yy, "Play", false, left_widget);
+	MTextButton *mainResume = new MTextButton(162, yy, "Play", false, left_widget, NULL, false);
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	MTextButton *mainMusic = new MTextButton(162, yy, "Music", false, left_widget);
+	MTextButton *mainMusic = new MTextButton(162, yy, "Music", false, left_widget, NULL, false);
 	yy += yinc;
 #endif
 
-	MTextButton *mainLevelUp = new MTextButton(162, yy, "Cheat", false, left_widget);
-	MTextButton *mainQuit = new MTextButton(162, yy, "Quit", false, left_widget);
+	MTextButton *mainLevelUp = new MTextButton(162, yy, "Cheat", false, left_widget, NULL, false);
+	MTextButton *mainQuit = new MTextButton(162, yy, "Quit", false, left_widget, NULL, false);
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	if (game_center)
 		game_center->set_right_widget(mainItem);
@@ -1148,12 +1156,12 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 		tguiAddWidget(fairy);
 
 	tguiAddWidget(partyStats);
-	if (dndForm)
-		tguiAddWidget(dndForm);
 	tguiAddWidget(mainTimeLabel);
 	tguiAddWidget(mainTime);
 	tguiAddWidget(mainGoldLabel);
 	tguiAddWidget(mainGold);
+	if (dndForm)
+		tguiAddWidget(dndForm);
 	tguiSetFocus(mainItem);
 
 	prepareForScreenGrab1();
@@ -1713,6 +1721,10 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				}
 				
 				tguiPop();
+	
+				char goldS[15];
+				sprintf(goldS, "%d", gold);
+				mainGold->setString(goldS);
 				
 				tguiDeleteWidget(fairy);
 				tguiSetFocus(mainItem);
@@ -2277,9 +2289,6 @@ void into_the_sun(void)
 				MCOLOR c = m_get_pixel(bg_locked, cx, cy);
 				unsigned char r, g, b, a;
 				m_unmap_rgba(c, &r, &g, &b, &a);
-				ALLEGRO_STATE st;
-				al_store_state(&st, ALLEGRO_STATE_BLENDER);
-				m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, white);
 				ALLEGRO_VERTEX v[1];
 				v[0].x = cx;
 				v[0].y = cy;
@@ -2291,7 +2300,6 @@ void into_the_sun(void)
 					v[0].color = black;
 				}
 				m_draw_prim(v, NULL, NULL, 0, 1, ALLEGRO_PRIM_POINT_LIST);
-				al_restore_state(&st);
 			}
 
 			drawBufferToScreen(false);
@@ -2532,9 +2540,8 @@ void credits(void)
 			set_target_backbuffer();
 		}
 
-		m_set_blender(ALLEGRO_ONE, ALLEGRO_ZERO, white);
 		m_draw_bitmap(bg, 0, 0, 0);
-		m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, white);
+
 		if (count < 0) {
 			count += step;
 			if (count > 0)
@@ -3032,7 +3039,7 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 				getTimeString(infos[i].time).c_str()
 			);
 		}
-		buttons[i] = new MTextButtonFullShadow(10, 20+i*14, std::string(buf));
+		buttons[i] = new MTextButtonFullShadow(10, 20+i*14, std::string(buf), false);
 	}
 
 	MLabel *lcaption = new MLabel(0, 1, caption, m_map_rgb(220, 220, 220));
@@ -3097,8 +3104,10 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 		if (draw_counter > 0) {
 			draw_counter = 0;
 			set_target_backbuffer();
-		
+
+			al_hold_bitmap_drawing(true);
 			tguiDraw();
+			al_hold_bitmap_drawing(false);
 			
 			drawBufferToScreen();
 			m_flip_display();
@@ -4117,12 +4126,19 @@ static void hqm_draw(MBITMAP *bg)
 {
 	m_draw_bitmap(bg, 0, 0, 0);
 
+	al_hold_bitmap_drawing(true);
 	tguiDraw();
+	al_hold_bitmap_drawing(false);
+
+	al_hold_bitmap_drawing(true);
 
 	// top descriptions
 	const char *text = "Free HQ soundtrack download";
 	const char *trans = _t(text);
-	mTextout_simple(trans, (BW-m_text_length(game_font, trans))/2, 15, m_map_rgb(255, 255, 0));
+	mTextout(
+		game_font,
+		trans, BW/2, 20, m_map_rgb(255, 255, 0),
+		black, WGT_TEXT_NORMAL, true);
 
 	// draw status
 	float percent;
@@ -4140,10 +4156,12 @@ static void hqm_draw(MBITMAP *bg)
 		BW/2,
 		125,
 		black,
-		m_map_rgb(65, 65, 65),
-		WGT_TEXT_SQUARE_BORDER,
+		black,
+		WGT_TEXT_NORMAL,
 		true
 	);
+	
+	al_hold_bitmap_drawing(false);
 	
 	drawBufferToScreen();
 }
@@ -4154,11 +4172,11 @@ static void hqm_menu(void)
 	
 	MBITMAP *bg = m_load_bitmap(getResource("media/options_bg.png"));
 
-	MTextButtonFullShadow *buttons[4];
-	buttons[0] = new MTextButtonFullShadow(20, 50, "Start/resume download");
-	buttons[1] = new MTextButtonFullShadow(20, 65, "Stop/pause download");
-	buttons[2] = new MTextButtonFullShadow(20, 80, "Delete downloads");
-	buttons[3] = new MTextButtonFullShadow(20, 95, "Done");
+	MTextButton *buttons[4];
+	buttons[0] = new MTextButton(20, 50, "Start/resume download", false, NULL, NULL, false);
+	buttons[1] = new MTextButton(20, 65, "Stop/pause download", false, NULL, NULL, false);
+	buttons[2] = new MTextButton(20, 80, "Delete downloads", false, NULL, NULL, false);
+	buttons[3] = new MTextButton(20, 95, "Done", false, NULL, NULL, false);
 
 	tguiPush();
 
@@ -4316,7 +4334,7 @@ static void title_draw(MBITMAP *bg)
 
 	mTextout(game_font, versionString,
 		BW-m_text_length(game_font, versionString)-1,
-		2, white, black, WGT_TEXT_SQUARE_BORDER, false);
+		2, white, black, WGT_TEXT_BORDER, false);
 
 	drawBufferToScreen();
 }
@@ -4359,6 +4377,17 @@ int title_menu(void)
 	len += m_text_height(game_font) + 2;
 	MTextButton *hqm_button = new MTextButtonFullShadow(BW-len-2, oy+30, "HQ sound track");
 	MTextButton *config_button = new MTextButtonFullShadow(BW-len-2, oy+45, "Options");
+	
+	hqm_button->setColors(
+		m_map_rgb(32, 32, 32),
+		black,
+		grey
+	);
+	config_button->setColors(
+		m_map_rgb(32, 32, 32),
+		black,
+		grey
+	);
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 	MIcon *joypad = NULL;
@@ -4373,6 +4402,11 @@ int title_menu(void)
 
 	tguiSetParent(0);
 	for (int i = 0; i < curr_button; i++) {
+		buttons[i]->setColors(
+			m_map_rgb(32, 32, 32),
+			black,
+			grey
+		);
 		tguiAddWidget(buttons[i]);
 	}
 	tguiAddWidget(hqm_button);

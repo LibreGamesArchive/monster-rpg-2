@@ -31,7 +31,7 @@ void create_tmpbuffer()
 	int flags = al_get_new_bitmap_flags();
 #if defined OPENGLES
 	int format = al_get_new_bitmap_format();
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
+	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
 #endif
 	al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
 	int w = al_get_display_width(display);
@@ -283,6 +283,7 @@ int versionMinor = 0;
 bool switched_out = false;
 uint32_t my_opengl_version;
 
+MBITMAP *custom_cursor_bmp;
 ALLEGRO_MOUSE_CURSOR *custom_mouse_cursor;
 int custom_cursor_w, custom_cursor_h;
 
@@ -297,34 +298,21 @@ void load_fonts(void)
 {
 	int ttf_flags;
 
-	ttf_flags = ALLEGRO_TTF_MONOCHROME;
+	ttf_flags = 0;//ALLEGRO_TTF_MONOCHROME;
 
 	ALLEGRO_DEBUG("loading fonts");
 
-#ifdef ALLEGRO_ANDROIDXXX
-	ALLEGRO_PATH *res_dir = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
-	char boofer[1000];
-	sprintf(boofer, "%s/unpack/DejaVuSans.ttf", al_path_cstr(res_dir, '/'));
-	al_destroy_path(res_dir);
-	al_set_standard_file_interface();
-	game_font = al_load_ttf_font("/mnt/sdcard/removable_sdcard/DejaVuSans.ttf", 9, ttf_flags);
-	al_android_set_apk_file_interface();
+	game_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 9*screenScaleY, ttf_flags);
 	if (!game_font) {
 		native_error("Failed to load game_font.");
 	}
-#else
-	game_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 9, ttf_flags);
-	if (!game_font) {
-		native_error("Failed to load game_font.");
-	}
-#endif
 
-	medium_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 32, 0);
+	medium_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 32*screenScaleY, ttf_flags);
 	if (!medium_font) {
 		native_error("Failed to load medium_font.");
 	}
-	
-	huge_font = m_load_font(getResource("huge_font.png"));
+
+	huge_font = al_load_ttf_font(getResource("heavy.ttf"), 24, ttf_flags);
 	if (!huge_font) {
 		native_error("Failed to load huge_font.");
 	}
@@ -605,10 +593,8 @@ static void *loader_proc(void *arg)
 	joypad_mutex = al_create_mutex_recursive();
 
 	m_push_target_bitmap();
-	m_push_blender();
 	orb_bmp = m_create_alpha_bitmap(80, 80);
 	m_set_target_bitmap(orb_bmp);
-	m_set_blender(M_ONE, M_ZERO, white);
 	for (int yy = 0; yy < 80; yy++) {
 		for (int xx = 0; xx < 80; xx++) {
 			float ax = xx - 40; // actual x
@@ -629,7 +615,6 @@ static void *loader_proc(void *arg)
 			m_put_pixel(xx, yy, c);
 		}
 	}
-	m_pop_blender();
 	m_pop_target_bitmap();
 
 	// FIXME
@@ -726,7 +711,9 @@ void init_shaders(void)
 		"}\n";
 
 		const char *tinter_pixel_source =
-#if defined OPENGLES
+#if defined ALLEGRO_RASPBERRYPI
+		"precision lowp float;\n"
+#elif defined OPENGLES
 		"precision mediump float;\n"
 #endif
 		"uniform sampler2D " ALLEGRO_SHADER_VAR_TEX ";\n"
@@ -754,7 +741,9 @@ void init_shaders(void)
 		"}";
 		
 		const char *warp_pixel_source =
-#if defined OPENGLES
+#if defined ALLEGRO_RASPBERRYPI
+		"precision lowp float;\n"
+#elif defined OPENGLES
 		"precision mediump float;\n"
 #endif
 		"uniform sampler2D " ALLEGRO_SHADER_VAR_TEX ";\n"
@@ -777,7 +766,9 @@ void init_shaders(void)
 		"}\n";
 		
 		const char *shadow_pixel_source =
-#if defined OPENGLES
+#if defined ALLEGRO_RASPBERRYPI
+		"precision lowp float;\n"
+#elif defined OPENGLES
 		"precision mediump float;\n"
 #endif
 		"uniform sampler2D " ALLEGRO_SHADER_VAR_TEX ";\n"
@@ -806,7 +797,9 @@ void init_shaders(void)
 		"}\n";
 		
 		const char *brighten_pixel_source =
-#if defined OPENGLES
+#if defined ALLEGRO_RASPBERRYPI
+		"precision lowp float;\n"
+#elif defined OPENGLES
 		"precision mediump float;\n"
 #endif
 		"uniform sampler2D " ALLEGRO_SHADER_VAR_TEX ";\n"
@@ -1257,27 +1250,14 @@ bool init(int *argc, char **argv[])
 	dpad_mutex = al_create_mutex();
 	touch_mutex = al_create_mutex();
 
-	// Android because it's very slow switching back in on some devices
-	// FIXME FIXME FIXME FIXME FIXME
-	// FIXME FIXME FIXME FIXME FIXME
-	// FIXME FIXME FIXME FIXME FIXME
-	// FIXME FIXME FIXME FIXME FIXME
-	// FIXME FIXME FIXME FIXME FIXME
-	// FIXME FIXME FIXME FIXME FIXME
-	// FIXME FIXME FIXME FIXME FIXME
-	/*
-#if defined A5_D3D || defined ALLEGRO_RASPBERRYPI || defined ALLEGRO_ANDROID
-#ifdef ALLEGRO_RASPBERRYPI
-	if (check_arg(*argc, *argv, "-programmable-pipeline") <= 0)
-#endif
-*/
+#if defined A5_D3D || defined ALLEGRO_ANDROID
 	use_fixed_pipeline = true;
-//#endif
+#endif
 	
 	if (!use_fixed_pipeline) {
 		al_set_new_display_flags(
 			al_get_new_display_flags() |
-			ALLEGRO_USE_PROGRAMMABLE_PIPELINE
+			ALLEGRO_PROGRAMMABLE_PIPELINE
 		);
 	}
 
@@ -1378,7 +1358,7 @@ bool init(int *argc, char **argv[])
 		use_programmable_pipeline = false;
 	}
 	else {
-		use_programmable_pipeline = al_get_display_flags(display) & ALLEGRO_USE_PROGRAMMABLE_PIPELINE;
+		use_programmable_pipeline = al_get_display_flags(display) & ALLEGRO_PROGRAMMABLE_PIPELINE;
 	}
 
 	ALLEGRO_DEBUG("initing shaders");
@@ -1421,22 +1401,16 @@ bool init(int *argc, char **argv[])
 	authenticatePlayer();
 #endif
 	
-	MBITMAP *tmpcurs = m_load_bitmap(getResource("media/mouse_cursor.png"));
-	custom_cursor_w = m_get_bitmap_width(tmpcurs);
-	custom_cursor_h = m_get_bitmap_height(tmpcurs);
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+	custom_cursor_bmp = m_load_bitmap(getResource("media/mouse_cursor.png"));
+	custom_cursor_w = m_get_bitmap_width(custom_cursor_bmp);
+	custom_cursor_h = m_get_bitmap_height(custom_cursor_bmp);
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
 	if (have_mouse) {
-		custom_mouse_cursor = al_create_mouse_cursor(tmpcurs->bitmap, 0, 0);
+		custom_mouse_cursor = al_create_mouse_cursor(custom_cursor_bmp->bitmap, 0, 0);
 		al_set_mouse_cursor(display, custom_mouse_cursor);
 	}
 #endif
-#ifdef ALLEGRO_RASPBERRYPI
-	else {
-		al_hide_mouse_cursor(display);
-	}
-#endif
 	show_mouse_cursor();
-	m_destroy_bitmap(tmpcurs);
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (sd->fullscreen) {
@@ -1680,11 +1654,13 @@ bool init(int *argc, char **argv[])
 }
 
 
-void destroy(void)
+void destroy()
 {
 	debug_message("Destroying resources...\n");
 
 	tguiShutdown();
+
+	m_destroy_bitmap(custom_cursor_bmp);
 
 	exit_event_thread = 1;
 	while (exit_event_thread != 2) {
@@ -2009,7 +1985,9 @@ void toggle_fullscreen()
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (have_mouse) {
+#if !defined ALLEGRO_RASPBERRYPI
 		al_set_mouse_cursor(display, custom_mouse_cursor);
+#endif
 		if (in_shooter || in_archery) {
 			m_set_mouse_xy(display, al_get_display_width(display)/2, al_get_display_height(display)/2);
 		}
@@ -2068,7 +2046,7 @@ static bool cursor_hidden = false;
 
 void show_mouse_cursor()
 {
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
 	if (have_mouse) {
 		al_show_mouse_cursor(display);
 	}
@@ -2078,7 +2056,7 @@ void show_mouse_cursor()
 
 void hide_mouse_cursor()
 {
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
 	if (have_mouse) {
 		al_hide_mouse_cursor(display);
 	}

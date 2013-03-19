@@ -262,94 +262,12 @@ extern Player *player;
 
 class MDragNDropForm : public TGUIWidget {
 public:
-	void mouseDown(int x, int y, int b) {
-		if (who >= 0) return;
-
-		int slot = y / (BH/4);
-		if (party[slot]) {
-			who = slot;
-			icon = m_load_bitmap(getResource("media/%s_profile.png", party[who]->getName().c_str()));
-		}
-		else {
-			who = -1;
-		}
-	}
-
-	void mouseUpAbs(int x, int y, int b)
-	{
-		bool clicked_on = x >= this->x && y >= this->y &&
-			x < (this->x+this->width) && y < (this->y+this->height);
-
-		if (clicked_on) {
-			x -= this->x;
-			y -= this->y;
-		}
-		else {
-			x = y = -1;
-		}
-
-		if (x >= 0 && y >= 0 && who >= 0) {
-			int dest_slot = y / (BH/4);
-
-			if (who == dest_slot) {
-				CombatFormation f = party[who]->getFormation();
-				if (f == FORMATION_FRONT) {
-					f = FORMATION_BACK;
-				}
-				else {
-					f = FORMATION_FRONT;
-				}
-				party[who]->setFormation(f);
-			}
-			else {
-				if (who == heroSpot)
-					heroSpot = dest_slot;
-				else if (dest_slot == heroSpot)
-					heroSpot = who;
-				Player *p = party[who];
-				party[who] = party[dest_slot];
-				party[dest_slot] = p;
-				player = party[heroSpot];
-			}
-
-			who = -1;
-			m_destroy_bitmap(icon);
-		}
-		else {
-			if (who >= 0) {
-				m_destroy_bitmap(icon);
-				who = -1;
-			}
-		}
-	}
-
-	void draw(void) {
-		if (who >= 0) {
-			// FIXME: / 2 here for current_mouse_x should use a SCALE_X/SCALE_Y constant 
-			ALLEGRO_MOUSE_STATE state;
-			m_get_mouse_state(&state);
-			int w = m_get_bitmap_width(icon);
-			int h = m_get_bitmap_height(icon);
-			al_draw_tinted_scaled_bitmap(icon->bitmap, al_map_rgba_f(0.75f, 0.75f, 0.75f, 0.75f), 0, 0, w, h,
-				state.x-w, state.y-h, w*2, h*2, 0);
-		}
-	}
-
-	bool acceptsFocus() { return false; }
-	
-	int update(int step)
-	{
-		return TGUI_CONTINUE;
-	}
-	
-	MDragNDropForm(void) {
-		this->hotkeys = 0;
-		this->x = 0;
-		this->y = 0;
-		this->width = BW/4;
-		this->height = BH;
-		who = -1;
-	}
+	void mouseDown(int x, int y, int b);
+	void mouseUpAbs(int x, int y, int b);
+	void post_draw(void);
+	bool acceptsFocus();
+	int update(int step);
+	MDragNDropForm(void);
 private:
 	int who;
 	MBITMAP *icon;
@@ -371,110 +289,13 @@ struct MTableData {
 
 class MTable : public TGUIWidget {
 public:
-	void setData(std::vector<std::vector<MTableData> > newData) {
-		data = newData;
-	}
-
-	void draw(void)
-	{
-		int curr = x;
-		for (int xx = 0; xx < columns-1; xx++) {
-			curr += widths[xx];
-			m_draw_line(curr, y, curr, y+total_height, line_color);
-		}
-		curr = y;
-		for (int yy = 0; yy < rows-1; yy++) {
-			curr += heights[yy];
-			m_draw_line(x, curr, x+total_width, curr, line_color);
-		}
-
-		for (int r = 0; r < rows; r++) {
-			for (int c = 0; c < columns; c++) {
-				std::string& text = data[c][r].text;
-				MTableJustify j = data[c][r].justify;
-				MCOLOR color = data[c][r].color;
-
-				int dx = 0;
-				for (int i = 0; i < c; i++) {
-					dx += widths[i];
-				};
-				int dy = 0;
-				for (int i = 0; i < r; i++) {
-					dy += heights[i];
-				}
-				dy += heights[r]/2-m_text_height(game_font)/2;
-
-				dx += x;
-				dy += y;
-
-				switch (j) {
-				case JUSTIFY_LEFT:
-					mTextout_simple(text.c_str(),
-						dx+3, dy, color);
-					break;
-				case JUSTIFY_CENTER:
-					mTextout_simple(text.c_str(),
-						dx+widths[c]/2-m_text_length(game_font, text.c_str())/2, dy, color);
-					break;
-				case JUSTIFY_RIGHT:
-					mTextout_simple(text.c_str(),
-						dx+widths[c]-m_text_length(game_font, text.c_str())-3, dy, color);
-					break;
-				}
-			}
-		}
-	}
-
-	int update(int millis)
-	{
-		return TGUI_CONTINUE;
-	}
-
-	bool acceptsFocus(void)
-	{
-		return false;
-	}
-
+	void setData(std::vector<std::vector<MTableData> > newData);
+	void draw(void);
+	int update(int millis);
+	bool acceptsFocus(void);
 	MTable(int x, int y,
 		std::vector< std::vector< MTableData > > data,
-		MCOLOR line_color) : data(data)
-	{
-		this->x = x;
-		this->y = y;
-		this->hotkeys = 0;
-
-		this->line_color = line_color;
-
-		columns = (int)data.size();
-		rows = (int)data[0].size();
-
-		total_width = 0;
-		total_height = 0;
-
-		for (int xx = 0; xx < columns; xx++) {
-			int max = 0;
-			for (int yy = 0; yy < rows; yy++) {
-				if (data[xx][yy].width > max)
-					max = data[xx][yy].width;
-			}
-			widths.push_back(max);
-			total_width += max;
-		}
-
-		for (int yy = 0; yy < rows; yy++) {
-			int max = 0;
-			for (int xx = 0; xx < columns; xx++) {
-				if (data[xx][yy].height > max)
-					max = data[xx][yy].height;
-			}
-			heights.push_back(max);
-			total_height += max;
-		}
-
-		this->width = total_width;
-		this->height = total_height;
-	}
-
+		MCOLOR line_color);
 	virtual ~MTable(void) {}
 protected:
 	std::vector<std::vector<MTableData> > data;
@@ -486,8 +307,6 @@ protected:
 	int total_width;
 	int total_height;
 };
-
-
 
 class MToggleList : public TGUIWidget {
 public:
@@ -764,6 +583,7 @@ private:
 
 class MLabel : public TGUIWidget {
 public:
+	void setString(std::string s);
 	void draw(void);
 	int update(int millis);
 	MLabel(int x, int y, std::string text, MCOLOR color);
@@ -776,7 +596,9 @@ protected:
 
 class MTextButton : public TGUIWidget {
 public:
+	void setColors(MCOLOR unsel, MCOLOR sel, MCOLOR shadow);
 	void draw(void);
+	void post_draw(void);
 	int update(int millis);
 	bool acceptsFocus(void);
 	void mouseUp(int x, int y, int b);
@@ -785,7 +607,7 @@ public:
 		left_widget = w;
 	}
 
-	MTextButton(int x, int y, std::string text, bool disabled = false, TGUIWidget *left_widget = NULL, TGUIWidget *right_widget = NULL);
+	MTextButton(int x, int y, std::string text, bool disabled = false, TGUIWidget *left_widget = NULL, TGUIWidget *right_widget = NULL, bool hold_drawing = true);
 	virtual ~MTextButton(void);
 protected:
 	char text[100];
@@ -793,6 +615,8 @@ protected:
 	int shadow_type;
 	bool disabled;
 	TGUIWidget *left_widget, *right_widget;
+	bool hold_drawing;
+	MCOLOR unsel, sel, shadow;
 };
 
 
@@ -827,7 +651,7 @@ protected:
 
 class MTextButtonFullShadow : public MTextButton {
 public:
-	MTextButtonFullShadow(int x, int y, std::string text);
+	MTextButtonFullShadow(int x, int y, std::string text, bool hold_drawing = true);
 	virtual ~MTextButtonFullShadow(void);
 };
 

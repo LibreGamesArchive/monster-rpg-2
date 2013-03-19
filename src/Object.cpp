@@ -264,8 +264,6 @@ void Object::drawUpper()
 		dy -= area->getOriginY();
 		dx += (int)ox;
 		dy += (int)oy;
-		m_push_blender();
-		m_set_blender(M_ONE, M_ZERO, white);
 		m_push_target_bitmap();
 		m_set_target_bitmap(poison_bmp_tmp);
 		m_clear(m_map_rgba(0, 0, 0, 0));
@@ -314,9 +312,7 @@ void Object::drawUpper()
 		col.g = tmp.g * tmp.a;
 		col.b = tmp.b * tmp.a;
 		col.a = tmp.a;
-		m_set_blender(M_ONE, M_INVERSE_ALPHA, col);
 		m_draw_bitmap(poison_bmp_tmp2, dx-5, dy-5, 0);
-		m_pop_blender();
 	}
 }
 

@@ -319,7 +319,7 @@ extern bool global_can_save;
 void do_close(bool quit = true);
 void do_close_exit_game();
 
-//extern std::vector<std::pair<int, bool> > forced_milestones;
+extern std::vector<std::pair<int, bool> > forced_milestones;
 extern bool gonna_fade_in_red;
 
 void update_orientation();
@@ -344,5 +344,10 @@ extern bool prompt_for_close_on_next_flip;
 extern bool halted;
 extern bool switched_in;
 #endif
+
+extern bool cmdline_warped;
+extern int cmdline_warp_x;
+extern int cmdline_warp_y;
+extern std::string cmdline_warp_area;
 
 #endif

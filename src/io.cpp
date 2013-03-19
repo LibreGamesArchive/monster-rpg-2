@@ -104,12 +104,28 @@ static bool readMilestones(bool* ms, int num, gzFile f)
 	for (int i = 0; i < num/8; i++) {
 		int c = gzgetc(f);
 		if (c == EOF) {
+			forced_milestones.clear();
 			return false;
 		}
 		for (int j = 0; j < 8; j++) {
 			if (i*8+j >= num)
 				break;
-			ms[i*8+j] = c & 0x80;
+			bool found = false;
+			bool val;
+			for (size_t k = 0; k < forced_milestones.size(); k++) {
+				std::pair<int, bool> &p = forced_milestones[k];
+				if (p.first == (i*8+j)) {
+					found = true;
+					val = p.second;
+					break;
+				}
+			}
+			if (found) {
+				ms[i*8+j] = val;
+			}
+			else {
+				ms[i*8+j] = c & 0x80;
+			}
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 			// Make sure achievements get set (Game Center) in
 			// case something went wrong before.
@@ -120,6 +136,8 @@ static bool readMilestones(bool* ms, int num, gzFile f)
 			c <<= 1;
 		}
 	}
+
+	forced_milestones.clear();
 	return true;
 }
 
@@ -366,15 +384,6 @@ bool loadGame(const char* filename)
 
 	readMilestones(gameInfo.milestones, MAX_MILESTONES, f);
 
-/*
-	for (int i = 0; i < (int)forced_milestones.size(); i++) {
-		std::pair<int, bool> &p = forced_milestones[i];
-		gameInfo.milestones[p.first] = p.second;
-	}
-*/
-
-	//gameInfo.milestones[MS_GOLEM_TIMER_STARTED] = false;
-
 	heroSpot = igetl(f);
 
 	debug_message("heroSpot = %d\n", heroSpot);
@@ -390,8 +399,13 @@ bool loadGame(const char* filename)
 		for (int i = 0; i < MAX_PARTY; i++) {
 			readStats(i, f);
 		}
-	
-		party[heroSpot]->getObject()->setPosition(x, y);
+
+		if (cmdline_warped) {
+			party[heroSpot]->getObject()->setPosition(cmdline_warp_x, cmdline_warp_y);
+		}
+		else {
+			party[heroSpot]->getObject()->setPosition(x, y);
+		}
 		party[heroSpot]->getObject()->getInput()->setDirection(DIRECTION_SOUTH);
 
 		readInventory(f);
@@ -412,7 +426,13 @@ bool loadGame(const char* filename)
 	bool ret;
 	
 	if (mapArea == "") {
-		startArea(std::string(areaName));
+		if (cmdline_warped) {
+			startArea(std::string(cmdline_warp_area));
+			cmdline_warped = false;
+		}
+		else {
+			startArea(std::string(areaName));
+		}
 		ret = false;
 	}
 	else {
