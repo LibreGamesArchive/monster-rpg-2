@@ -128,30 +128,54 @@ void m_draw_alpha_bitmap(MBITMAP *b, int x, int y, int flags)
 	m_draw_bitmap(b, x, y, flags);
 }
 
+static bool text_draw_on = false;
+static ALLEGRO_TRANSFORM old_view;
+
+void start_text()
+{
+	if (text_draw_on) {
+		return;
+	}
+	text_draw_on = true;
+	int dx, dy, dw, dh;
+	get_screen_offset_size(&dx, &dy, &dw, &dh);
+	al_copy_transform(&old_view, al_get_current_transform());
+	ALLEGRO_TRANSFORM v;
+	al_identity_transform(&v);
+	al_scale_transform(&v, 2.0f, 2.0f);
+	if (al_get_target_bitmap() == al_get_backbuffer(display) || al_get_target_bitmap() == tmpbuffer->bitmap) {
+		al_translate_transform(&v, dx, dy);
+	}
+	al_use_transform(&v);
+}
+
+void end_text()
+{
+	if (text_draw_on) {
+		al_use_transform(&old_view);
+		text_draw_on = false;
+	}
+}
+
+bool drawing_text()
+{
+	return text_draw_on;
+}
+
 void m_textout(const MFONT *font, const char *text, int x, int y, MCOLOR color)
 {
-	ALLEGRO_TRANSFORM old_v, v;
-	int dx, dy, dw, dh;
+	bool end = !text_draw_on;
 
-	if (font != huge_font) {
-		al_copy_transform(&old_v, al_get_current_transform());
-		get_screen_offset_size(&dx, &dy, &dw, &dh);
-
-		x *= screenScaleX;
-		y *= screenScaleY;
-
-		al_identity_transform(&v);
-		
-		if (al_get_target_bitmap() == al_get_backbuffer(display) || al_get_target_bitmap() == tmpbuffer->bitmap) {
-			al_translate_transform(&v, dx, dy);
-		}
-		al_use_transform(&v);
+	if (font == game_font) {
+		start_text();
+		x *= (screenScaleX/2);
+		y *= (screenScaleY/2);
 	}
 
-	al_draw_text(font, color, x, y-2*screenScaleY, 0, text);
+	al_draw_text(font, color, x, y, 0, text);
 
-	if (font != huge_font) {
-		al_use_transform(&old_v);
+	if (font == game_font && end) {
+		end_text();
 	}
 }
 
@@ -164,7 +188,10 @@ void m_textout_centre(const MFONT *font, const char *text, int x, int y, MCOLOR 
 
 int m_text_height(const MFONT *font)
 {
-	return al_get_font_line_height(font)/screenScaleY;
+	if (font != game_font) {
+		return al_get_font_line_height(font);
+	}
+	return al_get_font_line_height(font)/MIN(screenScaleX, screenScaleY)*2;
 }
 
 static INLINE float get_factor(int operation, float alpha)
@@ -639,7 +666,10 @@ void m_clear(MCOLOR color)
 
 static int m_text_length_real(const MFONT *font, const char *text)
 {
-	return al_get_text_width(font, text)/screenScaleX;
+	if (font != game_font) {
+		return al_get_text_width(font, text);
+	}
+	return al_get_text_width(font, text)/MIN(screenScaleX, screenScaleY)*2;
 }
 
 void m_set_target_bitmap(MBITMAP *bmp)
@@ -1218,6 +1248,23 @@ void m_draw_bitmap_identity_view(MBITMAP *bmp, int x, int y, int flags)
 	al_use_transform(&backup);
 }
 
+void m_draw_scaled_bitmap_identity_view(
+	MBITMAP *bmp, int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int flags
+)
+{
+	ALLEGRO_TRANSFORM backup, t;
+	al_copy_transform(&backup, al_get_current_transform());
+	al_identity_transform(&t);
+	al_use_transform(&t);
+	al_draw_scaled_bitmap(
+		bmp->bitmap,
+		sx, sy, sw, sh,
+		dx, dy, dw, dh,
+		0
+	);
+	al_use_transform(&backup);
+}
+
 void m_draw_scaled_target(MBITMAP *src, int sx, int sy, int sw, int sh,
 	int dx, int dy, int dw, int dh, MBITMAP *dst)
 {
@@ -1271,3 +1318,10 @@ void use_shader(ALLEGRO_SHADER *shader)
 	al_use_shader(shader);
 }
 
+int cursor_offset(bool centered)
+{
+	if (centered) {
+		return -m_get_bitmap_height(cursor)/2;
+	}
+	return m_text_height(game_font)/2-m_get_bitmap_height(cursor)/2;
+}

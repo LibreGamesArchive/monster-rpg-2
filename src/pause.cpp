@@ -507,7 +507,7 @@ void showSaveStateInfo(const char *basename)
 			if (tick < 800) {
 				int size = m_get_bitmap_width(cursor);
 				int rx = BW/2-m_text_length(game_font, _t("OK"))/2-size;
-				int ry = 140-size;
+				int ry = 140+cursor_offset(true);
 				m_draw_bitmap(cursor, rx, ry, 0);
 			}
 			drawBufferToScreen();
@@ -727,6 +727,7 @@ void showItemInfo(int index, bool preserve_buffer)
 			const char *desc = lua_tostring(luaState, -1);
 	
 			al_hold_bitmap_drawing(true);
+			start_text();
 			
 			mTextout(game_font, _t(desc), BW/2, y+5+m_text_height(game_font)/2+m_text_height(game_font),
 				grey, black,
@@ -776,6 +777,7 @@ void showItemInfo(int index, bool preserve_buffer)
 			}
 
 			al_hold_bitmap_drawing(false);
+			end_text();
 
 			for (int i = 0; i < MAX_PARTY; i++) {
 				if (can_use[i] && partyBmps[i]) {
@@ -805,17 +807,15 @@ void showItemInfo(int index, bool preserve_buffer)
 				}
 			}
 
-			al_hold_bitmap_drawing(true);
 			mTextout(game_font, _t("OK"), BW/2, 130,
 				grey, black,
 				WGT_TEXT_DROP_SHADOW, true);
-			al_hold_bitmap_drawing(false);
 			// Draw "cursor"
 			int tick = (unsigned)tguiCurrentTimeMillis() % 1000;
 			if (tick < 800) {
 				int size = m_get_bitmap_width(cursor);
 				int rx = BW/2-m_text_length(game_font, _t("OK"))/2-size;
-				int ry = 130-size;
+				int ry = 130+cursor_offset(true);
 				m_draw_bitmap(cursor, rx, ry, 0);
 			}
 			drawBufferToScreen();
@@ -1071,12 +1071,12 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 
 
 	MParty *partyStats = new MParty();
-	MLabel *mainTimeLabel = new MLabel(162, 109, "Time", grey);
-	MLabel *mainTime = new MLabel(162, 118, getTimeString(runtime), grey);
-	MLabel *mainGoldLabel = new MLabel(162, 135, "Gold", grey);
+	MLabel *mainTimeLabel = new MLabel(164, 107, "Time", grey);
+	MLabel *mainTime = new MLabel(164, 116, getTimeString(runtime), grey);
+	MLabel *mainGoldLabel = new MLabel(164, 133, "Gold", grey);
 	char goldS[15];
 	sprintf(goldS, "%d", gold);
-	MLabel *mainGold = new MLabel(162, 144, std::string(goldS), grey);
+	MLabel *mainGold = new MLabel(164, 142, std::string(goldS), grey);
 
 
 	//MRectangle *fullscreenRect2 = new MRectangle(0, 0, BW, BH,
@@ -1085,10 +1085,12 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	MPartySelector *partySelectorTop = new MPartySelector(3, 0, true);
 	MItemSelector *itemSelector = new MItemSelector(73, BH-2, 0, 0, true);
 	std::vector<MultiPoint> equipPoints;
+	int oy = 5 + m_text_height(game_font)/2;
 	for (int i = 0; i < 5; i++) {
 		MultiPoint p;
 		p.x = BW/2+10;
-		p.y = 2 + (m_text_height(game_font)/2) + (m_text_height(game_font)*i) + (i*4);
+		p.y = oy;
+		oy += m_text_height(game_font) + 3;
 		p.west = false;
 		equipPoints.push_back(p);
 	}
@@ -3125,6 +3127,8 @@ done:
 	tguiPop();
 
 	dpad_on();
+
+	clear_input_events();
 }
 
 static SaveStateInfo save_info[10];
@@ -4050,6 +4054,14 @@ bool config_menu(bool start_on_fullscreen)
 		if (aspect_real_to_option(config.getMaintainAspectRatio()) != sel) {
 			config.setMaintainAspectRatio(aspect_option_to_real(sel));
 			set_screen_params();
+			destroy_fonts();
+			load_fonts();
+			if (reset_game_center) {
+				reset_game_center->setX(BW-2-(m_text_length(game_font, _t(reset_str))+m_get_bitmap_width(cursor)+1));
+			}
+			if (controls) {
+				controls->setX(BW-2-(m_text_length(game_font, _t(reset_str))+m_get_bitmap_width(cursor)+1));
+			}
 		}
 
 #if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE && !defined ALLEGRO_RASPBERRYPI
@@ -4131,6 +4143,7 @@ static void hqm_draw(MBITMAP *bg)
 	al_hold_bitmap_drawing(false);
 
 	al_hold_bitmap_drawing(true);
+	start_text();
 
 	// top descriptions
 	const char *text = "Free HQ soundtrack download";
@@ -4162,6 +4175,7 @@ static void hqm_draw(MBITMAP *bg)
 	);
 	
 	al_hold_bitmap_drawing(false);
+	end_text();
 	
 	drawBufferToScreen();
 }
@@ -4431,6 +4445,8 @@ int title_menu(void)
 
 	clear_input_events();
 
+	bool fullscreen = al_get_display_flags(display) & ALLEGRO_FULLSCREEN_WINDOW;
+
 	for (;;) {
 		al_wait_cond(wait_cond, wait_mutex);
 		// Logic
@@ -4445,6 +4461,19 @@ int title_menu(void)
 			if (is_close_pressed()) {
 				do_close();
 				close_pressed = false;
+			}
+
+			bool fsnow = al_get_display_flags(display) & ALLEGRO_FULLSCREEN_WINDOW;
+			if (fsnow != fullscreen) {
+				fullscreen = fsnow;
+				destroy_fonts();
+				load_fonts();
+				int len1 = m_text_length(game_font, _t("HQ sound track"));
+				int len2 = m_text_length(game_font, _t("Options"));
+				int len = len1 > len2 ? len1 : len2;
+				len += m_text_height(game_font) + 2;
+				hqm_button->setX(BW-len-2);
+				config_button->setX(BW-len-2);
 			}
 
 			TGUIWidget *widget = tguiUpdate();
@@ -4468,6 +4497,8 @@ int title_menu(void)
 				hqm_menu();
 				on_title_screen = true;
 				tguiPop();
+				destroy_fonts();
+				load_fonts();
 				int len1 = m_text_length(game_font, _t("HQ sound track"));
 				int len2 = m_text_length(game_font, _t("Options"));
 				int len = len1 > len2 ? len1 : len2;
@@ -4489,6 +4520,8 @@ int title_menu(void)
 				bool result = config_menu();
 				on_title_screen = true;
 				tguiPop();
+				destroy_fonts();
+				load_fonts();
 				int len1 = m_text_length(game_font, _t("HQ sound track"));
 				int len2 = m_text_length(game_font, _t("Options"));
 				int len = len1 > len2 ? len1 : len2;

@@ -362,8 +362,7 @@ AnimationSet *AnimationSet::clone(int type)
 	}
 
 	qsort(o, anims.size(), sizeof(Order), sort);
-	
-	int y = 1;
+
 	for (size_t i = 0; i < anims.size(); i++) {
 		Image *img = anims[i]->getFrame(0)->getImage();
 		int oidx = 0;
@@ -374,7 +373,21 @@ AnimationSet *AnimationSet::clone(int type)
 			}
 		}
 		int y = img->getY() + oidx*2 + 1;
-		a->anims.push_back(anims[i]->clone(type, clone_from, clone_to, y));
+		int x = img->getX();
+		for (size_t j = 0; j < i; j++) {
+			Animation *anim = a->anims[j];
+			int nf = anim->getNumFrames();
+			int f = nf-1;
+			Image *img2 = anim->getFrame(f)->getImage();
+			if (y >= img2->getY()+img2->getHeight() || y+img->getHeight() <= img2->getY()) {
+				continue;
+			}
+			if (img2->getX()+img2->getWidth() > x) {
+				x = img2->getX()+img2->getWidth();
+			}
+		}
+		x++;
+		a->anims.push_back(anims[i]->clone(type, clone_from, clone_to, x, y));
 	}
 	
 	delete[] o;

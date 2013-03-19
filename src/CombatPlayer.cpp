@@ -755,7 +755,7 @@ public:
 		sel.clear();
 
 		applyFrame = new MFrame(BW/3-20, 110+(50/2)-6-5, 112, 22, true);
-		applyButton = new MTextButton(BW/3-20+6, 110+(50/2)-6+2, "Apply");
+		applyButton = new MTextButton(BW/3-20+6, 110+(50/2)-6, "Apply");
 
 		clear_input_events();
 
@@ -1263,15 +1263,15 @@ ActionHandler *ConfirmHandler::act(int step, Battle *b)
 void ConfirmHandler::init() {
 	frame = new MFrame(BW/3-20, 110+(50/2)-6-5, 125, 22, true);
 	if (reason == CONFIRM_DEFEND) {
-		button = new MTextButton(62, 110+(50/2)-6+2,
+		button = new MTextButton(62, 110+(50/2)-6,
 										 "Defend?");
 	}
 	else if (reason == CONFIRM_RUN) {
-		button = new MTextButton(62, 110+(50/2)-6+2,
+		button = new MTextButton(62, 110+(50/2)-6,
 										 "Run?");
 	}
 	else if (reason == CONFIRM_FORM) {
-		button = new MTextButton(62, 110+(50/2)-6+2,
+		button = new MTextButton(62, 110+(50/2)-6,
 										 "Change stance?");
 	}
 	tguiSetParent(0);
@@ -1464,7 +1464,7 @@ void CombatPlayer::draw()
 		}
 		y = 6;
 		mDrawFrame(x, y, w+5, h+3, true);
-		mTextout_simple(text, x+2, y+3, grey);
+		mTextout_simple(text, x+2, y+1, grey);
 	}
 	else if (spellIndex_display >= 0) {
 		char text[100];
@@ -1480,7 +1480,7 @@ void CombatPlayer::draw()
 		}
 		y = 5;
 		mDrawFrame(x, y, w+5, h+3, true);
-		mTextout_simple(text, x+2, y+3, grey);
+		mTextout_simple(text, x+2, y+1, grey);
 	}
 
 

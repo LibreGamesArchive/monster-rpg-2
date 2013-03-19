@@ -895,6 +895,7 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 	if (!focusing) {
 		set_target_backbuffer();
 		m_clear(black);
+		drawBufferToScreen(false);
 		m_flip_display();
 	}
 
@@ -940,7 +941,7 @@ void battleTransition()
 	MBITMAP *tmp = m_create_bitmap(dw, dh);
 	al_set_new_bitmap_flags(flags);
 	m_draw_scaled_target(tmpbuffer, dx, dy, dw, dh, 0, 0, dw, dh, tmp);
-
+		
 	if (!use_programmable_pipeline) {
 		set_target_backbuffer();
 		m_draw_bitmap_identity_view(tmpbuffer, 0, 0, 0);
@@ -961,9 +962,6 @@ void battleTransition()
 		prepareForScreenGrab1();
 		battle->draw();
 		prepareForScreenGrab2();
-
-		// FIXME:
-		al_save_bitmap("ss.png", tmpbuffer->bitmap);
 
 		m_draw_scaled_target(tmpbuffer, dx, dy, dw, dh, 0, 0, dw, dh, bufcopy2);
 
@@ -1061,6 +1059,10 @@ void battleTransition()
 	al_scale_transform(&t, screenScaleX, screenScaleY);
 	al_use_transform(&t);
 	battle->draw();
+	
+	// FIXME:
+	//al_save_bitmap("ss.png", battle_buf->bitmap);
+
 
 	dpad_off();
 

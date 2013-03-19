@@ -1024,7 +1024,7 @@ Configuration::Configuration() :
 	xbox360(false)
 	,cfg_tuning(CFG_TUNING_BALANCED)
 	,cfg_difficulty(CFG_DIFFICULTY_NORMAL)
-	,cfg_maintain_aspect_ratio(0)
+	,cfg_maintain_aspect_ratio(ASPECT_MAINTAIN_RATIO)
 	,language(0)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	,cfg_dpad_type(0)

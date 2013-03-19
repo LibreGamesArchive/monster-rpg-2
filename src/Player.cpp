@@ -822,7 +822,7 @@ bool levelUp(Player *player, int bonus)
 	
 	std::vector<MultiPoint> mcPoints;
 
-	int yy = 40;
+	int yy = 41;
 
 	for (int i = 0; i < 9; i++) {
 		if (ability_labels[i] == "<unused>") {

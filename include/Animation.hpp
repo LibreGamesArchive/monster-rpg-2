@@ -98,7 +98,7 @@ public:
 	
 	int getAlpha(void);
 
-	Animation *clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, int y);
+	Animation *clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, int x, int y);
 
 	Animation(void);
 	Animation(const char *name, int alpha);

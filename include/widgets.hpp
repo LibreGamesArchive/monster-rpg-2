@@ -705,33 +705,6 @@ protected:
 	bool checked;
 };
 
-
-class MShop : public TGUIWidget {
-public:
-	void draw(void);
-	int update(int millis);
-	bool acceptsFocus(void);
-	int getRow(void);
-	void setRow(int row);
-	int getCol(void);
-	void setCol(int col);
-	void mouseUp(int x, int y, int b);
-	
-	MShop(int x, int y, int nItems, int *things, int *costs);
-	virtual ~MShop(void);
-protected:
-	int nItems;
-	int *things;
-	int *costs;
-	int top;
-	int row, col;
-	MBITMAP *up;
-	AnimationSet *partyAnims[MAX_PARTY];
-	bool up_clicked, down_clicked;
-	bool clicked;
-};
-
-
 class MDoubleToggle : public TGUIWidget {
 public:
 	void draw(void);

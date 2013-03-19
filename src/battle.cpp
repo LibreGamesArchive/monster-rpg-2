@@ -332,6 +332,7 @@ void Battle::drawStatus(void)
 
 	bool held = al_is_bitmap_drawing_held();
 	al_hold_bitmap_drawing(true);
+	start_text();
 	
 	if (draw_enemy_status) {
 		// print enemies 
@@ -392,6 +393,7 @@ void Battle::drawStatus(void)
 
 	al_hold_bitmap_drawing(false);
 	al_hold_bitmap_drawing(held);
+	end_text();
 }
 
 
@@ -505,7 +507,7 @@ void Battle::draw(void)
 			}
 		}
 		mDrawFrame(x, y, w, h, true);
-		mTextout(game_font, _t((*messages.begin()).text.c_str()), x+5, y+4,
+		mTextout(game_font, _t((*messages.begin()).text.c_str()), x+5, y+2,
 			white, black,
 			WGT_TEXT_DROP_SHADOW, false);
 	}

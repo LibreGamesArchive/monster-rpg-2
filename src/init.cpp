@@ -271,7 +271,6 @@ bool red_off_press_on = false;
 volatile bool loading_done = false;
 MBITMAP *stomach_circle;
 
-bool scr_tiny = false;
 bool scr_smaller = false;
 bool scr_small = false;
 bool scr_medium = false;
@@ -298,24 +297,28 @@ void load_fonts(void)
 {
 	int ttf_flags;
 
-	ttf_flags = 0;//ALLEGRO_TTF_MONOCHROME;
+	ttf_flags = ALLEGRO_TTF_MONOCHROME;
 
 	ALLEGRO_DEBUG("loading fonts");
 
-	game_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 9*screenScaleY, ttf_flags);
+	game_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 9*MIN(screenScaleX, screenScaleY)/2, ttf_flags);
 	if (!game_font) {
 		native_error("Failed to load game_font.");
 	}
 
-	medium_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 32*screenScaleY, ttf_flags);
+	medium_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 32, ttf_flags);
 	if (!medium_font) {
 		native_error("Failed to load medium_font.");
 	}
+	char buf[1000];
+	sprintf(buf, "%s%s\n", _t("SWIPE TO ATTACK!"), _t("Drag to use!"));
+	al_get_text_width(medium_font, buf);
 
 	huge_font = al_load_ttf_font(getResource("heavy.ttf"), 24, ttf_flags);
 	if (!huge_font) {
 		native_error("Failed to load huge_font.");
 	}
+	al_get_text_width(huge_font, ":0123456789");
 
 	ALLEGRO_DEBUG("done loading fonts");
 	
@@ -325,10 +328,7 @@ void load_fonts(void)
 
 ScreenSize small_screen(void)
 {
-	if (scr_tiny) {
-		return ScreenSize_Tiny;
-	}
-	else if (scr_smaller) {
+	if (scr_smaller) {
 		return ScreenSize_Smaller;
 	}
 	else if (scr_small) {
@@ -937,84 +937,6 @@ void android_assert_handler(char const *expr,
 }
 #endif
 
-#ifdef ALLEGRO_RASPBERRYPI
-static void _al_raspberrypi_get_screen_info(int *dx, int *dy,
-   int *screen_width, int *screen_height)
-{
-   graphics_get_display_size(0 /* LCD */, (uint32_t *)screen_width, (uint32_t *)screen_height);
-
-   /* On TV-out the visible area (area used by X and console)
-    * is different from that reported by the bcm functions. We
-    * have to 1) read fbwidth and fbheight from /proc/cmdline
-    * and also overscan parameters from /boot/config.txt so our
-    * displays are the same size and overlap perfectly.
-    */
-   *dx = 0;
-   *dy = 0;
-   FILE *cmdline = fopen("/proc/cmdline", "r");
-   if (cmdline) {
-      char line[1000];
-      int i;
-      for (i = 0; i < 999; i++) {
-         int c = fgetc(cmdline);
-         if (c == EOF) break;
-         line[i] = c;
-      }
-      line[i] = 0;
-      const char *p = strstr(line, "fbwidth=");
-      if (p) {
-         const char *p2 = strstr(line, "fbheight=");
-         if (p2) {
-            p += strlen("fbwidth=");
-            p2 += strlen("fbheight=");
-            int w = atoi(p);
-            int h = atoi(p2);
-            ALLEGRO_CONFIG *cfg = al_load_config_file("/boot/config.txt");
-            if (cfg) {
-               const char *disable_overscan =
-                  al_get_config_value(
-                     cfg, "", "disable_overscan"
-                  );
-               // If overscan parameters are disabled don't process
-               if (!disable_overscan ||
-                   (disable_overscan &&
-                    (!strcasecmp(disable_overscan, "false") ||
-                     atoi(disable_overscan) == 0))) {
-                  const char *left = al_get_config_value(
-                     cfg, "", "overscan_left");
-                  const char *right = al_get_config_value(
-                     cfg, "", "overscan_right");
-                  const char *top = al_get_config_value(
-                     cfg, "", "overscan_top");
-                  const char *bottom = al_get_config_value(
-                     cfg, "", "overscan_bottom");
-                  int xx = left ? atoi(left) : 0;
-                  xx -= right ? atoi(right) : 0;
-                  int yy = top ? atoi(top) : 0;
-                  yy -= bottom ? atoi(bottom) : 0;
-                  *dx = (*screen_width - w + xx) / 2;
-                  *dy = (*screen_height - h + yy) / 2;
-                  *screen_width = w;
-                  *screen_height = h;
-               }
-               else {
-                  *dx = (*screen_width - w) / 2;
-                  *dy = (*screen_height - h) / 2;
-                  *screen_width = w;
-                  *screen_height = h;
-               }
-               al_destroy_config(cfg);
-            }
-            else {
-               printf("Couldn't open /boot/config.txt\n");
-            }
-         }
-      }
-      fclose(cmdline);
-   }
-}
-#endif
-
 bool init(int *argc, char **argv[])
 {
 	myArgc = *argc;
@@ -1032,10 +954,8 @@ bool init(int *argc, char **argv[])
 	
 	bool use_fixed_pipeline = false;
 
-#ifndef ALLEGRO_ANDROID
-	if (check_arg(*argc, *argv, "-tiny") > 0)
-		scr_tiny = true;
-	else if (check_arg(*argc, *argv, "-smaller") > 0)
+#if !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
+	if (check_arg(*argc, *argv, "-smaller") > 0)
 		scr_smaller = true;
 	else if (check_arg(*argc, *argv, "-small") > 0)
 		scr_small = true;
