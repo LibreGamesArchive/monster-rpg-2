@@ -16,12 +16,20 @@
 #include <cfloat>
 
 bool in_archery = false;
+
+static void delete_vbos(MODEL *m)
+{
+	for (size_t i = 0; i < m->verts.size(); i++) {
+		al_destroy_vertex_buffer(m->vbos[i]);
+	}
+	m->vbos.clear();
+}
 	
 MODEL::~MODEL() {
 	for (size_t i = 0; i < verts.size(); i++) {
 		delete[] verts[i];
-		al_destroy_vertex_buffer(vbos[i]);
 	}
+	delete_vbos(this);
 }
 
 void disable_zbuffer(void)
@@ -941,27 +949,29 @@ static int real_archery(int *accuracy_pts)
 			clear_zbuffer();
 			enable_cull_face(false);
 
-			al_identity_transform(&view_transform);
-			al_rotate_transform_3d(&view_transform, 1, 0, 0, -xrot);
-			al_rotate_transform_3d(&view_transform, 0, 1, 0, -yrot);
-			al_translate_transform_3d(&view_transform, 0, 0, bow_z);
-#ifdef A5_D3D
-			al_translate_transform_3d(&view_transform, 0.5f, 0.5f, 0.0f);
-#endif
-			al_use_transform(&view_transform);
-			draw_model_tex(bow_model, bow_tex);
-
-			if (!hiddenCount) {
+			if (!break_for_fade_after_draw && !prompt_for_close_on_next_flip) {
 				al_identity_transform(&view_transform);
-				al_translate_transform_3d(&view_transform, 0, 0, -(arrow_start_z-arrow_z));
 				al_rotate_transform_3d(&view_transform, 1, 0, 0, -xrot);
 				al_rotate_transform_3d(&view_transform, 0, 1, 0, -yrot);
-				al_translate_transform_3d(&view_transform, arrow_dist, 0, arrow_start_z);
+				al_translate_transform_3d(&view_transform, 0, 0, bow_z);
 #ifdef A5_D3D
 				al_translate_transform_3d(&view_transform, 0.5f, 0.5f, 0.0f);
 #endif
 				al_use_transform(&view_transform);
-				draw_model_tex(arrow_model, arrow_tex);
+				draw_model_tex(bow_model, bow_tex);
+
+				if (!hiddenCount) {
+					al_identity_transform(&view_transform);
+					al_translate_transform_3d(&view_transform, 0, 0, -(arrow_start_z-arrow_z));
+					al_rotate_transform_3d(&view_transform, 1, 0, 0, -xrot);
+					al_rotate_transform_3d(&view_transform, 0, 1, 0, -yrot);
+					al_translate_transform_3d(&view_transform, arrow_dist, 0, arrow_start_z);
+#ifdef A5_D3D
+					al_translate_transform_3d(&view_transform, 0.5f, 0.5f, 0.0f);
+#endif
+					al_use_transform(&view_transform);
+					draw_model_tex(arrow_model, arrow_tex);
+				}
 			}
 
 			disable_cull_face();
@@ -994,7 +1004,7 @@ static int real_archery(int *accuracy_pts)
 				reset_y = state.y;
 			}
 #endif
-			
+
 			m_flip_display();
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
@@ -1070,9 +1080,6 @@ bool archery(bool for_points)
 	while (1) {
 		int accuracy_pts;
 		int dead = real_archery(&accuracy_pts);
-		if (break_main_loop) {
-			return true;
-		}
 		if (dead == 2) {
 			return 2;
 		}
@@ -1429,38 +1436,40 @@ void volcano_scene(void)
 			enable_zbuffer();
 			enable_cull_face(true);
 
-			al_identity_transform(&view_transform);
-			al_rotate_transform_3d(&view_transform, 1, 0, 0, M_PI/2);
-			al_rotate_transform_3d(&view_transform, 0, 1, 0, land_angle);
-			al_translate_transform_3d(&view_transform, 0, 0.1f+staff_oy, -(0.33f+land_z_translate));
-			al_scale_transform_3d(&view_transform, 50, 50, 50);
-			al_use_transform(&view_transform);
-			draw_model_tex(land_model, land_texture);
-
-			clear_zbuffer();
-			enable_cull_face(false);
-
-			al_identity_transform(&view_transform);
-			al_rotate_transform_3d(&view_transform, 0, 1, 0, -land_angle);
-			al_rotate_transform_3d(&view_transform, 1, 0, 0, M_PI);
-			al_rotate_transform_3d(&view_transform, 1, 0, 0, staff_a);
-			al_translate_transform_3d(&view_transform, 0, 0, -1.25f);
-			al_translate_transform_3d(&view_transform, 0, 0.25f, -(staff_oz+staff_z_translate));
-			al_rotate_transform_3d(&view_transform, 0, 1, 0, -land_angle);
-#ifdef A5_D3D
-			al_translate_transform_3d(&view_transform, 0.5f, 0.5f, 0.0f);
-#endif
-			al_use_transform(&view_transform);
-
-			if (stage != STAGE_POOFING) {
-				draw_model_tex(staff_model, staff_tex);
-			}
-			else {
+			if (!prompt_for_close_on_next_flip) {
 				al_identity_transform(&view_transform);
-				al_translate_transform_3d(&view_transform, 0.25, 0.25, ring_z);
+				al_rotate_transform_3d(&view_transform, 1, 0, 0, M_PI/2);
+				al_rotate_transform_3d(&view_transform, 0, 1, 0, land_angle);
+				al_translate_transform_3d(&view_transform, 0, 0.1f+staff_oy, -(0.33f+land_z_translate));
+				al_scale_transform_3d(&view_transform, 50, 50, 50);
 				al_use_transform(&view_transform);
-				disable_cull_face();
-				draw_model_tex(ring_model, ring_texture);
+				draw_model_tex(land_model, land_texture);
+
+				clear_zbuffer();
+				enable_cull_face(false);
+
+				al_identity_transform(&view_transform);
+				al_rotate_transform_3d(&view_transform, 0, 1, 0, -land_angle);
+				al_rotate_transform_3d(&view_transform, 1, 0, 0, M_PI);
+				al_rotate_transform_3d(&view_transform, 1, 0, 0, staff_a);
+				al_translate_transform_3d(&view_transform, 0, 0, -1.25f);
+				al_translate_transform_3d(&view_transform, 0, 0.25f, -(staff_oz+staff_z_translate));
+				al_rotate_transform_3d(&view_transform, 0, 1, 0, -land_angle);
+#ifdef A5_D3D
+				al_translate_transform_3d(&view_transform, 0.5f, 0.5f, 0.0f);
+#endif
+				al_use_transform(&view_transform);
+
+				if (stage != STAGE_POOFING) {
+					draw_model_tex(staff_model, staff_tex);
+				}
+				else {
+					al_identity_transform(&view_transform);
+					al_translate_transform_3d(&view_transform, 0.25, 0.25, ring_z);
+					al_use_transform(&view_transform);
+					disable_cull_face();
+					draw_model_tex(ring_model, ring_texture);
+				}
 			}
 
 			disable_cull_face();

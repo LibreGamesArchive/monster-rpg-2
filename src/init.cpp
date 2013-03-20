@@ -1690,7 +1690,7 @@ void destroy()
 
 	// OK?
 #ifdef ALLEGRO_RASPBERRYPI
-	al_destroy_display(display);
+	//al_destroy_display(display);
 #endif
 
 	if (saveFilename)
