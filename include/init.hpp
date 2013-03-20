@@ -233,4 +233,7 @@ extern double f5_time, f6_time;
 
 extern MBITMAP *custom_cursor_bmp;
 
+extern ATLAS *object_atlas;
+extern std::map<std::string, int> object_atlas_map;
+
 #endif

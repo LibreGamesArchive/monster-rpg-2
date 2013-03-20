@@ -1661,7 +1661,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 					section = MAIN;
 				}
 				else {
-					for (int i = 0; i < (int)v2.size(); i++) {
+					for (size_t i = 0; i < v2.size(); i++) {
 						v2[i] = -v2[i] - 1;
 					}
 					tguiDeleteWidget(formChooser);

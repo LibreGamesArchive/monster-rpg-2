@@ -403,7 +403,7 @@ static void draw_model_tex(MODEL *m, MBITMAP *texture)
 void set_projection(float neer, float farr, bool reverse_y, bool rotate)
 {
 	ALLEGRO_DISPLAY *display = al_get_current_display();
-	float aspect = (float)BW/BH;
+	float aspect = (float)al_get_display_width(display)/al_get_display_height(display);
 	float ymax = 0.01f*(float)tan((R2D(M_PI/4))*M_PI/360.0f);
 	float ymin = -ymax;
 	if (reverse_y) {

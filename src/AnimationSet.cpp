@@ -1,5 +1,10 @@
 #include "monster2.hpp"
 
+MBITMAP *AnimationSet::getBitmap()
+{
+	return bitmap;
+}
+
 void AnimationSet::setSubAnimation(int anim)
 {
 	currAnim = anim;
@@ -144,6 +149,9 @@ void AnimationSet::reset(void)
 
 AnimationSet *new_AnimationSet(const char *filename, bool alpha, CloneType type)
 {
+	if (object_atlas_map.find(std::string(filename)) != object_atlas_map.end()) {
+		type = CLONE_OBJECT;
+	}
 	AnimationSet *tmp = new AnimationSet(filename, alpha);
 	AnimationSet *a = tmp->clone(type); // creates 1px border around every frame
 	delete tmp;
@@ -336,6 +344,20 @@ AnimationSet *AnimationSet::clone(int type)
 		clone_from = tmp;
 		clone_to = a->bitmap;
 	}
+	else if (type == CLONE_OBJECT) {
+		int id = object_atlas_map[std::string(filename)];
+		ATLAS_ITEM *item = atlas_get_item_by_id(object_atlas, id);
+		MBITMAP *bmp = atlas_get_item_sub_bitmap(item);
+		ALLEGRO_BITMAP *abmp = al_create_sub_bitmap(
+			bmp->bitmap,
+			0, 0,
+			m_get_bitmap_width(bmp),
+			m_get_bitmap_height(bmp)
+		);
+		a->bitmap = new_mbitmap(abmp);
+		clone_to = a->bitmap;
+		clone_from = a->bitmap;
+	}
 	else {
 		tmp = m_clone_bitmap(bitmap);
 		a->bitmap = m_create_bitmap(
@@ -400,7 +422,7 @@ AnimationSet *AnimationSet::clone(int type)
 		if (!found_dup) {
 			x++;
 		}
-		a->anims.push_back(anims[i]->clone(type, clone_from, clone_to, x, y, found_dup));
+		a->anims.push_back(anims[i]->clone(type, clone_from, clone_to, x, y, found_dup || (type == CLONE_OBJECT)));
 	}
 	
 	delete[] o;

@@ -89,6 +89,8 @@ set(COMMON_SRCS
 	src/Player.cpp
 	src/Spells.cpp
 	src/Tile.cpp
+	src/atlas.cpp
+	src/atlas_accessor.cpp
 	src/battle.cpp
 	src/debug.cpp
 	src/equipment.cpp
@@ -97,6 +99,7 @@ set(COMMON_SRCS
 	src/inventory.cpp
 	src/io.cpp
 	src/lander.cpp
+	src/my_load_bitmap.cpp
 	src/pause.cpp
 	src/redundant.cpp
 	src/script.cpp

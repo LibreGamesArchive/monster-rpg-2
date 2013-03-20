@@ -10,6 +10,7 @@ public:
 	void setFrame(int frame);
 	void setPrefix(std::string prefix);
 	bool checkSubAnimationExists(std::string subName);
+	MBITMAP *getBitmap();
 
 	std::string getSubName();
 	int getFrame();

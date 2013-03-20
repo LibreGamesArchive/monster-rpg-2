@@ -26,6 +26,8 @@ extern "C" {
 #include <bcm_host.h>
 #endif
 
+#include <object_filenames.hpp>
+
 void create_tmpbuffer()
 {
 	int flags = al_get_new_bitmap_flags();
@@ -131,6 +133,9 @@ static void d3d_resource_restore(void)
 	}
 }
 #endif
+
+ATLAS *object_atlas;
+std::map<std::string, int> object_atlas_map;
 
 int width_before_fullscreen = 0;
 int height_before_fullscreen = 0;
@@ -1539,7 +1544,6 @@ bool init(int *argc, char **argv[])
 	guiAnims.wide_sub = m_create_sub_bitmap(guiAnims.bitmap, 0, 3, 32, 3);
 	guiAnims.tall_sub = m_create_sub_bitmap(guiAnims.bitmap, 0, 6, 3, 32);
 
-	al_set_new_bitmap_flags(PRESERVE_TEXTURE);
 	al_set_new_bitmap_flags(PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
 	
 	cursor = m_load_bitmap(getResource("media/cursor.png"));
@@ -1554,8 +1558,26 @@ bool init(int *argc, char **argv[])
 	debug_message("Loading icons\n");
 	loadIcons();
 
+	object_atlas = atlas_create(2048, 2048, 1, false);
+	std::vector<AnimationSet *> tmp_animsets;
+	for (int i = 0; object_filenames[i]; i++) {
+		AnimationSet *a = new_AnimationSet(getResource(object_filenames[i]));
+		MBITMAP *bmp = m_clone_bitmap(a->getBitmap());
+		delete a;
+		atlas_add(object_atlas, bmp, i);
+		object_atlas_map[getResource(object_filenames[i])] = i;
+		tmp_animsets.push_back(a);
+	}
+	atlas_finish(object_atlas);
+	for (size_t i = 0; i < tmp_animsets.size(); i++) {
+		delete tmp_animsets[i];
+	}
+	tmp_animsets.clear();
+
 	inited = true;
 
+	m_clear(black);
+	m_flip_display(); // backup bitmaps (slow)
 	m_clear(black);
 
 #ifdef ALLEGRO_ANDROID
@@ -1652,6 +1674,8 @@ void destroy()
 
 	if (area)
 		delete area;
+
+	atlas_destroy(object_atlas);
 
 #if !defined A5_D3D
 	destroy_shaders();

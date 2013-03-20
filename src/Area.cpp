@@ -1257,19 +1257,33 @@ void Area::draw(int bw, int bh)
 		}
 	}
 
+	al_hold_bitmap_drawing(true);
 	/* Draw low objects */
 	for (unsigned int i = 0; i < sorted_objects.size(); i++) {
+		if (dynamic_cast<Light *>(sorted_objects[i])) {
+			al_hold_bitmap_drawing(false);
+		}
 		if (sorted_objects[i]->isLow() && !sorted_objects[i]->isHidden()) {
 			drawObject(sorted_objects[i]);
+		}
+		if (dynamic_cast<Light *>(sorted_objects[i])) {
+			al_hold_bitmap_drawing(true);
 		}
 	}
 
 	/* Draw regular objects */
 	for (unsigned int i = 0; i < sorted_objects.size(); i++) {
+		if (dynamic_cast<Light *>(sorted_objects[i])) {
+			al_hold_bitmap_drawing(false);
+		}
 		if (!sorted_objects[i]->isHigh() && !sorted_objects[i]->isLow() && !sorted_objects[i]->isHidden()) {
 			drawObject(sorted_objects[i]);
 		}
+		if (dynamic_cast<Light *>(sorted_objects[i])) {
+			al_hold_bitmap_drawing(true);
+		}
 	}
+	al_hold_bitmap_drawing(false);
 
 
 	if (tinting) {
@@ -1313,10 +1327,18 @@ void Area::draw(int bw, int bh)
 	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
 	// Draw high and flying objects
+	al_hold_bitmap_drawing(true);
 	for (unsigned int i = 0; i < objects.size(); i++) {
+		if (dynamic_cast<Light *>(objects[i])) {
+			al_hold_bitmap_drawing(false);
+		}
 		if (objects[i]->isHigh() && !objects[i]->isHidden())
 			objects[i]->draw();
+		if (dynamic_cast<Light *>(objects[i])) {
+			al_hold_bitmap_drawing(true);
+		}
 	}
+	al_hold_bitmap_drawing(false);
 #ifndef EDITOR
 	if (name == "darkside") {
 		if (gameInfo.milestones[MS_GOT_ORB]) {

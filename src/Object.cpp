@@ -852,14 +852,10 @@ void Fish::draw()
 	al_hold_bitmap_drawing(false);
 
 	m_pop_target_bitmap();
-	m_push_blender();
 
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, m_map_rgba(alpha, alpha, alpha, alpha));
-
-	m_draw_rotated_bitmap(tmpbmp, w/2, (h+MAX_WIGGLE*2)/2,
+	ALLEGRO_COLOR tint = al_map_rgba(alpha, alpha, alpha, alpha);
+	al_draw_tinted_rotated_bitmap(tmpbmp->bitmap, tint, w/2, (h+MAX_WIGGLE*2)/2,
 		x-area->getOriginX(), y-area->getOriginY(), angle, 0);
-
-	m_pop_blender();
 }
 
 

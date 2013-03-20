@@ -232,6 +232,7 @@ enum CloneType
 	CLONE_PLAYER = 1,
 	CLONE_ENEMY,
 	CLONE_FULL,
+	CLONE_OBJECT
 };
 
 
@@ -264,6 +265,7 @@ enum CloneType
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 #include "gamecenter.h"
 #endif
+#include "atlas.hpp"
 #include "init.hpp"
 #include "Configuration.hpp"
 #include "Input.hpp"
