@@ -103,7 +103,7 @@ Image *Image::clone(int type, MBITMAP *copy)
 
 Image *Image::clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, int x, int y, bool skip_draw)
 {
-	if (type != CLONE_FULL) {
+	if (type != CLONE_FULL && type != CLONE_OBJECT) {
 		return clone(type, clone_from);
 	}
 

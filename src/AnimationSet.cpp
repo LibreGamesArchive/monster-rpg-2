@@ -162,6 +162,7 @@ AnimationSet::AnimationSet(const char *filename, bool alpha) :
 	currAnim(0),
 	prefix("")
 {
+	clone_type = CLONE_NOT_A_CLONE;
 	this->filename = filename;
 
 	int flags = al_get_new_bitmap_flags();
@@ -276,6 +277,7 @@ AnimationSet::AnimationSet(const char *filename, bool alpha) :
 
 AnimationSet::AnimationSet()
 {
+	clone_type = CLONE_NOT_A_CLONE;
 }
 
 AnimationSet::~AnimationSet()
@@ -284,7 +286,9 @@ AnimationSet::~AnimationSet()
 		delete anims[i];
 	}
 
-	m_destroy_bitmap(bitmap);
+	if (clone_type != CLONE_OBJECT) {
+		m_destroy_bitmap(bitmap);
+	}
 }
 	
 struct Order {
@@ -308,6 +312,7 @@ AnimationSet *AnimationSet::clone(int type)
 	a->currAnim = currAnim;
 	a->prefix = prefix;
 	a->destroy = destroy;
+	a->clone_type = (CloneType)type;
 	
 	MBITMAP *clone_from, *clone_to;
 	MBITMAP *tmp = NULL;
@@ -347,14 +352,7 @@ AnimationSet *AnimationSet::clone(int type)
 	else if (type == CLONE_OBJECT) {
 		int id = object_atlas_map[std::string(filename)];
 		ATLAS_ITEM *item = atlas_get_item_by_id(object_atlas, id);
-		MBITMAP *bmp = atlas_get_item_sub_bitmap(item);
-		ALLEGRO_BITMAP *abmp = al_create_sub_bitmap(
-			bmp->bitmap,
-			0, 0,
-			m_get_bitmap_width(bmp),
-			m_get_bitmap_height(bmp)
-		);
-		a->bitmap = new_mbitmap(abmp);
+		a->bitmap = atlas_get_item_sub_bitmap(item);
 		clone_to = a->bitmap;
 		clone_from = a->bitmap;
 	}
@@ -374,7 +372,9 @@ AnimationSet *AnimationSet::clone(int type)
 		clone_to = a->bitmap;
 	}
 
-	Order *o = new Order[anims.size()];
+	Order *o;
+	
+	o = new Order[anims.size()];
 
 	for (size_t i = 0; i < anims.size(); i++) {
 		Order ord;
@@ -386,7 +386,10 @@ AnimationSet *AnimationSet::clone(int type)
 	qsort(o, anims.size(), sizeof(Order), sort);
 
 	for (size_t i = 0; i < anims.size(); i++) {
+		int x, y;
 		Image *img = anims[i]->getFrame(0)->getImage();
+		bool found_dup = false;
+
 		int oidx = 0;
 		for (size_t j = 0; j < anims.size(); j++) {
 			if (o[j].anim_num == i) {
@@ -394,9 +397,8 @@ AnimationSet *AnimationSet::clone(int type)
 				break;
 			}
 		}
-		int y = img->getY() + oidx*2 + 1;
-		int x = img->getX();
-		bool found_dup = false;
+		y = img->getY() + oidx*2 + 1;
+		x = img->getX();
 		for (size_t j = 0; j < i; j++) {
 			Animation *anim = a->anims[j];
 			int nf = anim->getNumFrames();
@@ -422,9 +424,10 @@ AnimationSet *AnimationSet::clone(int type)
 		if (!found_dup) {
 			x++;
 		}
+
 		a->anims.push_back(anims[i]->clone(type, clone_from, clone_to, x, y, found_dup || (type == CLONE_OBJECT)));
 	}
-	
+
 	delete[] o;
 
 	if (type == CLONE_FULL) {

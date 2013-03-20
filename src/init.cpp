@@ -1558,13 +1558,11 @@ bool init(int *argc, char **argv[])
 	debug_message("Loading icons\n");
 	loadIcons();
 
-	object_atlas = atlas_create(2048, 2048, 1, false);
+	object_atlas = atlas_create(1024, 1024, 1, false);
 	std::vector<AnimationSet *> tmp_animsets;
 	for (int i = 0; object_filenames[i]; i++) {
 		AnimationSet *a = new_AnimationSet(getResource(object_filenames[i]));
-		MBITMAP *bmp = m_clone_bitmap(a->getBitmap());
-		delete a;
-		atlas_add(object_atlas, bmp, i);
+		atlas_add(object_atlas, a->getBitmap(), i);
 		object_atlas_map[getResource(object_filenames[i])] = i;
 		tmp_animsets.push_back(a);
 	}
@@ -1573,6 +1571,8 @@ bool init(int *argc, char **argv[])
 		delete tmp_animsets[i];
 	}
 	tmp_animsets.clear();
+
+	al_save_bitmap("objs.png", atlas_get_sheet(object_atlas, 0)->bitmap);
 
 	inited = true;
 

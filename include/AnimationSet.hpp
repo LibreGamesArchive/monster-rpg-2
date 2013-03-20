@@ -40,6 +40,7 @@ private:
 	bool destroy;
 	MBITMAP *bitmap;
 	std::string filename;
+	CloneType clone_type;
 };
 
 AnimationSet *new_AnimationSet(const char *filename, bool alpha = false, CloneType type = CLONE_FULL);
