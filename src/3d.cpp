@@ -16,6 +16,13 @@
 #include <cfloat>
 
 bool in_archery = false;
+	
+MODEL::~MODEL() {
+	for (size_t i = 0; i < verts.size(); i++) {
+		delete[] verts[i];
+		al_destroy_vertex_buffer(vbos[i]);
+	}
+}
 
 void disable_zbuffer(void)
 {
@@ -54,6 +61,21 @@ struct FACE {
 	int t[4];
 	int n;
 };
+
+static void create_vbos(MODEL *m)
+{
+	for (size_t i = 0; i < m->verts.size(); i++) {
+		m->vbos.push_back(
+			al_create_vertex_buffer(
+				0,
+				m->verts[i],
+				m->num_verts[i],
+				true,
+				0
+			)
+		);
+	}
+}
 
 static MODEL *load_model2(const char *filename, MBITMAP *tex)
 {
@@ -180,6 +202,8 @@ static MODEL *load_model2(const char *filename, MBITMAP *tex)
 	al_fclose(file);
 
 	delete[] bytes;
+
+	create_vbos(m);
 
 	return m;
 }
@@ -382,6 +406,8 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 
 	delete[] bytes;
 
+	create_vbos(m);
+
 	return m;
 }
 
@@ -389,6 +415,13 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 static void draw_model_tex(MODEL *m, MBITMAP *texture)
 {
 	for (size_t i = 0; i < m->verts.size(); i++) {
+		al_draw_vertex_buffer(
+			m->vbos[i],
+			texture->bitmap,
+			0, m->num_verts[i],
+			ALLEGRO_PRIM_TRIANGLE_LIST
+		);
+		/*
 		m_draw_prim(
 			m->verts[i],
 			0,
@@ -397,6 +430,7 @@ static void draw_model_tex(MODEL *m, MBITMAP *texture)
 			m->num_verts[i],
 			ALLEGRO_PRIM_TRIANGLE_LIST
 		);
+		*/
 	}
 }
 
@@ -1036,6 +1070,9 @@ bool archery(bool for_points)
 	while (1) {
 		int accuracy_pts;
 		int dead = real_archery(&accuracy_pts);
+		if (break_main_loop) {
+			return true;
+		}
 		if (dead == 2) {
 			return 2;
 		}
@@ -1170,6 +1207,8 @@ static MODEL *create_ring(int sd /* subdivisions */, MBITMAP *texture)
 		m->verts[0][i*6+5].v = m_get_bitmap_height(texture)-1;
 		m->verts[0][i*6+5].color = trans_white;
 	}
+
+	create_vbos(m);
 
 	return m;
 }

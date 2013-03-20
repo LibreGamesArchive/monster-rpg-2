@@ -19,11 +19,8 @@ struct TMPMODEL {
 struct MODEL {
 	std::vector<ALLEGRO_VERTEX *> verts;
 	std::vector<int> num_verts;
-	~MODEL() {
-		for (size_t i = 0; i < verts.size(); i++) {
-			delete[] verts[i];
-		}
-	}
+	std::vector<ALLEGRO_VERTEX_BUFFER *> vbos;
+	~MODEL();
 };
 
 void set_projection(float near, float far, bool reverse_y = false, bool rotate = false);
