@@ -236,4 +236,7 @@ extern MBITMAP *custom_cursor_bmp;
 extern ATLAS *object_atlas;
 extern std::map<std::string, int> object_atlas_map;
 
+extern float textScaleX;
+extern float textScaleY;
+
 #endif

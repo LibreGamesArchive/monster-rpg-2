@@ -137,7 +137,7 @@ void start_text()
 		al_copy_transform(&old_view, al_get_current_transform());
 		ALLEGRO_TRANSFORM v;
 		al_identity_transform(&v);
-		al_scale_transform(&v, 2.0f, 2.0f);
+		al_scale_transform(&v, textScaleX, textScaleY);
 		if (al_get_target_bitmap() == al_get_backbuffer(display) || al_get_target_bitmap() == tmpbuffer->bitmap) {
 			al_translate_transform(&v, dx, dy);
 		}
@@ -164,8 +164,8 @@ void m_textout(const MFONT *font, const char *text, int x, int y, MCOLOR color)
 
 	if (font == game_font) {
 		start_text();
-		x *= (screenScaleX/2);
-		y *= (screenScaleY/2);
+		x *= (screenScaleX/textScaleX);
+		y *= (screenScaleY/textScaleY);
 	}
 
 	al_draw_text(font, color, x, y, 0, text);
@@ -187,7 +187,7 @@ int m_text_height(const MFONT *font)
 	if (font != game_font) {
 		return al_get_font_line_height(font);
 	}
-	return al_get_font_line_height(font)/MIN(screenScaleX, screenScaleY)*2;
+	return al_get_font_line_height(font)/(MIN(screenScaleX, screenScaleY)/2);
 }
 
 void m_draw_rectangle(float x1, float y1, float x2, float y2, MCOLOR color,
@@ -640,7 +640,7 @@ static int m_text_length_real(const MFONT *font, const char *text)
 	if (font != game_font) {
 		return al_get_text_width(font, text);
 	}
-	return al_get_text_width(font, text)/MIN(screenScaleX, screenScaleY)*2;
+	return al_get_text_width(font, text)/(MIN(screenScaleX, screenScaleY)/2);
 }
 
 void m_set_target_bitmap(MBITMAP *bmp)

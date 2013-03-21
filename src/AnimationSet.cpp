@@ -392,7 +392,7 @@ AnimationSet *AnimationSet::clone(int type)
 
 		int oidx = 0;
 		for (size_t j = 0; j < anims.size(); j++) {
-			if (o[j].anim_num == i) {
+			if (o[j].anim_num == (int)i) {
 				oidx = j;
 				break;
 			}

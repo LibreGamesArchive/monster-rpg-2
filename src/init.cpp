@@ -298,6 +298,9 @@ void destroy_fonts(void)
 	m_destroy_font(huge_font);
 }
 
+float textScaleX;
+float textScaleY;
+
 void load_fonts(void)
 {
 	int ttf_flags;
@@ -306,11 +309,20 @@ void load_fonts(void)
 
 	ALLEGRO_DEBUG("loading fonts");
 
-	game_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 9*MIN(screenScaleX, screenScaleY)/2, ttf_flags);
+	if (screenScaleX > screenScaleY) {
+		textScaleX = 2 * (screenScaleX/screenScaleY);
+		textScaleY = 2;
+	}
+	else {
+		textScaleX = 2;
+		textScaleY = 2 * (screenScaleY/screenScaleX);
+	}
+
+	game_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 9*(MIN(screenScaleX, screenScaleY)/2), ttf_flags);
 	if (!game_font) {
 		native_error("Failed to load game_font.");
 	}
-
+		
 	medium_font = al_load_ttf_font(getResource("DejaVuSans.ttf"), 32, ttf_flags);
 	if (!medium_font) {
 		native_error("Failed to load medium_font.");

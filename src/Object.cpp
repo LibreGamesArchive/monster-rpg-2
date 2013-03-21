@@ -316,7 +316,7 @@ void Object::drawUpper()
 		col.g = tmp.g * tmp.a;
 		col.b = tmp.b * tmp.a;
 		col.a = tmp.a;
-		m_draw_bitmap(poison_bmp_tmp2, dx-5, dy-5, 0);
+		m_draw_tinted_bitmap(poison_bmp_tmp2, col, dx-5, dy-5, 0);
 	}
 	if (held) {
 		al_hold_bitmap_drawing(true);

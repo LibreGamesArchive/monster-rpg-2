@@ -30,7 +30,7 @@ void my_clear_bitmap(MBITMAP *b);
 #define m_draw_tinted_scaled_rotated_bitmap(bmp, tint, cx, cy, dx, dy, xscale, yscale, angle, flags) \
 	al_draw_tinted_scaled_rotated_bitmap(bmp->bitmap, tint, cx, cy, (int)dx, (int)dy, xscale, yscale, angle, flags)
 #define m_draw_tinted_scaled_bitmap(bmp, tint, sx, sy, sw, sh, dx, dy, dw, dh, flags) \
-	al_draw_tinted_scaled_bitmap(bmp->bitmap, tint, (int)sx, (int)sx, sw, sh, (int)dx, (int)dy, dw, dh, flags)
+	al_draw_tinted_scaled_bitmap(bmp->bitmap, tint, (int)sx, (int)sy, sw, sh, (int)dx, (int)dy, dw, dh, flags)
 
 void my_do_line(int x1, int y1, int x2, int y2, void *data, void (*proc)(int, int, void *));
 void my_do_circle(int x, int y, int radius, MCOLOR d,

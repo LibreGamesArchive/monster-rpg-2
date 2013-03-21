@@ -1513,8 +1513,6 @@ void CombatPlayer::draw()
 
 	if (info.condition == CONDITION_MUSHROOM) {
 		draw_shadow(mushroom, x, y, location == LOCATION_LEFT);
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	else {
 		if (battle->isInWater())
