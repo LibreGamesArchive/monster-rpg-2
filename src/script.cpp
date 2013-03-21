@@ -774,7 +774,7 @@ static int CDoDialogue(lua_State *stack)
 				int th = m_text_height(huge_font);
 				mTextout(huge_font, text, BW-(tw/2)-10, th/2+5,
 					white, black,
-					WGT_TEXT_DROP_SHADOW, true);
+					WGT_TEXT_NORMAL, true);
 			}
 			tguiDraw();
 			drawBufferToScreen();
@@ -3498,12 +3498,13 @@ static int CDoKeepLook(lua_State *stack)
 			set_target_backbuffer();
 			m_draw_bitmap(bmp, 0, 0, 0);
 			if (show_shine) {
-				m_push_blender();
-				m_set_blender(M_ALPHA, M_ONE, white);
+				ALLEGRO_STATE state;
+				al_store_state(&state, ALLEGRO_STATE_BLENDER);
+				al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_ONE);
 				for (int i = 0; i < 7; i++) {
 					m_draw_pixel(x[i], y[i], c[i]);
 				}
-				m_pop_blender();
+				al_restore_state(&state);
 			}
 			tguiDraw();
 			drawBufferToScreen();

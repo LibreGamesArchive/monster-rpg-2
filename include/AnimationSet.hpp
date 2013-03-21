@@ -21,7 +21,7 @@ public:
 
 	void reset();
 	void draw(int x, int y, int flags = 0);
-	void drawRotated(int x, int y, float angle, int flags = 0);
+	void drawRotated(MCOLOR tint, int x, int y, float angle, int flags = 0);
 	void drawScaled(int x, int y, int w, int h, int flags = 0);
 	int update(int step);
 

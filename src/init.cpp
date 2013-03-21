@@ -916,7 +916,6 @@ void destroy_shaders(void)
 static void draw_loading_screen(MBITMAP *tmp, int percent, ScreenDescriptor *sd)
 {
 	m_set_target_bitmap(tmp);
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 	m_draw_bitmap(bg_loader, 0, 0, 0);
 	m_draw_bitmap(loading_loader, 33, 10, 0);
 	int bx = 38;
@@ -1186,7 +1185,7 @@ bool init(int *argc, char **argv[])
 		);
 	}
 
-#if defined ALLEGRO_IPHONE || defined KINDLEFIRE
+#if defined ALLEGRO_IPHONE
 	al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE, ALLEGRO_REQUIRE);
 #elif defined ALLEGRO_ANDROID
 	al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_270_DEGREES, ALLEGRO_REQUIRE);
@@ -1401,8 +1400,6 @@ bool init(int *argc, char **argv[])
 	ALLEGRO_DEBUG("setting window title\n");
 	
 	al_set_window_title(display, "Monster RPG 2");
-
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
 #ifdef A5_OGL
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -1906,6 +1903,12 @@ void toggle_fullscreen()
 	}
 	_destroy_loaded_bitmaps();
 #endif
+
+	if (inited) {
+		destroy_fonts();
+		destroyIcons();
+	}
+
 	al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, config.getWantedGraphicsMode()->fullscreen);
 
 	al_rest(0.1);
@@ -1919,6 +1922,11 @@ void toggle_fullscreen()
 #endif
 	set_target_backbuffer();
 	set_screen_params();
+	if (inited) {
+		load_fonts();
+		loadIcons();
+	}
+
 #ifdef A5_D3D
 	if (in_shooter) {
 		shooter_restoring = true;

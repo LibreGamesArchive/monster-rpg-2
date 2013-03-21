@@ -12,20 +12,18 @@ public:
 	virtual ~RecreateData() {}
 };
 
-
-const int M_ZERO = ALLEGRO_ZERO;
-const int M_ONE = ALLEGRO_ONE;
-const int M_ALPHA = ALLEGRO_ALPHA;
-const int M_INVERSE_ALPHA = ALLEGRO_INVERSE_ALPHA;
-
 const int M_FLIP_HORIZONTAL = 1;
 const int M_FLIP_VERTICAL = 2;
 
 void my_clear_bitmap(MBITMAP *b);
+#define m_draw_tinted_bitmap(bmp, tint, x, y, flags) \
+	al_draw_tinted_bitmap(bmp->bitmap, tint, (int)x, (int)y, flags)
 #define m_draw_bitmap(bmp, x, y, flags) \
-	al_draw_tinted_bitmap(bmp->bitmap, _blend_color, (int)x, (int)y, flags)
+	m_draw_tinted_bitmap(bmp, white, (int)x, (int)y, flags)
+#define m_draw_tinted_bitmap_region(bmp, tint, sx, sy, sw, sh, dx, dy, flags) \
+	al_draw_tinted_bitmap_region(bmp->bitmap, tint, (int)sx, (int)sy, sw, sh, (int)dx, (int)dy, flags)
 #define m_draw_bitmap_region(bmp, sx, sy, sw, sh, dx, dy, flags) \
-	al_draw_tinted_bitmap_region(bmp->bitmap, _blend_color, (int)sx, (int)sy, sw, sh, (int)dx, (int)dy, flags)
+	m_draw_tinted_bitmap_region(bmp, white, (int)sx, (int)sy, sw, sh, (int)dx, (int)dy, flags)
 #define m_draw_tinted_bitmap(bmp, tint, x, y, flags) al_draw_tinted_bitmap(bmp->bitmap, tint, (int)x, (int)y, flags)
 #define m_draw_scaled_rotated_bitmap(bmp, cx, cy, dx, dy, xscale, yscale, angle, flags) \
 	al_draw_scaled_rotated_bitmap(bmp->bitmap, cx, cy, (int)dx, (int)dy, xscale, yscale, angle, flags)
@@ -83,6 +81,8 @@ void m_draw_tinted(MBITMAP *bitmap, int x, int  y,
 	int flags);
 void m_put_pixel(int x, int y, MCOLOR color);
 void m_draw_trans_pixel(int x, int y, MCOLOR color);
+void m_draw_tinted_rotated_bitmap(MBITMAP *bitmap, MCOLOR tint, int cx, int cy, int dx, int dy,
+	float angle, int flags);
 void m_draw_rotated_bitmap(MBITMAP *bitmap, int cx, int cy, int dx, int dy,
 	float angle, int flags);
 void m_push_target_bitmap(void);
@@ -109,13 +109,6 @@ struct SAVED_BLENDER {
 	int oldSrcAlphaFactor, oldDestAlphaFactor;
 	ALLEGRO_COLOR oldBlendColor;
 };
-
-extern std::stack<SAVED_BLENDER> blender_stack;
-extern ALLEGRO_COLOR _blend_color;
-
-void m_set_blender(int s, int d, MCOLOR c);
-void m_push_blender(void);
-void m_pop_blender(void);
 
 #define m_get_pixel(b, x, y) al_get_pixel(b->bitmap, x, y)
 #define m_draw_pixel m_draw_trans_pixel
@@ -171,7 +164,11 @@ void m_draw_bitmap_to_self(MBITMAP *b, int x, int y, int flags);
 void m_draw_bitmap_region_to_self(MBITMAP *b, int sx, int sy, int sw, int sh, int dx, int dy, int flags);
 
 void m_draw_scaled_backbuffer(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, MBITMAP *dest);
+void m_draw_tinted_bitmap_identity_view(MBITMAP *bmp, MCOLOR tint, int x, int y, int flags);
 void m_draw_bitmap_identity_view(MBITMAP *bmp, int x, int y, int flags);
+void m_draw_tinted_scaled_bitmap_identity_view(
+	MBITMAP *bmp, MCOLOR tint, int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int flags
+);
 void m_draw_scaled_bitmap_identity_view(
 	MBITMAP *bmp, int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int flags
 );

@@ -64,7 +64,7 @@ static void draw_the_controls(bool draw_controls, ALLEGRO_COLOR tint)
 #endif
 			ALLEGRO_STATE state;
 			al_store_state(&state, ALLEGRO_STATE_BLENDER);
-			m_set_blender(ALLEGRO_ONE, ALLEGRO_ONE, white);
+			al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ONE);
 			
 			// 4 because the screen is scaled to have 960x640 "pixels" when created (960/240 = 4 etc)
 			float scalex = 4;
@@ -567,8 +567,6 @@ void drawBufferToScreen(bool draw_controls)
 
 void draw_shadow(MBITMAP *bmp, int x, int y, bool hflip)
 {
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-
 	ALLEGRO_VERTEX verts[6];
 	int w = m_get_bitmap_width(bmp);
 	int h = m_get_bitmap_height(bmp);
@@ -685,9 +683,6 @@ void m_draw_precise_line(MBITMAP *bitmap, float x1, float y1, float x2, float y2
 	color.g *= color.a;
 	color.b *= color.a;
 
-	m_push_blender();
-	m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, white);
-
 	for (float i = 0; i < dist && vcount < nverts; i += step) {
 		float x = x1 + xinc * i;
 		float y = y1 + yinc * i;
@@ -701,8 +696,6 @@ void m_draw_precise_line(MBITMAP *bitmap, float x1, float y1, float x2, float y2
 	if (vcount > 0) {
 		m_draw_prim(verts, 0, 0, 0, vcount, ALLEGRO_PRIM_POINT_LIST);
 	}
-
-	m_pop_blender();
 
 	delete[] verts;
 }
@@ -1077,14 +1070,11 @@ void battleTransition()
 
 		ALLEGRO_STATE state;
 		al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
-		m_push_blender();
 		m_set_target_bitmap(xfade_buf);
 		m_draw_bitmap(tmp, 0, 0, 0);
 		float alpha = angle / (M_PI*2);
-		m_set_blender(M_ONE, M_INVERSE_ALPHA, al_map_rgba_f(alpha, alpha, alpha, alpha));
-		m_draw_bitmap(battle_buf, 0, 0, 0);
+		m_draw_tinted_bitmap(battle_buf, al_map_rgba_f(alpha, alpha, alpha, alpha), 0, 0, 0);
 		al_restore_state(&state);
-		m_pop_blender();
 
 		ALLEGRO_STATE s;
 		al_store_state(&s, ALLEGRO_STATE_TARGET_BITMAP);

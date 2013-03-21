@@ -1625,19 +1625,9 @@ void CombatPlayer::draw()
 			m_draw_bitmap(mushroom, x-TILE_SIZE/2, y-TILE_SIZE, 0);
 		}
 		else if (info.condition == CONDITION_SHADOW) {
-			int amountF = -1.0f;
-			(void)amountF;
-			{
-			m_push_blender();
-			float  r, g, b;
-			r = 0.0f;
-			g = 0.0f;
-			b = 0.0f;
-			m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, al_map_rgb_f(r, g, b));
+			MCOLOR tint = m_map_rgb(0, 0, 0);
 			MBITMAP *sb = animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
-			m_draw_tinted_bitmap(sb, m_map_rgb(r, g, b), x-(w/2), y-h, flags);
-			m_pop_blender();
-			}
+			m_draw_tinted_bitmap(sb, tint, x-(w/2), y-h, flags);
 		}
 		else {
 			if (battle->isInWater())

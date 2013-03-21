@@ -73,7 +73,6 @@ bool Image::load(MBITMAP *copy_from, int x1, int y1, int x2, int y2)
 
 void Image::draw(int x, int y, int flags)
 {
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 	m_draw_bitmap(bitmap, x, y, flags);
 }
 

@@ -349,11 +349,11 @@ void Battle::drawStatus(void)
 			mTextout(game_font, name.c_str(), x, y,
 				grey,
 				black,
-				WGT_TEXT_DROP_SHADOW, false);
+				WGT_TEXT_NORMAL, false);
 			mTextout(game_font, _t(my_itoa(num)), separator-10, y,
 				grey,
 				black,
-				WGT_TEXT_DROP_SHADOW, false);
+				WGT_TEXT_NORMAL, false);
 			y += m_text_height(game_font);
 		}
 	}
@@ -378,14 +378,14 @@ void Battle::drawStatus(void)
 					_t(party[p->getNumber()]->getName().c_str()), x, y,
 					c,
 					black,
-					WGT_TEXT_DROP_SHADOW, false);
+					WGT_TEXT_NORMAL, false);
 				sprintf(buf, "%d/%d", MAX(0, p->getInfo().abilities.hp),
 					p->getInfo().abilities.maxhp);
 				mTextout(game_font, buf,
 					BW-10-m_text_length(game_font, buf), y,
 					c,
 					black,
-					WGT_TEXT_DROP_SHADOW, false);
+					WGT_TEXT_NORMAL, false);
 			}
 			y += m_text_height(game_font);
 		}
@@ -509,7 +509,7 @@ void Battle::draw(void)
 		mDrawFrame(x, y, w, h, true);
 		mTextout(game_font, _t((*messages.begin()).text.c_str()), x+5, y+2,
 			white, black,
-			WGT_TEXT_DROP_SHADOW, false);
+			WGT_TEXT_NORMAL, false);
 	}
 }
 

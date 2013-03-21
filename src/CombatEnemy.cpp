@@ -497,10 +497,7 @@ static void dragon_fade(AnimationSet *a, AnimationSet *a2, int fullframe, int fa
 		set_target_backbuffer();
 		m_clear(black);
 
-		m_push_blender();
-		m_set_blender(M_ONE, M_INVERSE_ALPHA, m_map_rgba(255*alpha, 255*alpha, 255*alpha, 255*alpha));
-		m_draw_bitmap(fade, dragon_x, dragon_y-a->getHeight(), dragon_flags);
-		m_pop_blender();
+		m_draw_tinted_bitmap(fade, al_map_rgba_f(alpha, alpha, alpha, alpha), dragon_x, dragon_y-a->getHeight(), dragon_flags);
 
 		m_draw_bitmap(full, dragon_x, dragon_y-a->getHeight(), dragon_flags);
 		
@@ -782,23 +779,20 @@ void CombatEnemy::draw(void)
 					if (angle == 0)
 						animSet->draw(x-(w/2), y-h, flags);
 					else
-						animSet->drawRotated(x+ox, y+oy-h/2, angle, flags);
+						animSet->drawRotated(white, x+ox, y+oy-h/2, angle, flags);
 					al_use_shader(NULL);
 				}
 				else {
-					m_push_blender();
 					float  r, g, b;
 					r = 0.5f;
 					g = 0.5f;
 					b = 0.5f;
-					m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, al_map_rgb_f(r, g, b));
 					if (angle == 0) {
 						MBITMAP *bmp = animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
-						m_draw_bitmap(bmp, x-(w/2), y-h, flags);
+						m_draw_tinted_bitmap(bmp, al_map_rgb_f(r, g, b), x-(w/2), y-h, flags);
 					}
 					else
-						animSet->drawRotated(x+ox, y+oy-h/2, angle, flags);
-					m_pop_blender();
+						animSet->drawRotated(al_map_rgb_f(r,g, b), x+ox, y+oy-h/2, angle, flags);
 				}
 			}
 			else {
@@ -826,7 +820,7 @@ void CombatEnemy::draw(void)
 				else if (angle == 0)
 					animSet->draw(x+ox-(w/2), y+oy-h, flags);
 				else
-					animSet->drawRotated(x+ox, y+oy-h/2, angle, flags);
+					animSet->drawRotated(white, x+ox, y+oy-h/2, angle, flags);
 
 				if (info.condition == CONDITION_QUICK || info.condition == CONDITION_SLOW
 						|| info.condition == CONDITION_CHARMED) {
@@ -1249,13 +1243,7 @@ void CombatEnemyTode::draw(void)
 			al_use_shader(NULL);
 		}
 		else {
-			{
-			m_push_blender();
-			float  r, g, b;
-			r = 0.8f;
-			g = 0.0f;
-			b = 0.8f;
-			m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, al_map_rgb_f(r, g, b));
+			MCOLOR tint = al_map_rgb_f(0.8, 0, 0.8);
 			int dx = (int)(x - w/2);
 			int dy = (int)(y - h);
 			for (int i = 0; i < h; i++, dy++) {
@@ -1263,18 +1251,16 @@ void CombatEnemyTode::draw(void)
 				int new_dx = (int)(dx + (sin(f)*6));
 				if (i % 2) {
 					if ((h - i) > firstLinesTop*2) {
-						m_draw_bitmap_region(bmp,
+						m_draw_tinted_bitmap_region(bmp, tint,
 							0, i, w, 1, new_dx, dy, flags);
 					}
 				}
 				else {
 					if ((h - i) > secondLinesTop*2) {
-						m_draw_bitmap_region(bmp,
+						m_draw_tinted_bitmap_region(bmp, tint,
 							0, i, w, 1, new_dx, dy, flags);
 					}
 				}
-			}
-			m_pop_blender();
 			}
 		}
 	}

@@ -102,7 +102,7 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 	 * Open source drivers claim to support the extension but simply
 	 * crash when it's used. So disable it altogether on Linux.
 	 */
-#if defined A5_D3D || defined __linux__ || defined OPENGLES || defined ALLEGRO_RASPBERRYPI
+#if defined A5_D3D || defined __linux__ || defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	bool multisample = false;
 #else
 	bool multisample = al_have_opengl_extension("GL_EXT_framebuffer_multisample");
@@ -110,7 +110,7 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 
 	ALLEGRO_BITMAP *out = my_al_create_bitmap(diagram_w, diagram_h);
 
-#if !defined A5_D3D
+#if !defined A5_D3D && !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
 	GLint old_vp[4];
 	GLuint fb;
 	GLuint ColorBufferID;
@@ -375,11 +375,11 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 
 	svgtiny_free(diagram);
 
+#if !defined A5_D3D && !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
 	if (multisample) {
-#if !defined A5_D3D
 		glViewport(old_vp[0], old_vp[1], old_vp[2], old_vp[3]);
-#endif
 	}
+#endif
 
 	if (multisample) {
 		al_set_target_bitmap(old_target);

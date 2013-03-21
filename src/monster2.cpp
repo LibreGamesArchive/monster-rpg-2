@@ -26,12 +26,15 @@ bool was_switched_out = false;
 static int last_mouse_x = -1, last_mouse_y;
 static int total_mouse_x, total_mouse_y;
 
-#if defined ALLEGRO_ANDROID || defined ALLEGRO_IPHONE
+#if defined ALLEGRO_ANDROID
 static std::string old_music_name;
 static std::string old_ambience_name;
 static float old_music_volume;
 static float old_ambience_volume;
 static bool music_replayed = true;
+#endif
+
+#if defined ALLEGRO_ANDROID || defined ALLEGRO_IPHONE
 bool switched_in = true;
 #endif
 
@@ -156,16 +159,17 @@ void connect_second_display(void)
 	connect_airplay_controls(true);
 	
 	m_destroy_bitmap(tmpbuffer);
-	
-	_destroy_loaded_bitmaps();
 	destroy_fonts();
+	destroyIcons();
+
+	_destroy_loaded_bitmaps();
 	destroy_shaders();
 	al_destroy_display(display);
 	
 	int flags = al_get_new_display_flags();
 
 	al_set_new_display_adapter(1);
-	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_USE_PROGRAMMABLE_PIPELINE);
+	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_PROGRAMMABLE_PIPELINE);
 	display = al_create_display(1, 1);
 
 	al_set_new_display_flags(flags);
@@ -176,6 +180,7 @@ void connect_second_display(void)
 
 	_reload_loaded_bitmaps();
 	load_fonts();
+	loadIcons();
 
 	_reload_loaded_bitmaps_delayed();
 
@@ -226,8 +231,6 @@ void connect_second_display(void)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 static void set_transform()
 {
-	ALLEGRO_TRANSFORM t;
-
 	int BB_W = al_get_display_width(display);
 	int BB_H = al_get_display_height(display);
 
@@ -393,7 +396,7 @@ static int find_touch(int touch_id)
 {
 	for (size_t i = 0; i < touches.size(); i++) {
 		if (touches[i].touch_id == touch_id)
-			return i;
+			return (int)i;
 	}
 	
 	return -1;
@@ -1074,6 +1077,7 @@ top:
 			al_get_clipping_rectangle(&cx, &cy, &cw, &ch);
 			_destroy_loaded_bitmaps();
 			destroy_fonts();
+			destroyIcons();
 			destroy_shaders();
 #endif
 			config.write();
@@ -1103,6 +1107,7 @@ top:
 			_reload_loaded_bitmaps();
 			_reload_loaded_bitmaps_delayed();
 			load_fonts();
+			loadIcons();
 			if (in_shooter) {
 				shooter_restoring = true;
 			}
@@ -1121,7 +1126,6 @@ top:
 			al_set_clipping_rectangle(cx, cy, cw, ch);
 #endif
 			glDisable(GL_DITHER);
-			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 			al_start_timer(logic_timer);
 			al_start_timer(draw_timer);
 		}
@@ -1274,6 +1278,7 @@ top:
 
 			_destroy_loaded_bitmaps();
 			destroy_fonts();
+			destroyIcons();
 
 			destroy_shaders();
 			al_destroy_display(display);
@@ -1294,16 +1299,17 @@ top:
 			al_set_new_display_adapter(0);
 			al_set_new_display_option(ALLEGRO_AUTO_CONVERT_BITMAPS, 1, ALLEGRO_REQUIRE);
 			int flags = al_get_new_display_flags();
-			al_set_new_display_flags(flags | ALLEGRO_USE_PROGRAMMABLE_PIPELINE | ALLEGRO_FULLSCREEN_WINDOW);
+			al_set_new_display_flags(flags | ALLEGRO_PROGRAMMABLE_PIPELINE | ALLEGRO_FULLSCREEN_WINDOW);
 			display = al_create_display(1, 1);
 			al_set_new_display_flags(flags);
 			register_display(display);
 			init_shaders();
-
 			_reload_loaded_bitmaps_delayed();
-			load_fonts();
 
 			set_screen_params();
+
+			load_fonts();
+			loadIcons();
 	
 			create_tmpbuffer();
 
@@ -1440,7 +1446,7 @@ void main_draw()
 		int th = m_text_height(huge_font);
 		mTextout(huge_font, text, BW-(tw/2)-10, th/2+5,
 			white, black,
-			WGT_TEXT_DROP_SHADOW, true);
+			WGT_TEXT_NORMAL, true);
 	}
 	// Draw the GUI
 	if (!manChooser || battle)

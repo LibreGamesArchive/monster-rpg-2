@@ -19,10 +19,6 @@ static MBITMAP **bolt2_bmps;
 static int bolt2_bmp_ref_count = 0;
 static int num_bolt2_bmps;
 
-extern "C" {
-void _al_blend_memory(ALLEGRO_COLOR *, ALLEGRO_BITMAP *, int, int, ALLEGRO_COLOR *);
-}
-
 static void get_bolt2_bitmaps(int n, MBITMAP **bmps)
 {
 	num_bolt2_bmps = n;
@@ -186,7 +182,7 @@ void TemporaryText::draw(void)
 {
 	mTextout(game_font, _t(text), cx, (int)(cy + yoffs),
 		color, black,
-		WGT_TEXT_BORDER, true);
+		WGT_TEXT_NORMAL, true);
 }
 
 bool TemporaryText::update(int step)
@@ -341,8 +337,6 @@ int Bolt2Effect::getLifetime(void)
 
 void Bolt2Effect::draw(void)
 {
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-
 	int bmpIndex;
 
 	if (target->getLocation() == LOCATION_LEFT) {
@@ -401,8 +395,6 @@ int LightningEffect::getLifetime(void)
 
 void LightningEffect::draw(void)
 {
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-
 	int bmpIndex;
 	if (count < (LIFETIME/3)) {
 		bmpIndex = (float)count/(LIFETIME/3) * NUM_FAST;
@@ -861,8 +853,6 @@ int Darkness1Effect::getLifetime(void)
 
 void Darkness1Effect::draw(void)
 {
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-
 	for (int i = 0; i < NUM_BLOBS; i++) {
 		float dx = blobs[i].x;
 		float dy = blobs[i].y;
@@ -959,8 +949,6 @@ int WeepEffect::getLifetime(void)
 
 void WeepEffect::draw(void)
 {
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-
 	for (int i = 0; i < NUM_DROPS; i++) {
 		MCOLOR color = m_map_rgba(
 			drops[i].color.r*drops[i].alpha*255,
@@ -1044,8 +1032,6 @@ int WaveEffect::getLifetime(void)
 
 void WaveEffect::draw(void)
 {
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-
 	int drawx;
 	int flags;
 
@@ -1812,8 +1798,6 @@ int RendEffect::getLifetime(void)
 
 void RendEffect::draw(void)
 {
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-
 	int dx = (int)(target->getX() - (animSet->getWidth()/2));
 	int dy = (int)(target->getY() - target->getAnimationSet()->getHeight()/2 - animSet->getHeight()/2);
 
@@ -1988,7 +1972,7 @@ int SprayEffect::getLifetime(void)
 
 void SprayEffect::draw(void)
 {
-	m_set_blender(ALLEGRO_ALPHA, ALLEGRO_ALPHA, white);
+	al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_ALPHA);
 	
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	int count = 0;
@@ -2076,7 +2060,7 @@ void SprayEffect::draw(void)
 	m_draw_prim(verts, 0, 0, 0, count, ALLEGRO_PRIM_LINE_LIST);
 #endif
 	
-	m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, white);
+	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA);
 }
 
 
@@ -3363,13 +3347,10 @@ int VampireEffect::getLifetime(void)
 
 void VampireEffect::draw(void)
 {
-	m_push_blender();
 	MBITMAP *bmp = 
 		target->getAnimationSet()->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, m_map_rgba(alpha, alpha, alpha, alpha));
-	m_draw_bitmap(bmp, cx, cy, target->getLocation() == LOCATION_LEFT ?
+	m_draw_tinted_bitmap(bmp, m_map_rgba(alpha, alpha, alpha, alpha), cx, cy, target->getLocation() == LOCATION_LEFT ?
 		M_FLIP_HORIZONTAL : 0);
-	m_pop_blender();
 }
 
 

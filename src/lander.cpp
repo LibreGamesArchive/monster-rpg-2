@@ -332,8 +332,6 @@ top:
 		if (break_for_fade_after_draw || draw_counter > 0) {
 			draw_counter = 0;
 
-			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-
 			if (!break_for_fade_after_draw) {
 				set_target_backbuffer();
 			}

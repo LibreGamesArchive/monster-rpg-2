@@ -745,7 +745,6 @@ static void levelUpCallback(int selected, LEVEL_UP_CALLBACK_DATA *d)
 			draw_counter = 0;
 			set_target_backbuffer();
 			m_draw_bitmap_identity_view(tmpbuffer, 0, 0, 0);
-			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 			// Draw the GUI
 			tguiDraw();
 			drawBufferToScreen();
@@ -860,7 +859,6 @@ bool levelUp(Player *player, int bonus)
 	tguiSetFocus(multiChooser);
 
 	prepareForScreenGrab1();
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 	tguiDraw();
 	drawBufferToScreen(false);
 	prepareForScreenGrab2();
@@ -949,7 +947,6 @@ done:
 
 	set_target_backbuffer();
 	m_clear(black);
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 	tguiDraw();
 	drawBufferToScreen();
 	m_flip_display();
@@ -975,7 +972,6 @@ done:
 			
 	prepareForScreenGrab1();
 	m_clear(black);
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 	tguiDraw();
 	drawBufferToScreen(false);
 	prepareForScreenGrab2();

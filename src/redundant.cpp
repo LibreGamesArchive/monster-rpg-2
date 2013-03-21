@@ -115,9 +115,6 @@ MBITMAP *m_create_alpha_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, Rec
 	return m;
 }
 
-std::stack<SAVED_BLENDER> blender_stack;
-ALLEGRO_COLOR _blend_color;
-
 void m_draw_alpha_bitmap(MBITMAP *b, int x, int y)
 {
 	m_draw_bitmap(b, x, y, 0);
@@ -133,20 +130,19 @@ static ALLEGRO_TRANSFORM old_view;
 
 void start_text()
 {
-	if (text_draw_on) {
-		return;
+	if (!text_draw_on) {
+		text_draw_on = true;
+		int dx, dy, dw, dh;
+		get_screen_offset_size(&dx, &dy, &dw, &dh);
+		al_copy_transform(&old_view, al_get_current_transform());
+		ALLEGRO_TRANSFORM v;
+		al_identity_transform(&v);
+		al_scale_transform(&v, 2.0f, 2.0f);
+		if (al_get_target_bitmap() == al_get_backbuffer(display) || al_get_target_bitmap() == tmpbuffer->bitmap) {
+			al_translate_transform(&v, dx, dy);
+		}
+		al_use_transform(&v);
 	}
-	text_draw_on = true;
-	int dx, dy, dw, dh;
-	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	al_copy_transform(&old_view, al_get_current_transform());
-	ALLEGRO_TRANSFORM v;
-	al_identity_transform(&v);
-	al_scale_transform(&v, 2.0f, 2.0f);
-	if (al_get_target_bitmap() == al_get_backbuffer(display) || al_get_target_bitmap() == tmpbuffer->bitmap) {
-		al_translate_transform(&v, dx, dy);
-	}
-	al_use_transform(&v);
 }
 
 void end_text()
@@ -194,28 +190,6 @@ int m_text_height(const MFONT *font)
 	return al_get_font_line_height(font)/MIN(screenScaleX, screenScaleY)*2;
 }
 
-static INLINE float get_factor(int operation, float alpha)
-{
-   switch (operation) {
-       case ALLEGRO_ZERO: return 0;
-       case ALLEGRO_ONE: return 1;
-       case ALLEGRO_ALPHA: return alpha;
-       case ALLEGRO_INVERSE_ALPHA: return 1 - alpha;
-   }
-   return 0; /* silence warning in release build */
-}
-
-static INLINE void _al_blend_inline(
-   const ALLEGRO_COLOR *scol, const ALLEGRO_COLOR *dcol,
-   ALLEGRO_COLOR *result)
-{
-	float a = scol->a;
-	float inv_a = (1 - scol->a);
-	result->r = scol->r*a + dcol->r*inv_a;
-	result->g = scol->g*a + dcol->g*inv_a;
-	result->b = scol->b*a + dcol->b*inv_a;
-}
-
 void m_draw_rectangle(float x1, float y1, float x2, float y2, MCOLOR color,
 	int flags)
 {
@@ -237,17 +211,14 @@ void m_draw_line(int x1, int y1, int x2, int y2, MCOLOR color)
 void m_draw_scaled_bitmap(MBITMAP *bmp, float sx, float sy, float sw, float sh,
 	float dx, float dy, float dw, float dh, int flags)
 {
-	al_draw_tinted_scaled_bitmap(bmp->bitmap, _blend_color, sx, sy, sw, sh, dx, dy, dw, dh, flags);
+	m_draw_tinted_scaled_bitmap(bmp, white, sx, sy, sw, sh, dx, dy, dw, dh, flags);
 }
 
 void m_draw_scaled_bitmap(MBITMAP *bmp, float sx, float sy, float sw, float sh,
 	float dx, float dy, float dw, float dh, int flags, float alpha)
 {
-	m_push_blender();
 	float alpha_f = alpha/255.0;
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, al_map_rgba_f(alpha_f, alpha_f, alpha_f, alpha_f));
-	al_draw_tinted_scaled_bitmap(bmp->bitmap, _blend_color, sx, sy, sw, sh, dx, dy, dw, dh, flags);
-	m_pop_blender();
+	al_draw_tinted_scaled_bitmap(bmp->bitmap, al_map_rgba_f(alpha_f, alpha_f, alpha_f, alpha_f), sx, sy, sw, sh, dx, dy, dw, dh, flags);
 }
 
 
@@ -708,10 +679,16 @@ void m_draw_trans_pixel(int x, int y, MCOLOR color)
 }
 
 // -angle?!?! really?!
+void m_draw_tinted_rotated_bitmap(MBITMAP *bitmap, MCOLOR tint, int cx, int cy,
+	int dx, int dy, float angle, int flags)
+{
+	al_draw_tinted_rotated_bitmap(bitmap->bitmap, tint, cx, cy, dx, dy, -angle, flags);
+}
+
 void m_draw_rotated_bitmap(MBITMAP *bitmap, int cx, int cy,
 	int dx, int dy, float angle, int flags)
 {
-	al_draw_tinted_rotated_bitmap(bitmap->bitmap, _blend_color, cx, cy, dx, dy, -angle, flags);
+	m_draw_tinted_rotated_bitmap(bitmap, white, cx, cy, dx, dy, angle, flags);
 }
 
 void m_fill_ellipse(int x, int y, int rx, int ry, MCOLOR color)
@@ -778,13 +755,7 @@ MBITMAP *create_trapezoid(int dir, int topw, int bottomw, int length, MCOLOR col
 
 void m_draw_trans_bitmap(MBITMAP *b, int x, int y, int alpha)
 {
-	m_push_blender();
-
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, m_map_rgba(alpha, alpha, alpha, alpha));
-
-	m_draw_bitmap(b, x, y, 0);
-
-	m_pop_blender();
+	m_draw_tinted_bitmap(b, m_map_rgba(alpha, alpha, alpha, alpha), x, y, 0);
 }
 
 
@@ -896,45 +867,6 @@ float my_get_opengl_version(void)
       return 1.5;
    else
       return 1.3;
-}
-
-static int curr_blend_s = ALLEGRO_ONE;
-static int curr_blend_d = ALLEGRO_INVERSE_ALPHA;
-static ALLEGRO_COLOR curr_blend_color = { 1, 1, 1, 1 };
-
-void m_set_blender(int s, int d, MCOLOR c)
-{
-	curr_blend_s = s;
-	curr_blend_d = d;
-	curr_blend_color = c;
-
-	_blend_color = c;
-	
-	al_set_blender(ALLEGRO_ADD, s, d);
-}
-
-void m_push_blender(void)
-{
-	SAVED_BLENDER sb;
-
-	sb.oldSrcColorFactor = curr_blend_s;
-	sb.oldDestColorFactor = curr_blend_d;
-	sb.oldBlendColor = curr_blend_color;
-
-	blender_stack.push(sb);
-}
-
-
-void m_pop_blender(void)
-{
-	SAVED_BLENDER sb = blender_stack.top();
-	blender_stack.pop();
-
-	m_set_blender(
-		sb.oldSrcColorFactor,
-		sb.oldDestColorFactor,
-		sb.oldBlendColor
-	);
 }
 
 void m_draw_prim (const void* vtxs, const ALLEGRO_VERTEX_DECL* decl, MBITMAP* texture, int start, int end, int type)
@@ -1238,13 +1170,36 @@ void m_draw_scaled_backbuffer(int sx, int sy, int sw, int sh, int dx, int dy, in
 	al_set_new_bitmap_format(old_format);
 }
 
-void m_draw_bitmap_identity_view(MBITMAP *bmp, int x, int y, int flags)
+void m_draw_tinted_bitmap_identity_view(MBITMAP *bmp, MCOLOR tint, int x, int y, int flags)
 {
 	ALLEGRO_TRANSFORM backup, t;
 	al_copy_transform(&backup, al_get_current_transform());
 	al_identity_transform(&t);
 	al_use_transform(&t);
-	m_draw_bitmap(bmp, x, y, flags);
+	m_draw_tinted_bitmap(bmp, tint, x, y, flags);
+	al_use_transform(&backup);
+}
+
+void m_draw_bitmap_identity_view(MBITMAP *bmp, int x, int y, int flags)
+{
+	m_draw_tinted_bitmap_identity_view(bmp, white, x, y, flags);
+}
+
+void m_draw_tinted_scaled_bitmap_identity_view(
+	MBITMAP *bmp, MCOLOR tint, int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int flags
+)
+{
+	ALLEGRO_TRANSFORM backup, t;
+	al_copy_transform(&backup, al_get_current_transform());
+	al_identity_transform(&t);
+	al_use_transform(&t);
+	al_draw_tinted_scaled_bitmap(
+		bmp->bitmap,
+		tint,
+		sx, sy, sw, sh,
+		dx, dy, dw, dh,
+		0
+	);
 	al_use_transform(&backup);
 }
 
@@ -1252,17 +1207,7 @@ void m_draw_scaled_bitmap_identity_view(
 	MBITMAP *bmp, int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int flags
 )
 {
-	ALLEGRO_TRANSFORM backup, t;
-	al_copy_transform(&backup, al_get_current_transform());
-	al_identity_transform(&t);
-	al_use_transform(&t);
-	al_draw_scaled_bitmap(
-		bmp->bitmap,
-		sx, sy, sw, sh,
-		dx, dy, dw, dh,
-		0
-	);
-	al_use_transform(&backup);
+	m_draw_tinted_scaled_bitmap_identity_view(bmp, white, sx, sy, sw, sh, dx, dy, dw, dh, flags);
 }
 
 void m_draw_scaled_target(MBITMAP *src, int sx, int sy, int sw, int sh,

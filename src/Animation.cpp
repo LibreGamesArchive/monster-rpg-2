@@ -98,13 +98,13 @@ void Animation::draw(int x, int y, int flags)
 }
 
 
-void Animation::drawRotated(int x, int y, float angle, int flags)
+void Animation::drawRotated(MCOLOR tint, int x, int y, float angle, int flags)
 {
 	MBITMAP *b = frames[currentFrame]->getImage()->getBitmap();
 	int w = m_get_bitmap_width(b);
 	int h = m_get_bitmap_height(b);
 
-	m_draw_rotated_bitmap(b, w/2, h/2, x, y, angle, flags);
+	m_draw_tinted_rotated_bitmap(b, tint, w/2, h/2, x, y, angle, flags);
 }
 
 
@@ -196,8 +196,6 @@ Animation *Animation::clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, in
 {
 	Animation *a = new Animation();
 		
-	Image *img = frames[0]->getImage();
-
 	for (size_t i = 0; i < frames.size(); i++) {
 		a->frames.push_back(frames[i]->clone(type, clone_from, clone_to, x, y, skip_draw));
 		x += frames[i]->getImage()->getWidth() + 2;

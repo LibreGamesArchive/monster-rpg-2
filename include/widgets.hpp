@@ -5,8 +5,6 @@
 /* These names have become confused. NORMAL is no shadow. DROP_SHADOW is +1+1. BORDER is 8 directions around. SQUARE_BORDER is a square drop shadow, 3 positions bottom right */
 const int WGT_TEXT_NORMAL = 0;
 const int WGT_TEXT_DROP_SHADOW = 1;
-const int WGT_TEXT_BORDER = 2;
-const int WGT_TEXT_SQUARE_BORDER = 3;
 
 const int CONTEXT_MENU_W = 200;
 const int CONTEXT_MENU_H = 172;
@@ -56,16 +54,16 @@ private:
 	}
 
 public:
-	MouseMonitor(void) {
+	MouseMonitor() {
 		queue = al_create_event_queue();
 		al_register_event_source(queue, al_get_touch_input_event_source());
 	}
 	
-	~MouseMonitor(void) {
+	~MouseMonitor() {
 		al_destroy_event_queue(queue);
 	}
 	
-	void update(void)
+	void update()
 	{
 		while (!al_event_queue_is_empty(queue)) {
 			ALLEGRO_EVENT event;
@@ -103,20 +101,20 @@ public:
 
 class TemporaryTextWidget : public TGUIWidget {
 public:
-	bool isDisplayed(void)
+	bool isDisplayed()
 	{
 		return displaying;
 	}
 
-	void draw(void)
+	void draw()
 	{
 		if (!displaying) return;
 		mTextout(game_font, _t(text), x, (int)(y + yoffs),
 			color, black,
-			WGT_TEXT_SQUARE_BORDER, true);
+			WGT_TEXT_NORMAL, true);
 	}
 
-	void stop(void) 
+	void stop() 
 	{
 		displaying = false;
 		yoffs = 0;
@@ -146,7 +144,7 @@ public:
 		return TGUI_CONTINUE;
 	}
 	
-	TemporaryTextWidget(void) {
+	TemporaryTextWidget() {
 		this->hotkeys = 0;
 		this->x = 0;
 		this->y = 0;
@@ -164,7 +162,7 @@ private:
 
 class MShadow : public TGUIWidget {
 public:
-	void draw(void);
+	void draw();
 	bool acceptsFocus() { return false; }
 	
 	int update(int step)
@@ -172,7 +170,7 @@ public:
 		return TGUI_CONTINUE;
 	}
 	
-	MShadow(void) {
+	MShadow() {
 		x = (BW*2)/3;
 		y = BH-50;
 		width = SHADOW_CORNER_SIZE;
@@ -219,11 +217,11 @@ private:
 
 class FakeWidget : public TGUIWidget {
 public:
-	void draw(void);
+	void draw();
 	void mouseDown(int x, int y, int b);
 	void mouseUp(int x, int y, int b);
-	unsigned long getHoldStart(void);
-	void reset(void);
+	unsigned long getHoldStart();
+	void reset();
 	bool acceptsFocus();
 	int update(int step);
 	virtual void setFocus(bool fcs);
@@ -243,7 +241,7 @@ private:
 
 class MTab : public TGUIWidget {
 public:
-	void draw(void);
+	void draw();
 	void mouseUp(int x, int y, int b);
 	bool acceptsFocus();
 	int update(int step);
@@ -264,10 +262,10 @@ class MDragNDropForm : public TGUIWidget {
 public:
 	void mouseDown(int x, int y, int b);
 	void mouseUpAbs(int x, int y, int b);
-	void post_draw(void);
+	void post_draw();
 	bool acceptsFocus();
 	int update(int step);
-	MDragNDropForm(void);
+	MDragNDropForm();
 private:
 	int who;
 	MBITMAP *icon;
@@ -290,13 +288,13 @@ struct MTableData {
 class MTable : public TGUIWidget {
 public:
 	void setData(std::vector<std::vector<MTableData> > newData);
-	void draw(void);
+	void draw();
 	int update(int millis);
-	bool acceptsFocus(void);
+	bool acceptsFocus();
 	MTable(int x, int y,
 		std::vector< std::vector< MTableData > > data,
 		MCOLOR line_color);
-	virtual ~MTable(void) {}
+	virtual ~MTable() {}
 protected:
 	std::vector<std::vector<MTableData> > data;
 	MCOLOR line_color;
@@ -310,23 +308,23 @@ protected:
 
 class MToggleList : public TGUIWidget {
 public:
-	void draw(void);
+	void draw();
 	int update(int millis);
-	bool acceptsFocus(void);
+	bool acceptsFocus();
 	void mouseMove(int x, int y, int z);
 	void mouseUpAbs(int x, int y, int b);
 	void mouseDownAbs(int x, int y, int b);
-	int getSelected(void);
+	int getSelected();
 	void setItems(std::vector<std::string> items);
 	void setFocus(bool f);
-	void reset(void) { top = selected = cursor = 0; }
-	int getTop(void) { return top; }
+	void reset() { top = selected = cursor = 0; }
+	int getTop() { return top; }
 	void setTop(int t) { top = selected = cursor = t; }
-	std::vector<bool> getToggled(void);
+	std::vector<bool> getToggled();
 	void setToggled(std::vector<bool> t);
 
 	MToggleList(int x, int y, int width, int height, bool onoff = true);
-	virtual ~MToggleList(void);
+	virtual ~MToggleList();
 protected:
 	int top;
 	int cursor;
@@ -366,22 +364,22 @@ protected:
 
 class MScrollingList : public TGUIWidget {
 public:
-	void post_draw(void);
-	void draw(void);
+	void post_draw();
+	void draw();
 	int update(int millis);
-	bool acceptsFocus(void);
+	bool acceptsFocus();
 	void mouseMove(int x, int y, int z);
 	void mouseUpAbs(int x, int y, int b);
 	void mouseDownAbs(int x, int y, int b);
-	int getSelected(void);
+	int getSelected();
 	void setItems(std::vector<std::string> items);
 	void setFocus(bool f);
-	void reset(void) { top = selected = 0; }
-	int getTop(void) { return top; }
+	void reset() { top = selected = 0; }
+	int getTop() { return top; }
 	void setTop(int t) { top = selected = t; }
 
 	MScrollingList(int x, int y, int width, int height, void (*drop_callback)(int n), int drop_x, int drop_y, void (*hold_callback)(int n, const void *data), const void *hold_data, bool do_prompt = true);
-	virtual ~MScrollingList(void);
+	virtual ~MScrollingList();
 protected:
 	int top;
 	int selected;
@@ -426,17 +424,17 @@ public:
 	static const int MIN_HEIGHT = 21;
 	static const int TRANSITION_IN_LENGTH = 300;
 	static const int SCROLL_LENGTH = 300;
-	void draw(void);
+	void draw();
 	int update(int millis);
-	bool acceptsFocus(void);
+	bool acceptsFocus();
 	void mouseUp(int x, int y, int b);
 
 	MSpeechDialog(int x, int y, int width, int height,
 		std::string text);
-	virtual ~MSpeechDialog(void);
+	virtual ~MSpeechDialog();
 protected:
 	void realDrawText(int section, int xo, int yo);
-	void drawText(void);
+	void drawText();
 	bool transitionInDone;
 	int drawHeight;
 	int count;
@@ -453,12 +451,12 @@ protected:
 
 class MCorner : public TGUIWidget {
 public:
-	void pre_draw(void)
+	void pre_draw()
 	{
 		m_draw_tinted_bitmap(bmp, al_map_rgb_f(blue.r+0.1f, blue.g+0.1f, blue.b+0.1f), x, y, 0);
 	}
 
-	bool acceptsFocus(void) { return false; }
+	bool acceptsFocus() { return false; }
 
 	MCorner(int x, int y)
 	{
@@ -467,7 +465,7 @@ public:
 		hotkeys = 0;
 	}
 
-	virtual ~MCorner(void)
+	virtual ~MCorner()
 	{
 		m_destroy_bitmap(bmp);
 	}
@@ -519,17 +517,17 @@ public:
 		right_widget = w;
 	}
 
-	void pre_draw(void);
-	void draw(void);
+	void pre_draw();
+	void draw();
 	int update(int millis);
-	bool acceptsFocus(void) { return accFocus; }
+	bool acceptsFocus() { return accFocus; }
 	void setBitmap(std::string filename) {
 		m_destroy_bitmap(bitmap);
 		bitmap = m_load_bitmap(filename.c_str());
 	}
 	MIcon(int x, int y, std::string filename, MCOLOR tint,
 		bool accFocus = false, const char *name = NULL, bool show_name = false, bool alpha_image = false, bool show_focus = true, bool return_on_mouse_down = false, bool generate_repeat_presses = false);
-	virtual ~MIcon(void);
+	virtual ~MIcon();
 private:
 	MBITMAP *bitmap;
 	MCOLOR tint;
@@ -549,10 +547,10 @@ private:
 
 class MFrame : public TGUIWidget {
 public:
-	void pre_draw(void);
+	void pre_draw();
 	int update(int millis);
 	MFrame(int x, int y, int width, int height, bool shadow = false);
-	virtual ~MFrame(void);
+	virtual ~MFrame();
 private:
 	bool shadow;
 };
@@ -560,10 +558,10 @@ private:
 
 class MFrame_NormalDraw : public TGUIWidget {
 public:
-	void draw(void);
+	void draw();
 	int update(int millis);
 	MFrame_NormalDraw(int x, int y, int width, int height, bool shadow = false);
-	virtual ~MFrame_NormalDraw(void);
+	virtual ~MFrame_NormalDraw();
 private:
 	bool shadow;
 };
@@ -571,11 +569,11 @@ private:
 
 class MSplitFrame : public MFrame {
 public:
-	bool acceptsFocus(void) { return false; }
-	void pre_draw(void);
+	bool acceptsFocus() { return false; }
+	void pre_draw();
 	int update(int millis);
 	MSplitFrame(int x, int y, int width, int height, std::vector<int> splits);
-	virtual ~MSplitFrame(void);
+	virtual ~MSplitFrame();
 private:
 	std::vector<int> splits;
 };
@@ -584,10 +582,10 @@ private:
 class MLabel : public TGUIWidget {
 public:
 	void setString(std::string s);
-	void draw(void);
+	void draw();
 	int update(int millis);
 	MLabel(int x, int y, std::string text, MCOLOR color);
-	virtual ~MLabel(void);
+	virtual ~MLabel();
 protected:
 	char text[100];
 	MCOLOR color;
@@ -597,10 +595,10 @@ protected:
 class MTextButton : public TGUIWidget {
 public:
 	void setColors(MCOLOR unsel, MCOLOR sel, MCOLOR shadow);
-	void draw(void);
-	void post_draw(void);
+	void draw();
+	void post_draw();
 	int update(int millis);
-	bool acceptsFocus(void);
+	bool acceptsFocus();
 	void mouseUp(int x, int y, int b);
 	void set_left_widget(TGUIWidget *w)
 	{
@@ -608,7 +606,7 @@ public:
 	}
 
 	MTextButton(int x, int y, std::string text, bool disabled = false, TGUIWidget *left_widget = NULL, TGUIWidget *right_widget = NULL, bool hold_drawing = true);
-	virtual ~MTextButton(void);
+	virtual ~MTextButton();
 protected:
 	char text[100];
 	bool clicked;
@@ -628,16 +626,16 @@ public:
 	static const int GETTING = 1;
 	static const int NORMAL = 2;
 
-	void draw(void);
+	void draw();
 	int update(int millis);
-	bool acceptsFocus(void);
+	bool acceptsFocus();
 	void mouseDown(int mx, int my, int mb);
 
 	int getValue();
 	void setValue(int val);
 
 	MInputGetter(int type, int x, int y, int w, std::string text, int start_value);
-	virtual ~MInputGetter(void);
+	virtual ~MInputGetter();
 
 protected:
 	int type;
@@ -648,42 +646,33 @@ protected:
 	bool released_b1;
 };
 
-
-class MTextButtonFullShadow : public MTextButton {
-public:
-	MTextButtonFullShadow(int x, int y, std::string text, bool hold_drawing = true);
-	virtual ~MTextButtonFullShadow(void);
-};
-
-
 class MToggle : public TGUIWidget {
 public:
-	void draw(void);
+	void draw();
 	int update(int millis);
-	bool acceptsFocus(void);
+	bool acceptsFocus();
 
 	void setSelected(int s);
-	int getSelected(void);
+	int getSelected();
 
 	MToggle(int x, int y, std::vector<std::string>& options);
-	virtual ~MToggle(void);
+	virtual ~MToggle();
 protected:
 	std::vector<std::string>& options;
 	int selected;
 };
 
-
 class MSlider : public TGUIWidget {
 public:
-	void draw(void);
+	void draw();
 	int update(int millis);
-	bool acceptsFocus(void);
+	bool acceptsFocus();
 
 	void setValue(int v);
-	int getValue(void);
+	int getValue();
 
 	MSlider(int x, int y);
-	virtual ~MSlider(void);
+	virtual ~MSlider();
 protected:
 	int value;
 };
@@ -691,15 +680,15 @@ protected:
 
 class MCheckbox : public TGUIWidget {
 public:
-	void draw(void);
+	void draw();
 	int update(int millis);
-	bool acceptsFocus(void);
+	bool acceptsFocus();
 
 	void setChecked(bool c);
-	bool getChecked(void);
+	bool getChecked();
 
 	MCheckbox(int x, int y, std::string text);
-	virtual ~MCheckbox(void);
+	virtual ~MCheckbox();
 protected:
 	std::string text;
 	bool checked;
@@ -707,16 +696,16 @@ protected:
 
 class MDoubleToggle : public TGUIWidget {
 public:
-	void draw(void);
+	void draw();
 	int update(int millis);
-	bool acceptsFocus(void);
-	int getSelected(void);
+	bool acceptsFocus();
+	int getSelected();
 	void setSelected(int sel);
 	void mouseUp(int x, int y, int b);
 	
 	MDoubleToggle(int x, int y, std::string text1,
 		std::string text2);
-	virtual ~MDoubleToggle(void);
+	virtual ~MDoubleToggle();
 protected:
 	std::string text1;
 	std::string text2;
@@ -726,15 +715,15 @@ protected:
 
 class MSingleToggle : public TGUIWidget {
 public:
-	void draw(void);
+	void draw();
 	int update(int millis);
-	bool acceptsFocus(void);
-	int getSelected(void);
+	bool acceptsFocus();
+	int getSelected();
 	void setSelected(int sel);
 	void mouseDown(int x, int y, int b);
 	
 	MSingleToggle(int x, int y, std::vector<std::string> options, bool megashadow = false);
-	virtual ~MSingleToggle(void);
+	virtual ~MSingleToggle();
 protected:
 	std::vector<std::string> options;
 	int selected;
@@ -744,11 +733,11 @@ protected:
 
 class MRectangle : public TGUIWidget {
 public:
-	void pre_draw(void);
+	void pre_draw();
 	int update(int millis);
 	MRectangle(int x, int y, int w, int h,
 		MCOLOR color, int flags);
-	virtual ~MRectangle(void);
+	virtual ~MRectangle();
 protected:
 	MCOLOR color;
 	int flags;
@@ -757,10 +746,10 @@ protected:
 
 class MLevelUpHeader : public TGUIWidget {
 public:
-	void draw(void);
+	void draw();
 	int update(int millis);
 	MLevelUpHeader(int *points, std::string spellCaption, bool bonus = false);
-	virtual ~MLevelUpHeader(void);
+	virtual ~MLevelUpHeader();
 protected:
 	std::string spellCaption;
 	int *points;
@@ -770,15 +759,15 @@ protected:
 
 class MStats : public TGUIWidget {
 public:
-	void draw(void);
+	void draw();
 	int update(int millis);
 	void setSelected(int index) { who = index; if (!party[who]) next(); }
 	void mouseUp(int x, int y, int b);
-	bool acceptsFocus(void) { return true; }
+	bool acceptsFocus() { return true; }
 	MStats(int y, int h, int who, bool can_change);
-	virtual ~MStats(void);
+	virtual ~MStats();
 protected:
-	void next(void);
+	void next();
 
 	int who;
 	bool can_change;
@@ -790,10 +779,10 @@ protected:
 
 class MStateSelector : public TGUIWidget {
 public:
-	void draw(void);
+	void draw();
 	int update(int millis);
-	MStateSelector(void);
-	virtual ~MStateSelector(void);
+	MStateSelector();
+	virtual ~MStateSelector();
 protected:
 	std::vector< std::vector<MBITMAP *> > bitmaps;
 };
@@ -801,11 +790,11 @@ protected:
 
 class MParty : public TGUIWidget {
 public:
-	bool acceptsFocus(void) { return false; }
-	void draw(void);
+	bool acceptsFocus() { return false; }
+	void draw();
 	int update(int millis);
-	MParty(void);
-	virtual ~MParty(void);
+	MParty();
+	virtual ~MParty();
 protected:
 };
 
@@ -813,12 +802,12 @@ protected:
 class MPartySelector : public TGUIWidget {
 public:
 	void setSelected(int s) { index = s; if (index != MAX_PARTY && !party[index]) next(); }
-	int getSelected(void) { return index; }
+	int getSelected() { return index; }
 	void grow(int dir) { growing = dir; }
-	int getEquipIndex(void) { return equipIndex; }
+	int getEquipIndex() { return equipIndex; }
 
-	bool acceptsFocus(void);
-	void draw(void);
+	bool acceptsFocus();
+	void draw();
 	int update(int millis);
 	void mouseDown(int x, int y, int b);
 	void mouseUp(int x, int y, int b);
@@ -829,7 +818,7 @@ public:
 	MPartySelector(int y, int index, bool show_trash);
 	virtual ~MPartySelector();
 protected:
-	void next(void);
+	void next();
 
 	int index;
 	bool show_trash;
@@ -854,20 +843,20 @@ protected:
 
 class MMultiChooser : public TGUIWidget {
 public:
-	std::vector<int> &getSelected(void);
+	std::vector<int> &getSelected();
 	void setSelected(std::vector<int> sel);
-	bool acceptsFocus(void);
+	bool acceptsFocus();
 	void mouseDownAbs(int x, int y, int b);
 	void mouseUp(int x, int y, int b);
-	int getTapped(void);
+	int getTapped();
 	void setTapped(bool tapped);
 	void setInset(bool i);
-	bool getInset(void) { return inset; }
+	bool getInset() { return inset; }
 
-	void draw(void);
+	void draw();
 	int update(int millis);
 	MMultiChooser(std::vector<MultiPoint> points, bool can_multi);
-	virtual ~MMultiChooser(void);
+	virtual ~MMultiChooser();
 protected:
 	std::vector<MultiPoint> points;
 	std::vector<int> current;
@@ -904,15 +893,15 @@ public:
 #endif
 	}
 
-	bool acceptsFocus(void);
+	bool acceptsFocus();
 	void mark(int index, bool used, bool dead);
 	void mouseDown(int x, int y, int b);
 	void mouseUp(int x, int y, int b);
 
-	void draw(void);
+	void draw();
 	int update(int millis);
 	MManSelector(std::vector<MMan> mans);
-	virtual ~MManSelector(void);
+	virtual ~MManSelector();
 protected:
 	std::vector<MMan> mans;
 	MBITMAP *arrow;
@@ -932,8 +921,8 @@ protected:
 
 class MItemSelector : public TGUIWidget {
 public:
-	void reset(void);
-	int getSelected(void);
+	void reset();
+	int getSelected();
 	void setSelected(int s);
 	void grow(int dir) {
 		growing = dir;
@@ -950,19 +939,19 @@ public:
 	void mouseMove(int x, int y, int z);
 
 	void setFocus(bool f);
-	bool acceptsFocus(void);
-	void draw(void);
+	bool acceptsFocus();
+	void draw();
 	int update(int millis);
 	void setInventory(Inventory *i) { inventory = i; }
 	void setRaiseOnFocus(bool r) { raiseOnFocus = r; }
 
-	void setShop(void) { isShop = true; }
+	void setShop() { isShop = true; }
 	void getDropLocation(int *dx, int *dy);
 
 	MItemSelector(int y1, int y2, int top, int selected, bool canArrange);
-	virtual ~MItemSelector(void);
+	virtual ~MItemSelector();
 protected:
-	bool itemsBelow(void);
+	bool itemsBelow();
 
 	int top;
 	int selected;
@@ -1009,7 +998,7 @@ protected:
 
 class MSpellSelector : public TGUIWidget {
 public:
-	int getSelected(void);
+	int getSelected();
 	void setSelected(int s);
 	void setTop(int t);
 	void mouseUpAbs(int x, int y, int b);
@@ -1017,13 +1006,13 @@ public:
 	void setFocus(bool f);
 	void mouseMove(int x, int y, int z);
 
-	bool acceptsFocus(void);
-	void draw(void);
+	bool acceptsFocus();
+	void draw();
 	int update(int millis);
 	MSpellSelector(int y1, int y2, int top, int selected, bool canArrange, MPartySelector *partySelector, CombatantInfo playerInfo);
-	virtual ~MSpellSelector(void);
+	virtual ~MSpellSelector();
 protected:
-	bool spellsBelow(void);
+	bool spellsBelow();
 
 	int top;
 	int selected;
@@ -1087,21 +1076,21 @@ struct MapPoint {
 
 class MMap : public TGUIWidget {
 public:
-	bool isTransitioning(void);
-	std::string getSelected(void);
+	bool isTransitioning();
+	std::string getSelected();
 	void setSelected(std::string s);
-	void flash(void);
+	void flash();
 
-	bool acceptsFocus(void);
-	void draw(void);
+	bool acceptsFocus();
+	void draw();
 	int update(int millis);
 	void mouseUp(int x, int y, int b);
 	void mouseDown(int x, int y, int b);
 
 	MMap(std::string start, std::string prefix);
-	virtual ~MMap(void);
+	virtual ~MMap();
 protected:
-	void load_map_data(void);
+	void load_map_data();
 	void getLines(MapPoint *p);
 	MapPoint *findPoint(std::string name);
 	void getIdealPoint(int x, int y, int *dx, int *dy);
@@ -1130,7 +1119,24 @@ protected:
 	int offset_x, offset_y;
 };
 
-
+class MMainMenu : public TGUIWidget {
+public:
+	void draw();
+	int update(int millis);
+	bool acceptsFocus();
+	int getSelected();
+	void setSelected(int sel);
+	void mouseDown(int x, int y, int b);
+	
+	MMainMenu(int mid_y, std::vector<std::string> options);
+	virtual ~MMainMenu();
+protected:
+	std::vector<std::string> options;
+	int selected;
+	int mid_y;
+	MBITMAP *arrow;
+	bool clicked;
+};
 
 extern MSpeechDialog *speechDialog;
 void doDialogue(std::string text, bool top = false, int rows = 4, int offset = 10, bool bottom = false);

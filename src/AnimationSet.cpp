@@ -93,9 +93,9 @@ void AnimationSet::draw(int x, int y, int flags)
 }
 
 
-void AnimationSet::drawRotated(int x, int y, float angle, int flags)
+void AnimationSet::drawRotated(MCOLOR tint, int x, int y, float angle, int flags)
 {
-	anims[currAnim]->drawRotated(x, y, angle, flags);
+	anims[currAnim]->drawRotated(tint, x, y, angle, flags);
 }
 
 void AnimationSet::drawScaled(int x, int y, int w, int h, int flags)

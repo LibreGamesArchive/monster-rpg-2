@@ -586,7 +586,6 @@ void Area::drawObject(int index)
 				}
 				else
 				{
-				m_push_blender();
 				float d, r, g, b;
 				d = targetTint.r - 1;
 				r = 1+(tint_ratio*d);
@@ -594,10 +593,8 @@ void Area::drawObject(int index)
 				g = 1+(tint_ratio*d);
 				d = targetTint.b - 1;
 				b = 1+(tint_ratio*d);
-				m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, al_map_rgb_f(r, g, b));
-				m_draw_bitmap_region(bmp, 0, TILE_SIZE-depth, TILE_SIZE,
+				m_draw_tinted_bitmap_region(bmp, al_map_rgb_f(r, g, b), 0, TILE_SIZE-depth, TILE_SIZE,
 					depth, dx, dy, 0);
-				m_pop_blender();
 				}
 			}
 			else {
@@ -1065,8 +1062,6 @@ void Area::drawLayer(int i, int bw, int bh)
 		c = white;
 	}
 
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-
 	for (ty = startTiley, oy = startOffsety;
  	     ty < sizey && oy < bh; ty++, oy += TILE_SIZE) {
 		for (tx = startTilex, ox = startOffsetx;
@@ -1190,26 +1185,8 @@ void Area::draw(int bw, int bh)
 		m_draw_bitmap_region(bg, bgox, bgoy, BW, BH, 0, 0, 0);
 	}
 
-	if (tinting) {
-		m_push_blender();
-		float d, r, g, b;
-		d = targetTint.r - 1;
-		r = 1+(tint_ratio*d);
-		d = targetTint.g - 1;
-		g = 1+(tint_ratio*d);
-		d = targetTint.b - 1;
-		b = 1+(tint_ratio*d);
-		m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, al_map_rgb_f(r, g, b));
-		for (int j = 0; j < TILE_LAYERS/2; j++) {
-			drawLayer(j, bw, bh);
-		}
-		
-		m_pop_blender();
-	}
-	else {
-		for (int i = 0; i < TILE_LAYERS/2; i++) {
-			drawLayer(i, bw, bh);
-		}
+	for (int i = 0; i < TILE_LAYERS/2; i++) {
+		drawLayer(i, bw, bh);
 	}
 	
 #ifndef NO_SHADERS
@@ -1233,8 +1210,6 @@ void Area::draw(int bw, int bh)
 		
 	// draw the lower objects
 
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-		
 	if (manChooser && !battle) tguiDraw();
 
 	std::vector<Object *> sorted_objects;
@@ -1260,51 +1235,22 @@ void Area::draw(int bw, int bh)
 	al_hold_bitmap_drawing(true);
 	/* Draw low objects */
 	for (unsigned int i = 0; i < sorted_objects.size(); i++) {
-		if (dynamic_cast<Light *>(sorted_objects[i])) {
-			al_hold_bitmap_drawing(false);
-		}
 		if (sorted_objects[i]->isLow() && !sorted_objects[i]->isHidden()) {
 			drawObject(sorted_objects[i]);
-		}
-		if (dynamic_cast<Light *>(sorted_objects[i])) {
-			al_hold_bitmap_drawing(true);
 		}
 	}
 
 	/* Draw regular objects */
 	for (unsigned int i = 0; i < sorted_objects.size(); i++) {
-		if (dynamic_cast<Light *>(sorted_objects[i])) {
-			al_hold_bitmap_drawing(false);
-		}
 		if (!sorted_objects[i]->isHigh() && !sorted_objects[i]->isLow() && !sorted_objects[i]->isHidden()) {
 			drawObject(sorted_objects[i]);
-		}
-		if (dynamic_cast<Light *>(sorted_objects[i])) {
-			al_hold_bitmap_drawing(true);
 		}
 	}
 	al_hold_bitmap_drawing(false);
 
 
-	if (tinting) {
-		m_push_blender();
-		float d, r, g, b;
-		d = targetTint.r - 1;
-		r = 1+(tint_ratio*d);
-		d = targetTint.g - 1;
-		g = 1+(tint_ratio*d);
-		d = targetTint.b - 1;
-		b = 1+(tint_ratio*d);
-		m_set_blender(ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA, al_map_rgb_f(r, g, b));
-		for (int j = TILE_LAYERS/2; j < TILE_LAYERS; j++) {
-			drawLayer(j, bw, bh);
-		}
-		m_pop_blender();
-	}
-	else {
-		for (int i = TILE_LAYERS/2; i < TILE_LAYERS; i++) {
-			drawLayer(i, bw, bh);
-		}
+	for (int i = TILE_LAYERS/2; i < TILE_LAYERS; i++) {
+		drawLayer(i, bw, bh);
 	}
 
 #ifndef NO_SHADERS
@@ -1324,19 +1270,11 @@ void Area::draw(int bw, int bh)
 	}
 #endif
 
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-
 	// Draw high and flying objects
 	al_hold_bitmap_drawing(true);
 	for (unsigned int i = 0; i < objects.size(); i++) {
-		if (dynamic_cast<Light *>(objects[i])) {
-			al_hold_bitmap_drawing(false);
-		}
 		if (objects[i]->isHigh() && !objects[i]->isHidden())
 			objects[i]->draw();
-		if (dynamic_cast<Light *>(objects[i])) {
-			al_hold_bitmap_drawing(true);
-		}
 	}
 	al_hold_bitmap_drawing(false);
 #ifndef EDITOR

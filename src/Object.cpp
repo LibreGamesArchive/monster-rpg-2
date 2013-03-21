@@ -255,6 +255,10 @@ void Object::draw()
 
 void Object::drawUpper()
 {
+	bool held = al_is_bitmap_drawing_held();
+	if (held) {
+		al_hold_bitmap_drawing(false);
+	}
 	if (poisoned && poisonBlocks[0].color.a > 0.0f) {
 		int dx = poisonBlocks[0].x;
 		int dy = poisonBlocks[0].y;
@@ -313,6 +317,9 @@ void Object::drawUpper()
 		col.b = tmp.b * tmp.a;
 		col.a = tmp.a;
 		m_draw_bitmap(poison_bmp_tmp2, dx-5, dy-5, 0);
+	}
+	if (held) {
+		al_hold_bitmap_drawing(true);
 	}
 }
 
@@ -800,13 +807,20 @@ bool Light::update(Area *area, int step)
 
 void Light::draw()
 {
-	m_push_blender();
+	bool held = al_is_bitmap_drawing_held();
+	if (held) {
+		al_hold_bitmap_drawing(false);
+	}
 
-	m_set_blender(M_ALPHA, M_ONE, m_map_rgba(255, 255, 255, alpha));
+	al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_ONE);
 
-	m_draw_bitmap(bmp, x-area->getOriginX(), y-area->getOriginY(), 0);
+	m_draw_tinted_bitmap(bmp, m_map_rgba(255, 255, 255, alpha), x-area->getOriginX(), y-area->getOriginY(), 0);
 
-	m_pop_blender();
+	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA);
+	
+	if (held) {
+		al_hold_bitmap_drawing(true);
+	}
 }
 
 Light::Light(float x, float y, int dir, int topw, int bottomw, int length, MCOLOR color) :
@@ -832,6 +846,11 @@ Light::~Light()
 
 void Fish::draw()
 {
+	bool held = al_is_bitmap_drawing_held();
+	if (held) {
+		al_hold_bitmap_drawing(false);
+	}
+
 	m_push_target_bitmap();
 
 	m_set_target_bitmap(tmpbmp);
@@ -850,6 +869,10 @@ void Fish::draw()
 	ALLEGRO_COLOR tint = al_map_rgba(alpha, alpha, alpha, alpha);
 	al_draw_tinted_rotated_bitmap(tmpbmp->bitmap, tint, w/2, (h+MAX_WIGGLE*2)/2,
 		x-area->getOriginX(), y-area->getOriginY(), angle, 0);
+
+	if (held) {
+		al_hold_bitmap_drawing(true);
+	}
 }
 
 

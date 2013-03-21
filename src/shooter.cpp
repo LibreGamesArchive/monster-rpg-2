@@ -660,8 +660,6 @@ static void draw_everything()
 
 	tguiDraw();
 
-	m_push_blender();
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 	m_draw_bitmap(crab_icon, 0, 0, 0);
 	m_draw_bitmap(shark_icon, 0, 16, 0);
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -687,8 +685,6 @@ static void draw_everything()
 		M_FLIP_HORIZONTAL
 	);
 
-	m_pop_blender();
-	
 	drawBufferToScreen();
 }
 
@@ -806,7 +802,9 @@ start:
 	int scr_h = al_get_display_height(display);
 	m_set_mouse_xy(display, scr_w/2, scr_h/2);
 	al_rest(0.5);
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	int last_mouse_x = scr_w/2;
+#endif
 
 	bool replay = false;
 

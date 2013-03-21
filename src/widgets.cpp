@@ -123,8 +123,6 @@ static void mTextout_real(MFONT *font, const char *text, int x, int y,
 		MCOLOR text_color, MCOLOR shadow_color,
 		int shadowType, bool center)
 {
-	float inc = 1.0f;
-
 	const char *ctext;
 	char buf[100];
 
@@ -158,39 +156,14 @@ static void mTextout_real(MFONT *font, const char *text, int x, int y,
 	else {
 		ctext = text;
 	}
-	
-	void (*to)(const MFONT *, const char *text, int x, int y, MCOLOR color);
-	
-	to = m_textout;
 
-	switch (shadowType) {
-		default:
-			break;
-		/*
-		case WGT_TEXT_NORMAL:
-			break;
-		case WGT_TEXT_DROP_SHADOW:
-			to(font, ctext, x+inc, y+inc, shadow_color);
-			break;
-		case WGT_TEXT_BORDER:
-			to(font, ctext, x-inc, y, shadow_color);
-			to(font, ctext, x-inc, y-inc, shadow_color);
-			to(font, ctext, x, y-inc, shadow_color);
-			to(font, ctext, x+inc, y-inc, shadow_color);
-			to(font, ctext, x+inc, y, shadow_color);
-			to(font, ctext, x+inc, y+inc, shadow_color);
-			to(font, ctext, x, y+inc, shadow_color);
-			to(font, ctext, x-inc, y+inc, shadow_color);
-			break;
-		case WGT_TEXT_SQUARE_BORDER:
-			to(font, ctext, x+inc, y, shadow_color);
-			to(font, ctext, x, y+inc, shadow_color);
-			to(font, ctext, x+inc, y+inc, shadow_color);
-			break;
-		*/
+	if (shadowType == WGT_TEXT_DROP_SHADOW) {
+		m_textout(font, ctext, x+1, y+1, shadow_color);
+		m_textout(font, ctext, x, y+1, shadow_color);
+		m_textout(font, ctext, x+1, y, shadow_color);
 	}
-	
-	to(font, ctext, x, y, text_color);
+
+	m_textout(font, ctext, x, y, text_color);
 }
 
 
@@ -235,7 +208,7 @@ void mTextout_simple(const char *text, int x, int y, MCOLOR color)
 {
 	mTextout(game_font, text, x, y,
 		color, black,
-		WGT_TEXT_DROP_SHADOW, false);
+		WGT_TEXT_NORMAL, false);
 }
 
 
@@ -289,15 +262,8 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 	al_get_clipping_rectangle(&xxx, &yyy, &www, &hhh);
 	
 	m_set_clip(x, y, x+w, y+h);
-
-	m_push_blender();
-
-	m_set_blender(M_ONE, M_INVERSE_ALPHA,
-		m_map_rgb_f(blue.r+0.1, blue.g+0.1, blue.b+0.1));
 	
-	m_draw_bitmap(corner_bmp, x+w-m_get_bitmap_width(corner_bmp), y, 0);
-	
-	m_pop_blender();
+	m_draw_tinted_bitmap(corner_bmp, m_map_rgb_f(blue.r+0.1, blue.g+0.1, blue.b+0.1), x+w-m_get_bitmap_width(corner_bmp), y, 0);
 	
 	al_set_clipping_rectangle(xxx, yyy, www, hhh);
 
@@ -435,7 +401,7 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 			// Draw "button"
 			mTextout(game_font, _t("OK"), BW/2, y+h-15,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, true);
+				WGT_TEXT_NORMAL, true);
 			// Draw "cursor"
 			int tick = (unsigned)tguiCurrentTimeMillis() % 1000;
 			if (tick < 800) {
@@ -474,7 +440,6 @@ static void _drawSimpleStatus_real(Player *p, int x, int y, CombatantInfo info)
 {
 	MBITMAP *icon = p->getIcon();
 	
-	m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 	if (info.condition == CONDITION_POISONED) {
 		al_draw_filled_rectangle(x-1, y-1, x+1+al_get_bitmap_width(icon->bitmap), y+1+al_get_bitmap_height(icon->bitmap), al_map_rgb_f(1.0f, 0.0f, 1.0f));
 	}
@@ -488,22 +453,22 @@ static void _drawSimpleStatus_real(Player *p, int x, int y, CombatantInfo info)
 	
 	mTextout(game_font, _t(p->getName().c_str()), x+w+2, y,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, false);
+				WGT_TEXT_NORMAL, false);
 	
 	char text[100];
 	sprintf(text, _t("Level %d"), getLevel(info.experience));
 	mTextout(game_font, text, x+w+2, y+9,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, false);
+				WGT_TEXT_NORMAL, false);
 	sprintf(text, _t("HP %d/%d"), (info.abilities.hp > 0) ?
 			  info.abilities.hp : 0, info.abilities.maxhp);
 	mTextout(game_font, text, x+w+2, y+18,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, false);
+				WGT_TEXT_NORMAL, false);
 	sprintf(text, _t("MP %d/%d"), info.abilities.mp, info.abilities.maxmp);
 	mTextout(game_font, text, x+w+2, y+27,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, false);
+				WGT_TEXT_NORMAL, false);
 	
 	al_hold_bitmap_drawing(false);
 	end_text();
@@ -542,7 +507,7 @@ static void playerMiniInfoDraw_battle(int x, int y, int w, int h, void *data)
 	}
 	mTextout(game_font, text, x+5, y+41,
 		grey, black,
-		WGT_TEXT_DROP_SHADOW, false);
+		WGT_TEXT_NORMAL, false);
 }
 
 static void playerMiniInfoDraw_nobattle(int x, int y, int w, int h, void *data)
@@ -560,7 +525,7 @@ static void playerMiniInfoDraw_nobattle(int x, int y, int w, int h, void *data)
 	}
 	mTextout(game_font, text, x+5, y+40,
 		grey, black,
-		WGT_TEXT_DROP_SHADOW, false);
+		WGT_TEXT_NORMAL, false);
 }
 
 void showPlayerInfo_number(int who)
@@ -645,17 +610,17 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 			start_text();
 			mTextout(game_font, _t(msg1.c_str()), BW/2, y+5+m_text_height(game_font)/2,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, true);
+				WGT_TEXT_NORMAL, true);
 			mTextout(game_font, _t(msg2.c_str()), BW/2, y+5+m_text_height(game_font)/2+m_text_height(game_font),
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, true);
+				WGT_TEXT_NORMAL, true);
 			mTextout(game_font, _t(msg3.c_str()), BW/2, y+5+m_text_height(game_font)/2+m_text_height(game_font)*2,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, true);
+				WGT_TEXT_NORMAL, true);
 			// Draw "button"
 			mTextout(game_font, _t("OK"), BW/2, y+5+48,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, true);
+				WGT_TEXT_NORMAL, true);
 			al_hold_bitmap_drawing(false);
 			end_text();
 			// Draw "cursor"
@@ -792,23 +757,23 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 			start_text();
 			mTextout(game_font, _t(msg1.c_str()), BW/2, my1,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, true);
+				WGT_TEXT_NORMAL, true);
 			mTextout(game_font, _t(msg2.c_str()), BW/2, my2,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, true);
+				WGT_TEXT_NORMAL, true);
 			mTextout(game_font, _t(msg3.c_str()), BW/2, my3,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, true);
+				WGT_TEXT_NORMAL, true);
 			// Draw "buttons"
 			mTextout(game_font, _t(b1text.c_str()), x1, ty,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, true);
+				WGT_TEXT_NORMAL, true);
 			mTextout(game_font, _t(b2text.c_str()), x2, ty,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, true);
+				WGT_TEXT_NORMAL, true);
 			mTextout(game_font, _t(b3text.c_str()), x3, ty,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, true);
+				WGT_TEXT_NORMAL, true);
 			al_hold_bitmap_drawing(false);
 			end_text();
 			// Draw "cursor"
@@ -962,20 +927,20 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 			start_text();
 			mTextout(game_font, _t(msg1.c_str()), BW/2, y+5+m_text_height(game_font)/2,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, true);
+				WGT_TEXT_NORMAL, true);
 			mTextout(game_font, _t(msg2.c_str()), BW/2, y+5+m_text_height(game_font)/2+m_text_height(game_font),
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, true);
+				WGT_TEXT_NORMAL, true);
 			// Draw "buttons"
 			mTextout(game_font, _t(s1), BW/2-w/4, y+3+38,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, true);
+				WGT_TEXT_NORMAL, true);
 			mTextout(game_font, _t(s2), BW/2+w/4, y+3+38,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, true);
+				WGT_TEXT_NORMAL, true);
 			mTextout(game_font, _t(bottom_msg.c_str()), BW/2, BH-10,
 				grey, black,
-				WGT_TEXT_BORDER, true);
+				WGT_TEXT_NORMAL, true);
 			al_hold_bitmap_drawing(false);
 			end_text();
 			// Draw "cursor"
@@ -1329,8 +1294,8 @@ void MSpeechDialog::realDrawText(int section, int xo, int yo)
 
 	int cx = xx+xo;
 	int cy = yy+yo;
-	const int SPACE_SIZE = 7;
-
+	int SPACE_SIZE = 7;
+	
 	for (int i = 0; i < words; i++) {
 		std::string word;
 		ss >> word;
@@ -1345,7 +1310,7 @@ void MSpeechDialog::realDrawText(int section, int xo, int yo)
 			cy += m_text_height(game_font)+1;
 		}
 		mTextout(game_font, word.c_str(), cx, cy, white, black,
-			WGT_TEXT_DROP_SHADOW, false);
+			WGT_TEXT_NORMAL, false);
 		cx += m_text_length(game_font, word.c_str()) + SPACE_SIZE;
 	}
 }
@@ -1561,10 +1526,9 @@ void MLabel::setString(std::string s)
 
 void MLabel::draw()
 {
-	bool held = al_is_bitmap_drawing_held();
 	mTextout(game_font, _t(text), x, y,
 		color, black,
-		WGT_TEXT_DROP_SHADOW, false);
+		WGT_TEXT_NORMAL, false);
 }
 
 
@@ -1712,7 +1676,7 @@ MTextButton::MTextButton(int x, int y, std::string text, bool disabled, TGUIWidg
 	this->hotkeys = 0;
 	clicked = false;
 
-	shadow_type = WGT_TEXT_DROP_SHADOW;
+	shadow_type = WGT_TEXT_NORMAL;
 
 	this->disabled = disabled;
 
@@ -1935,23 +1899,9 @@ MInputGetter::MInputGetter(int type, int x, int y, int w, std::string text, int 
 	this->mode = NORMAL;
 }
 
-MInputGetter::~MInputGetter(void)
+MInputGetter::~MInputGetter()
 {
 }
-
-
-MTextButtonFullShadow::MTextButtonFullShadow(int x, int y, std::string text, bool hold_drawing) :
-	MTextButton(x, y, text, false, NULL, NULL, hold_drawing)
-{
-	shadow_type = WGT_TEXT_DROP_SHADOW;
-}
-
-
-MTextButtonFullShadow::~MTextButtonFullShadow(void)
-{
-}
-
-
 
 void MToggle::draw()
 {
@@ -1965,7 +1915,6 @@ void MToggle::draw()
 	mTextout(game_font, _t(options[selected].c_str()), x, y,
 		color, black, WGT_TEXT_NORMAL, false);
 }
-
 
 int MToggle::update(int millis)
 {
@@ -2489,19 +2438,19 @@ static void drawSimpleEquipment(int partyMember, int x, int y, int height)
 	sprintf(text, "%s", _t(getItemName(info.equipment.lhand).c_str()));
 	mTextout(game_font, text, x + m_text_height(game_font) + 2, y,
 		grey, black,
-		WGT_TEXT_DROP_SHADOW, false);
+		WGT_TEXT_NORMAL, false);
 	if (info.equipment.lhand >= 0 && weapons[items[info.equipment.lhand].id].ammo) {
 		int o = 2 + m_text_length(game_font, text);
 		sprintf(text, "(%d)", info.equipment.lquantity);
 		mTextout(game_font, text,
 			x+o + m_text_height(game_font) + 2,
 			y, grey, black,
-			WGT_TEXT_DROP_SHADOW, false);
+			WGT_TEXT_NORMAL, false);
 	}
 	sprintf(text, "%s", _t(getItemName(info.equipment.rhand).c_str()));
 	mTextout(game_font, text, x + m_text_height(game_font) + 2, y+m_text_height(game_font)+extra,
 		grey, black,
-		WGT_TEXT_DROP_SHADOW, false);
+		WGT_TEXT_NORMAL, false);
 	if (info.equipment.rhand >= 0 && weapons[items[info.equipment.rhand].id].ammo) {
 		int o = 2 + m_text_length(game_font, text);
 		sprintf(text, "(%d)", info.equipment.rquantity);
@@ -2509,20 +2458,20 @@ static void drawSimpleEquipment(int partyMember, int x, int y, int height)
 			x+o + m_text_height(game_font) + 2,
 			y+m_text_height(game_font)+extra,
 			grey, black,
-			WGT_TEXT_DROP_SHADOW, false);
+			WGT_TEXT_NORMAL, false);
 	}
 	sprintf(text, "%s", _t(getItemName(info.equipment.harmor).c_str()));
 	mTextout(game_font, text, x + m_text_height(game_font) + 2, y+m_text_height(game_font)*2+extra*2,
 		grey, black,
-		WGT_TEXT_DROP_SHADOW, false);
+		WGT_TEXT_NORMAL, false);
 	sprintf(text, "%s", _t(getItemName(info.equipment.carmor).c_str()));
 	mTextout(game_font, text, x + m_text_height(game_font) + 2, y+m_text_height(game_font)*3+extra*3,
 		grey, black,
-		WGT_TEXT_DROP_SHADOW, false);
+		WGT_TEXT_NORMAL, false);
 	sprintf(text, "%s", _t(getItemName(info.equipment.farmor).c_str()));
 	mTextout(game_font, text, x + m_text_height(game_font) + 2, y+m_text_height(game_font)*4+extra*4,
 		grey, black,
-		WGT_TEXT_DROP_SHADOW, false);
+		WGT_TEXT_NORMAL, false);
 	
 	al_hold_bitmap_drawing(false);
 	end_text();
@@ -2534,23 +2483,23 @@ static void drawSimpleEquipment(int partyMember, int x, int y, int height)
 	sprintf(text, "%s", getItemIcon(info.equipment.lhand).c_str());
 	mTextout(game_font, text, x, y,
 		grey, black,
-		WGT_TEXT_DROP_SHADOW, false);
+		WGT_TEXT_NORMAL, false);
 	sprintf(text, "%s", getItemIcon(info.equipment.rhand).c_str());
 	mTextout(game_font, text, x, y+m_text_height(game_font)+extra,
 		grey, black,
-		WGT_TEXT_DROP_SHADOW, false);
+		WGT_TEXT_NORMAL, false);
 	sprintf(text, "%s", getItemIcon(info.equipment.harmor).c_str());
 	mTextout(game_font, text, x, y+m_text_height(game_font)*2+extra*2,
 		grey, black,
-		WGT_TEXT_DROP_SHADOW, false);
+		WGT_TEXT_NORMAL, false);
 	sprintf(text, "%s", getItemIcon(info.equipment.carmor).c_str());
 	mTextout(game_font, text, x, y+m_text_height(game_font)*3+extra*3,
 		grey, black,
-		WGT_TEXT_DROP_SHADOW, false);
+		WGT_TEXT_NORMAL, false);
 	sprintf(text, "%s", getItemIcon(info.equipment.farmor).c_str());
 	mTextout(game_font, text, x, y+m_text_height(game_font)*4+extra*4,
 		grey, black,
-		WGT_TEXT_DROP_SHADOW, false);
+		WGT_TEXT_NORMAL, false);
 	
 	al_hold_bitmap_drawing(false);
 }
@@ -2659,7 +2608,7 @@ void MMap::draw()
 		}
 
 		mTextout(game_font, _t(points[selected].display_name.c_str()), 5, BH-m_text_height(game_font)-5, black, white,
-			WGT_TEXT_DROP_SHADOW, false);
+			WGT_TEXT_NORMAL, false);
 	}
 
 }
@@ -2777,7 +2726,6 @@ int MMap::update(int millis)
 		if (points[selected].dest_area == "Keep_outer") {
 			playMusic("keep.ogg");
 			MBITMAP *bmp = m_load_bitmap(getResource("media/keep.png"));
-			m_push_blender();
 			int w = m_get_bitmap_width(bmp);
 			int h = m_get_bitmap_height(bmp);
 			const int start_x = (w-BW)/2;
@@ -2813,11 +2761,6 @@ int MMap::update(int millis)
 				if (!break_for_fade_after_draw) {
 					set_target_backbuffer();
 				}
-				/*
-				 * For some unknown reason m_draw_scaled_bitmap
-				 * sets an alpha blender, and I don't want to
-				 * find out why.
-				 */
 				m_draw_scaled_bitmap(bmp, curr_x, curr_y, curr_w, curr_h, 0, 0, BW, BH, 0);
 				drawBufferToScreen(false);
 
@@ -2844,7 +2787,6 @@ int MMap::update(int millis)
 			}
 			al_rest(5.0);
 			dpad_on();
-			m_pop_blender();
 			if (break_for_fade_after_draw) {
 				break_for_fade_after_draw = false;
 				prepareForScreenGrab2();
@@ -3526,7 +3468,7 @@ void MSpellSelector::draw()
 		}
 		mTextout(game_font, _t(name.c_str()), dx + m_text_height(game_font)+2, dy,
 			color, black,
-			WGT_TEXT_DROP_SHADOW, false);
+			WGT_TEXT_NORMAL, false);
 loop:
 		if ((i % 2) == 1)
 			dy += 15;
@@ -3558,7 +3500,7 @@ loop:
 		}
 		mTextout(game_font, "{008}", dx, dy,
 			color, black,
-			WGT_TEXT_DROP_SHADOW, false);
+			WGT_TEXT_NORMAL, false);
 loop2:
 		if ((i % 2) == 1)
 			dy += 15;
@@ -3585,15 +3527,12 @@ loop2:
 	if (dragging) {
 		ALLEGRO_MOUSE_STATE state;
 		al_get_mouse_state(&state);
-		m_push_blender();
-		m_set_blender(M_ONE, M_INVERSE_ALPHA, al_map_rgba(128, 128, 128, 128));
 		int w = m_get_bitmap_width(dragBmp);
 		int h = m_get_bitmap_height(dragBmp);
-		m_draw_scaled_bitmap_identity_view(
-			dragBmp, 0, 0, w, h,
+		m_draw_tinted_scaled_bitmap_identity_view(
+			dragBmp, al_map_rgba_f(0.5, 0.5, 0.5, 0.5), 0, 0, w, h,
 			state.x-w, state.y-h,
 			w*2, h*2, 0);
-		m_pop_blender();
 	}
 
 	if (use_dpad && this != tguiActiveWidget)
@@ -3613,7 +3552,7 @@ loop2:
 
 	mTextout(game_font, _t("Cost:"), fx+3, fy+2,
 		grey, black,
-		WGT_TEXT_DROP_SHADOW, false);
+		WGT_TEXT_NORMAL, false);
 	
 	char cost[10];
 	if (selected >= 0 && info.spells[selected] != "") {
@@ -3624,17 +3563,17 @@ loop2:
 	}
 		mTextout(game_font, cost, fx+3, fy+2+9,
 		grey, black,
-		WGT_TEXT_DROP_SHADOW, false);
+		WGT_TEXT_NORMAL, false);
 
 	mTextout(game_font, _t("Remain:"), fx+3, fy+2+18,
 		grey, black,
-		WGT_TEXT_DROP_SHADOW, false);
+		WGT_TEXT_NORMAL, false);
 	
 	char remain[10];
 	sprintf(remain, "%d", info.abilities.mp);
 		mTextout(game_font, remain, fx+3, fy+2+27,
 		grey, black,
-		WGT_TEXT_DROP_SHADOW, false);
+		WGT_TEXT_NORMAL, false);
 	
 	al_hold_bitmap_drawing(false);
 	end_text();
@@ -3703,7 +3642,7 @@ int MSpellSelector::update(int millis)
 			m_clear(m_map_rgba(0, 0, 0, 0));
 			mTextout(game_font, s, 0, 2,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, false);
+				WGT_TEXT_NORMAL, false);
 			m_pop_target_bitmap();
 		}
 	}
@@ -4205,27 +4144,24 @@ void MToggleList::draw()
 			mTextout(game_font, buf, x, yy,
 				m_map_rgb(255, 255, 0),
 				black,
-				WGT_TEXT_DROP_SHADOW, false);
+				WGT_TEXT_NORMAL, false);
 		else
 			mTextout(game_font, buf, x, yy,
 				grey,
 				black,
-				WGT_TEXT_DROP_SHADOW, false);
+				WGT_TEXT_NORMAL, false);
 		yy += 15;
 	}
 	
 	if (dragging) {
 		ALLEGRO_MOUSE_STATE state;
 		al_get_mouse_state(&state);
-		m_push_blender();
-		m_set_blender(M_ONE, M_INVERSE_ALPHA, al_map_rgba(128, 128, 128, 128));
 		int w = m_get_bitmap_width(dragBmp);
 		int h = m_get_bitmap_height(dragBmp);
-		m_draw_scaled_bitmap_identity_view(
-			dragBmp, 0, 0, w, h,
+		m_draw_tinted_scaled_bitmap_identity_view(
+			dragBmp, al_map_rgba_f(0.5, 0.5, 0.5, 0.5), 0, 0, w, h,
 			state.x-w, state.y-h,
 			w*2, h*2, 0);
-		m_pop_blender();
 	}
 
 	int dx, dy;
@@ -4579,15 +4515,12 @@ void MScrollingList::post_draw()
 	if (dragging) {
 		ALLEGRO_MOUSE_STATE state;
 		al_get_mouse_state(&state);
-		m_push_blender();
-		m_set_blender(M_ONE, M_INVERSE_ALPHA, al_map_rgba(128, 128, 128, 128));
 		int w = m_get_bitmap_width(dragBmp);
 		int h = m_get_bitmap_height(dragBmp);
-		m_draw_scaled_bitmap_identity_view(
-			dragBmp, 0, 0, w, h,
+		m_draw_tinted_scaled_bitmap_identity_view(
+			dragBmp, al_map_rgba_f(0.5, 0.5, 0.5, 0.5), 0, 0, w, h,
 			state.x-w, state.y-h,
 			w*2, h*2, 0);
-		m_pop_blender();
 	}
 }
 
@@ -4600,8 +4533,9 @@ void MScrollingList::draw()
 	m_set_clip(x, y-1, width-30+x, 15*rows+1+y-1);
 
 	bool held = al_is_bitmap_drawing_held();
-	start_text();
+	al_hold_bitmap_drawing(false);
 	al_hold_bitmap_drawing(true);
+	start_text();
 
 	for (int i = 0; i < rows; i++) {
 		int r = i + top;
@@ -4618,11 +4552,10 @@ void MScrollingList::draw()
 			mTextout_simple(_t(items[r].c_str()), x, yy, grey);
 		yy += 15;
 	}
-
+	end_text();
 	al_hold_bitmap_drawing(false);
 	al_hold_bitmap_drawing(held);
-	end_text();
-	
+
 	al_set_clipping_rectangle(cx, cy, cw, ch);
 	
 	int dx, dy;
@@ -4671,7 +4604,7 @@ int MScrollingList::update(int millis)
 			m_clear(m_map_rgba(0, 0, 0, 0));
 			mTextout(game_font, s, 0, 2,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, false);
+				WGT_TEXT_NORMAL, false);
 			m_pop_target_bitmap();
 		}
 		else {
@@ -5179,11 +5112,11 @@ void MItemSelector::draw()
 		}
 		mTextout(game_font, s, dx + m_text_height(game_font) + 2, dy,
 			color, black,
-			WGT_TEXT_DROP_SHADOW, false);
+			WGT_TEXT_NORMAL, false);
 		sprintf(s, "%d", inv->quantity);
 		mTextout(game_font, s, dx-20, dy,
 			color, black,
-			WGT_TEXT_DROP_SHADOW, false);
+			WGT_TEXT_NORMAL, false);
 loop:
 		if ((i % 2) == 1)
 			dy += 15;
@@ -5216,7 +5149,7 @@ loop:
 		}
 		mTextout(game_font, s, dx, dy,
 			color, black,
-			WGT_TEXT_DROP_SHADOW, false);
+			WGT_TEXT_NORMAL, false);
 loop2:
 		if ((i % 2) == 1)
 			dy += 15;
@@ -5243,15 +5176,12 @@ loop2:
 	if (dragging) {
 		ALLEGRO_MOUSE_STATE state;
 		al_get_mouse_state(&state);
-		m_push_blender();
-		m_set_blender(M_ONE, M_INVERSE_ALPHA, al_map_rgba(128, 128, 128, 128));
 		int w = m_get_bitmap_width(dragBmp);
 		int h = m_get_bitmap_height(dragBmp);
-		m_draw_scaled_bitmap_identity_view(
-			dragBmp, 0, 0, w, h,
+		m_draw_tinted_scaled_bitmap_identity_view(
+			dragBmp, al_map_rgba_f(0.5, 0.5, 0.5, 0.5), 0, 0, w, h,
 			state.x-w, state.y-h,
 			w*2, h*2, 0);
-		m_pop_blender();
 	}
 
 	// draw arrows
@@ -5324,7 +5254,7 @@ int MItemSelector::update(int millis)
 			m_clear(m_map_rgba(0, 0, 0, 0));
 			mTextout(game_font, s, 0, 2,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, false);
+				WGT_TEXT_NORMAL, false);
 			m_pop_target_bitmap();
 		}
 		else if (selected >= 0) {
@@ -6463,18 +6393,18 @@ void MPartySelector::draw()
 		}
 		mTextout(game_font, text, 5, y+40,
 			grey, black,
-			WGT_TEXT_DROP_SHADOW, false);
+			WGT_TEXT_NORMAL, false);
 	}
 	else {
 		if (index >= MAX_PARTY) {
 			mTextout(game_font, _t("Trash"), BW/2, y+height/2,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, true);
+				WGT_TEXT_NORMAL, true);
 		}
 		else {
 			mTextout(game_font, _t("Empty"), BW/2, y+height/2,
 				grey, black,
-				WGT_TEXT_DROP_SHADOW, true);
+				WGT_TEXT_NORMAL, true);
 		}
 	}
 
@@ -6495,15 +6425,12 @@ void MPartySelector::draw()
 	if (dragging) {
 		ALLEGRO_MOUSE_STATE state;
 		al_get_mouse_state(&state);
-		m_push_blender();
-		m_set_blender(M_ONE, M_INVERSE_ALPHA, al_map_rgba(128, 128, 128, 128));
 		int w = m_get_bitmap_width(dragBmp);
 		int h = m_get_bitmap_height(dragBmp);
-		m_draw_scaled_bitmap_identity_view(
-			dragBmp, 0, 0, w, h,
+		m_draw_tinted_scaled_bitmap_identity_view(
+			dragBmp, al_map_rgba_f(0.5, 0.5, 0.5, 0.5), 0, 0, w, h,
 			state.x-w, state.y-h,
 			w*2, h*2, 0);
-		m_pop_blender();
 	}
 }
 
@@ -6584,7 +6511,7 @@ int MPartySelector::update(int millis)
 					m_clear(m_map_rgba(0, 0, 0, 0));
 					mTextout(game_font, _t(s), 0, 2,
 						grey, black,
-						WGT_TEXT_DROP_SHADOW, false);
+						WGT_TEXT_NORMAL, false);
 					m_pop_target_bitmap();
 				}
 			}
@@ -6826,14 +6753,13 @@ void MIcon::pre_draw()
 void MIcon::draw()
 {
 	m_draw_tinted_bitmap(bitmap, tint, x, y, 0);
-	if (this == tguiActiveWidget && show_focus) {
-		m_push_blender();
-		m_set_blender(ALLEGRO_ONE, ALLEGRO_ONE, white);
+	if (accFocus && this == tguiActiveWidget && show_focus) {
+		al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ONE);
 		double t = fmod(al_get_time(), 1.0);
 		if (t >= 0.5) t = 0.5 - (t-0.5);
 		float a = t / 0.5;
 		al_draw_tinted_bitmap(bitmap->bitmap, al_map_rgba_f(a, a, a, a), x, y, 0);
-		m_pop_blender();
+		al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA);
 	}
 	if (down && show_name) {
 		m_draw_rectangle(
@@ -6975,7 +6901,7 @@ void MSingleToggle::draw(void)
 
 	mTextout(game_font, _t(options[selected].c_str()), x, y,
 		c, black,
-		WGT_TEXT_DROP_SHADOW,
+		WGT_TEXT_NORMAL,
 		false);
 }
 
@@ -7098,11 +7024,11 @@ void MDoubleToggle::draw(void)
 
 	mTextout(game_font, _t(text1.c_str()), x+5, y,
 		color1, black,
-		WGT_TEXT_DROP_SHADOW, false);
+		WGT_TEXT_NORMAL, false);
 	
 	mTextout(game_font, _t(text2.c_str()), x2+5, y,
 		color2, black,
-		WGT_TEXT_DROP_SHADOW, false);
+		WGT_TEXT_NORMAL, false);
 	
 }
 
@@ -7566,6 +7492,152 @@ MDragNDropForm::MDragNDropForm(void)
 	who = -1;
 }
 
+void MMainMenu::mouseDown(int mx, int my, int b)
+{
+	if (mx < BW/4) {
+		playPreloadedSample("blip.ogg");
+		selected--;
+		if (selected < 0) {
+			selected = options.size()-1;
+		}
+	}
+	else if (mx > BW-BW/4) {
+		playPreloadedSample("blip.ogg");
+		selected++;
+		if (selected == (int)options.size()) {
+			selected = 0;
+		}
+	}
+	else {
+		clicked = true;
+	}
+}
+
+
+void MMainMenu::draw(void)
+{
+	bool show = false;
+	if (((unsigned)tguiCurrentTimeMillis() % 300) < 150) {
+		show = true;
+	}
+
+	al_draw_filled_rectangle(0, mid_y-m_text_height(game_font)/2-10, BW, mid_y+m_text_height(game_font)/2+10, m_map_rgba(45, 45, 45, 160));
+	al_draw_line(0, mid_y-m_text_height(game_font)/2-10, BW, mid_y-m_text_height(game_font)/2-10, white, 1);
+	al_draw_line(0, mid_y+m_text_height(game_font)/2+10, BW, mid_y+m_text_height(game_font)/2+10, white, 1);
+
+	mTextout(game_font, _t(options[selected].c_str()), BW/2, mid_y,
+		this == tguiActiveWidget ? m_map_rgb(255, 255, 0) : white, black,
+		WGT_TEXT_NORMAL,
+		true);
+
+	int prev = selected-1;
+	if (prev < 0) prev = (int)options.size()-1;
+	int next = selected+1;
+	if (next >= (int)options.size()) next = 0;
+
+	mTextout(game_font, _t(options[selected].c_str()), BW/2, mid_y,
+		this == tguiActiveWidget ? m_map_rgb(255, 255, 0) : white, black,
+		WGT_TEXT_NORMAL,
+		true);
+
+	mTextout(game_font, _t(options[prev].c_str()), 0, mid_y,
+		this == tguiActiveWidget ? m_map_rgba(64, 64, 0, 64) : m_map_rgba(64, 64, 64, 64), black,
+		WGT_TEXT_NORMAL,
+		true);
+
+	mTextout(game_font, _t(options[next].c_str()), BW, mid_y,
+		this == tguiActiveWidget ? m_map_rgba(64, 64, 0, 64) : m_map_rgba(64, 64, 64, 64), black,
+		WGT_TEXT_NORMAL,
+		true);
+
+	if (show) {
+		m_draw_bitmap(arrow, 0, mid_y-m_get_bitmap_height(arrow)/2, 0);
+		m_draw_bitmap(arrow, BW-m_get_bitmap_width(arrow), mid_y-m_get_bitmap_height(arrow)/2, 
+			M_FLIP_HORIZONTAL);
+	}
+}
+
+
+int MMainMenu::update(int millis)
+{
+	INPUT_EVENT ie;
+	
+	if (this == tguiActiveWidget)
+		ie = get_next_input_event();
+	else
+		ie = EMPTY_INPUT_EVENT;
+
+	if (clicked || ie.button1 == DOWN) {
+		use_input_event();
+		playPreloadedSample("select.ogg");
+		clicked = false;
+		return TGUI_RETURN;
+	}
+
+	if (ie.left == DOWN) {
+		use_input_event();
+		playPreloadedSample("blip.ogg");
+		selected--;
+		if (selected < 0) selected = (int)options.size()-1;
+	}
+	else if (ie.right == DOWN) {
+		use_input_event();
+		playPreloadedSample("blip.ogg");
+		selected++;
+		if (selected == (int)options.size()) selected = 0;
+	}
+	else if (ie.up == DOWN) {
+		use_input_event();
+		playPreloadedSample("blip.ogg");
+		tguiFocusPrevious();
+	}
+	else if (ie.down == DOWN) {
+		use_input_event();
+		playPreloadedSample("blip.ogg");
+		tguiFocusNext();
+	}
+
+	return TGUI_CONTINUE;
+}
+
+
+bool MMainMenu::acceptsFocus(void)
+{
+	return true;
+}
+
+
+int MMainMenu::getSelected(void)
+{
+	return selected;
+}
+
+void MMainMenu::setSelected(int sel)
+{
+	selected = sel;
+}
+
+
+MMainMenu::MMainMenu(int mid_y, std::vector<std::string> options)
+{
+	this->x = 0;
+	this->y = mid_y-m_text_height(game_font)/2-10;
+	this->width = BW;
+	this->height = m_text_height(game_font)+20;
+	this->options = options;
+	this->hotkeys = 0;
+	selected = 0;
+	arrow = m_load_bitmap(getResource("media/arrow.png"));
+	clicked = false;
+	this->mid_y = mid_y;
+}
+	
+	
+MMainMenu::~MMainMenu(void)
+{
+	m_destroy_bitmap(arrow);
+}
+
 #ifdef EDITOR
 
 void WgtFrame::draw()
@@ -7695,7 +7767,7 @@ void WgtButton::draw()
 
 	mTextout(font, text.c_str(), x+width/2, y+height/2,
 		text_color, color,
-		WGT_TEXT_BORDER, true);
+		WGT_TEXT_NORMAL, true);
 }
 
 
@@ -8291,7 +8363,7 @@ void WgtRadioButton::draw()
 	}
 
 	mTextout(font, text.c_str(), x + height + 5, y, textColor, black,
-		WGT_TEXT_BORDER, false);
+		WGT_TEXT_NORMAL, false);
 }
 
 
@@ -8410,7 +8482,7 @@ WgtRadioButton::~WgtRadioButton()
 void WgtLabel::draw()
 {
 	mTextout(font, text.c_str(), x, y, textColor, shadowColor,
-		WGT_TEXT_BORDER, false);
+		WGT_TEXT_NORMAL, false);
 }
 
 

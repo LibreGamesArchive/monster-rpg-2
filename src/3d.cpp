@@ -568,8 +568,10 @@ static int real_archery(int *accuracy_pts)
 	int scr_w = al_get_display_width(display);
 	int scr_h = al_get_display_height(display);
 	m_set_mouse_xy(display, scr_w/2, scr_h/2);
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	int last_mouse_x = scr_w/2;
 	int last_mouse_y = scr_h/2;
+#endif
 
 	// stop set_sets (astar with mouse)
 	getInput()->set(false, false, false, false, false, false, false);
@@ -873,8 +875,6 @@ static int real_archery(int *accuracy_pts)
 
 			float arrow_dist = 0.1;
 
-			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
-
 			m_draw_bitmap(grass, 0, 0, 0);
 
 			// Need 3 passes to draw goblins
@@ -903,7 +903,6 @@ static int real_archery(int *accuracy_pts)
 				}
 			}
 
-			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 			m_draw_bitmap(tower, 0, 0, 0);
 
 			m_draw_line(target_x-4, target_y, target_x+4, target_y, m_map_rgb(255, 0, 0));
@@ -1392,8 +1391,6 @@ void volcano_scene(void)
 			if (!break_for_fade_after_draw) {
 				set_target_backbuffer();
 			}
-
-			m_set_blender(M_ONE, M_INVERSE_ALPHA, white);
 
 			if (stage == STAGE_SHOOTING && count > 0) {
 				// Can't do this without a single retained buffer to draw on

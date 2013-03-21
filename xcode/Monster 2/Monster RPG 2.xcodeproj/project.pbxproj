@@ -7,15 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9609BD8813636F270068EB38 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7413636EDE0068EB38 /* AudioToolbox.framework */; };
-		9609BD8913636F270068EB38 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7513636EDE0068EB38 /* AVFoundation.framework */; };
-		9609BD8A13636F270068EB38 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7613636EDE0068EB38 /* CoreFoundation.framework */; };
-		9609BD8B13636F270068EB38 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7713636EDE0068EB38 /* CoreGraphics.framework */; };
-		9609BD8C13636F270068EB38 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7813636EDE0068EB38 /* Foundation.framework */; };
-		9609BD8D13636F270068EB38 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7913636EDE0068EB38 /* MediaPlayer.framework */; };
-		9609BD8E13636F270068EB38 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7A13636EDE0068EB38 /* MobileCoreServices.framework */; };
-		9609BD8F13636F270068EB38 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7B13636EDE0068EB38 /* OpenGLES.framework */; };
-		9609BD9013636F270068EB38 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7C13636EDE0068EB38 /* QuartzCore.framework */; };
 		960C9CA316E0A4FD00ABC0FA /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 960C9CA116E0A4AA00ABC0FA /* init.cpp */; };
 		960C9CA416E0A4FE00ABC0FA /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 960C9CA116E0A4AA00ABC0FA /* init.cpp */; };
 		960DB499154C82EA000869BD /* NetReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB489154C82EA000869BD /* NetReachability.m */; };
@@ -26,14 +17,12 @@
 		960DB49E154C82EA000869BD /* TCPService.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB494154C82EA000869BD /* TCPService.m */; };
 		960DB49F154C82EA000869BD /* ThrottledTCPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB496154C82EA000869BD /* ThrottledTCPConnection.m */; };
 		960DB4A0154C82EA000869BD /* UDPSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB498154C82EA000869BD /* UDPSocket.m */; };
-		960DB4A2154C8341000869BD /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960DB4A1154C8341000869BD /* SystemConfiguration.framework */; };
 		9610AF8216C4BDFD0050372E /* Area.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9610AF8116C4BDFD0050372E /* Area.cpp */; };
 		9610AF8416C4BE6B0050372E /* libbzip2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9610AF8316C4BE6B0050372E /* libbzip2.a */; };
 		9610AF8516C4BEAD0050372E /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 964D7FC715CCF44600D6F9AF /* libcurl.a */; };
 		9610AF8A16C4BEAD0050372E /* liblua5.2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9610AF8716C4BEAD0050372E /* liblua5.2.a */; };
 		9610AF8B16C4BEAD0050372E /* libphysfs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9610AF8816C4BEAD0050372E /* libphysfs.a */; };
 		9610AF9516C4C26A0050372E /* libJoypad.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9610AF9416C4C26A0050372E /* libJoypad.a */; };
-		9610AF9716C4C5540050372E /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9610AF9616C4C5540050372E /* Security.framework */; };
 		9610AF9916C4C82E0050372E /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9610AF9816C4C82E0050372E /* data */; };
 		9610AF9B16C4C8E60050372E /* icon57.png in Resources */ = {isa = PBXBuildFile; fileRef = 9610AF9A16C4C8E60050372E /* icon57.png */; };
 		9610AF9D16C4C8ED0050372E /* icon114.png in Resources */ = {isa = PBXBuildFile; fileRef = 9610AF9C16C4C8ED0050372E /* icon114.png */; };
@@ -88,7 +77,6 @@
 		9636677016C9FF0A00A24B46 /* svg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9636676E16C9FC8200A24B46 /* svg.cpp */; };
 		9636677216C9FF9100A24B46 /* liballegro_color-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636677116C9FF9100A24B46 /* liballegro_color-static.a */; };
 		9639C4361152D3A900804984 /* iphone.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9639C4351152D3A900804984 /* iphone.mm */; };
-		964D7FC615CC7DAB00D6F9AF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7D13636EDE0068EB38 /* UIKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		964FB80216E6051600F4BBA4 /* tgui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9636675A16C985CB00A24B46 /* tgui.cpp */; };
 		964FB80316E6051600F4BBA4 /* Area.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9636675816C9858E00A24B46 /* Area.cpp */; };
 		964FB80416E6051600F4BBA4 /* mygamecentervc.m in Sources */ = {isa = PBXBuildFile; fileRef = 96E3D50416C0D06C00A4A973 /* mygamecentervc.m */; };
@@ -134,7 +122,6 @@
 		964FB82C16E6051600F4BBA4 /* widgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224273103D96D400756C5B /* widgets.cpp */; };
 		964FB82D16E6051600F4BBA4 /* xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224274103D96D400756C5B /* xml.cpp */; };
 		964FB82E16E6051600F4BBA4 /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 960C9CA116E0A4AA00ABC0FA /* init.cpp */; };
-		964FB83016E6051600F4BBA4 /* liballegro_color-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636677116C9FF9100A24B46 /* liballegro_color-static.a */; };
 		964FB83116E6051600F4BBA4 /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636676C16C9FC2B00A24B46 /* libexpat.a */; };
 		964FB83216E6051600F4BBA4 /* libdom.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636676216C9FC0800A24B46 /* libdom.a */; };
 		964FB83316E6051600F4BBA4 /* libhubbub.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636676316C9FC0800A24B46 /* libhubbub.a */; };
@@ -169,7 +156,6 @@
 		964FB85216E6051600F4BBA4 /* libbass.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 96FB52F0158EBBFC00FF36FC /* libbass.dylib */; };
 		964FB85316E6051600F4BBA4 /* libbassflac.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 969799791587A59E006E8AFA /* libbassflac.dylib */; };
 		964FB85516E6051600F4BBA4 /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9636676016C9886700A24B46 /* data */; };
-		965070C016CE501800E6E9D4 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 961BFB42143E093A00DD1693 /* GameKit.framework */; };
 		9659CDA1143A426C0007757E /* joypad.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA0143A426C0007757E /* joypad.mm */; };
 		9659CDA4143A42C50007757E /* joypad_handler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA3143A42C50007757E /* joypad_handler.m */; };
 		96729A7B16CADBDD00C094D5 /* libdom.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96729A7516CADBDD00C094D5 /* libdom.a */; };
@@ -181,7 +167,6 @@
 		9677118016C21DF10092EE0A /* liballegro_physfs-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9677117E16C21DF10092EE0A /* liballegro_physfs-static.a */; };
 		9677118116C21DF10092EE0A /* libphysfs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9677117F16C21DF10092EE0A /* libphysfs.a */; };
 		968C1E5B13BBB51D00615225 /* libbass.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 968C1E5A13BBB51D00615225 /* libbass.a */; };
-		968C1E5D13BBB55900615225 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 968C1E5C13BBB55900615225 /* CFNetwork.framework */; };
 		968C1E7A13BCED5E00615225 /* libbassflac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 968C1E7913BCED5D00615225 /* libbassflac.a */; };
 		968D3EFE15CAD4FE0080197D /* libjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96CB82621596A89100AD6979 /* libjpeg.a */; };
 		968D3F8B15CAE0EE0080197D /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 968D3F8A15CAE0EE0080197D /* libcurl.a */; };
@@ -246,6 +231,28 @@
 		96B4B139143BBEDC00ACA64C /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0D0143BBA8400ACA64C /* libfreetype.a */; };
 		96B4B13B143BBEDC00ACA64C /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0D3143BBA8400ACA64C /* libz.a */; };
 		96B7D08613D09EF7004D7ED6 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B7D08413D09EF7004D7ED6 /* libz.a */; };
+		96BC52A316FA8E39004E526B /* atlas_accessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96BC52A116FA8E39004E526B /* atlas_accessor.cpp */; };
+		96BC52A416FA8E39004E526B /* atlas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96BC52A216FA8E39004E526B /* atlas.cpp */; };
+		96BC52A516FA8EA9004E526B /* atlas_accessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96BC52A116FA8E39004E526B /* atlas_accessor.cpp */; };
+		96BC52A616FA8EAE004E526B /* atlas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96BC52A216FA8E39004E526B /* atlas.cpp */; };
+		96BC52A716FA8EB4004E526B /* atlas_accessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96BC52A116FA8E39004E526B /* atlas_accessor.cpp */; };
+		96BC52A816FA8EB8004E526B /* atlas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96BC52A216FA8E39004E526B /* atlas.cpp */; };
+		96BC52AA16FA8EE7004E526B /* my_load_bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96BC52A916FA8EE7004E526B /* my_load_bitmap.cpp */; };
+		96BC52AB16FA8F1A004E526B /* my_load_bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96BC52A916FA8EE7004E526B /* my_load_bitmap.cpp */; };
+		96BC52AC16FA8F20004E526B /* my_load_bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96BC52A916FA8EE7004E526B /* my_load_bitmap.cpp */; };
+		96BC52AD16FA8FB4004E526B /* liballegro_color-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636677116C9FF9100A24B46 /* liballegro_color-static.a */; };
+		96BC52AE16FA90E4004E526B /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7413636EDE0068EB38 /* AudioToolbox.framework */; };
+		96BC52AF16FA90E4004E526B /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7513636EDE0068EB38 /* AVFoundation.framework */; };
+		96BC52B016FA90E4004E526B /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 968C1E5C13BBB55900615225 /* CFNetwork.framework */; };
+		96BC52B116FA90E4004E526B /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7713636EDE0068EB38 /* CoreGraphics.framework */; };
+		96BC52B216FA90E4004E526B /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 961BFB42143E093A00DD1693 /* GameKit.framework */; };
+		96BC52B316FA90E4004E526B /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7B13636EDE0068EB38 /* OpenGLES.framework */; };
+		96BC52B416FA90E4004E526B /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7C13636EDE0068EB38 /* QuartzCore.framework */; };
+		96BC52B516FA90E4004E526B /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9610AF9616C4C5540050372E /* Security.framework */; };
+		96BC52B616FA90E4004E526B /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960DB4A1154C8341000869BD /* SystemConfiguration.framework */; };
+		96BC52B716FA90E4004E526B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7D13636EDE0068EB38 /* UIKit.framework */; };
+		96BC52B816FA90FE004E526B /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7913636EDE0068EB38 /* MediaPlayer.framework */; };
+		96BC52BB16FA9147004E526B /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7A13636EDE0068EB38 /* MobileCoreServices.framework */; };
 		96C2C90816C0A53C004EBAB9 /* liballegro_dialog-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96C2C90616C0A53B004EBAB9 /* liballegro_dialog-static.a */; };
 		96C2C90916C0A53C004EBAB9 /* liblua5.2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96C2C90716C0A53C004EBAB9 /* liblua5.2.a */; };
 		96C2C90B16C0A595004EBAB9 /* gamecenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96C2C90A16C0A595004EBAB9 /* gamecenter.mm */; };
@@ -503,6 +510,9 @@
 		96B4B131143BBC4800ACA64C /* liblua-fixed.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liblua-fixed.a"; path = "../../../local/lib/liblua-fixed.a"; sourceTree = "<group>"; };
 		96B7D08313D09EF7004D7ED6 /* libpng.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpng.a; path = ../../../iphone_libs_r/libpng.a; sourceTree = "<group>"; };
 		96B7D08413D09EF7004D7ED6 /* libz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libz.a; path = ../../../iphone_libs_r/libz.a; sourceTree = "<group>"; };
+		96BC52A116FA8E39004E526B /* atlas_accessor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atlas_accessor.cpp; path = ../../src/atlas_accessor.cpp; sourceTree = "<group>"; };
+		96BC52A216FA8E39004E526B /* atlas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atlas.cpp; path = ../../src/atlas.cpp; sourceTree = "<group>"; };
+		96BC52A916FA8EE7004E526B /* my_load_bitmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = my_load_bitmap.cpp; path = ../../src/my_load_bitmap.cpp; sourceTree = "<group>"; };
 		96C2C90616C0A53B004EBAB9 /* liballegro_dialog-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_dialog-static.a"; path = "../../../local/lib/liballegro_dialog-static.a"; sourceTree = "<group>"; };
 		96C2C90716C0A53C004EBAB9 /* liblua5.2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua5.2.a; path = ../../../local/lib/liblua5.2.a; sourceTree = "<group>"; };
 		96C2C90A16C0A595004EBAB9 /* gamecenter.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = gamecenter.mm; path = ../../src/gamecenter.mm; sourceTree = "<group>"; };
@@ -532,35 +542,33 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				965070C016CE501800E6E9D4 /* GameKit.framework in Frameworks */,
+				96BC52BB16FA9147004E526B /* MobileCoreServices.framework in Frameworks */,
+				96BC52B816FA90FE004E526B /* MediaPlayer.framework in Frameworks */,
+				96BC52AE16FA90E4004E526B /* AudioToolbox.framework in Frameworks */,
+				96BC52AF16FA90E4004E526B /* AVFoundation.framework in Frameworks */,
+				96BC52B016FA90E4004E526B /* CFNetwork.framework in Frameworks */,
+				96BC52B116FA90E4004E526B /* CoreGraphics.framework in Frameworks */,
+				96BC52B216FA90E4004E526B /* GameKit.framework in Frameworks */,
+				96BC52B316FA90E4004E526B /* OpenGLES.framework in Frameworks */,
+				96BC52B416FA90E4004E526B /* QuartzCore.framework in Frameworks */,
+				96BC52B516FA90E4004E526B /* Security.framework in Frameworks */,
+				96BC52B616FA90E4004E526B /* SystemConfiguration.framework in Frameworks */,
+				96BC52B716FA90E4004E526B /* UIKit.framework in Frameworks */,
 				96729A7B16CADBDD00C094D5 /* libdom.a in Frameworks */,
 				96729A7C16CADBDD00C094D5 /* libexpat.a in Frameworks */,
 				96729A7D16CADBDD00C094D5 /* libhubbub.a in Frameworks */,
 				96729A7E16CADBDD00C094D5 /* libparserutils.a in Frameworks */,
 				96729A7F16CADBDD00C094D5 /* libsvgtiny.a in Frameworks */,
 				96729A8016CADBDD00C094D5 /* libwapcaplet.a in Frameworks */,
-				9610AF9716C4C5540050372E /* Security.framework in Frameworks */,
 				9610AF9516C4C26A0050372E /* libJoypad.a in Frameworks */,
 				9610AF8A16C4BEAD0050372E /* liblua5.2.a in Frameworks */,
 				9610AF8B16C4BEAD0050372E /* libphysfs.a in Frameworks */,
 				9610AF8516C4BEAD0050372E /* libcurl.a in Frameworks */,
 				9610AF8416C4BE6B0050372E /* libbzip2.a in Frameworks */,
-				964D7FC615CC7DAB00D6F9AF /* UIKit.framework in Frameworks */,
-				960DB4A2154C8341000869BD /* SystemConfiguration.framework in Frameworks */,
 				96A460A7151D836A001BC99C /* libAllegro.a in Frameworks */,
 				96B7D08613D09EF7004D7ED6 /* libz.a in Frameworks */,
 				968C1E7A13BCED5E00615225 /* libbassflac.a in Frameworks */,
-				968C1E5D13BBB55900615225 /* CFNetwork.framework in Frameworks */,
 				968C1E5B13BBB51D00615225 /* libbass.a in Frameworks */,
-				9609BD8813636F270068EB38 /* AudioToolbox.framework in Frameworks */,
-				9609BD8913636F270068EB38 /* AVFoundation.framework in Frameworks */,
-				9609BD8A13636F270068EB38 /* CoreFoundation.framework in Frameworks */,
-				9609BD8B13636F270068EB38 /* CoreGraphics.framework in Frameworks */,
-				9609BD8C13636F270068EB38 /* Foundation.framework in Frameworks */,
-				9609BD8D13636F270068EB38 /* MediaPlayer.framework in Frameworks */,
-				9609BD8E13636F270068EB38 /* MobileCoreServices.framework in Frameworks */,
-				9609BD8F13636F270068EB38 /* OpenGLES.framework in Frameworks */,
-				9609BD9013636F270068EB38 /* QuartzCore.framework in Frameworks */,
 				9695A140138D706500FB0417 /* libfreetype.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -569,7 +577,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				964FB83016E6051600F4BBA4 /* liballegro_color-static.a in Frameworks */,
+				96BC52AD16FA8FB4004E526B /* liballegro_color-static.a in Frameworks */,
 				964FB83116E6051600F4BBA4 /* libexpat.a in Frameworks */,
 				964FB83216E6051600F4BBA4 /* libdom.a in Frameworks */,
 				964FB83316E6051600F4BBA4 /* libhubbub.a in Frameworks */,
@@ -773,6 +781,9 @@
 		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
+				96BC52A916FA8EE7004E526B /* my_load_bitmap.cpp */,
+				96BC52A116FA8E39004E526B /* atlas_accessor.cpp */,
+				96BC52A216FA8E39004E526B /* atlas.cpp */,
 				9636676E16C9FC8200A24B46 /* svg.cpp */,
 				9610AF8116C4BDFD0050372E /* Area.cpp */,
 				96A4D26E154A7EA0009ECD44 /* tftp_get.c */,
@@ -1107,6 +1118,7 @@
 				96224277103D96D400756C5B /* AnimationSet.cpp in Sources */,
 				969A9E3D16083E3000F4DBE2 /* ftpget.cpp in Sources */,
 				96224279103D96D400756C5B /* battle.cpp in Sources */,
+				96BC52AA16FA8EE7004E526B /* my_load_bitmap.cpp in Sources */,
 				9622427A103D96D400756C5B /* CombatActions.cpp in Sources */,
 				9622427B103D96D400756C5B /* Combatant.cpp in Sources */,
 				9622427C103D96D400756C5B /* CombatEnemy.cpp in Sources */,
@@ -1149,10 +1161,12 @@
 				960DB49D154C82EA000869BD /* TCPServer.m in Sources */,
 				960DB49E154C82EA000869BD /* TCPService.m in Sources */,
 				960DB49F154C82EA000869BD /* ThrottledTCPConnection.m in Sources */,
+				96BC52A316FA8E39004E526B /* atlas_accessor.cpp in Sources */,
 				960DB4A0154C82EA000869BD /* UDPSocket.m in Sources */,
 				9610AF8216C4BDFD0050372E /* Area.cpp in Sources */,
 				9636676F16C9FC8200A24B46 /* svg.cpp in Sources */,
 				960C9CA316E0A4FD00ABC0FA /* init.cpp in Sources */,
+				96BC52A416FA8E39004E526B /* atlas.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1167,6 +1181,8 @@
 				964FB80616E6051600F4BBA4 /* svg.cpp in Sources */,
 				964FB80716E6051600F4BBA4 /* ftpget.cpp in Sources */,
 				964FB80816E6051600F4BBA4 /* joypad_handler.m in Sources */,
+				96BC52AC16FA8F20004E526B /* my_load_bitmap.cpp in Sources */,
+				96BC52A716FA8EB4004E526B /* atlas_accessor.cpp in Sources */,
 				964FB80916E6051600F4BBA4 /* joypad.mm in Sources */,
 				964FB80A16E6051600F4BBA4 /* translate.cpp in Sources */,
 				964FB80B16E6051600F4BBA4 /* 3d.cpp in Sources */,
@@ -1184,6 +1200,7 @@
 				964FB81716E6051600F4BBA4 /* Frame.cpp in Sources */,
 				964FB81816E6051600F4BBA4 /* GenericEffect.cpp in Sources */,
 				964FB81916E6051600F4BBA4 /* graphics.cpp in Sources */,
+				96BC52A816FA8EB8004E526B /* atlas.cpp in Sources */,
 				964FB81A16E6051600F4BBA4 /* Image.cpp in Sources */,
 				964FB81B16E6051600F4BBA4 /* Input.cpp in Sources */,
 				964FB81C16E6051600F4BBA4 /* inventory.cpp in Sources */,
@@ -1212,8 +1229,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96BC52A516FA8EA9004E526B /* atlas_accessor.cpp in Sources */,
+				96BC52A616FA8EAE004E526B /* atlas.cpp in Sources */,
 				9636675B16C985CB00A24B46 /* tgui.cpp in Sources */,
 				9636675916C9858E00A24B46 /* Area.cpp in Sources */,
+				96BC52AB16FA8F1A004E526B /* my_load_bitmap.cpp in Sources */,
 				96E3D50516C0D06C00A4A973 /* mygamecentervc.m in Sources */,
 				96C2C90B16C0A595004EBAB9 /* gamecenter.mm in Sources */,
 				9636677016C9FF0A00A24B46 /* svg.cpp in Sources */,
@@ -1278,7 +1298,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = armv7;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Mo. RPG 2.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -1313,7 +1333,7 @@
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-				VALID_ARCHS = armv7;
+				VALID_ARCHS = "armv7 armv7s";
 			};
 			name = Release;
 		};
@@ -1356,7 +1376,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = armv7;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Mo. RPG 2.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -1390,7 +1410,7 @@
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-				VALID_ARCHS = armv7;
+				VALID_ARCHS = "armv7 armv7s";
 			};
 			name = Lite;
 		};
@@ -1616,7 +1636,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = armv7;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Mo. RPG 2.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -1651,7 +1671,7 @@
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-				VALID_ARCHS = armv7;
+				VALID_ARCHS = "armv7 armv7s";
 			};
 			name = Debug;
 		};
@@ -1683,7 +1703,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = armv7;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Mo. RPG 2.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -1718,7 +1738,7 @@
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-				VALID_ARCHS = armv7;
+				VALID_ARCHS = "armv7 armv7s";
 			};
 			name = "Release Simulator";
 		};

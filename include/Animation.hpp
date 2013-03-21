@@ -94,7 +94,7 @@ public:
 	void reset(void);
 	void setFrame(int frame);
 	void draw(int x, int y, int flags = 0);
-	void drawRotated(int x, int y, float angle, int flags = 0);
+	void drawRotated(MCOLOR tint, int x, int y, float angle, int flags = 0);
 	
 	int getAlpha(void);
 
