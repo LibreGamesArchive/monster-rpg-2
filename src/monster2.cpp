@@ -481,7 +481,7 @@ bool zone_defined(int x, int y)
 	return false;
 }
 
-static bool is_modifier(int c)
+bool is_modifier(int c)
 {
 	switch (c) {
 		case ALLEGRO_KEY_LSHIFT:
@@ -558,7 +558,7 @@ top:
 		if (getInput())
 			getInput()->handle_event(&event);
 		al_unlock_mutex(input_mutex);
-
+				
 		if (event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY) {
 			mouse_in_display = true;
 			al_set_mouse_cursor(display, custom_mouse_cursor);
@@ -600,60 +600,68 @@ top:
 			}
 		}
 		else if (event.type == ALLEGRO_EVENT_KEY_UP || event.type == USER_KEY_UP) {
-			INPUT_EVENT ie = EMPTY_INPUT_EVENT;
-			int code = event.keyboard.keycode;
-			if (code == config.getKeyLeft()) {
-				ie.left = UP;
-				add_input_event(ie);
-			}
-			else if (code == config.getKeyRight()) {
-				ie.right = UP;
-				add_input_event(ie);
-			}
-			else if (code == config.getKeyUp()) {
-				ie.up = UP;
-				add_input_event(ie);
-			}
-			else if (code == config.getKeyDown()) {
-				ie.down = UP;
-				add_input_event(ie);
-			}
-			else if (code == config.getKey1()) {
-				dpad_panning = false;
-				ie.button1 = UP;
-				add_input_event(ie);
-			}
-			else if (code == config.getKey2()) {
-				ie.button2 = UP;
-				add_input_event(ie);
-			}
-			else if (code == config.getKey3()) {
-				ie.button3 = UP;
-				add_input_event(ie);
-			}
-			else if (event.keyboard.keycode == ALLEGRO_KEY_F5) {
-				f5_time = -1;
-				f5_cheated = false;
-			}
-			else if (event.keyboard.keycode == ALLEGRO_KEY_F6) {
-				f6_time = -1;
-				f6_cheated = false;
+			if (is_modifier(event.keyboard.keycode)) {
+				if (event.keyboard.keycode == config.getKey1()) {
+					joy_b1_up();
+				}
+				else if (event.keyboard.keycode == config.getKey2()) {
+					joy_b2_up();
+				}
+				else if (event.keyboard.keycode == config.getKey3()) {
+					joy_b3_up();
+				}
+				else if (event.keyboard.keycode == config.getKeyLeft()) {
+					joy_l_up();
+				}
+				else if (event.keyboard.keycode == config.getKeyRight()) {
+					joy_r_up();
+				}
+				else if (event.keyboard.keycode == config.getKeyUp()) {
+					joy_u_up();
+				}
+				else if (event.keyboard.keycode == config.getKeyDown()) {
+					joy_d_up();
+				}
 			}
 			else {
 				INPUT_EVENT ie = EMPTY_INPUT_EVENT;
-				int c = event.keyboard.keycode;
-				bool m = is_modifier(c);
-				if (m && c == config.getKey1()) {
+				int code = event.keyboard.keycode;
+				if (code == config.getKeyLeft()) {
+					ie.left = UP;
+					add_input_event(ie);
+				}
+				else if (code == config.getKeyRight()) {
+					ie.right = UP;
+					add_input_event(ie);
+				}
+				else if (code == config.getKeyUp()) {
+					ie.up = UP;
+					add_input_event(ie);
+				}
+				else if (code == config.getKeyDown()) {
+					ie.down = UP;
+					add_input_event(ie);
+				}
+				else if (code == config.getKey1()) {
+					dpad_panning = false;
 					ie.button1 = UP;
 					add_input_event(ie);
 				}
-				else if (m && c == config.getKey2()) {
+				else if (code == config.getKey2()) {
 					ie.button2 = UP;
 					add_input_event(ie);
 				}
-				else if (m && c == config.getKey3()) {
+				else if (code == config.getKey3()) {
 					ie.button3 = UP;
 					add_input_event(ie);
+				}
+				else if (event.keyboard.keycode == ALLEGRO_KEY_F5) {
+					f5_time = -1;
+					f5_cheated = false;
+				}
+				else if (event.keyboard.keycode == ALLEGRO_KEY_F6) {
+					f6_time = -1;
+					f6_cheated = false;
 				}
 			}
 		}
@@ -817,7 +825,7 @@ top:
 				tguiConvertMousePosition(&this_x, &this_y, screen_offset_x, screen_offset_y, 1, 1);
 
 			if (use_dpad) {
-				void (*down[7])(void) = {
+				void (*down[7])(bool) = {
 					joy_l_down, joy_r_down, joy_u_down, joy_d_down,
 					joy_b1_down, joy_b2_down, joy_b3_down
 				};
@@ -879,7 +887,7 @@ top:
 
 				for (int i = 0; i < 7; i++) {
 					if (on1[i] == false && on2[i] == true) {
-						(*(down[i]))();
+						(*(down[i]))(false);
 					}
 					else if (on1[i] == true && on2[i] == false) {
 						(*(up[i]))();
@@ -1156,18 +1164,40 @@ top:
 		}
 
 		if (!getting_input_config && (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN)) {
-
-			if (event.keyboard.keycode == config.getKeyFullscreen()) {
+			if (is_modifier(event.keyboard.keycode)) {
+				if (event.keyboard.keycode == config.getKey1()) {
+					joy_b1_down();
+				}
+				else if (event.keyboard.keycode == config.getKey2()) {
+					joy_b2_down();
+				}
+				else if (event.keyboard.keycode == config.getKey3()) {
+					joy_b3_down();
+				}
+				else if (event.keyboard.keycode == config.getKeyLeft()) {
+					joy_l_down();
+				}
+				else if (event.keyboard.keycode == config.getKeyRight()) {
+					joy_r_down();
+				}
+				else if (event.keyboard.keycode == config.getKeyUp()) {
+					joy_u_down();
+				}
+				else if (event.keyboard.keycode == config.getKeyDown()) {
+					joy_d_down();
+				}
+			}
+			else if (event.keyboard.keycode == config.getKeyFullscreen()) {
 				if (!pause_f_to_toggle_fullscreen && !transitioning) {
 					do_toggle_fullscreen = true;
 				}
 			}
-			if (event.keyboard.keycode == config.getKeySettings() && !shooter_paused) {
+			else if (event.keyboard.keycode == config.getKeySettings() && !shooter_paused) {
 				if (!pause_f_to_toggle_fullscreen) {
 					close_pressed_for_configure = true;
 				}
 			}
-			if (event.keyboard.keycode == config.getKeyMusicDown()) {
+			else if (event.keyboard.keycode == config.getKeyMusicDown()) {
 				int v = config.getMusicVolume();
 				if (v <= 26) v = 0;
 				else v = v - 26; 
@@ -1175,7 +1205,7 @@ top:
 				setMusicVolume(getMusicVolume());
 				setAmbienceVolume(getAmbienceVolume());
 			}
-			if (event.keyboard.keycode == config.getKeyMusicUp()) {
+			else if (event.keyboard.keycode == config.getKeyMusicUp()) {
 				int v = config.getMusicVolume();
 				if (v >= 230) v = 255;
 				else v = v + 26; 
@@ -1183,7 +1213,7 @@ top:
 				setMusicVolume(getMusicVolume());
 				setAmbienceVolume(getAmbienceVolume());
 			}
-			if (event.keyboard.keycode == config.getKeySFXDown()) {
+			else if (event.keyboard.keycode == config.getKeySFXDown()) {
 				int v = config.getSFXVolume();
 				if (v <= 26) v = 0;
 				else v = v - 26; 
@@ -1195,7 +1225,7 @@ top:
 					);
 				}
 			}
-			if (event.keyboard.keycode == config.getKeySFXUp()) {
+			else if (event.keyboard.keycode == config.getKeySFXUp()) {
 				int v = config.getSFXVolume();
 				if (v >= 230) v = 255;
 				else v = v + 26; 
@@ -1207,13 +1237,13 @@ top:
 					);
 				}
 			}
-			if (event.keyboard.keycode == ALLEGRO_KEY_F5) {
+			else if (event.keyboard.keycode == ALLEGRO_KEY_F5) {
 				f5_time = al_get_time();
 			}
-			if (event.keyboard.keycode == ALLEGRO_KEY_F6) {
+			else if (event.keyboard.keycode == ALLEGRO_KEY_F6) {
 				f6_time = al_get_time();
 			}
-			if (event.keyboard.keycode == ALLEGRO_KEY_F12) {
+			else if (event.keyboard.keycode == ALLEGRO_KEY_F12) {
 				reload_translation = true;
 			}
 		}

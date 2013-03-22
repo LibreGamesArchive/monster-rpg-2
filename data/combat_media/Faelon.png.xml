@@ -240,5 +240,18 @@
 	</delays>
 </cast>
 
-
+<noweapon_use>
+	<looping>false</looping>
+	<x>0</x>
+	<y>600</y>
+	<width>45</width>
+	<height>40</height>
+	<frames>4</frames>
+	<delays>
+		<0>120</0>
+		<1>120</1>
+		<2>120</2>
+		<3>120</3>
+	</delays>
+</noweapon_use>
 

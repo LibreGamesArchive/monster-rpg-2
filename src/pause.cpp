@@ -3040,7 +3040,7 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 				getTimeString(infos[i].time).c_str()
 			);
 		}
-		buttons[i] = new MTextButton(10, 20+i*14, std::string(buf), false);
+		buttons[i] = new MTextButton(10, 18+i*14, std::string(buf), false);
 	}
 
 	MLabel *lcaption = new MLabel(0, 1, caption, m_map_rgb(220, 220, 220));

@@ -513,7 +513,7 @@ void use(Combatant *c, int index, bool can_equip, int numTargets)
 		else {
 			// special case for Heal
 			if (inventory[index].index == HEAL_INDEX) {
-				if (c->getType() == COMBATENTITY_TYPE_PLAYER && c->getAnimationSet()->getSubName() != "use") {
+				if (c->getType() == COMBATENTITY_TYPE_PLAYER && c->getAnimationSet() && c->getAnimationSet()->getSubName() != "use") {
 					c->getAnimationSet()->setSubAnimation("stand");
 				}
 				info->condition = CONDITION_NORMAL;
