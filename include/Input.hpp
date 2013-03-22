@@ -196,16 +196,16 @@ extern TripleInput *tripleInput; // too lazy to change the name now
 extern double drop_input_events_older_than;
 
 extern "C" {
-void joy_b1_down(bool skip_initial_event = false);
-void joy_b2_down(bool skip_initial_event = false);
-void joy_b3_down(bool skip_initial_event = false);
+void joy_b1_down(bool skip_initial_event = false, bool long_delay = false);
+void joy_b2_down(bool skip_initial_event = false, bool long_delay = false);
+void joy_b3_down(bool skip_initial_event = false, bool long_delay = false);
 void joy_b1_up();
 void joy_b2_up();
 void joy_b3_up();
-void joy_l_down(bool skip_initial_event = false);
-void joy_r_down(bool skip_initial_event = false);
-void joy_u_down(bool skip_initial_event = false);
-void joy_d_down(bool skip_initial_event = false);
+void joy_l_down(bool skip_initial_event = false, bool long_delay = false);
+void joy_r_down(bool skip_initial_event = false, bool long_delay = false);
+void joy_u_down(bool skip_initial_event = false, bool long_delay = false);
+void joy_d_down(bool skip_initial_event = false, bool long_delay = false);
 void joy_l_up();
 void joy_r_up();
 void joy_u_up();

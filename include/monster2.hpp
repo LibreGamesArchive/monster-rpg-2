@@ -354,5 +354,6 @@ extern int cmdline_warp_y;
 extern std::string cmdline_warp_area;
 
 bool is_modifier(int c);
+extern int modifier_repeat_count[7];
 
 #endif

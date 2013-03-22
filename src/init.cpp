@@ -475,33 +475,40 @@ static void *thread_proc(void *arg)
 					al_get_keyboard_state(&state);
 					if (!joystick_repeat_started[JOY_REPEAT_B1]) {
 						if (is_modifier(config.getKey1()) && al_key_down(&state, config.getKey1())) {
-							joy_b1_down(true);
+							joy_b1_down(true, modifier_repeat_count[0] == 0);
+							modifier_repeat_count[0]++;
 						}
 					}
 					if (!joystick_repeat_started[JOY_REPEAT_B2]) {
 						if (is_modifier(config.getKey2()) && al_key_down(&state, config.getKey2())) {
-							joy_b2_down(true);
+							joy_b2_down(true, modifier_repeat_count[1] == 0);
+							modifier_repeat_count[1]++;
 						}
 					}
 					if (!joystick_repeat_started[JOY_REPEAT_B3]) {
 						if (is_modifier(config.getKey3()) && al_key_down(&state, config.getKey3())) {
-							joy_b3_down(true);
+							joy_b3_down(true, modifier_repeat_count[2] == 0);
+							modifier_repeat_count[2]++;
 						}
 					}
 					if (!joystick_repeat_started[JOY_REPEAT_AXIS0]) {
 						if (is_modifier(config.getKeyLeft()) && al_key_down(&state, config.getKeyLeft())) {
-							joy_l_down(true);
+							joy_l_down(true, modifier_repeat_count[3] == 0);
+							modifier_repeat_count[3]++;
 						}
 						if (is_modifier(config.getKeyRight()) && al_key_down(&state, config.getKeyRight())) {
-							joy_r_down(true);
+							joy_r_down(true, modifier_repeat_count[4] == 0);
+							modifier_repeat_count[4]++;
 						}
 					}
 					if (!joystick_repeat_started[JOY_REPEAT_AXIS1]) {
 						if (is_modifier(config.getKeyUp()) && al_key_down(&state, config.getKeyUp())) {
-							joy_u_down(true);
+							joy_u_down(true, modifier_repeat_count[5] == 0);
+							modifier_repeat_count[5]++;
 						}
 						if (is_modifier(config.getKeyDown()) && al_key_down(&state, config.getKeyDown())) {
-							joy_d_down(true);
+							joy_d_down(true, modifier_repeat_count[6] == 0);
+							modifier_repeat_count[6]++;
 						}
 					}
 

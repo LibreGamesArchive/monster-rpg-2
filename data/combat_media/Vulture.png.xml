@@ -1,5 +1,5 @@
 <stand>
-	<x>90</x>
+	<x>0</x>
 	<y>0</y>
 	<width>50</width>
 	<height>59</height>
@@ -7,9 +7,10 @@
 </stand>
 
 <fly>
-	<x>0</x>
+	<x>50</x>
 	<y>0</y>
 	<width>90</width>
 	<height>59</height>
 	<frames>1</frames>
 </fly>
+

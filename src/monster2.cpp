@@ -13,6 +13,8 @@ static bool zeemote_enabled = false;
 
 #include "svg.hpp"
 
+int modifier_repeat_count[7] = { 0, };
+
 bool cmdline_warped = false;
 int cmdline_warp_x;
 int cmdline_warp_y;
@@ -603,24 +605,31 @@ top:
 			if (is_modifier(event.keyboard.keycode)) {
 				if (event.keyboard.keycode == config.getKey1()) {
 					joy_b1_up();
+					modifier_repeat_count[0] = 0;
 				}
 				else if (event.keyboard.keycode == config.getKey2()) {
 					joy_b2_up();
+					modifier_repeat_count[1] = 0;
 				}
 				else if (event.keyboard.keycode == config.getKey3()) {
 					joy_b3_up();
+					modifier_repeat_count[2] = 0;
 				}
 				else if (event.keyboard.keycode == config.getKeyLeft()) {
 					joy_l_up();
+					modifier_repeat_count[3] = 0;
 				}
 				else if (event.keyboard.keycode == config.getKeyRight()) {
 					joy_r_up();
+					modifier_repeat_count[4] = 0;
 				}
 				else if (event.keyboard.keycode == config.getKeyUp()) {
 					joy_u_up();
+					modifier_repeat_count[5] = 0;
 				}
 				else if (event.keyboard.keycode == config.getKeyDown()) {
 					joy_d_up();
+					modifier_repeat_count[6] = 0;
 				}
 			}
 			else {
@@ -825,7 +834,7 @@ top:
 				tguiConvertMousePosition(&this_x, &this_y, screen_offset_x, screen_offset_y, 1, 1);
 
 			if (use_dpad) {
-				void (*down[7])(bool) = {
+				void (*down[7])(bool, bool) = {
 					joy_l_down, joy_r_down, joy_u_down, joy_d_down,
 					joy_b1_down, joy_b2_down, joy_b3_down
 				};
@@ -887,7 +896,7 @@ top:
 
 				for (int i = 0; i < 7; i++) {
 					if (on1[i] == false && on2[i] == true) {
-						(*(down[i]))(false);
+						(*(down[i]))(false, false);
 					}
 					else if (on1[i] == true && on2[i] == false) {
 						(*(up[i]))();

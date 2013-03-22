@@ -651,7 +651,7 @@ ScriptInput::ScriptInput()
 void ScriptInput::update()
 {}
 
-void joy_b1_down(bool skip_initial_event)
+void joy_b1_down(bool skip_initial_event, bool long_delay)
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.button1 = DOWN;
@@ -661,7 +661,7 @@ void joy_b1_down(bool skip_initial_event)
 	joystick_repeat_started[JOY_REPEAT_B1] = true;
 	joystick_repeat_events[JOY_REPEAT_B1] = ie;
 	if (skip_initial_event) {
-		joystick_initial_repeat_countdown[JOY_REPEAT_B1] = JOY_REPEAT_TIME;
+		joystick_initial_repeat_countdown[JOY_REPEAT_B1] = long_delay ? JOY_INITIAL_REPEAT_TIME : JOY_REPEAT_TIME;
 	}
 	else {
 		joystick_initial_repeat_countdown[JOY_REPEAT_B1] = JOY_INITIAL_REPEAT_TIME;
@@ -671,7 +671,7 @@ void joy_b1_down(bool skip_initial_event)
 	blueblock_times[4] = al_get_time();
 }
 
-void joy_b2_down(bool skip_initial_event)
+void joy_b2_down(bool skip_initial_event, bool long_delay)
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.button2 = DOWN;
@@ -681,7 +681,7 @@ void joy_b2_down(bool skip_initial_event)
 	joystick_repeat_started[JOY_REPEAT_B2] = true;
 	joystick_repeat_events[JOY_REPEAT_B2] = ie;
 	if (skip_initial_event) {
-		joystick_initial_repeat_countdown[JOY_REPEAT_B2] = JOY_REPEAT_TIME;
+		joystick_initial_repeat_countdown[JOY_REPEAT_B2] = long_delay ? JOY_INITIAL_REPEAT_TIME : JOY_REPEAT_TIME;
 	}
 	else {
 		joystick_initial_repeat_countdown[JOY_REPEAT_B2] = JOY_INITIAL_REPEAT_TIME;
@@ -691,7 +691,7 @@ void joy_b2_down(bool skip_initial_event)
 	blueblock_times[5] = al_get_time();
 }
 
-void joy_b3_down(bool skip_initial_event)
+void joy_b3_down(bool skip_initial_event, bool long_delay)
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.button3 = DOWN;
@@ -701,7 +701,7 @@ void joy_b3_down(bool skip_initial_event)
 	joystick_repeat_started[JOY_REPEAT_B3] = true;
 	joystick_repeat_events[JOY_REPEAT_B3] = ie;
 	if (skip_initial_event) {
-		joystick_initial_repeat_countdown[JOY_REPEAT_B3] = JOY_REPEAT_TIME;
+		joystick_initial_repeat_countdown[JOY_REPEAT_B3] = long_delay ? JOY_INITIAL_REPEAT_TIME : JOY_REPEAT_TIME;
 	}
 	else {
 		joystick_initial_repeat_countdown[JOY_REPEAT_B3] = JOY_INITIAL_REPEAT_TIME;
@@ -742,7 +742,7 @@ void joy_b3_up()
 	joystick_repeat_countdown[JOY_REPEAT_B3] = JOY_REPEAT_TIME;
 }
 
-void joy_l_down(bool skip_initial_event)
+void joy_l_down(bool skip_initial_event, bool long_delay)
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.left = DOWN;
@@ -752,7 +752,7 @@ void joy_l_down(bool skip_initial_event)
 	joystick_repeat_started[JOY_REPEAT_AXIS0] = true;
 	joystick_repeat_events[JOY_REPEAT_AXIS0] = ie;
 	if (skip_initial_event) {
-		joystick_initial_repeat_countdown[JOY_REPEAT_AXIS0] = JOY_REPEAT_TIME;
+		joystick_initial_repeat_countdown[JOY_REPEAT_AXIS0] = long_delay ? JOY_INITIAL_REPEAT_TIME : JOY_REPEAT_TIME;
 	}
 	else {
 		joystick_initial_repeat_countdown[JOY_REPEAT_AXIS0] = JOY_INITIAL_REPEAT_TIME;
@@ -762,7 +762,7 @@ void joy_l_down(bool skip_initial_event)
 	blueblock_times[0] = al_get_time();
 }
 
-void joy_r_down(bool skip_initial_event)
+void joy_r_down(bool skip_initial_event, bool long_delay)
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.right = DOWN;
@@ -772,7 +772,7 @@ void joy_r_down(bool skip_initial_event)
 	joystick_repeat_started[JOY_REPEAT_AXIS0] = true;
 	joystick_repeat_events[JOY_REPEAT_AXIS0] = ie;
 	if (skip_initial_event) {
-		joystick_initial_repeat_countdown[JOY_REPEAT_AXIS0] = JOY_REPEAT_TIME;
+		joystick_initial_repeat_countdown[JOY_REPEAT_AXIS0] = long_delay ? JOY_INITIAL_REPEAT_TIME : JOY_REPEAT_TIME;
 	}
 	else {
 		joystick_initial_repeat_countdown[JOY_REPEAT_AXIS0] = JOY_INITIAL_REPEAT_TIME;
@@ -782,7 +782,7 @@ void joy_r_down(bool skip_initial_event)
 	blueblock_times[1] = al_get_time();
 }
 
-void joy_u_down(bool skip_initial_event)
+void joy_u_down(bool skip_initial_event, bool long_delay)
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.up = DOWN;
@@ -792,7 +792,7 @@ void joy_u_down(bool skip_initial_event)
 	joystick_repeat_started[JOY_REPEAT_AXIS1] = true;
 	joystick_repeat_events[JOY_REPEAT_AXIS1] = ie;
 	if (skip_initial_event) {
-		joystick_initial_repeat_countdown[JOY_REPEAT_AXIS1] = JOY_REPEAT_TIME;
+		joystick_initial_repeat_countdown[JOY_REPEAT_AXIS1] = long_delay ? JOY_INITIAL_REPEAT_TIME : JOY_REPEAT_TIME;
 	}
 	else {
 		joystick_initial_repeat_countdown[JOY_REPEAT_AXIS1] = JOY_INITIAL_REPEAT_TIME;
@@ -802,7 +802,7 @@ void joy_u_down(bool skip_initial_event)
 	blueblock_times[2] = al_get_time();
 }
 
-void joy_d_down(bool skip_initial_event)
+void joy_d_down(bool skip_initial_event, bool long_delay)
 {
 	INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 	ie.down = DOWN;
@@ -812,7 +812,7 @@ void joy_d_down(bool skip_initial_event)
 	joystick_repeat_started[JOY_REPEAT_AXIS1] = true;
 	joystick_repeat_events[JOY_REPEAT_AXIS1] = ie;
 	if (skip_initial_event) {
-		joystick_initial_repeat_countdown[JOY_REPEAT_AXIS1] = JOY_REPEAT_TIME;
+		joystick_initial_repeat_countdown[JOY_REPEAT_AXIS1] = long_delay ? JOY_INITIAL_REPEAT_TIME : JOY_REPEAT_TIME;
 	}
 	else {
 		joystick_initial_repeat_countdown[JOY_REPEAT_AXIS1] = JOY_INITIAL_REPEAT_TIME;
