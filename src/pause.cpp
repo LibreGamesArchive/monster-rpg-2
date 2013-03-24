@@ -2503,9 +2503,9 @@ void credits(void)
 	}
 
 
-	ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[20000];
+	ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[5000];
 
-	for (int i = 0; i < 20000; i++)
+	for (int i = 0; i < 5000; i++)
 		verts[i].z = 0;
 
 	int vcount;
