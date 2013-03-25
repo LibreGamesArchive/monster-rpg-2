@@ -94,14 +94,7 @@ extern XMLData *trans_data;
 extern XMLData *terrain;
 extern std::vector<WaterData> waterData;
 
-struct GuiAnims
-{
-	MBITMAP *bitmap;
-	MBITMAP *corner_sub;
-	MBITMAP *wide_sub;
-	MBITMAP *tall_sub;
-};
-extern GuiAnims guiAnims;
+extern AnimationSet *guiAnims;
 
 extern GameInfo gameInfo;
 extern MBITMAP *cursor;

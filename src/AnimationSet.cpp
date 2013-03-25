@@ -1,5 +1,58 @@
 #include "monster2.hpp"
 
+static void draw_bitmap_with_borders(MBITMAP *bmp, int x, int y)
+{
+	#define BMP_W m_get_bitmap_width(bmp)
+	#define BMP_H m_get_bitmap_height(bmp)
+
+	int sides[4][6] = {
+		{ /* src */ 0, 0, BMP_W, 1, /* dest */ 0, -1 }, // top
+		{ /* src */ 0, BMP_H-1, BMP_W, 1, /* dest */ 0, BMP_H }, // bottom
+		{ /* src */ 0, 0, 1, BMP_H, /* dest */ -1, 0 }, // left
+		{ /* src */ BMP_W-1, 0, 1, BMP_H, /* dest */ BMP_W, 0 } // right
+	};
+
+	int corners[4][4] = {
+		{ /* src */ 0, 0, /* dest */ -1, -1 }, // top left
+		{ /* src */ BMP_W-1, 0, /* dest */ BMP_W, -1 }, // top right
+		{ /* src */ 0, BMP_H-1, /* dest */ -1, BMP_H }, // bottom left
+		{ /* src */ BMP_W-1, BMP_H-1, /* dest */ BMP_W, BMP_H } // bottom right
+	};
+
+	#undef BMP_W
+	#undef BMP_H
+
+	// do sides
+	for (int i = 0; i < 4; i++) {
+		al_draw_bitmap_region(
+			bmp->bitmap,
+			sides[i][0],
+			sides[i][1],
+			sides[i][2],
+			sides[i][3],
+			x+sides[i][4],
+			y+sides[i][5],
+			0
+		);
+	}
+
+	// do corners
+	for (int i = 0; i < 4; i++) {
+		al_draw_bitmap_region(
+			bmp->bitmap,
+			corners[i][0],
+			corners[i][1],
+			1,
+			1,
+			x+corners[i][2],
+			y+corners[i][3],
+			0
+		);
+	}
+
+	al_draw_bitmap(bmp->bitmap, x, y, 0);
+}
+
 MBITMAP *AnimationSet::getBitmap()
 {
 	return bitmap;
@@ -356,7 +409,34 @@ AnimationSet *AnimationSet::clone(int type)
 		clone_to = a->bitmap;
 		clone_from = a->bitmap;
 	}
-	else {
+	else if (type == CLONE_COPY_BORDERS) {
+		tmp = m_clone_bitmap(bitmap);
+		a->bitmap = m_create_bitmap(
+			m_get_bitmap_width(tmp),
+			m_get_bitmap_height(tmp)
+		);
+		ALLEGRO_BITMAP *target = al_get_target_bitmap();
+		m_set_target_bitmap(a->bitmap);
+		m_clear(m_map_rgba(0, 0, 0, 0));
+		for (size_t i = 0; i < anims.size(); i++) {
+			Animation *a = anims[i];
+			for (size_t j = 0; j < a->getNumFrames(); j++) {
+				Frame *f = a->getFrame(j);
+				Image *img = f->getImage();
+				draw_bitmap_with_borders(
+					img->getBitmap(),
+					img->getX(),
+					img->getY()
+				);
+			}
+		}
+		// for each frame redraw
+		m_destroy_bitmap(tmp);
+		al_set_target_bitmap(target);
+		clone_from = a->bitmap;
+		clone_to = a->bitmap;
+	}
+	else { // CLONE_PLAYER or CLONE_ENEMY
 		tmp = m_clone_bitmap(bitmap);
 		a->bitmap = m_create_bitmap(
 			m_get_bitmap_width(tmp),

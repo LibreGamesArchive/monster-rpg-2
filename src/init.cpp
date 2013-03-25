@@ -208,7 +208,7 @@ MBITMAP *tile;
 char start_cwd[1000];
 XMLData *tilemap_data = NULL;
 XMLData *trans_data = NULL;
-GuiAnims guiAnims;
+AnimationSet *guiAnims;
 XMLData *terrain;
 std::vector<WaterData> waterData;
 float screenScaleX = 2;
@@ -473,20 +473,39 @@ static void *thread_proc(void *arg)
 					// Handle joystick repeat events
 					ALLEGRO_KEYBOARD_STATE state;
 					al_get_keyboard_state(&state);
+
+					bool joyb1 = false;
+					bool joyb2 = false;
+					bool joyb3 = false;
+					if (config.getGamepadAvailable() && user_joystick != NULL) {
+						ALLEGRO_JOYSTICK_STATE joystate;
+						al_get_joystick_state(user_joystick, &joystate);
+						if (joystate.button[config.getJoyButton1()]) {
+							joyb1 = true;
+						}
+						if (joystate.button[config.getJoyButton2()]) {
+							joyb2 = true;
+						}
+						if (joystate.button[config.getJoyButton3()]) {
+							joyb3 = true;
+						}
+					}
+
+
 					if (!joystick_repeat_started[JOY_REPEAT_B1]) {
-						if (is_modifier(config.getKey1()) && al_key_down(&state, config.getKey1())) {
+						if (joyb1 || (is_modifier(config.getKey1()) && al_key_down(&state, config.getKey1()))) {
 							joy_b1_down(true, modifier_repeat_count[0] == 0);
 							modifier_repeat_count[0]++;
 						}
 					}
 					if (!joystick_repeat_started[JOY_REPEAT_B2]) {
-						if (is_modifier(config.getKey2()) && al_key_down(&state, config.getKey2())) {
+						if (joyb2 || (is_modifier(config.getKey2()) && al_key_down(&state, config.getKey2()))) {
 							joy_b2_down(true, modifier_repeat_count[1] == 0);
 							modifier_repeat_count[1]++;
 						}
 					}
 					if (!joystick_repeat_started[JOY_REPEAT_B3]) {
-						if (is_modifier(config.getKey3()) && al_key_down(&state, config.getKey3())) {
+						if (joyb3 || (is_modifier(config.getKey3()) && al_key_down(&state, config.getKey3()))) {
 							joy_b3_down(true, modifier_repeat_count[2] == 0);
 							modifier_repeat_count[2]++;
 						}
@@ -581,7 +600,9 @@ static void *loader_proc(void *arg)
 	deter_display_access_bmp = m_create_bitmap(16, 16); // check
 	m_set_target_bitmap(deter_display_access_bmp);
 
-	guiAnims.bitmap = m_load_bitmap(getResource("gui.png"));
+	AnimationSet *tmpAnimSet = new_AnimationSet(getResource("gui.png"));
+	guiAnims = tmpAnimSet->clone(CLONE_COPY_BORDERS);
+	delete tmpAnimSet;
 
 	poison_bmp = m_load_alpha_bitmap(getResource("media/poison.png"), true);
 	poison_bmp_tmp = m_create_alpha_bitmap( // check
@@ -1589,10 +1610,6 @@ bool init(int *argc, char **argv[])
 	poison_bmp_tmp = m_make_alpha_display_bitmap(poison_bmp_tmp);
 	poison_bmp_tmp2 = m_make_alpha_display_bitmap(poison_bmp_tmp2);
 	orb_bmp = m_make_alpha_display_bitmap(orb_bmp);
-	guiAnims.bitmap = m_make_display_bitmap(guiAnims.bitmap);
-	guiAnims.corner_sub = m_create_sub_bitmap(guiAnims.bitmap, 0, 0, 3, 3);
-	guiAnims.wide_sub = m_create_sub_bitmap(guiAnims.bitmap, 0, 3, 32, 3);
-	guiAnims.tall_sub = m_create_sub_bitmap(guiAnims.bitmap, 0, 6, 3, 32);
 
 	al_set_new_bitmap_flags(PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
 	
@@ -1693,10 +1710,7 @@ void destroy()
 	m_destroy_bitmap(batteryIcon);
 	delete terrain;
 	m_destroy_bitmap(cursor);
-	m_destroy_bitmap(guiAnims.corner_sub);
-	m_destroy_bitmap(guiAnims.wide_sub);
-	m_destroy_bitmap(guiAnims.tall_sub);
-	m_destroy_bitmap(guiAnims.bitmap);
+	delete guiAnims;
 	m_destroy_bitmap(orb_bmp);
 	m_destroy_bitmap(poison_bmp);
 	m_destroy_bitmap(poison_bmp_tmp);

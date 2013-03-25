@@ -1,24 +1,24 @@
-<frame_corner>
+<corner>
 	<x>0</x>
 	<y>0</y>
 	<width>3</width>
 	<height>3</height>
 	<frames>1</frames>
-</frame_corner>
+</corner>
 
-<frame_horizontal>
+<wide>
 	<x>0</x>
 	<y>3</y>
 	<width>32</width>
 	<height>3</height>
 	<frames>1</frames>
-</frame_horizontal>
+</wide>
 
-<frame_vertical>
+<tall>
 	<x>0</x>
 	<y>6</y>
 	<width>3</width>
 	<height>32</height>
 	<frames>1</frames>
-</frame_vertical>
+</tall>
 

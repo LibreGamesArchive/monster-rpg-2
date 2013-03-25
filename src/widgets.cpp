@@ -234,19 +234,22 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 	bool held = al_is_bitmap_drawing_held();
 	al_hold_bitmap_drawing(true);
 
-	MBITMAP *b = guiAnims.wide_sub;
+	guiAnims->setSubAnimation("wide");
+	MBITMAP *b = guiAnims->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 	int sprite_w = m_get_bitmap_width(b);
 	int sprite_h = m_get_bitmap_height(b);
 	al_draw_scaled_bitmap(b->bitmap, 0, 0, sprite_w, sprite_h, x, y-sprite_h, w, sprite_h, 0);
 	al_draw_scaled_bitmap(b->bitmap, 0, 0, sprite_w, sprite_h, x, y+h, w, sprite_h, ALLEGRO_FLIP_VERTICAL);
 
-	b = guiAnims.tall_sub;
+	guiAnims->setSubAnimation("tall");
+	b = guiAnims->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 	sprite_w = m_get_bitmap_width(b);
 	sprite_h = m_get_bitmap_height(b);
 	al_draw_scaled_bitmap(b->bitmap, 0, 0, sprite_w, sprite_h, x-sprite_w, y, sprite_w, h, 0);
 	al_draw_scaled_bitmap(b->bitmap, 0, 0, sprite_w, sprite_h, x+w, y, sprite_w, h, ALLEGRO_FLIP_HORIZONTAL);
 
-	b = guiAnims.corner_sub;
+	guiAnims->setSubAnimation("corner");
+	b = guiAnims->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 	sprite_w = m_get_bitmap_width(b);
 	sprite_h = m_get_bitmap_height(b);
 	m_draw_bitmap(b, x-sprite_w, y-sprite_h, 0);
