@@ -39,7 +39,7 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 		return NULL;
 	}
 
-	size = al_fsize(fd);
+	size = (size_t)al_fsize(fd);
 
 	buffer = (char *)malloc(size);
 	if (!buffer) {

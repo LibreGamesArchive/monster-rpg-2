@@ -1,3 +1,5 @@
+#ifndef NO_JOYPAD
+
 #import <objc/objc.h>
 #include "joypad_handler.h"
 #include "joypad.hpp"
@@ -100,3 +102,4 @@ bool joypad_connected()
 	return joypad && joypad->connected;
 }
 
+#endif // NO_JOYPAD

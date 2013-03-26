@@ -5,9 +5,10 @@
 #include <CFNetwork/CFNetwork.h>
 #endif
 			
-			
+#ifndef NO_JOYPAD
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 #include "joypad.hpp"
+#endif
 #endif
 
 #if defined ALLEGRO_IPHONE
@@ -957,6 +958,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 #endif
 #endif
 	
+#ifndef NO_JOYPAD
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 	MIcon *joypad = NULL;
 #ifdef ALLEGRO_ANDROID
@@ -967,6 +969,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 		joypad = new MIcon(128, yyy, getResource("joypad_icon.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
 		yyy += 26;
 	}
+#endif
 #endif
 #endif
 	MIcon *fairy = new MIcon(128, yyy, getResource("fairy.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
@@ -1058,9 +1061,11 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 		game_center->set_right_widget(mainItem);
 #endif
 
+#ifndef NO_JOYPAD
 #if defined IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 	if (joypad)
 		joypad->set_right_widget(mainItem);
+#endif
 #endif
 
 	fairy->set_right_widget(mainItem);
@@ -1149,9 +1154,11 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 		tguiAddWidget(game_center);
 #endif
 
+#ifndef NO_JOYPAD
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 	if (joypad)
 		tguiAddWidget(joypad);
+#endif
 #endif
 
 	if (add_fairy && !fairy_used)
@@ -1679,6 +1686,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				section = MAIN;
 			}
 		
+#ifndef NO_JOYPAD
 #if defined IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 			else if (joypad && widget == joypad)
 			{
@@ -1689,6 +1697,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				find_joypads();
 #endif
 			}
+#endif
 #endif
 
 			else if (widget == fairy)
@@ -1834,8 +1843,10 @@ done:
 	delete game_center;
 #endif
 
+#ifndef NO_JOYPAD
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 	delete joypad;
+#endif
 #endif
 
 	setMusicVolume(1);
@@ -1848,8 +1859,10 @@ done:
 	
 	tguiPop();
 
+#ifndef NO_JOYPAD
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	stop_finding_joypads();
+#endif
 #endif
 
 	waitForRelease(4);
@@ -4365,12 +4378,14 @@ int title_menu(void)
 
 	MMainMenu *main_menu = new MMainMenu(BH-BH/5, options);
 	
+#ifndef NO_JOYPAD
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 	MIcon *joypad = NULL;
 #ifdef ALLEGRO_ANDROID
 	joypad = new MIcon(5, 5, getResource("zeemote.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
 #else
 	joypad = new MIcon(5, 5, getResource("joypad_icon.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
+#endif
 #endif
 #endif
 
@@ -4380,9 +4395,11 @@ int title_menu(void)
 
 	tguiAddWidget(main_menu);
 
+#ifndef NO_JOYPAD
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 	if (joypad)
 		tguiAddWidget(joypad);
+#endif
 #endif
 
 	tguiSetFocus(main_menu);
@@ -4472,6 +4489,7 @@ int title_menu(void)
 			}
 			break_main_loop = false; // AGAIN (SEE ABOVE)
 
+#ifndef NO_JOYPAD
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 			if (joypad && widget == joypad)
 			{
@@ -4482,6 +4500,7 @@ int title_menu(void)
 				find_joypads();
 #endif
 			}
+#endif
 #endif
 
 			INPUT_EVENT ie = get_next_input_event();
@@ -4521,11 +4540,13 @@ done:
 	tguiDeleteWidget(main_menu);
 	delete main_menu;
 
+#ifndef NO_JOYPAD
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 	if (joypad) {
 		tguiDeleteWidget(joypad);
 		delete joypad;
 	}
+#endif
 #endif
 
 	dpad_on();
@@ -4536,8 +4557,10 @@ done:
 
 	global_draw_red = gdr;
 
+#ifndef NO_JOYPAD
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	stop_finding_joypads();
+#endif
 #endif
 
 	on_title_screen = false;

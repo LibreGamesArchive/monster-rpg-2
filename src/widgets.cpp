@@ -5,8 +5,6 @@
 #include "java.h"
 #endif
 
-extern bool joypad_connected(void);
-
 #ifdef EDITOR
 MFONT *big_font;
 #endif

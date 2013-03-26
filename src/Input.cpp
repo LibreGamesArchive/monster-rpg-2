@@ -1,7 +1,9 @@
 #include "monster2.hpp"
 
+#ifndef NO_JOYPAD
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 #include "joypad.hpp"
+#endif
 #endif
 
 #ifdef ALLEGRO_ANDROID
@@ -104,8 +106,10 @@ void clear_input_events(double older_than)
 
 	clear_touches();
 
+#ifndef NO_JOYPAD
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	reset_joypad_state();
+#endif
 #endif
 
 	released = true;
@@ -551,10 +555,12 @@ void TripleInput::update()
 			false;
 
 	InputDescriptor id3;
+#ifndef NO_JOYPAD
 #if defined ALLEGRO_MACOSX
 	if (joypad_connected())
 		id3 = get_joypad_state();
 	else
+#endif
 #endif
 		id3.left = id3.right = id3.up = id3.down =
 			id3.button1 = id3.button2 = id3.button3 =
@@ -576,10 +582,13 @@ void TripleInput::update()
 	InputDescriptor id1 = kb->getDescriptor();
 
 	InputDescriptor id3;
+#ifndef NO_JOYPAD
 	if (joypad_connected()) {
 		id3 = get_joypad_state();
 	}
-	else {
+	else
+#endif
+	{
 		id3.left = id3.right = id3.up = id3.down = id3.button1 = id3.button2 = id3.button3 = false;
 	}
 

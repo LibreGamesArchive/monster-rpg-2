@@ -1,10 +1,4 @@
-//
-//  joypad_handler.h
-//  Ballz
-//
-//  Created by Trent Gamblin on 11-09-28.
-//  Copyright 2011 Nooskewl. All rights reserved.
-//
+#ifndef NO_JOYPAD
 
 #import "JPSDK.h"
 
@@ -21,3 +15,5 @@
 -(void)stop_finding_devices;
 
 @end
+
+#endif // NO_JOYPAD

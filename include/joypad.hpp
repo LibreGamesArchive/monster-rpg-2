@@ -1,3 +1,5 @@
+#ifndef NO_JOYPAD
+
 #ifndef _JOYPAD_HPP
 #define _JOYPAD_HPP
 
@@ -12,3 +14,5 @@ bool joypad_connected();
 void reset_joypad_state();
 
 #endif
+
+#endif // NO_JOYPAD

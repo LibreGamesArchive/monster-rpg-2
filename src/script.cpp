@@ -23,7 +23,7 @@ unsigned char *slurp_file(std::string filename, int *ret_size)
 	if (!f)
 		return NULL;
 
-	long size = al_fsize(f);
+	long size = (long)al_fsize(f);
 	unsigned char *bytes;
 
 	if (size < 0) {

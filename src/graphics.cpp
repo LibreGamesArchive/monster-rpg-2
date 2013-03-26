@@ -2,10 +2,6 @@
 
 #include <allegro5/internal/aintern_bitmap.h>
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
-#include "joypad.hpp"
-#endif
-
 #ifdef ALLEGRO_ANDROID
 #include "java.h"
 #endif

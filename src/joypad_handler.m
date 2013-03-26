@@ -1,3 +1,5 @@
+#ifndef NO_JOYPAD
+
 #import "joypad_handler.h"
 
 void lock_joypad_mutex(void);
@@ -219,3 +221,5 @@ void disconnect_external_controls(void);
 }
 
 @end
+
+#endif // NO_JOYPAD

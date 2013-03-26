@@ -8,8 +8,10 @@
 #include <allegro5/allegro_direct3d.h>
 #endif
 
+#ifndef NO_JOYPAD
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 #include "joypad.hpp"
+#endif
 #endif
 
 #ifdef ALLEGRO_IPHONE
@@ -1391,8 +1393,10 @@ bool init(int *argc, char **argv[])
 
 	al_set_new_bitmap_flags(PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
 
+#ifndef NO_JOYPAD
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	init_joypad();
+#endif
 #endif
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX

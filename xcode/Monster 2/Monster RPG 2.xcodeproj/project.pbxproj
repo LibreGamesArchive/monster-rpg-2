@@ -178,6 +178,88 @@
 		969A9E3D16083E3000F4DBE2 /* ftpget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 969A9E3C16083E3000F4DBE2 /* ftpget.cpp */; };
 		969A9E3E16083F6700F4DBE2 /* ftpget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 969A9E3C16083E3000F4DBE2 /* ftpget.cpp */; };
 		969D9A5F159DAC780063280C /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D26C154A7E66009ECD44 /* libpng.a */; };
+		96A028B617016774008264E6 /* tgui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9636675A16C985CB00A24B46 /* tgui.cpp */; };
+		96A028B717016774008264E6 /* Area.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9636675816C9858E00A24B46 /* Area.cpp */; };
+		96A028B817016774008264E6 /* mygamecentervc.m in Sources */ = {isa = PBXBuildFile; fileRef = 96E3D50416C0D06C00A4A973 /* mygamecentervc.m */; };
+		96A028B917016774008264E6 /* gamecenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96C2C90A16C0A595004EBAB9 /* gamecenter.mm */; };
+		96A028BA17016774008264E6 /* svg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9636676E16C9FC8200A24B46 /* svg.cpp */; };
+		96A028BB17016774008264E6 /* ftpget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 969A9E3C16083E3000F4DBE2 /* ftpget.cpp */; };
+		96A028BC17016774008264E6 /* joypad_handler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA3143A42C50007757E /* joypad_handler.m */; };
+		96A028BD17016774008264E6 /* my_load_bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96BC52A916FA8EE7004E526B /* my_load_bitmap.cpp */; };
+		96A028BE17016774008264E6 /* atlas_accessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96BC52A116FA8E39004E526B /* atlas_accessor.cpp */; };
+		96A028BF17016774008264E6 /* joypad.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA0143A426C0007757E /* joypad.mm */; };
+		96A028C017016774008264E6 /* translate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D175A713351F06008462BB /* translate.cpp */; };
+		96A028C117016774008264E6 /* 3d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224251103D96D400756C5B /* 3d.cpp */; };
+		96A028C217016774008264E6 /* Animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224252103D96D400756C5B /* Animation.cpp */; };
+		96A028C317016774008264E6 /* AnimationSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224253103D96D400756C5B /* AnimationSet.cpp */; };
+		96A028C417016774008264E6 /* battle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224255103D96D400756C5B /* battle.cpp */; };
+		96A028C517016774008264E6 /* CombatActions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224256103D96D400756C5B /* CombatActions.cpp */; };
+		96A028C617016774008264E6 /* Combatant.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224257103D96D400756C5B /* Combatant.cpp */; };
+		96A028C717016774008264E6 /* CombatEnemy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224258103D96D400756C5B /* CombatEnemy.cpp */; };
+		96A028C817016774008264E6 /* CombatEntity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224259103D96D400756C5B /* CombatEntity.cpp */; };
+		96A028C917016774008264E6 /* CombatPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9622425A103D96D400756C5B /* CombatPlayer.cpp */; };
+		96A028CA17016774008264E6 /* Configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9622425B103D96D400756C5B /* Configuration.cpp */; };
+		96A028CB17016774008264E6 /* debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9622425C103D96D400756C5B /* debug.cpp */; };
+		96A028CC17016774008264E6 /* equipment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9622425D103D96D400756C5B /* equipment.cpp */; };
+		96A028CD17016774008264E6 /* Frame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9622425E103D96D400756C5B /* Frame.cpp */; };
+		96A028CE17016774008264E6 /* GenericEffect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9622425F103D96D400756C5B /* GenericEffect.cpp */; };
+		96A028CF17016774008264E6 /* graphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224260103D96D400756C5B /* graphics.cpp */; };
+		96A028D017016774008264E6 /* atlas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96BC52A216FA8E39004E526B /* atlas.cpp */; };
+		96A028D117016774008264E6 /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224261103D96D400756C5B /* Image.cpp */; };
+		96A028D217016774008264E6 /* Input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224263103D96D400756C5B /* Input.cpp */; };
+		96A028D317016774008264E6 /* inventory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224264103D96D400756C5B /* inventory.cpp */; };
+		96A028D417016774008264E6 /* io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224265103D96D400756C5B /* io.cpp */; };
+		96A028D517016774008264E6 /* Items.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224266103D96D400756C5B /* Items.cpp */; };
+		96A028D617016774008264E6 /* lander.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224267103D96D400756C5B /* lander.cpp */; };
+		96A028D717016774008264E6 /* monster2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224268103D96D400756C5B /* monster2.cpp */; };
+		96A028D817016774008264E6 /* Object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224269103D96D400756C5B /* Object.cpp */; };
+		96A028D917016774008264E6 /* pause.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9622426A103D96D400756C5B /* pause.cpp */; };
+		96A028DA17016774008264E6 /* Player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9622426B103D96D400756C5B /* Player.cpp */; };
+		96A028DB17016774008264E6 /* redundant.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9622426C103D96D400756C5B /* redundant.cpp */; };
+		96A028DC17016774008264E6 /* script.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9622426D103D96D400756C5B /* script.cpp */; };
+		96A028DD17016774008264E6 /* shooter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9622426E103D96D400756C5B /* shooter.cpp */; };
+		96A028DE17016774008264E6 /* tftp_get.c in Sources */ = {isa = PBXBuildFile; fileRef = 96A4D26E154A7EA0009ECD44 /* tftp_get.c */; };
+		96A028DF17016774008264E6 /* sound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9622426F103D96D400756C5B /* sound.cpp */; };
+		96A028E017016774008264E6 /* Spells.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224270103D96D400756C5B /* Spells.cpp */; };
+		96A028E117016774008264E6 /* Tile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224271103D96D400756C5B /* Tile.cpp */; };
+		96A028E217016774008264E6 /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224272103D96D400756C5B /* util.cpp */; };
+		96A028E317016774008264E6 /* widgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224273103D96D400756C5B /* widgets.cpp */; };
+		96A028E417016774008264E6 /* xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224274103D96D400756C5B /* xml.cpp */; };
+		96A028E517016774008264E6 /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 960C9CA116E0A4AA00ABC0FA /* init.cpp */; };
+		96A028E717016774008264E6 /* liballegro_color-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636677116C9FF9100A24B46 /* liballegro_color-static.a */; };
+		96A028E817016774008264E6 /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636676C16C9FC2B00A24B46 /* libexpat.a */; };
+		96A028E917016774008264E6 /* libdom.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636676216C9FC0800A24B46 /* libdom.a */; };
+		96A028EA17016774008264E6 /* libhubbub.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636676316C9FC0800A24B46 /* libhubbub.a */; };
+		96A028EB17016774008264E6 /* libparserutils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636676416C9FC0800A24B46 /* libparserutils.a */; };
+		96A028EC17016774008264E6 /* libsvgtiny.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636676516C9FC0800A24B46 /* libsvgtiny.a */; };
+		96A028ED17016774008264E6 /* libwapcaplet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636676616C9FC0800A24B46 /* libwapcaplet.a */; };
+		96A028EE17016774008264E6 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9636675E16C985F900A24B46 /* Security.framework */; };
+		96A028F017016774008264E6 /* liballegro_physfs-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9677117E16C21DF10092EE0A /* liballegro_physfs-static.a */; };
+		96A028F117016774008264E6 /* libphysfs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9677117F16C21DF10092EE0A /* libphysfs.a */; };
+		96A028F217016774008264E6 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96CFE56916C0AB6A00B7DB0C /* GameKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		96A028F317016774008264E6 /* liballegro_dialog-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96C2C90616C0A53B004EBAB9 /* liballegro_dialog-static.a */; };
+		96A028F417016774008264E6 /* liblua5.2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96C2C90716C0A53C004EBAB9 /* liblua5.2.a */; };
+		96A028F517016774008264E6 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 968D3F8A15CAE0EE0080197D /* libcurl.a */; };
+		96A028F617016774008264E6 /* libjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96CB82621596A89100AD6979 /* libjpeg.a */; };
+		96A028F717016774008264E6 /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D26C154A7E66009ECD44 /* libpng.a */; };
+		96A028F817016774008264E6 /* libbass.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0CE143BBA8400ACA64C /* libbass.dylib */; };
+		96A028F917016774008264E6 /* libbassflac.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0CF143BBA8400ACA64C /* libbassflac.dylib */; };
+		96A028FA17016774008264E6 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D26A154A7E21009ECD44 /* IOKit.framework */; };
+		96A028FB17016774008264E6 /* liballegro_font-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D25A154A7DFA009ECD44 /* liballegro_font-static.a */; };
+		96A028FC17016774008264E6 /* liballegro_image-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D25B154A7DFA009ECD44 /* liballegro_image-static.a */; };
+		96A028FD17016774008264E6 /* liballegro_main-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D25C154A7DFA009ECD44 /* liballegro_main-static.a */; };
+		96A028FE17016774008264E6 /* liballegro_memfile-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D25D154A7DFA009ECD44 /* liballegro_memfile-static.a */; };
+		96A028FF17016774008264E6 /* liballegro_primitives-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D25E154A7DFA009ECD44 /* liballegro_primitives-static.a */; };
+		96A0290017016774008264E6 /* liballegro_ttf-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D260154A7DFA009ECD44 /* liballegro_ttf-static.a */; };
+		96A0290117016774008264E6 /* liballegro-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D261154A7DFA009ECD44 /* liballegro-static.a */; };
+		96A0290217016774008264E6 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D256154A7D55009ECD44 /* Cocoa.framework */; };
+		96A0290317016774008264E6 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D257154A7D55009ECD44 /* OpenGL.framework */; };
+		96A0290417016774008264E6 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0D0143BBA8400ACA64C /* libfreetype.a */; };
+		96A0290517016774008264E6 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0D3143BBA8400ACA64C /* libz.a */; };
+		96A0290717016774008264E6 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9692632016CC7BFF00E09689 /* icon.icns */; };
+		96A0290917016774008264E6 /* libbass.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 96FB52F0158EBBFC00FF36FC /* libbass.dylib */; };
+		96A0290A17016774008264E6 /* libbassflac.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 969799791587A59E006E8AFA /* libbassflac.dylib */; };
+		96A0290C17016774008264E6 /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9636676016C9886700A24B46 /* data */; };
 		96A460A7151D836A001BC99C /* libAllegro.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A460A6151D836A001BC99C /* libAllegro.a */; };
 		96A4D258154A7D55009ECD44 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D256154A7D55009ECD44 /* Cocoa.framework */; };
 		96A4D259154A7D55009ECD44 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D257154A7D55009ECD44 /* OpenGL.framework */; };
@@ -294,6 +376,27 @@
 			dstSubfolderSpec = 7;
 			files = (
 				964FB85516E6051600F4BBA4 /* data in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96A0290817016774008264E6 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				96A0290917016774008264E6 /* libbass.dylib in CopyFiles */,
+				96A0290A17016774008264E6 /* libbassflac.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96A0290B17016774008264E6 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+				96A0290C17016774008264E6 /* data in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -472,6 +575,8 @@
 		969799791587A59E006E8AFA /* libbassflac.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbassflac.dylib; path = ../../../local/lib/libbassflac.dylib; sourceTree = "<group>"; };
 		969A7CE7159F7293001BE047 /* libJoypadCocoa.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libJoypadCocoa.a; path = ../../../JoypadSDKs/Cocoa/Mac/JoypadMac/libJoypadCocoa.a; sourceTree = "<group>"; };
 		969A9E3C16083E3000F4DBE2 /* ftpget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ftpget.cpp; path = ../../src/ftpget.cpp; sourceTree = "<group>"; };
+		96A0291217016774008264E6 /* Monster RPG 2 not MAS copy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Monster RPG 2 not MAS copy.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		96A0291317016775008264E6 /* Monster RPG 2 not MAS copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Monster RPG 2 not MAS copy-Info.plist"; path = "/Users/trent/code/monster-rpg-2/xcode/Monster 2/Monster RPG 2 not MAS copy-Info.plist"; sourceTree = "<absolute>"; };
 		96A460A6151D836A001BC99C /* libAllegro.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAllegro.a; path = ../../../iphone_libs_r/libAllegro.a; sourceTree = "<group>"; };
 		96A4D256154A7D55009ECD44 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
 		96A4D257154A7D55009ECD44 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/OpenGL.framework; sourceTree = DEVELOPER_DIR; };
@@ -611,6 +716,43 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		96A028E617016774008264E6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96A028E717016774008264E6 /* liballegro_color-static.a in Frameworks */,
+				96A028E817016774008264E6 /* libexpat.a in Frameworks */,
+				96A028E917016774008264E6 /* libdom.a in Frameworks */,
+				96A028EA17016774008264E6 /* libhubbub.a in Frameworks */,
+				96A028EB17016774008264E6 /* libparserutils.a in Frameworks */,
+				96A028EC17016774008264E6 /* libsvgtiny.a in Frameworks */,
+				96A028ED17016774008264E6 /* libwapcaplet.a in Frameworks */,
+				96A028EE17016774008264E6 /* Security.framework in Frameworks */,
+				96A028F017016774008264E6 /* liballegro_physfs-static.a in Frameworks */,
+				96A028F117016774008264E6 /* libphysfs.a in Frameworks */,
+				96A028F217016774008264E6 /* GameKit.framework in Frameworks */,
+				96A028F317016774008264E6 /* liballegro_dialog-static.a in Frameworks */,
+				96A028F417016774008264E6 /* liblua5.2.a in Frameworks */,
+				96A028F517016774008264E6 /* libcurl.a in Frameworks */,
+				96A028F617016774008264E6 /* libjpeg.a in Frameworks */,
+				96A028F717016774008264E6 /* libpng.a in Frameworks */,
+				96A028F817016774008264E6 /* libbass.dylib in Frameworks */,
+				96A028F917016774008264E6 /* libbassflac.dylib in Frameworks */,
+				96A028FA17016774008264E6 /* IOKit.framework in Frameworks */,
+				96A028FB17016774008264E6 /* liballegro_font-static.a in Frameworks */,
+				96A028FC17016774008264E6 /* liballegro_image-static.a in Frameworks */,
+				96A028FD17016774008264E6 /* liballegro_main-static.a in Frameworks */,
+				96A028FE17016774008264E6 /* liballegro_memfile-static.a in Frameworks */,
+				96A028FF17016774008264E6 /* liballegro_primitives-static.a in Frameworks */,
+				96A0290017016774008264E6 /* liballegro_ttf-static.a in Frameworks */,
+				96A0290117016774008264E6 /* liballegro-static.a in Frameworks */,
+				96A0290217016774008264E6 /* Cocoa.framework in Frameworks */,
+				96A0290317016774008264E6 /* OpenGL.framework in Frameworks */,
+				96A0290417016774008264E6 /* libfreetype.a in Frameworks */,
+				96A0290517016774008264E6 /* libz.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		96B4B09B143BB83100ACA64C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -665,6 +807,7 @@
 				96490EB9136368C500B2FBAF /* Mo. RPG 2.app */,
 				96B4B09E143BB83100ACA64C /* Monster RPG 2.app */,
 				964FB85B16E6051600F4BBA4 /* Monster RPG 2.app */,
+				96A0291217016774008264E6 /* Monster RPG 2 not MAS copy.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -774,6 +917,7 @@
 				964BBF201363557A00482029 /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 				964FB85C16E6051600F4BBA4 /* Monster RPG 2 copy2-Info.plist */,
+				96A0291317016775008264E6 /* Monster RPG 2 not MAS copy-Info.plist */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
@@ -1025,6 +1169,25 @@
 			productReference = 964FB85B16E6051600F4BBA4 /* Monster RPG 2.app */;
 			productType = "com.apple.product-type.application";
 		};
+		96A028B417016774008264E6 /* Monster RPG 2 not MAS 32 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 96A0290D17016774008264E6 /* Build configuration list for PBXNativeTarget "Monster RPG 2 not MAS 32" */;
+			buildPhases = (
+				96A028B517016774008264E6 /* Sources */,
+				96A028E617016774008264E6 /* Frameworks */,
+				96A0290617016774008264E6 /* Resources */,
+				96A0290817016774008264E6 /* CopyFiles */,
+				96A0290B17016774008264E6 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Monster RPG 2 not MAS 32";
+			productName = "Monster RPG 2";
+			productReference = 96A0291217016774008264E6 /* Monster RPG 2 not MAS copy.app */;
+			productType = "com.apple.product-type.application";
+		};
 		96B4B09D143BB83100ACA64C /* Monster RPG 2 */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 96B4B0BC143BB83100ACA64C /* Build configuration list for PBXNativeTarget "Monster RPG 2" */;
@@ -1071,6 +1234,7 @@
 				1D6058900D05DD3D006BFB54 /* MoRPG2 */,
 				96B4B09D143BB83100ACA64C /* Monster RPG 2 */,
 				964FB80016E6051600F4BBA4 /* Monster RPG 2 not MAS */,
+				96A028B417016774008264E6 /* Monster RPG 2 not MAS 32 */,
 			);
 		};
 /* End PBXProject section */
@@ -1081,6 +1245,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				964FB85016E6051600F4BBA4 /* icon.icns in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96A0290617016774008264E6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96A0290717016774008264E6 /* icon.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1222,6 +1394,61 @@
 				964FB82C16E6051600F4BBA4 /* widgets.cpp in Sources */,
 				964FB82D16E6051600F4BBA4 /* xml.cpp in Sources */,
 				964FB82E16E6051600F4BBA4 /* init.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96A028B517016774008264E6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96A028B617016774008264E6 /* tgui.cpp in Sources */,
+				96A028B717016774008264E6 /* Area.cpp in Sources */,
+				96A028B817016774008264E6 /* mygamecentervc.m in Sources */,
+				96A028B917016774008264E6 /* gamecenter.mm in Sources */,
+				96A028BA17016774008264E6 /* svg.cpp in Sources */,
+				96A028BB17016774008264E6 /* ftpget.cpp in Sources */,
+				96A028BC17016774008264E6 /* joypad_handler.m in Sources */,
+				96A028BD17016774008264E6 /* my_load_bitmap.cpp in Sources */,
+				96A028BE17016774008264E6 /* atlas_accessor.cpp in Sources */,
+				96A028BF17016774008264E6 /* joypad.mm in Sources */,
+				96A028C017016774008264E6 /* translate.cpp in Sources */,
+				96A028C117016774008264E6 /* 3d.cpp in Sources */,
+				96A028C217016774008264E6 /* Animation.cpp in Sources */,
+				96A028C317016774008264E6 /* AnimationSet.cpp in Sources */,
+				96A028C417016774008264E6 /* battle.cpp in Sources */,
+				96A028C517016774008264E6 /* CombatActions.cpp in Sources */,
+				96A028C617016774008264E6 /* Combatant.cpp in Sources */,
+				96A028C717016774008264E6 /* CombatEnemy.cpp in Sources */,
+				96A028C817016774008264E6 /* CombatEntity.cpp in Sources */,
+				96A028C917016774008264E6 /* CombatPlayer.cpp in Sources */,
+				96A028CA17016774008264E6 /* Configuration.cpp in Sources */,
+				96A028CB17016774008264E6 /* debug.cpp in Sources */,
+				96A028CC17016774008264E6 /* equipment.cpp in Sources */,
+				96A028CD17016774008264E6 /* Frame.cpp in Sources */,
+				96A028CE17016774008264E6 /* GenericEffect.cpp in Sources */,
+				96A028CF17016774008264E6 /* graphics.cpp in Sources */,
+				96A028D017016774008264E6 /* atlas.cpp in Sources */,
+				96A028D117016774008264E6 /* Image.cpp in Sources */,
+				96A028D217016774008264E6 /* Input.cpp in Sources */,
+				96A028D317016774008264E6 /* inventory.cpp in Sources */,
+				96A028D417016774008264E6 /* io.cpp in Sources */,
+				96A028D517016774008264E6 /* Items.cpp in Sources */,
+				96A028D617016774008264E6 /* lander.cpp in Sources */,
+				96A028D717016774008264E6 /* monster2.cpp in Sources */,
+				96A028D817016774008264E6 /* Object.cpp in Sources */,
+				96A028D917016774008264E6 /* pause.cpp in Sources */,
+				96A028DA17016774008264E6 /* Player.cpp in Sources */,
+				96A028DB17016774008264E6 /* redundant.cpp in Sources */,
+				96A028DC17016774008264E6 /* script.cpp in Sources */,
+				96A028DD17016774008264E6 /* shooter.cpp in Sources */,
+				96A028DE17016774008264E6 /* tftp_get.c in Sources */,
+				96A028DF17016774008264E6 /* sound.cpp in Sources */,
+				96A028E017016774008264E6 /* Spells.cpp in Sources */,
+				96A028E117016774008264E6 /* Tile.cpp in Sources */,
+				96A028E217016774008264E6 /* util.cpp in Sources */,
+				96A028E317016774008264E6 /* widgets.cpp in Sources */,
+				96A028E417016774008264E6 /* xml.cpp in Sources */,
+				96A028E517016774008264E6 /* init.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1742,6 +1969,197 @@
 			};
 			name = "Release Simulator";
 		};
+		96A0290E17016774008264E6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CODE_SIGN_IDENTITY = "Mac Developer: Trent Gamblin (5923J6TNDK)";
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					A5_OGL,
+					WITH_SVG,
+					NO_GAMECENTER,
+					NO_JOYPAD,
+				);
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				HEADER_SEARCH_PATHS = (
+					/Users/trent/code/local/include,
+					"/Users/trent/code/monster-rpg-2/include",
+					"/Users/trent/code/JoypadSDK-0.3.5/JoypadMac-0.3.5/include",
+					/opt/netsurf/include,
+				);
+				INFOPLIST_FILE = "Monster RPG 2 not MAS copy-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					/Users/trent/code/local/lib,
+					/Users/trent/code/JoypadSDKs/Cocoa/Mac/JoypadMac,
+					"\"$(SRCROOT)/../../../JoypadSDK-0.3.5/JoypadMac-0.3.5\"",
+					/opt/netsurf/lib,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "Monster RPG 2";
+				PROVISIONING_PROFILE = "7AF15FA2-D1C8-46C3-91F8-9DDE111DF4D6";
+				SDKROOT = macosx;
+				VALID_ARCHS = i386;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		96A0290F17016774008264E6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CODE_SIGN_IDENTITY = "Mac Developer: Trent Gamblin (5923J6TNDK)";
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					A5_OGL,
+					WITH_SVG,
+					NO_GAMECENTER,
+					NO_JOYPAD,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				HEADER_SEARCH_PATHS = (
+					/Users/trent/code/local/include,
+					"/Users/trent/code/monster-rpg-2/include",
+					"/Users/trent/code/JoypadSDK-0.3.5/JoypadMac-0.3.5/include",
+					/opt/netsurf/include,
+				);
+				INFOPLIST_FILE = "Monster RPG 2 not MAS copy-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					/Users/trent/code/local/lib,
+					/Users/trent/code/JoypadSDKs/Cocoa/Mac/JoypadMac,
+					"\"$(SRCROOT)/../../../JoypadSDK-0.3.5/JoypadMac-0.3.5\"",
+					/opt/netsurf/lib,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "Monster RPG 2";
+				PROVISIONING_PROFILE = "7AF15FA2-D1C8-46C3-91F8-9DDE111DF4D6";
+				SDKROOT = macosx;
+				VALID_ARCHS = i386;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		96A0291017016774008264E6 /* Lite */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CODE_SIGN_IDENTITY = "Mac Developer: Trent Gamblin (5923J6TNDK)";
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					A5_OGL,
+					WITH_SVG,
+					NO_GAMECENTER,
+					NO_JOYPAD,
+				);
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				HEADER_SEARCH_PATHS = (
+					/Users/trent/code/local/include,
+					"/Users/trent/code/monster-rpg-2/include",
+					"/Users/trent/code/JoypadSDK-0.3.5/JoypadMac-0.3.5/include",
+					/opt/netsurf/include,
+				);
+				INFOPLIST_FILE = "Monster RPG 2 not MAS copy-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					/Users/trent/code/local/lib,
+					/Users/trent/code/JoypadSDKs/Cocoa/Mac/JoypadMac,
+					"\"$(SRCROOT)/../../../JoypadSDK-0.3.5/JoypadMac-0.3.5\"",
+					/opt/netsurf/lib,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "Monster RPG 2";
+				PROVISIONING_PROFILE = "7AF15FA2-D1C8-46C3-91F8-9DDE111DF4D6";
+				SDKROOT = macosx;
+				VALID_ARCHS = i386;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Lite;
+		};
+		96A0291117016774008264E6 /* Release Simulator */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CODE_SIGN_IDENTITY = "Mac Developer: Trent Gamblin (5923J6TNDK)";
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					A5_OGL,
+					WITH_SVG,
+					NO_GAMECENTER,
+					NO_JOYPAD,
+				);
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				HEADER_SEARCH_PATHS = (
+					/Users/trent/code/local/include,
+					"/Users/trent/code/monster-rpg-2/include",
+					"/Users/trent/code/JoypadSDK-0.3.5/JoypadMac-0.3.5/include",
+					/opt/netsurf/include,
+				);
+				INFOPLIST_FILE = "Monster RPG 2 not MAS copy-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					/Users/trent/code/local/lib,
+					/Users/trent/code/JoypadSDKs/Cocoa/Mac/JoypadMac,
+					"\"$(SRCROOT)/../../../JoypadSDK-0.3.5/JoypadMac-0.3.5\"",
+					/opt/netsurf/lib,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "Monster RPG 2";
+				PROVISIONING_PROFILE = "7AF15FA2-D1C8-46C3-91F8-9DDE111DF4D6";
+				SDKROOT = macosx;
+				VALID_ARCHS = i386;
+				WRAPPER_EXTENSION = app;
+			};
+			name = "Release Simulator";
+		};
 		96B4B0B8143BB83100ACA64C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1981,6 +2399,17 @@
 				964FB85816E6051600F4BBA4 /* Debug */,
 				964FB85916E6051600F4BBA4 /* Lite */,
 				964FB85A16E6051600F4BBA4 /* Release Simulator */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		96A0290D17016774008264E6 /* Build configuration list for PBXNativeTarget "Monster RPG 2 not MAS 32" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				96A0290E17016774008264E6 /* Release */,
+				96A0290F17016774008264E6 /* Debug */,
+				96A0291017016774008264E6 /* Lite */,
+				96A0291117016774008264E6 /* Release Simulator */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
