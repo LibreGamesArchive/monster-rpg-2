@@ -727,7 +727,7 @@ bool shooter(bool for_points)
 
 	int mipmap = 0;
 	int linear = 0;
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI  && !defined A5_D3D && !defined __linux__
+#if 0 //!defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI  && !defined A5_D3D && !defined __linux__ && !defined ALLEGRO_MACOSX && !defined ALLEGRO_WINDOWS
 	mipmap = ALLEGRO_MIPMAP;
 	linear = ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR;
 #endif

@@ -7501,7 +7501,7 @@ void MMainMenu::mouseDown(int mx, int my, int b)
 		playPreloadedSample("blip.ogg");
 		selected--;
 		if (selected < 0) {
-			selected = options.size()-1;
+			selected = (int)options.size()-1;
 		}
 	}
 	else if (mx > BW-BW/4) {

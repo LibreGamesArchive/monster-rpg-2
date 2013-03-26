@@ -65,7 +65,7 @@ void AnimationSet::setSubAnimation(int anim)
 
 int AnimationSet::getNumAnims()
 {
-	return anims.size();
+	return (int)anims.size();
 }
 
 /*
@@ -373,7 +373,7 @@ AnimationSet *AnimationSet::clone(int type)
 	if (type == CLONE_FULL) {
 		tmp = m_load_bitmap(filename.c_str());
 
-		int extra_y = anims.size()*2; // max it can be
+		int extra_y = (int)anims.size()*2; // max it can be
 		int minw = INT_MAX;
 
 		for (size_t anim = 0; anim < anims.size(); anim++) {
@@ -421,7 +421,7 @@ AnimationSet *AnimationSet::clone(int type)
 		for (size_t i = 0; i < anims.size(); i++) {
 			Animation *a = anims[i];
 			for (size_t j = 0; j < a->getNumFrames(); j++) {
-				Frame *f = a->getFrame(j);
+				Frame *f = a->getFrame((int)j);
 				Image *img = f->getImage();
 				draw_bitmap_with_borders(
 					img->getBitmap(),
@@ -459,7 +459,7 @@ AnimationSet *AnimationSet::clone(int type)
 	for (size_t i = 0; i < anims.size(); i++) {
 		Order ord;
 		ord.y = anims[i]->getFrame(0)->getImage()->getY();
-		ord.anim_num = i;
+		ord.anim_num = (int)i;
 		o[i] = ord;
 	}
 
@@ -473,7 +473,7 @@ AnimationSet *AnimationSet::clone(int type)
 		int oidx = 0;
 		for (size_t j = 0; j < anims.size(); j++) {
 			if (o[j].anim_num == (int)i) {
-				oidx = j;
+				oidx = (int)j;
 				break;
 			}
 		}

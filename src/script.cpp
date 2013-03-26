@@ -66,7 +66,6 @@ int getNumberFromScript(lua_State *state, std::string name)
  */
 void startNewGame(const char *name)
 {
-
 	/* Reset game info */
 	for (int i = 0; i < MAX_MILESTONES; i++) {
 		gameInfo.milestones[i] = false;
@@ -81,7 +80,6 @@ void startNewGame(const char *name)
 	if (std::string(name) == "tutorial") {
 		party[heroSpot]->getInfo().abilities.hp -= 50;
 	}
-
 
 	/* Run start script */
 

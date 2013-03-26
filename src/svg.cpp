@@ -13,6 +13,7 @@ extern "C" {
 }
 
 #include "monster2.hpp"
+#include "svg.hpp"
 #include <allegro5/allegro_color.h>
 
 #ifdef A5_D3D

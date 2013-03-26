@@ -1936,7 +1936,7 @@ unsigned int Area::getHeight(void)
 	return (uint)sizey;
 }
 
-void draw_tile_with_borders(MBITMAP *tile, int x, int y)
+static void draw_tile_with_borders(MBITMAP *tile, int x, int y)
 {
 	int sides[4][6] = {
 		{ /* src */ 0, 0, TILE_SIZE, 1, /* dest */ 0, -1 }, // top
