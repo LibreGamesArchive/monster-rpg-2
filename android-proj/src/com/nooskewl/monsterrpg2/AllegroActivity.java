@@ -51,7 +51,6 @@ import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.egl.*;
 
 import com.nooskewl.monsterrpg2.AllegroInputStream;
@@ -138,7 +137,8 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
    /* load allegro */
    static {
 		/* FIXME: see if we can't load the allegro library name, or type from the manifest here */
-		/*
+
+/*
       System.loadLibrary("allegro-debug");
       System.loadLibrary("allegro_memfile-debug");
       System.loadLibrary("allegro_primitives-debug");
@@ -146,7 +146,11 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
       System.loadLibrary("allegro_font-debug");
       System.loadLibrary("allegro_ttf-debug");
       System.loadLibrary("allegro_color-debug");
-      */
+
+      System.loadLibrary("allegro_audio-debug");
+      System.loadLibrary("allegro_acodec-debug");
+*/
+
       System.loadLibrary("allegro");
       System.loadLibrary("allegro_memfile");
       System.loadLibrary("allegro_primitives");
@@ -155,8 +159,12 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
       System.loadLibrary("allegro_ttf");
       System.loadLibrary("allegro_color");
 
+      //System.loadLibrary("allegro_audio");
+      //System.loadLibrary("allegro_acodec");
+
       System.loadLibrary("bass");
       System.loadLibrary("bassflac");
+
       System.loadLibrary("monsterrpg2");
    }
 	
@@ -375,7 +383,7 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
       surface = null;
    }
    
-   public void postDestroySurface(View s)
+   public void postDestroySurface()
    {
       try {
          Log.d("AllegroActivity", "postDestroySurface");
@@ -476,16 +484,23 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
       Log.d("AllegroActivity", "decodeBitmap_f end");
       return decodedBitmap;
    }
+
+   public void goHome()
+   {
+      Intent intent = new Intent(Intent.ACTION_MAIN);
+      intent.addCategory(Intent.CATEGORY_HOME);
+      startActivity(intent);
+   }
    
    public void postFinish()
    {
-      /*
       try {
          Log.d("AllegroActivity", "posting finish!");
          handler.post( new Runnable() {
             public void run() {
                try {
                   AllegroActivity.this.finish();
+		  System.exit(0);
                } catch(Exception x) {
                   Log.d("AllegroActivity", "inner exception: " + x.getMessage());
                }
@@ -494,9 +509,10 @@ public class AllegroActivity extends ZeemoteActivity implements SensorEventListe
       } catch(Exception x) {
          Log.d("AllegroActivity", "exception: " + x.getMessage());
       }
-      */
+      /*
       Log.d("AllegroActivity", "Finishing!");
       System.exit(0);
+      */
    }
    
    /* end of functions native code calls */
@@ -1579,21 +1595,6 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
          es2_attrib[2] = EGL10.EGL_NONE;
       }
       
-      //egl_setConfigAttrib(EGL10.EGL_RENDERABLE_TYPE, version == 2 ? EGL_OPENGL_ES2_BIT : EGL_OPENGL_ES_BIT);
-	
-	/*
-      boolean color_size_specified = false;
-      for (int i = 0; i < egl_attribWork.size(); i++) {
-         Log.d("AllegroSurface", "egl_attribs[" + i + "] = " + egl_attribWork.get(i));
-         if (i % 2 == 0) {
-            if (egl_attribWork.get(i) == EGL10.EGL_RED_SIZE || egl_attribWork.get(i) == EGL10.EGL_GREEN_SIZE ||
-                  egl_attribWork.get(i) == EGL10.EGL_BLUE_SIZE) {
-               color_size_specified = true;
-            }
-         }
-      }
-	*/
-
       egl_attribs = new int[egl_attribWork.size()+1];
       for (int i = 0; i < egl_attribWork.size(); i++) {
          egl_attribs[i] = egl_attribWork.get(i);
@@ -1617,7 +1618,7 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
       Log.d("AllegroSurface", "EGL context created");
       
       egl_Context = ctx;
-      
+
       Log.d("AllegroSurface", "egl_createContext end");
 
       return ret;

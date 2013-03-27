@@ -8,7 +8,7 @@ static std::string shutdownMusicName = "";
 static std::string shutdownAmbienceName = "";
 
 bool sound_inited = false;
-static int total_samples = 0;
+static int total_samples;
 static int curr_sample = 0;
 
 static std::map<std::string, ALLEGRO_SAMPLE *> preloaded_samples;
@@ -80,22 +80,26 @@ static std::string preloaded_names[] = {
 void initSound(void)
 {
 	sound_inited = true;
+
+	total_samples = 0;
 	
 	for (int i = 0; preloaded_names[i] != ""; i++) {
 		total_samples++;
 	}
 
-	al_init_acodec_addon();
-
 	al_install_audio();
 	al_reserve_samples(32);
+	
+	al_init_acodec_addon();
 }
 
 bool loadSamples(void (*cb)(int, int))
 {
 	preloaded_samples[preloaded_names[curr_sample]] =
 		loadSample(preloaded_names[curr_sample]);
-	(*cb)(curr_sample, total_samples);
+	if (cb) {
+		(*cb)(curr_sample, total_samples);
+	}
 	curr_sample++;
 	if (curr_sample == total_samples) {
 		curr_sample = 0;
@@ -142,7 +146,18 @@ MSAMPLE loadSample(std::string name)
 
 	if (!sound_inited) return s;
 
+#ifdef ALLEGRO_ANDROID
+	ALLEGRO_PATH *p = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+	char fn[1000];
+	sprintf(fn, "%s/unpack/sfx/%s", al_path_cstr(p, '/'), name.c_str());
+	al_destroy_path(p);
+	debug_message("loading sample '%s'\n", fn);
+	al_set_standard_file_interface();
+	s = al_load_sample(fn);
+	al_android_set_apk_file_interface();
+#else
 	s = al_load_sample(getResource("sfx/%s", name.c_str()));
+#endif
 	if (s == 0) {
 		native_error("Load error.", ((std::string("sfx/") + name).c_str()));
 	}
@@ -214,7 +229,18 @@ void playMusic(std::string name, float vol, bool force)
 	bool is_flac;
 	name = check_music_name(name, &is_flac);
 
+#ifdef ALLEGRO_ANDROID
+	if (is_flac) {
+		al_set_standard_file_interface();
+		music = al_load_audio_stream(name.c_str(), 4, 2048);
+		al_android_set_apk_file_interface();
+	}
+	else {
+		music = al_load_audio_stream(name.c_str(), 4, 2048);
+	}
+#else
 	music = al_load_audio_stream(name.c_str(), 4, 2048);
+#endif
 	if (music == 0) {
 		native_error("Load error.", name.c_str());
 	}

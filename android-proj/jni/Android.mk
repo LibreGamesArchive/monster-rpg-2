@@ -80,9 +80,11 @@ LOCAL_ALLOW_UNDEFINED_SYMBOLS := false
 LOCAL_MODULE    := monsterrpg2
 LOCAL_SRC_FILES := \
 	3d.cpp\
-	Area.cpp\
 	Animation.cpp\
 	AnimationSet.cpp\
+	Area.cpp\
+	atlas.cpp\
+	atlas_accessor.cpp\
 	battle.cpp\
 	CombatActions.cpp\
 	Combatant.cpp\
@@ -105,6 +107,7 @@ LOCAL_SRC_FILES := \
 	java.c\
 	lander.cpp\
 	monster2.cpp\
+	my_load_bitmap.cpp\
 	Object.cpp\
 	pause.cpp\
 	Player.cpp\

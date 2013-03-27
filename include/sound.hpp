@@ -1,17 +1,15 @@
 #ifndef SOUND_HPP
 #define SOUND_HPP
 
-#ifdef ALLEGRO_ANDROID
+#if defined KCM_AUDIO
+typedef ALLEGRO_SAMPLE *MSAMPLE;
+typedef ALLEGRO_SAMPLE_ID MSAMPLE_ID;
+#elif defined ALLEGRO_ANDROID
 typedef int MSAMPLE;
 typedef int MSAMPLE_ID;
 #else
-#if !defined KCM_AUDIO
 typedef HSAMPLE MSAMPLE;
 typedef int MSAMPLE_ID;
-#else
-typedef ALLEGRO_SAMPLE *MSAMPLE;
-typedef ALLEGRO_SAMPLE_ID MSAMPLE_ID;
-#endif
 #endif
 
 extern std::string musicName;

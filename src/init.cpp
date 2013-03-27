@@ -425,12 +425,6 @@ static void *thread_proc(void *arg)
 	al_register_event_source(events, al_get_display_event_source(display));
 #endif
 
-	draw_timer = al_create_timer(1.0/config.getTargetFPS());
-	logic_timer = al_create_timer(1.0/LOGIC_RATE);
-	
-	al_start_timer(draw_timer);
-	al_start_timer(logic_timer);
-	
 	al_register_event_source(events, (ALLEGRO_EVENT_SOURCE *)draw_timer);
 	al_register_event_source(events, (ALLEGRO_EVENT_SOURCE *)logic_timer);
 	
@@ -465,96 +459,95 @@ static void *thread_proc(void *arg)
 			loadPlayDestroy("Cure.ogg");
 		}
 		
-		if (al_wait_for_event_timed(events, &event, 1.0f/LOGIC_RATE)) {
-			if (event.type == ALLEGRO_EVENT_TIMER) {
-				if (event.timer.source == draw_timer) {
-					draw_counter++;
-				}
-				else if (event.timer.source == logic_timer) {
-					logic_counter++;
-					// Handle joystick repeat events
-					ALLEGRO_KEYBOARD_STATE state;
-					al_get_keyboard_state(&state);
-
-					bool joyb1 = false;
-					bool joyb2 = false;
-					bool joyb3 = false;
-					if (config.getGamepadAvailable() && user_joystick != NULL) {
-						ALLEGRO_JOYSTICK_STATE joystate;
-						al_get_joystick_state(user_joystick, &joystate);
-						if (joystate.button[config.getJoyButton1()]) {
-							joyb1 = true;
-						}
-						if (joystate.button[config.getJoyButton2()]) {
-							joyb2 = true;
-						}
-						if (joystate.button[config.getJoyButton3()]) {
-							joyb3 = true;
-						}
-					}
-
-
-					if (!joystick_repeat_started[JOY_REPEAT_B1]) {
-						if (joyb1 || (is_modifier(config.getKey1()) && al_key_down(&state, config.getKey1()))) {
-							joy_b1_down(true, modifier_repeat_count[0] == 0);
-							modifier_repeat_count[0]++;
-						}
-					}
-					if (!joystick_repeat_started[JOY_REPEAT_B2]) {
-						if (joyb2 || (is_modifier(config.getKey2()) && al_key_down(&state, config.getKey2()))) {
-							joy_b2_down(true, modifier_repeat_count[1] == 0);
-							modifier_repeat_count[1]++;
-						}
-					}
-					if (!joystick_repeat_started[JOY_REPEAT_B3]) {
-						if (joyb3 || (is_modifier(config.getKey3()) && al_key_down(&state, config.getKey3()))) {
-							joy_b3_down(true, modifier_repeat_count[2] == 0);
-							modifier_repeat_count[2]++;
-						}
-					}
-					if (!joystick_repeat_started[JOY_REPEAT_AXIS0]) {
-						if (is_modifier(config.getKeyLeft()) && al_key_down(&state, config.getKeyLeft())) {
-							joy_l_down(true, modifier_repeat_count[3] == 0);
-							modifier_repeat_count[3]++;
-						}
-						if (is_modifier(config.getKeyRight()) && al_key_down(&state, config.getKeyRight())) {
-							joy_r_down(true, modifier_repeat_count[4] == 0);
-							modifier_repeat_count[4]++;
-						}
-					}
-					if (!joystick_repeat_started[JOY_REPEAT_AXIS1]) {
-						if (is_modifier(config.getKeyUp()) && al_key_down(&state, config.getKeyUp())) {
-							joy_u_down(true, modifier_repeat_count[5] == 0);
-							modifier_repeat_count[5]++;
-						}
-						if (is_modifier(config.getKeyDown()) && al_key_down(&state, config.getKeyDown())) {
-							joy_d_down(true, modifier_repeat_count[6] == 0);
-							modifier_repeat_count[6]++;
-						}
-					}
-
-					al_lock_mutex(joypad_mutex);
-					if (!pause_joystick_repeat_events) {
-						for (int i = 0; i < JOY_NUM_REPEATABLE; i++) {
-							if (joystick_repeat_started[i] == false) {
-								continue;
-							}
-							if (joystick_initial_repeat_countdown[i] > 0) {
-								joystick_initial_repeat_countdown[i] -= LOGIC_MILLIS;
-							}
-							else {
-								joystick_repeat_countdown[i] -= LOGIC_MILLIS;
-								if (joystick_repeat_countdown[i] <= 0) {
-									joystick_repeat_countdown[i] = JOY_REPEAT_TIME;
-									add_input_event(joystick_repeat_events[i]);
-								}
-							}
-						}
-					}
-					al_unlock_mutex(joypad_mutex);
-				}
-				al_signal_cond(wait_cond);
+		al_wait_for_event(events, &event);
+		if (event.type == ALLEGRO_EVENT_TIMER) {
+			if (event.timer.source == draw_timer) {
+				draw_counter++;
 			}
+			else if (event.timer.source == logic_timer) {
+				logic_counter++;
+				// Handle joystick repeat events
+				ALLEGRO_KEYBOARD_STATE state;
+				al_get_keyboard_state(&state);
+
+				bool joyb1 = false;
+				bool joyb2 = false;
+				bool joyb3 = false;
+				if (config.getGamepadAvailable() && user_joystick != NULL) {
+					ALLEGRO_JOYSTICK_STATE joystate;
+					al_get_joystick_state(user_joystick, &joystate);
+					if (joystate.button[config.getJoyButton1()]) {
+						joyb1 = true;
+					}
+					if (joystate.button[config.getJoyButton2()]) {
+						joyb2 = true;
+					}
+					if (joystate.button[config.getJoyButton3()]) {
+						joyb3 = true;
+					}
+				}
+
+
+				if (!joystick_repeat_started[JOY_REPEAT_B1]) {
+					if (joyb1 || (is_modifier(config.getKey1()) && al_key_down(&state, config.getKey1()))) {
+						joy_b1_down(true, modifier_repeat_count[0] == 0);
+						modifier_repeat_count[0]++;
+					}
+				}
+				if (!joystick_repeat_started[JOY_REPEAT_B2]) {
+					if (joyb2 || (is_modifier(config.getKey2()) && al_key_down(&state, config.getKey2()))) {
+						joy_b2_down(true, modifier_repeat_count[1] == 0);
+						modifier_repeat_count[1]++;
+					}
+				}
+				if (!joystick_repeat_started[JOY_REPEAT_B3]) {
+					if (joyb3 || (is_modifier(config.getKey3()) && al_key_down(&state, config.getKey3()))) {
+						joy_b3_down(true, modifier_repeat_count[2] == 0);
+						modifier_repeat_count[2]++;
+					}
+				}
+				if (!joystick_repeat_started[JOY_REPEAT_AXIS0]) {
+					if (is_modifier(config.getKeyLeft()) && al_key_down(&state, config.getKeyLeft())) {
+						joy_l_down(true, modifier_repeat_count[3] == 0);
+						modifier_repeat_count[3]++;
+					}
+					if (is_modifier(config.getKeyRight()) && al_key_down(&state, config.getKeyRight())) {
+						joy_r_down(true, modifier_repeat_count[4] == 0);
+						modifier_repeat_count[4]++;
+					}
+				}
+				if (!joystick_repeat_started[JOY_REPEAT_AXIS1]) {
+					if (is_modifier(config.getKeyUp()) && al_key_down(&state, config.getKeyUp())) {
+						joy_u_down(true, modifier_repeat_count[5] == 0);
+						modifier_repeat_count[5]++;
+					}
+					if (is_modifier(config.getKeyDown()) && al_key_down(&state, config.getKeyDown())) {
+						joy_d_down(true, modifier_repeat_count[6] == 0);
+						modifier_repeat_count[6]++;
+					}
+				}
+
+				al_lock_mutex(joypad_mutex);
+				if (!pause_joystick_repeat_events) {
+					for (int i = 0; i < JOY_NUM_REPEATABLE; i++) {
+						if (joystick_repeat_started[i] == false) {
+							continue;
+						}
+						if (joystick_initial_repeat_countdown[i] > 0) {
+							joystick_initial_repeat_countdown[i] -= LOGIC_MILLIS;
+						}
+						else {
+							joystick_repeat_countdown[i] -= LOGIC_MILLIS;
+							if (joystick_repeat_countdown[i] <= 0) {
+								joystick_repeat_countdown[i] = JOY_REPEAT_TIME;
+								add_input_event(joystick_repeat_events[i]);
+							}
+						}
+					}
+				}
+				al_unlock_mutex(joypad_mutex);
+			}
+			al_signal_cond(wait_cond);
 		}
 	}
 	
@@ -1250,7 +1243,7 @@ bool init(int *argc, char **argv[])
 	dpad_mutex = al_create_mutex();
 	touch_mutex = al_create_mutex();
 
-#if defined A5_D3D || defined ALLEGRO_ANDROID
+#if defined A5_D3D
 	use_fixed_pipeline = true;
 #endif
 	
@@ -1369,6 +1362,12 @@ bool init(int *argc, char **argv[])
 	al_init_user_event_source(&user_event_source);
 #endif
 
+	draw_timer = al_create_timer(1.0/config.getTargetFPS());
+	logic_timer = al_create_timer(1.0/LOGIC_RATE);
+	
+	al_start_timer(draw_timer);
+	al_start_timer(logic_timer);
+	
 	tguiInit();
 	tguiSetRotation(0);
 
@@ -1388,6 +1387,8 @@ bool init(int *argc, char **argv[])
 		is_android_lessthan_2_3 = true;
 	}
 #endif
+
+	debug_message("Calling initSound\n");
 
 	initSound();
 
@@ -1757,7 +1758,7 @@ void destroy()
 	al_shutdown_ttf_addon();
 
 	// OK?
-#ifdef ALLEGRO_RASPBERRYPI
+#ifdef ALLEGRO_ANDROID
 	//al_destroy_display(display);
 #endif
 
@@ -1781,7 +1782,7 @@ void destroy()
 
 	destroy_translation();
 	
-#ifdef ALLEGRO_WINDOWS
+#if defined ALLEGRO_WINDOWS
 	al_uninstall_system();
 #endif
 

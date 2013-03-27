@@ -2226,9 +2226,14 @@ int main(int argc, char *argv[])
 		}
 		#endif
 		else if (choice == 0xBEEF) {
+#ifndef ALLEGRO_ANDROID
 			config.write();
 			destroy();
 			exit(0);
+#else
+			goHome();
+			continue;
+#endif
 		}
 		else {
 			break;

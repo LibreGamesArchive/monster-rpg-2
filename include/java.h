@@ -9,7 +9,7 @@ extern "C" {
 
 #include "input_descriptor.h"
 
-void bass_initSound(void);
+void bass_initSound();
 HSAMPLE bass_loadSample(const char *name);;
 HSAMPLE bass_loadSampleLoop(const char *name);
 void bass_playSampleVolumePan(HSAMPLE s, float vol, float pan);
@@ -20,7 +20,7 @@ HMUSIC bass_loadMusic(const char *name);
 void bass_playMusic(HMUSIC music);
 void bass_stopMusic(HMUSIC music);
 void bass_destroyMusic(HMUSIC music);
-void bass_shutdownBASS(void);
+void bass_shutdownBASS();
 void bass_destroySample(HSAMPLE s);
 void bass_setMusicVolume(HMUSIC music, float vol);
 
@@ -31,12 +31,13 @@ void set_clipboard(char *buf);
 
 const char *get_sdcarddir();
 
-bool wifiConnected(void);
+bool wifiConnected();
 
-struct InputDescriptor get_zeemote_state(void);
+struct InputDescriptor get_zeemote_state();
 extern bool zeemote_connected;
-void find_zeemotes(void);
-void autoconnect_zeemote(void);
+void find_zeemotes();
+void autoconnect_zeemote();
+void goHome();
 
 #ifdef __cplusplus
 }

@@ -5,7 +5,7 @@
 
 static bool ok = false;
 
-JNIEnv *_al_android_get_jnienv(void);
+JNIEnv *_al_android_get_jnienv();
 
 #define _jni_checkException(env) __jni_checkException(env, __FILE__, __FUNCTION__, __LINE__)
 void __jni_checkException(JNIEnv *env, const char *file, const char *fname, int line);
@@ -147,7 +147,7 @@ static void *thread_proc(void *arg)
 			}
 			al_unlock_mutex(mutex);
 			if (inited) {
-				al_rest(0.001);
+				al_rest(1.0/60.0);
 			}
 			continue;
 		}
@@ -224,7 +224,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 	return JNI_VERSION_1_4;
 }
 
-void bass_initSound(void)
+void bass_initSound()
 {
 	mutex = al_create_mutex();
 
@@ -294,7 +294,7 @@ void bass_destroyMusic(HMUSIC music)
 	push("destroyMusic", NULL, music, 0, 0);
 }
 
-void bass_shutdownBASS(void)
+void bass_shutdownBASS()
 {
 	push("shutdownBASS", NULL, 0, 0, 0);
 }
@@ -362,7 +362,7 @@ void set_clipboard(char *buf)
 	(*_al_android_get_jnienv())->DeleteLocalRef(_al_android_get_jnienv(), saveS);
 }
 
-bool wifiConnected(void)
+bool wifiConnected()
 {
 	ALLEGRO_DEBUG("calling java method wifiConnected");
 
@@ -378,23 +378,23 @@ bool wifiConnected(void)
 	return ret;
 }
 
-void joy_b1_down(void);
-void joy_b2_down(void);
-void joy_b3_down(void);
-void joy_b1_up(void);
-void joy_b2_up(void);
-void joy_b3_up(void);
-void joy_l_down(void);
-void joy_r_down(void);
-void joy_u_down(void);
-void joy_d_down(void);
-void joy_l_up(void);
-void joy_r_up(void);
-void joy_u_up(void);
-void joy_d_up(void);
+void joy_b1_down();
+void joy_b2_down();
+void joy_b3_down();
+void joy_b1_up();
+void joy_b2_up();
+void joy_b3_up();
+void joy_l_down();
+void joy_r_down();
+void joy_u_down();
+void joy_d_down();
+void joy_l_up();
+void joy_r_up();
+void joy_u_up();
+void joy_d_up();
 
-void connect_external_controls(void);
-void disconnect_external_controls(void);
+void connect_external_controls();
+void disconnect_external_controls();
 	
 static bool left, right, up, down, ba, bb, bc, bd;
 
@@ -481,7 +481,7 @@ void zeemote_button_up(int b)
 	}
 }
 
-struct InputDescriptor get_zeemote_state(void)
+struct InputDescriptor get_zeemote_state()
 {
 	struct InputDescriptor id;
 	id.left = left;
@@ -496,13 +496,13 @@ struct InputDescriptor get_zeemote_state(void)
 
 bool zeemote_connected = false;
 
-void zeemote_connect(void)
+void zeemote_connect()
 {
 	zeemote_connected = true;
 	connect_external_controls();
 }
 
-void zeemote_disconnect(void)
+void zeemote_disconnect()
 {
 	zeemote_connected = false;
 	left = right = up = down = ba = bb = bc = bd = false;
@@ -547,7 +547,7 @@ JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeZeemo
 	zeemote_button_up(button);
 }
 
-void find_zeemotes(void)
+void find_zeemotes()
 {
 	_jni_callVoidMethodV(
 		_al_android_get_jnienv(),
@@ -557,7 +557,7 @@ void find_zeemotes(void)
 	);
 }
 
-void autoconnect_zeemote(void)
+void autoconnect_zeemote()
 {
 	_jni_callVoidMethodV(
 		_al_android_get_jnienv(),
@@ -589,5 +589,16 @@ const char * get_sdcarddir()
 	(*_al_android_get_jnienv())->ReleaseStringUTFChars(_al_android_get_jnienv(), s, native);
 
 	return buf;
+}
+
+
+void goHome()
+{
+	_jni_callVoidMethodV(
+		_al_android_get_jnienv(),
+		_al_android_activity_object(),
+		"goHome",
+		"()V"
+	);
 }
 

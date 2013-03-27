@@ -1021,7 +1021,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	TGUIWidget *left_widget = game_center;
-#elif defined(ALLEGRO_ANDROID)
+#elif defined(ALLEGRO_ANDROID) && !defined NO_JOYPAD
 	TGUIWidget *left_widget = joypad;
 #else
 	TGUIWidget *left_widget = NULL;
@@ -4495,7 +4495,7 @@ int title_menu(void)
 			{
 #ifdef ALLEGRO_ANDROID
 				find_zeemotes();
-				tguiSetFocus(buttons[0]);
+				tguiSetFocus(main_menu);
 #else
 				find_joypads();
 #endif

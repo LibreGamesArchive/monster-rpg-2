@@ -43,6 +43,7 @@ static int tgui_screen_offset_y = 0;
 static float tgui_screen_ratio_x = 1.0;
 static float tgui_screen_ratio_y = 1.0;
 
+static ALLEGRO_EVENT_QUEUE *timer_events;
 static ALLEGRO_EVENT_QUEUE *key_events;
 static ALLEGRO_EVENT_QUEUE *mouse_events;
 struct MSESTATE {
@@ -82,6 +83,8 @@ static std::vector<TGUIWidget *> disabledWidgets;
 
 #define KEEP_TIME 1.0
 
+static bool queue_emptier_returned = false;
+
 static void *queue_emptier(void *crap)
 {
 	int own_mouse_downs = 0;
@@ -90,15 +93,22 @@ static void *queue_emptier(void *crap)
 
 	while (event_queues_created) {
 		ALLEGRO_EVENT event;
-		if (al_peek_next_event(key_events, &event)) {
+		bool exit = true;
+		al_wait_for_event(timer_events, &event);
+		while (al_peek_next_event(key_events, &event)) {
 			if (event.any.timestamp+KEEP_TIME < al_current_time()) {
 				al_drop_next_event(key_events);
+				exit = false;
 			}
 			if (event.type == USER_KEY_DOWN || event.type == USER_KEY_UP || event.type == USER_KEY_CHAR) {
 				al_unref_user_event((ALLEGRO_USER_EVENT *)&event);
 			}
+			if (exit) {
+				break;
+			}
 		}
-		if (al_peek_next_event(mouse_events, &event)) {
+		exit = true;
+		while (al_peek_next_event(mouse_events, &event)) {
 			if (event.any.timestamp+KEEP_TIME < al_current_time()) {
 				if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
 					own_mouse_downs++;
@@ -112,13 +122,19 @@ static void *queue_emptier(void *crap)
 					}
 				}
 				al_drop_next_event(mouse_events);
+				exit = false;
 			}
 			if (event.type == USER_KEY_DOWN || event.type == USER_KEY_UP || event.type == USER_KEY_CHAR) {
 				al_unref_user_event((ALLEGRO_USER_EVENT *)&event);
 			}
+			if (exit) {
+				break;
+			}
 		}
-		al_rest(0.001);
+		al_rest(0.01);
 	}
+
+	queue_emptier_returned = true;
 
 	return NULL;
 }
@@ -300,6 +316,9 @@ void tguiInit()
 
 		mouse_events = al_create_event_queue();
 		
+		timer_events = al_create_event_queue();
+		al_register_event_source(timer_events, al_get_timer_event_source(logic_timer));
+
 		key_events = al_create_event_queue();
 #if !defined ALLEGRO_IPHONE
 		al_register_event_source(key_events, al_get_keyboard_event_source());
@@ -332,6 +351,11 @@ void tguiShutdown()
 	}
 	tguiStack.clear();
 	event_queues_created = false;
+	while (queue_emptier_returned == false) {
+		al_rest(0.001);
+	}
+	queue_emptier_returned = false;
+	al_destroy_event_queue(timer_events);
 	al_destroy_event_queue(key_events);
 	if (al_is_mouse_installed()) {
 		al_unregister_event_source(mouse_events, al_get_mouse_event_source());
