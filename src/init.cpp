@@ -458,7 +458,7 @@ static void *thread_proc(void *arg)
 			healall = true;
 			loadPlayDestroy("Cure.ogg");
 		}
-		
+
 		al_wait_for_event(events, &event);
 		if (event.type == ALLEGRO_EVENT_TIMER) {
 			if (event.timer.source == draw_timer) {
@@ -486,7 +486,6 @@ static void *thread_proc(void *arg)
 						joyb3 = true;
 					}
 				}
-
 
 				if (!joystick_repeat_started[JOY_REPEAT_B1]) {
 					if (joyb1 || (is_modifier(config.getKey1()) && al_key_down(&state, config.getKey1()))) {
@@ -594,10 +593,6 @@ static void *loader_proc(void *arg)
 
 	deter_display_access_bmp = m_create_bitmap(16, 16); // check
 	m_set_target_bitmap(deter_display_access_bmp);
-
-	AnimationSet *tmpAnimSet = new_AnimationSet(getResource("gui.png"));
-	guiAnims = tmpAnimSet->clone(CLONE_COPY_BORDERS);
-	delete tmpAnimSet;
 
 	poison_bmp = m_load_alpha_bitmap(getResource("media/poison.png"), true);
 	poison_bmp_tmp = m_create_alpha_bitmap( // check
@@ -1610,6 +1605,10 @@ bool init(int *argc, char **argv[])
 
 	load_translation_tags();
 	load_fonts();
+	
+	AnimationSet *tmpAnimSet = new_AnimationSet(getResource("gui.png"));
+	guiAnims = tmpAnimSet->clone(CLONE_COPY_BORDERS);
+	delete tmpAnimSet;
 
 	poison_bmp = m_make_alpha_display_bitmap(poison_bmp);
 	poison_bmp_tmp = m_make_alpha_display_bitmap(poison_bmp_tmp);

@@ -104,7 +104,7 @@ LOCAL_SRC_FILES := \
 	inventory.cpp\
 	io.cpp\
 	Items.cpp\
-	java.c\
+	java.cpp\
 	lander.cpp\
 	monster2.cpp\
 	my_load_bitmap.cpp\

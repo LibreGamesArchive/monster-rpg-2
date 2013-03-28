@@ -767,10 +767,6 @@ void m_destroy_font(MFONT *f)
 MBITMAP *m_clone_bitmap(MBITMAP *b)
 {
 	ALLEGRO_BITMAP *bmp = al_clone_bitmap(b->bitmap);
-	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
-	al_set_target_bitmap(bmp);
-	al_use_shader(NULL);
-	al_set_target_bitmap(old_target);
 	MBITMAP *m = new_mbitmap(bmp);
 	return m;
 }

@@ -1101,6 +1101,7 @@ top:
 			al_stop_timer(logic_timer);
 			al_stop_timer(draw_timer);
 			// halt
+			
 			al_acknowledge_drawing_halt(display);
 
 			while (true) {
