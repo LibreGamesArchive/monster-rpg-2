@@ -411,10 +411,13 @@ AnimationSet *AnimationSet::clone(int type)
 	}
 	else if (type == CLONE_COPY_BORDERS) {
 		tmp = m_clone_bitmap(bitmap);
+		int flags = al_get_new_bitmap_flags();
+		al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 		a->bitmap = m_create_bitmap(
 			m_get_bitmap_width(tmp),
 			m_get_bitmap_height(tmp)
 		);
+		al_set_new_bitmap_flags(flags);
 		ALLEGRO_BITMAP *target = al_get_target_bitmap();
 		m_set_target_bitmap(a->bitmap);
 		m_clear(m_map_rgba(0, 0, 0, 0));
@@ -438,10 +441,13 @@ AnimationSet *AnimationSet::clone(int type)
 	}
 	else { // CLONE_PLAYER or CLONE_ENEMY
 		tmp = m_clone_bitmap(bitmap);
+		int flags = al_get_new_bitmap_flags();
+		al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
 		a->bitmap = m_create_bitmap(
 			m_get_bitmap_width(tmp),
 			m_get_bitmap_height(tmp)
 		);
+		al_set_new_bitmap_flags(flags);
 		ALLEGRO_BITMAP *target = al_get_target_bitmap();
 		m_set_target_bitmap(a->bitmap);
 		m_clear(m_map_rgba(0, 0, 0, 0));

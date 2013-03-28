@@ -76,13 +76,6 @@ public:
 				return newHandler;
 			}
 		}
-		if (area && area->getName() == "tutorial") {
-			if (iphone_shaken(0.1)) {
-				iphone_clear_shaken();
-				battle->run(true);
-				return NULL;
-			}
-		}
 
 		for (int i = 0; i < MAX_PARTY; i++) {
 			FakeWidget *formWidget = formWidgets[i];

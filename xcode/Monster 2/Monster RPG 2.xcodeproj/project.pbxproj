@@ -575,7 +575,7 @@
 		969799791587A59E006E8AFA /* libbassflac.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbassflac.dylib; path = ../../../local/lib/libbassflac.dylib; sourceTree = "<group>"; };
 		969A7CE7159F7293001BE047 /* libJoypadCocoa.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libJoypadCocoa.a; path = ../../../JoypadSDKs/Cocoa/Mac/JoypadMac/libJoypadCocoa.a; sourceTree = "<group>"; };
 		969A9E3C16083E3000F4DBE2 /* ftpget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ftpget.cpp; path = ../../src/ftpget.cpp; sourceTree = "<group>"; };
-		96A0291217016774008264E6 /* Monster RPG 2 not MAS copy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Monster RPG 2 not MAS copy.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		96A0291217016774008264E6 /* Monster RPG 2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Monster RPG 2.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		96A0291317016775008264E6 /* Monster RPG 2 not MAS copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Monster RPG 2 not MAS copy-Info.plist"; path = "/Users/trent/code/monster-rpg-2/xcode/Monster 2/Monster RPG 2 not MAS copy-Info.plist"; sourceTree = "<absolute>"; };
 		96A460A6151D836A001BC99C /* libAllegro.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAllegro.a; path = ../../../iphone_libs_r/libAllegro.a; sourceTree = "<group>"; };
 		96A4D256154A7D55009ECD44 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
@@ -807,7 +807,7 @@
 				96490EB9136368C500B2FBAF /* Mo. RPG 2.app */,
 				96B4B09E143BB83100ACA64C /* Monster RPG 2.app */,
 				964FB85B16E6051600F4BBA4 /* Monster RPG 2.app */,
-				96A0291217016774008264E6 /* Monster RPG 2 not MAS copy.app */,
+				96A0291217016774008264E6 /* Monster RPG 2.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1185,7 +1185,7 @@
 			);
 			name = "Monster RPG 2 not MAS 32";
 			productName = "Monster RPG 2";
-			productReference = 96A0291217016774008264E6 /* Monster RPG 2 not MAS copy.app */;
+			productReference = 96A0291217016774008264E6 /* Monster RPG 2.app */;
 			productType = "com.apple.product-type.application";
 		};
 		96B4B09D143BB83100ACA64C /* Monster RPG 2 */ = {

@@ -1631,7 +1631,7 @@ bool init(int *argc, char **argv[])
 
 	al_set_new_bitmap_flags(0);
 	object_atlas = atlas_create(1024, 1024, 1, false);
-	al_set_new_bitmap_flags(PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
+	al_set_new_bitmap_flags(ALLEGRO_CONVERT_BITMAP);
 	std::vector<AnimationSet *> tmp_animsets;
 	for (int i = 0; object_filenames[i]; i++) {
 		AnimationSet *a = new_AnimationSet(getResource(object_filenames[i]));
@@ -1644,6 +1644,8 @@ bool init(int *argc, char **argv[])
 		delete tmp_animsets[i];
 	}
 	tmp_animsets.clear();
+	
+	al_set_new_bitmap_flags(PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
 
 	inited = true;
 
