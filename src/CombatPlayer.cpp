@@ -1326,8 +1326,12 @@ void CombatPlayer::createStoneBmp()
 		int wh = m_get_bitmap_height(work);
 		stone_bmp = m_create_bitmap(ww, wh);
 		ALLEGRO_BITMAP *tolock;
+		int work_ox = 0;
+		int work_oy = 0;
 		if (al_get_parent_bitmap(work->bitmap)) {
 			tolock = al_get_parent_bitmap(work->bitmap);
+			work_ox = animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getX();
+			work_oy = animSet->getCurrentAnimation()->getCurrentFrame()->getImage()->getY();
 		}
 		else {
 			tolock = work->bitmap;
@@ -1345,7 +1349,7 @@ void CombatPlayer::createStoneBmp()
 
 		for (int yy = 0; yy < wh; yy++) {
 			for (int xx = 0; xx < ww; xx++) {
-				MCOLOR c = al_get_pixel(tolock, xx, yy);
+				MCOLOR c = al_get_pixel(tolock, xx+work_ox, yy+work_oy);
 				if (c.a != 1.0f) continue;
 				MCOLOR c2;
 				c2 = m_get_pixel(stoneTexture, xx%m_get_bitmap_width(stoneTexture), yy%m_get_bitmap_height(stoneTexture));
