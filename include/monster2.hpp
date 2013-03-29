@@ -357,4 +357,6 @@ extern std::string cmdline_warp_area;
 bool is_modifier(int c);
 extern int modifier_repeat_count[7];
 
+void get_mouse_pos_in_buffer_coords(int *this_x, int *this_y);
+
 #endif

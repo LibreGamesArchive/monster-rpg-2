@@ -611,6 +611,8 @@ static int real_archery(int *accuracy_pts)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	current_mouse_x = BW/2;
 	current_mouse_y = BH/2;
+	int last_mouse_x = current_mouse_x;
+	int last_mouse_y = current_mouse_y;
 #endif
 	
 	set_target_backbuffer();
@@ -824,8 +826,12 @@ static int real_archery(int *accuracy_pts)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			if (!use_dpad) {
 				al_lock_mutex(click_mutex);
-				target_x = current_mouse_x;
-				target_y = current_mouse_y;
+				if (last_mouse_x != current_mouse_x || last_mouse_y != current_mouse_y) {
+					target_x = current_mouse_x;
+					target_y = current_mouse_y;
+					last_mouse_x = target_x;
+					last_mouse_y = target_y;
+				}
 				al_unlock_mutex(click_mutex);
 			}
 #endif

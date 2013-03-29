@@ -258,10 +258,21 @@ bool isVowel(char c)
 
 double iphone_line_times[4] = { -9999, };
 double iphone_shake_time = -9999;
+static bool need_release = false;
 
 bool iphone_line(IPHONE_LINE_DIR dir, double since)
 {
+	if (need_release) {
+		if (released) {
+			need_release = false;
+		}
+		else {
+			iphone_clear_line(dir);
+			return false;
+		}
+	}
 	if (al_current_time()-iphone_line_times[dir] < since) {
+		need_release = true;
 		return true;
 	}
 	return false;

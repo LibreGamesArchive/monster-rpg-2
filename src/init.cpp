@@ -1238,7 +1238,7 @@ bool init(int *argc, char **argv[])
 	dpad_mutex = al_create_mutex();
 	touch_mutex = al_create_mutex();
 
-#if defined A5_D3D
+#if defined A5_D3D || defined ALLEGRO_ANDROID
 	use_fixed_pipeline = true;
 #endif
 	

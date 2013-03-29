@@ -215,6 +215,9 @@ void connect_second_display(void)
 	black_button = m_load_alpha_bitmap(getResource("media/blackbutton.png"));
 	airplay_logo = m_load_alpha_bitmap(getResource("media/m2_controller_logo.png"));
 
+	m_set_target_bitmap(tmpbuffer);
+	m_clear(black);
+
 	set_target_backbuffer();
 	
 
@@ -527,6 +530,21 @@ static bool is_input_event(ALLEGRO_EVENT *e)
 	return false;
 }
 
+void get_mouse_pos_in_buffer_coords(int *this_x, int *this_y)
+{
+#ifdef ALLEGRO_IPHONE
+	if (airplay_connected) {
+		*this_x = ((float)*this_x / al_get_display_width(controller_display)) * 240;
+		*this_y = ((float)*this_y / al_get_display_height(controller_display)) * 160;
+	}
+	else
+#endif
+	if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN)
+		tguiConvertMousePosition(this_x, this_y, 0, 0, screen_ratio_x, screen_ratio_y);
+	else
+		tguiConvertMousePosition(this_x, this_y, screen_offset_x, screen_offset_y, 1, 1);
+}
+
 // called from everywhere
 bool is_close_pressed(bool pump_events_only)
 {
@@ -821,17 +839,7 @@ top:
 			event_mouse_x = this_x;
 			event_mouse_y = this_y;
 
-#ifdef ALLEGRO_IPHONE
-			if (airplay_connected) {
-				this_x = ((float)this_x / al_get_display_width(controller_display)) * 240;
-				this_y = ((float)this_y / al_get_display_height(controller_display)) * 160;
-			}
-			else
-#endif
-			if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN)
-				tguiConvertMousePosition(&this_x, &this_y, 0, 0, screen_ratio_x, screen_ratio_y);
-			else
-				tguiConvertMousePosition(&this_x, &this_y, screen_offset_x, screen_offset_y, 1, 1);
+			get_mouse_pos_in_buffer_coords(&this_x, &this_y);
 
 			if (use_dpad) {
 				void (*down[7])(bool, bool) = {
@@ -1058,6 +1066,11 @@ top:
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 		else if (event.type == ALLEGRO_EVENT_DISPLAY_ORIENTATION) {
 			set_transform();
+			/*
+			int x, y, w, h;
+			get_screen_offset_size(&x, &y, &w, &h);
+			al_set_clipping_rectangle(x, y, w, h);
+			*/
 		}
 #endif
 
@@ -1092,6 +1105,11 @@ top:
 #elif defined ALLEGRO_ANDROID
 			int cx, cy, cw, ch;
 			al_get_clipping_rectangle(&cx, &cy, &cw, &ch);
+			
+			int dx, dy, dw, dh;
+			get_screen_offset_size(&dx, &dy, &dw, &dh);
+			m_destroy_bitmap(tmpbuffer);
+
 			_destroy_loaded_bitmaps();
 			destroy_fonts();
 			destroyIcons();
@@ -1124,24 +1142,32 @@ top:
 
 			_reload_loaded_bitmaps();
 			_reload_loaded_bitmaps_delayed();
+	
+			set_screen_params();
+
 			load_fonts();
 			loadIcons();
 			if (in_shooter) {
 				shooter_restoring = true;
 			}
+
+			int dx2, dy2, dw2, dh2;
+			get_screen_offset_size(&dx2, &dy2, &dw2, &dh2);
 			ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
-			int dx, dy, dw, dh;
-			get_screen_offset_size(&dx, &dy, &dw, &dh);
 			set_target_backbuffer();
 			ALLEGRO_TRANSFORM t;
 			al_identity_transform(&t);
 			al_scale_transform(&t, screenScaleX, screenScaleY);
-			al_translate_transform(&t, dx, dy);
+			al_translate_transform(&t, dx2, dy2);
 			al_use_transform(&t);
+			al_set_target_bitmap(old_target);
+			al_set_clipping_rectangle(cx, cy, cw, ch);
+
+			create_tmpbuffer();
+			old_target = al_get_target_bitmap();
 			m_set_target_bitmap(tmpbuffer);
 			m_clear(black);
 			al_set_target_bitmap(old_target);
-			al_set_clipping_rectangle(cx, cy, cw, ch);
 #endif
 			glDisable(GL_DITHER);
 			al_start_timer(logic_timer);
@@ -1291,6 +1317,9 @@ top:
 	if (do_acknowledge_resize) {
 		al_acknowledge_resize(display);
 		do_acknowledge_resize = false;
+		int x, y, w, h;
+		get_screen_offset_size(&x, &y, &w, &h);
+		al_set_clipping_rectangle(x, y, w, h);
 	}
 
 	if (reload_translation) {
@@ -1399,6 +1428,13 @@ top:
 		set_target_backbuffer();
 		toggle_fullscreen();
 	}
+
+#ifdef ALLEGRO_ANDROID
+	if (!switched_in) {
+		al_rest(0.01);
+		goto top;
+	}
+#endif
 
 	return close_pressed;
 }

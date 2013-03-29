@@ -943,8 +943,12 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	int yy = 6;
 	int yinc;
 
+#if defined ALLEGRO_ANDROID || defined ALLEGRO_IPHONE
+	yinc = 14;
+#else
 	if (use_dpad) yinc = 14;
 	else yinc = 16;
+#endif
 
 	int yyy = 6;
 
@@ -1035,10 +1039,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	MTextButton *mainMagic = new MTextButton(162, yy, "Magic", false, left_widget, NULL, false);
 	yy += yinc;
 	MTextButton *mainForm = new MTextButton(162, yy, "Form", false, left_widget, NULL, false);
-#if defined ALLEGRO_ANDROID || defined ALLEGRO_IPHONE
-	if (use_dpad)
-#endif
-		yy += yinc;
+	yy += yinc;
 	MTextButton *mainStats = new MTextButton(162, yy, "Stats", false, left_widget, NULL, false);
 	yy += yinc;
 	TGUIWidget *mainSave;
@@ -1073,7 +1074,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	MDragNDropForm *dndForm = NULL;
 	if (!use_dpad)
 		dndForm = new MDragNDropForm();
-
 
 	MParty *partyStats = new MParty();
 	MLabel *mainTimeLabel = new MLabel(164, 107, "Time", grey);
@@ -1131,10 +1131,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	tguiAddWidget(mainFrame);
 	tguiAddWidget(mainItem);
 	tguiAddWidget(mainMagic);
-#if defined ALLEGRO_ANDROID || defined ALLEGRO_IPHONE
-	if (use_dpad)
-#endif
-		tguiAddWidget(mainForm);
+	tguiAddWidget(mainForm);
 	tguiAddWidget(mainStats);
 	tguiAddWidget(mainSave);
 #ifdef ALLEGRO_IPHONE
@@ -1582,7 +1579,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				section = MAIN;
 			}
 #endif
-			else if (widget == formChooser) {
+			else if (widget == formChooser && !formChooser->getInset()) {
 				std::vector<int> &v = formChooser->getSelected();
 				if (v.size() > 0) {
 					if (v[0] < 0) {
@@ -1668,8 +1665,10 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 					section = MAIN;
 				}
 				else {
-					for (size_t i = 0; i < v2.size(); i++) {
-						v2[i] = -v2[i] - 1;
+					if (v2.size() > 0) {
+						for (size_t i = 0; i < v2.size(); i++) {
+							v2[i] = -v2[i] - 1;
+						}
 					}
 					tguiDeleteWidget(formChooser);
 					tguiDeleteWidget(formChooser2);
@@ -1678,7 +1677,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				}
 				formChooser->setInset(false);
 			}
-
 			else if (widget == stats) {
 				tguiDeleteWidget(stats);
 				tguiPop();

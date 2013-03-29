@@ -5943,6 +5943,10 @@ MManSelector::~MManSelector(void)
 
 void MMultiChooser::mouseDownAbs(int x, int y, int b)
 {
+	if (inset) {
+		return;
+	}
+
 	down = true;
 
 	for (int i = 0; i < (int)points.size(); i++) {
@@ -6211,7 +6215,7 @@ int MMultiChooser::update(int millis)
 		playPreloadedSample("select.ogg");
 		return TGUI_RETURN;
 	}
-	else if (ie.button2 == DOWN || iphone_shaken(0.1)) {
+	else if (!inset && (ie.button2 == DOWN || iphone_shaken(0.1))) {
 		use_input_event();
 		iphone_clear_shaken();
 		playPreloadedSample("select.ogg");
@@ -6246,7 +6250,7 @@ int MMultiChooser::update(int millis)
 		possibilities.clear();
 	}
 
-	if (!use_dpad) {
+	if (!use_dpad && !inset) {
 		if (current.size() > 0) {
 			IPHONE_LINE_DIR dir;
 			IPHONE_LINE_DIR opposite;
@@ -6261,6 +6265,7 @@ int MMultiChooser::update(int millis)
 			if (iphone_line(dir, 0.1)) {
 				iphone_clear_line(dir);
 				playPreloadedSample("select.ogg");
+				down = false;
 				return TGUI_RETURN;
 			}
 			else if (iphone_line(opposite, 0.1)) {
@@ -6268,12 +6273,14 @@ int MMultiChooser::update(int millis)
 				for (size_t i = 0; i < current.size(); i++) {
 					current[i] = -current[i] - 1;
 				}
+				down = false;
 				return TGUI_RETURN;
 			}
 			else if (this == tguiActiveWidget && iphone_shaken(0.1)) {
 				iphone_clear_shaken();
 				playPreloadedSample("blip.ogg");
 				current.clear();
+				down = false;
 				return TGUI_RETURN;
  			}
 		}
