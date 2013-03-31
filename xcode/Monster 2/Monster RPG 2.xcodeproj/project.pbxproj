@@ -559,7 +559,6 @@
 		968C1E5A13BBB51D00615225 /* libbass.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbass.a; path = ../../../iphone_libs_r/libbass.a; sourceTree = "<group>"; };
 		968C1E5C13BBB55900615225 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		968C1E7913BCED5D00615225 /* libbassflac.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbassflac.a; path = ../../../iphone_libs_r/libbassflac.a; sourceTree = "<group>"; };
-		968D3EFA15CAD2900080197D /* Monster RPG 2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Monster RPG 2.entitlements"; sourceTree = "<group>"; };
 		968D3F8A15CAE0EE0080197D /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcurl.a; path = ../../../local/lib/libcurl.a; sourceTree = "<group>"; };
 		9692632016CC7BFF00E09689 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = icon.icns; path = "../../mac-icons/icon.icns"; sourceTree = "<group>"; };
 		9695A12C138D706400FB0417 /* liballegro_font-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_font-static.a"; path = "../../../iphone_libs_r/liballegro_font-static.a"; sourceTree = "<group>"; };
@@ -598,21 +597,11 @@
 		96B4B0A8143BB83100ACA64C /* Monster RPG 2-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Monster RPG 2-Info.plist"; sourceTree = "<group>"; };
 		96B4B0AA143BB83100ACA64C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		96B4B0AE143BB83100ACA64C /* Monster RPG 2-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Monster RPG 2-Prefix.pch"; sourceTree = "<group>"; };
-		96B4B0BE143BBA4700ACA64C /* liballegro_dialog-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_dialog-static.a"; path = "../../../../../../usr/local/lib/liballegro_dialog-static.a"; sourceTree = "<group>"; };
-		96B4B0BF143BBA4700ACA64C /* liballegro_font-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_font-static.a"; path = "../../../../../../usr/local/lib/liballegro_font-static.a"; sourceTree = "<group>"; };
-		96B4B0C0143BBA4700ACA64C /* liballegro_image-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_image-static.a"; path = "../../../../../../usr/local/lib/liballegro_image-static.a"; sourceTree = "<group>"; };
-		96B4B0C1143BBA4700ACA64C /* liballegro_main-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_main-static.a"; path = "../../../../../../usr/local/lib/liballegro_main-static.a"; sourceTree = "<group>"; };
-		96B4B0C2143BBA4700ACA64C /* liballegro_primitives-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_primitives-static.a"; path = "../../../../../../usr/local/lib/liballegro_primitives-static.a"; sourceTree = "<group>"; };
-		96B4B0C3143BBA4700ACA64C /* liballegro_shader-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_shader-static.a"; path = "../../../../../../usr/local/lib/liballegro_shader-static.a"; sourceTree = "<group>"; };
-		96B4B0C4143BBA4700ACA64C /* liballegro_ttf-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_ttf-static.a"; path = "../../../../../../usr/local/lib/liballegro_ttf-static.a"; sourceTree = "<group>"; };
-		96B4B0C5143BBA4700ACA64C /* liballegro-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro-static.a"; path = "../../../../../../usr/local/lib/liballegro-static.a"; sourceTree = "<group>"; };
 		96B4B0CE143BBA8400ACA64C /* libbass.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbass.dylib; path = ../../../local/lib/libbass.dylib; sourceTree = "<group>"; };
 		96B4B0CF143BBA8400ACA64C /* libbassflac.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbassflac.dylib; path = ../../../local/lib/libbassflac.dylib; sourceTree = "<group>"; };
 		96B4B0D0143BBA8400ACA64C /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = ../../../local/lib/libfreetype.a; sourceTree = "<group>"; };
 		96B4B0D2143BBA8400ACA64C /* libtgui.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtgui.a; path = ../../../local/lib/libtgui.a; sourceTree = "<group>"; };
 		96B4B0D3143BBA8400ACA64C /* libz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libz.a; path = ../../../local/lib/libz.a; sourceTree = "<group>"; };
-		96B4B0DD143BBB6200ACA64C /* libJoypadCocoa.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libJoypadCocoa.a; path = ../../../../Downloads/JoypadSDKs/Mac/JoypadCocoaSDK/libJoypadCocoa.a; sourceTree = "<group>"; };
-		96B4B131143BBC4800ACA64C /* liblua-fixed.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liblua-fixed.a"; path = "../../../local/lib/liblua-fixed.a"; sourceTree = "<group>"; };
 		96B7D08313D09EF7004D7ED6 /* libpng.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpng.a; path = ../../../iphone_libs_r/libpng.a; sourceTree = "<group>"; };
 		96B7D08413D09EF7004D7ED6 /* libz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libz.a; path = ../../../iphone_libs_r/libz.a; sourceTree = "<group>"; };
 		96BC52A116FA8E39004E526B /* atlas_accessor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atlas_accessor.cpp; path = ../../src/atlas_accessor.cpp; sourceTree = "<group>"; };
@@ -621,18 +610,9 @@
 		96C2C90616C0A53B004EBAB9 /* liballegro_dialog-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_dialog-static.a"; path = "../../../local/lib/liballegro_dialog-static.a"; sourceTree = "<group>"; };
 		96C2C90716C0A53C004EBAB9 /* liblua5.2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua5.2.a; path = ../../../local/lib/liblua5.2.a; sourceTree = "<group>"; };
 		96C2C90A16C0A595004EBAB9 /* gamecenter.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = gamecenter.mm; path = ../../src/gamecenter.mm; sourceTree = "<group>"; };
-		96CB82611596A77F00AD6979 /* Monster RPG 2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Monster RPG 2.entitlements"; sourceTree = "<group>"; };
 		96CB82621596A89100AD6979 /* libjpeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjpeg.a; path = ../../../local/lib/libjpeg.a; sourceTree = "<group>"; };
 		96CFE56916C0AB6A00B7DB0C /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/GameKit.framework; sourceTree = DEVELOPER_DIR; };
 		96D175A713351F06008462BB /* translate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = translate.cpp; path = ../../src/translate.cpp; sourceTree = "<group>"; };
-		96DB70C513DA65D7006F8FCF /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = ../../icons/full/Default.png; sourceTree = "<group>"; };
-		96DDE20313DB24A9008AA371 /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-72.png"; path = "../../icons/lite/Icon-72.png"; sourceTree = "<group>"; };
-		96DDE20413DB24A9008AA371 /* Icon-Small-50.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-Small-50.png"; path = "../../icons/lite/Icon-Small-50.png"; sourceTree = "<group>"; };
-		96DDE20513DB24A9008AA371 /* Icon-Small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-Small.png"; path = "../../icons/lite/Icon-Small.png"; sourceTree = "<group>"; };
-		96DDE20613DB24A9008AA371 /* Icon-Small@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-Small@2x.png"; path = "../../icons/lite/Icon-Small@2x.png"; sourceTree = "<group>"; };
-		96DDE20713DB24A9008AA371 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = ../../icons/lite/Icon.png; sourceTree = "<group>"; };
-		96DDE20813DB24A9008AA371 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon@2x.png"; path = "../../icons/lite/Icon@2x.png"; sourceTree = "<group>"; };
-		96DDE20913DB24A9008AA371 /* iTunesArtwork */ = {isa = PBXFileReference; lastKnownFileType = text; name = iTunesArtwork; path = ../../icons/lite/iTunesArtwork; sourceTree = "<group>"; };
 		96E3D50416C0D06C00A4A973 /* mygamecentervc.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = mygamecentervc.m; path = ../../src/mygamecentervc.m; sourceTree = "<group>"; };
 		96ED3258136349520057B4C7 /* Monster_2-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Monster_2-Info.plist"; sourceTree = "<group>"; };
 		96FB52F0158EBBFC00FF36FC /* libbass.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbass.dylib; path = ../../../local/lib/libbass.dylib; sourceTree = "<group>"; };
@@ -976,14 +956,6 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				96DDE20913DB24A9008AA371 /* iTunesArtwork */,
-				96DDE20713DB24A9008AA371 /* Icon.png */,
-				96DDE20813DB24A9008AA371 /* Icon@2x.png */,
-				96DDE20313DB24A9008AA371 /* Icon-72.png */,
-				96DDE20413DB24A9008AA371 /* Icon-Small-50.png */,
-				96DDE20513DB24A9008AA371 /* Icon-Small.png */,
-				96DDE20613DB24A9008AA371 /* Icon-Small@2x.png */,
-				96DB70C513DA65D7006F8FCF /* Default.png */,
 				96ED3258136349520057B4C7 /* Monster_2-Info.plist */,
 			);
 			name = Resources;
@@ -1089,9 +1061,7 @@
 		96B4B0A6143BB83100ACA64C /* Monster RPG 2 */ = {
 			isa = PBXGroup;
 			children = (
-				968D3EFA15CAD2900080197D /* Monster RPG 2.entitlements */,
 				966C6FB015CA5ACF00AA804D /* Monster RPG 2.entitlements */,
-				96CB82611596A77F00AD6979 /* Monster RPG 2.entitlements */,
 				96B4B0A7143BB83100ACA64C /* Supporting Files */,
 			);
 			path = "Monster RPG 2";
@@ -1110,21 +1080,11 @@
 		96B4B0BD143BB9E600ACA64C /* Mac libs */ = {
 			isa = PBXGroup;
 			children = (
-				96B4B131143BBC4800ACA64C /* liblua-fixed.a */,
-				96B4B0DD143BBB6200ACA64C /* libJoypadCocoa.a */,
 				96B4B0CE143BBA8400ACA64C /* libbass.dylib */,
 				96B4B0CF143BBA8400ACA64C /* libbassflac.dylib */,
 				96B4B0D0143BBA8400ACA64C /* libfreetype.a */,
 				96B4B0D2143BBA8400ACA64C /* libtgui.a */,
 				96B4B0D3143BBA8400ACA64C /* libz.a */,
-				96B4B0BE143BBA4700ACA64C /* liballegro_dialog-static.a */,
-				96B4B0BF143BBA4700ACA64C /* liballegro_font-static.a */,
-				96B4B0C0143BBA4700ACA64C /* liballegro_image-static.a */,
-				96B4B0C1143BBA4700ACA64C /* liballegro_main-static.a */,
-				96B4B0C2143BBA4700ACA64C /* liballegro_primitives-static.a */,
-				96B4B0C3143BBA4700ACA64C /* liballegro_shader-static.a */,
-				96B4B0C4143BBA4700ACA64C /* liballegro_ttf-static.a */,
-				96B4B0C5143BBA4700ACA64C /* liballegro-static.a */,
 			);
 			name = "Mac libs";
 			sourceTree = "<group>";
@@ -1527,8 +1487,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Mo. RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
 				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -1546,7 +1505,7 @@
 					/opt/netsurf/include,
 				);
 				INFOPLIST_FILE = "Monster_2-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				IPOD_DISPLAY_NAME = "Mo. RPG 2";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1557,8 +1516,7 @@
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Mo. RPG 2";
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "D081C66B-5CB2-4BF0-B7B6-FFD35B57742D";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				VALID_ARCHS = "armv7 armv7s";
 			};
@@ -1605,8 +1563,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Mo. RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
 				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1623,7 +1580,7 @@
 					/opt/netsurf/include,
 				);
 				INFOPLIST_FILE = "Monster_2-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				IPOD_DISPLAY_NAME = "Mo. RPG 2";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1634,8 +1591,7 @@
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Mo. RPG 2";
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "D081C66B-5CB2-4BF0-B7B6-FFD35B57742D";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				VALID_ARCHS = "armv7 armv7s";
 			};
@@ -1865,8 +1821,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Mo. RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
 				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -1884,7 +1839,7 @@
 					/opt/netsurf/include,
 				);
 				INFOPLIST_FILE = "Monster_2-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				IPOD_DISPLAY_NAME = "Mo. RPG 2";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1895,8 +1850,7 @@
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Mo. RPG 2";
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "D081C66B-5CB2-4BF0-B7B6-FFD35B57742D";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				VALID_ARCHS = "armv7 armv7s";
 			};
@@ -1932,8 +1886,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Mo. RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
 				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -1951,7 +1904,7 @@
 					/opt/netsurf/include,
 				);
 				INFOPLIST_FILE = "Monster_2-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				IPOD_DISPLAY_NAME = "Mo. RPG 2";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1962,8 +1915,7 @@
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Mo. RPG 2";
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "D081C66B-5CB2-4BF0-B7B6-FFD35B57742D";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				VALID_ARCHS = "armv7 armv7s";
 			};

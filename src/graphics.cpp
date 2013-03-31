@@ -826,19 +826,13 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 
 	while (true) {
 		pump_events();
-		INPUT_EVENT ie = get_next_input_event();
-		if (ie.button1 == DOWN || ie.button2 == DOWN || !released) {
-			use_input_event();
-			if (can_cancel) {
-				dpad_on();
-				m_destroy_bitmap(tmp);
-				m_destroy_bitmap(bufdup);
-				set_target_backbuffer();
-				global_draw_red = true;
-				global_draw_controls = true;
-				transitioning = false;
-				done = true;
-				ret = true;
+		if (getInput()) {
+			InputDescriptor id = getInput()->getDescriptor();
+			if (id.button1 || id.button2 || !released) {
+				if (can_cancel) {
+					done = true;
+					ret = true;
+				}
 			}
 		}
 		now = (unsigned long)(al_get_time()*1000);

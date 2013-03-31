@@ -467,6 +467,7 @@ static void *thread_proc(void *arg)
 			else if (event.timer.source == logic_timer) {
 				logic_counter++;
 				// Handle joystick repeat events
+#if !defined ALLEGRO_IPHONE
 				ALLEGRO_KEYBOARD_STATE state;
 				al_get_keyboard_state(&state);
 
@@ -525,6 +526,7 @@ static void *thread_proc(void *arg)
 						modifier_repeat_count[6]++;
 					}
 				}
+#endif
 
 				al_lock_mutex(joypad_mutex);
 				if (!pause_joystick_repeat_events) {
