@@ -2,26 +2,28 @@
 
 #import "joypad_handler.h"
 
-void lock_joypad_mutex(void);
-void unlock_joypad_mutex(void);
+extern "C" {
+	void lock_joypad_mutex(void);
+	void unlock_joypad_mutex(void);
 
-void joy_b1_down(void);
-void joy_b2_down(void);
-void joy_b3_down(void);
-void joy_b1_up(void);
-void joy_b2_up(void);
-void joy_b3_up(void);
-void joy_l_down(void);
-void joy_r_down(void);
-void joy_u_down(void);
-void joy_d_down(void);
-void joy_l_up(void);
-void joy_r_up(void);
-void joy_u_up(void);
-void joy_d_up(void);
+	void connect_external_controls(void);
+	void disconnect_external_controls(void);
 
-void connect_external_controls(void);
-void disconnect_external_controls(void);
+	void joy_b1_down(bool skip_initial_event = false, bool long_delay = false);
+	void joy_b2_down(bool skip_initial_event = false, bool long_delay = false);
+	void joy_b3_down(bool skip_initial_event = false, bool long_delay = false);
+	void joy_b1_up();
+	void joy_b2_up();
+	void joy_b3_up();
+	void joy_l_down(bool skip_initial_event = false, bool long_delay = false);
+	void joy_r_down(bool skip_initial_event = false, bool long_delay = false);
+	void joy_u_down(bool skip_initial_event = false, bool long_delay = false);
+	void joy_d_down(bool skip_initial_event = false, bool long_delay = false);
+	void joy_l_up();
+	void joy_r_up();
+	void joy_u_up();
+	void joy_d_up();
+}
 
 @implementation joypad_handler
 

@@ -264,7 +264,7 @@ static AnimationSet *dot_loader;
 static MBITMAP *bg_loader, *loading_loader, *bar_loader;
 MBITMAP *corner_bmp;
 bool had_battle = false;
-MBITMAP *shadow_sheet;
+AnimationSet *shadow_sheet;
 MBITMAP *dpad_buttons;
 bool onscreen_swipe_to_attack;
 bool onscreen_drag_to_use;
@@ -1091,12 +1091,6 @@ bool init(int *argc, char **argv[])
 
 	debug_message("created input_event_mutex");
 
-#ifdef ALLEGRO_IPHONE
-	config.setAutoRotation(config.getAutoRotation());
-#endif
-
-	debug_message("setAutoRotation");
-
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	dpad_type = config.getDpadType();
 #else
@@ -1595,7 +1589,12 @@ bool init(int *argc, char **argv[])
 	al_set_new_bitmap_flags(ALLEGRO_CONVERT_BITMAP);
 
 	//shadow_sheet = m_create_alpha_bitmap(4*16, 2*16, create_shadows, NULL, destroy_shadows);
-	shadow_sheet = m_load_alpha_bitmap(getResource("media/shadows.png"));
+	//shadow_sheet = m_load_alpha_bitmap(getResource("media/shadows.png"));
+
+	AnimationSet *shadow_tmp = new_AnimationSet(getResource("media/shadows.png"));
+	shadow_sheet = shadow_tmp->clone(CLONE_COPY_BORDERS);
+	delete shadow_tmp;
+
 	draw_loading_screen(tmp, 100, sd);
 
 	m_destroy_bitmap(tmp);
@@ -1730,7 +1729,7 @@ void destroy()
 
 	m_destroy_bitmap(corner_bmp);
 
-	m_destroy_bitmap(shadow_sheet);
+	delete shadow_sheet;
 
 	destroy_fonts();
 

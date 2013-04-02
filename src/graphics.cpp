@@ -924,8 +924,12 @@ void battleTransition()
 	MBITMAP *tmp = m_create_bitmap(dw, dh);
 	al_set_new_bitmap_flags(flags);
 	m_draw_scaled_target(tmpbuffer, dx, dy, dw, dh, 0, 0, dw, dh, tmp);
-		
+
+#ifdef ALLEGRO_IPHONE
+	if (true) {
+#else
 	if (!use_programmable_pipeline) {
+#endif
 		set_target_backbuffer();
 		m_draw_bitmap_identity_view(tmpbuffer, 0, 0, 0);
 		m_flip_display();

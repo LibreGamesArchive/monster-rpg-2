@@ -130,7 +130,7 @@ extern float area_panned_x;
 extern float area_panned_y;
 extern MBITMAP *corner_bmp;
 extern bool had_battle;
-extern MBITMAP *shadow_sheet;
+extern AnimationSet *shadow_sheet;
 const int SHADOW_CORNER_SIZE = 10;
 extern MBITMAP *shakeAlternativeBitmap;
 extern MBITMAP *dpad_buttons;

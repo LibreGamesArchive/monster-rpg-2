@@ -83,7 +83,6 @@
 		964FB80516E6051600F4BBA4 /* gamecenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96C2C90A16C0A595004EBAB9 /* gamecenter.mm */; };
 		964FB80616E6051600F4BBA4 /* svg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9636676E16C9FC8200A24B46 /* svg.cpp */; };
 		964FB80716E6051600F4BBA4 /* ftpget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 969A9E3C16083E3000F4DBE2 /* ftpget.cpp */; };
-		964FB80816E6051600F4BBA4 /* joypad_handler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA3143A42C50007757E /* joypad_handler.m */; };
 		964FB80916E6051600F4BBA4 /* joypad.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA0143A426C0007757E /* joypad.mm */; };
 		964FB80A16E6051600F4BBA4 /* translate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D175A713351F06008462BB /* translate.cpp */; };
 		964FB80B16E6051600F4BBA4 /* 3d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224251103D96D400756C5B /* 3d.cpp */; };
@@ -157,7 +156,6 @@
 		964FB85316E6051600F4BBA4 /* libbassflac.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 969799791587A59E006E8AFA /* libbassflac.dylib */; };
 		964FB85516E6051600F4BBA4 /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9636676016C9886700A24B46 /* data */; };
 		9659CDA1143A426C0007757E /* joypad.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA0143A426C0007757E /* joypad.mm */; };
-		9659CDA4143A42C50007757E /* joypad_handler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA3143A42C50007757E /* joypad_handler.m */; };
 		96729A7B16CADBDD00C094D5 /* libdom.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96729A7516CADBDD00C094D5 /* libdom.a */; };
 		96729A7C16CADBDD00C094D5 /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96729A7616CADBDD00C094D5 /* libexpat.a */; };
 		96729A7D16CADBDD00C094D5 /* libhubbub.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96729A7716CADBDD00C094D5 /* libhubbub.a */; };
@@ -184,7 +182,6 @@
 		96A028B917016774008264E6 /* gamecenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96C2C90A16C0A595004EBAB9 /* gamecenter.mm */; };
 		96A028BA17016774008264E6 /* svg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9636676E16C9FC8200A24B46 /* svg.cpp */; };
 		96A028BB17016774008264E6 /* ftpget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 969A9E3C16083E3000F4DBE2 /* ftpget.cpp */; };
-		96A028BC17016774008264E6 /* joypad_handler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA3143A42C50007757E /* joypad_handler.m */; };
 		96A028BD17016774008264E6 /* my_load_bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96BC52A916FA8EE7004E526B /* my_load_bitmap.cpp */; };
 		96A028BE17016774008264E6 /* atlas_accessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96BC52A116FA8E39004E526B /* atlas_accessor.cpp */; };
 		96A028BF17016774008264E6 /* joypad.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA0143A426C0007757E /* joypad.mm */; };
@@ -273,7 +270,6 @@
 		96A4D26B154A7E21009ECD44 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D26A154A7E21009ECD44 /* IOKit.framework */; };
 		96A4D270154A7EA0009ECD44 /* tftp_get.c in Sources */ = {isa = PBXBuildFile; fileRef = 96A4D26E154A7EA0009ECD44 /* tftp_get.c */; };
 		96A4D273154A7F2F009ECD44 /* tftp_get.c in Sources */ = {isa = PBXBuildFile; fileRef = 96A4D26E154A7EA0009ECD44 /* tftp_get.c */; };
-		96B4B0E2143BBBF300ACA64C /* joypad_handler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA3143A42C50007757E /* joypad_handler.m */; };
 		96B4B0E3143BBBF300ACA64C /* joypad.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA0143A426C0007757E /* joypad.mm */; };
 		96B4B0E4143BBBF300ACA64C /* translate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D175A713351F06008462BB /* translate.cpp */; };
 		96B4B10F143BBBF300ACA64C /* 3d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96224251103D96D400756C5B /* 3d.cpp */; };
@@ -338,6 +334,7 @@
 		96C2C90816C0A53C004EBAB9 /* liballegro_dialog-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96C2C90616C0A53B004EBAB9 /* liballegro_dialog-static.a */; };
 		96C2C90916C0A53C004EBAB9 /* liblua5.2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96C2C90716C0A53C004EBAB9 /* liblua5.2.a */; };
 		96C2C90B16C0A595004EBAB9 /* gamecenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96C2C90A16C0A595004EBAB9 /* gamecenter.mm */; };
+		96CAEF70170A088100C6E9D1 /* joypad_handler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96CAEF6F170A088100C6E9D1 /* joypad_handler.mm */; };
 		96CFE56A16C0AB6A00B7DB0C /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96CFE56916C0AB6A00B7DB0C /* GameKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		96D175A813351F06008462BB /* translate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D175A713351F06008462BB /* translate.cpp */; };
 		96E3D50516C0D06C00A4A973 /* mygamecentervc.m in Sources */ = {isa = PBXBuildFile; fileRef = 96E3D50416C0D06C00A4A973 /* mygamecentervc.m */; };
@@ -532,7 +529,6 @@
 		9659CD93143A2A030007757E /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon@2x.png"; path = "../../icons/full/Icon@2x.png"; sourceTree = "<group>"; };
 		9659CD94143A2A030007757E /* iTunesArtwork */ = {isa = PBXFileReference; lastKnownFileType = text; name = iTunesArtwork; path = ../../icons/full/iTunesArtwork; sourceTree = "<group>"; };
 		9659CDA0143A426C0007757E /* joypad.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = joypad.mm; path = ../../src/joypad.mm; sourceTree = "<group>"; };
-		9659CDA3143A42C50007757E /* joypad_handler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = joypad_handler.m; path = ../../src/joypad_handler.m; sourceTree = "<group>"; };
 		965E248B15852F8500839861 /* liballegro_memfile-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_memfile-static.a"; path = "../../../iphone_libs_r/liballegro_memfile-static.a"; sourceTree = "<group>"; };
 		965E24911585309A00839861 /* Monster RPG 2 copy-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Monster RPG 2 copy-Info.plist"; sourceTree = "<group>"; };
 		965E24941585321C00839861 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
@@ -610,6 +606,7 @@
 		96C2C90616C0A53B004EBAB9 /* liballegro_dialog-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_dialog-static.a"; path = "../../../local/lib/liballegro_dialog-static.a"; sourceTree = "<group>"; };
 		96C2C90716C0A53C004EBAB9 /* liblua5.2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua5.2.a; path = ../../../local/lib/liblua5.2.a; sourceTree = "<group>"; };
 		96C2C90A16C0A595004EBAB9 /* gamecenter.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = gamecenter.mm; path = ../../src/gamecenter.mm; sourceTree = "<group>"; };
+		96CAEF6F170A088100C6E9D1 /* joypad_handler.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = joypad_handler.mm; path = ../../src/joypad_handler.mm; sourceTree = "<group>"; };
 		96CB82621596A89100AD6979 /* libjpeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjpeg.a; path = ../../../local/lib/libjpeg.a; sourceTree = "<group>"; };
 		96CFE56916C0AB6A00B7DB0C /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/GameKit.framework; sourceTree = DEVELOPER_DIR; };
 		96D175A713351F06008462BB /* translate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = translate.cpp; path = ../../src/translate.cpp; sourceTree = "<group>"; };
@@ -905,13 +902,13 @@
 		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
+				96CAEF6F170A088100C6E9D1 /* joypad_handler.mm */,
 				96BC52A916FA8EE7004E526B /* my_load_bitmap.cpp */,
 				96BC52A116FA8E39004E526B /* atlas_accessor.cpp */,
 				96BC52A216FA8E39004E526B /* atlas.cpp */,
 				9636676E16C9FC8200A24B46 /* svg.cpp */,
 				9610AF8116C4BDFD0050372E /* Area.cpp */,
 				96A4D26E154A7EA0009ECD44 /* tftp_get.c */,
-				9659CDA3143A42C50007757E /* joypad_handler.m */,
 				9659CDA0143A426C0007757E /* joypad.mm */,
 				96D175A713351F06008462BB /* translate.cpp */,
 				9639C4351152D3A900804984 /* iphone.mm */,
@@ -1284,7 +1281,6 @@
 				9639C4361152D3A900804984 /* iphone.mm in Sources */,
 				96D175A813351F06008462BB /* translate.cpp in Sources */,
 				9659CDA1143A426C0007757E /* joypad.mm in Sources */,
-				9659CDA4143A42C50007757E /* joypad_handler.m in Sources */,
 				96A4D270154A7EA0009ECD44 /* tftp_get.c in Sources */,
 				960DB499154C82EA000869BD /* NetReachability.m in Sources */,
 				960DB49A154C82EA000869BD /* NetServiceBrowser.m in Sources */,
@@ -1299,6 +1295,7 @@
 				9636676F16C9FC8200A24B46 /* svg.cpp in Sources */,
 				960C9CA316E0A4FD00ABC0FA /* init.cpp in Sources */,
 				96BC52A416FA8E39004E526B /* atlas.cpp in Sources */,
+				96CAEF70170A088100C6E9D1 /* joypad_handler.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1312,7 +1309,6 @@
 				964FB80516E6051600F4BBA4 /* gamecenter.mm in Sources */,
 				964FB80616E6051600F4BBA4 /* svg.cpp in Sources */,
 				964FB80716E6051600F4BBA4 /* ftpget.cpp in Sources */,
-				964FB80816E6051600F4BBA4 /* joypad_handler.m in Sources */,
 				96BC52AC16FA8F20004E526B /* my_load_bitmap.cpp in Sources */,
 				96BC52A716FA8EB4004E526B /* atlas_accessor.cpp in Sources */,
 				964FB80916E6051600F4BBA4 /* joypad.mm in Sources */,
@@ -1367,7 +1363,6 @@
 				96A028B917016774008264E6 /* gamecenter.mm in Sources */,
 				96A028BA17016774008264E6 /* svg.cpp in Sources */,
 				96A028BB17016774008264E6 /* ftpget.cpp in Sources */,
-				96A028BC17016774008264E6 /* joypad_handler.m in Sources */,
 				96A028BD17016774008264E6 /* my_load_bitmap.cpp in Sources */,
 				96A028BE17016774008264E6 /* atlas_accessor.cpp in Sources */,
 				96A028BF17016774008264E6 /* joypad.mm in Sources */,
@@ -1425,7 +1420,6 @@
 				96C2C90B16C0A595004EBAB9 /* gamecenter.mm in Sources */,
 				9636677016C9FF0A00A24B46 /* svg.cpp in Sources */,
 				969A9E3E16083F6700F4DBE2 /* ftpget.cpp in Sources */,
-				96B4B0E2143BBBF300ACA64C /* joypad_handler.m in Sources */,
 				96B4B0E3143BBBF300ACA64C /* joypad.mm in Sources */,
 				96B4B0E4143BBBF300ACA64C /* translate.cpp in Sources */,
 				96B4B10F143BBBF300ACA64C /* 3d.cpp in Sources */,

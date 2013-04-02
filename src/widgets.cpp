@@ -270,52 +270,69 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 
 	if (!use_programmable_pipeline && shadow) {
 		al_hold_bitmap_drawing(true);
+
+		MBITMAP *bmp;
+
+		shadow_sheet->setSubAnimation("top");
+		bmp = shadow_sheet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 		m_draw_scaled_bitmap(
-			shadow_sheet,
+			bmp,
 			0, 0,
 			1, SHADOW_CORNER_SIZE,
-			x-2, y-2-SHADOW_CORNER_SIZE,
-			w+4, SHADOW_CORNER_SIZE,
-			0
-		);
-#ifdef A5_OGL
-		int true_w, true_h;
-		al_get_opengl_texture_size(shadow_sheet->bitmap, &true_w, &true_h);
-#endif
-		m_draw_scaled_bitmap(
-			shadow_sheet,
-#ifdef A5_OGL
-			32 + (0.5 / true_w), 0,
-			0.5, SHADOW_CORNER_SIZE,
-#else
-			32, 0,
-			1, SHADOW_CORNER_SIZE,
-#endif
-			x-2, y+h+2,
-			w+4, SHADOW_CORNER_SIZE,
-			0
-		);
-		m_draw_scaled_bitmap(
-			shadow_sheet,
-			16, 0,
-			SHADOW_CORNER_SIZE, 1,
-			x+w+2, y-2,
-			SHADOW_CORNER_SIZE, h+4,
-			0
-		);
-		m_draw_scaled_bitmap(
-			shadow_sheet,
-			48, 0,
-			SHADOW_CORNER_SIZE, 1,
-			x-2-SHADOW_CORNER_SIZE, y-2,
-			SHADOW_CORNER_SIZE, h+4,
+			x-3, y-3-SHADOW_CORNER_SIZE,
+			w+6, SHADOW_CORNER_SIZE,
 			0
 		);
 
-		al_draw_bitmap_region(shadow_sheet->bitmap, 0, 16, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x-2-SHADOW_CORNER_SIZE, y-2-SHADOW_CORNER_SIZE, 0);
-		al_draw_bitmap_region(shadow_sheet->bitmap, SHADOW_CORNER_SIZE, 16, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x+w+2, y-2-SHADOW_CORNER_SIZE, 0);
-		al_draw_bitmap_region(shadow_sheet->bitmap, SHADOW_CORNER_SIZE*2, 16, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x+w+2, y+h+2, 0);
-		al_draw_bitmap_region(shadow_sheet->bitmap, SHADOW_CORNER_SIZE*3, 16, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x-2-SHADOW_CORNER_SIZE, y+h+2, 0);
+		shadow_sheet->setSubAnimation("bottom");
+		bmp = shadow_sheet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
+		m_draw_scaled_bitmap(
+			bmp,
+			0, 0,
+			1, SHADOW_CORNER_SIZE,
+			x-3, y+h+3,
+			w+6, SHADOW_CORNER_SIZE,
+			0
+		);
+
+		shadow_sheet->setSubAnimation("right");
+		bmp = shadow_sheet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
+		m_draw_scaled_bitmap(
+			bmp,
+			0, 0,
+			SHADOW_CORNER_SIZE, 1,
+			x+w+3, y-3,
+			SHADOW_CORNER_SIZE, h+6,
+			0
+		);
+
+		shadow_sheet->setSubAnimation("left");
+		bmp = shadow_sheet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
+		m_draw_scaled_bitmap(
+			bmp,
+			0, 0,
+			SHADOW_CORNER_SIZE, 1,
+			x-3-SHADOW_CORNER_SIZE, y-3,
+			SHADOW_CORNER_SIZE, h+6,
+			0
+		);
+
+		shadow_sheet->setSubAnimation("topleft");
+		bmp = shadow_sheet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
+		al_draw_bitmap_region(bmp->bitmap, 0, 0, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x-3-SHADOW_CORNER_SIZE, y-3-SHADOW_CORNER_SIZE, 0);
+
+		shadow_sheet->setSubAnimation("topright");
+		bmp = shadow_sheet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
+		al_draw_bitmap_region(bmp->bitmap, 0, 0, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x+w+3, y-3-SHADOW_CORNER_SIZE, 0);
+
+		shadow_sheet->setSubAnimation("bottomright");
+		bmp = shadow_sheet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
+		al_draw_bitmap_region(bmp->bitmap, 0, 0, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x+w+3, y+h+3, 0);
+
+		shadow_sheet->setSubAnimation("bottomleft");
+		bmp = shadow_sheet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
+		al_draw_bitmap_region(bmp->bitmap, 0, 0, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x-3-SHADOW_CORNER_SIZE, y+h+3, 0);
+
 		al_hold_bitmap_drawing(false);
 	}
 	
@@ -1151,7 +1168,7 @@ int config_input(int type)
 
 			INPUT_EVENT ie = get_next_input_event();
 
-			if (ie.button2 == DOWN || iphone_shaken(0.1)) {
+			if (((!getting_input_config) && (ie.button2 == DOWN)) || iphone_shaken(0.1)) {
 				if (ie.button2 == DOWN) {
 					use_input_event();
 				}
@@ -1796,12 +1813,14 @@ int MInputGetter::update(int millis)
 							getting_input_config = false;
 							do {
 #ifdef ALLEGRO_IPHONE
-				memcpy(&state, &icade_keyboard_state, sizeof state);
+								memcpy(&state, &icade_keyboard_state, sizeof state);
 #else
-				al_get_keyboard_state(&state);
+								al_get_keyboard_state(&state);
 #endif
 							} while (al_key_down(&state, value));
+							al_rest(0.1);
 							clear_input_events();
+							next_input_event_ready = true; // slight hack
 							break;
 						}
 					}
@@ -4138,7 +4157,7 @@ void MToggleList::draw()
 		strncpy(buf, _t(items[r].c_str()), count);
 		buf[count] = 0;
 
-		if (use_dpad && cursor == r) {
+		if (cursor == r) {
 			m_draw_rectangle(0, yy-2, BW, yy+m_text_height(game_font)+2, m_map_rgb(30, 60, 30), M_FILLED);
 		}
 		if (toggled[r])
@@ -4193,7 +4212,7 @@ int MToggleList::update(int millis)
 		return TGUI_CONTINUE;
 	}
 
-	if (use_dpad && this == tguiActiveWidget) {
+	if (this == tguiActiveWidget) {
 		INPUT_EVENT ie = get_next_input_event();
 		if (ie.left == DOWN) {
 			use_input_event();

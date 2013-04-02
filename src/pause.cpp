@@ -1739,15 +1739,23 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				tguiSetFocus(mainItem);
 				
 				fairy_used = true;
-	
-				mainItem->set_left_widget(NULL);
-				mainMagic->set_left_widget(NULL);
-				mainForm->set_left_widget(NULL);
-				mainStats->set_left_widget(NULL);
+
+				TGUIWidget *lwidget;
+
+#if (defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX) && !defined NO_GAMECENTER
+				lwidget = game_center;
+#else
+				lwidget = NULL;
+#endif
+
+				mainItem->set_left_widget(lwidget);
+				mainMagic->set_left_widget(lwidget);
+				mainForm->set_left_widget(lwidget);
+				mainStats->set_left_widget(lwidget);
 				if (dynamic_cast<MTextButton *>(mainSave))
-					((MTextButton *)mainSave)->set_left_widget(NULL);
-				mainResume->set_left_widget(NULL);
-				mainQuit->set_left_widget(NULL);
+					((MTextButton *)mainSave)->set_left_widget(lwidget);
+				mainResume->set_left_widget(lwidget);
+				mainQuit->set_left_widget(lwidget);
 			}
 			
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
@@ -3730,7 +3738,7 @@ bool config_menu(bool start_on_fullscreen)
 	y += 13;
 #endif
 
-#if defined ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE_XXX
 	std::vector<std::string> flip_screen_choices;
 	flip_screen_choices.push_back("{027} Automatic screen rotation");
 	flip_screen_choices.push_back("{027} Lock current orientation");
@@ -3807,7 +3815,7 @@ bool config_menu(bool start_on_fullscreen)
 	tguiAddWidget(swap_buttons_toggle);
 #endif
 
-#if defined ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE_XXX
 	tguiAddWidget(flip_screen_toggle);
 #endif
 
@@ -4024,7 +4032,7 @@ bool config_menu(bool start_on_fullscreen)
 		config.setSwapButtons(sel);
 #endif
 		
-#if defined ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE_XXX
 		sel = flip_screen_toggle->getSelected();
 		if (sel != curr_flip_screen)
 		{
@@ -4105,7 +4113,7 @@ done:
 	delete swap_buttons_toggle;
 #if defined ALLEGRO_IPHONE
 	delete shake_toggle;
-	delete flip_screen_toggle;
+	//delete flip_screen_toggle;
 #endif
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	if (reset_game_center)

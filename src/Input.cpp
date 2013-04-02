@@ -61,6 +61,7 @@ void add_input_event(INPUT_EVENT ie)
 {
 	al_lock_mutex(input_event_mutex);
 
+	ie.timestamp = al_get_time();
 	input_events.push_back(ie);
 
 	al_unlock_mutex(input_event_mutex);

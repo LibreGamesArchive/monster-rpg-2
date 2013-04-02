@@ -745,6 +745,7 @@ bool Configuration::read()
 	if (xml_shake_action) {
 		setShakeAction(atoi(xml_shake_action->getValue().c_str()));
 	}
+	/*
 	XMLData *xml_flip_screen = game->find("flip_screen");
 	if (xml_flip_screen) {
 		XMLData *xml_auto_rotate = game->find("auto_rotate");
@@ -766,6 +767,7 @@ bool Configuration::read()
 			setAutoRotation(atoi(xml_auto_rotate->getValue().c_str()));
 		}
 	}
+	*/
 #endif
 	XMLData *xml_language = game->find("language");
 	if (xml_language) {
@@ -893,7 +895,7 @@ void Configuration::write()
 	XMLData *xml_tuning = new XMLData("tuning", my_itoa(getTuning()));
 #ifdef ALLEGRO_IPHONE
 	XMLData *xml_shake_action = new XMLData("shake_action", my_itoa(getShakeAction()));
-	XMLData *xml_auto_rotate = new XMLData("auto_rotate", my_itoa(getAutoRotation()));
+	//XMLData *xml_auto_rotate = new XMLData("auto_rotate", my_itoa(getAutoRotation()));
 #endif
 	XMLData* xml_lang = new XMLData("language", my_itoa(getLanguage()));
 
@@ -926,7 +928,7 @@ void Configuration::write()
 	game->add(xml_tuning);
 #ifdef ALLEGRO_IPHONE
 	game->add(xml_shake_action);
-	game->add(xml_auto_rotate);
+	//game->add(xml_auto_rotate);
 #endif
 	game->add(xml_lang);
 
@@ -1033,7 +1035,7 @@ Configuration::Configuration() :
 #endif
 #ifdef ALLEGRO_IPHONE
 	,cfg_shake_action(CFG_SHAKE_CANCEL)
-	,cfg_auto_rotation(2)
+	//,cfg_auto_rotation(2)
 #endif
 {
 #ifdef EDITOR

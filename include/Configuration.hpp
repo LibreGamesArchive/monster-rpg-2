@@ -141,21 +141,6 @@ public:
 				al_set_display_option(display, ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE);
 			}
 		}
-		else
-		{
-			if (auto_rot == 0)
-			{
-				al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_270_DEGREES, ALLEGRO_REQUIRE);
-			}
-			else if (auto_rot == 1)
-			{
-				al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_90_DEGREES, ALLEGRO_REQUIRE);
-			}
-			else
-			{
-				al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE, ALLEGRO_REQUIRE);
-			}
-		}
 	}
 #endif
 	int getMaintainAspectRatio(void) {
