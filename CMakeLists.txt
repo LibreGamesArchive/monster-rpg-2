@@ -237,6 +237,9 @@ if(APPLE)
 	endif(KCM_AUDIO)
 else(APPLE)
 	if(NOT KCM_AUDIO)
+		# Ubuntu software center build:
+		#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,/opt/monster-rpg-2")
+		# Normal build:
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,.")
 	endif(NOT KCM_AUDIO)
 	SET(MAIN_LIBS 
