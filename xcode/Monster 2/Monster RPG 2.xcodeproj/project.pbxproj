@@ -335,6 +335,9 @@
 		96C2C90916C0A53C004EBAB9 /* liblua5.2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96C2C90716C0A53C004EBAB9 /* liblua5.2.a */; };
 		96C2C90B16C0A595004EBAB9 /* gamecenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96C2C90A16C0A595004EBAB9 /* gamecenter.mm */; };
 		96CAEF70170A088100C6E9D1 /* joypad_handler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96CAEF6F170A088100C6E9D1 /* joypad_handler.mm */; };
+		96CAEF72170A71B000C6E9D1 /* joypad_handler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96CAEF6F170A088100C6E9D1 /* joypad_handler.mm */; };
+		96CAEF73170A71CA00C6E9D1 /* joypad_handler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96CAEF6F170A088100C6E9D1 /* joypad_handler.mm */; };
+		96CAEF74170A71CF00C6E9D1 /* joypad_handler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96CAEF6F170A088100C6E9D1 /* joypad_handler.mm */; };
 		96CFE56A16C0AB6A00B7DB0C /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96CFE56916C0AB6A00B7DB0C /* GameKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		96D175A813351F06008462BB /* translate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D175A713351F06008462BB /* translate.cpp */; };
 		96E3D50516C0D06C00A4A973 /* mygamecentervc.m in Sources */ = {isa = PBXBuildFile; fileRef = 96E3D50416C0D06C00A4A973 /* mygamecentervc.m */; };
@@ -1345,6 +1348,7 @@
 				964FB82716E6051600F4BBA4 /* tftp_get.c in Sources */,
 				964FB82816E6051600F4BBA4 /* sound.cpp in Sources */,
 				964FB82916E6051600F4BBA4 /* Spells.cpp in Sources */,
+				96CAEF72170A71B000C6E9D1 /* joypad_handler.mm in Sources */,
 				964FB82A16E6051600F4BBA4 /* Tile.cpp in Sources */,
 				964FB82B16E6051600F4BBA4 /* util.cpp in Sources */,
 				964FB82C16E6051600F4BBA4 /* widgets.cpp in Sources */,
@@ -1399,6 +1403,7 @@
 				96A028DE17016774008264E6 /* tftp_get.c in Sources */,
 				96A028DF17016774008264E6 /* sound.cpp in Sources */,
 				96A028E017016774008264E6 /* Spells.cpp in Sources */,
+				96CAEF74170A71CF00C6E9D1 /* joypad_handler.mm in Sources */,
 				96A028E117016774008264E6 /* Tile.cpp in Sources */,
 				96A028E217016774008264E6 /* util.cpp in Sources */,
 				96A028E317016774008264E6 /* widgets.cpp in Sources */,
@@ -1453,6 +1458,7 @@
 				96A4D273154A7F2F009ECD44 /* tftp_get.c in Sources */,
 				96B4B12B143BBBF300ACA64C /* sound.cpp in Sources */,
 				96B4B12C143BBBF300ACA64C /* Spells.cpp in Sources */,
+				96CAEF73170A71CA00C6E9D1 /* joypad_handler.mm in Sources */,
 				96B4B12D143BBBF300ACA64C /* Tile.cpp in Sources */,
 				96B4B12E143BBBF300ACA64C /* util.cpp in Sources */,
 				96B4B12F143BBBF300ACA64C /* widgets.cpp in Sources */,
@@ -1481,7 +1487,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Mo. RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Nooskewl";
 				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -1510,7 +1516,7 @@
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Mo. RPG 2";
-				PROVISIONING_PROFILE = "D081C66B-5CB2-4BF0-B7B6-FFD35B57742D";
+				PROVISIONING_PROFILE = "D70B149C-084B-496B-89ED-0D12FD791B7C";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				VALID_ARCHS = "armv7 armv7s";
 			};
@@ -1557,7 +1563,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Mo. RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Nooskewl";
 				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1585,7 +1591,7 @@
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Mo. RPG 2";
-				PROVISIONING_PROFILE = "D081C66B-5CB2-4BF0-B7B6-FFD35B57742D";
+				PROVISIONING_PROFILE = "D70B149C-084B-496B-89ED-0D12FD791B7C";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				VALID_ARCHS = "armv7 armv7s";
 			};
@@ -1815,7 +1821,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Mo. RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Nooskewl";
 				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -1844,7 +1850,7 @@
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Mo. RPG 2";
-				PROVISIONING_PROFILE = "D081C66B-5CB2-4BF0-B7B6-FFD35B57742D";
+				PROVISIONING_PROFILE = "D70B149C-084B-496B-89ED-0D12FD791B7C";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				VALID_ARCHS = "armv7 armv7s";
 			};
@@ -1880,7 +1886,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Mo. RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Nooskewl";
 				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -1909,7 +1915,7 @@
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Mo. RPG 2";
-				PROVISIONING_PROFILE = "D081C66B-5CB2-4BF0-B7B6-FFD35B57742D";
+				PROVISIONING_PROFILE = "D70B149C-084B-496B-89ED-0D12FD791B7C";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				VALID_ARCHS = "armv7 armv7s";
 			};
