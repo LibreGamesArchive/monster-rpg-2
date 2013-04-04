@@ -269,9 +269,9 @@ else(APPLE)
 		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host /usr/lib/libfreetype.a /usr/lib/libz.a /usr/lib/libpng.a /usr/lib/libjpeg.a /usr/local/lib/liblua.a /usr/lib/libphysfs.a /usr/local/lib/libcurl.a /usr/lib/libbz2.a stdc++)
 	else(RASPBERYPI)
 		# trentg's build
-		#LIST(APPEND MAIN_LIBS allegro_dialog${ALLEG_SUFFIX} GL GLU /usr/lib/libfreetype.a /usr/lib/libz.a /usr/lib/libpng.a /usr/lib/libjpeg.a /usr/local/lib/liblua5.2.a /usr/lib/libphysfs.a /usr/local/lib/libcurl.a)
+		LIST(APPEND MAIN_LIBS allegro_dialog${ALLEG_SUFFIX} GL GLU /usr/lib/libfreetype.a /usr/lib/libz.a /usr/lib/libpng.a /usr/lib/libjpeg.a /usr/local/lib/liblua5.2.a /usr/lib/libphysfs.a /usr/local/lib/libcurl.a)
 		# normal build
-		LIST(APPEND MAIN_LIBS allegro_dialog${ALLEG_SUFFIX} GL GLU freetype z png jpeg lua5.2 physfs curl)
+		#LIST(APPEND MAIN_LIBS allegro_dialog${ALLEG_SUFFIX} GL GLU freetype z png jpeg lua5.2 physfs curl)
 	endif(RASPBERRYPI)
 endif(APPLE)
 endif(WIN32)
