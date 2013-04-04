@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Monster RPG 2
+Comment=An Old School Japanese Style RPG
+Icon=monster-rpg2
+Exec=/opt/monster-rpg-2/monster2
+Categories=Game;RolePlaying
+

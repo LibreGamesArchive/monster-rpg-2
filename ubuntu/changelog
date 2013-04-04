@@ -1,3 +1,52 @@
+monster-rpg2 (2.0.0-1ubuntu1) maverick; urgency=low
+
+  * Added an input configuration screen
+  * Textured all of the 3D models
+  * New Russian translation
+  * Indiegogo sponsor credits at the end of the game
+  * More believable/passable "Breath of Fire" attack from the dragon
+  * Autosaves
+  * Custom mouse cursor
+  * You can inspect the library shelves to see book titles
+  * All party members close their eyes when sleeping
+  * A notice is shown when you trade for an item
+  * F8 (default) auto-sorts your inventory when in the pause->items screen
+  * In the pause menu (and other places where player profile "mug shots" are shown), a purple border is shown around poisoned members
+  * Red and green down/up arrows are shown when inspecting items, letting you know if the item is better or worse than what everyone already has
+  * The biggest window that's an integer scaling factor of the games native res will be chosen by default (if you have a config file already, delete it to get this behaviour)
+  * Odd looking tree overhangs fixed in jungle
+  * Some odd behaviour when using mouse or touch screen was fixed (clicking an object would not take you there)
+  * Fixed two tiles that were solid and not solid when they should have been opposite in the forest
+  * Alien items are now all stronger than Light items
+  * Item stacking behaviour is better in inventory
+  * Bartender's juice stacks correctly now
+  * Juice now has a distinct sound when used (used to be same as Cure)
+  * 'Squito' enemy moved very slowly without shaders, fixed.
+  * Improved look of web that sometimes covered the players.
+  * Redo solids (where you can and cannot walk) in mountain, volcano and underground because they were erratic.
+  * Can view players stats in battle with just a mouse by long-clicking.
+  * Gunnar now "walks into" you when he joins the party, like all other party-joiners.
+  * Can now control mini games with mouse only
+  * Use an SVG Nooskewl logo at game start
+  * Round icon a bit
+  * Smaller total file size
+  * Cleaned up lots of sprites, especially enemies
+  * Some remade icons (Joypad and Game Center)
+  * Render directly to screen backbuffer for better performance and high res primitives
+  * Optimize some spell effects
+  * Fix up the autosave code
+  * Guards close their eyes when asleep
+  * New Bolt1 spell effect
+  * Scroll wheel support on lists
+  * Improved auto-save behaviour
+  * Touched up a lot of sprites
+  * 1 pixel border on sprites to avoid scaling issues
+  * Higher res font
+  * Improved look of Bolt3 spell
+  * Much faster 3D scenes
+
+ -- Trent Gamblin <trent@nooskewl.com>  Wed, 3 Apr 2013 16:31:00 -0700
+
 monster-rpg2 (1.12.0-1ubuntu1) maverick; urgency=low
 
   * Greatly improved speed and reliability of HQ music download.

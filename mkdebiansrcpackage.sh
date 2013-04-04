@@ -31,7 +31,6 @@ function do_package {
 	local DIRS="$@"
 
 	local VER=`perl -e 'open FH, "../'${DEB_DIR}'/changelog"; my $ver = <FH>; close FH; $ver =~ s/.*\((\d+\.\d+(?:\.\d+)?)[^)]*\).*/$1/; print $ver;'`
-	#local VER=`perl -e 'open FH, "../bin/data/Version"; local $/; my $ver = <FH>; close FH; print join(".",unpack("LL", $ver))."\n";'`
 	local DIRNAME=${PACKAGE_NAME}_${VER}
 	local TARBALL_NAME="${DIRNAME}.orig.tar.bz2"
 
@@ -41,8 +40,8 @@ function do_package {
 	copy_dirs $DIRS
 
 	if [ "$DO_EXTRA" == "1" ] ; then
-		echo Resizing pcicon.png
-		convert ${BASEDIR}/pcicon.png -resize 32x32 monster-rpg2.png
+		echo Resizing icon512.png
+		convert ${BASEDIR}/icon512.png -resize 32x32 monster-rpg2.png
 
 		echo Copying monster-rpg-2.desktop
 		cp -a ${BASEDIR}/monster-rpg2.desktop monster-rpg2.desktop
@@ -159,7 +158,7 @@ BASEDIR=../../../monster-rpg-2
 
 do_package ${PACKAGE_NAME} ${DISTRO} 1
 
-do_package ${PACKAGE_NAME_DATA} ${DISTRO}-data 0 ${BASEDIR}/bin/data 
+do_package ${PACKAGE_NAME_DATA} ${DISTRO}-data 0 ${BASEDIR}/data 
 
 cd $ORIG_DIR
 
