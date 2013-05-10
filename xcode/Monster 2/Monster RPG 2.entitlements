@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>com.apple.developer.game-center</key>
-	<true/>
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
 	<key>com.apple.security.device.usb</key>
@@ -12,10 +10,5 @@
 	<true/>
 	<key>com.apple.security.network.server</key>
 	<true/>
-	<key>com.apple.security.temporary-exception.mach-lookup.global-name</key>
-	<array>
-		<string>com.apple.gamed.osx</string>
-		<string>com.apple.gamed.xpc</string>
-	</array>
 </dict>
 </plist>

@@ -1601,7 +1601,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				CODE_SIGN_IDENTITY = "Mac Developer: Trent Gamblin (5923J6TNDK)";
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1636,7 +1636,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Monster RPG 2";
-				PROVISIONING_PROFILE = "7AF15FA2-D1C8-46C3-91F8-9DDE111DF4D6";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1646,7 +1645,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				CODE_SIGN_IDENTITY = "Mac Developer: Trent Gamblin (5923J6TNDK)";
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1684,7 +1683,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Monster RPG 2";
-				PROVISIONING_PROFILE = "7AF15FA2-D1C8-46C3-91F8-9DDE111DF4D6";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1694,7 +1692,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				CODE_SIGN_IDENTITY = "Mac Developer: Trent Gamblin (5923J6TNDK)";
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1729,7 +1727,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Monster RPG 2";
-				PROVISIONING_PROFILE = "7AF15FA2-D1C8-46C3-91F8-9DDE111DF4D6";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1739,7 +1736,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				CODE_SIGN_IDENTITY = "Mac Developer: Trent Gamblin (5923J6TNDK)";
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1774,7 +1771,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Monster RPG 2";
-				PROVISIONING_PROFILE = "7AF15FA2-D1C8-46C3-91F8-9DDE111DF4D6";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1925,7 +1921,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "Mac Developer: Trent Gamblin (5923J6TNDK)";
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1961,7 +1957,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Monster RPG 2";
-				PROVISIONING_PROFILE = "7AF15FA2-D1C8-46C3-91F8-9DDE111DF4D6";
 				SDKROOT = macosx;
 				VALID_ARCHS = i386;
 				WRAPPER_EXTENSION = app;
@@ -1972,7 +1967,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "Mac Developer: Trent Gamblin (5923J6TNDK)";
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2011,7 +2006,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Monster RPG 2";
-				PROVISIONING_PROFILE = "7AF15FA2-D1C8-46C3-91F8-9DDE111DF4D6";
 				SDKROOT = macosx;
 				VALID_ARCHS = i386;
 				WRAPPER_EXTENSION = app;
@@ -2022,7 +2016,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "Mac Developer: Trent Gamblin (5923J6TNDK)";
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2058,7 +2052,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Monster RPG 2";
-				PROVISIONING_PROFILE = "7AF15FA2-D1C8-46C3-91F8-9DDE111DF4D6";
 				SDKROOT = macosx;
 				VALID_ARCHS = i386;
 				WRAPPER_EXTENSION = app;
@@ -2069,7 +2062,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "Mac Developer: Trent Gamblin (5923J6TNDK)";
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2105,7 +2098,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Monster RPG 2";
-				PROVISIONING_PROFILE = "7AF15FA2-D1C8-46C3-91F8-9DDE111DF4D6";
 				SDKROOT = macosx;
 				VALID_ARCHS = i386;
 				WRAPPER_EXTENSION = app;
