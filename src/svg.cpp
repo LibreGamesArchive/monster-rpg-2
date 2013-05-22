@@ -347,7 +347,7 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 #endif
 
 		for (size_t j = 0; j < points.size(); j++) {
-			al_draw_polyline(&points[j][0], (int)points[j].size()/2, ALLEGRO_LINE_JOIN_MITER, ALLEGRO_LINE_CAP_ROUND, stroke, stroke_width, 4.0);
+			al_draw_polygon(&points[j][0], (int)points[j].size()/2, ALLEGRO_LINE_JOIN_MITER, stroke, stroke_width, 4.0);
 		}
 	}
 

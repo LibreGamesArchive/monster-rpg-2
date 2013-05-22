@@ -652,11 +652,16 @@ void m_put_alpha_pixel(MBITMAP *bmp, int x, int y, MCOLOR c)
 {
 	MCOLOR bg = m_get_pixel(bmp, x, y);
 	
-	_al_put_pixel(bmp->bitmap, x, y, m_map_rgb_f(
+	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
+	al_set_target_bitmap(bmp->bitmap);
+	
+	al_put_pixel(x, y, m_map_rgb_f(
 		MIN(1.0f, c.r*c.a+bg.r*(1-c.a)),
 		MIN(1.0f, c.g*c.a+bg.g*(1-c.a)),
 		MIN(1.0f, c.b*c.a+bg.b*(1-c.a))
 	));
+	
+	al_set_target_bitmap(old_target);
 }
 
 /* BITMAP IS IGNORED FIXME */
