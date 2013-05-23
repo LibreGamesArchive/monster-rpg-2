@@ -114,8 +114,9 @@ bool should_reset = false;
 
 bool is_fs_toggle = false;
 
-static void d3d_resource_release(void)
+static void d3d_resource_release(ALLEGRO_DISPLAY *d)
 {
+	(void)d;
 	if (!is_fs_toggle) {
 		d3d_halted = true;
 		should_reset = true;
@@ -125,8 +126,9 @@ static void d3d_resource_release(void)
 	}
 }
 
-static void d3d_resource_restore(void)
+static void d3d_resource_restore(ALLEGRO_DISPLAY *d)
 {
+	(void)d;
 	if (!is_fs_toggle) {
 		d3d_halted = false;
 		while (main_halted) {
@@ -154,7 +156,6 @@ double next_shake = 0;
 bool do_acknowledge_resize = false;
 
 ALLEGRO_JOYSTICK *user_joystick = NULL;
-bool is_intel_gpu_on_desktop_linux = false;
 #ifdef ALLEGRO_ANDROID
 bool is_android_lessthan_2_3 = false;
 #endif
@@ -1150,7 +1151,7 @@ bool init(int *argc, char **argv[])
 	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 16, ALLEGRO_REQUIRE);
 #else
 #if !defined A5_D3D // we manage depth stencil ourselves for D3D
-	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_REQUIRE);
+	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_SUGGEST);
 	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 8, ALLEGRO_REQUIRE);
 #endif
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_RASPBERRYPI
@@ -1228,7 +1229,6 @@ bool init(int *argc, char **argv[])
 	if (config.getWaitForVsync())
 		al_set_new_display_option(ALLEGRO_VSYNC, 1, ALLEGRO_SUGGEST);
 
-
 	click_mutex = al_create_mutex();
 	input_mutex = al_create_mutex();
 	dpad_mutex = al_create_mutex();
@@ -1258,53 +1258,12 @@ bool init(int *argc, char **argv[])
 #ifdef EDITOR
 	display = al_create_display(800, 500);
 #else
-
 	display = al_create_display(sd->width, sd->height);
-#if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE
-	if (!display) {
-		safemode = true;
-		flags &= ~ALLEGRO_FULLSCREEN;
-		flags |= ALLEGRO_WINDOWED;
-		al_set_new_display_flags(flags);
-		display = al_create_display(720, 480);
-		if (!display) {
-			display = al_create_display(480, 320);
-		}
-	}
-#endif
-
-#if defined ALLEGRO_ANDROID
-	if (!display) {
-		const int N = 7;
-		const int S = 5;
-		int totry[N][S] = {
-			{ 24, 0, 5, 6, 5 },
-			{ 24, 8, 5, 6, 5 },
-			{ 24, 8, 8, 8, 8 },
-			{ 16, 0, 5, 6, 5 },
-			{ 16, 0, 8, 8, 8 },
-			{ 16, 8, 5, 6, 5 },
-			{ 16, 8, 8, 8, 8 }
-		};
-		for (int i = 0; i < N; i++) {
-			al_set_new_display_option(ALLEGRO_DEPTH_SIZE, totry[i][0], ALLEGRO_REQUIRE);
-			al_set_new_display_option(ALLEGRO_STENCIL_SIZE, totry[i][1], ALLEGRO_REQUIRE);
-			al_set_new_display_option(ALLEGRO_RED_SIZE, totry[i][2], ALLEGRO_REQUIRE);
-			al_set_new_display_option(ALLEGRO_GREEN_SIZE, totry[i][3], ALLEGRO_REQUIRE);
-			al_set_new_display_option(ALLEGRO_BLUE_SIZE, totry[i][4], ALLEGRO_REQUIRE);
-			al_set_new_display_option(ALLEGRO_ALPHA_SIZE, 0, ALLEGRO_REQUIRE);
-			display = al_create_display(sd->width, sd->height);
-			if (display) {
-				break;
-			}
-		}
-	}
-#endif
-
 #endif
 
 	if (!display) {
-		native_error("Failed to set gfx mode.");
+		config.write();
+		exit(1);
 	}
 
 	// Set an icon
@@ -1320,7 +1279,9 @@ bool init(int *argc, char **argv[])
 	al_set_new_bitmap_flags(icon_flags);
 #endif
 
+#ifdef ALLEGRO_ANDROID
 	al_rest(1.0);
+#endif
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	sd->width = al_get_display_width(display);
@@ -1366,9 +1327,6 @@ bool init(int *argc, char **argv[])
       
 #ifdef A5_OGL
 	glDisable(GL_DITHER);
-#if defined __linux__ && !defined ALLEGRO_ANDROID
-	is_intel_gpu_on_desktop_linux = strstr((const char *)glGetString(GL_RENDERER), "Intel");
-#endif
 #endif
 
 #ifdef ALLEGRO_ANDROID
@@ -1460,8 +1418,8 @@ bool init(int *argc, char **argv[])
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 #ifdef A5_D3D
 	init_big_depth_surface();
-	al_d3d_set_restore_callback(d3d_resource_restore);
-	al_d3d_set_release_callback(d3d_resource_release);
+	al_set_d3d_device_restore_callback(d3d_resource_restore);
+	al_set_d3d_device_release_callback(d3d_resource_release);
 #endif
 	m_clear(black);
 	m_flip_display();

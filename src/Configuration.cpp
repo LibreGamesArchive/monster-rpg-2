@@ -801,6 +801,10 @@ bool Configuration::read()
 	if (xml_aspect) {
 		setMaintainAspectRatio(atoi(xml_aspect->getValue().c_str()));
 	}
+	XMLData *xml_depth = gfx->find("depth_bits");
+	if (xml_depth) {
+		setDepthBits(atoi(xml_depth->getValue().c_str()));
+	}
 
 	XMLData* sound = monster->find("sound");
 	if (!sound) { delete xml; throw ReadError(); }
@@ -939,11 +943,13 @@ void Configuration::write()
 	XMLData* fullscreen = new XMLData("fullscreen", my_itoa(sd->fullscreen));
 	XMLData* vsync = new XMLData("vsync", my_itoa(getWaitForVsync()));
 	XMLData *xml_aspect = new XMLData("maintain_aspect_ratio", my_itoa(getMaintainAspectRatio()));
+	XMLData *xml_depth = new XMLData("depth_bits", my_itoa(getDepthBits()));
 	gfx->add(width);
 	gfx->add(height);
 	gfx->add(fullscreen);
 	gfx->add(vsync);
 	gfx->add(xml_aspect);
+	gfx->add(xml_depth);
 
 	XMLData* sound = new XMLData("sound", "");
 	XMLData* music_volume = new XMLData("music_volume", my_itoa(getMusicVolume()));
@@ -1037,6 +1043,7 @@ Configuration::Configuration() :
 	,cfg_shake_action(CFG_SHAKE_CANCEL)
 	//,cfg_auto_rotation(2)
 #endif
+	,cfg_depth_bits(-1)
 {
 #ifdef EDITOR
 	wantedMode.width = 800;

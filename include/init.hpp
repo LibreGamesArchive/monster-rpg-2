@@ -200,7 +200,6 @@ extern double allegro_iphone_shaken;
 #endif
 
 extern ALLEGRO_JOYSTICK *user_joystick;
-extern bool is_intel_gpu_on_desktop_linux;
 #ifdef ALLEGRO_ANDROID
 extern bool is_android_lessthan_2_3;
 #endif

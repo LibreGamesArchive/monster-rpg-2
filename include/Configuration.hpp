@@ -62,67 +62,67 @@ public:
 	void setJoyButton2(int b2);
 	int getJoyButton3();
 	void setJoyButton3(int b3);
-	int getKey1(void);
+	int getKey1();
 	void setKey1(int k1);
-	int getKey2(void);
+	int getKey2();
 	void setKey2(int k2);
-	int getKey3(void);
+	int getKey3();
 	void setKey3(int k2);
-	int getKeyLeft(void);
+	int getKeyLeft();
 	void setKeyLeft(int kl);
-	int getKeyRight(void);
+	int getKeyRight();
 	void setKeyRight(int kr);
-	int getKeyUp(void);
+	int getKeyUp();
 	void setKeyUp(int ku);
-	int getKeyDown(void);
+	int getKeyDown();
 	void setKeyDown(int kd);
-	int getKeySettings(void);
-	int getKeyFullscreen(void);
-	int getKeySFXUp(void);
-	int getKeySFXDown(void);
-	int getKeyMusicUp(void);
-	int getKeyMusicDown(void);
+	int getKeySettings();
+	int getKeyFullscreen();
+	int getKeySFXUp();
+	int getKeySFXDown();
+	int getKeyMusicUp();
+	int getKeyMusicDown();
 	void setKeySettings(int k);
 	void setKeyFullscreen(int k);
 	void setKeySFXUp(int k);
 	void setKeySFXDown(int k);
 	void setKeyMusicUp(int k);
 	void setKeyMusicDown(int k);
-	int getKeyQuit(void);
+	int getKeyQuit();
 	void setKeyQuit(int k);
-	int getKeySortItems(void);
+	int getKeySortItems();
 	void setKeySortItems(int k);
-	int getTargetFPS(void);
-	bool getUseOnlyMemoryBitmaps(void);
+	int getTargetFPS();
+	bool getUseOnlyMemoryBitmaps();
 	void setUseOnlyMemoryBitmaps(bool onlyMem);
-	bool getLowCpuUsage(void);
+	bool getLowCpuUsage();
 	void setLowCpuUsage(bool low);
-	int getStick(void);
+	int getStick();
 	void setStick(int s);
-	int getAxis(void);
+	int getAxis();
 	void setAxis(int a);
-	bool getXbox360(void);
+	bool getXbox360();
 	void setXbox360(bool x);
-	int getAdapter(void);
+	int getAdapter();
 	void setAdapter(int a);
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	int getDpadType(void) { return cfg_dpad_type; }
+	int getDpadType() { return cfg_dpad_type; }
 	void setDpadType(int b) { cfg_dpad_type = b; }
-	bool getTellUserToUseDpad(void) { return cfg_tellusertousedpad; }
+	bool getTellUserToUseDpad() { return cfg_tellusertousedpad; }
 	void setTellUserToUseDpad(bool b) { cfg_tellusertousedpad = b; }
-	bool getSwapButtons(void) { return cfg_swap_buttons; }
+	bool getSwapButtons() { return cfg_swap_buttons; }
 	void setSwapButtons(bool b) { cfg_swap_buttons = b; }
 #endif
-	int getDifficulty(void) { return cfg_difficulty; }
+	int getDifficulty() { return cfg_difficulty; }
 	void setDifficulty(int d) { cfg_difficulty = d; }
-	int getTuning(void) { return cfg_tuning; }
+	int getTuning() { return cfg_tuning; }
 	void setTuning(int t) { cfg_tuning = t; }
 #ifdef ALLEGRO_IPHONE
-	int getShakeAction(void) { return cfg_shake_action; }
+	int getShakeAction() { return cfg_shake_action; }
 	void setShakeAction(int t) { cfg_shake_action = t; }
 #endif
 #ifdef ALLEGRO_IPHONE
-	int getAutoRotation(void) {
+	int getAutoRotation() {
 		return cfg_auto_rotation;
 	}
 	void setAutoRotation(int auto_rot) {
@@ -143,15 +143,23 @@ public:
 		}
 	}
 #endif
-	int getMaintainAspectRatio(void) {
+	int getMaintainAspectRatio() {
 		return cfg_maintain_aspect_ratio;
 	}
 	void setMaintainAspectRatio(int m) {
 		cfg_maintain_aspect_ratio = m;
 	}
+
+	int getDepthBits() {
+		return cfg_depth_bits;
+	}
+	void setDepthBits(int b) {
+		cfg_depth_bits = b;
+	}
+
 	void setLanguage(int l);
-	int getLanguage(void);
-	bool getAutoconnectToZeemote(void);
+	int getLanguage();
+	bool getAutoconnectToZeemote();
 	void setAutoconnectToZeemote(bool ac);
 	// returns true if there was a config file
 	bool read();
@@ -205,11 +213,12 @@ private:
 	int cfg_shake_action;
 	int cfg_auto_rotation;
 #endif
+	int cfg_depth_bits;
 };
 
 extern Configuration config;
 
-bool do_config(void);
+bool do_config();
 const char *keycode_to_keyname(int i);
 
 #endif

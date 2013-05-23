@@ -129,7 +129,7 @@ static MODEL *load_model2(const char *filename, MBITMAP *tex)
 		else if (line[0] == 'v') {
 			sscanf(line, "vt %g %g", &t.u, &t.v);
 			t.u *= true_w;
-			t.v *= true_h;;
+			t.v *= true_h;
 			t.v = true_h - t.v;
 			texcoords.push_back(t);
 		}
@@ -431,7 +431,7 @@ static void draw_model_tex(MODEL *m, MBITMAP *texture)
 			0, m->num_verts[i],
 			ALLEGRO_PRIM_TRIANGLE_LIST
 		);
-		/*
+#if 0
 		m_draw_prim(
 			m->verts[i],
 			0,
@@ -440,7 +440,7 @@ static void draw_model_tex(MODEL *m, MBITMAP *texture)
 			m->num_verts[i],
 			ALLEGRO_PRIM_TRIANGLE_LIST
 		);
-		*/
+#endif
 	}
 }
 
