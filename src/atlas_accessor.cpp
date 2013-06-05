@@ -1,5 +1,6 @@
-#include "monster2.hpp"
-#include "atlas_internal.hpp"
+#include <allegro5/allegro.h>
+#include "atlas.h"
+#include "atlas_internal.h"
 
 int atlas_get_width(ATLAS *atlas)
 {

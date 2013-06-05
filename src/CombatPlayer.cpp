@@ -1,8 +1,4 @@
 #include "monster2.hpp"
-#include <allegro5/internal/aintern_bitmap.h>
-
-// FIXME?!?!
-#include "allegro5/internal/aintern_pixels.h"
 
 static bool end_this_battle = false;
 static BattleResult battleResult;

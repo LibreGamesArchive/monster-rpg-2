@@ -6,8 +6,6 @@
 extern ALLEGRO_DISPLAY *display;
 
 #ifdef ALLEGRO_IPHONE
-#include <allegro5/internal/aintern_iphone.h>
-
 extern volatile bool modalViewShowing;
 extern bool airplay_connected;
 extern ALLEGRO_DISPLAY *controller_display;

@@ -1,11 +1,18 @@
 #ifndef TEXATLAS_H
 #define TEXATLAS_H
 
+struct MBITMAP;
+
+enum ATLAS_CREATE_FLAGS {
+	ATLAS_ALPHA_BORDER = 0,
+	ATLAS_REPEAT_EDGES = 1
+};
+
 typedef struct ATLAS ATLAS;
 typedef struct ATLAS_ITEM ATLAS_ITEM;
 
 /* Main api */
-ATLAS *atlas_create(int width, int height, int border, bool destroy_bmps);
+ATLAS *atlas_create(int width, int height, int flags, int border, bool destroy_bmps);
 bool atlas_add(ATLAS *atlas, MBITMAP *bitmap, int id);
 int atlas_finish(ATLAS *atlas);
 void atlas_destroy(ATLAS *atlas);

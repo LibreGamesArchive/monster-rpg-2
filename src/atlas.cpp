@@ -1,23 +1,11 @@
+#include <allegro5/allegro.h>
+
 #include "monster2.hpp"
-#include <allegro5/internal/aintern_list.h>
-#include "atlas_internal.hpp"
 
-typedef struct {
-	int x, y, w, h;
-	int sheet;
-} ARECT;
+#include "atlas.h"
+#include "atlas_internal.h"
 
-typedef struct {
-	MBITMAP *bitmap;
-	int id;
-} ABMP;
-
-static void my_free(void *value, void *unused)
-{
-	(void)unused;
-	ARECT *a = (ARECT *)value;
-	delete a;
-}
+#include <stdio.h>
 
 static ARECT *create_rect(int x, int y, int w, int h, int sheet)
 {
@@ -38,11 +26,11 @@ static ABMP *create_bmp(MBITMAP *bmp, int id)
 	return b;
 }
 
-static void insert_sheet(ATLAS *atlas, _AL_LIST *rect_list)
+static void insert_sheet(ATLAS *atlas, std::vector<ARECT *> &rect_list)
 {
 	int sheet = atlas->num_sheets;
 	ARECT *rect = create_rect(0, 0, atlas->width, atlas->height, sheet);
-	_al_list_item_set_dtor(_al_list_push_back(rect_list, rect), my_free);
+	rect_list.push_back(rect);
 
 	if (sheet == 0) {
 		atlas->sheets = new MBITMAP*[1];
@@ -64,7 +52,60 @@ static void insert_sheet(ATLAS *atlas, _AL_LIST *rect_list)
 	atlas->num_sheets++;
 }
 
-ATLAS *atlas_create(int width, int height, int border, bool destroy_bmps)
+static void draw_bitmap_with_borders(MBITMAP *bmp, int x, int y)
+{
+	#define BMP_W al_get_bitmap_width(bmp->bitmap)
+	#define BMP_H al_get_bitmap_height(bmp->bitmap)
+
+	int sides[4][6] = {
+		{ /* src */ 0, 0, BMP_W, 1, /* dest */ 0, -1 }, // top
+		{ /* src */ 0, BMP_H-1, BMP_W, 1, /* dest */ 0, BMP_H }, // bottom
+		{ /* src */ 0, 0, 1, BMP_H, /* dest */ -1, 0 }, // left
+		{ /* src */ BMP_W-1, 0, 1, BMP_H, /* dest */ BMP_W, 0 } // right
+	};
+
+	int corners[4][4] = {
+		{ /* src */ 0, 0, /* dest */ -1, -1 }, // top left
+		{ /* src */ BMP_W-1, 0, /* dest */ BMP_W, -1 }, // top right
+		{ /* src */ 0, BMP_H-1, /* dest */ -1, BMP_H }, // bottom left
+		{ /* src */ BMP_W-1, BMP_H-1, /* dest */ BMP_W, BMP_H } // bottom right
+	};
+
+	#undef BMP_W
+	#undef BMP_H
+
+	// do sides
+	for (int i = 0; i < 4; i++) {
+		al_draw_bitmap_region(
+			bmp->bitmap,
+			sides[i][0],
+			sides[i][1],
+			sides[i][2],
+			sides[i][3],
+			x+sides[i][4],
+			y+sides[i][5],
+			0
+		);
+	}
+
+	// do corners
+	for (int i = 0; i < 4; i++) {
+		al_draw_bitmap_region(
+			bmp->bitmap,
+			corners[i][0],
+			corners[i][1],
+			1,
+			1,
+			x+corners[i][2],
+			y+corners[i][3],
+			0
+		);
+	}
+
+	al_draw_bitmap(bmp->bitmap, x, y, 0);
+}
+
+ATLAS *atlas_create(int width, int height, int flags, int border, bool destroy_bmps)
 {
 	ATLAS *atlas;
 
@@ -74,11 +115,13 @@ ATLAS *atlas_create(int width, int height, int border, bool destroy_bmps)
 
 	atlas->width = width;
 	atlas->height = height;
-	atlas->border = border;
+	atlas->flags = flags;
+	atlas->border = (flags & ATLAS_REPEAT_EDGES) ? 1 : border;
 	atlas->destroy_bmps = destroy_bmps;
 
-	atlas->bmp_list = _al_list_create();
-	
+	atlas->sheets = NULL;
+	atlas->items = NULL;
+
 	return atlas;
 }
 
@@ -87,35 +130,30 @@ bool atlas_add(ATLAS *atlas, MBITMAP *bitmap, int id)
 	/* Add bitmaps from largest to smallest */
 	int add_w = al_get_bitmap_width(bitmap->bitmap);
 	int add_h = al_get_bitmap_height(bitmap->bitmap);
+	//int add_area = add_w * add_h;
 	int add_max = add_w > add_h ? add_w : add_h;
 
 
-	_AL_LIST_ITEM *item = _al_list_front(atlas->bmp_list);
-
-	while (item) {
-		ABMP *b = (ABMP *)_al_list_item_data(item);
+	std::vector<ABMP *>::iterator it;
+	for (it = atlas->bmp_list.begin(); it != atlas->bmp_list.end(); it++) {
+		ABMP *b = *it;
 		MBITMAP *bmp = b->bitmap;
 		int this_w = al_get_bitmap_width(bmp->bitmap);
 		int this_h = al_get_bitmap_height(bmp->bitmap);
+		//int this_area = this_w * this_h;
 		int this_max = this_w > this_h ? this_w : this_h;
 
 		if (this_max < add_max)
 			break;
-		
-		item = _al_list_next(atlas->bmp_list, item);
 	}
 
 	ABMP *b = create_bmp(bitmap, id);
 
-	if (item) {
-		_al_list_insert_before(
-			atlas->bmp_list,
-			item,
-			b
-		);
+	if (it != atlas->bmp_list.end()) {
+		atlas->bmp_list.insert(it, b);
 	}
 	else {
-		_al_list_push_back(atlas->bmp_list, b);
+		atlas->bmp_list.push_back(b);
 	}
 
 	return true;
@@ -124,8 +162,6 @@ bool atlas_add(ATLAS *atlas, MBITMAP *bitmap, int id)
 /* Return number of bitmaps added to atlas */
 int atlas_finish(ATLAS *atlas)
 {
-	assert(_al_list_size(atlas->bmp_list) > 0);
-
 	ALLEGRO_STATE orig_state;
 	al_store_state(&orig_state,
 		ALLEGRO_STATE_BLENDER |
@@ -135,14 +171,17 @@ int atlas_finish(ATLAS *atlas)
 	atlas->num_items = 0;
 	atlas->num_sheets = 0;
 
-	_AL_LIST *rect_list = _al_list_create();
+	std::vector<ARECT *> rect_list;
 	insert_sheet(atlas, rect_list);
 
-	_AL_LIST_ITEM *item = _al_list_front(atlas->bmp_list);
 	int count = 0;
+	
+	if (atlas->bmp_list.size() == 0) {
+		goto end;
+	}
 
-	do {
-		ABMP *b = (ABMP *)_al_list_item_data(item);
+	for (size_t item = 0; item < atlas->bmp_list.size();) {
+		ABMP *b = atlas->bmp_list[item];
 		MBITMAP *bmp = b->bitmap;
 
 		int bmp_w = al_get_bitmap_width(bmp->bitmap);
@@ -150,23 +189,33 @@ int atlas_finish(ATLAS *atlas)
 		int req_w = bmp_w + (atlas->border * 2);
 		int req_h = bmp_h + (atlas->border * 2);
 		if (req_w > atlas->width || req_h > atlas->height) {
-			item = _al_list_next(atlas->bmp_list, item);
+			item++;
 			continue;
 		}
 		bool found = false;
-		_AL_LIST_ITEM *rect_item = _al_list_front(rect_list);
-		while (rect_item) {
-			ARECT *rect = (ARECT *)_al_list_item_data(rect_item);
+		for (size_t rect_i = 0; rect_i < rect_list.size();) {	
+			ARECT *rect = rect_list[rect_i];
 			if (rect->w >= req_w && rect->h >= req_h) {
 				found = true;
 				ATLAS_ITEM *atlas_item = new ATLAS_ITEM;
 				al_set_target_bitmap(atlas->sheets[rect->sheet]->bitmap);
-				al_draw_bitmap(
-					bmp->bitmap,
-					rect->x+atlas->border,
-					rect->y+atlas->border,
-					0
-				);
+
+				if (atlas->flags & ATLAS_REPEAT_EDGES) {
+					draw_bitmap_with_borders(
+						bmp,
+						rect->x+1,
+						rect->y+1
+					);
+				}
+				else {
+					al_draw_bitmap(
+						bmp->bitmap,
+						rect->x+atlas->border,
+						rect->y+atlas->border,
+						0
+					);
+				}
+
 
 				atlas_item->sub = m_create_sub_bitmap(
 					atlas->sheets[rect->sheet],
@@ -202,7 +251,8 @@ int atlas_finish(ATLAS *atlas)
 				// Four possibilities
 				if (rect->w == req_w && rect->h == req_h) {
 					// exact match, remove rect
-					_al_list_erase(rect_list, rect_item);
+					delete rect_list[rect_i];
+					rect_list.erase(rect_list.begin()+rect_i);
 				}
 				else if (rect->w == req_w) {
 					// width match, change rect
@@ -223,31 +273,28 @@ int atlas_finish(ATLAS *atlas)
 						rect->h,
 						rect->sheet
 					);
-					_al_list_item_set_dtor(
-						_al_list_insert_after(
-							rect_list,
-							rect_item,
-							r2
-						),
-						my_free
-					);
+					rect_list.insert(rect_list.begin()+rect_i+1, r2);
 					rect->y += req_h;
 					rect->h -= req_h;
 					rect->w = req_w;
 				}
 				break;
 			}
-			rect_item = _al_list_next(rect_list, rect_item);
+			rect_i++;
 		}
 		if (!found) {
 			insert_sheet(atlas, rect_list);
 			continue;
 		}
-		item = _al_list_next(atlas->bmp_list, item);
+		item++;
 		count++;
-	} while (item);
+	}
 
-	_al_list_destroy(rect_list);
+end:
+
+	for (size_t i = 0; i < rect_list.size(); i++) {
+		delete rect_list[i];
+	}
 
 	al_restore_state(&orig_state);
 
@@ -258,17 +305,13 @@ void atlas_destroy(ATLAS *atlas)
 {
 	int i;
 
-	_AL_LIST_ITEM *item;
-	while ((item = _al_list_front(atlas->bmp_list)) != NULL) {
-		ABMP *b = (ABMP *)_al_list_item_data(item);
+	for (size_t i = 0; i < atlas->bmp_list.size(); i++) {
+		ABMP *b = atlas->bmp_list[i];
 		if (atlas->destroy_bmps) {
 			m_destroy_bitmap(b->bitmap);
 		}
 		delete b;
-		_al_list_pop_front(atlas->bmp_list);
 	}
-
-	_al_list_destroy(atlas->bmp_list);
 
 	for (i = 0; i < atlas->num_sheets; i++) {
 		m_destroy_bitmap(atlas->sheets[i]);

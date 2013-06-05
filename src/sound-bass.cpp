@@ -3,10 +3,6 @@
 #include "tftp_get.h"
 
 #ifdef ALLEGRO_ANDROID
-#define ASSERT ALLEGRO_ASSERT
-extern "C" {
-#include <allegro5/internal/aintern_android.h>
-}
 #include "sound-android.hpp"
 #include <physfs.h>
 #endif

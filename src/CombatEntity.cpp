@@ -1,6 +1,5 @@
 #include "monster2.hpp"
 #include "CombatEntity.hpp"
-#include <allegro5/internal/aintern_bitmap.h>
 
 const float Ice1Effect::VELOCITY = 0.5f;
 const float WaveEffect::SPEED = 0.16f;

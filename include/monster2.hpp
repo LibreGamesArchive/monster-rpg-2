@@ -267,7 +267,7 @@ enum CloneType
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 #include "gamecenter.h"
 #endif
-#include "atlas.hpp"
+#include "atlas.h"
 #include "init.hpp"
 #include "Configuration.hpp"
 #include "Input.hpp"

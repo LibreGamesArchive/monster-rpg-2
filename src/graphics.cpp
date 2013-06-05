@@ -1,7 +1,5 @@
 #include "monster2.hpp"
 
-#include <allegro5/internal/aintern_bitmap.h>
-
 #ifdef ALLEGRO_ANDROID
 #include "java.h"
 #endif

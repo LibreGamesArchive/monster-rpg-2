@@ -1,7 +1,5 @@
 #include "monster2.hpp"
 
-#include <allegro5/internal/aintern_bitmap.h>
-
 const float GenericHolyWaterEffect::RISE_SPEED = 0.1f;
 
 void GenericCureEffect::finalize(Combatant *target)
