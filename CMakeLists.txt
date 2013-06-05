@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 OPTION(KCM_AUDIO "Use Allegro audio instead of BASS" off)
 OPTION(WITH_SVG "Enable SVG loader" off)
+OPTION(WITH_JOYPAD "Enable Joypad app support" off)
 
 if(KCM_AUDIO)
 	set(CMAKE_C_FLAGS "-DKCM_AUDIO")
@@ -117,6 +118,10 @@ if(WIN32)
 	set(COMMON_SRCS ${COMMON_SRCS} src/init.cpp)
 else(WIN32)
 if(APPLE)
+	if(NOT WITH_JOYPAD)
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNO_JOYPAD")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNO_JOYPAD")
+	endif()
 	set(COMMON_SRCS ${COMMON_SRCS} src/init.mm src/joypad.mm src/joypad_handler.mm src/gamecenter.mm src/mygamecentervc.m)
 else(APPLE)
 	set(COMMON_SRCS ${COMMON_SRCS} src/init.cpp)
@@ -223,12 +228,14 @@ if(APPLE)
 		allegro${ALLEG_SUFFIX} ${ALLEGRO_MAIN_LIB}
 		${EXTRA_LIBS}
 		lua5.2
-		JoypadMac
 		curl
 		physfs
 		png
 		jpeg
 	)
+	if (WITH_JOYPAD)
+		LIST(APPEND MAIN_LIBS JoypadMac)
+	endif()
 
 	if(KCM_AUDIO)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -framework OpenAL")

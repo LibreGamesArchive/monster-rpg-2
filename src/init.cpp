@@ -1589,7 +1589,7 @@ bool init(int *argc, char **argv[])
 	loadIcons();
 
 	al_set_new_bitmap_flags(0);
-	object_atlas = atlas_create(1024, 1024, 1, false);
+	object_atlas = atlas_create(1024, 1024, ATLAS_ALPHA_BORDER, 1, false);
 	al_set_new_bitmap_flags(ALLEGRO_CONVERT_BITMAP);
 	std::vector<AnimationSet *> tmp_animsets;
 	for (int i = 0; object_filenames[i]; i++) {
