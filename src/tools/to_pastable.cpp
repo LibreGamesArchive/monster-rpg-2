@@ -73,6 +73,11 @@ unsigned char *slurp_file(std::string filename, int *ret_size)
 
 int main(int argc, char **argv)
 {
+	if (argc < 2) {
+		printf("Usage: to_pastable <save filename>\n");
+		return 0;
+	}
+
 	const char *fn = argv[1];
 
 	int sz;
