@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <cstdio>
 #include <allegro5/allegro.h>
 
 static const char *strings[] = {
@@ -52,7 +53,7 @@ unsigned char *slurp_file(std::string filename, int *ret_size)
 		}
 		size = v.size();
 		bytes = new unsigned char[size+1];
-		for (unsigned int i = 0; i < size; i++) {
+		for (int i = 0; i < size; i++) {
 			bytes[i] = v[i];
 		}
 	}
