@@ -1,0 +1,24 @@
+<east>
+	<x>0</x>
+	<y>0</y>
+	<width>32</width>
+	<height>32</height>
+	<frames>2</frames>
+	<delays>
+		<0>500</0>
+		<1>500</1>
+	</delays>
+</east>
+
+<west>
+	<x>0</x>
+	<y>32</y>
+	<width>32</width>
+	<height>32</height>
+	<frames>2</frames>
+	<delays>
+		<0>500</0>
+		<1>500</1>
+	</delays>
+</west>
+

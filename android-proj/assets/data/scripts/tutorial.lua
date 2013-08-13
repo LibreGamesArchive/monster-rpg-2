@@ -1,0 +1,11 @@
+startArea("tutorial")
+setObjectPosition(0, 0, 0)
+setObjectDirection(0, DIRECTION_SOUTH)
+setObjectSubAnimation(0, "stand_s")
+prepareForScreenGrab1()
+clearBuffer()
+updateArea()
+drawArea()
+prepareForScreenGrab2()
+transitionIn()
+

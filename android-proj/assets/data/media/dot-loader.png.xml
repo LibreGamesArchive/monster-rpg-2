@@ -1,0 +1,12 @@
+<only>
+	<x>0</x>
+	<y>0</y>
+	<width>20</width>
+	<height>6</height>
+	<frames>3</frames>
+	<delays>
+		<0>80</0>
+		<1>80</1>
+		<2>80</2>
+	</delays>
+</only>
