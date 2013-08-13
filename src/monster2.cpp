@@ -12,7 +12,9 @@
 
 #include "svg.hpp"
 
+#ifdef ALLEGRO_ANDROID
 static bool dontbail = false;
+#endif
 
 extern bool center_button_pressed;
 
@@ -1127,10 +1129,12 @@ top:
 #endif
 			config.write();
 
+#ifdef ALLEGRO_ANDROID
 			if (isOuya() && dontbail == false) {
 				exit(0);
 			}
 			dontbail = false;
+#endif
 
 			al_stop_timer(logic_timer);
 			al_stop_timer(draw_timer);

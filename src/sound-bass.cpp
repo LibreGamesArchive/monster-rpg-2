@@ -242,6 +242,7 @@ void playPreloadedSample(std::string name)
 	playSample(preloaded_samples[name]);
 }
 
+#ifdef ALLEGRO_ANDROID
 static unsigned char *load_from_zip(std::string filename, int *ret_size, bool terminate_with_0, bool use_malloc)
 {
 	ALLEGRO_FILE *f = al_fopen(filename.c_str(), "rb");
@@ -310,6 +311,7 @@ static HSTREAM get_decode_stream(const char *name, unsigned char **buf)
 	);
 	return stream;
 }
+#endif
 
 MSAMPLE loadSample(std::string name)
 {
