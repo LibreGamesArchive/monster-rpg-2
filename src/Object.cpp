@@ -342,7 +342,7 @@ bool Object::update(Area *area, int step)
 	
 	InputDescriptor ie = input->getDescriptor();
 
-	if (speechDialog || dpad_panning) {
+	if (speechDialog || (dpad_panning && _id == 0)) {
 		ie.left = ie.right = ie.up = ie.down = false;
 		if (dpad_panning)
 			ie.button1 = ie.button2 = false;

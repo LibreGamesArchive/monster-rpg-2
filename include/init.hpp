@@ -65,6 +65,8 @@ void get_screen_offset_size(int *dx, int *dy, int *dw, int *dh);
 
 void create_tmpbuffer();
 
+bool isOuya();
+
 // FIXME: TONNES OF GLOBALS
 
 extern ALLEGRO_TIMER *logic_timer, *draw_timer;

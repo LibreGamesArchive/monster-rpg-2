@@ -36,14 +36,19 @@ function update(step)
 	elseif (stage == 0) then
 		if (px >= 14 and px <= 15 and py >= 9 and py <= 10) then
 			stage = stage + 1
-			if (get_use_dpad() or get_platform() == "pc" or get_platform() == "mac" or get_platform() == "linux") then
-				anotherDoDialogue("Great!\nYou can look around you by holding the action button and using the arrows. Try it now!\n")
+			if (getAlwaysCenter() == 0) then
+				panned = true
+				pan_count = 10000
 			else
-				anotherDoDialogue("Great!\nYou can look around you by touching the screen and dragging it to pan. Try it now!\n")
+				if (get_use_dpad() or get_platform() == "pc" or get_platform() == "mac" or get_platform() == "linux") then
+					anotherDoDialogue("Great!\nYou can look around you by holding the action button and using the arrows. Try it now!\n")
+				else
+					anotherDoDialogue("Great!\nYou can look around you by touching the screen and dragging it to pan. Try it now!\n")
+				end
+				pan_count = 0
+				panned = false
+				pan_start_x, pan_start_y = getAreaPan()
 			end
-			pan_count = 0
-			panned = false
-			pan_start_x, pan_start_y = getAreaPan()
 		end
 	end
 

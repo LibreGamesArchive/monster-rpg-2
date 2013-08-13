@@ -396,6 +396,8 @@ static void drawOverlay(bool draw_controls, ALLEGRO_COLOR tint)
 
 #if defined ALLEGRO_IPHONE
 	if (draw_red && global_draw_red && !path_head && !airplay_connected) {
+#elif defined ALLEGRO_ANDROID
+	if (!isOuya() && draw_red && global_draw_red && !path_head) {
 #else
 	if (draw_red && global_draw_red && !path_head) {
 #endif
@@ -449,52 +451,54 @@ void drawBufferToScreen(bool draw_controls)
 
 	if (!transitioning) {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-		bool on = ((unsigned)tguiCurrentTimeMillis() % 1000) < 500;
-		const char *text = NULL;
-		if (onscreen_swipe_to_attack) {
-			text = "SWIPE TO ATTACK!";
-		}
-		else if (onscreen_drag_to_use) {
-			text = "Drag to use!";
-		}
-		if (text && area && area->getName() != "tutorial") {
-			int len = m_text_length(medium_font, _t(text));
-			int h = m_text_height(medium_font);		
-			float scale = 32.0/(h+4);
-			if ((len+4)*scale > BW) scale = (float)BW/(len+4);
-			al_draw_filled_rectangle(0, (BH/2)-(h/2*scale+10), BW, (BH/2)+(h/2*scale+10), m_map_rgba(45, 45, 45, 160));
-			al_draw_line(0, (BH/2)-(h/2*scale+10), BW, (BH/2)-(h/2*scale+10), black, 1);
-			al_draw_line(0, (BH/2)+(h/2*scale+10), BW, (BH/2)+(h/2*scale+10), black, 1);
-		}
-		if (on && !use_dpad && area && area->getName() != "tutorial") {
-			if (text) {
+		if (!isOuya()) {
+			bool on = ((unsigned)tguiCurrentTimeMillis() % 1000) < 500;
+			const char *text = NULL;
+			if (onscreen_swipe_to_attack) {
+				text = "SWIPE TO ATTACK!";
+			}
+			else if (onscreen_drag_to_use) {
+				text = "Drag to use!";
+			}
+			if (text && area && area->getName() != "tutorial") {
 				int len = m_text_length(medium_font, _t(text));
-				int h = m_text_height(medium_font);
-
-				ALLEGRO_STATE state;
-				al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
-
-				MBITMAP *tmp = m_create_alpha_bitmap(len+4, h+4); // check
-				m_set_target_bitmap(tmp);
-				m_clear(m_map_rgba(0, 0, 0, 0));
-				
-				mTextout(medium_font, _t(text), 1, 1,
-					white, black,
-					WGT_TEXT_NORMAL, false);
-
+				int h = m_text_height(medium_font);		
 				float scale = 32.0/(h+4);
 				if ((len+4)*scale > BW) scale = (float)BW/(len+4);
-				
-				al_restore_state(&state);
+				al_draw_filled_rectangle(0, (BH/2)-(h/2*scale+10), BW, (BH/2)+(h/2*scale+10), m_map_rgba(45, 45, 45, 160));
+				al_draw_line(0, (BH/2)-(h/2*scale+10), BW, (BH/2)-(h/2*scale+10), black, 1);
+				al_draw_line(0, (BH/2)+(h/2*scale+10), BW, (BH/2)+(h/2*scale+10), black, 1);
+			}
+			if (on && !use_dpad && area && area->getName() != "tutorial") {
+				if (text) {
+					int len = m_text_length(medium_font, _t(text));
+					int h = m_text_height(medium_font);
 
-				m_draw_scaled_bitmap(tmp, 0, 0, len+4, h+4,
-					(BW/2)-(((len+4)*scale)/2),
-					(BH/2)-(((h+4)*scale)/2),
-					(len+2)*scale, (h+2)*scale,
-					0
-				);
+					ALLEGRO_STATE state;
+					al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
 
-				m_destroy_bitmap(tmp);
+					MBITMAP *tmp = m_create_alpha_bitmap(len+4, h+4); // check
+					m_set_target_bitmap(tmp);
+					m_clear(m_map_rgba(0, 0, 0, 0));
+					
+					mTextout(medium_font, _t(text), 1, 1,
+						white, black,
+						WGT_TEXT_NORMAL, false);
+
+					float scale = 32.0/(h+4);
+					if ((len+4)*scale > BW) scale = (float)BW/(len+4);
+					
+					al_restore_state(&state);
+
+					m_draw_scaled_bitmap(tmp, 0, 0, len+4, h+4,
+						(BW/2)-(((len+4)*scale)/2),
+						(BH/2)-(((h+4)*scale)/2),
+						(len+2)*scale, (h+2)*scale,
+						0
+					);
+
+					m_destroy_bitmap(tmp);
+				}
 			}
 		}
 #endif
@@ -531,7 +535,7 @@ void drawBufferToScreen(bool draw_controls)
 #endif
 	}
 
-	drawOverlay(draw_controls, al_map_rgba_f(0.5f, 0.5f, 0.5f, 0.5f));
+	drawOverlay((isOuya() ? false : draw_controls), al_map_rgba_f(0.5f, 0.5f, 0.5f, 0.5f));
 
 	if (fps_on && !preparingForScreenGrab) {
 		char buf[10];
@@ -712,16 +716,6 @@ static void fade(int startAlpha, int endAlpha, int length, MCOLOR color)
 
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	int flags = al_get_new_bitmap_flags();
-	int format = al_get_new_bitmap_format();
-	al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
-#if defined ALLEGRO_IPHONE || defined ALLERGRO_ANDROID
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
-#endif
-	MBITMAP *tmp = m_create_bitmap(dw, dh);
-	al_set_new_bitmap_flags(flags);
-	al_set_new_bitmap_format(format);
-	m_draw_scaled_target(tmpbuffer, dx, dy, dw, dh, 0, 0, dw, dh, tmp);
 
 	ALLEGRO_TRANSFORM backup, t;
 	al_copy_transform(&backup, al_get_current_transform());
@@ -744,7 +738,7 @@ static void fade(int startAlpha, int endAlpha, int length, MCOLOR color)
 
 		set_target_backbuffer();
 	
-		m_draw_bitmap(tmp, dx, dy, 0);
+		m_draw_bitmap(tmpbuffer, 0, 0, 0);
 
 		al_draw_filled_rectangle(dx, dy, dx+dw, dy+dh, al_map_rgba(r, g, b, a));
 		
@@ -757,14 +751,12 @@ static void fade(int startAlpha, int endAlpha, int length, MCOLOR color)
 		m_clear(color);
 	}
 	else {
-		m_draw_bitmap(tmp, dx, dy, 0);
+		m_draw_bitmap(tmpbuffer, 0, 0, 0);
 	}
 	drawBufferToScreen(false);
 	m_flip_display();
 
 	al_use_transform(&backup);
-
-	m_destroy_bitmap(tmp);
 
 	dpad_on();
 	global_draw_red = true;
@@ -809,8 +801,6 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 	int flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE);
 	MBITMAP *tmp = m_create_bitmap(disp_w, disp_h);
-	MBITMAP *bufdup = m_create_bitmap(disp_w, disp_h);
-	m_draw_scaled_target(tmpbuffer, 0, 0, disp_w, disp_h, 0, 0, disp_w, disp_h, bufdup);
 	al_set_new_bitmap_flags(flags);
 
 	ALLEGRO_TRANSFORM backup, t;
@@ -854,7 +844,7 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 		if (recth < 1) recth = 1;
 
 		m_set_target_bitmap(tmp);
-		al_draw_scaled_bitmap(bufdup->bitmap, dx, dy, dw, dh, 0, 0, dw/size, dh/size, 0);
+		al_draw_scaled_bitmap(tmpbuffer->bitmap, dx, dy, dw, dh, 0, 0, dw/size, dh/size, 0);
 
 		set_target_backbuffer();
 		m_clear(black);
@@ -886,7 +876,6 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 	}
 
 	m_destroy_bitmap(tmp);
-	m_destroy_bitmap(bufdup);
 
 	set_target_backbuffer();
 	al_use_transform(&backup);
@@ -918,21 +907,25 @@ void transitionOut(bool toggle_dpad)
 
 void battleTransition()
 {
+	debug_message("battleTransition 1\n");
+
 	transitioning = true;
 	
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE);
-	MBITMAP *tmp = m_create_bitmap(dw, dh);
-	al_set_new_bitmap_flags(flags);
-	m_draw_scaled_target(tmpbuffer, dx, dy, dw, dh, 0, 0, dw, dh, tmp);
 
 #ifdef ALLEGRO_IPHONE
 	if (true) {
 #else
 	if (!use_programmable_pipeline) {
 #endif
+		int flags = al_get_new_bitmap_flags();
+		al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE);
+		MBITMAP *tmp = m_create_bitmap(dw, dh);
+		al_set_new_bitmap_flags(flags);
+		m_draw_scaled_target(tmpbuffer, dx, dy, dw, dh, 0, 0, dw, dh, tmp);
+		debug_message("battleTransition 2\n");
+
 		set_target_backbuffer();
 		m_draw_bitmap_identity_view(tmpbuffer, 0, 0, 0);
 		m_flip_display();
@@ -943,7 +936,7 @@ void battleTransition()
 
 		int format = al_get_new_bitmap_format();
 		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
-		int flags = al_get_new_bitmap_flags();
+		flags = al_get_new_bitmap_flags();
 		al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE);
 		MBITMAP *bufcopy2 = m_create_bitmap(dw, dh);
 		al_set_new_bitmap_flags(flags);
@@ -1036,25 +1029,26 @@ void battleTransition()
 		transitioning = false;
 		return;
 	}
+	debug_message("battleTransition 3\n");
 
-	flags = al_get_new_bitmap_flags();
+	dpad_off();
+		
+	int flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE);
-	MBITMAP *xfade_buf = m_create_bitmap(dw, dh);
-	battle_buf = m_create_bitmap(dw, dh);
+	MBITMAP *tmp = m_create_bitmap(
+		al_get_bitmap_width(tmpbuffer->bitmap),
+		al_get_bitmap_height(tmpbuffer->bitmap)
+	);
 	al_set_new_bitmap_flags(flags);
-
-	m_set_target_bitmap(battle_buf);
+	ALLEGRO_STATE s;
+	al_store_state(&s, ALLEGRO_STATE_TARGET_BITMAP);
+	m_set_target_bitmap(tmp);
 	ALLEGRO_TRANSFORM t;
 	al_identity_transform(&t);
 	al_scale_transform(&t, screenScaleX, screenScaleY);
+	al_translate_transform(&t, dx, dy);
 	al_use_transform(&t);
 	battle->draw();
-	
-	// FIXME:
-	//al_save_bitmap("ss.png", battle_buf->bitmap);
-
-
-	dpad_off();
 
 	long now = tguiCurrentTimeMillis();
 	long start = now;
@@ -1065,43 +1059,42 @@ void battleTransition()
 		int elapsed = (int)(now - start);
 		angle = ((double)elapsed / (length*2.0)) * (M_PI*2);
 
-		ALLEGRO_STATE state;
-		al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
-		m_set_target_bitmap(xfade_buf);
-		m_draw_bitmap(tmp, 0, 0, 0);
-		float alpha = angle / (M_PI*2);
-		m_draw_tinted_bitmap(battle_buf, al_map_rgba_f(alpha, alpha, alpha, alpha), 0, 0, 0);
-		al_restore_state(&state);
-
-		ALLEGRO_STATE s;
-		al_store_state(&s, ALLEGRO_STATE_TARGET_BITMAP);
 		set_target_backbuffer();
 		ALLEGRO_TRANSFORM backup, t;
 		al_copy_transform(&backup, al_get_current_transform());
 		al_identity_transform(&t);
 		al_use_transform(&t);
 		use_shader(warp);
+		al_set_shader_float("alpha", 1);
 		al_set_shader_float("angle", angle);
 		al_set_shader_float("tex_bot", 1);
-		al_set_shader_sampler("tex", xfade_buf->bitmap, 0);
-		m_draw_bitmap(xfade_buf, dx, dy, 0);
-		al_use_shader(NULL);
-		al_restore_state(&s);
+		m_draw_bitmap(tmpbuffer, 0, 0, 0);
+		use_shader(NULL);
+		use_shader(warp);
+		float alpha = angle / (M_PI*2);
+		al_set_shader_float("alpha", alpha);
+		al_set_shader_float("angle", angle);
+		al_set_shader_float("tex_bot", 1);
+		m_draw_bitmap(tmp, 0, 0, 0);
+		use_shader(NULL);
+		al_use_transform(&backup);
+
 		drawBufferToScreen(false);
 		m_flip_display();
-		al_use_transform(&backup);
 		now = tguiCurrentTimeMillis();
 	}
+	debug_message("battleTransition 15\n");
 
-
-	m_destroy_bitmap(xfade_buf);
-	m_destroy_bitmap(battle_buf);
-	battle_buf = NULL;
-	m_destroy_bitmap(tmp);
+	debug_message("battleTransition 16\n");
 
 	dpad_on();
 
+	m_destroy_bitmap(tmp);
+
+	al_restore_state(&s);
+
 	transitioning = false;
+	debug_message("battleTransition 17\n");
 }
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -1163,14 +1156,8 @@ void add_blit(MBITMAP *src, int dx, int dy, MCOLOR color, float amount, int flag
 	
 	ALLEGRO_BITMAP *tolock;
 	int ofsx = 0, ofsy = 0;
-	if (al_get_parent_bitmap(src->bitmap)) {
-		tolock = al_get_parent_bitmap(src->bitmap);
-		ofsx += src->bitmap->xofs;
-		ofsx += src->bitmap->yofs;
-	}
-	else {
-		tolock = src->bitmap;
-	}
+	tolock = src->bitmap;
+
 	ALLEGRO_LOCKED_REGION *sreg = al_lock_bitmap(tolock, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READONLY);
 	ALLEGRO_LOCKED_REGION *dreg = al_lock_bitmap(target, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READWRITE);
 
@@ -1318,31 +1305,15 @@ void death_blit_region(MBITMAP *src, int x, int y, int w, int h, int dx, int dy,
 		h -= (dy+h)-th;
 	}
 
-#if 1//def ALLEGRO_ANDROID
 	ALLEGRO_BITMAP *tolock;
-	if (al_get_parent_bitmap(src->bitmap)) {
-		tolock = al_get_parent_bitmap(src->bitmap);
-		x += src->bitmap->xofs;
-		y += src->bitmap->yofs;
-	}
-	else {
-		tolock = src->bitmap;
-	}
+	tolock = src->bitmap;
+
 	ALLEGRO_LOCKED_REGION *sreg = al_lock_bitmap(tolock, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READONLY);
 	ALLEGRO_LOCKED_REGION *dreg = al_lock_bitmap(target, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READWRITE);
-#else
-	ALLEGRO_LOCKED_REGION *sreg = m_lock_bitmap_region(src, x, y, w, h, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READONLY);
-	ALLEGRO_LOCKED_REGION *dreg = al_lock_bitmap_region(target, dx, dy, w, h, ALLEGRO_PIXEL_FORMAT_RGBA_4444, ALLEGRO_LOCK_READWRITE);
-#endif
 
 	for (int yy = 0; yy < h; yy++) {
-#if 1//def ALLEGRO_ANDROID
 		unsigned char *sptr = ((unsigned char *)sreg->data + (yy+y) * sreg->pitch + (x * 2));
 		unsigned char *dptr = ((unsigned char *)dreg->data + (yy+dy) * dreg->pitch + (dx * 2));
-#else
-		unsigned char *sptr = ((unsigned char *)sreg->data + yy * sreg->pitch);
-		unsigned char *dptr = ((unsigned char *)dreg->data + yy * dreg->pitch);
-#endif
 		if (flags & M_FLIP_HORIZONTAL) {
 			dptr += w*2 - 1;
 		}
@@ -1378,11 +1349,7 @@ void death_blit_region(MBITMAP *src, int x, int y, int w, int h, int dx, int dy,
 		}
 	}
 
-#if 1//def ALLEGRO_ANDROID
 	al_unlock_bitmap(tolock);
-#else
-	m_unlock_bitmap(src);
-#endif
 	al_unlock_bitmap(target);
 }
 #else

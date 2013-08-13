@@ -379,7 +379,7 @@ MFONT *m_load_font(const char *name)
 		return f;
 	}
 
-	ALLEGRO_DEBUG("couldn't load font: using mem bitmaps");
+	debug_message("couldn't load font: using mem bitmaps");
 
 	al_set_new_bitmap_flags(flags|ALLEGRO_MEMORY_BITMAP);
 	f = al_load_font(name, 0, 0);
@@ -555,7 +555,9 @@ void m_flip_display(void)
 	}
 
 	if (!skip_flip) {
+		debug_message("flipping\n");
 		al_flip_display();
+		debug_message("flipped\n");
 	}
 
 	int xxx, yyy, www, hhh;
@@ -653,11 +655,9 @@ void m_set_clip(int x1, int y1, int x2, int y2)
 {
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
-	if (al_get_target_bitmap() == al_get_backbuffer(display) || al_get_target_bitmap() == tmpbuffer->bitmap) {
+	ALLEGRO_BITMAP *target = al_get_target_bitmap();
+	if (al_get_bitmap_width(target) == al_get_display_width(display) && al_get_bitmap_height(target) == al_get_display_height(display)) {
 		al_set_clipping_rectangle(dx+x1*screenScaleX, dy+y1*screenScaleY, (x2-x1)*screenScaleX, (y2-y1)*screenScaleY);
-	}
-	else if (battle_buf && al_get_target_bitmap() == battle_buf->bitmap) {
-		al_set_clipping_rectangle(x1*screenScaleX, y1*screenScaleY, (x2-x1)*screenScaleX, (y2-y1)*screenScaleY);
 	}
 	else {
 		al_set_clipping_rectangle(
@@ -1266,3 +1266,9 @@ int cursor_offset(bool centered)
 	}
 	return m_text_height(game_font)/2-m_get_bitmap_height(cursor)/2;
 }
+
+void my_get_keyboard_state(ALLEGRO_KEYBOARD_STATE *state)
+{
+	al_get_keyboard_state(state);
+}
+

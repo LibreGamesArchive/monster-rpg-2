@@ -2,6 +2,9 @@
 
 void debug_message(const char *fmt, ...)
 {
+// FIXME:
+return;
+
 	va_list ap;
 	char msg[1000];
 

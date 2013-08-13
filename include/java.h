@@ -38,6 +38,14 @@ extern bool zeemote_connected;
 void find_zeemotes();
 void autoconnect_zeemote();
 void goHome();
+void logString(const char *s);
+
+#ifdef OUYA
+int isPurchased();
+void queryPurchased();
+void doIAP();
+int checkPurchased();
+#endif
 
 #ifdef __cplusplus
 }

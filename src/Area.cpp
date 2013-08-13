@@ -5,6 +5,8 @@
 
 #include <sys/stat.h>
 
+bool center_button_pressed = false;
+
 int get_tile_atlas_pos(int tn)
 {
 	return tn*TILE_SIZE + 1 + 2*tn;
@@ -240,17 +242,16 @@ Node *path_head = NULL;
 void cleanup_astar(void)
 {
 	if (path_tail) {
-		delete path_tail;
+		//delete path_tail;
 		path_tail = NULL;
 	}
 
 	std::list<Node *>::iterator it;
+	std::list<Node *>::iterator it2;
 	
 	for (it = as_open.begin(); it != as_open.end(); it++) {
 		delete *it;
 	}
-	
-	std::list<Node *>::iterator it2;
 
 	for (it2 = as_closed.begin(); it2 != as_closed.end(); it2++) {
 		delete *it2;
@@ -271,129 +272,106 @@ static Node *astar(int start_x, int start_y, int dest_x, int dest_y)
 	}
 	
 #define AS_ESTIMATE(sx, sy, dx, dy) \
-(abs(sx-dx) + abs(sy-dy))
+	(abs(sx-dx) + abs(sy-dy))
 	
 	const int offsets[4][2] = {
-		{  0, -1 },            
-		{ -1,  0 },             {  1,  0 },
-		{  0,  1 }            
+		{  0, -1 },
+		{ -1,  0 },
+		{  1,  0 },
+		{  0,  1 }
 	};
 
-	int count = 0;
-
 	Node *StartNode = new Node();
-	count++;
 	StartNode->x = start_x;
 	StartNode->y = start_y;
 	StartNode->CostFromStart = 0;
-	StartNode->CostToGoal = AS_ESTIMATE(start_x, start_y, dest_x, dest_y);
-	StartNode->TotalCost = StartNode->CostToGoal;
+	StartNode->TotalCost = AS_ESTIMATE(start_x, start_y, dest_x, dest_y);
 	StartNode->parent = NULL;
 	as_open.insert(as_open.begin(), StartNode);
 
 	while (as_open.size()) {
 		Node *n = *(as_open.begin());
-		as_open.erase(as_open.begin());
 		
 		if (n->x == dest_x && n->y == dest_y) {
 			return n;
 		}
-		else {
-			for (int i = 0; i < 4; i++) {
-				int x = n->x + offsets[i][0];
-				int y = n->y + offsets[i][1];
-			
-				if (!(x == dest_x && y == dest_y) && astar_is_solid(x, y, start_x, start_y, dest_x, dest_y)) {
-					Node *NewNode = new Node;
-					NewNode->x = x;
-					NewNode->y = y;
-					as_closed.push_back(NewNode);
 
-					continue;
-				}
-				
-				// cost always 1
-				int NewCost = n->CostFromStart + 1;
-				
-				bool in_open = false;
-				bool in_closed = false;
-				
-				std::list<Node *>::iterator open_it;
-				open_it = astar_find(as_open, x, y);
-				if (open_it != as_open.end()) {
-					in_open = true;
-				}
-				
-				std::list<Node *>::iterator closed_it;
-				closed_it = astar_find(as_closed, x, y);
-				if (closed_it != as_closed.end()) {
-					in_closed = true;
-				}
+		std::list<Node *>::iterator open_it;
 
-				int costFromStart;
-				if (in_open)
-					costFromStart = (*open_it)->CostFromStart;
-				else if (in_closed)
-					costFromStart = (*closed_it)->CostFromStart;
-				
-				if ((in_open || in_closed) &&
-					costFromStart <= NewCost) {
-					continue;
-				}
-				else {
-					Node *NewNode = new Node();
-					count++;
-					NewNode->x = x;
-					NewNode->y = y;
-					NewNode->parent = n;
-					NewNode->CostFromStart = NewCost;
-					NewNode->CostToGoal =
-					AS_ESTIMATE(
-									NewNode->x, NewNode->y,
-									dest_x, dest_y
-									);
-					NewNode->TotalCost =
-					NewNode->CostFromStart +
-					NewNode->CostToGoal;
-					
-					in_open = in_closed = false;
-					
-					open_it =
-					astar_find(
-								  as_open,
-								  NewNode->x,
-								  NewNode->y
-								  );
-					if (open_it != as_open.end()) {
-						in_open = true;
-					}
-					
-					closed_it =
-					astar_find(
-								  as_closed,
-								  NewNode->x,
-								  NewNode->y
-								  );
-					if (closed_it != as_closed.end()) {
-						in_closed = true;
-					}
-					
-					if (in_closed) {
-						delete *closed_it;
-						as_closed.erase(closed_it);
-						count--;
-					}
-					if (in_open) {
-						delete NewNode;
-						count--;
-					}
-					else {
-						as_open.insert(as_open.begin(), NewNode);
-						as_open.sort(compare_node_pointer);
-					}
-				}
+		for (int i = 0; i < 4; i++) {
+			int x = n->x + offsets[i][0];
+			int y = n->y + offsets[i][1];
+		
+			if (!(x == dest_x && y == dest_y) && astar_is_solid(x, y, start_x, start_y, dest_x, dest_y)) {
+				continue;
 			}
+			
+			// cost always 1
+			int NewCost = n->CostFromStart + 1;
+			
+			bool in_open = false;
+			bool in_closed = false;
+			
+			open_it = astar_find(as_open, x, y);
+			if (open_it != as_open.end()) {
+				in_open = true;
+			}
+			
+			std::list<Node *>::iterator closed_it;
+			closed_it = astar_find(as_closed, x, y);
+			if (closed_it != as_closed.end()) {
+				in_closed = true;
+			}
+
+			int heuristic;
+			if (in_closed) {
+				if ((*closed_it)->CostFromStart <= NewCost) {
+					continue;
+				}
+				heuristic = (*closed_it)->TotalCost - (*closed_it)->CostFromStart;
+				Node *tmp = *closed_it;
+				as_closed.erase(closed_it);
+				delete tmp;
+			}
+			else if (in_open) {
+				if ((*open_it)->CostFromStart <= NewCost) {
+					continue;
+				}
+				heuristic = (*open_it)->TotalCost - (*open_it)->CostFromStart;
+			}
+			else {
+				heuristic = AS_ESTIMATE(x, y, dest_x, dest_y);
+			}
+			
+			Node *NewNode = new Node();
+			NewNode->x = x;
+			NewNode->y = y;
+			NewNode->parent = n;
+			NewNode->CostFromStart = NewCost;
+			NewNode->TotalCost = NewCost + heuristic;
+			
+			in_open = in_closed = false;
+			
+			open_it = astar_find(as_open, NewNode->x, NewNode->y);
+			if (open_it != as_open.end()) {
+				in_open = true;
+			}
+			
+			if (!in_open) {
+				as_open.insert(as_open.begin(), NewNode);
+			}
+			else {
+				delete NewNode;
+			}
+
+			as_open.sort(compare_node_pointer);
 		}
+
+		open_it = astar_find(as_open, n->x, n->y);
+		if (open_it != as_open.end()) {
+			as_open.erase(open_it);
+		}
+
 		as_closed.push_back(n);
 	}
 	
@@ -811,18 +789,18 @@ void Area::initLua()
 	unsigned char *bytes;
 	int file_size;
 
-	ALLEGRO_DEBUG("going to load global area script");
+	debug_message("going to load global area script");
 
 	debug_message("Loading global area script...\n");
 	bytes = slurp_file(getResource("area_scripts/global.%s", getScriptExtension().c_str()), &file_size);
 	if (!bytes) native_error("Load error.", "area_scripts/global.lua");
-	ALLEGRO_DEBUG("slurped %d bytes", file_size);
+	debug_message("slurped %d bytes", file_size);
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
 	}
 	delete[] bytes;
-	ALLEGRO_DEBUG("loaded it");
+	debug_message("loaded it");
 
 	debug_message("Running global area script...\n");
 	if (lua_pcall(luaState, 0, 0, 0)) {
@@ -831,7 +809,7 @@ void Area::initLua()
 		throw ScriptError();
 	}
 
-	ALLEGRO_DEBUG("gonna load the other one");
+	debug_message("gonna load the other one");
 
 	debug_message("Loading area script (%s)...\n", name.c_str());
 	bytes = slurp_file(getResource("area_scripts/%s.%s", name.c_str(), getScriptExtension().c_str()), &file_size);
@@ -843,7 +821,7 @@ void Area::initLua()
 	}
 	delete[] bytes;
 
-	ALLEGRO_DEBUG("loaded the other one!");
+	debug_message("loaded the other one!");
 
 	debug_message("Running area script...\n");
 	if (lua_pcall(luaState, 0, 0, 0)) {
@@ -861,7 +839,7 @@ void Area::initLua()
 	adjustPan();
 
 
-	ALLEGRO_DEBUG("initLua done!");
+	debug_message("initLua done!");
 }
 
 void Area::startMusic(void)
@@ -1367,7 +1345,7 @@ void Area::copyTile(int x, int y, Tile *t)
 static int ss_save_counter = 0;
 static int mem_save_counter = 0;
 
-void real_auto_save_game_to_memory(bool save_ss)
+static void real_auto_save_game_to_memory(bool save_ss, std::string mapArea = "")
 {
 	mem_save_counter = 0;
 	ss_save_counter = 0;
@@ -1375,7 +1353,7 @@ void real_auto_save_game_to_memory(bool save_ss)
 	had_battle = false;
 	memory_save_offset = 0;
 	using_memory_save = true;
-	saveGame(NULL);
+	saveGame(NULL, mapArea);
 	using_memory_save = false;
 	memory_saved = true;
 
@@ -1402,9 +1380,6 @@ void Area::auto_save_game_to_memory(int step, bool ignoreCount, bool save_ss)
 		if (
 		
 			(ignoreCount || mem_save_counter >= 10000 || had_battle)
-
-
-			// FIXME: is this bad news?
 			&& !onAnyObject(o->getId(), o->getX(), o->getY())
 		)
 		{
@@ -1416,6 +1391,12 @@ void Area::auto_save_game_to_memory(int step, bool ignoreCount, bool save_ss)
 			auto_save_to_disk_counter++;
 		}
 	}
+}
+
+void force_auto_save(std::string mapArea)
+{
+	real_auto_save_game_to_memory(true, mapArea);
+	save_auto_save_to_disk();
 }
 
 bool pan_centered_x = false;
@@ -1492,8 +1473,11 @@ void Area::update(int step)
 						if (activate(objects[i]->getId(), id.direction)) {
 						}
 						else if (!player_scripted && !battle && !manChooser
-								&& this == area && !speechDialog) {
+								&& this == area && !speechDialog && config.getAlwaysCenter() != PAN_CENTER && !down) {
 							dpad_panning = true;
+							if (config.getAlwaysCenter() == PAN_HYBRID) {
+								center_view = false;
+							}
 						}
 					}
 				}
@@ -1525,7 +1509,7 @@ void Area::update(int step)
 
 	if (!player_scripted && !battle && !manChooser
 			&& this == area && !speechDialog) {
-		if (!use_dpad) {
+		if (!use_dpad && config.getAlwaysCenter() != PAN_CENTER && !dpad_panning) {
 			if (!released && !down) {
 				down = true;
 				al_lock_mutex(click_mutex);
@@ -1535,6 +1519,9 @@ void Area::update(int step)
 				current_mouse_y = start_my;
 				al_unlock_mutex(click_mutex);
 				down_time = al_current_time();
+				if (config.getAlwaysCenter() == PAN_HYBRID) {
+					center_view = false;
+				}
 			}
 			else if (down) {
 				al_lock_mutex(click_mutex);
@@ -1589,6 +1576,12 @@ void Area::update(int step)
 						}
 					}
 					panned = false;
+					if (config.getAlwaysCenter() == PAN_HYBRID) {
+						area_panned_x = floor(area_panned_x);
+						area_panned_y = floor(area_panned_y);
+						area->center_view = true;
+						center_button_pressed = true;
+					}
 				}
 				else {
 					if (al_current_time() > down_time+0.2 && !panned) {
@@ -1750,7 +1743,7 @@ void Area::update(int step)
 
 	bool smallX = sizex*TILE_SIZE <= BW;
 	bool smallY = sizey*TILE_SIZE <= BH;
-	bool changed;
+	bool changed = false;
 	
 	if (center_view && !smallX) {
 		for (int i = 0; i < (int)(0.2*step); i++) {
@@ -1777,6 +1770,8 @@ void Area::update(int step)
 		adjustPanX();
 	}
 
+	bool changed1 = changed;
+
 	if (center_view && !smallY) {
 		for (int i = 0; i < (int)(0.2*step); i++) {
 			changed = false;
@@ -1794,6 +1789,12 @@ void Area::update(int step)
 			}
 			if (!changed) {
 				adjustPanY();
+				if (!changed1 && center_button_pressed) {
+					center_button_pressed = false;
+					if (config.getAlwaysCenter() == PAN_MANUAL) {
+						center_view = false;
+					}
+				}
 			}
 		}
 	}
@@ -2371,7 +2372,12 @@ Area::Area(void)
 	astar_next_immediate_x = -1;
 	area_panned_x = -BW/2;
 	area_panned_y = -BH/2;
-	center_view = false;
+	if (config.getAlwaysCenter() != PAN_MANUAL) {
+		center_view = true;
+	}
+	else {
+		center_view = false;
+	}
 	totalUpdates = 0;
 	oldArea = 0;
 	in_activate = false;

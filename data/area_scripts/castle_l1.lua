@@ -103,7 +103,7 @@ function update(step)
 		done_preparing = false
 		setObjectDirection(chef.id, player_dir(chef))
 		updateArea()
-		doDialogue("Chef: Here you go!\n", true, false, true)
+		doDialogue("Chef: Here you go!\n", true)
 		loadPlayDestroy("chest.ogg")
 		setInventory(slot, ITEM_JUICE, 1)
 		setObjectSubAnimation(chef.id, "prepare")

@@ -3,7 +3,6 @@
 #include "tftp_get.h"
 
 #ifdef ALLEGRO_ANDROID
-#include "sound-android.hpp"
 #include <physfs.h>
 #endif
 
@@ -154,13 +153,6 @@ void initSound(void)
 	}
 
 #ifdef ALLEGRO_ANDROID
-	if (is_android_lessthan_2_3) {
-		initSound_oldandroid();
-		return;
-	}
-#endif
-	
-#ifdef ALLEGRO_ANDROID
 	fileprocs.close = my_close;
 	fileprocs.length = my_len;
 	fileprocs.read = my_read;
@@ -177,7 +169,7 @@ void initSound(void)
 #endif
 	if (!BASS_Init(-1, 44100, 0, NULL, NULL)) {
 		int code = BASS_ErrorGetCode();
-		ALLEGRO_DEBUG("BASS_Init failed (%d). Failing or falling back", code);
+		debug_message("BASS_Init failed (%d). Failing or falling back", code);
 	}
 
 #if defined ALLEGRO_WINDOWS
@@ -197,7 +189,7 @@ void initSound(void)
 #endif
 
 	if (!BASSFLACplugin) {
-		ALLEGRO_DEBUG("Error loading FLAC plugin (%d)\n", BASS_ErrorGetCode());
+		debug_message("Error loading FLAC plugin (%d)\n", BASS_ErrorGetCode());
 	}
 
 	return;
@@ -235,16 +227,9 @@ void destroySound(void)
 	shutdownMusicName = musicName;
 	shutdownAmbienceName = ambienceName;
 
-#ifdef ALLEGRO_ANDROID
-	if (is_android_lessthan_2_3) {
-		destroySound_oldandroid();
-		return;
-	}
-#endif
-
 	BASS_Free();
 
-	ALLEGRO_DEBUG("Sound shutdown\n");
+	debug_message("Sound shutdown\n");
 }
 
 void playPreloadedSample(std::string name)
@@ -257,32 +242,119 @@ void playPreloadedSample(std::string name)
 	playSample(preloaded_samples[name]);
 }
 
+static unsigned char *load_from_zip(std::string filename, int *ret_size, bool terminate_with_0, bool use_malloc)
+{
+	ALLEGRO_FILE *f = al_fopen(filename.c_str(), "rb");
+	if (f == NULL) {
+		return NULL;
+	}
+	long size = al_fsize(f);
+	unsigned char *bytes;
+	int extra = terminate_with_0;
+
+	if (size < 0) {
+		std::vector<char> v;
+		int c;
+		while ((c = al_fgetc(f)) != EOF) {
+			v.push_back(c);
+		}
+		if (use_malloc) {
+			bytes = (unsigned char *)malloc(v.size()+extra);
+		}
+		else {
+			bytes = new unsigned char[v.size()+extra];
+		}
+		for (unsigned int i = 0; i < v.size(); i++) {
+			bytes[i] = v[i];
+		}
+	}
+	else {
+		if (use_malloc) {
+			bytes = (unsigned char *)malloc(size+extra);
+		}
+		else {
+			bytes = new unsigned char[size+extra];
+		}
+		al_fread(f, bytes, size);
+	}
+	al_fclose(f);
+	if (extra) {
+		bytes[size] = 0;
+	}
+
+	if (ret_size)
+		*ret_size = size + extra;
+
+	return bytes;
+}
+
+static HSTREAM get_decode_stream(const char *name, unsigned char **buf)
+{
+	int sz;
+	*buf = load_from_zip(
+		name,
+		&sz,
+		false,
+		true
+	);
+	if (*buf == NULL) {
+		debug_message("buf == NULL");
+		return 0;
+	}
+	HSTREAM stream = BASS_StreamCreateFile(
+		true,
+		*buf,
+		0,
+		sz,
+		BASS_STREAM_DECODE
+	);
+	return stream;
+}
+
 MSAMPLE loadSample(std::string name)
 {
-#ifdef ALLEGRO_ANDROID
-	if (is_android_lessthan_2_3) {
-		return loadSample_oldandroid(name);
-	}
-#endif
-
 	MSAMPLE s = 0;
 
 	if (!sound_inited) return s;
 
 #ifdef ALLEGRO_ANDROID
-	ALLEGRO_PATH *p = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
-	char fn[1000];
-	sprintf(fn, "%s/unpack/sfx/%s", al_path_cstr(p, '/'), name.c_str());
-	al_destroy_path(p);
-
-	s = BASS_SampleLoad(false,
-		fn,
-		0, 0, 8,
-		BASS_SAMPLE_MONO|BASS_SAMPLE_OVER_POS);
-	
-	if (s == 0) {
-		native_error("Load error.", fn);
+	unsigned char *buf0;
+	HSTREAM stream = get_decode_stream(getResource("sfx/%s", name.c_str()), &buf0);
+	if (stream == 0) {
+		return 0;
 	}
+	#define SZ (256*1024)
+	int total_read = 0;
+	int bufsize = 0;
+	DWORD read = 0;
+	unsigned char *buf;
+	do {
+		if (bufsize == 0) {
+			bufsize += SZ;
+			buf = (unsigned char *)malloc(SZ);
+		}
+		else {
+			bufsize += SZ;
+			buf = (unsigned char *)realloc(buf, bufsize);
+		}
+		read = BASS_ChannelGetData(stream, buf+total_read, SZ);
+		total_read += read;
+	} while (read == SZ);
+	#undef SZ
+	BASS_CHANNELINFO info;
+	BASS_ChannelGetInfo(stream, &info);
+	BASS_StreamFree(stream);
+	HSAMPLE samp = BASS_SampleCreate(
+		total_read,
+		info.freq,
+		info.chans,
+		4,
+		BASS_SAMPLE_OVER_POS
+	);
+	BASS_SampleSetData(samp, buf);
+	free(buf0);
+	free(buf);
+	return samp;
 #else
 	s = BASS_SampleLoad(false,
 		getResource("sfx/%s", name.c_str()),
@@ -298,12 +370,6 @@ MSAMPLE loadSample(std::string name)
 
 void destroySample(MSAMPLE sample)
 {
-#ifdef ALLEGRO_ANDROID
-	if (is_android_lessthan_2_3) {
-		destroySample_oldandroid(sample);
-		return;
-	}
-#endif
 	if (!sound_inited) return;
 
 	BASS_SampleFree(sample);
@@ -312,12 +378,6 @@ void destroySample(MSAMPLE sample)
 
 void playSample(MSAMPLE sample, MSAMPLE_ID *unused)
 {
-#ifdef ALLEGRO_ANDROID
-	if (is_android_lessthan_2_3) {
-		playSample_oldandroid(sample, unused);
-		return;
-	}
-#endif
 	(void)unused;
 	if (!sound_inited) return;
 
@@ -330,12 +390,6 @@ void playSample(MSAMPLE sample, MSAMPLE_ID *unused)
 
 void loadPlayDestroy(std::string name)
 {
-#ifdef ALLEGRO_ANDROID
-	if (is_android_lessthan_2_3) {
-		loadPlayDestroy_oldandroid(name);
-		return;
-	}
-#endif
 	if (!sound_inited) return;
 
 	playPreloadedSample(name);
@@ -366,25 +420,18 @@ std::string check_music_name(std::string name, bool *is_flac)
 	}
 
 	*is_flac = false;
+
 #ifdef ALLEGRO_ANDROID
-	if (!is_android_lessthan_2_3) {
-		static char n[1000];
-		sprintf(n, "assets/data/music/%s", name.c_str());
-		return n;
-	}
-#endif
-	
+	static char buffer[1000];
+	sprintf(buffer, "assets/data/music/%s", name.c_str());
+	return buffer;
+#else
 	return getResource("music/%s", name.c_str());
+#endif
 }
 
 void playMusic(std::string name, float vol, bool force)
 {
-#ifdef ALLEGRO_ANDROID
-	if (is_android_lessthan_2_3) {
-		playMusic_oldandroid(name, vol, force);
-		return;
-	}
-#endif
 	if (!sound_inited) return;
 
 	if (!force && musicName == name)
@@ -446,12 +493,6 @@ void playMusic(std::string name, float vol, bool force)
 
 void setMusicVolume(float volume)
 {
-#ifdef ALLEGRO_ANDROID
-	if (is_android_lessthan_2_3) {
-		setMusicVolume_oldandroid(volume);
-		return;
-	}
-#endif
 	if (!sound_inited) return;
 
 	musicVolume = volume;
@@ -465,12 +506,6 @@ void setMusicVolume(float volume)
 
 void playAmbience(std::string name, float vol)
 {
-#ifdef ALLEGRO_ANDROID
-	if (is_android_lessthan_2_3) {
-		playAmbience_oldandroid(name, vol);
-		return;
-	}
-#endif
 	if (!sound_inited) return;
 
 	ambienceName = name;
@@ -527,12 +562,6 @@ void playAmbience(std::string name, float vol)
 
 void setAmbienceVolume(float volume)
 {
-#ifdef ALLEGRO_ANDROID
-	if (is_android_lessthan_2_3) {
-		setAmbienceVolume_oldandroid(volume);
-		return;
-	}
-#endif
 	if (!sound_inited) return;
 
 	ambienceVolume = volume;
@@ -544,32 +573,16 @@ void setAmbienceVolume(float volume)
 
 float getMusicVolume(void)
 {
-#ifdef ALLEGRO_ANDROID
-	if (is_android_lessthan_2_3) {
-		return getMusicVolume_oldandroid();
-	}
-#endif
    return musicVolume;
 }
 
 float getAmbienceVolume(void)
 {
-#ifdef ALLEGRO_ANDROID
-	if (is_android_lessthan_2_3) {
-		return getAmbienceVolume_oldandroid();
-	}
-#endif
    return ambienceVolume;
 }
 
 void unmuteMusic(void)
 {
-#ifdef ALLEGRO_ANDROID
-	if (is_android_lessthan_2_3) {
-		unmuteMusic_oldandroid();
-		return;
-	}
-#endif
 	playMusic(musicName, 1.0, true);
 }
 
@@ -591,46 +604,22 @@ static void destroyMusic(void)
 
 void unmuteAmbience(void)
 {
-#ifdef ALLEGRO_ANDROID
-	if (is_android_lessthan_2_3) {
-		unmuteAmbience_oldandroid();
-		return;
-	}
-#endif
 	playAmbience(ambienceName);
 }
 
 void restartMusic(void)
 {
-#ifdef ALLEGRO_ANDROID
-	if (is_android_lessthan_2_3) {
-		restartMusic_oldandroid();
-		return;
-	}
-#endif
 	playMusic(shutdownMusicName, 1.0, true);
 }
 
 
 void restartAmbience(void)
 {
-#ifdef ALLEGRO_ANDROID
-	if (is_android_lessthan_2_3) {
-		restartAmbience_oldandroid();
-		return;
-	}
-#endif
 	playAmbience(shutdownAmbienceName);
 }
 
 void setStreamVolume(MSAMPLE stream, float volume)
 {
-#ifdef ALLEGRO_ANDROID
-	if (is_android_lessthan_2_3) {
-		setStreamVolume_oldandroid(stream, volume);
-		return;
-	}
-#endif
 	if (!sound_inited) return;
 
 	volume *= config.getSFXVolume()/255.0f;
@@ -644,11 +633,6 @@ MSAMPLE streamSample(std::string name, float vol)
 {
 	MSAMPLE samp;
 
-#ifdef ALLEGRO_ANDROID
-	if (is_android_lessthan_2_3) {
-		return streamSample_oldandroid(name, vol);
-	}
-#endif
 	if (!sound_inited) return 0;
 
 	bool is_flac;

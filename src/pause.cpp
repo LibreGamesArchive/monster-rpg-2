@@ -405,6 +405,8 @@ static void maybeShowItemHelp(void)
 
 void showSaveStateInfo(const char *basename)
 {
+	bool first = true;
+
 	dpad_off();
 	
 	bool delayed = false;
@@ -453,30 +455,32 @@ void showSaveStateInfo(const char *basename)
 				goto done;
 			}
 
-			if (!updating) {
-				if (al_get_time() > started+0.5) {
-					clear_input_events();
-					updating = true;
+			if (!first) {
+				if (!updating) {
+					if (al_get_time() > started+0.5) {
+						clear_input_events();
+						updating = true;
+					}
 				}
-			}
-			else {
-				if (use_dpad) {
-					INPUT_EVENT ie = get_next_input_event();
-					if (ie.button1 == DOWN || ie.button2 == DOWN) {
-						use_input_event();
+				else {
+					if (use_dpad) {
+						INPUT_EVENT ie = get_next_input_event();
+						if (ie.button1 == DOWN || ie.button2 == DOWN) {
+							use_input_event();
+							playPreloadedSample("select.ogg");
+							goto done;
+						}
+					}
+					if (tguiUpdate() == w1 || iphone_shaken(0.1)) {
+						iphone_clear_shaken();
 						playPreloadedSample("select.ogg");
 						goto done;
 					}
 				}
-				if (tguiUpdate() == w1 || iphone_shaken(0.1)) {
-					iphone_clear_shaken();
-					playPreloadedSample("select.ogg");
-					goto done;
-				}
 			}
 		}
 		
-		if (draw_counter > 0) {
+		if (draw_counter > 0 || first) {
 			draw_counter = 0;
 		
 			set_target_backbuffer();
@@ -519,6 +523,12 @@ void showSaveStateInfo(const char *basename)
 				m_rest(0.25);
 			}
 		}
+
+		if (first) {
+			if (!getInput()->getDescriptor().button1) {
+				first = false;
+			}
+		}
 	}
 	
 done:
@@ -541,17 +551,71 @@ done:
 	return;
 }
 
-void showItemInfo(int index, bool preserve_buffer)
+static void draw_item_desc(lua_State *luaState, int index, int y)
 {
-	dpad_off();
-	
-	bool delayed = false;
-	
-	int w = 200;
-	int h = 120;
-	int x = (BW-w)/2;
-	int y = (BH-h)/2;
+	std::string name = getItemName(index);
+	mTextout(game_font, _t(name.c_str()), BW/2, y,
+		grey, black,
+		WGT_TEXT_NORMAL, true);
+	callLua(luaState, "get_item_description", "i>s", index);
+	const char *desc = lua_tostring(luaState, -1);
 
+	al_hold_bitmap_drawing(true);
+	start_text();
+	
+	mTextout(game_font, _t(desc), BW/2, y+m_text_height(game_font),
+		grey, black,
+		WGT_TEXT_NORMAL, true);
+	lua_pop(luaState, 1);
+
+	switch (items[index].type) {
+		case ITEM_TYPE_WEAPON: {
+			char buf[100];
+			sprintf(buf, _t("Attack: %d"), weapons[items[index].id].attack);
+			mTextout(game_font, buf,
+				BW/2, y+m_text_height(game_font)*3,
+				grey, black,
+				WGT_TEXT_NORMAL, true);
+			break;
+		}
+		case ITEM_TYPE_HEAD_ARMOR:
+		case ITEM_TYPE_FEET_ARMOR:
+		case ITEM_TYPE_CHEST_ARMOR: {
+			ArmorItem *a;
+			switch (items[index].type) {
+				case ITEM_TYPE_HEAD_ARMOR:
+					a = (ArmorItem *)helmets;
+					break;
+				case ITEM_TYPE_FEET_ARMOR:
+					a = (ArmorItem *)feetArmors;
+					break;
+				default:
+					a = (ArmorItem *)chestArmors;
+					break;
+			}
+			char buf[100];
+			sprintf(buf, _t("Defense: %d"), a[items[index].id].defense);
+			mTextout(game_font, buf,
+				BW/2, y+m_text_height(game_font)*3,
+				grey, black,
+				WGT_TEXT_NORMAL, true);
+			sprintf(buf, _t("MDefense: %d"), a[items[index].id].magicDefense);
+			mTextout(game_font, buf,
+				BW/2, y+m_text_height(game_font)*4,
+				grey, black,
+				WGT_TEXT_NORMAL, true);
+			break;
+		}
+		default:
+			break;
+	}
+
+	al_hold_bitmap_drawing(false);
+	end_text();
+}
+
+static void draw_item_users(MBITMAP *partyBmps[MAX_PARTY], lua_State *luaState, int index, int y)
+{
 	bool can_use[MAX_PARTY] = { false, };
 	int diff[MAX_PARTY] = { 0, }; // better, worse, or equal to current item
 
@@ -640,6 +704,47 @@ void showItemInfo(int index, bool preserve_buffer)
 		}
 	}
 
+	for (int i = 0; i < MAX_PARTY; i++) {
+		if (can_use[i] && partyBmps[i]) {
+			int x = BW/2+(i-2)*20;
+			int w = al_get_bitmap_width(partyBmps[i]->bitmap);
+			int h = al_get_bitmap_height(partyBmps[i]->bitmap);
+			m_draw_bitmap(partyBmps[i], BW/2+(i-2)*20, y, 0);
+			if (diff[i] < 0) {
+				draw_tiny_tri(
+					x+w-2,
+					y+h-1,
+					3,
+					-1,
+					al_map_rgb_f(1, 0, 0)
+				);
+			}
+			else if (diff[i] > 0) {
+				draw_tiny_tri(
+					x+w-2,
+					y+h-6,
+					3,
+					1,
+					al_map_rgb_f(0, 1, 0)
+				);
+			}
+		}
+	}
+}
+
+void showItemInfo(int index, bool preserve_buffer)
+{
+	bool first = true;
+
+	dpad_off();
+	
+	bool delayed = false;
+	
+	int w = 200;
+	int h = 120;
+	int x = (BW-w)/2;
+	int y = (BH-h)/2;
+
 	MBITMAP *partyBmps[MAX_PARTY];
 
 	for (int i = 0; i < MAX_PARTY; i++) {
@@ -652,7 +757,6 @@ void showItemInfo(int index, bool preserve_buffer)
 	}
 
 	lua_State *luaState;
-
 	luaState = lua_open();
 	openLuaLibs(luaState);
 	runGlobalScript(luaState);
@@ -689,128 +793,49 @@ void showItemInfo(int index, bool preserve_buffer)
 				goto done;
 			}
 
-			if (!updating) {
-				if (al_get_time() > started+0.5) {
-					clear_input_events();
-					updating = true;
+			if (!first) {
+				if (!updating) {
+					if (al_get_time() > started+0.5) {
+						clear_input_events();
+						updating = true;
+					}
 				}
-			}
-			else {
-				INPUT_EVENT ie = get_next_input_event();
-				if (ie.button1 == DOWN || ie.button2 == DOWN) {
-					use_input_event();
-					playPreloadedSample("select.ogg");
-					goto done;
-				}
-				if (iphone_shaken(0.1) || tguiUpdate() == w1) {
-					iphone_clear_shaken();
-					playPreloadedSample("select.ogg");
-					goto done;
+				else {
+					INPUT_EVENT ie = get_next_input_event();
+					if (ie.button1 == DOWN || ie.button2 == DOWN) {
+						use_input_event();
+						playPreloadedSample("select.ogg");
+						goto done;
+					}
+					if (iphone_shaken(0.1) || tguiUpdate() == w1) {
+						iphone_clear_shaken();
+						playPreloadedSample("select.ogg");
+						goto done;
+					}
 				}
 			}
 		}
 
-		if (draw_counter > 0) {
+		if (draw_counter > 0 || first) {
 			draw_counter = 0;
+
 			set_target_backbuffer();
+
 			if (preserve_buffer) {
 				m_clear(m_map_rgb(0, 0, 0));
 				m_draw_bitmap_identity_view(tmpbuffer, 0, 0, 0);
 			}
+
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
-			// Draw info
-			std::string name = getItemName(index);
-			mTextout(game_font, _t(name.c_str()), BW/2, y+5+m_text_height(game_font)/2,
-				grey, black,
-				WGT_TEXT_NORMAL, true);
-			callLua(luaState, "get_item_description", "i>s", index);
-			const char *desc = lua_tostring(luaState, -1);
-	
-			al_hold_bitmap_drawing(true);
-			start_text();
-			
-			mTextout(game_font, _t(desc), BW/2, y+5+m_text_height(game_font)/2+m_text_height(game_font),
-				grey, black,
-				WGT_TEXT_NORMAL, true);
-			lua_pop(luaState, 1);
 
-			switch (items[index].type) {
-				case ITEM_TYPE_WEAPON: {
-					char buf[100];
-					sprintf(buf, _t("Attack: %d"), weapons[items[index].id].attack);
-					mTextout(game_font, buf,
-						BW/2, y+5+m_text_height(game_font)/2+m_text_height(game_font)*3,
-						grey, black,
-						WGT_TEXT_NORMAL, true);
-					break;
-				}
-				case ITEM_TYPE_HEAD_ARMOR:
-				case ITEM_TYPE_FEET_ARMOR:
-				case ITEM_TYPE_CHEST_ARMOR: {
-					ArmorItem *a;
-					switch (items[index].type) {
-						case ITEM_TYPE_HEAD_ARMOR:
-							a = (ArmorItem *)helmets;
-							break;
-						case ITEM_TYPE_FEET_ARMOR:
-							a = (ArmorItem *)feetArmors;
-							break;
-						default:
-							a = (ArmorItem *)chestArmors;
-							break;
-					}
-					char buf[100];
-					sprintf(buf, _t("Defense: %d"), a[items[index].id].defense);
-					mTextout(game_font, buf,
-						BW/2, y+5+m_text_height(game_font)/2+m_text_height(game_font)*3,
-						grey, black,
-						WGT_TEXT_NORMAL, true);
-					sprintf(buf, _t("MDefense: %d"), a[items[index].id].magicDefense);
-					mTextout(game_font, buf,
-						BW/2, y+5+m_text_height(game_font)/2+m_text_height(game_font)*4,
-						grey, black,
-						WGT_TEXT_NORMAL, true);
-					break;
-				}
-				default:
-					break;
-			}
-
-			al_hold_bitmap_drawing(false);
-			end_text();
-
-			for (int i = 0; i < MAX_PARTY; i++) {
-				if (can_use[i] && partyBmps[i]) {
-					int x = BW/2+(i-2)*20;
-					int y = 95;
-					int w = al_get_bitmap_width(partyBmps[i]->bitmap);
-					int h = al_get_bitmap_height(partyBmps[i]->bitmap);
-					m_draw_bitmap(partyBmps[i], BW/2+(i-2)*20, 95, 0);
-					if (diff[i] < 0) {
-						draw_tiny_tri(
-							x+w-2,
-							y+h-1,
-							3,
-							-1,
-							al_map_rgb_f(1, 0, 0)
-						);
-					}
-					else if (diff[i] > 0) {
-						draw_tiny_tri(
-							x+w-2,
-							y+h-6,
-							3,
-							1,
-							al_map_rgb_f(0, 1, 0)
-						);
-					}
-				}
-			}
+			draw_item_desc(luaState, index, y+5+m_text_height(game_font)/2);
+			draw_item_users(partyBmps, luaState, index, 95);
 
 			mTextout(game_font, _t("OK"), BW/2, 130,
 				grey, black,
 				WGT_TEXT_NORMAL, true);
+
 			// Draw "cursor"
 			int tick = (unsigned)tguiCurrentTimeMillis() % 1000;
 			if (tick < 800) {
@@ -819,12 +844,19 @@ void showItemInfo(int index, bool preserve_buffer)
 				int ry = 130+cursor_offset(true);
 				m_draw_bitmap(cursor, rx, ry, 0);
 			}
+
 			drawBufferToScreen();
 			m_flip_display();
 			
 			if (!delayed) {
 				delayed = true;
 				m_rest(0.25);
+			}
+		}
+
+		if (first) {
+			if (!getInput()->getDescriptor().button1) {
+				first = false;
 			}
 		}
 		
@@ -879,6 +911,8 @@ static bool choose_save_slot(int num, bool exists, void *data)
 					delete_file(getUserResource("%d.png", num));
 				}
 
+				force_auto_save(map_name);
+
 				notify("Your game", "has been saved...", "");
 			}
 		}
@@ -897,6 +931,9 @@ static bool choose_save_slot(int num, bool exists, void *data)
 				delete_file(getUserResource("%d.png", num));
 				delete_file(getUserResource("%d.bmp", num));
 			}
+
+			force_auto_save(map_name);
+
 			notify("Your game", "has been saved...", "");
 		}
 	}
@@ -1050,8 +1087,11 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	yy += yinc;
 	MTextButton *mainResume = new MTextButton(162, yy, "Play", false, left_widget, NULL, false);
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE
 	MTextButton *mainMusic = new MTextButton(162, yy, "Music", false, left_widget, NULL, false);
+	yy += yinc;
+#elif defined ALLEGRO_ANDROID
+	MTextButton *mainMusic = new MTextButton(162, yy, "Options", false, left_widget, NULL, false);
 	yy += yinc;
 #endif
 
@@ -1573,7 +1613,8 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 #if defined ALLEGRO_IPHONE
 				showIpodControls();
 #elif defined ALLEGRO_ANDROID
-				showMusicToggle();
+				//showMusicToggle();
+				config_menu(false);
 #endif
 				tguiSetFocus(mainMusic);
 				section = MAIN;
@@ -1979,21 +2020,35 @@ void doShop(std::string name, const char *imageName, int nItems,
 {
 #define DRAW \
 	m_clear(black); \
-	mDrawFrame(3, 3, BW-6, 40-6); \
+	mDrawFrame(3, 3, BW-6, 60-6); \
 	m_draw_bitmap(face, 5, 20-16, 0); \
 	char s[100]; \
 	sprintf(s, _t("%d gold"), gold); \
-	mTextout_simple(s, BW-5-m_text_length(game_font, _t(s)), \
+	mTextout_simple(s, BW-5-m_text_length(game_font, s), \
 		20-m_text_height(game_font)-2, grey); \
-	int selected = shop->getSelected(); \
-	if (selected >= 0 && shop_inventory[selected].index >= 0) { \
-		sprintf(s, _t("Cost: %d"), costs[selected]); \
+	s[0] = 0; \
+	if (!(shop->getSelected() == -1 && isel->getSelected() == -1)) { \
+		int selected = shop->getSelected(); \
+		if (tguiActiveWidget == shop && selected >= 0 && shop_inventory[selected].index >= 0) { \
+			sprintf(s, _t("Cost: %d"), costs[selected]); \
+		} \
+		else { \
+			strcpy(s, "-"); \
+		} \
+		if (tguiActiveWidget == shop && selected >= 0 && shop_inventory[selected].index >= 0) { \
+			draw_item_desc(luaState, shop_inventory[selected].index, 4+m_get_bitmap_height(face)+2); \
+			draw_item_users(partyBmps, luaState, shop_inventory[selected].index, 8); \
+		} \
+		else if (tguiActiveWidget == isel) { \
+			int sel = isel->getSelected(); \
+			if (sel >= 0 && inventory[sel].index >= 0) { \
+				draw_item_desc(luaState, inventory[sel].index, 4+m_get_bitmap_height(face)+2); \
+				draw_item_users(partyBmps, luaState, inventory[sel].index, 8); \
+			} \
+		} \
+		mTextout_simple(s, BW-5-m_text_length(game_font, s), \
+			22, grey); \
 	} \
-	else { \
-		strcpy(s, "-"); \
-	} \
-	mTextout_simple(s, BW-5-m_text_length(game_font, _t(s)), \
-		22, grey); \
 	tguiDraw();
 
 	dpad_off();
@@ -2017,15 +2072,31 @@ void doShop(std::string name, const char *imageName, int nItems,
 	}
 
 	// Main widgets
-	MItemSelector *shop = new MItemSelector(42, 42+60-4, 0, 0, false);
+	MItemSelector *shop = new MItemSelector(62, 62+50-4, 0, 0, false);
 	shop->setShop();
 	shop->setInventory(shop_inventory);
 	shop->setRaiseOnFocus(true);
-	MItemSelector *isel = new MItemSelector(103, 103+60-5, 0, 0, false);
+	MItemSelector *isel = new MItemSelector(113, 113+50-5, 0, 0, false);
 	isel->setShop();
 	isel->setRaiseOnFocus(true);
 
 	MBITMAP *face = m_load_bitmap(imageName);
+
+	MBITMAP *partyBmps[MAX_PARTY];
+
+	for (int i = 0; i < MAX_PARTY; i++) {
+		if (party[i]) {
+			partyBmps[i] = m_load_bitmap(getResource("objects/%s_front.png", party[i]->getName().c_str()));
+		}
+		else {
+			partyBmps[i] = NULL;
+		}
+	}
+
+	lua_State *luaState;
+	luaState = lua_open();
+	openLuaLibs(luaState);
+	runGlobalScript(luaState);
 
 	// Add widgets
 	tguiSetParent(0);
@@ -2034,18 +2105,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 	tguiSetFocus(shop);
 
 	prepareForScreenGrab1();
-	m_clear(black);
-	mDrawFrame(3, 3, BW-6, 40-6);
-	m_draw_bitmap(face, 5, 20-16, 0);
-	char s[100];
-	sprintf(s, _t("%d gold"), gold);
-	mTextout_simple(_t(s), BW-5-m_text_length(game_font, _t(s)),
-		20-m_text_height(game_font)-2, grey);
-	int sel = shop->getSelected();
-	sprintf(s, _t("Cost: %d"), costs[sel]);
-	mTextout_simple(_t(s), BW-5-m_text_length(game_font, _t(s)),
-		22, grey);
-	tguiDraw();
+	DRAW
 	drawBufferToScreen(false);
 	prepareForScreenGrab2();
 	fadeIn(black);
@@ -2110,10 +2170,19 @@ void doShop(std::string name, const char *imageName, int nItems,
 							else {
 								// check for room in inventory
 								int slot = -1;
+								int slot_part = -1;
 								int tmp;
-								tmp = findUsedInventorySlot(shop_inventory[sel].index);
-								if (tmp >= 0 && inventory[tmp].quantity+q <= 99) {
-									slot = tmp;
+								tmp = findUsedInventorySlot(shop_inventory[sel].index, 0);
+								while (tmp >= 0 && inventory[tmp].quantity >= 99) {
+									tmp = findUsedInventorySlot(shop_inventory[sel].index, tmp+1);
+								}
+								if (tmp >= 0) {
+									if (inventory[tmp].quantity+q <= 99) {
+										slot = tmp;
+									}
+									else {
+										slot_part = tmp;
+									}
 								}
 								if (slot < 0) {
 									tmp = findEmptyInventorySlot();
@@ -2129,6 +2198,11 @@ void doShop(std::string name, const char *imageName, int nItems,
 								}
 								else {
 									gold -= total_cost;
+									if (slot_part >= 0) {
+										inventory[slot_part].index = shop_inventory[sel].index;
+										q = q - (99 - inventory[slot_part].quantity);
+										inventory[slot_part].quantity = 99;
+									}
 									inventory[slot].index = shop_inventory[sel].index;
 									inventory[slot].quantity += q;
 									loadPlayDestroy("chest.ogg");
@@ -2215,6 +2289,9 @@ void doShop(std::string name, const char *imageName, int nItems,
 	}
 
 done:
+
+	shop->setSelected(-1);
+	isel->setSelected(-1);
 	
 	setMusicVolume(1);
 	
@@ -2231,6 +2308,13 @@ done:
 	delete isel;
 
 	m_destroy_bitmap(face);
+
+	for (int i = 0; i < MAX_PARTY; i++) {
+		if (partyBmps[i])
+			m_destroy_bitmap(partyBmps[i]);
+	}
+
+	lua_close(luaState);
 
 	clear_input_events();
 
@@ -2437,6 +2521,7 @@ void credits(void)
 			"TONY HUISMAN",
 			"SERGEY LATYSHEV",
 			"FABIO NOBREGA",
+			"JACOB NUTTING",
 			"ELIAS PSCHERNIG",
 			NULL
 		},
@@ -3674,28 +3759,18 @@ bool config_menu(bool start_on_fullscreen)
 	y += 13;
 
 #if defined ALLEGRO_IPHONE ||  defined ALLEGRO_ANDROID
-	std::vector<std::string> input_choices;
-	input_choices.push_back("{027} Tap-and-go");
-	input_choices.push_back("{027} Hybrid input 1");
-	input_choices.push_back("{027} Hybrid input 2");
-	input_choices.push_back("{027} Total D-Pad 1");
-	input_choices.push_back("{027} Total D-Pad 2");
-	MSingleToggle *input_toggle;
-
-	input_toggle = new MSingleToggle(xx, y, input_choices);
-	input_toggle->setSelected(config.getDpadType());
-	y += 13;
-#endif
-
-#if defined ALLEGRO_ANDROID_XXX
-	std::vector<std::string> zeemote_choices;
-	zeemote_choices.push_back("{027} Do not autoconnect to Zeemote");
-	zeemote_choices.push_back("{027} Autoconnect to Zeemote");
-	MSingleToggle *zeemote_toggle;
-
-	zeemote_toggle = new MSingleToggle(xx, y, zeemote_choices);
-	zeemote_toggle->setSelected(config.getAutoconnectToZeemote());
-	y += 13;
+	MSingleToggle *input_toggle = NULL;
+	if (!isOuya()) {
+		std::vector<std::string> input_choices;
+		input_choices.push_back("{027} Tap-and-go");
+		input_choices.push_back("{027} Hybrid input 1");
+		input_choices.push_back("{027} Hybrid input 2");
+		input_choices.push_back("{027} Total D-Pad 1");
+		input_choices.push_back("{027} Total D-Pad 2");
+		input_toggle = new MSingleToggle(xx, y, input_choices);
+		input_toggle->setSelected(config.getDpadType());
+		y += 13;
+	}
 #endif
 
 	std::vector<std::string> difficulty_choices;
@@ -3717,35 +3792,33 @@ bool config_menu(bool start_on_fullscreen)
 	y += 13;
 #endif
 
-	std::vector<std::string> tuning_choices;
-	tuning_choices.push_back("{027} Tune for battery life");
-	tuning_choices.push_back("{027} Balanced tuning");
-	tuning_choices.push_back("{027} Tune for performance");
-	MSingleToggle *tuning_toggle = new MSingleToggle(xx, y, tuning_choices);
-	int curr_tuning = config.getTuning();
-	tuning_toggle->setSelected(curr_tuning);
 
-	y += 13;
+	MSingleToggle *tuning_toggle = NULL;
+	int curr_tuning = 2;
+	if (!isOuya()) {
+		std::vector<std::string> tuning_choices;
+		tuning_choices.push_back("{027} Tune for battery life");
+		tuning_choices.push_back("{027} Balanced tuning");
+		tuning_choices.push_back("{027} Tune for performance");
+		tuning_toggle = new MSingleToggle(xx, y, tuning_choices);
+		curr_tuning = config.getTuning();
+		tuning_toggle->setSelected(curr_tuning);
+
+		y += 13;
+	}
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	std::vector<std::string> swap_buttons_choices;
-	swap_buttons_choices.push_back("{027} Normal buttons (select, cancel)");
-	swap_buttons_choices.push_back("{027} Swap buttons (cancel, select)");
-	MSingleToggle *swap_buttons_toggle = new MSingleToggle(xx, y, swap_buttons_choices);
-	int curr_swap_buttons = config.getSwapButtons();
-	swap_buttons_toggle->setSelected(curr_swap_buttons);
+	MSingleToggle *swap_buttons_toggle = NULL;
+	if (!isOuya()) {
+		std::vector<std::string> swap_buttons_choices;
+		swap_buttons_choices.push_back("{027} Normal buttons (select, cancel)");
+		swap_buttons_choices.push_back("{027} Swap buttons (cancel, select)");
+		swap_buttons_toggle = new MSingleToggle(xx, y, swap_buttons_choices);
+		int curr_swap_buttons = config.getSwapButtons();
+		swap_buttons_toggle->setSelected(curr_swap_buttons);
 
-	y += 13;
-#endif
-
-#if defined ALLEGRO_IPHONE_XXX
-	std::vector<std::string> flip_screen_choices;
-	flip_screen_choices.push_back("{027} Automatic screen rotation");
-	flip_screen_choices.push_back("{027} Lock current orientation");
-	MSingleToggle *flip_screen_toggle = new MSingleToggle(xx, y, flip_screen_choices);
-	int curr_flip_screen = config.getAutoRotation() == 2 ? 0 : 1;
-	flip_screen_toggle->setSelected(curr_flip_screen);
-	y += 13;
+		y += 13;
+	}
 #endif
 
 	#define aspect_real_to_option(c) (c == ASPECT_FILL_SCREEN ? 1 : (c == ASPECT_MAINTAIN_RATIO ? 2 : 0))
@@ -3769,6 +3842,15 @@ bool config_menu(bool start_on_fullscreen)
 	fullscreen_toggle->setSelected(start_fullscreen);
 	y += 13;
 #endif
+	
+	std::vector<std::string> alwaysCenter_choices;
+	alwaysCenter_choices.push_back("{027} View: Centered");
+	alwaysCenter_choices.push_back("{027} View: Moveable");
+	alwaysCenter_choices.push_back("{027} View: Hybrid");
+	MSingleToggle *alwaysCenter_toggle = new MSingleToggle(xx, y, alwaysCenter_choices);
+	alwaysCenter_toggle->setSelected(config.getAlwaysCenter());
+	int alwaysCenter = config.getAlwaysCenter();
+	y += 13;
 	
 	std::vector<std::string> language_choices;
 	for (int i = 0; i < 1000; i++) {
@@ -3803,20 +3885,17 @@ bool config_menu(bool start_on_fullscreen)
 		tguiAddWidget(input_toggle);
 	}
 #endif
-#if defined ALLEGRO_ANDROID_XXX
-	tguiAddWidget(zeemote_toggle);
-#endif
 	tguiAddWidget(difficulty_toggle);
 #ifdef ALLEGRO_IPHONE
 	tguiAddWidget(shake_toggle);
 #endif
-	tguiAddWidget(tuning_toggle);
+	if (!isOuya()) {
+		tguiAddWidget(tuning_toggle);
+	}
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	tguiAddWidget(swap_buttons_toggle);
-#endif
-
-#if defined ALLEGRO_IPHONE_XXX
-	tguiAddWidget(flip_screen_toggle);
+	if (!isOuya()) {
+		tguiAddWidget(swap_buttons_toggle);
+	}
 #endif
 
 	tguiAddWidget(aspect_toggle);
@@ -3825,6 +3904,8 @@ bool config_menu(bool start_on_fullscreen)
 	tguiAddWidget(fullscreen_toggle);
 #endif
 	
+	tguiAddWidget(alwaysCenter_toggle);
+
 	tguiAddWidget(language_toggle);
 	
 	if (reset_game_center) {
@@ -3899,11 +3980,13 @@ bool config_menu(bool start_on_fullscreen)
 				prepareForScreenGrab2();
 				notify("These controls are for", "iCade only!", "");
 #elif defined ALLEGRO_ANDROID
-				prepareForScreenGrab1();
-				tguiDraw();
-				drawBufferToScreen(false);
-				prepareForScreenGrab2();
-				notify("For Bluetooth keyboards use the", "RawInputIME input method", "");
+				if (!isOuya()) {
+					prepareForScreenGrab1();
+					tguiDraw();
+					drawBufferToScreen(false);
+					prepareForScreenGrab2();
+					notify("For Bluetooth keyboards use the", "RawInputIME input method", "");
+				}
 #endif
 				while (true) {
 					type = config_input(type);
@@ -3942,7 +4025,10 @@ bool config_menu(bool start_on_fullscreen)
 			if (controls) {
 				controls->setX(BW-2-(m_text_length(game_font, _t(reset_str))+m_get_bitmap_width(cursor)+1));
 			}
+			clear_input_events();
 		}
+
+		config.setAlwaysCenter(alwaysCenter_toggle->getSelected());
 		
 		int sel = sound_toggle->getSelected();
 		if (sel != sound_start) {
@@ -4019,17 +4105,22 @@ bool config_menu(bool start_on_fullscreen)
 			config.setShakeAction(sel);
 		}
 #endif
-		
-		sel = tuning_toggle->getSelected();
-		if (sel != curr_tuning) {
-			curr_tuning = sel;
-			config.setTuning(sel);
-			reinstall_timer = true;
+	
+
+		if (tuning_toggle) {
+			sel = tuning_toggle->getSelected();
+			if (sel != curr_tuning) {
+				curr_tuning = sel;
+				config.setTuning(sel);
+				reinstall_timer = true;
+			}
 		}
 		
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-		sel = swap_buttons_toggle->getSelected();
-		config.setSwapButtons(sel);
+		if (swap_buttons_toggle) {
+			sel = swap_buttons_toggle->getSelected();
+			config.setSwapButtons(sel);
+		}
 #endif
 		
 #if defined ALLEGRO_IPHONE_XXX
@@ -4068,6 +4159,7 @@ bool config_menu(bool start_on_fullscreen)
 			if (controls) {
 				controls->setX(BW-2-(m_text_length(game_font, _t(reset_str))+m_get_bitmap_width(cursor)+1));
 			}
+			clear_input_events();
 		}
 
 #if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE && !defined ALLEGRO_RASPBERRYPI
@@ -4113,7 +4205,6 @@ done:
 	delete swap_buttons_toggle;
 #if defined ALLEGRO_IPHONE
 	delete shake_toggle;
-	//delete flip_screen_toggle;
 #endif
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	if (reset_game_center)
@@ -4124,6 +4215,7 @@ done:
 	delete fullscreen_toggle;
 #endif
 	delete language_toggle;
+	delete alwaysCenter_toggle;
 	
 	tguiPop();
 
@@ -4136,6 +4228,15 @@ done:
 	clear_input_events();
 
 	config.write();
+
+	if (area && alwaysCenter != config.getAlwaysCenter()) {
+		if (config.getAlwaysCenter() != PAN_MANUAL) {
+			area->center_view = true;
+		}
+		else {
+			area->center_view = false;
+		}
+	}
 
 	return false;
 }
@@ -4381,6 +4482,11 @@ int title_menu(void)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	options.push_back("Visit WWW site");
 #endif
+#if defined ALLEGRO_ANDROID && defined OUYA
+	if (isOuya() && config.getPurchased() != 1) {
+		options.push_back("BUY FULL VERSION");
+	}
+#endif
 
 	MMainMenu *main_menu = new MMainMenu(BH-BH/5, options);
 	
@@ -4493,6 +4599,36 @@ int title_menu(void)
 				prepareForScreenGrab2();
 				fadeIn(black);
 			}
+#if defined ALLEGRO_ANDROID && defined OUYA
+			else if (widget == main_menu && main_menu->getSelected() == 6 && isOuya()) {
+				int purchased = checkPurchased();
+				if (purchased != 1) {
+					doIAP();
+					purchased = -1;
+					while (purchased == -1) {
+						purchased = isPurchased();
+						al_rest(0.01);
+						if (is_close_pressed()) {
+							do_close();
+							close_pressed = false;
+						}
+					}
+				}
+				if (purchased == 1) {
+					prepareForScreenGrab1();
+					title_draw(bg);
+					prepareForScreenGrab2();
+					notify("", "Thank you!", "");
+					main_menu->setSelected(0);
+					main_menu->removeOption(6);
+					config.setPurchased(purchased);
+				}
+				al_rest(0.5);
+				clear_input_events();
+				getInput()->set(false, false, false, false, false, false, false);
+				al_flush_event_queue(input_event_queue);
+			}
+#endif
 			break_main_loop = false; // AGAIN (SEE ABOVE)
 
 #ifndef NO_JOYPAD
@@ -4509,12 +4645,15 @@ int title_menu(void)
 #endif
 #endif
 
+#ifndef ALLEGRO_ANDROID
+
 			INPUT_EVENT ie = get_next_input_event();
 			// Back button on android is a shake. other shakes (hot corner) suppressed on this menu (see monster2.cpp)
 			if (ie.button2 == DOWN || iphone_shaken(0.1)) {
 				selected = 0xBEEF;
 				goto done;
 			}
+#endif
 		}
 
 		if (break_for_fade_after_draw || draw_counter > 0) {
@@ -4533,7 +4672,10 @@ int title_menu(void)
 			m_flip_display();
 		}
 	}
+
+#ifndef ALLEGRO_ANDROID
 done:
+#endif
 
 	if (break_for_fade_after_draw) {
 		break_for_fade_after_draw = false;

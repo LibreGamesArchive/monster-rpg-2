@@ -4,7 +4,6 @@
 
 #ifdef ALLEGRO_ANDROID
 #include "java.h"
-static bool zeemote_enabled = false;
 #endif
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
@@ -12,6 +11,10 @@ static bool zeemote_enabled = false;
 #endif
 
 #include "svg.hpp"
+
+static bool dontbail = false;
+
+extern bool center_button_pressed;
 
 int modifier_repeat_count[7] = { 0, };
 
@@ -242,6 +245,7 @@ static void set_transform()
 	glViewport(0, 0, BB_W, BB_H);
 }
 
+#ifdef ALLEGRO_IPHONE
 static bool should_pause_game(void)
 {
 	return (area && !battle && !player_scripted && !in_pause && !in_map);
@@ -249,6 +253,7 @@ static bool should_pause_game(void)
 
 static float backup_music_volume = 1.0f;
 static float backup_ambience_volume = 1.0f;
+#endif
 #endif
 
 static void get_inputs(int x, int y, bool *l, bool *r, bool *u, bool *d, bool *b1, bool *b2, bool *b3)
@@ -264,7 +269,7 @@ static void get_inputs(int x, int y, bool *l, bool *r, bool *u, bool *d, bool *b
 	xx -= 5;
 	xx2 += 5;
 
-	if (x > xx & x < xx+BUTTON_SIZE) {
+	if (x > xx && x < xx+BUTTON_SIZE) {
 		if (dpad_at_top) {
 			if (y < BUTTON_SIZE+10) {
 				if (config.getSwapButtons())
@@ -288,7 +293,7 @@ static void get_inputs(int x, int y, bool *l, bool *r, bool *u, bool *d, bool *b
 	xx -= 5;
 	xx2 += 5;
 
-	if (x > xx & x < xx+BUTTON_SIZE) {
+	if (x > xx && x < xx+BUTTON_SIZE) {
 		if (dpad_at_top) {
 			if (y < BUTTON_SIZE+10) {
 				if (config.getSwapButtons())
@@ -557,13 +562,6 @@ bool is_close_pressed(bool pump_events_only)
 top:
 #endif
 
-#ifdef ALLEGRO_ANDROID
-	if (!pump_events_only && zeemote_enabled != zeemote_connected) {
-		zeemote_enabled = zeemote_connected;
-		al_inhibit_screensaver(zeemote_enabled);
-	}
-#endif
-
 	// random tasks
 	while (!al_event_queue_is_empty(input_event_queue)) {
 
@@ -590,6 +588,12 @@ top:
 		else if (event.type == ALLEGRO_EVENT_KEY_CHAR || event.type == USER_KEY_CHAR) {
 			INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 			int code = event.keyboard.keycode;
+			if (area && !battle && !in_pause && code == ALLEGRO_KEY_MENU && config.getAlwaysCenter() == PAN_MANUAL) {
+				area_panned_x = floor(area_panned_x);
+				area_panned_y = floor(area_panned_y);
+				area->center_view = true;
+				center_button_pressed = true;
+			}
 			if (code == config.getKeyLeft()) {
 				ie.left = DOWN;
 				add_input_event(ie);
@@ -620,7 +624,7 @@ top:
 			}
 		}
 		else if (event.type == ALLEGRO_EVENT_KEY_UP || event.type == USER_KEY_UP) {
-			if (is_modifier(event.keyboard.keycode)) {
+			if (!isOuya() && is_modifier(event.keyboard.keycode)) {
 				if (event.keyboard.keycode == config.getKey1()) {
 					joy_b1_up();
 					modifier_repeat_count[0] = 0;
@@ -671,6 +675,12 @@ top:
 				}
 				else if (code == config.getKey1()) {
 					dpad_panning = false;
+					if (area && !battle && !in_pause && config.getAlwaysCenter() == PAN_HYBRID) {
+						area_panned_x = floor(area_panned_x);
+						area_panned_y = floor(area_panned_y);
+						area->center_view = true;
+						center_button_pressed = true;
+					}
 					ie.button1 = UP;
 					add_input_event(ie);
 				}
@@ -693,7 +703,7 @@ top:
 			}
 		}
 
-#if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE
+#if !defined ALLEGRO_IPHONE
 		else if (event.type == ALLEGRO_EVENT_JOYSTICK_CONFIGURATION) {
 			al_reconfigure_joysticks();
 			int nj = al_get_num_joysticks();
@@ -1116,6 +1126,12 @@ top:
 			destroy_shaders();
 #endif
 			config.write();
+
+			if (isOuya() && dontbail == false) {
+				exit(0);
+			}
+			dontbail = false;
+
 			al_stop_timer(logic_timer);
 			al_stop_timer(draw_timer);
 			// halt
@@ -1200,7 +1216,7 @@ top:
 		}
 
 		if (!getting_input_config && (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN)) {
-			if (is_modifier(event.keyboard.keycode)) {
+			if (!isOuya() && is_modifier(event.keyboard.keycode)) {
 				if (event.keyboard.keycode == config.getKey1()) {
 					joy_b1_down();
 				}
@@ -1223,11 +1239,14 @@ top:
 					joy_d_down();
 				}
 			}
+			// FIXME:
+			/*
 			else if (event.keyboard.keycode == config.getKeyFullscreen()) {
 				if (!pause_f_to_toggle_fullscreen && !transitioning) {
 					do_toggle_fullscreen = true;
 				}
 			}
+			*/
 			else if (event.keyboard.keycode == config.getKeySettings() && !shooter_paused) {
 				if (!pause_f_to_toggle_fullscreen) {
 					close_pressed_for_configure = true;
@@ -1707,9 +1726,7 @@ static void run()
 				}
 				BattleResult result = battle->update(LOGIC_MILLIS);
 				if (result != BATTLE_CONTINUE) {
-					for (int i = 0; i < 7; i++) {
-						waitForRelease(i);
-					}
+					getInput()->waitForReleaseOr(4, 1000000);
 					clear_input_events();
 
 					had_battle = true;
@@ -1723,6 +1740,7 @@ static void run()
 					if (result == BATTLE_ENEMY_WIN) {
 						battle_won = false;
 						battle_lost = true;
+						dont_draw_now = true;
 					}
 					else if (result == BATTLE_PLAYER_RUN) {
 						battle_won = false;
@@ -1755,7 +1773,6 @@ static void run()
 					}
 				
 					if (result == BATTLE_ENEMY_WIN && battle_must_win) {
-						m_rest(5);
 						if (saveFilename) saveTime(saveFilename);
 						return;
 					}
@@ -1906,7 +1923,7 @@ static void run()
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 		ALLEGRO_KEYBOARD_STATE state;
-		al_get_keyboard_state(&state);
+		my_get_keyboard_state(&state);
 #endif
 	}
 
@@ -1922,9 +1939,8 @@ static void run()
 #ifndef EDITOR
 int main(int argc, char *argv[])
 {
-	int n;
-
 #ifndef ALLEGRO_ANDROID
+	int n;
 	if ((n = check_arg(argc, argv, "-adapter")) != -1) {
 		config.setAdapter(atoi(argv[n+1]));
 	}
@@ -1935,6 +1951,17 @@ int main(int argc, char *argv[])
 		remove(getUserResource("launch_config"));
 		return 1;
 	}
+
+#ifdef OUYA
+	// FIXME: Don't use this, use config file
+	/*
+	queryPurchased();
+	int purchased = -1;
+	do {
+		purchased = isPurchased();
+	} while (purchased == -1);
+	*/
+#endif
 
 #ifndef ALLEGRO_ANDROID
 	int c = argc;
@@ -1996,7 +2023,7 @@ int main(int argc, char *argv[])
 #endif
 	al_set_new_bitmap_flags(linear);
 	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
-	MBITMAP *tmp = m_load_bitmap(getResource("media/nooskewl.com"));
+	MBITMAP *tmp = m_load_bitmap(getResource("media/nooskewl.png"));
 	al_set_new_bitmap_flags(flags);
 	MBITMAP *nooskewl = m_create_bitmap(
 		wanted,
@@ -2128,7 +2155,7 @@ int main(int argc, char *argv[])
 		if (choice != 0xDEAD)
 #endif
 		choice = title_menu();
-		
+
 		m_push_target_bitmap();
 		set_target_backbuffer();
 		m_clear(m_map_rgb(0, 0, 0));
@@ -2255,13 +2282,16 @@ int main(int argc, char *argv[])
 		else if (choice == 4) {
 			config.write();
 #ifdef ALLEGRO_ANDROID
+			dontbail = true;
 			openURL("http://www.monster-rpg.com");
-			exit(0);
+			al_rest(1.0);
+			continue;
 #else
 			openRatingSite();
 #endif
 		}
 		#endif
+#if 0
 		else if (choice == 0xBEEF) {
 #ifndef ALLEGRO_ANDROID
 			config.write();
@@ -2272,7 +2302,9 @@ int main(int argc, char *argv[])
 			continue;
 #endif
 		}
+#endif
 		else {
+			config.write();
 			break;
 		}
 
@@ -2339,7 +2371,7 @@ int main(int argc, char *argv[])
 
 	debug_message("done\n");
 
-	ALLEGRO_DEBUG("RETURNING FROM MAIN\n");
+	debug_message("RETURNING FROM MAIN\n");
 
 	return 0;
 }

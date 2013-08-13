@@ -1,1 +1,0 @@
-../../src/equipment.cpp

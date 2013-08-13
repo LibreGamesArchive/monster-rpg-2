@@ -445,6 +445,11 @@ function update(step)
 		end
 
 		if (all_dead) then
+			prepareForScreenGrab1()
+			clearBuffer(255, 0, 0)
+			drawBufferToScreen()
+			prepareForScreenGrab2()
+			anotherDoDialogue("You were defeated in battle...\nRestore your game and save the world!\n", false, false)
 			gameOver()
 			return
 		end

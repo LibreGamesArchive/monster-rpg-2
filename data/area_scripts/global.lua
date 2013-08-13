@@ -74,7 +74,7 @@ function Object:new(o)
 	o.maxdist = o.maxdist or Object.maxdist
 	o.current_scripted_event = o.current_scripted_event or 1
 	o.id = o.id or addObject();
-	-- stuff for WALK_LINE
+	-- stuff for MOVE_LINE
 	if (o.move_type == MOVE_LINE) then
 		o.resting = Object.resting
 		o.rest_count = Object.rest_count
@@ -370,50 +370,6 @@ function Object:scripted_move(event)
 	end
 
 	setObjectInput(self.id, l, r, u, d, false, false)
-
-
-
---[[
-
-	if (event.current_step_x == nil or
-			((event.current_step_x == x
-			and event.current_step_y == y)
-			)) then
-
-		if (event.current_step_x == nil) then
-			event.current_step_x = x
-			event.current_step_y = y
-		end
-
-		l = false
-		r = false
-		u = false
-		d = false
-
-		if (x < dx) then
-			r = true
-			event.current_step_x = x + 1
-		elseif (x > dx) then
-			l = true
-			event.current_step_x = x - 1
-		elseif (y < dy) then
-			d = true
-			event.current_step_y = y + 1
-		else
-			u = true
-			event.current_step_y = y - 1
-		end
-
-		setObjectInput(self.id, l, r, u, d, false, false)
-
-		self.moved = true
-
-	elseif (self.moved == true) then
-		setObjectInput(self.id, false, false, false, false, false, false)
-		self.moved = false
-	end
---]]
-
 
 	return false;
 end

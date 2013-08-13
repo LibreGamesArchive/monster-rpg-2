@@ -187,18 +187,30 @@ void mTextout(MFONT *font, const char *text, int x, int y,
 	std::stringstream ss(text);
 	std::string word;
 
+	int SPACE_SIZE = 4;
+	int full_len = 0;
+
 	if (center) {
-		x -= m_text_length(font, text)/2;
+		for (int i = 0; i < words; i++) {
+			ss >> word;
+			full_len += m_text_length(font, word.c_str());
+			if (i < words-1) {
+				full_len += SPACE_SIZE;
+			}
+		}
+		x -= full_len/2;
 		y -= m_text_height(font)/2;
 	}
+	
+	std::stringstream ss2(text);
 
 	for (int i = 0; i < words; i++) {
-		ss >> word;
+		ss2 >> word;
 		mTextout_real(font, word.c_str(), x, y,
 			text_color, shadow_color,
 			shadowType, center);
 		x += m_text_length(font, word.c_str());
-		x += m_text_length(font, " ");
+		x += SPACE_SIZE;
 	}
 }
 
@@ -342,6 +354,8 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 
 static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data), void *data)
 {
+	bool first = true;
+
 	if (!inited) return;
 	
 	dpad_off();
@@ -386,28 +400,30 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 				goto done;
 			}
 
-			if (!updating) {
-				if (al_get_time() > started+0.5) {
-					clear_input_events();
-					updating = true;
+			if (!first) {
+				if (!updating) {
+					if (al_get_time() > started+0.5) {
+						clear_input_events();
+						updating = true;
+					}
 				}
-			}
-			else {
-				INPUT_EVENT ie = get_next_input_event();
-				if (iphone_shaken(0.1) || ie.button1 == DOWN || ie.button2 == DOWN) {
-					use_input_event();
-					playPreloadedSample("select.ogg");
-					al_rest(0.25);
-					goto done;
-				}
-				if (tguiUpdate() == w1) {
-					playPreloadedSample("select.ogg");
-					goto done;
+				else {
+					INPUT_EVENT ie = get_next_input_event();
+					if (iphone_shaken(0.1) || ie.button1 == DOWN || ie.button2 == DOWN) {
+						use_input_event();
+						playPreloadedSample("select.ogg");
+						al_rest(0.25);
+						goto done;
+					}
+					if (tguiUpdate() == w1) {
+						playPreloadedSample("select.ogg");
+						goto done;
+					}
 				}
 			}
 		}
 
-		if (draw_counter > 0) {
+		if (draw_counter > 0 || first) {
 			draw_counter = 0;
 
 			set_target_backbuffer();
@@ -434,6 +450,12 @@ static void notify(void (*draw_callback)(int x, int y, int w, int h, void *data)
 			if (!delayed) {
 				delayed = true;
 				m_rest(0.25);
+			}
+		}
+
+		if (first) {
+			if (!getInput()->getDescriptor().button1) {
+				first = false;
 			}
 		}
 	}
@@ -1019,28 +1041,45 @@ int config_input(int type)
 	int num_getters;
 	
 	if (type == MInputGetter::TYPE_KB) {
-		num_getters = 15;
-		getters[0] = new MInputGetter(type, 1, 6, BW-2, _t("Action Key"), config.getKey1());
-		getters[1] = new MInputGetter(type, 1, 15, BW-2, _t("Back Key"), config.getKey2());
-		getters[2] = new MInputGetter(type, 1, 24, BW-2, _t("View Key"), config.getKey3());
-		getters[3] = new MInputGetter(type, 1, 33, BW-2, _t("Left Key"), config.getKeyLeft());
-		getters[4] = new MInputGetter(type, 1, 42, BW-2, _t("Right Key"), config.getKeyRight());
-		getters[5] = new MInputGetter(type, 1, 51, BW-2, _t("Up Key"), config.getKeyUp());
-		getters[6] = new MInputGetter(type, 1, 60, BW-2, _t("Down Key"), config.getKeyDown());
-		getters[7] = new MInputGetter(type, 1, 69, BW-2, _t("Settings Key"), config.getKeySettings());
-		getters[8] = new MInputGetter(type, 1, 78, BW-2, _t("Fullscreen Key"), config.getKeyFullscreen());
-		getters[9] = new MInputGetter(type, 1, 87, BW-2, _t("SFX Up Key"), config.getKeySFXUp());
-		getters[10] = new MInputGetter(type, 1, 96, BW-2, _t("SFX Down Key"), config.getKeySFXDown());
-		getters[11] = new MInputGetter(type, 1, 105, BW-2, _t("Music Up Key"), config.getKeyMusicUp());
-		getters[12] = new MInputGetter(type, 1, 114, BW-2, _t("Music Down Key"), config.getKeyMusicDown());
-		getters[13] = new MInputGetter(type, 1, 123, BW-2, _t("Quit Key"), config.getKeyQuit());
-		getters[14] = new MInputGetter(type, 1, 132, BW-2, _t("Sort Items Key"), config.getKeySortItems());
+		if (isOuya()) {
+			num_getters = 8;
+			getters[0] = new MInputGetter(type, 1, 6, BW-2, _t("Action Key"), config.getKey1());
+			getters[1] = new MInputGetter(type, 1, 15, BW-2, _t("Back Key"), config.getKey2());
+			getters[2] = new MInputGetter(type, 1, 24, BW-2, _t("View Key"), config.getKey3());
+			getters[3] = new MInputGetter(type, 1, 33, BW-2, _t("SFX Up Key"), config.getKeySFXUp());
+			getters[4] = new MInputGetter(type, 1, 42, BW-2, _t("SFX Down Key"), config.getKeySFXDown());
+			getters[5] = new MInputGetter(type, 1, 51, BW-2, _t("Music Up Key"), config.getKeyMusicUp());
+			getters[6] = new MInputGetter(type, 1, 60, BW-2, _t("Music Down Key"), config.getKeyMusicDown());
+			getters[7] = new MInputGetter(type, 1, 69, BW-2, _t("Sort Items Key"), config.getKeySortItems());
+		}
+		else {
+			num_getters = 15;
+			getters[0] = new MInputGetter(type, 1, 6, BW-2, _t("Action Key"), config.getKey1());
+			getters[1] = new MInputGetter(type, 1, 15, BW-2, _t("Back Key"), config.getKey2());
+			getters[2] = new MInputGetter(type, 1, 24, BW-2, _t("View Key"), config.getKey3());
+			getters[3] = new MInputGetter(type, 1, 33, BW-2, _t("Left Key"), config.getKeyLeft());
+			getters[4] = new MInputGetter(type, 1, 42, BW-2, _t("Right Key"), config.getKeyRight());
+			getters[5] = new MInputGetter(type, 1, 51, BW-2, _t("Up Key"), config.getKeyUp());
+			getters[6] = new MInputGetter(type, 1, 60, BW-2, _t("Down Key"), config.getKeyDown());
+			getters[7] = new MInputGetter(type, 1, 69, BW-2, _t("Settings Key"), config.getKeySettings());
+			getters[8] = new MInputGetter(type, 1, 78, BW-2, _t("Fullscreen Key"), config.getKeyFullscreen());
+			getters[9] = new MInputGetter(type, 1, 87, BW-2, _t("SFX Up Key"), config.getKeySFXUp());
+			getters[10] = new MInputGetter(type, 1, 96, BW-2, _t("SFX Down Key"), config.getKeySFXDown());
+			getters[11] = new MInputGetter(type, 1, 105, BW-2, _t("Music Up Key"), config.getKeyMusicUp());
+			getters[12] = new MInputGetter(type, 1, 114, BW-2, _t("Music Down Key"), config.getKeyMusicDown());
+			getters[13] = new MInputGetter(type, 1, 123, BW-2, _t("Quit Key"), config.getKeyQuit());
+			getters[14] = new MInputGetter(type, 1, 132, BW-2, _t("Sort Items Key"), config.getKeySortItems());
+		}
 	}
 	else {
-		num_getters= 3;
+		num_getters= 7;
 		getters[0] = new MInputGetter(type, 1, 6, BW-2, _t("Action Button"), config.getJoyButton1());
 		getters[1] = new MInputGetter(type, 1, 15, BW-2, _t("Back Button"), config.getJoyButton2());
 		getters[2] = new MInputGetter(type, 1, 24, BW-2, _t("View Button"), config.getJoyButton3());
+		getters[3] = new MInputGetter(type, 1, 33, BW-2, _t("SFX Up"), config.getJoyButtonSFXUp());
+		getters[4] = new MInputGetter(type, 1, 42, BW-2, _t("SFX Down"), config.getJoyButtonSFXDown());
+		getters[5] = new MInputGetter(type, 1, 51, BW-2, _t("Music Up"), config.getJoyButtonMusicUp());
+		getters[6] = new MInputGetter(type, 1, 60, BW-2, _t("Music Down"), config.getJoyButtonMusicDown());
 	}
 
 	MTextButton *apply = new MTextButton(0, 0, "Apply");
@@ -1122,26 +1161,42 @@ int config_input(int type)
 					}
 					else {
 						if (type == MInputGetter::TYPE_KB) {
-							config.setKey1(getters[0]->getValue());
-							config.setKey2(getters[1]->getValue());
-							config.setKey3(getters[2]->getValue());
-							config.setKeyLeft(getters[3]->getValue());
-							config.setKeyRight(getters[4]->getValue());
-							config.setKeyUp(getters[5]->getValue());
-							config.setKeyDown(getters[6]->getValue());
-							config.setKeySettings(getters[7]->getValue());
-							config.setKeyFullscreen(getters[8]->getValue());
-							config.setKeySFXUp(getters[9]->getValue());
-							config.setKeySFXDown(getters[10]->getValue());
-							config.setKeyMusicUp(getters[11]->getValue());
-							config.setKeyMusicDown(getters[12]->getValue());
-							config.setKeyQuit(getters[13]->getValue());
-							config.setKeySortItems(getters[14]->getValue());
+							if (isOuya()) {
+								config.setKey1(getters[0]->getValue());
+								config.setKey2(getters[1]->getValue());
+								config.setKey3(getters[2]->getValue());
+								config.setKeySFXUp(getters[3]->getValue());
+								config.setKeySFXDown(getters[4]->getValue());
+								config.setKeyMusicUp(getters[5]->getValue());
+								config.setKeyMusicDown(getters[6]->getValue());
+								config.setKeySortItems(getters[7]->getValue());
+							}
+							else {
+								config.setKey1(getters[0]->getValue());
+								config.setKey2(getters[1]->getValue());
+								config.setKey3(getters[2]->getValue());
+								config.setKeyLeft(getters[3]->getValue());
+								config.setKeyRight(getters[4]->getValue());
+								config.setKeyUp(getters[5]->getValue());
+								config.setKeyDown(getters[6]->getValue());
+								config.setKeySettings(getters[7]->getValue());
+								config.setKeyFullscreen(getters[8]->getValue());
+								config.setKeySFXUp(getters[9]->getValue());
+								config.setKeySFXDown(getters[10]->getValue());
+								config.setKeyMusicUp(getters[11]->getValue());
+								config.setKeyMusicDown(getters[12]->getValue());
+								config.setKeyQuit(getters[13]->getValue());
+								config.setKeySortItems(getters[14]->getValue());
+							}
 						}
 						else {
 							config.setJoyButton1(getters[0]->getValue());
 							config.setJoyButton2(getters[1]->getValue());
 							config.setJoyButton3(getters[2]->getValue());
+							config.setJoyButtonSFXUp(getters[3]->getValue());
+							config.setJoyButtonSFXDown(getters[4]->getValue());
+							config.setJoyButtonMusicUp(getters[5]->getValue());
+							config.setJoyButtonMusicDown(getters[6]->getValue());
 						}
 						prepareForScreenGrab1();
 						tguiDraw();
@@ -1312,7 +1367,7 @@ void MSpeechDialog::realDrawText(int section, int xo, int yo)
 
 	int cx = xx+xo;
 	int cy = yy+yo;
-	int SPACE_SIZE = 7;
+	int SPACE_SIZE = 4;
 	
 	for (int i = 0; i < words; i++) {
 		std::string word;
@@ -1774,7 +1829,52 @@ void MInputGetter::draw()
 			WGT_TEXT_NORMAL, false);
 
 		char buf[100];
-		sprintf(buf, "%s", type == TYPE_KB ? keycode_to_keyname(value) : my_itoa(value));
+		if (isOuya()) {
+			switch (value) {
+				case ALLEGRO_KEY_BUTTON_A:
+					snprintf(buf, 100, "%s", "O");
+					break;
+				case ALLEGRO_KEY_BUTTON_X:
+					snprintf(buf, 100, "%s", "U");
+					break;
+				case ALLEGRO_KEY_BUTTON_Y:
+					snprintf(buf, 100, "%s", "Y");
+					break;
+				case ALLEGRO_KEY_BUTTON_B:
+					snprintf(buf, 100, "%s", "A");
+					break;
+				case ALLEGRO_KEY_BUTTON_L2:
+					snprintf(buf, 100, "%s", "L1");
+					break;
+				case ALLEGRO_KEY_BUTTON_R2:
+					snprintf(buf, 100, "%s", "R1");
+					break;
+				case ALLEGRO_KEY_BUTTON_L1:
+					snprintf(buf, 100, "%s", "L2");
+					break;
+				case ALLEGRO_KEY_BUTTON_R1:
+					snprintf(buf, 100, "%s", "R2");
+					break;
+				case ALLEGRO_KEY_THUMBL:
+					snprintf(buf, 100, "%s", "L3");
+					break;
+				case ALLEGRO_KEY_THUMBR:
+					snprintf(buf, 100, "%s", "R3");
+					break;
+				case ALLEGRO_KEY_START:
+					snprintf(buf, 100, "%s", "Start");
+					break;
+				case ALLEGRO_KEY_BACK:
+					snprintf(buf, 100, "%s", "Back");
+					break;
+				default:
+					snprintf(buf, 100, "%s", "?");
+					break;
+			}
+		}
+		else {
+			sprintf(buf, "%s", type == TYPE_KB ? keycode_to_keyname(value) : my_itoa(value));
+		}
 		mTextout(game_font, buf, x+width-m_text_length(game_font, buf), y-2,
 			color, black,
 			WGT_TEXT_NORMAL, false);
@@ -1798,7 +1898,7 @@ int MInputGetter::update(int millis)
 #ifdef ALLEGRO_IPHONE
 				memcpy(&state, &icade_keyboard_state, sizeof state);
 #else
-				al_get_keyboard_state(&state);
+				my_get_keyboard_state(&state);
 #endif
 				if (type == TYPE_KB) {
 					for (int i = 0; i < ALLEGRO_KEY_MAX; i++) {
@@ -1809,19 +1909,21 @@ int MInputGetter::update(int millis)
 							else {
 								value = i;
 							}
-							mode = NORMAL;
-							getting_input_config = false;
-							do {
+							if (!isOuya() || (value != ALLEGRO_KEY_MENU && value != ALLEGRO_KEY_LEFT && value != ALLEGRO_KEY_RIGHT && value != ALLEGRO_KEY_UP && value != ALLEGRO_KEY_DOWN && value != ALLEGRO_KEY_BACK && value != ALLEGRO_KEY_START)) {
+								mode = NORMAL;
+								getting_input_config = false;
+								do {
 #ifdef ALLEGRO_IPHONE
-								memcpy(&state, &icade_keyboard_state, sizeof state);
+									memcpy(&state, &icade_keyboard_state, sizeof state);
 #else
-								al_get_keyboard_state(&state);
+									my_get_keyboard_state(&state);
 #endif
-							} while (al_key_down(&state, value));
-							al_rest(0.1);
-							clear_input_events();
-							next_input_event_ready = true; // slight hack
-							break;
+								} while (al_key_down(&state, value));
+								al_rest(0.1);
+								clear_input_events();
+								next_input_event_ready = true; // slight hack
+								break;
+							}
 						}
 					}
 				}
@@ -1837,7 +1939,11 @@ int MInputGetter::update(int millis)
 							ALLEGRO_JOYSTICK_STATE state;
 							al_get_joystick_state(user_joystick, &state);
 							for (int i = 0; i < nb; i++) {
+								bool go = false;
 								if (state.button[i]) {
+									go = true;
+								}
+								if (go) {
 									value = i;
 									mode = NORMAL;
 									getting_input_config = false;
@@ -2643,16 +2749,19 @@ int MMap::update(int millis)
 
 	if (transitioning) {
 		offset_x = offset_y = 0;
-		count += millis;
-		if (count > 1000) {
+		float dx = destx - startx;
+		float dy = desty - starty;
+		float a = atan2(dy, dx);
+		const float speed = 1.5f;
+		top_x += cos(a) * speed;
+		top_y += sin(a) * speed;
+		dx = destx - top_x;
+		dy = desty - top_y;
+		float dist = sqrt(dx*dx + dy*dy);
+		if (dist <= speed+1) {
 			transitioning = false;
 			top_x = destx;
 			top_y = desty;
-		}
-		else {
-			percent_moved = count / 1000.0f;
-			top_x = ((destx - startx) * percent_moved) + startx;
-			top_y = ((desty - starty) * percent_moved) + starty;
 		}
 		return TGUI_CONTINUE;
 	}
@@ -2715,13 +2824,11 @@ int MMap::update(int millis)
 		transitioning = true;
 		startx = top_x+offset_x;
 		starty = top_y+offset_y;
-		int tmpx, tmpy;
+		float tmpx, tmpy;
 		getIdealPoint(points[selected].x, points[selected].y,
 			&tmpx, &tmpy);
 		destx = tmpx;
 		desty = tmpy;
-		percent_moved = 0;
-		count = 0;
 	}
 
 	if (shouldFlash) {
@@ -2734,106 +2841,115 @@ int MMap::update(int millis)
 	}
 
 	if (ie.button1 == DOWN || clicked) {
-		use_input_event();
-		clicked = false;
-		playPreloadedSample("select.ogg");
-		prepareForScreenGrab1();
-		main_draw();
-		prepareForScreenGrab2();
-		fadeOut(black);
-
-		/* Scroll in a portrait of the keep if entering it */
-		if (points[selected].dest_area == "Keep_outer") {
-			playMusic("keep.ogg");
-			MBITMAP *bmp = m_load_bitmap(getResource("media/keep.png"));
-			int w = m_get_bitmap_width(bmp);
-			int h = m_get_bitmap_height(bmp);
-			const int start_x = (w-BW)/2;
-			const int start_y = 0;
-			//int target_x = 0;
-			int target_y = h-BH*2;
-			m_draw_bitmap(bmp, -start_x, start_y, 0);
-			const int TOTAL = 5000;
-			long start = tguiCurrentTimeMillis();
-			long end = start + TOTAL;
-			long now = start;
-			int elapsed = 0;
-			int totalElapsed = 0;
-			dpad_off();
-
-			bool break_for_fade_after_draw = false;
-			bool redraw_so_its_the_same = false;
-		
-			while (true) {
-				if (is_close_pressed()) {
-					do_close();
-					close_pressed = false;
-				}
-				if (break_main_loop) {
-					break;
-				}
-				float p = (float)MIN(totalElapsed, TOTAL) / TOTAL;
-				int curr_w = p * w/2 + w/2;
-				int curr_h = p * BH + BH;
-				int curr_x = start_x - (p * start_x);
-				int curr_y = p * target_y;
-
-				if (!break_for_fade_after_draw) {
-					set_target_backbuffer();
-				}
-				m_draw_scaled_bitmap(bmp, curr_x, curr_y, curr_w, curr_h, 0, 0, BW, BH, 0);
-				drawBufferToScreen(false);
-
-				if (break_for_fade_after_draw) {
-					break;
-				}
-
-				if (redraw_so_its_the_same) {
-					break_for_fade_after_draw = true;
-					prepareForScreenGrab1();
-					continue;
-				}
-			
-				if  (now >= end) {
-					redraw_so_its_the_same = true;
-				}
-
-				m_flip_display();
-
-				now = tguiCurrentTimeMillis();
-				elapsed = (int)(now-start);
-				start = now;
-				totalElapsed += elapsed;
-			}
-			al_rest(5.0);
-			dpad_on();
-			if (break_for_fade_after_draw) {
-				break_for_fade_after_draw = false;
-				prepareForScreenGrab2();
-				fadeOut(black);
-			}
-			m_destroy_bitmap(bmp);
+		if (isOuya() && (config.getPurchased() != 1) && points[selected].dest_area == "flowey") {
+			prepareForScreenGrab1();
+			draw();
+			drawBufferToScreen(false);
+			prepareForScreenGrab2();
+			notify("Please purchase from main", "menu to continue.", "");
 		}
+		else {
+			use_input_event();
+			clicked = false;
+			playPreloadedSample("select.ogg");
+			prepareForScreenGrab1();
+			main_draw();
+			prepareForScreenGrab2();
+			fadeOut(black);
 
-		Object *o = party[heroSpot]->getObject();
-		o->setPosition(points[selected].dest_x, points[selected].dest_y);
-		setObjectDirection(o, points[selected].dest_dir);
-		startArea(points[selected].dest_area);
-		ALLEGRO_BITMAP *oldTarget = al_get_target_bitmap();
-		set_target_backbuffer();
-		m_clear(black);
-		al_set_target_bitmap(oldTarget);
+			/* Scroll in a portrait of the keep if entering it */
+			if (points[selected].dest_area == "Keep_outer") {
+				playMusic("keep.ogg");
+				MBITMAP *bmp = m_load_bitmap(getResource("media/keep.png"));
+				int w = m_get_bitmap_width(bmp);
+				int h = m_get_bitmap_height(bmp);
+				const int start_x = (w-BW)/2;
+				const int start_y = 0;
+				//int target_x = 0;
+				int target_y = h-BH*2;
+				m_draw_bitmap(bmp, -start_x, start_y, 0);
+				const int TOTAL = 5000;
+				long start = tguiCurrentTimeMillis();
+				long end = start + TOTAL;
+				long now = start;
+				int elapsed = 0;
+				int totalElapsed = 0;
+				dpad_off();
 
-		waitForRelease(4);
-		clear_input_events();
+				bool break_for_fade_after_draw = false;
+				bool redraw_so_its_the_same = false;
+			
+				while (true) {
+					if (is_close_pressed()) {
+						do_close();
+						close_pressed = false;
+					}
+					if (break_main_loop) {
+						break;
+					}
+					float p = (float)MIN(totalElapsed, TOTAL) / TOTAL;
+					int curr_w = p * w/2 + w/2;
+					int curr_h = p * BH + BH;
+					int curr_x = start_x - (p * start_x);
+					int curr_y = p * target_y;
 
-		area->update(1);
-		prepareForScreenGrab1();
-		area->draw();
-		drawBufferToScreen(false);
-		prepareForScreenGrab2();
-		transitionIn();
-		return TGUI_RETURN;
+					if (!break_for_fade_after_draw) {
+						set_target_backbuffer();
+					}
+					m_draw_scaled_bitmap(bmp, curr_x, curr_y, curr_w, curr_h, 0, 0, BW, BH, 0);
+					drawBufferToScreen(false);
+
+					if (break_for_fade_after_draw) {
+						break;
+					}
+
+					if (redraw_so_its_the_same) {
+						break_for_fade_after_draw = true;
+						prepareForScreenGrab1();
+						continue;
+					}
+				
+					if  (now >= end) {
+						redraw_so_its_the_same = true;
+					}
+
+					m_flip_display();
+
+					now = tguiCurrentTimeMillis();
+					elapsed = (int)(now-start);
+					start = now;
+					totalElapsed += elapsed;
+				}
+				al_rest(5.0);
+				dpad_on();
+				if (break_for_fade_after_draw) {
+					break_for_fade_after_draw = false;
+					prepareForScreenGrab2();
+					fadeOut(black);
+				}
+				m_destroy_bitmap(bmp);
+			}
+
+			Object *o = party[heroSpot]->getObject();
+			o->setPosition(points[selected].dest_x, points[selected].dest_y);
+			setObjectDirection(o, points[selected].dest_dir);
+			startArea(points[selected].dest_area);
+			ALLEGRO_BITMAP *oldTarget = al_get_target_bitmap();
+			set_target_backbuffer();
+			m_clear(black);
+			al_set_target_bitmap(oldTarget);
+
+			waitForRelease(4);
+			clear_input_events();
+
+			area->update(1);
+			prepareForScreenGrab1();
+			area->draw();
+			drawBufferToScreen(false);
+			prepareForScreenGrab2();
+			transitionIn();
+			return TGUI_RETURN;
+		}
 	}
 	if (!shouldFlash && (ie.button2 == DOWN || iphone_shaken(0.1))) {
 		use_input_event();
@@ -3126,7 +3242,7 @@ void MMap::load_map_data(void)
 }
 
 
-void MMap::getIdealPoint(int x, int y, int *dx, int *dy)
+void MMap::getIdealPoint(int x, int y, float *dx, float *dy)
 {
 	if (x <= BW/2) {
 		*dx = 0;
@@ -5375,7 +5491,7 @@ int MItemSelector::update(int millis)
 #ifndef ALLEGRO_IPHONE // FIXME: fix when iphone gets keyboard support
 	if (canArrange) {
 		ALLEGRO_KEYBOARD_STATE st;
-		al_get_keyboard_state(&st);
+		my_get_keyboard_state(&st);
 		if (al_key_down(&st, config.getKeySortItems())) {
 			playPreloadedSample("select.ogg");
 			sortInventory();
@@ -7303,11 +7419,12 @@ MTab::MTab(std::string text, int x, int y) {
 	clicked = false;
 	int flags = al_get_new_bitmap_flags();
 	al_set_new_bitmap_flags(flags & ~ALLEGRO_NO_PRESERVE_TEXTURE);
-	bmp = m_create_bitmap(width, 14);
+	bmp = m_create_bitmap(width, 15);
 	al_set_new_bitmap_flags(flags);
 	m_push_target_bitmap();
 	m_set_target_bitmap(bmp);
 	mDrawFrame(2, 2, width-4, 20);
+	al_draw_line(0, 14.5, width, 14.5, blue, 1);
 	m_pop_target_bitmap();
 	selected = false;
 }
@@ -7517,6 +7634,11 @@ MDragNDropForm::MDragNDropForm(void)
 	this->width = BW/4;
 	this->height = BH;
 	who = -1;
+}
+
+void MMainMenu::removeOption(int index)
+{
+	options.erase(options.begin()+index);
 }
 
 void MMainMenu::mouseDown(int mx, int my, int b)

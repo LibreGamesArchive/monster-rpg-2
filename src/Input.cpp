@@ -393,25 +393,28 @@ void KeyboardInput::handle_event(ALLEGRO_EVENT *event)
 	else if (keycode == config.getKeyDown()) {
 		 down = onoff;
 	}
-	/* X does weird crap with my macbook keyboard. Holding space
-	 * makes left and right return home/end. This fixes it.
-	 */
-	else if (keycode == ALLEGRO_KEY_HOME) {
-		if (onoff) {
-			right = false;
-			left = true;
+
+	if (!isOuya()) {
+		/* X does weird crap with my macbook keyboard. Holding space
+		 * makes left and right return home/end. This fixes it.
+		 */
+		if (keycode == ALLEGRO_KEY_HOME) {
+			if (onoff) {
+				right = false;
+				left = true;
+			}
+			else {
+				left = false;
+			}
 		}
-		else {
-			left = false;
-		}
-	}
-	else if (keycode == ALLEGRO_KEY_END) {
-		if (onoff) {
-			left = false;
-			right = true;
-		}
-		else {
-			right = false;
+		else if (keycode == ALLEGRO_KEY_END) {
+			if (onoff) {
+				left = false;
+				right = true;
+			}
+			else {
+				right = false;
+			}
 		}
 	}
 
@@ -528,7 +531,7 @@ TripleInput::TripleInput() :
 	Input()
 {
 	playerControlled = true;
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE
 	js = new GamepadInput();
 #else
 	js = NULL;
@@ -541,7 +544,7 @@ void TripleInput::update()
 {
 	al_lock_mutex(mutex);
 	
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
+#if !defined ALLEGRO_IPHONE
 	kb->update();
 	js->update();
 	
@@ -608,28 +611,6 @@ void TripleInput::update()
 	    sets.button1 || id1.button1 || id3.button1 || id4.button1,
 	    sets.button2 || id1.button2 || id3.button2 || id4.button2,
 	    sets.button3 || id1.button3 || id3.button3 || id4.button3,
-	    false
-	    );
-#elif defined ALLEGRO_ANDROID
-	kb->update();
-	
-	InputDescriptor id1 = kb->getDescriptor();
-
-	InputDescriptor id3;
-	if (zeemote_connected)
-		id3 = get_zeemote_state();
-	else
-		id3.left = id3.right = id3.up = id3.down =
-			id3.button1 = id3.button2 = id3.button3 =
-			false;
-	set(
-	    sets.left || id1.left || id3.left,
-	    sets.right || id1.right || id3.right,
-	    sets.up || id1.up || id3.up,
-	    sets.down || id1.down || id3.down,
-	    sets.button1 || id1.button1 || id3.button1,
-	    sets.button2 || id1.button2 || id3.button2,
-	    sets.button3 || id1.button3 || id3.button3,
 	    false
 	    );
 #endif

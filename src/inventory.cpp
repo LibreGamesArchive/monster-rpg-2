@@ -318,9 +318,9 @@ int findUnfullInventorySlot(int index)
 	return findEmptyInventorySlot();
 }
 
-int findUsedInventorySlot(int index)
+int findUsedInventorySlot(int index, int start)
 {
-	for (int i = 0; i < MAX_INVENTORY; i++) {
+	for (int i = start; i < MAX_INVENTORY; i++) {
 		if (inventory[i].index == index)
 			return i;
 	}
@@ -447,6 +447,10 @@ void use(Combatant *c, int index, bool can_equip, int numTargets)
 					loadPlayDestroy("Mmm.ogg");
 					CombatEnemyTode *t = (CombatEnemyTode *)c;
 					t->puke_next();
+					inventory[index].quantity--;
+					if (inventory[index].quantity <= 0) {
+						inventory[index].index = -1;
+					}
 					return;
 				}
 			}

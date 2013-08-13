@@ -274,9 +274,5 @@ MeatballsEffect::MeatballsEffect(int itemIndex) :
 
 MeatballsEffect::~MeatballsEffect(void)
 {
-	inventory[itemIndex].quantity--;
-	if (inventory[itemIndex].quantity <= 0) {
-		inventory[itemIndex].index = -1;
-	}
 }
 

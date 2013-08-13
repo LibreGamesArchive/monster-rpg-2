@@ -2,6 +2,10 @@
 #define _WINSOCKAPI_
 #include <allegro5/allegro.h>
 
+#ifdef ALLEGRO_ANDROID
+#include <allegro5/allegro_android.h>
+#endif
+
 #ifdef ALLEGRO_WINDOWS
 #define mkdir(a, b) mkdir(a)
 #endif
@@ -17,8 +21,6 @@
 #else
 #define LIST_FILENAME "list.txt"
 #endif
-
-ALLEGRO_DEBUG_CHANNEL("tftp")
 
 #ifdef ALLEGRO_ANDROID
 #define IPPROTO_UDP 17
@@ -67,6 +69,7 @@ static char DOWNLOAD_PATH[1000];
 static volatile bool stop = false;
 static bool is_downloading = false;
 
+#if 0
 static int sock = -1;
 static struct sockaddr saddr;
 static socklen_t saddr_len;
@@ -274,6 +277,7 @@ static int download_file(const char *filename)
 
 	return total_size;
 }
+#endif
 
 static int download_file_curl(const char *filename)
 {
@@ -359,6 +363,7 @@ static bool download_all(void)
 	return true;
 }
 
+#if 0
 static void *hqm_go_thread(void *arg)
 {
 	int len;
@@ -398,6 +403,7 @@ static void *hqm_go_thread(void *arg)
 
 	return NULL;
 }
+#endif
 
 static void *hqm_go_thread_curl(void *arg)
 {
@@ -413,10 +419,10 @@ static void *hqm_go_thread_curl(void *arg)
 
 	int ret = mkdir(DOWNLOAD_PATH, PERMS);
 	if (ret == -1) {
-		ALLEGRO_DEBUG("mkdir failed: %d\n", errno);
+		debug_message("mkdir failed: %d\n", errno);
 	}
 
-	ALLEGRO_DEBUG("created download path: %s\n", DOWNLOAD_PATH);
+	debug_message("created download path: %s\n", DOWNLOAD_PATH);
 
 	len = download_file_curl(LIST_FILENAME);
 	if (len != EXPECTED_LIST_SIZE) {

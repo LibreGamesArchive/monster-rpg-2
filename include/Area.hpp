@@ -157,7 +157,6 @@ struct Node {
 	Node *child;
 	int x, y;
 	int CostFromStart;
-	int CostToGoal;
 	int TotalCost;
 	Node(void) {}
 	~Node(void) {}
@@ -184,6 +183,6 @@ extern int mapping[4096];
 extern Node *path_head;
 extern Node *path_tail;
 
-void real_auto_save_game_to_memory(bool save_ss);
+void force_auto_save(std::string mapArea);
 
 #endif

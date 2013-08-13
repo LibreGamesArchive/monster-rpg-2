@@ -68,7 +68,7 @@ extern ArmorItem feetArmors[];
 
 int findEmptyInventorySlot(void);
 int findUnfullInventorySlot(int index);
-int findUsedInventorySlot(int index);
+int findUsedInventorySlot(int index, int start = 0);
 void setInventory(int slot, int index, int quantity);
 std::string getItemName(int index);
 int armorDefense(ItemType type, int num);

@@ -1093,7 +1093,7 @@ protected:
 	void load_map_data();
 	void getLines(MapPoint *p);
 	MapPoint *findPoint(std::string name);
-	void getIdealPoint(int x, int y, int *dx, int *dy);
+	void getIdealPoint(int x, int y, float *dx, float *dy);
 	BmpAndPos *findDots(std::string s1, std::string s2);
 
 	MBITMAP *map_bmp;
@@ -1104,11 +1104,9 @@ protected:
 	int selected;
 	std::string start;
 	bool transitioning;
-	int top_x, top_y;
+	float top_x, top_y;
 	float startx, starty;
 	float destx, desty;
-	float percent_moved;
-	int count;
 	std::string prev;
 	std::string prefix;
 	bool clicked;
@@ -1127,6 +1125,7 @@ public:
 	int getSelected();
 	void setSelected(int sel);
 	void mouseDown(int x, int y, int b);
+	void removeOption(int index);
 	
 	MMainMenu(int mid_y, std::vector<std::string> options);
 	virtual ~MMainMenu();

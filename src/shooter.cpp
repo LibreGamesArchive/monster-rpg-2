@@ -399,8 +399,10 @@ static double get_xofs(double cx)
 
 static void render(int start, int end, MBITMAP *bmp)
 {
+	/*
 	if (start >= end)
 		return;
+	*/
 
 	ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[64*(end-start)*6];
 	int vcount = 0;

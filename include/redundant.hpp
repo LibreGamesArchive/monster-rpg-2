@@ -196,4 +196,6 @@ void start_text();
 void end_text();
 bool drawing_text();
 
+void my_get_keyboard_state(ALLEGRO_KEYBOARD_STATE *state);
+
 #endif

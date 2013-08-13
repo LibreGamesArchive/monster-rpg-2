@@ -84,9 +84,9 @@ const char *getUserResource(const char *fmt, ...)
  * then a system-wide resource directory then the directory
  * "data" from the current directory.
  */
+#ifndef ALLEGRO_ANDROID
 static char* resourcePath()
 {
-#ifndef __linux__ALWAYSUSETHIS
 	char tmp[MAX_PATH];
 	static char result[MAX_PATH];
 
@@ -96,24 +96,8 @@ static char* resourcePath()
 	sprintf(result, "%s/data/", tmp);
 
 	return result;
-#else
-	static char path[MAX_PATH];
-
-	char* env = getenv("MONSTER2_DATA");
-
-	if (env) {
-		strcpy(path, env);
-		if (path[strlen(path)-1] != '\\' && path[strlen(path)-1] != '/') {
-			strncat(path, "/", (sizeof(path)/sizeof(*path))-1);
-		}
-	}
-	else {
-		strcpy(path, "data/");
-	}
-
-	return path;
-#endif
 }
+#endif
 
 const char *getResource(const char *fmt, ...)
 {

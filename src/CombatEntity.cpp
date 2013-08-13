@@ -438,7 +438,7 @@ LightningEffect::LightningEffect(Combatant *target) :
 		bitmaps[i] = m_load_alpha_bitmap(getResource("combat_media/%s", name));
 	}
 
-	ALLEGRO_DEBUG("after loading lightning bitmaps");
+	debug_message("after loading lightning bitmaps");
 }
 
 
@@ -1112,9 +1112,17 @@ void WhirlpoolEffect::draw(void)
 	int vpx = dx + (spx*screenScaleX) - vpw/2;
 	/* 8 is the depth of the water! */
 #ifdef A5_D3D
-	int vpy = dy + (spy*screenScaleY) - vph/2 - (8*screenScaleY);
+	int vpy = (dy + (spy*screenScaleY) + vph/2 - (8*screenScaleY)) - vph;
+	float xx = 0.0f;
+	float yy = 0;
+	float trans_z = -1.75f*2.0f;
+	float scale = 2.0f;
 #else
 	int vpy = dy + (spy*screenScaleY) + vph/2 - (8*screenScaleY);
+	float xx = 0.0f;
+	float yy = 0.0f;
+	float trans_z = -1.75f;
+	float scale = 1.0f;
 #endif
 
 #ifdef A5_D3D
@@ -1143,15 +1151,15 @@ void WhirlpoolEffect::draw(void)
 	al_use_transform(&t);
 
 	al_rotate_transform_3d(&t, 1, 0, 0, D2R(1));
-	al_scale_transform_3d(&t, 1, 0.5f, 1);
-	al_translate_transform_3d(&t, 0, 0, -1.75);
+	al_scale_transform_3d(&t, 1*scale, 0.5f*scale, 1);
+	al_translate_transform_3d(&t, 0, 0, trans_z);
 	al_perspective_transform(&t, -w/2, -h/2, 1, w/2, h/2, 1000);
 	al_set_projection_transform(display, &t);
 
 	al_draw_rotated_bitmap(
 		spiral->bitmap,
 		w/2, h/2,
-		0, 0,
+		xx, yy,
 		angle, 0
 	);
 
@@ -1738,11 +1746,7 @@ void SludgeEffect::get_info(void)
 
 	for (int i = 0; i < numFrames; i++) {
 		MBITMAP *b = a->getFrame(i)->getImage()->getBitmap();
-#ifdef ALLEGRO_ANDROID
-		al_lock_bitmap(b->bitmap->parent, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
-#else
 		m_lock_bitmap(b, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
-#endif
 		left_pixels[i] = new int[m_get_bitmap_height(b)];
 		right_pixels[i] = new int[m_get_bitmap_height(b)];
 		for (int y = 0; y < m_get_bitmap_height(b); y++) {
@@ -1772,11 +1776,7 @@ void SludgeEffect::get_info(void)
 				right_pixels[i][y] = last;
 			}
 		}
-#ifdef ALLEGRO_ANDROID
-		al_unlock_bitmap(b->bitmap->parent);
-#else
 		m_unlock_bitmap(b);
-#endif
 	}
 }
 

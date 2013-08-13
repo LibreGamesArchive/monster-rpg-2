@@ -39,6 +39,12 @@ enum CFG_SHAKE_ACTION
 	CFG_SHAKE_CHANGE_SONG = 1
 };
 
+enum PANNING_TYPE {
+	PAN_CENTER = 0,
+	PAN_MANUAL = 1,
+	PAN_HYBRID = 2
+};
+
 class Configuration {
 public:
 	ScreenDescriptor* getWantedGraphicsMode();
@@ -62,6 +68,14 @@ public:
 	void setJoyButton2(int b2);
 	int getJoyButton3();
 	void setJoyButton3(int b3);
+	int getJoyButtonMusicUp();
+	void setJoyButtonMusicUp(int b);
+	int getJoyButtonMusicDown();
+	void setJoyButtonMusicDown(int b);
+	int getJoyButtonSFXUp();
+	void setJoyButtonSFXUp(int b);
+	int getJoyButtonSFXDown();
+	void setJoyButtonSFXDown(int b);
 	int getKey1();
 	void setKey1(int k1);
 	int getKey2();
@@ -161,6 +175,15 @@ public:
 	int getLanguage();
 	bool getAutoconnectToZeemote();
 	void setAutoconnectToZeemote(bool ac);
+
+	int getPurchased() { return purchased; }
+	void setPurchased(int p) { purchased = p; }
+
+	void setDefaultInputs();
+
+	int getAlwaysCenter() { return always_center; }
+	void setAlwaysCenter(int ac) { always_center = ac; }
+
 	// returns true if there was a config file
 	bool read();
 	void write();
@@ -177,6 +200,10 @@ private:
 	int joyB1;
 	int joyB2;
 	int joyB3;
+	int joyMusicUp;
+	int joyMusicDown;
+	int joySFXUp;
+	int joySFXDown;
 	int key1;
 	int key2;
 	int key3;
@@ -214,6 +241,8 @@ private:
 	int cfg_auto_rotation;
 #endif
 	int cfg_depth_bits;
+	int purchased;
+	int always_center;
 };
 
 extern Configuration config;

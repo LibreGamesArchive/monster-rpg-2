@@ -3,7 +3,11 @@
 #include <jni.h>
 #include "java.h"
 
+#include "monster2.hpp"
+
+/*
 static bool ok = false;
+*/
 
 extern "C" {
 JNIEnv *_al_android_get_jnienv();
@@ -43,7 +47,6 @@ jobject _al_android_activity_object();
    \
    bool ret = false; \
    if(method_id == NULL) { \
-      ALLEGRO_DEBUG("couldn't find method :("); \
    } \
    else { \
       ret = _jni_call(env, bool, CallBooleanMethod, obj, method_id, ##args); \
@@ -54,260 +57,34 @@ jobject _al_android_activity_object();
    ret; \
 })
 
+#define _jni_callIntMethodV(env, obj, name, sig, args...) ({ \
+   jclass class_id = _jni_call(env, jclass, GetObjectClass, obj); \
+   \
+   jmethodID method_id = _jni_call(env, jmethodID, GetMethodID, class_id, name, sig); \
+   \
+   int ret = -1; \
+   if(method_id == NULL) { \
+      /*ALLEGRO_DEBUG("couldn't find method :(");*/ \
+   } \
+   else { \
+      ret = _jni_call(env, int, CallIntMethod, obj, method_id, ##args); \
+   } \
+   \
+   _jni_callv(env, DeleteLocalRef, class_id); \
+   \
+   ret; \
+})
+
+#define _jni_callIntMethod(env, obj, name) _jni_callIntMethodV(env, obj, name, "()I");
 
 static jobject _jni_callObjectMethod(JNIEnv *env, jobject object, const char *name, const char *sig)
 {
    jclass class_id = _jni_call(env, jclass, GetObjectClass, object);
    jmethodID method_id = _jni_call(env, jmethodID, GetMethodID, class_id, name, sig);
    jobject ret = _jni_call(env, jobject, CallObjectMethod, object, method_id);
+   _jni_callv(env, DeleteLocalRef, class_id);
    
    return ret;
-}
-
-ALLEGRO_DEBUG_CHANNEL("tmgCrap");
-
-static JavaVM *javavm;
-static JNIEnv *java_env;
-static JNIEnv *thread_env;
-static jclass bpc;
-
-typedef struct FuncCall
-{
-	bool processed;
-	const char *funcname;
-	const char *filename;
-	int handle;
-	float vol, pan;
-} FuncCall;
-
-#define FUNCBUF_SIZE 250
-static FuncCall funcs[FUNCBUF_SIZE];
-static int insertPos = 0;
-static int processPos = 0;
-static ALLEGRO_MUTEX *mutex;
-static bool need_return = false;
-static int the_return;
-static bool inited = false;
-
-static void push(const char *funcname, const char *filename, int handle, float vol, float pan)
-{
-	al_lock_mutex(mutex);
-
-	FuncCall f;
-	f.processed = false;
-	f.funcname = funcname;
-	f.filename = filename;
-	f.handle = handle;
-	f.vol = vol;
-	f.pan = pan;
-	funcs[insertPos++] = f;
-	insertPos %= FUNCBUF_SIZE;
-
-	need_return = true;
-
-	al_unlock_mutex(mutex);
-
-	while (need_return);
-}
-
-static int wait(const char *funcname, const char *filename, int handle, float vol, float pan)
-{
-	push(funcname, filename, handle, vol, pan);
-	return the_return;
-}
-
-static void *thread_proc(void *arg)
-{
-   	JavaVMAttachArgs attach_args = { JNI_VERSION_1_4, "java_audio_thread", NULL };
-      	javavm->AttachCurrentThread(&thread_env, &attach_args);
-	
-	jmethodID meth_initSound = thread_env->GetStaticMethodID(bpc, "initSound", "(Lcom/nooskewl/monsterrpg2/AllegroActivity;)V");
-	jmethodID meth_update = thread_env->GetStaticMethodID(bpc, "update", "()V");
-	jmethodID meth_loadSample = thread_env->GetStaticMethodID(bpc, "loadSample", "(Ljava/lang/String;)I");
-	jmethodID meth_loadSampleLoop = thread_env->GetStaticMethodID(bpc, "loadSampleLoop", "(Ljava/lang/String;)I");
-	jmethodID meth_playSampleVolumePan = thread_env->GetStaticMethodID(bpc, "playSampleVolumePan", "(IFF)V");
-	jmethodID meth_playSampleVolume = thread_env->GetStaticMethodID(bpc, "playSampleVolume", "(IF)V");
-	jmethodID meth_playSample = thread_env->GetStaticMethodID(bpc, "playSample", "(I)V");
-	jmethodID meth_stopSample = thread_env->GetStaticMethodID(bpc, "stopSample", "(I)V");
-	jmethodID meth_loadMusic = thread_env->GetStaticMethodID(bpc, "loadMusic", "(Ljava/lang/String;)I");
-	jmethodID meth_playMusic = thread_env->GetStaticMethodID(bpc, "playMusic", "(I)V");
-	jmethodID meth_stopMusic = thread_env->GetStaticMethodID(bpc, "stopMusic", "(I)V");
-	jmethodID meth_destroyMusic = thread_env->GetStaticMethodID(bpc, "destroyMusic", "(I)V");
-	jmethodID meth_shutdownBASS = thread_env->GetStaticMethodID(bpc, "shutdownBASS", "()V");
-	jmethodID meth_destroySample = thread_env->GetStaticMethodID(bpc, "destroySample", "(I)V");
-	jmethodID meth_setMusicVolume = thread_env->GetStaticMethodID(bpc, "setMusicVolume", "(IF)V");
-
-	ok = true;
-
-	while (1) {
-		al_lock_mutex(mutex);
-		bool processed = funcs[processPos].processed;
-		if (processed) {
-			if (inited) {
-				thread_env->CallStaticVoidMethod(bpc, meth_update);
-			}
-			al_unlock_mutex(mutex);
-			if (inited) {
-				al_rest(0.001);
-			}
-			continue;
-		}
-		const char *func = funcs[processPos].funcname;
-		if (!strcmp(func, "initSound")) {
-			thread_env->CallStaticVoidMethod(bpc, meth_initSound, _al_android_activity_object());
-			ok = true;
-		}
-		else if (!strcmp(func, "shutdownBASS")) {
-			thread_env->CallStaticVoidMethod(bpc, meth_shutdownBASS);
-		}
-		else if (!strcmp(func, "loadSample")) {
-			jstring str = thread_env->NewStringUTF(funcs[processPos].filename);
-			the_return = thread_env->CallStaticIntMethod(bpc, meth_loadSample, str);
-			thread_env->DeleteLocalRef(str);
-		}
-		else if (!strcmp(func, "loadSampleLoop")) {
-			jstring str = thread_env->NewStringUTF(funcs[processPos].filename);
-			the_return = thread_env->CallStaticIntMethod(bpc, meth_loadSampleLoop, str);
-			thread_env->DeleteLocalRef(str);
-		}
-		else if (!strcmp(func, "loadMusic")) {
-			jstring str = thread_env->NewStringUTF(funcs[processPos].filename);
-			the_return = thread_env->CallStaticIntMethod(bpc, meth_loadMusic, str);
-			thread_env->DeleteLocalRef(str);
-		}
-		else if (!strcmp(func, "playSampleVolumePan")) {
-			thread_env->CallStaticIntMethod(bpc, meth_playSampleVolumePan, funcs[processPos].handle, funcs[processPos].vol, funcs[processPos].pan);
-		}
-		else if (!strcmp(func, "playSampleVolume")) {
-			thread_env->CallStaticIntMethod(bpc, meth_playSampleVolume, funcs[processPos].handle, funcs[processPos].vol);
-		}
-		else if (!strcmp(func, "playSample")) {
-			thread_env->CallStaticIntMethod(bpc, meth_playSample, funcs[processPos].handle);
-		}
-		else if (!strcmp(func, "stopSample")) {
-			thread_env->CallStaticIntMethod(bpc, meth_stopSample, funcs[processPos].handle);
-		}
-		else if (!strcmp(func, "playMusic")) {
-			thread_env->CallStaticIntMethod(bpc, meth_playMusic, funcs[processPos].handle);
-		}
-		else if (!strcmp(func, "stopMusic")) {
-			thread_env->CallStaticIntMethod(bpc, meth_stopMusic, funcs[processPos].handle);
-		}
-		else if (!strcmp(func, "destroyMusic")) {
-			thread_env->CallStaticIntMethod(bpc, meth_destroyMusic, funcs[processPos].handle);
-		}
-		else if (!strcmp(func, "destroySample")) {
-			thread_env->CallStaticIntMethod(bpc, meth_destroySample, funcs[processPos].handle);
-		}
-		else if (!strcmp(func, "setMusicVolume")) {
-			thread_env->CallStaticIntMethod(bpc, meth_setMusicVolume, funcs[processPos].handle, funcs[processPos].vol);
-		}
-		funcs[processPos].processed = true;
-		processPos++;
-		processPos %= FUNCBUF_SIZE;
-		need_return = false;
-		al_unlock_mutex(mutex);
-	}
-
-	return NULL;
-}
-
-jint JNI_OnLoad(JavaVM* vm, void* reserved)
-{
-	(void)reserved;
-
-	javavm = vm;
-	javavm->GetEnv((void **)&java_env, JNI_VERSION_1_4);
-
-	jclass cls = java_env->FindClass("com/nooskewl/monsterrpg2/OldAndroid");
-	bpc = (jclass)java_env->NewGlobalRef(cls);
-	
-	return JNI_VERSION_1_4;
-}
-
-void bass_initSound()
-{
-	mutex = al_create_mutex();
-
-	int i;
-	for (i = 0; i < FUNCBUF_SIZE; i++) {
-		funcs[i].processed = true;
-	}
-
-	al_run_detached_thread(thread_proc, NULL);
-
-	push("initSound", NULL, 0, 0, 0);
-
-	while (!ok) {
-		al_rest(0.001);
-	}
-
-	inited = true;
-}
-
-HSAMPLE bass_loadSample(const char *name)
-{
-	return (HSAMPLE)wait("loadSample", name, 0, 0, 0);
-}
-
-HSAMPLE bass_loadSampleLoop(const char *name)
-{
-	return (HSAMPLE)wait("loadSampleLoop", name, 0, 0, 0);
-}
-
-void bass_playSampleVolumePan(HSAMPLE s, float vol, float pan)
-{
-	push("playSampleVolumePan", NULL, s, vol, pan);
-}
-
-void bass_playSampleVolume(HSAMPLE s, float vol)
-{
-	push("playSampleVolume", NULL, s, vol, 0);
-}
-
-void bass_playSample(HSAMPLE s)
-{
-	push("playSample", NULL, s, 0, 0);
-}
-
-void bass_stopSample(HSAMPLE s)
-{
-	push("stopSample", NULL, s, 0, 0);
-}
-
-HMUSIC bass_loadMusic(const char *name)
-{
-	return (HMUSIC)wait("loadMusic", name, 0, 0, 0);
-}
-
-void bass_playMusic(HMUSIC music)
-{
-	push("playMusic", NULL, music, 0, 0);
-}
-
-void bass_stopMusic(HMUSIC music)
-{
-	push("stopMusic", NULL, music, 0, 0);
-}
-
-void bass_destroyMusic(HMUSIC music)
-{
-	push("destroyMusic", NULL, music, 0, 0);
-}
-
-void bass_shutdownBASS()
-{
-	push("shutdownBASS", NULL, 0, 0, 0);
-}
-
-void bass_destroySample(HSAMPLE s)
-{
-	push("destroySample", NULL, s, 0, 0);
-}
-
-void bass_setMusicVolume(HMUSIC music, float vol)
-{
-	push("setMusicVolume", NULL, music, vol, 0);
 }
 
 void openURL(const char *url)
@@ -323,6 +100,30 @@ void openURL(const char *url)
 	);
 	
 	_al_android_get_jnienv()->DeleteLocalRef(urlS);
+
+	/*
+	bool done = false;
+	while (!done) {
+		done = _jni_callBooleanMethodV(
+			_al_android_get_jnienv(),
+			_al_android_activity_object(),
+			"browserDone",
+			"()Z"
+		);
+		if (!done) {
+			al_rest(0.01);
+			if (is_close_pressed()) {
+				do_close();
+				close_pressed = false;
+			}
+		}
+	}
+
+	al_rest(0.5);
+	clear_input_events();
+	getInput()->set(false, false, false, false, false, false, false);
+	al_flush_event_queue(input_event_queue);
+	*/
 }
 
 // return true on success
@@ -365,7 +166,9 @@ void set_clipboard(char *buf)
 
 bool wifiConnected()
 {
-	ALLEGRO_DEBUG("calling java method wifiConnected");
+	if (isOuya()) {
+		return true;
+	}
 
 	bool ret = _jni_callBooleanMethodV(
 		_al_android_get_jnienv(),
@@ -374,205 +177,7 @@ bool wifiConnected()
 		"()Z"
 	);
 
-	ALLEGRO_DEBUG("after calling java method wifiConnected");
-
 	return ret;
-}
-
-static bool left, right, up, down, ba, bb, bc, bd;
-
-extern "C" {
-void connect_external_controls();
-void disconnect_external_controls();
-	
-void joy_b1_down(bool skip_initial_event = false, bool long_delay = false);
-void joy_b2_down(bool skip_initial_event = false, bool long_delay = false);
-void joy_b3_down(bool skip_initial_event = false, bool long_delay = false);
-void joy_b1_up();
-void joy_b2_up();
-void joy_b3_up();
-void joy_l_down(bool skip_initial_event = false, bool long_delay = false);
-void joy_r_down(bool skip_initial_event = false, bool long_delay = false);
-void joy_u_down(bool skip_initial_event = false, bool long_delay = false);
-void joy_d_down(bool skip_initial_event = false, bool long_delay = false);
-void joy_l_up();
-void joy_r_up();
-void joy_u_up();
-void joy_d_up();
-}
-
-void zeemote_axis(float x, float y)
-{
-	if (x <= -0.5) {
-		if (right)
-			joy_r_up();
-		if (!left) {
-			joy_l_down();
-		}
-		left = true;
-	}
-	else if (x >= 0.5) {
-		if (left)
-			joy_l_up();
-		if (!right)
-			joy_r_down();
-		right = true;
-	}
-	else {
-		if (left)
-			joy_l_up();
-		else if (right)
-			joy_r_up();
-		left = right = false;
-	}
-
-	if (y <= -0.5) {
-		if (down)
-			joy_d_up();
-		if (!up)
-			joy_u_down();
-		up = true;
-	}
-	else if (y >= 0.5) {
-		if (up)
-			joy_u_up();
-		if (!down)
-			joy_d_down();
-		down = true;
-	}
-	else {
-		if (up)
-			joy_u_up();
-		else if (down)
-			joy_d_up();
-		up = down = false;
-	}
-}
-
-void zeemote_button_down(int b)
-{
-	switch (b) {
-		case 0:
-			ba = true;
-			joy_b1_down();
-			break;
-		case 1:
-			bb = true;
-			joy_b2_down();
-			break;
-		case 3:
-			bd = true;
-			joy_b3_down();
-			break;
-	}
-}
-
-void zeemote_button_up(int b)
-{
-	switch (b) {
-		case 0:
-			ba = false;
-			joy_b1_up();
-			break;
-		case 1:
-			bb = false;
-			joy_b2_up();
-			break;
-		case 3:
-			bd = false;
-			joy_b3_up();
-			break;
-	}
-}
-
-struct InputDescriptor get_zeemote_state()
-{
-	struct InputDescriptor id;
-	id.left = left;
-	id.right = right;
-	id.up = up;
-	id.down = down;
-	id.button1 = ba;
-	id.button2 = bb;
-	id.button3 = bd;
-	return id;
-}
-
-bool zeemote_connected = false;
-
-void zeemote_connect()
-{
-	zeemote_connected = true;
-	connect_external_controls();
-}
-
-void zeemote_disconnect()
-{
-	zeemote_connected = false;
-	left = right = up = down = ba = bb = bc = bd = false;
-	disconnect_external_controls();
-}
-
-extern "C" {
-
-JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeZeemoteConnect(JNIEnv *env, jobject obj)
-{
-	(void)env;
-	(void)obj;
-
-	zeemote_connect();
-}
-
-JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeZeemoteDisconnect(JNIEnv *env, jobject obj)
-{
-	(void)env;
-	(void)obj;
-
-	zeemote_disconnect();
-}
-
-JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeZeemoteAxis(JNIEnv *env, jobject obj, float x, float y)
-{
-	(void)env;
-	(void)obj;
-
-	zeemote_axis(x, y);
-}
-
-JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeZeemoteButtonDown(JNIEnv *env, jobject obj, int button)
-{
-	(void)env;
-	(void)obj;
-	zeemote_button_down(button);
-}
-
-JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_AllegroActivity_nativeZeemoteButtonUp(JNIEnv *env, jobject obj, int button)
-{
-	(void)env;
-	(void)obj;
-	zeemote_button_up(button);
-}
-
-} // end extern "C"
-
-void find_zeemotes()
-{
-	_jni_callVoidMethodV(
-		_al_android_get_jnienv(),
-		_al_android_activity_object(),
-		"find_zeemotes",
-		"()V"
-	);
-}
-
-void autoconnect_zeemote()
-{
-	_jni_callVoidMethodV(
-		_al_android_get_jnienv(),
-		_al_android_activity_object(),
-		"autoconnect_zeemote",
-		"()V"
-	);
 }
 
 const char * get_sdcarddir()
@@ -596,10 +201,12 @@ const char * get_sdcarddir()
 
 	_al_android_get_jnienv()->ReleaseStringUTFChars(s, native);
 
+	_al_android_get_jnienv()->DeleteLocalRef(s);
+
 	return buf;
 }
 
-
+/*
 void goHome()
 {
 	_jni_callVoidMethodV(
@@ -608,5 +215,106 @@ void goHome()
 		"goHome",
 		"()V"
 	);
+
+}
+*/
+
+bool isOuya()
+{
+	static bool first = true;
+	static bool is_ouya;
+
+	if (!first) {
+		return is_ouya;
+	}
+
+	first = false;
+	is_ouya = false;
+
+	JNIEnv *env = _al_android_get_jnienv();
+	jobject object = _al_android_activity_object();
+
+	jclass class_id = _jni_call(env, jclass, GetObjectClass, object);
+	jmethodID method_id = _jni_call(env, jmethodID, GetMethodID, class_id, "getModel", "()Ljava/lang/String;");
+	jstring s = (jstring)_jni_call(env, jobject, CallObjectMethod, object, method_id);
+
+	if (s == NULL)
+		return false;
+	
+	const char *native = _al_android_get_jnienv()->GetStringUTFChars(s, 0);
+
+	if (strstr(native, "OUYA")) {
+		is_ouya = true;
+	}
+
+	_al_android_get_jnienv()->ReleaseStringUTFChars(s, native);
+	_jni_callv(env, DeleteLocalRef, s);
+	_jni_callv(env, DeleteLocalRef, class_id);
+
+	return is_ouya;
 }
 
+void logString(const char *s)
+{
+	jstring S = _al_android_get_jnienv()->NewStringUTF(s);
+
+	_jni_callVoidMethodV(
+		_al_android_get_jnienv(),
+		_al_android_activity_object(),
+		"logString",
+		"(Ljava/lang/String;)V",
+		S
+	);
+	
+	_al_android_get_jnienv()->DeleteLocalRef(S);
+}
+
+#ifdef OUYA
+int isPurchased()
+{
+	int ret = _jni_callIntMethod(
+		_al_android_get_jnienv(),
+		_al_android_activity_object(),
+		"isPurchased"
+	);
+
+	return ret;
+}
+
+void queryPurchased()
+{
+	_jni_callVoidMethodV(
+		_al_android_get_jnienv(),
+		_al_android_activity_object(),
+		"queryPurchased",
+		"()V"
+	);
+}
+
+void doIAP()
+{
+	_jni_callVoidMethodV(
+		_al_android_get_jnienv(),
+		_al_android_activity_object(),
+		"doIAP",
+		"()V"
+	);
+}
+
+int checkPurchased()
+{
+	queryPurchased();
+
+	int purchased = -1;
+
+	do {
+		purchased = isPurchased();
+		if (purchased == -1) {
+			al_rest(0.01);
+		}
+	} while (purchased == -1);
+
+	return purchased;
+}
+
+#endif

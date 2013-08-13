@@ -26,7 +26,7 @@ unsigned char *slurp_file(std::string filename, int *ret_size)
 	long size = (long)al_fsize(f);
 	unsigned char *bytes;
 
-	if (size < 0) {
+	if (size <= 0) {
 		std::vector<char> v;
 		int c;
 		while ((c = al_fgetc(f)) != EOF) {
@@ -138,19 +138,19 @@ void runGlobalScript(lua_State *luaState)
 	unsigned char *bytes;
 	int file_size;
 
-	ALLEGRO_DEBUG("Running global script");
+	debug_message("Running global script");
 
 	debug_message("Loading global script...\n");
 	bytes = slurp_file(getResource("scripts/global.%s", getScriptExtension().c_str()), &file_size);
 	if (!bytes) native_error("Load error.", "scripts/global.lua");
-	ALLEGRO_DEBUG("slurped %d bytes", file_size);
+	debug_message("slurped %d bytes", file_size);
 	if (luaL_loadbuffer(luaState, (char *)bytes, file_size, "chunk")) {
 		dumpLuaStack(luaState);
 		throw ReadError();
 	}
-	ALLEGRO_DEBUG("loaded buffer");
+	debug_message("loaded buffer");
 	delete[] bytes;
-	ALLEGRO_DEBUG("deleted bytes");
+	debug_message("deleted bytes");
 
 	debug_message("Running global script...\n");
 	if (lua_pcall(luaState, 0, 0, 0)) {
@@ -683,7 +683,9 @@ int CDeScriptifyPlayer(lua_State *stack)
 	party[heroSpot]->getObject()->setInput(getInput());
 	getInput()->setDirection(d);
 	astar_stop();
-	area->center_view = false;
+	if (config.getAlwaysCenter() == PAN_MANUAL) {
+		area->center_view = false;
+	}
 	area->resetInput();
 	al_unlock_mutex(input_mutex);
 	return 0;
@@ -3065,7 +3067,7 @@ static int CDoItemTutorial(lua_State *stack)
 							DLG("Ok, you're almost done.\nLet's try one battle just to get our feet wet...\nAttacking works by pressing an arrow next to the enemy you wish to attack.\nThen you draw an invisible line in the direction of the arrow.\nUsing items works the same way.\nYou have several other options in battle... Play around with them to make yourself familiar!\n", false);
 							DLG("Remember, draw an invisible line in the direction of the arrows to perform an action!\nThat includes attacking, using items, casting spells, etc.\nHere we go!\n", false);
 						}
-											goto done;
+						goto done;
 					}
 					else if (sel < 0) {
 						itemSelector->setSelected(0);
@@ -3195,7 +3197,7 @@ static int CDoMapTutorial(lua_State *stack)
 
 			TGUIWidget *widget = tguiUpdate();
 			if (widget == mapWidget) {
-				ALLEGRO_DEBUG("tguiUpdate returned");
+				debug_message("tguiUpdate returned");
 				if (mapWidget->getSelected() == "seaside") {
 					goto done;
 				}
@@ -3702,7 +3704,7 @@ static int C_dbg(lua_State *stack)
 {
 	const char *t = lua_tostring(stack, 1);
 
-	ALLEGRO_DEBUG("%s", t);
+	debug_message("%s", t);
 
 	return 0;
 }
@@ -3845,6 +3847,12 @@ static int CPrepareForScreenGrab2(lua_State *stack)
 {
 	prepareForScreenGrab2();
 	return 0;
+}
+
+static int CGetAlwaysCenter(lua_State *stack)
+{
+	lua_pushnumber(stack, config.getAlwaysCenter());
+	return 1;
 }
 
 /*
@@ -4451,5 +4459,8 @@ void registerCFunctions(lua_State* luaState)
 
 	lua_pushcfunction(luaState, CPrepareForScreenGrab2);
 	lua_setglobal(luaState, "prepareForScreenGrab2");
+
+	lua_pushcfunction(luaState, CGetAlwaysCenter);
+	lua_setglobal(luaState, "getAlwaysCenter");
 }
 

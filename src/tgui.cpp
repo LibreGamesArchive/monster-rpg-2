@@ -153,9 +153,9 @@ static void tguiFindFocus()
 /*
  * Returns true if the shift keys are pressed, otherwise false.
  */
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 static bool tguiShiftsPressed(ALLEGRO_KEYBOARD_STATE *kbdstate, int shifts)
 {
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (shifts & TGUI_KEYFLAG_SHIFT) {
 		if (!al_key_down(kbdstate, ALLEGRO_KEY_LSHIFT) &&
 				!al_key_down(kbdstate, ALLEGRO_KEY_RSHIFT))
@@ -203,10 +203,8 @@ static bool tguiShiftsPressed(ALLEGRO_KEYBOARD_STATE *kbdstate, int shifts)
 	}
 
 	return true;
-#else
-	return false;
-#endif
 }
+#endif
 
 /*
  * Returns true if a hotkey is pressed, otherwise false.
@@ -219,7 +217,7 @@ static bool tguiHotkeyPressed(int hotkey)
 
 	ALLEGRO_KEYBOARD_STATE kbdstate;
 
-	al_get_keyboard_state(&kbdstate);
+	my_get_keyboard_state(&kbdstate);
 
 	if (tguiShiftsPressed(&kbdstate, shifts) && al_key_down(&kbdstate, k))
 		return true;
@@ -321,7 +319,9 @@ void tguiInit()
 
 		key_events = al_create_event_queue();
 #if !defined ALLEGRO_IPHONE
-		al_register_event_source(key_events, al_get_keyboard_event_source());
+		if (!isOuya()) {
+			al_register_event_source(key_events, al_get_keyboard_event_source());
+		}
 #else
 		al_register_event_source(key_events, &user_event_source);
 #endif

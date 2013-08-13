@@ -736,14 +736,14 @@ void LightningSpell::init(Combatant *caster, Combatant **targets, int numTargets
 {
 	Spell::init(caster, targets, numTargets);
 
-	ALLEGRO_DEBUG("in LightningSpell::init");
+	debug_message("in LightningSpell::init");
 	for (int i = 0; i < numTargets; i++) {
 		targets[i]->getAnimationSet()->setSubAnimation("hit");
 		LightningEffect *le = new LightningEffect(targets[i]);
 		lifetime = le->getLifetime();
 		battle->addEntity(le);
 	}
-	ALLEGRO_DEBUG("end of LightningSpell::init");
+	debug_message("end of LightningSpell::init");
 }
 
 
