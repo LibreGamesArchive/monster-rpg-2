@@ -105,6 +105,10 @@ void Object::setAnimationSet(std::string name)
 	h = a->getCurrentFrame()->getImage()->getHeight();
 	clearOccupied();
 	addOccupied(x, y);
+
+	if (strstr(name.c_str(), "Rider.png") || strstr(name.c_str(), "Rios.png")) {
+		floater = true;
+	}
 }
 
 
@@ -235,7 +239,9 @@ void Object::draw(float x, float y)
 		o = ((unsigned)tguiCurrentTimeMillis() % 600) < 300 ? 1 : 0;
 	}
 
-	animationSet->draw(x, y-o);
+	if (!(x >= BW || y-o >= BH || x+animationSet->getWidth() < 0 || y-o+animationSet->getHeight() < 0)) {
+		animationSet->draw(x, y-o);
+	}
 }
 
 void Object::draw()
@@ -767,7 +773,11 @@ void Smoke::draw()
 		dy = y - puffs[i].height;
 		dx -= area->getOriginX();
 		dy -= area->getOriginY();
-		m_draw_bitmap(bitmap, dx-half_w, dy-half_h, 0);
+		int absx = dx-half_w;
+		int absy = dy-half_h;
+		if (!(absx >= BW || absy >= BH || absx+m_get_bitmap_width(bitmap) < 0 || absy+m_get_bitmap_height(bitmap) < 0)) {
+			m_draw_bitmap(bitmap, dx-half_w, dy-half_h, 0);
+		}
 	}
 }
 
