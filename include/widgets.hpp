@@ -5,6 +5,7 @@
 /* These names have become confused. NORMAL is no shadow. DROP_SHADOW is +1+1. BORDER is 8 directions around. SQUARE_BORDER is a square drop shadow, 3 positions bottom right */
 const int WGT_TEXT_NORMAL = 0;
 const int WGT_TEXT_DROP_SHADOW = 1;
+const int WGT_TEXT_8WAY_SHADOW = 2;
 
 const int CONTEXT_MENU_W = 200;
 const int CONTEXT_MENU_H = 172;
@@ -99,59 +100,16 @@ public:
 	}
 };
 
+
 class TemporaryTextWidget : public TGUIWidget {
 public:
-	bool isDisplayed()
-	{
-		return displaying;
-	}
-
-	void draw()
-	{
-		if (!displaying) return;
-		mTextout(game_font, _t(text), x, (int)(y + yoffs),
-			color, black,
-			WGT_TEXT_NORMAL, true);
-	}
-
-	void stop() 
-	{
-		displaying = false;
-		yoffs = 0;
-   		x = y = 0;
-	}
-
-	void start(std::string text, int cx, int cy, MCOLOR color)
-	{
-		x = cx;
-		y = cy;
-		displaying = true;
-		yoffs = 0;
-		strcpy(this->text, text.c_str());
-		this->color = color;
-	}
-
-	bool acceptsFocus() { return false; }
-	
-	int update(int step)
-	{
-		if (!displaying)
-			return TGUI_CONTINUE;
-		yoffs -= 0.01f * step;
-		if (yoffs < -10) {
-			stop();
-		}
-		return TGUI_CONTINUE;
-	}
-	
-	TemporaryTextWidget() {
-		this->hotkeys = 0;
-		this->x = 0;
-		this->y = 0;
-		this->width = 10;
-		this->height = 10;
-		stop();
-	}
+	bool isDisplayed();
+	void draw();
+	void stop();
+	void start(std::string text, int cx, int cy, MCOLOR color);
+	bool acceptsFocus();
+	int update(int step);
+	TemporaryTextWidget();
 private:
 	bool displaying;
 	char text[100];

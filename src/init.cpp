@@ -415,7 +415,6 @@ void set_user_joystick(void)
 		int nb = al_get_joystick_num_buttons(j);
 		if (nb > 0) {
 			user_joystick = j;
-			use_dpad = true;
 			break;
 		}
 	}

@@ -179,9 +179,14 @@ bool TemporaryText::act(int step, Battle *b)
 
 void TemporaryText::draw(void)
 {
+	ALLEGRO_COLOR darker;
+	darker.r = color.r * 0.2f;
+	darker.g = color.g * 0.2f;
+	darker.b = color.b * 0.2f;
+	darker.a = color.a;
 	mTextout(game_font, _t(text), cx, (int)(cy + yoffs),
-		color, black,
-		WGT_TEXT_NORMAL, true);
+		color, darker,
+		WGT_TEXT_8WAY_SHADOW, true);
 }
 
 bool TemporaryText::update(int step)

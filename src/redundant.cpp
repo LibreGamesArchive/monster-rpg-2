@@ -158,7 +158,7 @@ bool drawing_text()
 	return text_draw_on;
 }
 
-void m_textout(const MFONT *font, const char *text, int x, int y, MCOLOR color)
+void m_textout_f(const MFONT *font, const char *text, float x, float y, MCOLOR color)
 {
 	bool end = !text_draw_on;
 
@@ -173,6 +173,11 @@ void m_textout(const MFONT *font, const char *text, int x, int y, MCOLOR color)
 	if (font == game_font && end) {
 		end_text();
 	}
+}
+
+void m_textout(const MFONT *font, const char *text, int x, int y, MCOLOR color)
+{
+	m_textout_f(font, text, x, y, color);
 }
 
 void m_textout_centre(const MFONT *font, const char *text, int x, int y, MCOLOR color)

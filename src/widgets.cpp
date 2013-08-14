@@ -156,9 +156,19 @@ static void mTextout_real(MFONT *font, const char *text, int x, int y,
 	}
 
 	if (shadowType == WGT_TEXT_DROP_SHADOW) {
-		m_textout(font, ctext, x+1, y+1, shadow_color);
-		m_textout(font, ctext, x, y+1, shadow_color);
-		m_textout(font, ctext, x+1, y, shadow_color);
+		m_textout_f(font, ctext, x+0.5f, y+0.5f, shadow_color);
+		m_textout_f(font, ctext, x, y+0.5f, shadow_color);
+		m_textout_f(font, ctext, x+0.5f, y, shadow_color);
+	}
+	else if (shadowType == WGT_TEXT_8WAY_SHADOW) {
+		m_textout_f(font, ctext, x-0.5f, y-0.5f, shadow_color);
+		m_textout_f(font, ctext, x, y-0.5f, shadow_color);
+		m_textout_f(font, ctext, x+0.5f, y-0.5f, shadow_color);
+		m_textout_f(font, ctext, x-0.5f, y, shadow_color);
+		m_textout_f(font, ctext, x+0.5f, y, shadow_color);
+		m_textout_f(font, ctext, x-0.5f, y+0.5f, shadow_color);
+		m_textout_f(font, ctext, x, y+0.5f, shadow_color);
+		m_textout_f(font, ctext, x+0.5f, y+0.5f, shadow_color);
 	}
 
 	m_textout(font, ctext, x, y, text_color);
@@ -1302,10 +1312,10 @@ void doDialogue(std::string text, bool top, int rows, int offset, bool bottom)
 		}
 		else {
 			int oy = area->getFocusY() - area->getOriginY();
-			if (!area->center_view && oy < BH/2+5) {
+			if (!player_scripted && oy < BH/2+5) {
 				y = BH-offset-54;
 			}
-			else if (!area->center_view && oy > BH/2-5) {
+			else if (!player_scripted && oy > BH/2-5) {
 				y = offset;
 			}
 			else {
@@ -2648,8 +2658,8 @@ void MMap::mouseUp(int x, int y, int b)
 
 	if (x >= 0 && y >= 0 && !transitioning) {
 		MapPoint *p = &points[selected];
-		int px = p->x-top_x-offset_x;
-		int py = p->y-top_y-offset_y;
+		int px = p->x-(top_x+offset_x);
+		int py = p->y-(top_y+offset_y);
 		int dx = x - px;
 		int dy = y - py;
 		if (sqrtf(dx*dx + dy*dy) < 10) {
@@ -2661,8 +2671,8 @@ void MMap::mouseUp(int x, int y, int b)
 			p = points[selected].links[i];
 			if (!p)
 				continue;
-			int px = p->x-top_x-offset_x;
-			int py = p->y-top_y-offset_y;
+			int px = p->x-(top_x+offset_x);
+			int py = p->y-(top_y+offset_y);
 			int dx = x - px;
 			int dy = y - py;
 			if (sqrtf(dx*dx + dy*dy) < 10) {
@@ -2690,18 +2700,13 @@ static int crap_map_quadrant_global_count = 0;
 
 void MMap::draw()
 {
-	if (transitioning) {
-		m_draw_bitmap_region(map_bmp,
-			top_x+offset_x, top_y+offset_y, BW, BH,
-			0, 0, 0);
-	}
-	else {
-		m_draw_bitmap(map_bmp, -top_x-offset_x, -top_y-offset_y, 0);
+	m_draw_bitmap_region(map_bmp, top_x+offset_x, top_y+offset_y, BW, BH, 0, 0, 0);
 
+	if (!transitioning) {
 		MapPoint *p = &points[selected];
 		MBITMAP *place_icon = bitmaps[points[selected].internal_name];
-		m_draw_bitmap(place_icon, p->x-top_x-offset_x-m_get_bitmap_width(place_icon)/2,
-			p->y-top_y-offset_y-m_get_bitmap_height(place_icon)/2, 0);
+		m_draw_bitmap(place_icon, p->x-(top_x+offset_x)-m_get_bitmap_width(place_icon)/2,
+			p->y-(top_y+offset_y)-m_get_bitmap_height(place_icon)/2, 0);
 
 		// draw surrounding points
 		for (int i = 0; i < 4; i++) {
@@ -2710,30 +2715,29 @@ void MMap::draw()
 				continue;
 			place_icon = bitmaps[points[selected].links[i]->internal_name];
 			m_draw_bitmap(place_icon,
-				p2->x-top_x-offset_x-m_get_bitmap_width(place_icon)/2,
-				p2->y-top_y-offset_y-m_get_bitmap_height(place_icon)/2, 0);
+				p2->x-(top_x+offset_x)-m_get_bitmap_width(place_icon)/2,
+				p2->y-(top_y+offset_y)-m_get_bitmap_height(place_icon)/2, 0);
 			if ((unsigned)tguiCurrentTimeMillis() % 600 < 400) {
 				BmpAndPos *b = findDots(p->internal_name,
 					p2->internal_name);
 				if (b) {
 					m_draw_bitmap(b->bitmap,
-						b->x-top_x-offset_x, b->y-top_y-offset_y, 0);
+						b->x-(top_x+offset_x), b->y-(top_y+offset_y), 0);
 				}
 			}
 		}
 
-		if (!transitioning) {
-			// draw arrow
+		// draw arrow
 
-			int ay = ((unsigned)tguiCurrentTimeMillis() % 500) / 50;
+		int ay = ((unsigned)tguiCurrentTimeMillis() % 500) / 50;
 
-			p = &points[selected];
-			m_draw_bitmap(down_arrow,
-				p->x-top_x-offset_x-m_get_bitmap_width(down_arrow)/2,
-				p->y-top_y-offset_y-m_get_bitmap_height(down_arrow)-ay, 0);
-		}
+		p = &points[selected];
+		m_draw_bitmap(down_arrow,
+			p->x-(top_x+offset_x)-m_get_bitmap_width(down_arrow)/2,
+			p->y-(top_y+offset_y)-m_get_bitmap_height(down_arrow)-ay, 0);
 
-		mTextout(game_font, _t(points[selected].display_name.c_str()), 5, BH-m_text_height(game_font)-5, black, white,
+		m_draw_rectangle(5, BH-m_text_height(game_font)-10-5, 15+m_text_length(game_font, _t(points[selected].display_name.c_str())), BH-5, m_map_rgba(160, 160, 160, 160), M_FILLED);
+		mTextout(game_font, _t(points[selected].display_name.c_str()), 10, BH-m_text_height(game_font)-10, black, white,
 			WGT_TEXT_NORMAL, false);
 	}
 
@@ -2748,7 +2752,6 @@ int MMap::update(int millis)
 	}
 
 	if (transitioning) {
-		offset_x = offset_y = 0;
 		float dx = destx - startx;
 		float dy = desty - starty;
 		float a = atan2(dy, dx);
@@ -2778,16 +2781,20 @@ int MMap::update(int millis)
 	}
 
 	if (top_x+offset_x < 0) {
-		offset_x -= top_x+offset_x;
+		top_x = 0;
+		offset_x = 0;
 	}
 	else if (top_x+offset_x >= m_get_bitmap_width(map_bmp)-BW) {
-		offset_x = m_get_bitmap_width(map_bmp)-BW-top_x;
+		top_x = m_get_bitmap_width(map_bmp)-BW;
+		offset_x = 0;
 	}
 	if (top_y+offset_y < 0) {
-		offset_y -= top_y+offset_y;
+		top_y = 0;
+		offset_y = 0;
 	}
 	else if (top_y+offset_y >= m_get_bitmap_height(map_bmp)-BH) {
-		offset_y = m_get_bitmap_height(map_bmp)-BH-top_y;
+		top_y = m_get_bitmap_height(map_bmp)-BH;
+		offset_y = 0;
 	}
 
 	INPUT_EVENT ie = get_next_input_event();
@@ -2824,6 +2831,9 @@ int MMap::update(int millis)
 		transitioning = true;
 		startx = top_x+offset_x;
 		starty = top_y+offset_y;
+		top_x = startx;
+		top_y = starty;
+		offset_x = offset_y = 0;
 		float tmpx, tmpy;
 		getIdealPoint(points[selected].x, points[selected].y,
 			&tmpx, &tmpy);
@@ -7785,6 +7795,68 @@ MMainMenu::MMainMenu(int mid_y, std::vector<std::string> options)
 MMainMenu::~MMainMenu(void)
 {
 	m_destroy_bitmap(arrow);
+}
+
+
+bool TemporaryTextWidget::isDisplayed()
+{
+	return displaying;
+}
+
+void TemporaryTextWidget::draw()
+{
+	if (!displaying) return;
+	ALLEGRO_COLOR darker;
+	darker.r = color.r * 0.2f;
+	darker.g = color.g * 0.2f;
+	darker.b = color.b * 0.2f;
+	darker.a = color.a;
+	mTextout(game_font, _t(text), x, (int)(y + yoffs),
+		color, darker,
+		WGT_TEXT_8WAY_SHADOW, true);
+}
+
+void TemporaryTextWidget::stop() 
+{
+	displaying = false;
+	yoffs = 0;
+	x = y = 0;
+}
+
+void TemporaryTextWidget::start(std::string text, int cx, int cy, MCOLOR color)
+{
+	x = cx;
+	y = cy;
+	displaying = true;
+	yoffs = 0;
+	strcpy(this->text, text.c_str());
+	this->color = color;
+}
+
+bool TemporaryTextWidget::acceptsFocus()
+{
+	return false;
+}
+
+int TemporaryTextWidget::update(int step)
+{
+	if (!displaying)
+		return TGUI_CONTINUE;
+	yoffs -= 0.01f * step;
+	if (yoffs < -10) {
+		stop();
+	}
+	return TGUI_CONTINUE;
+}
+
+TemporaryTextWidget::TemporaryTextWidget()
+{
+	this->hotkeys = 0;
+	this->x = 0;
+	this->y = 0;
+	this->width = 10;
+	this->height = 10;
+	stop();
 }
 
 #ifdef EDITOR

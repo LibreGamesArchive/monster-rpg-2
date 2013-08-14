@@ -165,7 +165,7 @@ void initSound(void)
 #endif
 
 #ifdef ALLEGRO_RASPBERRYPI
-	BASS_SetConfig(BASS_CONFIG_DEV_BUFFER, 50);
+	BASS_SetConfig(BASS_CONFIG_DEV_BUFFER, 250);
 #endif
 	if (!BASS_Init(-1, 44100, 0, NULL, NULL)) {
 		int code = BASS_ErrorGetCode();

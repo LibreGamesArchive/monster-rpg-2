@@ -27,7 +27,7 @@ void doAttack(Combatant *attacker, Combatant *attacked, bool swoosh)
 	CombatantInfo &attackedInfo = attacked->getInfo();
 
 
-// determine where the attack hit
+	// determine where the attack hit
 	int armor = -1;
 	ItemType armorType = ITEM_TYPE_CHEST_ARMOR;
 	if (attacked->getType() == COMBATENTITY_TYPE_PLAYER) {

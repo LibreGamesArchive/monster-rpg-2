@@ -2144,7 +2144,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 					break;
 				}
 				shop->getDropLocation(&drop_x, &drop_y);
-				if (use_dpad || drop_y < 0 || drop_y >= 100) {
+				if (use_dpad || drop_y < 0 || drop_y >= 110) {
 					// buy
 					if (shop_inventory[sel].index >= 0) {
 						char s1[100];
@@ -2224,7 +2224,7 @@ void doShop(std::string name, const char *imageName, int nItems,
 					break;
 				}
 				isel->getDropLocation(&drop_x, &drop_y);
-				if (use_dpad || drop_y < 0 || (drop_y >= 40 && drop_y < 100)) {
+				if (use_dpad || drop_y < 0 || (drop_y >= 50 && drop_y < 110)) {
 					// sell
 					if (inventory[sel].index >= 0 &&
 						inventory[sel].quantity > 0 && 

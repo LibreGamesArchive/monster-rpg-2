@@ -742,6 +742,12 @@ top:
 		else if (event.type == ALLEGRO_EVENT_JOYSTICK_BUTTON_UP) {
 			if (event.joystick.id == user_joystick) {
 				if (event.joystick.button == config.getJoyButton1()) {
+					if (area && !battle && !in_pause && config.getAlwaysCenter() == PAN_HYBRID) {
+						area_panned_x = floor(area_panned_x);
+						area_panned_y = floor(area_panned_y);
+						area->center_view = true;
+						center_button_pressed = true;
+					}
 					joy_b1_up();
 				}
 				else if (event.joystick.button == config.getJoyButton2()) {
