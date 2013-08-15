@@ -1249,14 +1249,13 @@ top:
 					joy_d_down();
 				}
 			}
-			// FIXME:
-			/*
+#if !defined ALLEGRO_ANDROID && !defined ALLEGRO_IPHONE && !defined ALLEGRO_RASPBERRYPI
 			else if (event.keyboard.keycode == config.getKeyFullscreen()) {
 				if (!pause_f_to_toggle_fullscreen && !transitioning) {
 					do_toggle_fullscreen = true;
 				}
 			}
-			*/
+#endif
 			else if (event.keyboard.keycode == config.getKeySettings() && !shooter_paused) {
 				if (!pause_f_to_toggle_fullscreen) {
 					close_pressed_for_configure = true;
