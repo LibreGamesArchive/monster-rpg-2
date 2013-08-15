@@ -772,6 +772,13 @@ bool Configuration::read()
 	always_center = 2;
 
 	setDefaultInputs();
+	
+	if (isOuya()) {
+		cfg_maintain_aspect_ratio = ASPECT_INTEGER;
+	}
+	else {
+		cfg_maintain_aspect_ratio = ASPECT_MAINTAIN_RATIO;
+	}
 
 	char buf[1000];
 	sprintf(buf, "%s", getUserResource(""));
@@ -1149,7 +1156,6 @@ Configuration::Configuration() :
 	xbox360(false)
 	,cfg_tuning(CFG_TUNING_PERFORMANCE)
 	,cfg_difficulty(CFG_DIFFICULTY_NORMAL)
-	,cfg_maintain_aspect_ratio(ASPECT_INTEGER)
 	,language(0)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	,cfg_dpad_type(0)

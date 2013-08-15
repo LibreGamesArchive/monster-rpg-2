@@ -163,7 +163,7 @@ bool is_android_lessthan_2_3 = false;
 bool achievement_show = false;
 double achievement_time = 0;
 MBITMAP *achievement_bmp;
-#if defined A5_D3D //|| defined KINDLEFIRE
+#if defined A5_D3D
 int PRESERVE_TEXTURE = 0;
 int NO_PRESERVE_TEXTURE = ALLEGRO_NO_PRESERVE_TEXTURE;
 #else
@@ -343,16 +343,19 @@ void load_fonts(void)
 	if (!huge_font) {
 		native_error("Failed to load huge_font.");
 	}
-	al_get_text_width(huge_font, ":0123456789");
 
 	debug_message("done loading fonts");
 	
 	// NOTE: This has to be after display creation and loading of fonts
 	load_translation(get_language_name(config.getLanguage()).c_str());
-	
+
+	al_get_text_width(huge_font, ":0123456789");
+
+	/*
 	char buf[1000];
 	sprintf(buf, "%s%s\n", _t("SWIPE TO ATTACK!"), _t("Drag to use!"));
 	al_get_text_width(medium_font, buf);
+	*/
 }
 
 ScreenSize small_screen(void)
@@ -790,9 +793,9 @@ void init_shaders(void)
 		"}\n";
 
 		const char *tinter_pixel_source =
-#if defined ALLEGRO_RASPBERRYPI
+#if defined ALLEGRO_RASPBERRYPI_XXX
 		"precision lowp float;\n"
-#elif defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#elif defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 		"precision mediump float;\n"
 #endif
 		"uniform sampler2D " ALLEGRO_SHADER_VAR_TEX ";\n"
@@ -821,9 +824,9 @@ void init_shaders(void)
 		"}";
 		
 		const char *warp_pixel_source =
-#if defined ALLEGRO_RASPBERRYPI
+#if defined ALLEGRO_RASPBERRYPI_XXX
 		"precision lowp float;\n"
-#elif defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#elif defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 		"precision mediump float;\n"
 #endif
 		"uniform sampler2D " ALLEGRO_SHADER_VAR_TEX ";\n"
@@ -834,12 +837,14 @@ void init_shaders(void)
 		"uniform float tex_bot;\n"
 		"uniform float alpha;\n"
 		"void main() {\n"
-		"   float div;\n"
-		"   div = angle / (3.14159*2.0);\n"
-		"   if (div > 0.5)\n"
-		"      div = 1.0 - div;\n"
-		"   div = (0.5 - div) * 25.0 + 5.0;\n"
-		"   float o = (sin((angle+(varying_texcoord.x-0.5))*4.0) / div) + varying_texcoord.y;\n"
+		"   float mul;\n"
+		"   if (angle > 3.14159) {\n"
+		"      mul = 0.1 - (0.1 * (angle - 3.14159) / 3.14159);\n"
+		"   }\n"
+		"   else {\n"
+		"      mul = 0.1 * angle / 3.14159;\n"
+		"   }\n"
+		"   float o = sin((angle+(varying_texcoord.x-0.5))*4.0)*mul + varying_texcoord.y;\n"
 		"   if (o < 0.0 || o > tex_bot)\n"
 		"      gl_FragColor = vec4(0, 0, 0, 1);\n"
 		"   else {\n"
@@ -853,9 +858,9 @@ void init_shaders(void)
 		"}\n";
 		
 		const char *shadow_pixel_source =
-#if defined ALLEGRO_RASPBERRYPI
+#if defined ALLEGRO_RASPBERRYPI_XXX
 		"precision lowp float;\n"
-#elif defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#elif defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 		"precision mediump float;\n"
 #endif
 		"uniform float x1;\n"
@@ -880,9 +885,9 @@ void init_shaders(void)
 		"}\n";
 		
 		const char *brighten_pixel_source =
-#if defined ALLEGRO_RASPBERRYPI
+#if defined ALLEGRO_RASPBERRYPI_XXX
 		"precision lowp float;\n"
-#elif defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#elif defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 		"precision mediump float;\n"
 #endif
 		"uniform sampler2D " ALLEGRO_SHADER_VAR_TEX ";\n"
@@ -1040,12 +1045,14 @@ void init_shaders(void)
 		"float alpha;\n"
 		"float4 ps_main(VS_OUTPUT Input) : COLOR0\n"
 		"{\n"
-		"   float div;\n"
-		"   div = angle / (3.14159*2.0);\n"
-		"   if (div > 0.5)\n"
-		"      div = 1.0 - div;\n"
-		"   div = (0.5 - div) * 25.0 + 5.0;\n"
-		"   float o = (sin((angle+(Input.TexCoord.x-0.5))*4.0) / div) + Input.TexCoord.y;\n"
+		"   float mul;\n"
+		"   if (angle > 3.14159) {\n"
+		"      mul = 0.1 - (0.1 * (angle - 3.14159) / 3.14159);\n"
+		"   }\n"
+		"   else {\n"
+		"      mul = 0.1 * angle / 3.14159;\n"
+		"   }\n"
+		"   float o = sin((angle+(Input.TexCoord.x-0.5))*4.0)*mul + Input.TexCoord.y;\n"
 		"   if (o < 0.0 || o > tex_bot)\n"
 		"      return float4(0.0, 0.0, 0.0, 1.0);\n"
 		"   else {\n"

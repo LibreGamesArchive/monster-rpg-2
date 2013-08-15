@@ -185,6 +185,7 @@ void mTextout(MFONT *font, const char *text, int x, int y,
 	int i = 0;
 
 	while (1) {
+		// FIXME: no need to test for != 0 here
  		while ((text[i] == ' ' || text[i] == '\t' || text[i] == '\n') && text[i] != 0)
 			i++;
 		if (text[i] == 0)
@@ -194,16 +195,21 @@ void mTextout(MFONT *font, const char *text, int x, int y,
 			i++;
 	}
 
-	std::stringstream ss(text);
-	std::string word;
+	char buf[1000];
+	int offs = 0;
 
 	int SPACE_SIZE = 4;
 	int full_len = 0;
 
 	if (center) {
 		for (int i = 0; i < words; i++) {
-			ss >> word;
-			full_len += m_text_length(font, word.c_str());
+			int offs2 = 0;
+			while (offs < 1000 && text[offs] != 0 && text[offs] != ' ' && text[offs] != '\t' && text[offs] != '\n') {
+				buf[offs2++] = text[offs++];
+			}
+			offs++;
+			buf[offs2] = 0;
+			full_len += m_text_length(font, buf);
 			if (i < words-1) {
 				full_len += SPACE_SIZE;
 			}
@@ -212,14 +218,19 @@ void mTextout(MFONT *font, const char *text, int x, int y,
 		y -= m_text_height(font)/2;
 	}
 	
-	std::stringstream ss2(text);
+	offs = 0;
 
 	for (int i = 0; i < words; i++) {
-		ss2 >> word;
-		mTextout_real(font, word.c_str(), x, y,
+		int offs2 = 0;
+		while (offs < 1000 && text[offs] != 0 && text[offs] != ' ' && text[offs] != '\t' && text[offs] != '\n') {
+			buf[offs2++] = text[offs++];
+		}
+		offs++;
+		buf[offs2] = 0;
+		mTextout_real(font, buf, x, y,
 			text_color, shadow_color,
 			shadowType, center);
-		x += m_text_length(font, word.c_str());
+		x += m_text_length(font, buf);
 		x += SPACE_SIZE;
 	}
 }

@@ -1048,13 +1048,8 @@ void Area::drawLayer(int i, int bw, int bh)
 				continue;
 			Tile *t = tiles[tx+ty*sizex];
 			int n = t->getAnimationNum(i);
-#ifdef EDITOR
-			if (n >= 0 && n < (int)tileAnimations.size() && tileAnimationNums[n]) {
-				int mapped = tileAnimationNums[n];
-#else
 			if (n >= 0 && n < (int)tileAnimations.size() && tileAnimationNums[n]) {
 				int mapped = newmap[tileAnimationNums[n]];
-#endif
 				std::map<int, anim_data>::iterator it  = anim_info.find(mapped);
 				float tu;
 				float tv;
@@ -1111,30 +1106,6 @@ void Area::drawLayer(int i, int bw, int bh)
 			}
 		}
 	}
-
-#ifdef EDITOR // draw solids
-	if (i == (TILE_LAYERS-1) && showSolids) {
-		for (ty = startTiley, oy = startOffsety;
-		     ty < sizey && oy < bh; ty++, oy += TILE_SIZE) {
-			for (tx = startTilex, ox = startOffsetx;
-			     tx < sizex && ox < bw; tx++, ox += TILE_SIZE) {
-					Tile *t = tiles[tx+ty*sizex];
-					if (t->isSolid()) {
-						int rx1 = ox;
-						int ry1 = oy;
-						int rx2 = ox + TILE_SIZE;
-						int ry2 = oy + TILE_SIZE;
-						MCOLOR color;
-						color = m_map_rgb(255, 255, 0);
-						m_draw_line(rx1, ry1, rx2, ry2,
-							color);
-						m_draw_line(rx1, ry2, rx2, ry1,
-							color);
-					}
-			}
-		}
-	}
-#endif // EDITOR
 }
 
 
@@ -1254,8 +1225,9 @@ void Area::draw(int bw, int bh)
 		if (objects[i]->isHigh() && !objects[i]->isHidden())
 			objects[i]->draw();
 	}
+
 	al_hold_bitmap_drawing(false);
-#ifndef EDITOR
+
 	if (name == "darkside") {
 		if (gameInfo.milestones[MS_GOT_ORB]) {
 			int player_posx, player_posy;
@@ -1278,7 +1250,6 @@ void Area::draw(int bw, int bh)
 			m_draw_rectangle(x1, y2, x2, y2+BH, black, M_FILLED);
 			// draw circle
 			m_draw_bitmap(orb_bmp, x1, y1, 0);
-			set_target_backbuffer();
 		}
 		else {
 			m_draw_rectangle(0, 0, BW, BH, black, M_FILLED);
@@ -1295,31 +1266,7 @@ void Area::draw(int bw, int bh)
 	}
 	
 	sorted_objects.clear();
-#endif
 }
-
-#ifdef EDITOR
-void Area::saveBmp(std::string filename)
-{
-	int pixw = sizex * TILE_SIZE;
-	int pixh = sizey * TILE_SIZE;
-
-	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags | ALLEGRO_MEMORY_BITMAP);
-	MBITMAP *mem = m_create_bitmap(pixw, pixh); // check
-	al_set_new_bitmap_flags(flags);
-
-	ALLEGRO_BITMAP *target = al_get_target_bitmap();
-	m_set_target_bitmap(mem);
-	m_clear(al_map_rgb(0, 0, 0));
-	draw(pixw, pixh);
-	al_set_target_bitmap(target);
-
-	al_save_bitmap(filename.c_str(), mem->bitmap);
-
-	m_destroy_bitmap(mem);
-}
-#endif
 
 Tile* Area::getTile(int x, int y)
 {
@@ -2118,11 +2065,7 @@ void Area::loadAnimation(int index, bool addIndex)
 
 	ad.tu = tu;
 	ad.tv = tv;
-#ifdef EDITOR
-	anim_info[index] = ad;
-#else
 	anim_info[newmap[index]] = ad;
-#endif
 }
 
 std::vector<Tile *> &Area::getTiles(void)
@@ -2259,44 +2202,6 @@ void Area::followPlayer(bool f)
 		adjustPan();
 	}
 }
-
-
-
-#ifdef EDITOR
-
-
-Area::Area(int w, int h) throw (std::bad_alloc) 
-{
-	name = "";
-
-	sizex = w;
-	sizey = h;
-    
-	try {
-		int anims[TILE_LAYERS];
-		for (int i = 0; i < TILE_LAYERS; i++)
-			anims[i] = -1;
-
-		short tu[TILE_LAYERS] = { 0, };
-		short tv[TILE_LAYERS] = { 0, };
-
-		for (int i = 0; i < (int)sizex; i++) {
-			Tile *t;
-			t = new Tile(anims, false, tu, tv);
-			if (!t)
-				throw std::bad_alloc();
-			tiles.push_back(t);
-		}
-	}
-	catch (std::bad_alloc e) {
-		for (unsigned int i = 0; i < tiles.size(); i++) {
-			delete tiles[i];
-		}
-		tiles.clear();
-		throw std::bad_alloc();
-	}
-}
-#endif
 
 void Area::setFocus(int x, int y)
 {

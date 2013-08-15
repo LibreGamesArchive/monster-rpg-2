@@ -138,7 +138,7 @@ void start_text()
 		ALLEGRO_TRANSFORM v;
 		al_identity_transform(&v);
 		al_scale_transform(&v, textScaleX, textScaleY);
-		if (al_get_target_bitmap() == al_get_backbuffer(display) || al_get_target_bitmap() == tmpbuffer->bitmap) {
+		if (al_get_bitmap_width(al_get_target_bitmap()) == al_get_display_width(display) && al_get_bitmap_height(al_get_target_bitmap()) == al_get_display_height(display)) {
 			al_translate_transform(&v, dx, dy);
 		}
 		al_use_transform(&v);
