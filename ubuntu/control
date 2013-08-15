@@ -8,6 +8,6 @@ Homepage: http://www.monster-rpg.com/
 
 Package: monster-rpg2
 Architecture: i386 amd64
-Depends: ${shlibs:Depends}, ${misc:Depends}, monster-rpg-2-data (= 2.0.0-1ubuntu1)
+Depends: ${shlibs:Depends}, ${misc:Depends}, monster-rpg-2-data (= 2.0.3-1ubuntu1)
 Description: Monster RPG 2
  Monster RPG 2 is a fantasy quest that spans continents and worlds and lets you take a simple villager and develop her into a hero with the power to save her world. The next instalment in the classic Monster RPG series, Monster RPG 2 is a turn-based role-playing game with enough variety, plot twists, secrets, and scenery to keep even the old school players coming back for more. If you loved the 16 bit classics on systems like SNES, you'll love this game. If you've never heard of those games, you're in for a real treat!

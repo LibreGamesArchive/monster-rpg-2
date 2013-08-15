@@ -1,4 +1,4 @@
-monster-rpg2 (2.0.0-1ubuntu1) maverick; urgency=low
+monster-rpg2 (2.0.3-1ubuntu1) oneiric; urgency=low
 
   * Added an input configuration screen
   * Textured all of the 3D models
