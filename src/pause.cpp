@@ -2451,7 +2451,7 @@ void credits(void)
 	const int times[S_COUNT] = { 1000, 5000, 2000 };
 	
 	int section = 0;
-	const int sections = 12;
+	const int sections = 14;
 
 	const char *section_text[sections][16] = {
 		{
@@ -2487,6 +2487,12 @@ void credits(void)
 			"DAN \"DASSE\" EVERTSSON",
 			"TRENT GAMBLIN",
 			"DAVID VITAS",
+			NULL
+		},
+		{
+			"LEVEL DESIGN",
+			" ",
+			"TRENT GAMBLIN",
 			NULL
 		},
 		{
@@ -2561,10 +2567,15 @@ void credits(void)
 		{
 			"SPECIAL THANKS",
 			" ",
+			"TANYA GAMBLIN-BECKER",
 			"NATASHA HUISMAN",
 			"DANICA CRISTOBAL-RABANG",
 			"WILL TICE",
-			"STEVEN WALLACE",
+			"TRIXIE",
+			NULL
+		},
+		{
+			"- A NOOSKEWL GAME -",
 			NULL
 		}
 	};
@@ -2670,7 +2681,7 @@ void credits(void)
 						int dy = dest_y - start_y;
 						int x = (dx*p)+start_x;
 						int y = (dy*p)+start_y;
-						int u;
+						int u, v;
 						ALLEGRO_COLOR col = white;
 						if (letter == ' ') {
 							col = al_map_rgba(0, 0, 0, 0);
@@ -2690,40 +2701,42 @@ void credits(void)
 						}
 						else
 							u = (letter-'A')*10;
+						v = 1;
+						u += 1 + (u / 10)*2;
 						verts[vcount].x = x;
 						verts[vcount].y = y;
 						verts[vcount].u = u;
-						verts[vcount].v = 0;
-						verts[vcount].color = col;
-						vcount++;
-						verts[vcount].x = x;
-						verts[vcount].y = y+10;
-						verts[vcount].u = u;
-						verts[vcount].v = 10;
-						verts[vcount].color = col;
-						vcount++;
-						verts[vcount].x = x+10;
-						verts[vcount].y = y;
-						verts[vcount].u = u+10;
-						verts[vcount].v = 0;
+						verts[vcount].v = v;
 						verts[vcount].color = col;
 						vcount++;
 						verts[vcount].x = x;
 						verts[vcount].y = y+10;
 						verts[vcount].u = u;
-						verts[vcount].v = 10;
+						verts[vcount].v = v+10;
 						verts[vcount].color = col;
 						vcount++;
 						verts[vcount].x = x+10;
 						verts[vcount].y = y;
 						verts[vcount].u = u+10;
-						verts[vcount].v = 0;
+						verts[vcount].v = v;
+						verts[vcount].color = col;
+						vcount++;
+						verts[vcount].x = x;
+						verts[vcount].y = y+10;
+						verts[vcount].u = u;
+						verts[vcount].v = v+10;
+						verts[vcount].color = col;
+						vcount++;
+						verts[vcount].x = x+10;
+						verts[vcount].y = y;
+						verts[vcount].u = u+10;
+						verts[vcount].v = v;
 						verts[vcount].color = col;
 						vcount++;
 						verts[vcount].x = x+10;
 						verts[vcount].y = y+10;
 						verts[vcount].u = u+10;
-						verts[vcount].v = 10;
+						verts[vcount].v = v+10;
 						verts[vcount].color = col;
 						vcount++;
 					}
@@ -2742,7 +2755,7 @@ void credits(void)
 						int letter = section_text[section][line][c];
 						int x = lettersPos[section][line][c].second.x;
 						int y = lettersPos[section][line][c].second.y;
-						int u;
+						int u, v;
 						ALLEGRO_COLOR col = white;
 						if (letter == ' ') {
 							col = al_map_rgba(0, 0, 0, 0);
@@ -2762,40 +2775,42 @@ void credits(void)
 						}
 						else
 							u = (letter-'A')*10;
+						v = 1;
+						u += 1 + (u / 10)*2;
 						verts[vcount].x = x;
 						verts[vcount].y = y;
 						verts[vcount].u = u;
-						verts[vcount].v = 0;
-						verts[vcount].color = col;
-						vcount++;
-						verts[vcount].x = x;
-						verts[vcount].y = y+10;
-						verts[vcount].u = u;
-						verts[vcount].v = 10;
-						verts[vcount].color = col;
-						vcount++;
-						verts[vcount].x = x+10;
-						verts[vcount].y = y;
-						verts[vcount].u = u+10;
-						verts[vcount].v = 0;
+						verts[vcount].v = v;
 						verts[vcount].color = col;
 						vcount++;
 						verts[vcount].x = x;
 						verts[vcount].y = y+10;
 						verts[vcount].u = u;
-						verts[vcount].v = 10;
+						verts[vcount].v = v+10;
 						verts[vcount].color = col;
 						vcount++;
 						verts[vcount].x = x+10;
 						verts[vcount].y = y;
 						verts[vcount].u = u+10;
-						verts[vcount].v = 0;
+						verts[vcount].v = v;
+						verts[vcount].color = col;
+						vcount++;
+						verts[vcount].x = x;
+						verts[vcount].y = y+10;
+						verts[vcount].u = u;
+						verts[vcount].v = v+10;
+						verts[vcount].color = col;
+						vcount++;
+						verts[vcount].x = x+10;
+						verts[vcount].y = y;
+						verts[vcount].u = u+10;
+						verts[vcount].v = v;
 						verts[vcount].color = col;
 						vcount++;
 						verts[vcount].x = x+10;
 						verts[vcount].y = y+10;
 						verts[vcount].u = u+10;
-						verts[vcount].v = 10;
+						verts[vcount].v = v+10;
 						verts[vcount].color = col;
 						vcount++;
 					}
@@ -2825,7 +2840,7 @@ void credits(void)
 						MCOLOR alpha_white = m_map_rgba(
 							alpha, alpha, alpha, alpha
 						);
-						int u;
+						int u, v;
 						ALLEGRO_COLOR col = alpha_white;
 						if (letter == ' ') {
 							col = al_map_rgba(0, 0, 0, 0);
@@ -2845,40 +2860,42 @@ void credits(void)
 						}
 						else
 							u = (letter-'A')*10;
+						v = 1;
+						u += 1 + (u / 10)*2;
 						verts[vcount].x = x;
 						verts[vcount].y = y;
 						verts[vcount].u = u;
-						verts[vcount].v = 0;
-						verts[vcount].color = col;
-						vcount++;
-						verts[vcount].x = x;
-						verts[vcount].y = y+10;
-						verts[vcount].u = u;
-						verts[vcount].v = 10;
-						verts[vcount].color = col;
-						vcount++;
-						verts[vcount].x = x+10;
-						verts[vcount].y = y;
-						verts[vcount].u = u+10;
-						verts[vcount].v = 0;
+						verts[vcount].v = v;
 						verts[vcount].color = col;
 						vcount++;
 						verts[vcount].x = x;
 						verts[vcount].y = y+10;
 						verts[vcount].u = u;
-						verts[vcount].v = 10;
+						verts[vcount].v = v+10;
 						verts[vcount].color = col;
 						vcount++;
 						verts[vcount].x = x+10;
 						verts[vcount].y = y;
 						verts[vcount].u = u+10;
-						verts[vcount].v = 0;
+						verts[vcount].v = v;
+						verts[vcount].color = col;
+						vcount++;
+						verts[vcount].x = x;
+						verts[vcount].y = y+10;
+						verts[vcount].u = u;
+						verts[vcount].v = v+10;
+						verts[vcount].color = col;
+						vcount++;
+						verts[vcount].x = x+10;
+						verts[vcount].y = y;
+						verts[vcount].u = u+10;
+						verts[vcount].v = v;
 						verts[vcount].color = col;
 						vcount++;
 						verts[vcount].x = x+10;
 						verts[vcount].y = y+10;
 						verts[vcount].u = u+10;
-						verts[vcount].v = 10;
+						verts[vcount].v = v+10;
 						verts[vcount].color = col;
 						vcount++;
 					}
@@ -2927,9 +2944,9 @@ done:
 		/* Now roll the Indiegogo sponsor credits! */
 
 		const char *lines[] = {
-			"AND A VERY SPECIAL",
-			"THANKS TO OUR",
-			"INDIEGOGO SPONSORS...",
+			"A VERY SPECIAL",
+			"SHOUT OUT TO OUR",
+			"INDIEGOGO SPONSORS",
 			"",
 			"",
 			"",
@@ -3007,7 +3024,7 @@ done:
 				int x = BW/2 - (int)strlen(lines[line])*10/2;
 				for (int c = 0; lines[line][c]; c++, x += 10) {
 					int letter = lines[line][c];
-					int u;
+					int u, v;
 					ALLEGRO_COLOR col = white;
 					if (letter == ' ') {
 						col = al_map_rgba(0, 0, 0, 0);
@@ -3027,40 +3044,42 @@ done:
 					}
 					else
 						u = (letter-'A')*10;
+					v = 1;
+					u += 1 + (u / 10)*2;
 					verts[vcount].x = x;
 					verts[vcount].y = y;
 					verts[vcount].u = u;
-					verts[vcount].v = 0;
-					verts[vcount].color = col;
-					vcount++;
-					verts[vcount].x = x;
-					verts[vcount].y = y+10;
-					verts[vcount].u = u;
-					verts[vcount].v = 10;
-					verts[vcount].color = col;
-					vcount++;
-					verts[vcount].x = x+10;
-					verts[vcount].y = y;
-					verts[vcount].u = u+10;
-					verts[vcount].v = 0;
+					verts[vcount].v = v;
 					verts[vcount].color = col;
 					vcount++;
 					verts[vcount].x = x;
 					verts[vcount].y = y+10;
 					verts[vcount].u = u;
-					verts[vcount].v = 10;
+					verts[vcount].v = v+10;
 					verts[vcount].color = col;
 					vcount++;
 					verts[vcount].x = x+10;
 					verts[vcount].y = y;
 					verts[vcount].u = u+10;
-					verts[vcount].v = 0;
+					verts[vcount].v = v;
+					verts[vcount].color = col;
+					vcount++;
+					verts[vcount].x = x;
+					verts[vcount].y = y+10;
+					verts[vcount].u = u;
+					verts[vcount].v = v+10;
+					verts[vcount].color = col;
+					vcount++;
+					verts[vcount].x = x+10;
+					verts[vcount].y = y;
+					verts[vcount].u = u+10;
+					verts[vcount].v = v;
 					verts[vcount].color = col;
 					vcount++;
 					verts[vcount].x = x+10;
 					verts[vcount].y = y+10;
 					verts[vcount].u = u+10;
-					verts[vcount].v = 10;
+					verts[vcount].v = v+10;
 					verts[vcount].color = col;
 					vcount++;
 				}
