@@ -45,8 +45,8 @@ if(WIN32)
 	endif(MINGW)
 else(WIN32)
 	if(RASPBERRYPI)
-		set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL -O2 -march=armv6 -mfpu=vfp -mfloat-abi=hard")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL -O2 -march=armv6 -mfpu=vfp -mfloat-abi=hard")
+		set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL -Os -march=armv6 -mfpu=vfp -mfloat-abi=hard")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DA5_OGL -Os -march=armv6 -mfpu=vfp -mfloat-abi=hard")
    		include_directories(
 			"/opt/vc/include"
 			"/opt/vc/include/interface/vcos/pthreads"

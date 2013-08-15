@@ -793,7 +793,7 @@ void init_shaders(void)
 		"}\n";
 
 		const char *tinter_pixel_source =
-#if defined ALLEGRO_RASPBERRYPI_XXX
+#if defined ALLEGRO_RASPBERRYPI
 		"precision lowp float;\n"
 #elif defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 		"precision mediump float;\n"
@@ -824,7 +824,7 @@ void init_shaders(void)
 		"}";
 		
 		const char *warp_pixel_source =
-#if defined ALLEGRO_RASPBERRYPI_XXX
+#if defined ALLEGRO_RASPBERRYPI
 		"precision lowp float;\n"
 #elif defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 		"precision mediump float;\n"
@@ -858,7 +858,7 @@ void init_shaders(void)
 		"}\n";
 		
 		const char *shadow_pixel_source =
-#if defined ALLEGRO_RASPBERRYPI_XXX
+#if defined ALLEGRO_RASPBERRYPI
 		"precision lowp float;\n"
 #elif defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 		"precision mediump float;\n"
@@ -885,7 +885,7 @@ void init_shaders(void)
 		"}\n";
 		
 		const char *brighten_pixel_source =
-#if defined ALLEGRO_RASPBERRYPI_XXX
+#if defined ALLEGRO_RASPBERRYPI
 		"precision lowp float;\n"
 #elif defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 		"precision mediump float;\n"
