@@ -160,7 +160,6 @@
 		96A028B717016774008264E6 /* Area.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9636675816C9858E00A24B46 /* Area.cpp */; };
 		96A028B817016774008264E6 /* mygamecentervc.m in Sources */ = {isa = PBXBuildFile; fileRef = 96E3D50416C0D06C00A4A973 /* mygamecentervc.m */; };
 		96A028B917016774008264E6 /* gamecenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96C2C90A16C0A595004EBAB9 /* gamecenter.mm */; };
-		96A028BA17016774008264E6 /* svg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9636676E16C9FC8200A24B46 /* svg.cpp */; };
 		96A028BB17016774008264E6 /* ftpget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 969A9E3C16083E3000F4DBE2 /* ftpget.cpp */; };
 		96A028BD17016774008264E6 /* my_load_bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96BC52A916FA8EE7004E526B /* my_load_bitmap.cpp */; };
 		96A028BE17016774008264E6 /* atlas_accessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96BC52A116FA8E39004E526B /* atlas_accessor.cpp */; };
@@ -1290,7 +1289,6 @@
 				96A028B717016774008264E6 /* Area.cpp in Sources */,
 				96A028B817016774008264E6 /* mygamecentervc.m in Sources */,
 				96A028B917016774008264E6 /* gamecenter.mm in Sources */,
-				96A028BA17016774008264E6 /* svg.cpp in Sources */,
 				96A028BB17016774008264E6 /* ftpget.cpp in Sources */,
 				96A028BD17016774008264E6 /* my_load_bitmap.cpp in Sources */,
 				96A028BE17016774008264E6 /* atlas_accessor.cpp in Sources */,
@@ -1858,7 +1856,6 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					A5_OGL,
-					WITH_SVG,
 					NO_GAMECENTER,
 					NO_JOYPAD,
 				);
@@ -1906,7 +1903,6 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					A5_OGL,
-					WITH_SVG,
 					NO_GAMECENTER,
 					NO_JOYPAD,
 				);
@@ -1953,7 +1949,6 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					A5_OGL,
-					WITH_SVG,
 					NO_GAMECENTER,
 					NO_JOYPAD,
 				);
@@ -1999,7 +1994,6 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					A5_OGL,
-					WITH_SVG,
 					NO_GAMECENTER,
 					NO_JOYPAD,
 				);
@@ -2033,7 +2027,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Monster RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: Nooskewl (ZCLK6CUZ99)";
+				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2067,7 +2061,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "F922E595-A8DC-414A-9A85-9DC785CC970D";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
@@ -2078,7 +2072,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Monster RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: Nooskewl (ZCLK6CUZ99)";
+				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2115,7 +2109,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "F922E595-A8DC-414A-9A85-9DC785CC970D";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
@@ -2126,7 +2120,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Monster RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: Nooskewl (ZCLK6CUZ99)";
+				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2160,7 +2154,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "F922E595-A8DC-414A-9A85-9DC785CC970D";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
@@ -2171,7 +2165,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Monster RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: Nooskewl (ZCLK6CUZ99)";
+				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2205,7 +2199,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "F922E595-A8DC-414A-9A85-9DC785CC970D";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
