@@ -2,6 +2,13 @@
 
 #import "joypad_handler.h"
 
+#include "Area.hpp"
+#include "Battle.hpp"
+#include "Configuration.hpp"
+#include "init.hpp"
+extern bool center_button_pressed;
+
+/*
 extern "C" {
 	void lock_joypad_mutex(void);
 	void unlock_joypad_mutex(void);
@@ -24,6 +31,7 @@ extern "C" {
 	void joy_u_up();
 	void joy_d_up();
 }
+*/
 
 @implementation joypad_handler
 
@@ -155,6 +163,12 @@ extern "C" {
 	if (button == kJPInputAButton)
 	{
 		ba = false;
+		if (area && !battle && !in_pause && config.getAlwaysCenter() == PAN_HYBRID) {
+			area_panned_x = floor(area_panned_x);
+			area_panned_y = floor(area_panned_y);
+			area->center_view = true;
+			center_button_pressed = true;
+		}
 		joy_b1_up();
 	}
 	else if (button == kJPInputBButton)

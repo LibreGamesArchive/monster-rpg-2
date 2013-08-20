@@ -12,6 +12,9 @@
 
 #include "svg.hpp"
 
+extern double my_last_shake_time;
+extern ALLEGRO_FONT *my_load_ttf_font(const char *filename, int sz, int flags);
+
 #ifdef ALLEGRO_ANDROID
 static bool dontbail = false;
 #endif
@@ -210,9 +213,9 @@ void connect_second_display(void)
 		blueblocks[i] = m_load_bitmap(getResource("media/blueblocks%d.png", i+1));
 	}
 	al_set_new_bitmap_format(format);
-	game_font_second_display = al_load_ttf_font(getResource("DejaVuSans.ttf"), 10, 0);
+	game_font_second_display = my_load_ttf_font(getResource("DejaVuSans.gif"), 10, 0);
 	if (!game_font_second_display) {
-		native_error("Couldn't load DejaVuSans.ttf.");
+		native_error("Couldn't load DejaVuSans.gif.");
 	}
 	
 	airplay_dpad = m_load_alpha_bitmap(getResource("media/airplay_pad.png"));
@@ -628,6 +631,12 @@ top:
 		else if (event.type == ALLEGRO_EVENT_KEY_UP || event.type == USER_KEY_UP) {
 			if (!isOuya() && is_modifier(event.keyboard.keycode)) {
 				if (event.keyboard.keycode == config.getKey1()) {
+					if (area && !battle && !in_pause && config.getAlwaysCenter() == PAN_HYBRID) {
+						area_panned_x = floor(area_panned_x);
+						area_panned_y = floor(area_panned_y);
+						area->center_view = true;
+						center_button_pressed = true;
+					}
 					joy_b1_up();
 					modifier_repeat_count[0] = 0;
 				}
@@ -925,6 +934,13 @@ top:
 						(*(down[i]))(false, false);
 					}
 					else if (on1[i] == true && on2[i] == false) {
+						if (i == 4 /* up */ && area && !battle && !in_pause && config.getAlwaysCenter() == PAN_HYBRID) {
+							area_panned_x = floor(area_panned_x);
+							area_panned_y = floor(area_panned_y);
+							area->center_view = true;
+							center_button_pressed = true;
+						}
+
 						(*(up[i]))();
 					}
 					
@@ -1207,7 +1223,8 @@ top:
 		}
 #endif
 
-#ifdef ALLEGRO_IPHONE
+/* FIXME: This doesn't work with the iCade code! */
+#ifdef ALLEGRO_IPHONE_XXX
 		double shake = al_iphone_get_last_shake_time();
 		if (shake > allegro_iphone_shaken) {
 			allegro_iphone_shaken = shake;

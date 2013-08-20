@@ -201,6 +201,10 @@ void mTextout(MFONT *font, const char *text, int x, int y,
 	int SPACE_SIZE = 4;
 	int full_len = 0;
 
+	if (font == medium_font) {
+		SPACE_SIZE += 2;
+	}
+
 	if (center) {
 		for (int i = 0; i < words; i++) {
 			int offs2 = 0;
@@ -4384,8 +4388,6 @@ int MToggleList::update(int millis)
 			playPreloadedSample("select.ogg");
 			toggled[cursor] = !toggled[cursor];
 		}
-	}
-	else {
 		if (clicked && ((last_clicked != selected) || (selected == up_selected))) {
 			clicked = false;
 			if (last_clicked != selected)

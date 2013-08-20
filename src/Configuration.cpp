@@ -769,7 +769,11 @@ bool Configuration::read()
 	purchased = 1;
 #endif
 
-	always_center = 2;
+#ifdef ALLEGRO_IPHONE
+	always_center = PAN_MANUAL;
+#else
+	always_center = PAN_HYBRID;
+#endif
 
 	setDefaultInputs();
 	

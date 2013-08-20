@@ -1409,7 +1409,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Mo. RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Nooskewl";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -1418,6 +1418,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					OPENGLES,
 					A5_OGL,
+					NO_JOYPAD,
 				);
 				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
@@ -1438,7 +1439,7 @@
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Mo. RPG 2";
-				PROVISIONING_PROFILE = "D70B149C-084B-496B-89ED-0D12FD791B7C";
+				PROVISIONING_PROFILE = "";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				VALID_ARCHS = "armv7 armv7s";
 			};
@@ -1485,7 +1486,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Mo. RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Nooskewl";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1493,6 +1494,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					OPENGLES,
 					A5_OGL,
+					NO_JOYPAD,
 				);
 				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
@@ -1513,7 +1515,7 @@
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Mo. RPG 2";
-				PROVISIONING_PROFILE = "D70B149C-084B-496B-89ED-0D12FD791B7C";
+				PROVISIONING_PROFILE = "";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				VALID_ARCHS = "armv7 armv7s";
 			};
@@ -1739,7 +1741,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Mo. RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Nooskewl";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -1748,6 +1750,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					OPENGLES,
 					A5_OGL,
+					NO_JOYPAD,
 				);
 				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
@@ -1768,7 +1771,7 @@
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Mo. RPG 2";
-				PROVISIONING_PROFILE = "D70B149C-084B-496B-89ED-0D12FD791B7C";
+				PROVISIONING_PROFILE = "";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				VALID_ARCHS = "armv7 armv7s";
 			};
@@ -1804,7 +1807,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Mo. RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Nooskewl";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -1813,6 +1816,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					OPENGLES,
 					A5_OGL,
+					NO_JOYPAD,
 				);
 				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
@@ -1833,7 +1837,7 @@
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "Mo. RPG 2";
-				PROVISIONING_PROFILE = "D70B149C-084B-496B-89ED-0D12FD791B7C";
+				PROVISIONING_PROFILE = "";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				VALID_ARCHS = "armv7 armv7s";
 			};

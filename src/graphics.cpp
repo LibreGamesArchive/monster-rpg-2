@@ -481,9 +481,9 @@ void drawBufferToScreen(bool draw_controls)
 					m_set_target_bitmap(tmp);
 					m_clear(m_map_rgba(0, 0, 0, 0));
 					
-					mTextout(medium_font, _t(text), 1, 1,
+					mTextout(medium_font, _t(text), (len+4)/2, (h+4)/2,
 						white, black,
-						WGT_TEXT_NORMAL, false);
+						WGT_TEXT_NORMAL, true);
 
 					float scale = 32.0/(h+4);
 					if ((len+4)*scale > BW) scale = (float)BW/(len+4);
@@ -914,11 +914,7 @@ void battleTransition()
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
 
-#ifdef ALLEGRO_IPHONE
-	if (true) {
-#else
 	if (!use_programmable_pipeline) {
-#endif
 		int flags = al_get_new_bitmap_flags();
 		al_set_new_bitmap_flags(flags | NO_PRESERVE_TEXTURE);
 		MBITMAP *tmp = m_create_bitmap(dw, dh);

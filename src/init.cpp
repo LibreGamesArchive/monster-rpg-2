@@ -187,7 +187,7 @@ bool use_digital_joystick = false;
 int screen_offset_x, screen_offset_y;
 float screen_ratio_x, screen_ratio_y;
 #ifdef ALLEGRO_IPHONE
-double allegro_iphone_shaken = DBL_MIN;
+double allegro_iphone_shaken = 0;
 #endif
 bool sound_was_playing_at_program_start;
 ALLEGRO_DISPLAY *display = 0;
@@ -302,7 +302,7 @@ void destroy_fonts(void)
 }
 
 // Android is stupid and wants to compress ttfs unless you give them a different extension
-static ALLEGRO_FONT *my_load_ttf_font(const char *filename, int sz, int flags)
+ALLEGRO_FONT *my_load_ttf_font(const char *filename, int sz, int flags)
 {
 	ALLEGRO_FILE *f = al_fopen(filename, "rb");
 	ALLEGRO_FONT *font = al_load_ttf_font_f(f, "", sz, flags);

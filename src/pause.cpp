@@ -3801,7 +3801,8 @@ bool config_menu(bool start_on_fullscreen)
 	difficulty_toggle->setSelected(curr_difficulty);
 	y += 13;
 
-#if defined ALLEGRO_IPHONE
+/* FIXME: This doesn't work with the iCade code! */
+#if defined ALLEGRO_IPHONE_XXX
 	std::vector<std::string> shake_choices;
 	shake_choices.push_back("{027} Shake cancels");
 	shake_choices.push_back("{027} Shake changes songs (iPod)");
@@ -3905,7 +3906,7 @@ bool config_menu(bool start_on_fullscreen)
 	}
 #endif
 	tguiAddWidget(difficulty_toggle);
-#ifdef ALLEGRO_IPHONE
+#ifdef ALLEGRO_IPHONE_XXX
 	tguiAddWidget(shake_toggle);
 #endif
 	if (!isOuya()) {
@@ -4117,7 +4118,7 @@ bool config_menu(bool start_on_fullscreen)
 			config.setDifficulty(sel);
 		}
 		
-#ifdef ALLEGRO_IPHONE
+#ifdef ALLEGRO_IPHONE_XXX
 		sel = shake_toggle->getSelected();
 		if (sel != curr_shake) {
 			curr_shake = sel;
@@ -4222,7 +4223,7 @@ done:
 	if (input_toggle)
 		delete input_toggle;
 	delete swap_buttons_toggle;
-#if defined ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE_XXX
 	delete shake_toggle;
 #endif
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
