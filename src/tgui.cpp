@@ -319,9 +319,9 @@ void tguiInit()
 
 		key_events = al_create_event_queue();
 #if !defined ALLEGRO_IPHONE
-		if (!isOuya()) {
-			al_register_event_source(key_events, al_get_keyboard_event_source());
-		}
+#if !defined ALLEGRO_ANDROID
+		al_register_event_source(key_events, al_get_keyboard_event_source());
+#endif
 #else
 		al_register_event_source(key_events, &user_event_source);
 #endif

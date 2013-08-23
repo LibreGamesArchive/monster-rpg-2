@@ -4665,7 +4665,7 @@ int title_menu(void)
 #endif
 #endif
 
-#ifndef ALLEGRO_ANDROID
+#ifndef OUYA
 
 			INPUT_EVENT ie = get_next_input_event();
 			// Back button on android is a shake. other shakes (hot corner) suppressed on this menu (see monster2.cpp)
@@ -4693,7 +4693,7 @@ int title_menu(void)
 		}
 	}
 
-#ifndef ALLEGRO_ANDROID
+#ifndef OUYA
 done:
 #endif
 

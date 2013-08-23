@@ -1306,6 +1306,7 @@ static void real_auto_save_game_to_memory(bool save_ss, std::string mapArea = ""
 
 	if (save_ss) {
 		if (area) {
+			al_lock_mutex(ss_mutex);
 			ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
 			m_set_target_bitmap(screenshot);
 			ALLEGRO_TRANSFORM t;
@@ -1314,6 +1315,7 @@ static void real_auto_save_game_to_memory(bool save_ss, std::string mapArea = ""
 			al_use_transform(&t);
 			area->draw();
 			al_set_target_bitmap(old_target);
+			al_unlock_mutex(ss_mutex);
 		}
 	}
 }
@@ -2301,14 +2303,14 @@ Area::Area(void)
 
 Area::~Area()
 {
-	if (partial_tm)
+	if (partial_tm) {
 		m_destroy_bitmap(partial_tm);
+	}
 
-	if (luaState)
+	if (luaState) {
 		callLua(luaState, "stop", ">");
-
-	if (luaState)
 		lua_close(luaState);
+	}
 
 	for (unsigned int i = 0; i < tiles.size(); i++) {
 		delete tiles[i];

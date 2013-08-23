@@ -560,9 +560,7 @@ void m_flip_display(void)
 	}
 
 	if (!skip_flip) {
-		debug_message("flipping\n");
 		al_flip_display();
-		debug_message("flipped\n");
 	}
 
 	int xxx, yyy, www, hhh;

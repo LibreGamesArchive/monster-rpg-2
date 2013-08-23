@@ -1365,6 +1365,8 @@ top:
 		int x, y, w, h;
 		get_screen_offset_size(&x, &y, &w, &h);
 		al_set_clipping_rectangle(x, y, w, h);
+		// FIXME: Kindle Fire only?
+		set_screen_params();
 	}
 
 	if (reload_translation) {

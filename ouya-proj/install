@@ -1,0 +1,2 @@
+echo install
+/c/Progra~1/Android/android-sdk/platform-tools/adb -d install -r $1

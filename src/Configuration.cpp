@@ -769,7 +769,7 @@ bool Configuration::read()
 	purchased = 1;
 #endif
 
-#ifdef ALLEGRO_IPHONE
+#if defined ALLEGRO_IPHONE || (defined ALLEGRO_ANDROID && !defined OUYA)
 	always_center = PAN_MANUAL;
 #else
 	always_center = PAN_HYBRID;
@@ -805,7 +805,7 @@ bool Configuration::read()
 	if (xml->getFailed()) {
 		debug_message("couldn't read config");
 		delete xml;
-#ifdef ALLEGRO_ANDROID
+#ifdef OUYA
 		if (isOuya()) {
 			int purchased = checkPurchased();
 			if (purchased == 1) {

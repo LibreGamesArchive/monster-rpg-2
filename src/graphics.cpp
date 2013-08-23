@@ -785,7 +785,7 @@ void fadeOut(MCOLOR color)
  * 	in/out (e.g., focus of 2 would draw a two pixel square
  *	of the same color for every other pixel).
  */
-static bool transition(bool focusing, int length, bool can_cancel = false, bool toggle_dpad = true)
+static bool transition(bool focusing, double length, bool can_cancel = false, bool toggle_dpad = true)
 {
 	transitioning = true;
 	
@@ -808,29 +808,13 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 	al_identity_transform(&t);
 	al_use_transform(&t);
 		
-	int cx, cy, cw, ch;
-	al_get_clipping_rectangle(&cx, &cy, &cw, &ch);
-
-	unsigned long start = (unsigned long)(al_get_time()*1000);
-	unsigned long now = start;
-
-	bool done = false;
+	double start = al_get_time();
 	bool ret = false;
 
 	while (true) {
-		pump_events();
-		if (getInput()) {
-			InputDescriptor id = getInput()->getDescriptor();
-			if (id.button1 || id.button2 || !released) {
-				if (can_cancel) {
-					done = true;
-					ret = true;
-				}
-			}
-		}
-		now = (unsigned long)(al_get_time()*1000);
-		int elapsed = (int)(now - start);
-		float p = (float)elapsed / length;
+		double now = al_get_time();
+		double elapsed = (now - start);
+		float p = (float)(elapsed / length);
 		if (p > 1) p = 1;
 		if (p < 0) p = 0;
 		if (focusing)
@@ -849,23 +833,20 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
 		set_target_backbuffer();
 		m_clear(black);
 
-		al_set_clipping_rectangle(dx+(dw-rectw)/2, dy+(dh-recth)/2, rectw, recth);
-
 		al_draw_scaled_bitmap(tmp->bitmap, 0, 0, dw/size, dh/size, dx, dy, dw, dh, 0);
 
-		al_set_clipping_rectangle(cx, cy, cw, ch);
-		
+		al_draw_filled_rectangle(0, 0, dx+(dw-rectw)/2, disp_h, black);
+		al_draw_filled_rectangle(0, 0, disp_w, dy+(dh-recth)/2, black);
+		al_draw_filled_rectangle(dx+(dw+rectw)/2, 0, disp_w, disp_h, black);
+		al_draw_filled_rectangle(0, dy+(dh+recth)/2, disp_w, disp_h, black);
+
 		drawBufferToScreen(false);
 
-		if (done) {
+		m_flip_display();
+		
+		if ((now - start) >= length) {
 			break;
 		}
-
-		if ((now - start) >= (unsigned long)length) {
-			done = true;
-		}
-
-		m_flip_display();
 	}
 
 	if (!focusing) {
@@ -894,14 +875,14 @@ static bool transition(bool focusing, int length, bool can_cancel = false, bool 
  */
 bool transitionIn(bool can_cancel, bool toggle_dpad)
 {
-	bool ret = transition(true, 600, can_cancel, toggle_dpad);
+	bool ret = transition(true, 0.6, can_cancel, toggle_dpad);
 	return ret;
 }
 
 
 void transitionOut(bool toggle_dpad)
 {
-	transition(false, 600, false, toggle_dpad);
+	transition(false, 0.6, false, toggle_dpad);
 }
 
 
