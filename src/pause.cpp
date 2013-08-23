@@ -1103,7 +1103,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 #endif
 
 #ifndef NO_JOYPAD
-#if defined IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 	if (joypad)
 		joypad->set_right_widget(mainItem);
 #endif
@@ -1726,7 +1726,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 			}
 		
 #ifndef NO_JOYPAD
-#if defined IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined ALLEGRO_ANDROID
 			else if (joypad && widget == joypad)
 			{
 #ifdef ALLEGRO_ANDROID

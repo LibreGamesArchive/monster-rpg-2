@@ -13,8 +13,6 @@
 #import "mygamecentervc.h"
 #include <allegro5/allegro_iphone.h>
 
-#import "NetReachability.h"
-
 extern "C" {
 #include <allegro5/allegro_iphone_objc.h>
 }
@@ -557,19 +555,8 @@ void vibrate(void)
 
 bool wifiConnected(void)
 {
-	const bool wifiOnly = true;
-
-	//Make sure we have a WiFi network up & running
-	NetReachability * _reachability = [[NetReachability alloc] initWithDefaultRoute:NO];
-
-	bool result = [_reachability isReachable];
-
-	if (wifiOnly)
-		result = result && ![_reachability isUsingCell];
-
-	[_reachability release];
-
-	return result;
+	// can't use this anymore, return true
+	return true;
 }
 
 void disableMic(void)
