@@ -28,18 +28,18 @@ import android.webkit.WebViewClient;
 
 public class MO2Activity extends AllegroActivity {
 
-   /* load libs */
-   static {
-      System.loadLibrary("allegro");
-      System.loadLibrary("allegro_memfile");
-      System.loadLibrary("allegro_primitives");
-      System.loadLibrary("allegro_image");
-      System.loadLibrary("allegro_font");
-      System.loadLibrary("allegro_ttf");
-      System.loadLibrary("allegro_color");
-      System.loadLibrary("bass");
-      System.loadLibrary("bassflac");
-   }
+	/* load libs */
+	static {
+		System.loadLibrary("allegro");
+		System.loadLibrary("allegro_memfile");
+		System.loadLibrary("allegro_primitives");
+		System.loadLibrary("allegro_image");
+		System.loadLibrary("allegro_font");
+		System.loadLibrary("allegro_ttf");
+		System.loadLibrary("allegro_color");
+		System.loadLibrary("bass");
+		System.loadLibrary("bassflac");
+	}
 
 	public void logString(String s)
 	{
@@ -253,12 +253,10 @@ public class MO2Activity extends AllegroActivity {
 		else {
 			purchased = 0;
 		}
-
 	}
 
 	public int isPurchased()
 	{
-		//Log.d("Purchased?", "" + purchased);
 		return purchased;
 	}
 
