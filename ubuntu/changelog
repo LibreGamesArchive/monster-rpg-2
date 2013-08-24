@@ -1,3 +1,9 @@
+monster-rpg2 (2.10.0-1ubuntu1) oneiric; urgency=low
+
+  * Many new features, enhancements and bug fixes.
+
+ -- Trent Gamblin <trent@nooskewl.com>  Fri, 24 Aug 2013 00:40:00 -0700
+
 monster-rpg2 (2.0.3-1ubuntu1) oneiric; urgency=low
 
   * Added an input configuration screen

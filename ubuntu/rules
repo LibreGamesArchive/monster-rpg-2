@@ -18,20 +18,11 @@ export PKG_CONFIG_PATH=${INSTDIR}/lib/pkgconfig
 export MONSTER2_PKGNAME=monster-rpg2
 export MONSTER2_BASENAME=monster-rpg-2
 
-export LDFLAGS = -L${INSTDIR}/lib -L${HOME}/libs
-export CFLAGS = -Wall -g -fPIC -I${INSTDIR}/include -I${BASEDIR}/bass24
-
 INSTALL = install
 INSTALL_FILE    = $(INSTALL) -p    -o root -g root  -m  644
 INSTALL_PROGRAM = $(INSTALL) -p    -o root -g root  -m  755
 INSTALL_SCRIPT  = $(INSTALL) -p    -o root -g root  -m  755
 INSTALL_DIR     = $(INSTALL) -p -d -o root -g root  -m  755
-
-ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
-	CFLAGS += -O0
-else
-	CFLAGS += -O2
-endif
 
 ifeq (,$(filter nostrip,$(DEB_BUILD_OPTIONS)))
 	INSTALL_PROGRAM += -s
