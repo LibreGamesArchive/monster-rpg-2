@@ -1,0 +1,3 @@
+echo start
+/c/Progra~1/Android/android-sdk/platform-tools/adb -d shell 'am start -a android.intent.action.MAIN -n com.nooskewl.monsterrpg2/.MO2Activity'
+

@@ -714,6 +714,7 @@ void CombatEnemy::draw(void)
 		else {
 			int dx = (int)(x - (w/2));
 			int dy = (int)(y - h);
+			al_hold_bitmap_drawing(true);
 			for (int i = 0; i < h; i++, dy++) {
 				float f = fl + (((float)i/h) * (M_PI*2));
 				int dxo = sin(f)*6;
@@ -732,6 +733,7 @@ void CombatEnemy::draw(void)
 					}
 				}
 			}
+			al_hold_bitmap_drawing(false);
 		}
 	}
 	else {

@@ -336,7 +336,9 @@ void saveGame(const char* filename, std::string mapArea)
 	int y = party[heroSpot]->getObject()->getY();
 
 	if (!writeMilestones(gameInfo.milestones, MAX_MILESTONES, f)) {
-		gzclose(f);
+		if (f) {
+			gzclose(f);
+		}
 		throw WriteError();
 	}
 
@@ -362,7 +364,9 @@ void saveGame(const char* filename, std::string mapArea)
 		}
 	}
 	catch (...) {
-		gzclose(f);
+		if (f) {
+			gzclose(f);
+		}
 		throw WriteError();
 	}
 

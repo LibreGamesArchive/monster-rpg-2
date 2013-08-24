@@ -13,11 +13,11 @@
 #import "mygamecentervc.h"
 #include <allegro5/allegro_iphone.h>
 
-#import "NetReachability.h"
-
 extern "C" {
 #include <allegro5/allegro_iphone_objc.h>
 }
+
+extern bool center_button_pressed;
 
 static MPMusicPlayerController *musicPlayer;
 
@@ -555,25 +555,16 @@ void vibrate(void)
 
 bool wifiConnected(void)
 {
-	const bool wifiOnly = true;
-
-	//Make sure we have a WiFi network up & running
-	NetReachability * _reachability = [[NetReachability alloc] initWithDefaultRoute:NO];
-
-	bool result = [_reachability isReachable];
-
-	if (wifiOnly)
-		result = result && ![_reachability isUsingCell];
-
-	[_reachability release];
-
-	return result;
+	// can't use this anymore, return true
+	return true;
 }
 
 void disableMic(void)
 {
 	[[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:NULL];
 }
+
+double my_last_shake_time = 0.0;
 
 static UITextView *text_view;
 ALLEGRO_EVENT_SOURCE user_event_source;
@@ -708,6 +699,12 @@ ALLEGRO_KEYBOARD_STATE icade_keyboard_state;
 				_AL_KEYBOARD_STATE_CLEAR_KEY_DOWN(icade_keyboard_state, e->keyboard.keycode);
 
 				if (e->keyboard.keycode == config.getKey1()) {
+					if (area && !battle && !in_pause && config.getAlwaysCenter() == PAN_HYBRID) {
+						area_panned_x = floor(area_panned_x);
+						area_panned_y = floor(area_panned_y);
+						area->center_view = true;
+						center_button_pressed = true;
+					}
 					joy_b1_up();
 				}
 				else if (e->keyboard.keycode == config.getKey2()) {

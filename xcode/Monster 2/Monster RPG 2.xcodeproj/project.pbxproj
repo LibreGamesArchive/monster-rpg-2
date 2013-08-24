@@ -9,20 +9,11 @@
 /* Begin PBXBuildFile section */
 		960C9CA316E0A4FD00ABC0FA /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 960C9CA116E0A4AA00ABC0FA /* init.cpp */; };
 		960C9CA416E0A4FE00ABC0FA /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 960C9CA116E0A4AA00ABC0FA /* init.cpp */; };
-		960DB499154C82EA000869BD /* NetReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB489154C82EA000869BD /* NetReachability.m */; };
-		960DB49A154C82EA000869BD /* NetServiceBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB48B154C82EA000869BD /* NetServiceBrowser.m */; };
-		960DB49B154C82EA000869BD /* NetUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB48D154C82EA000869BD /* NetUtilities.m */; };
-		960DB49C154C82EA000869BD /* TCPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB490154C82EA000869BD /* TCPConnection.m */; };
-		960DB49D154C82EA000869BD /* TCPServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB492154C82EA000869BD /* TCPServer.m */; };
-		960DB49E154C82EA000869BD /* TCPService.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB494154C82EA000869BD /* TCPService.m */; };
-		960DB49F154C82EA000869BD /* ThrottledTCPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB496154C82EA000869BD /* ThrottledTCPConnection.m */; };
-		960DB4A0154C82EA000869BD /* UDPSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 960DB498154C82EA000869BD /* UDPSocket.m */; };
 		9610AF8216C4BDFD0050372E /* Area.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9610AF8116C4BDFD0050372E /* Area.cpp */; };
 		9610AF8416C4BE6B0050372E /* libbzip2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9610AF8316C4BE6B0050372E /* libbzip2.a */; };
 		9610AF8516C4BEAD0050372E /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 964D7FC715CCF44600D6F9AF /* libcurl.a */; };
 		9610AF8A16C4BEAD0050372E /* liblua5.2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9610AF8716C4BEAD0050372E /* liblua5.2.a */; };
 		9610AF8B16C4BEAD0050372E /* libphysfs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9610AF8816C4BEAD0050372E /* libphysfs.a */; };
-		9610AF9516C4C26A0050372E /* libJoypad.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9610AF9416C4C26A0050372E /* libJoypad.a */; };
 		9610AF9916C4C82E0050372E /* data in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9610AF9816C4C82E0050372E /* data */; };
 		9610AF9B16C4C8E60050372E /* icon57.png in Resources */ = {isa = PBXBuildFile; fileRef = 9610AF9A16C4C8E60050372E /* icon57.png */; };
 		9610AF9D16C4C8ED0050372E /* icon114.png in Resources */ = {isa = PBXBuildFile; fileRef = 9610AF9C16C4C8ED0050372E /* icon114.png */; };
@@ -144,6 +135,13 @@
 		9659CDA1143A426C0007757E /* joypad.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9659CDA0143A426C0007757E /* joypad.mm */; };
 		9677118016C21DF10092EE0A /* liballegro_physfs-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9677117E16C21DF10092EE0A /* liballegro_physfs-static.a */; };
 		9677118116C21DF10092EE0A /* libphysfs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9677117F16C21DF10092EE0A /* libphysfs.a */; };
+		96798AC317C368A2009EDBD9 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 96798AC217C368A2009EDBD9 /* Default.png */; };
+		96798AC517C368A8009EDBD9 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 96798AC417C368A8009EDBD9 /* Default@2x.png */; };
+		96798AC717C368AD009EDBD9 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 96798AC617C368AD009EDBD9 /* Default-568h@2x.png */; };
+		96798AC917C36931009EDBD9 /* Default-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 96798AC817C36931009EDBD9 /* Default-Portrait~ipad.png */; };
+		96798ACB17C36945009EDBD9 /* Default-Portrait@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 96798ACA17C36945009EDBD9 /* Default-Portrait@2x~ipad.png */; };
+		96798ACD17C36957009EDBD9 /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 96798ACC17C36957009EDBD9 /* Default-Landscape~ipad.png */; };
+		96798ACF17C36961009EDBD9 /* Default-Landscape@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 96798ACE17C36961009EDBD9 /* Default-Landscape@2x~ipad.png */; };
 		968C1E5B13BBB51D00615225 /* libbass.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 968C1E5A13BBB51D00615225 /* libbass.a */; };
 		968C1E7A13BCED5E00615225 /* libbassflac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 968C1E7913BCED5D00615225 /* libbassflac.a */; };
 		968D3EFE15CAD4FE0080197D /* libjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96CB82621596A89100AD6979 /* libjpeg.a */; };
@@ -160,7 +158,6 @@
 		96A028B717016774008264E6 /* Area.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9636675816C9858E00A24B46 /* Area.cpp */; };
 		96A028B817016774008264E6 /* mygamecentervc.m in Sources */ = {isa = PBXBuildFile; fileRef = 96E3D50416C0D06C00A4A973 /* mygamecentervc.m */; };
 		96A028B917016774008264E6 /* gamecenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96C2C90A16C0A595004EBAB9 /* gamecenter.mm */; };
-		96A028BA17016774008264E6 /* svg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9636676E16C9FC8200A24B46 /* svg.cpp */; };
 		96A028BB17016774008264E6 /* ftpget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 969A9E3C16083E3000F4DBE2 /* ftpget.cpp */; };
 		96A028BD17016774008264E6 /* my_load_bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96BC52A916FA8EE7004E526B /* my_load_bitmap.cpp */; };
 		96A028BE17016774008264E6 /* atlas_accessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96BC52A116FA8E39004E526B /* atlas_accessor.cpp */; };
@@ -305,6 +302,7 @@
 		96BC52B716FA90E4004E526B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7D13636EDE0068EB38 /* UIKit.framework */; };
 		96BC52B816FA90FE004E526B /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7913636EDE0068EB38 /* MediaPlayer.framework */; };
 		96BC52BB16FA9147004E526B /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9609BD7A13636EDE0068EB38 /* MobileCoreServices.framework */; };
+		96BD380017C336F7006F4B12 /* libJoypad.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9610AF9416C4C26A0050372E /* libJoypad.a */; };
 		96C2C90816C0A53C004EBAB9 /* liballegro_dialog-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96C2C90616C0A53B004EBAB9 /* liballegro_dialog-static.a */; };
 		96C2C90916C0A53C004EBAB9 /* liblua5.2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96C2C90716C0A53C004EBAB9 /* liblua5.2.a */; };
 		96C2C90B16C0A595004EBAB9 /* gamecenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96C2C90A16C0A595004EBAB9 /* gamecenter.mm */; };
@@ -315,6 +313,10 @@
 		96CFE56A16C0AB6A00B7DB0C /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96CFE56916C0AB6A00B7DB0C /* GameKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		96D175A813351F06008462BB /* translate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D175A713351F06008462BB /* translate.cpp */; };
 		96E3D50516C0D06C00A4A973 /* mygamecentervc.m in Sources */ = {isa = PBXBuildFile; fileRef = 96E3D50416C0D06C00A4A973 /* mygamecentervc.m */; };
+		96EFA2F417C35574001B48BA /* icon57.png in Resources */ = {isa = PBXBuildFile; fileRef = 96EFA2F317C35574001B48BA /* icon57.png */; };
+		96EFA2F617C35581001B48BA /* icon114.png in Resources */ = {isa = PBXBuildFile; fileRef = 96EFA2F517C35581001B48BA /* icon114.png */; };
+		96EFA2F817C3558E001B48BA /* icon72.png in Resources */ = {isa = PBXBuildFile; fileRef = 96EFA2F717C3558E001B48BA /* icon72.png */; };
+		96EFA2FA17C35598001B48BA /* icon144.png in Resources */ = {isa = PBXBuildFile; fileRef = 96EFA2F917C35598001B48BA /* icon144.png */; };
 		96FB52F1158EBBFD00FF36FC /* libbass.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 96FB52F0158EBBFC00FF36FC /* libbass.dylib */; };
 		96FB913916C4AA2F0051C00D /* gamecenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96FB913616C4AA2E0051C00D /* gamecenter.mm */; };
 		96FB913A16C4AA2F0051C00D /* mygamecentervc.m in Sources */ = {isa = PBXBuildFile; fileRef = 96FB913716C4AA2E0051C00D /* mygamecentervc.m */; };
@@ -399,7 +401,6 @@
 
 /* Begin PBXFileReference section */
 		960260311568CC52006F7CB9 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = "../../pc-data/data"; sourceTree = "<group>"; };
-		9603A84716E4191000B80C7D /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		9609BD7413636EDE0068EB38 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		9609BD7513636EDE0068EB38 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		9609BD7613636EDE0068EB38 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
@@ -410,25 +411,7 @@
 		9609BD7B13636EDE0068EB38 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		9609BD7C13636EDE0068EB38 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		9609BD7D13636EDE0068EB38 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		960A8B3315CB90AE0073CF82 /* Monster RPG 2.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Monster RPG 2.entitlements"; sourceTree = "<group>"; };
 		960C9CA116E0A4AA00ABC0FA /* init.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; name = init.cpp; path = ../../src/init.cpp; sourceTree = "<group>"; };
-		960DB488154C82EA000869BD /* NetReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NetReachability.h; path = ../../src/NetworkingSupport/NetReachability.h; sourceTree = "<group>"; };
-		960DB489154C82EA000869BD /* NetReachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NetReachability.m; path = ../../src/NetworkingSupport/NetReachability.m; sourceTree = "<group>"; };
-		960DB48A154C82EA000869BD /* NetServiceBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NetServiceBrowser.h; path = ../../src/NetworkingSupport/NetServiceBrowser.h; sourceTree = "<group>"; };
-		960DB48B154C82EA000869BD /* NetServiceBrowser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NetServiceBrowser.m; path = ../../src/NetworkingSupport/NetServiceBrowser.m; sourceTree = "<group>"; };
-		960DB48C154C82EA000869BD /* NetUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NetUtilities.h; path = ../../src/NetworkingSupport/NetUtilities.h; sourceTree = "<group>"; };
-		960DB48D154C82EA000869BD /* NetUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NetUtilities.m; path = ../../src/NetworkingSupport/NetUtilities.m; sourceTree = "<group>"; };
-		960DB48E154C82EA000869BD /* Networking_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Networking_Internal.h; path = ../../src/NetworkingSupport/Networking_Internal.h; sourceTree = "<group>"; };
-		960DB48F154C82EA000869BD /* TCPConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TCPConnection.h; path = ../../src/NetworkingSupport/TCPConnection.h; sourceTree = "<group>"; };
-		960DB490154C82EA000869BD /* TCPConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TCPConnection.m; path = ../../src/NetworkingSupport/TCPConnection.m; sourceTree = "<group>"; };
-		960DB491154C82EA000869BD /* TCPServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TCPServer.h; path = ../../src/NetworkingSupport/TCPServer.h; sourceTree = "<group>"; };
-		960DB492154C82EA000869BD /* TCPServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TCPServer.m; path = ../../src/NetworkingSupport/TCPServer.m; sourceTree = "<group>"; };
-		960DB493154C82EA000869BD /* TCPService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TCPService.h; path = ../../src/NetworkingSupport/TCPService.h; sourceTree = "<group>"; };
-		960DB494154C82EA000869BD /* TCPService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TCPService.m; path = ../../src/NetworkingSupport/TCPService.m; sourceTree = "<group>"; };
-		960DB495154C82EA000869BD /* ThrottledTCPConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ThrottledTCPConnection.h; path = ../../src/NetworkingSupport/ThrottledTCPConnection.h; sourceTree = "<group>"; };
-		960DB496154C82EA000869BD /* ThrottledTCPConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ThrottledTCPConnection.m; path = ../../src/NetworkingSupport/ThrottledTCPConnection.m; sourceTree = "<group>"; };
-		960DB497154C82EA000869BD /* UDPSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UDPSocket.h; path = ../../src/NetworkingSupport/UDPSocket.h; sourceTree = "<group>"; };
-		960DB498154C82EA000869BD /* UDPSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UDPSocket.m; path = ../../src/NetworkingSupport/UDPSocket.m; sourceTree = "<group>"; };
 		960DB4A1154C8341000869BD /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		960EFA3E1536971C008A2033 /* 60beat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = 60beat.m; path = ../../src/60beat.m; sourceTree = "<group>"; };
 		9610AF8116C4BDFD0050372E /* Area.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = Area.cpp; path = ../../src/Area.cpp; sourceTree = "<group>"; };
@@ -485,11 +468,10 @@
 		9636677116C9FF9100A24B46 /* liballegro_color-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_color-static.a"; path = "../../../local/lib/liballegro_color-static.a"; sourceTree = "<group>"; };
 		9639C4351152D3A900804984 /* iphone.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = iphone.mm; path = ../../src/iphone.mm; sourceTree = SOURCE_ROOT; };
 		963AF9031585AA80007E85D5 /* MoRPG2-lite-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "MoRPG2-lite-Info.plist"; path = "MoRPG2-lite/MoRPG2-lite-Info.plist"; sourceTree = "<group>"; };
-		96490EB9136368C500B2FBAF /* Mo. RPG 2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mo. RPG 2.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		96490EB9136368C500B2FBAF /* MoRPG2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoRPG2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		964D7FC715CCF44600D6F9AF /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcurl.a; path = ../../../iphone_libs_r/libcurl.a; sourceTree = "<group>"; };
 		964FB85B16E6051600F4BBA4 /* Monster RPG 2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Monster RPG 2.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		964FB85C16E6051600F4BBA4 /* Monster RPG 2 copy2-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Monster RPG 2 copy2-Info.plist"; path = "/Users/trent/code/monster-rpg-2/xcode/Monster 2/Monster RPG 2 copy2-Info.plist"; sourceTree = "<absolute>"; };
-		965070C116CE553900E6E9D4 /* Mo. RPG 2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Mo. RPG 2.entitlements"; sourceTree = "<group>"; };
 		96581D701585710D006BF72E /* tftp_get.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = tftp_get.c; path = ../../src/tftp_get.c; sourceTree = "<group>"; };
 		96581D7515857178006BF72E /* 60beat.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = 60beat.m; path = ../../src/60beat.m; sourceTree = "<group>"; };
 		9659CD8E143A2A030007757E /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-72.png"; path = "../../icons/full/Icon-72.png"; sourceTree = "<group>"; };
@@ -504,18 +486,17 @@
 		965E24911585309A00839861 /* Monster RPG 2 copy-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Monster RPG 2 copy-Info.plist"; sourceTree = "<group>"; };
 		965E24941585321C00839861 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		965E24981585334500839861 /* liballegro_native_dialog-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_native_dialog-static.a"; path = "../../../iphone_libs_r/liballegro_native_dialog-static.a"; sourceTree = "<group>"; };
-		966C6FB015CA5ACF00AA804D /* Monster RPG 2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Monster RPG 2.entitlements"; sourceTree = SOURCE_ROOT; };
 		9677117E16C21DF10092EE0A /* liballegro_physfs-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_physfs-static.a"; path = "../../../local/lib/liballegro_physfs-static.a"; sourceTree = "<group>"; };
 		9677117F16C21DF10092EE0A /* libphysfs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libphysfs.a; path = ../../../local/lib/libphysfs.a; sourceTree = "<group>"; };
-		967C33CB15CBA765003FD960 /* Monster RPG 2 Lite.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Monster RPG 2 Lite.entitlements"; sourceTree = "<group>"; };
-		967C33CF15CC4A1A003FD960 /* Default-Landscape~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape~ipad.png"; sourceTree = "<group>"; };
-		967C33D115CC4A1E003FD960 /* Default-Landscape@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape@2x~ipad.png"; sourceTree = "<group>"; };
-		967C33D315CC4A2A003FD960 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
-		967C33D515CC4A2D003FD960 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
+		96798AC117C361B1009EDBD9 /* Mo. RPG 2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Mo. RPG 2.entitlements"; sourceTree = "<group>"; };
+		96798AC217C368A2009EDBD9 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
+		96798AC417C368A8009EDBD9 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
+		96798AC617C368AD009EDBD9 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		96798AC817C36931009EDBD9 /* Default-Portrait~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Portrait~ipad.png"; sourceTree = "<group>"; };
+		96798ACA17C36945009EDBD9 /* Default-Portrait@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Portrait@2x~ipad.png"; sourceTree = "<group>"; };
+		96798ACC17C36957009EDBD9 /* Default-Landscape~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape~ipad.png"; sourceTree = "<group>"; };
+		96798ACE17C36961009EDBD9 /* Default-Landscape@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape@2x~ipad.png"; sourceTree = "<group>"; };
 		967C33D715CC4AC7003FD960 /* icon144.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon144.png; sourceTree = "<group>"; };
-		967C33D915CC4AD1003FD960 /* MoRPG2-DBG.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "MoRPG2-DBG.entitlements"; sourceTree = "<group>"; };
-		967C33DA15CC4AF3003FD960 /* MoRPG2-DBG.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "MoRPG2-DBG.entitlements"; sourceTree = "<group>"; };
-		967C33DB15CC4B03003FD960 /* MoRPG2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = MoRPG2.entitlements; sourceTree = "<group>"; };
 		967C33ED15CC56A0003FD960 /* libJoypadCocoaTouch.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libJoypadCocoaTouch.a; path = ../../../JoypadSDKs/Cocoa/iOS/JoypadiOS/libJoypadCocoaTouch.a; sourceTree = "<group>"; };
 		968C1E5A13BBB51D00615225 /* libbass.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbass.a; path = ../../../iphone_libs_r/libbass.a; sourceTree = "<group>"; };
 		968C1E5C13BBB55900615225 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
@@ -530,8 +511,6 @@
 		9695A131138D706400FB0417 /* liballegro_ttf-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_ttf-static.a"; path = "../../../iphone_libs_r/liballegro_ttf-static.a"; sourceTree = "<group>"; };
 		9695A132138D706400FB0417 /* liballegro-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro-static.a"; path = "../../../iphone_libs_r/liballegro-static.a"; sourceTree = "<group>"; };
 		9695A133138D706400FB0417 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = ../../../iphone_libs_r/libfreetype.a; sourceTree = "<group>"; };
-		969799761587A4A3006E8AFA /* libbass 2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libbass 2.dylib"; path = "../../../local/lib/libbass 2.dylib"; sourceTree = "<group>"; };
-		969799781587A59E006E8AFA /* libbass 2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libbass 2.dylib"; path = "../../../local/lib/libbass 2.dylib"; sourceTree = "<group>"; };
 		969799791587A59E006E8AFA /* libbassflac.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbassflac.dylib; path = ../../../local/lib/libbassflac.dylib; sourceTree = "<group>"; };
 		969A7CE7159F7293001BE047 /* libJoypadCocoa.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libJoypadCocoa.a; path = ../../../JoypadSDKs/Cocoa/Mac/JoypadMac/libJoypadCocoa.a; sourceTree = "<group>"; };
 		969A9E3C16083E3000F4DBE2 /* ftpget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ftpget.cpp; path = ../../src/ftpget.cpp; sourceTree = "<group>"; };
@@ -561,7 +540,6 @@
 		96B4B0CE143BBA8400ACA64C /* libbass.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbass.dylib; path = ../../../local/lib/libbass.dylib; sourceTree = "<group>"; };
 		96B4B0CF143BBA8400ACA64C /* libbassflac.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbassflac.dylib; path = ../../../local/lib/libbassflac.dylib; sourceTree = "<group>"; };
 		96B4B0D0143BBA8400ACA64C /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = ../../../local/lib/libfreetype.a; sourceTree = "<group>"; };
-		96B4B0D2143BBA8400ACA64C /* libtgui.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtgui.a; path = ../../../local/lib/libtgui.a; sourceTree = "<group>"; };
 		96B4B0D3143BBA8400ACA64C /* libz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libz.a; path = ../../../local/lib/libz.a; sourceTree = "<group>"; };
 		96B7D08313D09EF7004D7ED6 /* libpng.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpng.a; path = ../../../iphone_libs_r/libpng.a; sourceTree = "<group>"; };
 		96B7D08413D09EF7004D7ED6 /* libz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libz.a; path = ../../../iphone_libs_r/libz.a; sourceTree = "<group>"; };
@@ -577,6 +555,10 @@
 		96D175A713351F06008462BB /* translate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = translate.cpp; path = ../../src/translate.cpp; sourceTree = "<group>"; };
 		96E3D50416C0D06C00A4A973 /* mygamecentervc.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = mygamecentervc.m; path = ../../src/mygamecentervc.m; sourceTree = "<group>"; };
 		96ED3258136349520057B4C7 /* Monster_2-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Monster_2-Info.plist"; sourceTree = "<group>"; };
+		96EFA2F317C35574001B48BA /* icon57.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon57.png; sourceTree = "<group>"; };
+		96EFA2F517C35581001B48BA /* icon114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon114.png; sourceTree = "<group>"; };
+		96EFA2F717C3558E001B48BA /* icon72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon72.png; sourceTree = "<group>"; };
+		96EFA2F917C35598001B48BA /* icon144.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon144.png; sourceTree = "<group>"; };
 		96FB52F0158EBBFC00FF36FC /* libbass.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbass.dylib; path = ../../../local/lib/libbass.dylib; sourceTree = "<group>"; };
 		96FB913616C4AA2E0051C00D /* gamecenter.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; name = gamecenter.mm; path = ../../src/gamecenter.mm; sourceTree = "<group>"; };
 		96FB913716C4AA2E0051C00D /* mygamecentervc.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = mygamecentervc.m; path = ../../src/mygamecentervc.m; sourceTree = "<group>"; };
@@ -589,6 +571,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96BD380017C336F7006F4B12 /* libJoypad.a in Frameworks */,
 				96BC52BB16FA9147004E526B /* MobileCoreServices.framework in Frameworks */,
 				96BC52B816FA90FE004E526B /* MediaPlayer.framework in Frameworks */,
 				96BC52AE16FA90E4004E526B /* AudioToolbox.framework in Frameworks */,
@@ -601,7 +584,6 @@
 				96BC52B516FA90E4004E526B /* Security.framework in Frameworks */,
 				96BC52B616FA90E4004E526B /* SystemConfiguration.framework in Frameworks */,
 				96BC52B716FA90E4004E526B /* UIKit.framework in Frameworks */,
-				9610AF9516C4C26A0050372E /* libJoypad.a in Frameworks */,
 				9610AF8A16C4BEAD0050372E /* liblua5.2.a in Frameworks */,
 				9610AF8B16C4BEAD0050372E /* libphysfs.a in Frameworks */,
 				9610AF8516C4BEAD0050372E /* libcurl.a in Frameworks */,
@@ -721,7 +703,7 @@
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				96490EB9136368C500B2FBAF /* Mo. RPG 2.app */,
+				96490EB9136368C500B2FBAF /* MoRPG2.app */,
 				96B4B09E143BB83100ACA64C /* Monster RPG 2.app */,
 				964FB85B16E6051600F4BBA4 /* Monster RPG 2.app */,
 				96A0291217016774008264E6 /* Monster RPG 2.app */,
@@ -732,9 +714,19 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
-				9603A84716E4191000B80C7D /* Default-568h@2x.png */,
+				96798ACE17C36961009EDBD9 /* Default-Landscape@2x~ipad.png */,
+				96798ACC17C36957009EDBD9 /* Default-Landscape~ipad.png */,
+				96798ACA17C36945009EDBD9 /* Default-Portrait@2x~ipad.png */,
+				96798AC817C36931009EDBD9 /* Default-Portrait~ipad.png */,
+				96798AC617C368AD009EDBD9 /* Default-568h@2x.png */,
+				96798AC417C368A8009EDBD9 /* Default@2x.png */,
+				96798AC217C368A2009EDBD9 /* Default.png */,
+				96798AC117C361B1009EDBD9 /* Mo. RPG 2.entitlements */,
+				96EFA2F917C35598001B48BA /* icon144.png */,
+				96EFA2F717C3558E001B48BA /* icon72.png */,
+				96EFA2F517C35581001B48BA /* icon114.png */,
+				96EFA2F317C35574001B48BA /* icon57.png */,
 				960C9CA116E0A4AA00ABC0FA /* init.cpp */,
-				965070C116CE553900E6E9D4 /* Mo. RPG 2.entitlements */,
 				9692632016CC7BFF00E09689 /* icon.icns */,
 				9636677116C9FF9100A24B46 /* liballegro_color-static.a */,
 				9636676016C9886700A24B46 /* data */,
@@ -765,23 +757,12 @@
 				969A9E3C16083E3000F4DBE2 /* ftpget.cpp */,
 				967C33ED15CC56A0003FD960 /* libJoypadCocoaTouch.a */,
 				967C33EC15CC5627003FD960 /* curl ios */,
-				967C33DB15CC4B03003FD960 /* MoRPG2.entitlements */,
-				967C33DA15CC4AF3003FD960 /* MoRPG2-DBG.entitlements */,
-				967C33D915CC4AD1003FD960 /* MoRPG2-DBG.entitlements */,
 				967C33D715CC4AC7003FD960 /* icon144.png */,
-				967C33D515CC4A2D003FD960 /* Default@2x.png */,
-				967C33D315CC4A2A003FD960 /* Default.png */,
-				967C33D115CC4A1E003FD960 /* Default-Landscape@2x~ipad.png */,
-				967C33CF15CC4A1A003FD960 /* Default-Landscape~ipad.png */,
-				967C33CB15CBA765003FD960 /* Monster RPG 2 Lite.entitlements */,
-				960A8B3315CB90AE0073CF82 /* Monster RPG 2.entitlements */,
 				968D3F8A15CAE0EE0080197D /* libcurl.a */,
 				969A7CE7159F7293001BE047 /* libJoypadCocoa.a */,
 				96CB82621596A89100AD6979 /* libjpeg.a */,
 				96FB52F0158EBBFC00FF36FC /* libbass.dylib */,
-				969799781587A59E006E8AFA /* libbass 2.dylib */,
 				969799791587A59E006E8AFA /* libbassflac.dylib */,
-				969799761587A4A3006E8AFA /* libbass 2.dylib */,
 				963AF9031585AA80007E85D5 /* MoRPG2-lite-Info.plist */,
 				96581D7515857178006BF72E /* 60beat.m */,
 				96581D701585710D006BF72E /* tftp_get.c */,
@@ -791,7 +772,6 @@
 				965E248B15852F8500839861 /* liballegro_memfile-static.a */,
 				960260331568CC5C006F7CB9 /* Mac data */,
 				960DB4A1154C8341000869BD /* SystemConfiguration.framework */,
-				960DB487154C82C3000869BD /* NetworkingSupport */,
 				96A4D26C154A7E66009ECD44 /* libpng.a */,
 				96A4D26A154A7E21009ECD44 /* IOKit.framework */,
 				96A4D256154A7D55009ECD44 /* Cocoa.framework */,
@@ -894,30 +874,6 @@
 			name = "Mac data";
 			sourceTree = "<group>";
 		};
-		960DB487154C82C3000869BD /* NetworkingSupport */ = {
-			isa = PBXGroup;
-			children = (
-				960DB488154C82EA000869BD /* NetReachability.h */,
-				960DB489154C82EA000869BD /* NetReachability.m */,
-				960DB48A154C82EA000869BD /* NetServiceBrowser.h */,
-				960DB48B154C82EA000869BD /* NetServiceBrowser.m */,
-				960DB48C154C82EA000869BD /* NetUtilities.h */,
-				960DB48D154C82EA000869BD /* NetUtilities.m */,
-				960DB48E154C82EA000869BD /* Networking_Internal.h */,
-				960DB48F154C82EA000869BD /* TCPConnection.h */,
-				960DB490154C82EA000869BD /* TCPConnection.m */,
-				960DB491154C82EA000869BD /* TCPServer.h */,
-				960DB492154C82EA000869BD /* TCPServer.m */,
-				960DB493154C82EA000869BD /* TCPService.h */,
-				960DB494154C82EA000869BD /* TCPService.m */,
-				960DB495154C82EA000869BD /* ThrottledTCPConnection.h */,
-				960DB496154C82EA000869BD /* ThrottledTCPConnection.m */,
-				960DB497154C82EA000869BD /* UDPSocket.h */,
-				960DB498154C82EA000869BD /* UDPSocket.m */,
-			);
-			name = NetworkingSupport;
-			sourceTree = "<group>";
-		};
 		964BBF201363557A00482029 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -986,7 +942,6 @@
 		96B4B0A6143BB83100ACA64C /* Monster RPG 2 */ = {
 			isa = PBXGroup;
 			children = (
-				966C6FB015CA5ACF00AA804D /* Monster RPG 2.entitlements */,
 				96B4B0A7143BB83100ACA64C /* Supporting Files */,
 			);
 			path = "Monster RPG 2";
@@ -1008,7 +963,6 @@
 				96B4B0CE143BBA8400ACA64C /* libbass.dylib */,
 				96B4B0CF143BBA8400ACA64C /* libbassflac.dylib */,
 				96B4B0D0143BBA8400ACA64C /* libfreetype.a */,
-				96B4B0D2143BBA8400ACA64C /* libtgui.a */,
 				96B4B0D3143BBA8400ACA64C /* libz.a */,
 			);
 			name = "Mac libs";
@@ -1032,7 +986,7 @@
 			);
 			name = MoRPG2;
 			productName = "Monster 2";
-			productReference = 96490EB9136368C500B2FBAF /* Mo. RPG 2.app */;
+			productReference = 96490EB9136368C500B2FBAF /* MoRPG2.app */;
 			productType = "com.apple.product-type.application";
 		};
 		964FB80016E6051600F4BBA4 /* Monster RPG 2 not MAS */ = {
@@ -1157,6 +1111,17 @@
 				9610AF9D16C4C8ED0050372E /* icon114.png in Resources */,
 				9610AF9F16C4C8FD0050372E /* icon72.png in Resources */,
 				9610AFA016C4C9090050372E /* icon144.png in Resources */,
+				96EFA2F417C35574001B48BA /* icon57.png in Resources */,
+				96EFA2F617C35581001B48BA /* icon114.png in Resources */,
+				96EFA2F817C3558E001B48BA /* icon72.png in Resources */,
+				96EFA2FA17C35598001B48BA /* icon144.png in Resources */,
+				96798AC317C368A2009EDBD9 /* Default.png in Resources */,
+				96798AC517C368A8009EDBD9 /* Default@2x.png in Resources */,
+				96798AC717C368AD009EDBD9 /* Default-568h@2x.png in Resources */,
+				96798AC917C36931009EDBD9 /* Default-Portrait~ipad.png in Resources */,
+				96798ACB17C36945009EDBD9 /* Default-Portrait@2x~ipad.png in Resources */,
+				96798ACD17C36957009EDBD9 /* Default-Landscape~ipad.png in Resources */,
+				96798ACF17C36961009EDBD9 /* Default-Landscape@2x~ipad.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1210,15 +1175,7 @@
 				96D175A813351F06008462BB /* translate.cpp in Sources */,
 				9659CDA1143A426C0007757E /* joypad.mm in Sources */,
 				96A4D270154A7EA0009ECD44 /* tftp_get.c in Sources */,
-				960DB499154C82EA000869BD /* NetReachability.m in Sources */,
-				960DB49A154C82EA000869BD /* NetServiceBrowser.m in Sources */,
-				960DB49B154C82EA000869BD /* NetUtilities.m in Sources */,
-				960DB49C154C82EA000869BD /* TCPConnection.m in Sources */,
-				960DB49D154C82EA000869BD /* TCPServer.m in Sources */,
-				960DB49E154C82EA000869BD /* TCPService.m in Sources */,
-				960DB49F154C82EA000869BD /* ThrottledTCPConnection.m in Sources */,
 				96BC52A316FA8E39004E526B /* atlas_accessor.cpp in Sources */,
-				960DB4A0154C82EA000869BD /* UDPSocket.m in Sources */,
 				9610AF8216C4BDFD0050372E /* Area.cpp in Sources */,
 				9636676F16C9FC8200A24B46 /* svg.cpp in Sources */,
 				960C9CA316E0A4FD00ABC0FA /* init.cpp in Sources */,
@@ -1290,7 +1247,6 @@
 				96A028B717016774008264E6 /* Area.cpp in Sources */,
 				96A028B817016774008264E6 /* mygamecentervc.m in Sources */,
 				96A028B917016774008264E6 /* gamecenter.mm in Sources */,
-				96A028BA17016774008264E6 /* svg.cpp in Sources */,
 				96A028BB17016774008264E6 /* ftpget.cpp in Sources */,
 				96A028BD17016774008264E6 /* my_load_bitmap.cpp in Sources */,
 				96A028BE17016774008264E6 /* atlas_accessor.cpp in Sources */,
@@ -1411,9 +1367,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Mo. RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Nooskewl";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = YES;
+				DISPLAY_NAME = "Mo. RPG 2";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Monster_2_Prefix.pch;
@@ -1430,7 +1387,6 @@
 				);
 				INFOPLIST_FILE = "Monster_2-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				IPOD_DISPLAY_NAME = "Mo. RPG 2";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../JoypadSDKs/Cocoa/iOS/JoypadiOS\"",
@@ -1439,8 +1395,8 @@
 					"\"$(SRCROOT)/../../../JoypadSDK-0.3.5/Joypad-0.3.5\"",
 				);
 				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_NAME = "Mo. RPG 2";
-				PROVISIONING_PROFILE = "D70B149C-084B-496B-89ED-0D12FD791B7C";
+				PRODUCT_NAME = MoRPG2;
+				PROVISIONING_PROFILE = "";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				VALID_ARCHS = "armv7 armv7s";
 			};
@@ -1487,9 +1443,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Mo. RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Nooskewl";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = YES;
+				DISPLAY_NAME = "Mo. RPG 2";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Monster_2_Prefix.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1505,7 +1462,6 @@
 				);
 				INFOPLIST_FILE = "Monster_2-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				IPOD_DISPLAY_NAME = "Mo. RPG 2";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../JoypadSDKs/Cocoa/iOS/JoypadiOS\"",
@@ -1514,8 +1470,8 @@
 					"\"$(SRCROOT)/../../../JoypadSDK-0.3.5/Joypad-0.3.5\"",
 				);
 				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_NAME = "Mo. RPG 2";
-				PROVISIONING_PROFILE = "D70B149C-084B-496B-89ED-0D12FD791B7C";
+				PRODUCT_NAME = MoRPG2;
+				PROVISIONING_PROFILE = "";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				VALID_ARCHS = "armv7 armv7s";
 			};
@@ -1741,9 +1697,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Mo. RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Nooskewl";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = YES;
+				DISPLAY_NAME = "Mo. RPG 2";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Monster_2_Prefix.pch;
@@ -1760,7 +1717,6 @@
 				);
 				INFOPLIST_FILE = "Monster_2-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				IPOD_DISPLAY_NAME = "Mo. RPG 2";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../JoypadSDKs/Cocoa/iOS/JoypadiOS\"",
@@ -1769,8 +1725,8 @@
 					"\"$(SRCROOT)/../../../JoypadSDK-0.3.5/Joypad-0.3.5\"",
 				);
 				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_NAME = "Mo. RPG 2";
-				PROVISIONING_PROFILE = "D70B149C-084B-496B-89ED-0D12FD791B7C";
+				PRODUCT_NAME = MoRPG2;
+				PROVISIONING_PROFILE = "";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				VALID_ARCHS = "armv7 armv7s";
 			};
@@ -1806,9 +1762,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Mo. RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Nooskewl";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = YES;
+				DISPLAY_NAME = "Mo. RPG 2";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Monster_2_Prefix.pch;
@@ -1825,7 +1782,6 @@
 				);
 				INFOPLIST_FILE = "Monster_2-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				IPOD_DISPLAY_NAME = "Mo. RPG 2";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../JoypadSDKs/Cocoa/iOS/JoypadiOS\"",
@@ -1834,8 +1790,8 @@
 					"\"$(SRCROOT)/../../../JoypadSDK-0.3.5/Joypad-0.3.5\"",
 				);
 				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_NAME = "Mo. RPG 2";
-				PROVISIONING_PROFILE = "D70B149C-084B-496B-89ED-0D12FD791B7C";
+				PRODUCT_NAME = MoRPG2;
+				PROVISIONING_PROFILE = "";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				VALID_ARCHS = "armv7 armv7s";
 			};
@@ -1858,7 +1814,6 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					A5_OGL,
-					WITH_SVG,
 					NO_GAMECENTER,
 					NO_JOYPAD,
 				);
@@ -1906,7 +1861,6 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					A5_OGL,
-					WITH_SVG,
 					NO_GAMECENTER,
 					NO_JOYPAD,
 				);
@@ -1953,7 +1907,6 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					A5_OGL,
-					WITH_SVG,
 					NO_GAMECENTER,
 					NO_JOYPAD,
 				);
@@ -1999,7 +1952,6 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					A5_OGL,
-					WITH_SVG,
 					NO_GAMECENTER,
 					NO_JOYPAD,
 				);
@@ -2033,7 +1985,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Monster RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: Nooskewl (ZCLK6CUZ99)";
+				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2067,7 +2019,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "F922E595-A8DC-414A-9A85-9DC785CC970D";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
@@ -2078,7 +2030,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Monster RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: Nooskewl (ZCLK6CUZ99)";
+				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2115,7 +2067,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "F922E595-A8DC-414A-9A85-9DC785CC970D";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
@@ -2126,7 +2078,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Monster RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: Nooskewl (ZCLK6CUZ99)";
+				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2160,7 +2112,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "F922E595-A8DC-414A-9A85-9DC785CC970D";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
@@ -2171,7 +2123,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "Monster RPG 2.entitlements";
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: Nooskewl (ZCLK6CUZ99)";
+				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2205,7 +2157,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "F922E595-A8DC-414A-9A85-9DC785CC970D";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};

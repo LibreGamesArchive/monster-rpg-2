@@ -1,0 +1,5 @@
+cp bin/monsterrpg2-project-release-unsigned.apk tmp.apk
+/c/Progra~1/Java/jdk1.7.0_25/bin/jarsigner.exe -verbose -sigalg MD5withRSA -digestalg SHA1 -keystore my-release-key.keystore tmp.apk Nooskewl
+/c/Progra~1/Java/jdk1.7.0_25/bin/jarsigner.exe -verify tmp.apk
+/c/Progra~1/Android/android-sdk/tools/zipalign -v 4 tmp.apk $1
+rm tmp.apk
