@@ -1152,9 +1152,11 @@ top:
 			config.write();
 
 #ifdef ALLEGRO_ANDROID
+#ifndef AMAZON
 			if (isOuya() && dontbail == false) {
 				exit(0);
 			}
+#endif
 			dontbail = false;
 #endif
 
@@ -1979,17 +1981,6 @@ int main(int argc, char *argv[])
 		remove(getUserResource("launch_config"));
 		return 1;
 	}
-
-#ifdef OUYA
-	// FIXME: Don't use this, use config file
-	/*
-	queryPurchased();
-	int purchased = -1;
-	do {
-		purchased = isPurchased();
-	} while (purchased == -1);
-	*/
-#endif
 
 #ifndef ALLEGRO_ANDROID
 	int c = argc;

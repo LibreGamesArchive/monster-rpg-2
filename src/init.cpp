@@ -33,7 +33,7 @@ extern "C" {
 void create_tmpbuffer()
 {
 	int flags = al_get_new_bitmap_flags();
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
 	int format = al_get_new_bitmap_format();
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
 #endif
@@ -1418,6 +1418,8 @@ bool init(int *argc, char **argv[])
 	int w = mi.x2 - mi.x1;
 	int h = mi.y2 - mi.y1;
 #ifdef ALLEGRO_RASPBERRYPI
+	w = 1280;
+	h = 720;
 	sd->width = w;
 	sd->height = h;
 	config_save_width = w;

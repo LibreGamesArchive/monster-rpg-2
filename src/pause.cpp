@@ -4499,7 +4499,7 @@ int title_menu(void)
 	options.push_back("Tutorial");
 	options.push_back("HQ sound track");
 	options.push_back("Options");
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if (defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID) && !defined AMAZON
 	options.push_back("Visit WWW site");
 #endif
 #if defined ALLEGRO_ANDROID && defined OUYA
@@ -4568,7 +4568,11 @@ int title_menu(void)
 			TGUIWidget *widget = tguiUpdate();
 
 			if (widget == main_menu) {
+#ifdef AMAZON
+				if (main_menu->getSelected() < 3) {
+#else
 				if (main_menu->getSelected() < 3 || main_menu->getSelected() == 5) {
+#endif
 					if (main_menu->getSelected() == 5) {
 						selected = 3;
 					}
@@ -4666,7 +4670,6 @@ int title_menu(void)
 #endif
 
 #ifndef OUYA
-
 			INPUT_EVENT ie = get_next_input_event();
 			// Back button on android is a shake. other shakes (hot corner) suppressed on this menu (see monster2.cpp)
 			if (ie.button2 == DOWN || iphone_shaken(0.1)) {

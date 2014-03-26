@@ -1855,6 +1855,49 @@ void MInputGetter::draw()
 
 		char buf[100];
 		if (isOuya()) {
+#ifdef AMAZON
+			switch (value) {
+				case ALLEGRO_KEY_BUTTON_A:
+					snprintf(buf, 100, "%s", "A");
+					break;
+				case ALLEGRO_KEY_BUTTON_X:
+					snprintf(buf, 100, "%s", "X");
+					break;
+				case ALLEGRO_KEY_BUTTON_Y:
+					snprintf(buf, 100, "%s", "Y");
+					break;
+				case ALLEGRO_KEY_BUTTON_B:
+					snprintf(buf, 100, "%s", "B");
+					break;
+				case ALLEGRO_KEY_BUTTON_L2:
+					snprintf(buf, 100, "%s", "L2");
+					break;
+				case ALLEGRO_KEY_BUTTON_R2:
+					snprintf(buf, 100, "%s", "R2");
+					break;
+				case ALLEGRO_KEY_BUTTON_L1:
+					snprintf(buf, 100, "%s", "L1");
+					break;
+				case ALLEGRO_KEY_BUTTON_R1:
+					snprintf(buf, 100, "%s", "R1");
+					break;
+				case ALLEGRO_KEY_THUMBL:
+					snprintf(buf, 100, "%s", "L3");
+					break;
+				case ALLEGRO_KEY_THUMBR:
+					snprintf(buf, 100, "%s", "R3");
+					break;
+				case ALLEGRO_KEY_START:
+					snprintf(buf, 100, "%s", "Start");
+					break;
+				case ALLEGRO_KEY_BACK:
+					snprintf(buf, 100, "%s", "Back");
+					break;
+				default:
+					snprintf(buf, 100, "%s", "?");
+					break;
+			}
+#else
 			switch (value) {
 				case ALLEGRO_KEY_BUTTON_A:
 					snprintf(buf, 100, "%s", "O");
@@ -1896,6 +1939,7 @@ void MInputGetter::draw()
 					snprintf(buf, 100, "%s", "?");
 					break;
 			}
+#endif
 		}
 		else {
 			sprintf(buf, "%s", type == TYPE_KB ? keycode_to_keyname(value) : my_itoa(value));
@@ -2866,7 +2910,11 @@ int MMap::update(int millis)
 	}
 
 	if (ie.button1 == DOWN || clicked) {
+#ifdef AMAZON
+		if (false) {
+#else
 		if (isOuya() && (config.getPurchased() != 1) && points[selected].dest_area == "flowey") {
+#endif
 			prepareForScreenGrab1();
 			draw();
 			drawBufferToScreen(false);

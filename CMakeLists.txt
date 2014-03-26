@@ -273,7 +273,7 @@ else(APPLE)
 		LIST(APPEND MAIN_LIBS "${CMAKE_BINARY_DIR}/libbass.so")
 	endif(KCM_AUDIO)
 	if(RASPBERRYPI)
-		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host /usr/local/lib/libfreetype.a /usr/lib/libz.a /usr/lib/libpng.a /usr/lib/libjpeg.a /usr/local/lib/liblua.a /usr/lib/libphysfs.a /usr/local/lib/libcurl.a /usr/lib/libbz2.a stdc++)
+		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host /usr/lib/arm-linux-gnueabihf/libfreetype.a /usr/lib/arm-linux-gnueabihf/libz.a /usr/lib/arm-linux-gnueabihf/libpng.a /usr/lib/arm-linux-gnueabihf/liblua5.2.a /usr/lib/libphysfs.a /usr/local/lib/libcurl.a)
 	else(RASPBERYPI)
 		# trentg's build
 		LIST(APPEND MAIN_LIBS allegro_dialog${ALLEG_SUFFIX} GL GLU /usr/lib/libfreetype.a /usr/lib/libz.a /usr/lib/libpng.a /usr/lib/libjpeg.a /usr/local/lib/liblua5.2.a /usr/lib/libphysfs.a /usr/local/lib/libcurl.a)

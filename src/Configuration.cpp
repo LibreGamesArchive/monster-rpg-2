@@ -713,8 +713,13 @@ void Configuration::setDefaultInputs()
 		keyFullscreen = ALLEGRO_KEY_F;
 		keySFXUp = ALLEGRO_KEY_BUTTON_R1;
 		keySFXDown = ALLEGRO_KEY_BUTTON_L1;
+#ifdef AMAZON
+		keyMusicUp = ALLEGRO_KEY_THUMBR;
+		keyMusicDown = ALLEGRO_KEY_THUMBL;
+#else
 		keyMusicUp = ALLEGRO_KEY_BUTTON_R2;
 		keyMusicDown = ALLEGRO_KEY_BUTTON_L2;
+#endif
 		keyQuit = ALLEGRO_KEY_Q;
 		keySortItems = ALLEGRO_KEY_BUTTON_Y;
 	}
@@ -757,8 +762,11 @@ void Configuration::setDefaultInputs()
 bool Configuration::read()
 {
 #ifdef ALLEGRO_ANDROID
-	// FIXME
+#ifdef AMAZON
+	#define unlocked 1
+#else
 	#define unlocked 0
+#endif
 	if (isOuya()) {
 		purchased = unlocked;
 	}
@@ -770,14 +778,23 @@ bool Configuration::read()
 #endif
 
 #if defined ALLEGRO_IPHONE || (defined ALLEGRO_ANDROID && !defined OUYA)
-	always_center = PAN_MANUAL;
+	if (isOuya()) {
+		always_center = PAN_HYBRID;
+	}
+	else {
+		always_center = PAN_MANUAL;
+	}
 #else
 	always_center = PAN_HYBRID;
 #endif
 
 	setDefaultInputs();
-	
+
+#ifdef AMAZON
+	if (false) {
+#else
 	if (isOuya()) {
+#endif
 		cfg_maintain_aspect_ratio = ASPECT_INTEGER;
 	}
 	else {
@@ -805,7 +822,7 @@ bool Configuration::read()
 	if (xml->getFailed()) {
 		debug_message("couldn't read config");
 		delete xml;
-#ifdef OUYA
+#if defined OUYA
 		if (isOuya()) {
 			int purchased = checkPurchased();
 			if (purchased == 1) {

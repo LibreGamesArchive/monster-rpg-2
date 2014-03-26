@@ -243,7 +243,11 @@ bool isOuya()
 	
 	const char *native = _al_android_get_jnienv()->GetStringUTFChars(s, 0);
 
+#if defined AMAZON
+	if (native[0] == 'A' && native[1] == 'F' && native[2] == 'T') {
+#else
 	if (strstr(native, "OUYA")) {
+#endif
 		is_ouya = true;
 	}
 
@@ -269,7 +273,7 @@ void logString(const char *s)
 	_al_android_get_jnienv()->DeleteLocalRef(S);
 }
 
-#ifdef OUYA
+#if defined OUYA
 int isPurchased()
 {
 	int ret = _jni_callIntMethod(
@@ -316,5 +320,4 @@ int checkPurchased()
 
 	return purchased;
 }
-
 #endif

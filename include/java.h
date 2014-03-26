@@ -40,7 +40,7 @@ void autoconnect_zeemote();
 void goHome();
 void logString(const char *s);
 
-#ifdef OUYA
+#if defined OUYA
 int isPurchased();
 void queryPurchased();
 void doIAP();
