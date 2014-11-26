@@ -2913,13 +2913,25 @@ int MMap::update(int millis)
 #ifdef AMAZON
 		if (false) {
 #else
+#ifdef DEMO
+		if (points[selected].dest_area == "flowey") {
+#else
 		if (isOuya() && (config.getPurchased() != 1) && points[selected].dest_area == "flowey") {
 #endif
+#endif
+
+			use_input_event();
+			clicked = false;
+
 			prepareForScreenGrab1();
 			draw();
 			drawBufferToScreen(false);
 			prepareForScreenGrab2();
+#ifdef DEMO
+			notify("You have reached", "the end of the demo.", "");
+#else
 			notify("Please purchase from main", "menu to continue.", "");
+#endif
 		}
 		else {
 			use_input_event();

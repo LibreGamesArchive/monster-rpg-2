@@ -36,7 +36,7 @@
 #undef UNICODE
 #include <windows.h>
 #include <winsock2.h>
-#include <ws2tcpip.h>
+//#include <ws2tcpip.h>
 #define my_shutdown(a, b) closesocket(a)
 #define SHUT_RDWR 0xf008a7
 #define socklen_t int

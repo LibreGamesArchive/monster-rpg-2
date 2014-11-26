@@ -5,6 +5,7 @@ OPTION(KCM_AUDIO "Use Allegro audio instead of BASS" off)
 OPTION(WITH_SVG "Enable SVG loader" off)
 OPTION(WITH_JOYPAD "Enable Joypad app support" off)
 OPTION(RASPBERRYPI "Compile for Raspberry Pi" off)
+OPTION(DEMO "Build demo version" off)
 
 if(KCM_AUDIO)
 	set(CMAKE_C_FLAGS "-DKCM_AUDIO")
@@ -139,6 +140,11 @@ if(WITH_SVG AND NOT D3D)
 	set(COMMON_SRCS ${COMMON_SRCS} src/svg.cpp)
 endif()
 
+if(DEMO)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEMO=1")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEMO=1")
+endif()
+
 add_library(mo2-engine
 	STATIC
 	${COMMON_SRCS}
@@ -178,7 +184,6 @@ if(WIN32)
 		"wsock32"
 		"ws2_32"
 		"freetype"
-		"png"
 		"z"
 	)
 	SET(MAIN_LIBS 
