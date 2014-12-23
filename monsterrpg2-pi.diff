@@ -1,0 +1,35 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ac4cd75..6c2a7d8 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -273,7 +273,7 @@ else(APPLE)
+ 		LIST(APPEND MAIN_LIBS "${CMAKE_BINARY_DIR}/libbass.so")
+ 	endif(KCM_AUDIO)
+ 	if(RASPBERRYPI)
+-		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host /usr/local/lib/libfreetype.a /usr/lib/libz.a /usr/lib/libpng.a /usr/lib/libjpeg.a /usr/local/lib/liblua.a /usr/lib/libphysfs.a /usr/local/lib/libcurl.a /usr/lib/libbz2.a stdc++)
++		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host /usr/lib/arm-linux-gnueabihf/libfreetype.a /usr/lib/arm-linux-gnueabihf/libz.a /usr/lib/arm-linux-gnueabihf/libpng.a /usr/lib/arm-linux-gnueabihf/liblua5.2.a /usr/lib/libphysfs.a /usr/local/lib/libcurl.a)
+ 	else(RASPBERYPI)
+ 		# trentg's build
+ 		LIST(APPEND MAIN_LIBS allegro_dialog${ALLEG_SUFFIX} GL GLU /usr/lib/libfreetype.a /usr/lib/libz.a /usr/lib/libpng.a /usr/lib/libjpeg.a /usr/local/lib/liblua5.2.a /usr/lib/libphysfs.a /usr/local/lib/libcurl.a)
+diff --git a/src/init.cpp b/src/init.cpp
+index 748f334..00d2a9a 100644
+--- a/src/init.cpp
++++ b/src/init.cpp
+@@ -33,7 +33,7 @@ extern "C" {
+ void create_tmpbuffer()
+ {
+ 	int flags = al_get_new_bitmap_flags();
+-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
++#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
+ 	int format = al_get_new_bitmap_format();
+ 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
+ #endif
+@@ -1418,6 +1418,8 @@ bool init(int *argc, char **argv[])
+ 	int w = mi.x2 - mi.x1;
+ 	int h = mi.y2 - mi.y1;
+ #ifdef ALLEGRO_RASPBERRYPI
++	w = 1280;
++	h = 720;
+ 	sd->width = w;
+ 	sd->height = h;
+ 	config_save_width = w;
