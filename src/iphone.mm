@@ -21,29 +21,6 @@ extern bool center_button_pressed;
 
 static MPMusicPlayerController *musicPlayer;
 
-void openRatingSite(void)
-{
-	const char *url_ascii = "http://www.monster-rpg.com";
-	NSString *u = [[NSString alloc] initWithCString:url_ascii encoding:NSUTF8StringEncoding];
-	CFURLRef url = CFURLCreateWithString(NULL, (CFStringRef)u, NULL);
-	[[UIApplication sharedApplication] openURL:(NSURL *)url];
-	[u release];
-	CFRelease(url);
-	exit(0);
-}
-
-void openFeedbackSite(void)
-{
-	const char *url_ascii = "http://www.monster-rpg.com/feedback.html";
-	NSString *u = [[NSString alloc] initWithCString:url_ascii encoding:NSUTF8StringEncoding];
-	CFURLRef url = CFURLCreateWithString(NULL, (CFStringRef)u, NULL);
-	[[UIApplication sharedApplication] openURL:(NSURL *)url];
-	[u release];
-	CFRelease(url);
-	exit(0);
-}
-
-
 MPMusicPlayerController *getMusicPlayer(void)
 {
 	if (musicPlayer == nil) {
@@ -551,12 +528,6 @@ bool isMultitaskingSupported(void)
 void vibrate(void)
 {
 	AudioServicesPlaySystemSound (kSystemSoundID_Vibrate);
-}
-
-bool wifiConnected(void)
-{
-	// can't use this anymore, return true
-	return true;
 }
 
 void disableMic(void)

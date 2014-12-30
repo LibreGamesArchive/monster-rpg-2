@@ -7,8 +7,6 @@ extern "C" {
 
 void addImageView();
 void removeImageView();
-void openRatingSite();
-void openFeedbackSite();
 void showIpod();
 void shutdownIpod();
 bool iPodIsPlaying();

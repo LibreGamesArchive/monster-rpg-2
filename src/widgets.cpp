@@ -1066,37 +1066,30 @@ int config_input(int type)
 	int num_getters;
 	
 	if (type == MInputGetter::TYPE_KB) {
-		if (isOuya()) {
-			num_getters = 8;
-			getters[0] = new MInputGetter(type, 1, 6, BW-2, _t("Action Key"), config.getKey1());
-			getters[1] = new MInputGetter(type, 1, 15, BW-2, _t("Back Key"), config.getKey2());
-			getters[2] = new MInputGetter(type, 1, 24, BW-2, _t("View Key"), config.getKey3());
-			getters[3] = new MInputGetter(type, 1, 33, BW-2, _t("SFX Up Key"), config.getKeySFXUp());
-			getters[4] = new MInputGetter(type, 1, 42, BW-2, _t("SFX Down Key"), config.getKeySFXDown());
-			getters[5] = new MInputGetter(type, 1, 51, BW-2, _t("Music Up Key"), config.getKeyMusicUp());
-			getters[6] = new MInputGetter(type, 1, 60, BW-2, _t("Music Down Key"), config.getKeyMusicDown());
-			getters[7] = new MInputGetter(type, 1, 69, BW-2, _t("Sort Items Key"), config.getKeySortItems());
-		}
-		else {
-			num_getters = 15;
-			getters[0] = new MInputGetter(type, 1, 6, BW-2, _t("Action Key"), config.getKey1());
-			getters[1] = new MInputGetter(type, 1, 15, BW-2, _t("Back Key"), config.getKey2());
-			getters[2] = new MInputGetter(type, 1, 24, BW-2, _t("View Key"), config.getKey3());
-			getters[3] = new MInputGetter(type, 1, 33, BW-2, _t("Left Key"), config.getKeyLeft());
-			getters[4] = new MInputGetter(type, 1, 42, BW-2, _t("Right Key"), config.getKeyRight());
-			getters[5] = new MInputGetter(type, 1, 51, BW-2, _t("Up Key"), config.getKeyUp());
-			getters[6] = new MInputGetter(type, 1, 60, BW-2, _t("Down Key"), config.getKeyDown());
-			getters[7] = new MInputGetter(type, 1, 69, BW-2, _t("Settings Key"), config.getKeySettings());
-			getters[8] = new MInputGetter(type, 1, 78, BW-2, _t("Fullscreen Key"), config.getKeyFullscreen());
-			getters[9] = new MInputGetter(type, 1, 87, BW-2, _t("SFX Up Key"), config.getKeySFXUp());
-			getters[10] = new MInputGetter(type, 1, 96, BW-2, _t("SFX Down Key"), config.getKeySFXDown());
-			getters[11] = new MInputGetter(type, 1, 105, BW-2, _t("Music Up Key"), config.getKeyMusicUp());
-			getters[12] = new MInputGetter(type, 1, 114, BW-2, _t("Music Down Key"), config.getKeyMusicDown());
-			getters[13] = new MInputGetter(type, 1, 123, BW-2, _t("Quit Key"), config.getKeyQuit());
-			getters[14] = new MInputGetter(type, 1, 132, BW-2, _t("Sort Items Key"), config.getKeySortItems());
-		}
+		num_getters = 15;
+		getters[0] = new MInputGetter(type, 1, 6, BW-2, _t("Action Key"), config.getKey1());
+		getters[1] = new MInputGetter(type, 1, 15, BW-2, _t("Back Key"), config.getKey2());
+		getters[2] = new MInputGetter(type, 1, 24, BW-2, _t("View Key"), config.getKey3());
+		getters[3] = new MInputGetter(type, 1, 33, BW-2, _t("Left Key"), config.getKeyLeft());
+		getters[4] = new MInputGetter(type, 1, 42, BW-2, _t("Right Key"), config.getKeyRight());
+		getters[5] = new MInputGetter(type, 1, 51, BW-2, _t("Up Key"), config.getKeyUp());
+		getters[6] = new MInputGetter(type, 1, 60, BW-2, _t("Down Key"), config.getKeyDown());
+		getters[7] = new MInputGetter(type, 1, 69, BW-2, _t("Settings Key"), config.getKeySettings());
+		getters[8] = new MInputGetter(type, 1, 78, BW-2, _t("Fullscreen Key"), config.getKeyFullscreen());
+		getters[9] = new MInputGetter(type, 1, 87, BW-2, _t("SFX Up Key"), config.getKeySFXUp());
+		getters[10] = new MInputGetter(type, 1, 96, BW-2, _t("SFX Down Key"), config.getKeySFXDown());
+		getters[11] = new MInputGetter(type, 1, 105, BW-2, _t("Music Up Key"), config.getKeyMusicUp());
+		getters[12] = new MInputGetter(type, 1, 114, BW-2, _t("Music Down Key"), config.getKeyMusicDown());
+		getters[13] = new MInputGetter(type, 1, 123, BW-2, _t("Quit Key"), config.getKeyQuit());
+		getters[14] = new MInputGetter(type, 1, 132, BW-2, _t("Sort Items Key"), config.getKeySortItems());
 	}
 	else {
+#ifdef ALLEGRO_ANDROID
+		num_getters= 3;
+		getters[0] = new MInputGetter(type, 1, 6, BW-2, _t("Action Button"), config.getJoyButton1());
+		getters[1] = new MInputGetter(type, 1, 15, BW-2, _t("Back Button"), config.getJoyButton2());
+		getters[2] = new MInputGetter(type, 1, 24, BW-2, _t("View Button"), config.getJoyButton3());
+#else
 		num_getters= 7;
 		getters[0] = new MInputGetter(type, 1, 6, BW-2, _t("Action Button"), config.getJoyButton1());
 		getters[1] = new MInputGetter(type, 1, 15, BW-2, _t("Back Button"), config.getJoyButton2());
@@ -1105,6 +1098,7 @@ int config_input(int type)
 		getters[4] = new MInputGetter(type, 1, 42, BW-2, _t("SFX Down"), config.getJoyButtonSFXDown());
 		getters[5] = new MInputGetter(type, 1, 51, BW-2, _t("Music Up"), config.getJoyButtonMusicUp());
 		getters[6] = new MInputGetter(type, 1, 60, BW-2, _t("Music Down"), config.getJoyButtonMusicDown());
+#endif
 	}
 
 	MTextButton *apply = new MTextButton(0, 0, "Apply");
@@ -1165,7 +1159,10 @@ int config_input(int type)
 					bool dup = false;
 					for (int i = 0; i < num_getters; i++) {
 						for (int j = i+1; j < num_getters; j++) {
-							if (getters[i]->getValue() == 0) {
+							if (type == MInputGetter::TYPE_KB && getters[i]->getValue() == 0) {
+								continue;
+							}
+							if (type == MInputGetter::TYPE_GAMEPAD && getters[i]->getValue() == -1) {
 								continue;
 							}
 							if (getters[i]->getValue() == getters[j]->getValue()) {
@@ -1186,42 +1183,32 @@ int config_input(int type)
 					}
 					else {
 						if (type == MInputGetter::TYPE_KB) {
-							if (isOuya()) {
-								config.setKey1(getters[0]->getValue());
-								config.setKey2(getters[1]->getValue());
-								config.setKey3(getters[2]->getValue());
-								config.setKeySFXUp(getters[3]->getValue());
-								config.setKeySFXDown(getters[4]->getValue());
-								config.setKeyMusicUp(getters[5]->getValue());
-								config.setKeyMusicDown(getters[6]->getValue());
-								config.setKeySortItems(getters[7]->getValue());
-							}
-							else {
-								config.setKey1(getters[0]->getValue());
-								config.setKey2(getters[1]->getValue());
-								config.setKey3(getters[2]->getValue());
-								config.setKeyLeft(getters[3]->getValue());
-								config.setKeyRight(getters[4]->getValue());
-								config.setKeyUp(getters[5]->getValue());
-								config.setKeyDown(getters[6]->getValue());
-								config.setKeySettings(getters[7]->getValue());
-								config.setKeyFullscreen(getters[8]->getValue());
-								config.setKeySFXUp(getters[9]->getValue());
-								config.setKeySFXDown(getters[10]->getValue());
-								config.setKeyMusicUp(getters[11]->getValue());
-								config.setKeyMusicDown(getters[12]->getValue());
-								config.setKeyQuit(getters[13]->getValue());
-								config.setKeySortItems(getters[14]->getValue());
-							}
+							config.setKey1(getters[0]->getValue());
+							config.setKey2(getters[1]->getValue());
+							config.setKey3(getters[2]->getValue());
+							config.setKeyLeft(getters[3]->getValue());
+							config.setKeyRight(getters[4]->getValue());
+							config.setKeyUp(getters[5]->getValue());
+							config.setKeyDown(getters[6]->getValue());
+							config.setKeySettings(getters[7]->getValue());
+							config.setKeyFullscreen(getters[8]->getValue());
+							config.setKeySFXUp(getters[9]->getValue());
+							config.setKeySFXDown(getters[10]->getValue());
+							config.setKeyMusicUp(getters[11]->getValue());
+							config.setKeyMusicDown(getters[12]->getValue());
+							config.setKeyQuit(getters[13]->getValue());
+							config.setKeySortItems(getters[14]->getValue());
 						}
 						else {
 							config.setJoyButton1(getters[0]->getValue());
 							config.setJoyButton2(getters[1]->getValue());
 							config.setJoyButton3(getters[2]->getValue());
+#ifndef ALLEGRO_ANDROID
 							config.setJoyButtonSFXUp(getters[3]->getValue());
 							config.setJoyButtonSFXDown(getters[4]->getValue());
 							config.setJoyButtonMusicUp(getters[5]->getValue());
 							config.setJoyButtonMusicDown(getters[6]->getValue());
+#endif
 						}
 						prepareForScreenGrab1();
 						tguiDraw();
@@ -1854,96 +1841,7 @@ void MInputGetter::draw()
 			WGT_TEXT_NORMAL, false);
 
 		char buf[100];
-		if (isOuya()) {
-#ifdef AMAZON
-			switch (value) {
-				case ALLEGRO_KEY_BUTTON_A:
-					snprintf(buf, 100, "%s", "A");
-					break;
-				case ALLEGRO_KEY_BUTTON_X:
-					snprintf(buf, 100, "%s", "X");
-					break;
-				case ALLEGRO_KEY_BUTTON_Y:
-					snprintf(buf, 100, "%s", "Y");
-					break;
-				case ALLEGRO_KEY_BUTTON_B:
-					snprintf(buf, 100, "%s", "B");
-					break;
-				case ALLEGRO_KEY_BUTTON_L2:
-					snprintf(buf, 100, "%s", "L2");
-					break;
-				case ALLEGRO_KEY_BUTTON_R2:
-					snprintf(buf, 100, "%s", "R2");
-					break;
-				case ALLEGRO_KEY_BUTTON_L1:
-					snprintf(buf, 100, "%s", "L1");
-					break;
-				case ALLEGRO_KEY_BUTTON_R1:
-					snprintf(buf, 100, "%s", "R1");
-					break;
-				case ALLEGRO_KEY_THUMBL:
-					snprintf(buf, 100, "%s", "L3");
-					break;
-				case ALLEGRO_KEY_THUMBR:
-					snprintf(buf, 100, "%s", "R3");
-					break;
-				case ALLEGRO_KEY_START:
-					snprintf(buf, 100, "%s", "Start");
-					break;
-				case ALLEGRO_KEY_BACK:
-					snprintf(buf, 100, "%s", "Back");
-					break;
-				default:
-					snprintf(buf, 100, "%s", "?");
-					break;
-			}
-#else
-			switch (value) {
-				case ALLEGRO_KEY_BUTTON_A:
-					snprintf(buf, 100, "%s", "O");
-					break;
-				case ALLEGRO_KEY_BUTTON_X:
-					snprintf(buf, 100, "%s", "U");
-					break;
-				case ALLEGRO_KEY_BUTTON_Y:
-					snprintf(buf, 100, "%s", "Y");
-					break;
-				case ALLEGRO_KEY_BUTTON_B:
-					snprintf(buf, 100, "%s", "A");
-					break;
-				case ALLEGRO_KEY_BUTTON_L2:
-					snprintf(buf, 100, "%s", "L1");
-					break;
-				case ALLEGRO_KEY_BUTTON_R2:
-					snprintf(buf, 100, "%s", "R1");
-					break;
-				case ALLEGRO_KEY_BUTTON_L1:
-					snprintf(buf, 100, "%s", "L2");
-					break;
-				case ALLEGRO_KEY_BUTTON_R1:
-					snprintf(buf, 100, "%s", "R2");
-					break;
-				case ALLEGRO_KEY_THUMBL:
-					snprintf(buf, 100, "%s", "L3");
-					break;
-				case ALLEGRO_KEY_THUMBR:
-					snprintf(buf, 100, "%s", "R3");
-					break;
-				case ALLEGRO_KEY_START:
-					snprintf(buf, 100, "%s", "Start");
-					break;
-				case ALLEGRO_KEY_BACK:
-					snprintf(buf, 100, "%s", "Back");
-					break;
-				default:
-					snprintf(buf, 100, "%s", "?");
-					break;
-			}
-#endif
-		}
-		else {
-			sprintf(buf, "%s", type == TYPE_KB ? keycode_to_keyname(value) : my_itoa(value));
-		}
+		sprintf(buf, "%s", type == TYPE_KB ? keycode_to_keyname(value) : my_itoa(value));
 		mTextout(game_font, buf, x+width-m_text_length(game_font, buf), y-2,
 			color, black,
 			WGT_TEXT_NORMAL, false);
@@ -1978,21 +1876,19 @@ int MInputGetter::update(int millis)
 							else {
 								value = i;
 							}
-							if (!isOuya() || (value != ALLEGRO_KEY_MENU && value != ALLEGRO_KEY_LEFT && value != ALLEGRO_KEY_RIGHT && value != ALLEGRO_KEY_UP && value != ALLEGRO_KEY_DOWN && value != ALLEGRO_KEY_BACK && value != ALLEGRO_KEY_START)) {
-								mode = NORMAL;
-								getting_input_config = false;
-								do {
+							mode = NORMAL;
+							getting_input_config = false;
+							do {
 #ifdef ALLEGRO_IPHONE
-									memcpy(&state, &icade_keyboard_state, sizeof state);
+								memcpy(&state, &icade_keyboard_state, sizeof state);
 #else
-									my_get_keyboard_state(&state);
+								my_get_keyboard_state(&state);
 #endif
-								} while (al_key_down(&state, value));
-								al_rest(0.1);
-								clear_input_events();
-								next_input_event_ready = true; // slight hack
-								break;
-							}
+							} while (al_key_down(&state, value));
+							al_rest(0.1);
+							clear_input_events();
+							next_input_event_ready = true; // slight hack
+							break;
 						}
 					}
 				}
@@ -2009,9 +1905,16 @@ int MInputGetter::update(int millis)
 							al_get_joystick_state(user_joystick, &state);
 							for (int i = 0; i < nb; i++) {
 								bool go = false;
+#ifdef ALLEGRO_ANDROID
+								/* Don't allow dpad buttons to be used */
+								if (state.button[i] && (i < 6 || i > 9)) {
+									go = true;
+								}
+#else
 								if (state.button[i]) {
 									go = true;
 								}
+#endif
 								if (go) {
 									value = i;
 									mode = NORMAL;
@@ -2910,14 +2813,12 @@ int MMap::update(int millis)
 	}
 
 	if (ie.button1 == DOWN || clicked) {
-#ifdef AMAZON
-		if (false) {
-#else
-#ifdef DEMO
+#if defined DEMO
 		if (points[selected].dest_area == "flowey") {
+#elif defined OUYA
+		if (isAndroidConsole() && (config.getPurchased() != 1) && points[selected].dest_area == "flowey") {
 #else
-		if (isOuya() && (config.getPurchased() != 1) && points[selected].dest_area == "flowey") {
-#endif
+		if (false) {
 #endif
 
 			use_input_event();

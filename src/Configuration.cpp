@@ -692,6 +692,15 @@ void Configuration::setLanguage(int l)
 
 void Configuration::setDefaultInputs()
 {
+#ifdef ALLEGRO_ANDROID
+	joyB1 = 0;
+	joyB2 = 1;
+	joyB3 = 2;
+	joyMusicUp = -1;
+	joyMusicDown = -1;
+	joySFXUp = -1;
+	joySFXDown = -1;
+#else
 	joyB1 = 0;
 	joyB2 = 1;
 	joyB3 = 2;
@@ -699,47 +708,24 @@ void Configuration::setDefaultInputs()
 	joyMusicDown = 4;
 	joySFXUp = 5;
 	joySFXDown = 6;
+#endif
 
 #ifndef ALLEGRO_IPHONE
-	if (isOuya()) {
-		key1 = ALLEGRO_KEY_BUTTON_A;
-		key2 = ALLEGRO_KEY_BUTTON_B;
-		key3 = ALLEGRO_KEY_BUTTON_X;
-		keyLeft = ALLEGRO_KEY_LEFT;
-		keyRight = ALLEGRO_KEY_RIGHT;
-		keyUp = ALLEGRO_KEY_UP;
-		keyDown = ALLEGRO_KEY_DOWN;
-		keySettings = ALLEGRO_KEY_S;
-		keyFullscreen = ALLEGRO_KEY_F;
-		keySFXUp = ALLEGRO_KEY_BUTTON_R1;
-		keySFXDown = ALLEGRO_KEY_BUTTON_L1;
-#ifdef AMAZON
-		keyMusicUp = ALLEGRO_KEY_THUMBR;
-		keyMusicDown = ALLEGRO_KEY_THUMBL;
-#else
-		keyMusicUp = ALLEGRO_KEY_BUTTON_R2;
-		keyMusicDown = ALLEGRO_KEY_BUTTON_L2;
-#endif
-		keyQuit = ALLEGRO_KEY_Q;
-		keySortItems = ALLEGRO_KEY_BUTTON_Y;
-	}
-	else {
-		key1 = ALLEGRO_KEY_SPACE;
-		key2 = ALLEGRO_KEY_ESCAPE;
-		key3 = ALLEGRO_KEY_V;
-		keyLeft = ALLEGRO_KEY_LEFT;
-		keyRight = ALLEGRO_KEY_RIGHT;
-		keyUp = ALLEGRO_KEY_UP;
-		keyDown = ALLEGRO_KEY_DOWN;
-		keySettings = ALLEGRO_KEY_S;
-		keyFullscreen = ALLEGRO_KEY_F;
-		keySFXUp = ALLEGRO_KEY_F4;
-		keySFXDown = ALLEGRO_KEY_F3;
-		keyMusicUp = ALLEGRO_KEY_F2;
-		keyMusicDown = ALLEGRO_KEY_F1;
-		keyQuit = ALLEGRO_KEY_Q;
-		keySortItems = ALLEGRO_KEY_F8;
-	}
+	key1 = ALLEGRO_KEY_SPACE;
+	key2 = ALLEGRO_KEY_ESCAPE;
+	key3 = ALLEGRO_KEY_V;
+	keyLeft = ALLEGRO_KEY_LEFT;
+	keyRight = ALLEGRO_KEY_RIGHT;
+	keyUp = ALLEGRO_KEY_UP;
+	keyDown = ALLEGRO_KEY_DOWN;
+	keySettings = ALLEGRO_KEY_S;
+	keyFullscreen = ALLEGRO_KEY_F;
+	keySFXUp = ALLEGRO_KEY_F4;
+	keySFXDown = ALLEGRO_KEY_F3;
+	keyMusicUp = ALLEGRO_KEY_F2;
+	keyMusicDown = ALLEGRO_KEY_F1;
+	keyQuit = ALLEGRO_KEY_Q;
+	keySortItems = ALLEGRO_KEY_F8;
 #else
 	key1 = ALLEGRO_KEY_K;
 	key2 = ALLEGRO_KEY_L;
@@ -761,13 +747,8 @@ void Configuration::setDefaultInputs()
 
 bool Configuration::read()
 {
-#ifdef ALLEGRO_ANDROID
-#ifdef AMAZON
-	#define unlocked 1
-#else
-	#define unlocked 0
-#endif
-	if (isOuya()) {
+#ifdef OUYA
+	if (isAndroidConsole()) {
 		purchased = unlocked;
 	}
 	else {
@@ -777,24 +758,11 @@ bool Configuration::read()
 	purchased = 1;
 #endif
 
-#if defined ALLEGRO_IPHONE || (defined ALLEGRO_ANDROID && !defined OUYA)
-	if (isOuya()) {
-		always_center = PAN_HYBRID;
-	}
-	else {
-		always_center = PAN_MANUAL;
-	}
-#else
 	always_center = PAN_HYBRID;
-#endif
 
 	setDefaultInputs();
 
-#ifdef AMAZON
-	if (false) {
-#else
-	if (isOuya()) {
-#endif
+	if (isAndroidConsole()) {
 		cfg_maintain_aspect_ratio = ASPECT_INTEGER;
 	}
 	else {
@@ -823,11 +791,9 @@ bool Configuration::read()
 		debug_message("couldn't read config");
 		delete xml;
 #if defined OUYA
-		if (isOuya()) {
-			int purchased = checkPurchased();
-			if (purchased == 1) {
-				config.setPurchased(1);
-			}
+		int purchased = checkPurchased();
+		if (purchased == 1) {
+			config.setPurchased(1);
 		}
 #endif
 		return false;
@@ -838,6 +804,17 @@ bool Configuration::read()
 	if (!monster) { delete xml; throw ReadError(); }
 
 	XMLData *hacks = monster->find("hacks");
+
+	if (hacks) {
+		XMLData *ignorecfg = hacks->find("ignorecfg");
+		if (!ignorecfg) {
+			delete xml;
+
+			loaded = true;
+
+			return true;
+		}
+	}
 
 	XMLData* game = monster->find("game");
 	if (!game) { delete xml; throw ReadError(); }
@@ -850,8 +827,8 @@ bool Configuration::read()
 	XMLData *joysfxdown = game->find("joysfxdown");
 	XMLData *purchXML = game->find("p");
 
-	bool keysfixed = isOuya() ? false : true;
-	if (isOuya() && hacks) {
+	bool keysfixed = isAndroidConsole() ? false : true;
+	if (isAndroidConsole() && hacks) {
 		XMLData *keyfix = hacks->find("ouya_keyfix");
 		if (keyfix) {
 			keysfixed = atoi(keyfix->getValue().c_str());
@@ -1141,8 +1118,10 @@ void Configuration::write()
 	XMLData *hacks = new XMLData("hacks", "");
 	XMLData *rm_french_canada = new XMLData("rm_french_canada", my_itoa(1));
 	XMLData *ouya_keyfix = new XMLData("ouya_keyfix", my_itoa(1));
+	XMLData *ignorecfg = new XMLData("ignorecfg", my_itoa(0));
 	hacks->add(rm_french_canada);
 	hacks->add(ouya_keyfix);
+	hacks->add(ignorecfg);
 
 	monster->add(game);
 	monster->add(gfx);

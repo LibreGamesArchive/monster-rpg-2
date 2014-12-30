@@ -65,7 +65,8 @@ void get_screen_offset_size(int *dx, int *dy, int *dw, int *dh);
 
 void create_tmpbuffer();
 
-bool isOuya();
+bool isAndroidConsole();
+bool gamepadConnected();
 
 // FIXME: TONNES OF GLOBALS
 

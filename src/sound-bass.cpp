@@ -1,7 +1,5 @@
 #include "monster2.hpp"
 
-#include "tftp_get.h"
-
 #ifdef ALLEGRO_ANDROID
 #include <physfs.h>
 #endif
@@ -138,12 +136,6 @@ static BOOL CALLBACK physfs_my_seek(QWORD offset, void *user)
 }
 #endif
 
-#ifdef ALLEGRO_IPHONE
-extern HPLUGIN BASSFLACplugin;
-#else
-static HPLUGIN BASSFLACplugin;
-#endif
-
 void initSound(void)
 {
 	sound_inited = true;
@@ -170,26 +162,6 @@ void initSound(void)
 	if (!BASS_Init(-1, 44100, 0, NULL, NULL)) {
 		int code = BASS_ErrorGetCode();
 		debug_message("BASS_Init failed (%d). Failing or falling back", code);
-	}
-
-#if defined ALLEGRO_WINDOWS
-	BASSFLACplugin = BASS_PluginLoad("bassflac.dll", 0);
-#elif defined LINUX_GENERIC
-	char buf1[MAX_PATH];
-	char buf2[MAX_PATH];
-	getcwd(buf1, MAX_PATH);
-	sprintf(buf2, "%s/libbassflac.so", buf1);
-	BASSFLACplugin = BASS_PluginLoad(buf2, 0);
-#elif defined ALLEGRO_IPHONE
-	BASS_PluginLoad((const char *)&BASSFLACplugin, 0);
-#elif defined ALLEGRO_MACOSX
-	BASSFLACplugin = BASS_PluginLoad("libbassflac.dylib", 0);
-#else
-	BASSFLACplugin = BASS_PluginLoad("libbassflac.so", 0);
-#endif
-
-	if (!BASSFLACplugin) {
-		debug_message("Error loading FLAC plugin (%d)\n", BASS_ErrorGetCode());
 	}
 
 	return;
@@ -405,22 +377,6 @@ static void CALLBACK MusicSyncProc(HSYNC handle, DWORD channel, DWORD data, void
 
 std::string check_music_name(std::string name, bool *is_flac)
 {
-	if (hqm_get_status(NULL) == HQM_STATUS_COMPLETE) {
-		std::string::size_type p = name.rfind(".");
-		if (p != std::string::npos) {
-			name = name.substr(0, p) + ".flac";
-#ifdef ALLEGRO_ANDROID
-			name = std::string(get_sdcarddir()) + "/MonsterRPG2/" + name;
-			*is_flac = true;
-			return name;
-#else
-			name = getUserResource((std::string("flacs/") + name).c_str());
-#endif
-			*is_flac = true;
-			return name;
-		}
-	}
-
 	*is_flac = false;
 
 #ifdef ALLEGRO_ANDROID
@@ -600,8 +556,6 @@ static void destroyMusic(void)
 	}
 	
 	musicName = "";
-
-	BASS_PluginFree((HPLUGIN)BASSFLACplugin);
 }
 
 void unmuteAmbience(void)

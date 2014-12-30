@@ -1082,7 +1082,7 @@ bool archery(bool for_points)
 	m_clear(m_map_rgb(0, 0, 0));
 	prepareForScreenGrab2();
 
-	if (!isOuya() && dpad_type != DPAD_TOTAL_1 && dpad_type != DPAD_TOTAL_2)
+	if (!gamepadConnected() && dpad_type != DPAD_TOTAL_1 && dpad_type != DPAD_TOTAL_2)
 		notify("Drag your bow into", "position and release", "to fire...");
 
 	while (1) {

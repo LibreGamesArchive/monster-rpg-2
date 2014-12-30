@@ -396,10 +396,8 @@ static void drawOverlay(bool draw_controls, ALLEGRO_COLOR tint)
 
 #if defined ALLEGRO_IPHONE
 	if (draw_red && global_draw_red && !path_head && !airplay_connected) {
-#elif defined ALLEGRO_ANDROID
-	if (!isOuya() && draw_red && global_draw_red && !path_head) {
 #else
-	if (draw_red && global_draw_red && !path_head) {
+	if (!gamepadConnected() && draw_red && global_draw_red && !path_head) {
 #endif
 		m_draw_triangle(0, 0, 16, 0, 0, 16, al_map_rgba_f(tint.r*tint.a, 0, 0, tint.a));
 	}
@@ -451,7 +449,7 @@ void drawBufferToScreen(bool draw_controls)
 
 	if (!transitioning) {
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-		if (!isOuya()) {
+		if (!gamepadConnected()) {
 			bool on = ((unsigned)tguiCurrentTimeMillis() % 1000) < 500;
 			const char *text = NULL;
 			if (onscreen_swipe_to_attack) {
@@ -535,7 +533,7 @@ void drawBufferToScreen(bool draw_controls)
 #endif
 	}
 
-	drawOverlay((isOuya() ? false : draw_controls), al_map_rgba_f(0.5f, 0.5f, 0.5f, 0.5f));
+	drawOverlay((gamepadConnected() ? false : draw_controls), al_map_rgba_f(0.5f, 0.5f, 0.5f, 0.5f));
 
 	if (fps_on && !preparingForScreenGrab) {
 		char buf[10];

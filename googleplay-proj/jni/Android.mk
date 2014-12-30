@@ -120,7 +120,7 @@ LOCAL_SRC_FILES := \
 
 LOCAL_ARM_MODE := arm
 #LOCAL_CFLAGS    := -DDEBUGMODE -DA5_OGL -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/include -I../include -DOPENGLES -DNO_JOYPAD -Wall -DOUYA -Os
-LOCAL_CFLAGS    := -DDEBUGMODE -DA5_OGL -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/include -I../include -DOPENGLES -DNO_JOYPAD -Wall -Os
+LOCAL_CFLAGS    := -DGOOGLEPLAY -DDEBUGMODE -DA5_OGL -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/include -I../include -DOPENGLES -DNO_JOYPAD -Wall -Os
 
 LOCAL_LDLIBS    := -L$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/lib -L$(LOCAL_PATH)/$(TARGET_ARCH_ABI) -llog libs/$(TARGET_ARCH_ABI)/liballegro.so libs/$(TARGET_ARCH_ABI)/liballegro_memfile.so libs/$(TARGET_ARCH_ABI)/liballegro_primitives.so libs/$(TARGET_ARCH_ABI)/liballegro_image.so libs/$(TARGET_ARCH_ABI)/liballegro_font.so libs/$(TARGET_ARCH_ABI)/liballegro_ttf.so libs/$(TARGET_ARCH_ABI)/liballegro_color.so -lGLESv1_CM -lstdc++ -llua5.2 -lz -lbass -lbassflac -lphysfs -lcurl
 

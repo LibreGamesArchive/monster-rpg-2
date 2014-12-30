@@ -87,45 +87,6 @@ static jobject _jni_callObjectMethod(JNIEnv *env, jobject object, const char *na
    return ret;
 }
 
-void openURL(const char *url)
-{
-	jstring urlS = _al_android_get_jnienv()->NewStringUTF(url);
-
-	_jni_callVoidMethodV(
-		_al_android_get_jnienv(),
-		_al_android_activity_object(),
-		"openURL",
-		"(Ljava/lang/String;)V",
-		urlS
-	);
-	
-	_al_android_get_jnienv()->DeleteLocalRef(urlS);
-
-	/*
-	bool done = false;
-	while (!done) {
-		done = _jni_callBooleanMethodV(
-			_al_android_get_jnienv(),
-			_al_android_activity_object(),
-			"browserDone",
-			"()Z"
-		);
-		if (!done) {
-			al_rest(0.01);
-			if (is_close_pressed()) {
-				do_close();
-				close_pressed = false;
-			}
-		}
-	}
-
-	al_rest(0.5);
-	clear_input_events();
-	getInput()->set(false, false, false, false, false, false, false);
-	al_flush_event_queue(input_event_queue);
-	*/
-}
-
 // return true on success
 bool get_clipboard(char *buf, int len)
 {
@@ -162,22 +123,6 @@ void set_clipboard(char *buf)
 	);
 
 	_al_android_get_jnienv()->DeleteLocalRef(saveS);
-}
-
-bool wifiConnected()
-{
-	if (isOuya()) {
-		return true;
-	}
-
-	bool ret = _jni_callBooleanMethodV(
-		_al_android_get_jnienv(),
-		_al_android_activity_object(),
-		"wifiConnected",
-		"()Z"
-	);
-
-	return ret;
 }
 
 const char * get_sdcarddir()
@@ -219,17 +164,17 @@ void goHome()
 }
 */
 
-bool isOuya()
+bool isAndroidConsole()
 {
 	static bool first = true;
-	static bool is_ouya;
+	static bool is_console;
 
 	if (!first) {
-		return is_ouya;
+		return is_console;
 	}
 
 	first = false;
-	is_ouya = false;
+	is_console = false;
 
 	JNIEnv *env = _al_android_get_jnienv();
 	jobject object = _al_android_activity_object();
@@ -243,19 +188,43 @@ bool isOuya()
 	
 	const char *native = _al_android_get_jnienv()->GetStringUTFChars(s, 0);
 
-#if defined AMAZON
-	if (native[0] == 'A' && native[1] == 'F' && native[2] == 'T') {
-#else
+logString(native);
+
 	if (strstr(native, "OUYA")) {
-#endif
-		is_ouya = true;
+		is_console = true;
+	}
+	else if (!strncmp(native, "AFTB", 4) || !strncmp(native, "AFTM", 4)) {
+		jmethodID method_id2 = _jni_call(env, jmethodID, GetMethodID, class_id, "getManufacturer", "()Ljava/lang/String;");
+		jstring s2 = (jstring)_jni_call(env, jobject, CallObjectMethod, object, method_id2);
+		const char *native2 = _al_android_get_jnienv()->GetStringUTFChars(s2, 0);
+logString(native2);
+		if (!strcmp(native2, "Amazon")) {
+			is_console = true;
+		}
+		_al_android_get_jnienv()->ReleaseStringUTFChars(s2, native2);
+		_jni_callv(env, DeleteLocalRef, s2);
 	}
 
 	_al_android_get_jnienv()->ReleaseStringUTFChars(s, native);
 	_jni_callv(env, DeleteLocalRef, s);
 	_jni_callv(env, DeleteLocalRef, class_id);
 
-	return is_ouya;
+	return is_console;
+}
+
+bool gamepadConnected()
+{
+	bool ret = false;
+
+	if (al_is_joystick_installed() && al_get_num_joysticks() > 1) {
+		ret = true;
+	}
+
+	if (!ret) {
+		ret = isAndroidConsole();
+	}
+
+	return ret;
 }
 
 void logString(const char *s)
@@ -272,6 +241,42 @@ void logString(const char *s)
 	
 	_al_android_get_jnienv()->DeleteLocalRef(S);
 }
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+static float backup_music_volume, backup_ambience_volume;
+
+#ifdef GOOGLEPLAY
+JNIEXPORT void JNICALL Java_com_nooskewl_morpg2_MyBroadcastReceiver_pauseSound
+  (JNIEnv *env, jobject obj)
+#else
+JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_MyBroadcastReceiver_pauseSound
+  (JNIEnv *env, jobject obj)
+#endif
+{
+	backup_music_volume = getMusicVolume();
+	backup_ambience_volume = getAmbienceVolume();
+	setMusicVolume(0.0);
+	setAmbienceVolume(0.0);
+}
+
+#ifdef GOOGLEPLAY
+JNIEXPORT void JNICALL Java_com_nooskewl_morpg2_MyBroadcastReceiver_resumeSound
+  (JNIEnv *env, jobject obj)
+#else
+JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_MyBroadcastReceiver_resumeSound
+  (JNIEnv *env, jobject obj)
+#endif
+{
+	setMusicVolume(backup_music_volume);
+	setAmbienceVolume(backup_ambience_volume);
+}
+
+#ifdef __cplusplus
+}
+#endif
 
 #if defined OUYA
 int isPurchased()

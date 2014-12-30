@@ -19,8 +19,6 @@
 #include "java.h"
 #endif
 
-#include "tftp_get.h"
-
 bool on_title_screen = false;
 
 bool fairy_used = false;
@@ -126,106 +124,6 @@ static std::string getTimeString(uint32_t runtime)
 	sprintf(s, "%02d:%02d:%02d", days, hours, minutes);
 	return std::string(s);
 }
-
-#ifdef ALLEGRO_ANDROID
-static void showMusicToggle(void)
-{
-	tguiPush();
-
-	MFrame *frame = new MFrame(SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE,
-		BW-SHADOW_CORNER_SIZE*2, BH-SHADOW_CORNER_SIZE*2);
-
-	int y = SHADOW_CORNER_SIZE+8;
-	
-	std::vector<std::string> toggle_choices;
-	toggle_choices.push_back("{027} Sound on");
-	toggle_choices.push_back("{027} SFX only");
-	toggle_choices.push_back("{027} Silence");
-	MSingleToggle *sound_toggle = new MSingleToggle(SHADOW_CORNER_SIZE+8, y, toggle_choices, false);
-	bool music_on = config.getMusicVolume();
-	bool sound_on = config.getSFXVolume();
-	if (music_on && sound_on) sound_toggle->setSelected(0);
-	else if (sound_on) sound_toggle->setSelected(1);
-	else sound_toggle->setSelected(2);
-	
-	tguiSetParent(0);
-	tguiAddWidget(frame);
-	tguiSetParent(frame);
-	tguiAddWidget(sound_toggle);
-	tguiSetFocus(sound_toggle);
-	
-	std::string startAmbienceName = ambienceName;
-
-	clear_input_events();
-
-	for (;;) {
-		al_wait_cond(wait_cond, wait_mutex);
-		// Logic
-		int tmp_counter = logic_counter;
-		logic_counter = 0;
-		if (tmp_counter > 10)
-			tmp_counter = 1;
-		while  (tmp_counter > 0) {
-			next_input_event_ready = true;
-
-			tmp_counter--;
-			if (is_close_pressed()) {
-				do_close();
-				close_pressed = false;
-			}
-			if (break_main_loop) {
-				goto done;
-			}
-		
-			int sel = sound_toggle->getSelected();
-			if (sel == 0) {
-				ambienceName = startAmbienceName;
-				config.setMusicVolume(255);
-				config.setSFXVolume(255);
-				setMusicVolume(1);
-			}
-			else if (sel == 1) {
-				config.setMusicVolume(0);
-				config.setSFXVolume(255);
-				setMusicVolume(1);
-			}
-			else {
-				config.setMusicVolume(0);
-				config.setSFXVolume(0);
-				setMusicVolume(1);
-			}
-			
-			INPUT_EVENT ie = get_next_input_event();
-
-			if (ie.button2 == DOWN || iphone_shaken(0.1)) {
-				use_input_event();
-				playPreloadedSample("select.ogg");
-				iphone_clear_shaken();
-				goto done;
-			}
-
-			// update gui
-			tguiUpdate();
-		}
-
-		if (draw_counter > 0) {
-			draw_counter = 0;
-			set_target_backbuffer();
-			m_clear(black);
-			tguiDraw();
-			drawBufferToScreen();
-			m_flip_display();
-		}
-	}
-done:
-	tguiDeleteWidget(frame);
-
-	delete frame;
-	delete sound_toggle;
-
-	tguiPop();
-}
-#endif
 
 #ifdef ALLEGRO_IPHONE
 static void showIpodControls(void)
@@ -1613,7 +1511,6 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 #if defined ALLEGRO_IPHONE
 				showIpodControls();
 #elif defined ALLEGRO_ANDROID
-				//showMusicToggle();
 				config_menu(false);
 #endif
 				tguiSetFocus(mainMusic);
@@ -3779,7 +3676,7 @@ bool config_menu(bool start_on_fullscreen)
 
 #if defined ALLEGRO_IPHONE ||  defined ALLEGRO_ANDROID
 	MSingleToggle *input_toggle = NULL;
-	if (!isOuya()) {
+	if (!isAndroidConsole()) {
 		std::vector<std::string> input_choices;
 		input_choices.push_back("{027} Tap-and-go");
 		input_choices.push_back("{027} Hybrid input 1");
@@ -3815,7 +3712,7 @@ bool config_menu(bool start_on_fullscreen)
 
 	MSingleToggle *tuning_toggle = NULL;
 	int curr_tuning = 2;
-	if (!isOuya()) {
+	if (!isAndroidConsole()) {
 		std::vector<std::string> tuning_choices;
 		tuning_choices.push_back("{027} Tune for battery life");
 		tuning_choices.push_back("{027} Balanced tuning");
@@ -3829,7 +3726,7 @@ bool config_menu(bool start_on_fullscreen)
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	MSingleToggle *swap_buttons_toggle = NULL;
-	if (!isOuya()) {
+	if (!isAndroidConsole()) {
 		std::vector<std::string> swap_buttons_choices;
 		swap_buttons_choices.push_back("{027} Normal buttons (select, cancel)");
 		swap_buttons_choices.push_back("{027} Swap buttons (cancel, select)");
@@ -3909,11 +3806,11 @@ bool config_menu(bool start_on_fullscreen)
 #ifdef ALLEGRO_IPHONE_XXX
 	tguiAddWidget(shake_toggle);
 #endif
-	if (!isOuya()) {
+	if (!isAndroidConsole()) {
 		tguiAddWidget(tuning_toggle);
 	}
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	if (!isOuya()) {
+	if (!isAndroidConsole()) {
 		tguiAddWidget(swap_buttons_toggle);
 	}
 #endif
@@ -3992,21 +3889,17 @@ bool config_menu(bool start_on_fullscreen)
 			else
 #endif
 			if (w && w == controls) {
+#ifdef ALLEGRO_ANDROID
+				int type = MInputGetter::TYPE_GAMEPAD;
+#else
 				int type = MInputGetter::TYPE_KB;
+#endif
 #if defined ALLEGRO_IPHONE
 				prepareForScreenGrab1();
 				tguiDraw();
 				drawBufferToScreen(false);
 				prepareForScreenGrab2();
 				notify("These controls are for", "iCade only!", "");
-#elif defined ALLEGRO_ANDROID
-				if (!isOuya()) {
-					prepareForScreenGrab1();
-					tguiDraw();
-					drawBufferToScreen(false);
-					prepareForScreenGrab2();
-					notify("For Bluetooth keyboards use the", "RawInputIME input method", "");
-				}
 #endif
 				while (true) {
 					type = config_input(type);
@@ -4261,210 +4154,6 @@ done:
 	return false;
 }
 
-static void hqm_draw(MBITMAP *bg)
-{
-	m_draw_bitmap(bg, 0, 0, 0);
-
-	al_hold_bitmap_drawing(true);
-	tguiDraw();
-	al_hold_bitmap_drawing(false);
-
-	al_hold_bitmap_drawing(true);
-	start_text();
-
-	// top descriptions
-	const char *text = "Free HQ soundtrack download";
-	const char *trans = _t(text);
-	mTextout(
-		game_font,
-		trans, BW/2, 20, m_map_rgb(255, 255, 0),
-		black, WGT_TEXT_NORMAL, true);
-
-	// draw status
-	float percent;
-	int status = hqm_get_status(&percent);
-	const char *status_txt = hqm_status_string(status);
-	char buf[100];
-	char s[100];
-	char s2[100];
-	strcpy(s, hqm_is_downloading() ? _t("Downloading") : _t("Stopped"));
-	strcpy(s2, _t(status_txt));
-	sprintf(buf, _t("Status: %s. %s. (%d%%)"), s2, s, (int)(percent * 100));
-	mTextout(
-		game_font,
-		buf,
-		BW/2,
-		125,
-		black,
-		black,
-		WGT_TEXT_NORMAL,
-		true
-	);
-	
-	al_hold_bitmap_drawing(false);
-	end_text();
-	
-	drawBufferToScreen();
-}
-
-static void hqm_menu(void)
-{
-	dpad_off();
-	
-	MBITMAP *bg = m_load_bitmap(getResource("media/options_bg.png"));
-
-	MTextButton *buttons[4];
-	buttons[0] = new MTextButton(20, 50, "Start/resume download", false, NULL, NULL, false);
-	buttons[1] = new MTextButton(20, 65, "Stop/pause download", false, NULL, NULL, false);
-	buttons[2] = new MTextButton(20, 80, "Delete downloads", false, NULL, NULL, false);
-	buttons[3] = new MTextButton(20, 95, "Done", false, NULL, NULL, false);
-
-	tguiPush();
-
-	tguiSetParent(0);
-	for (int i = 0; i < 4; i++) {
-		tguiAddWidget(buttons[i]);
-	}
-
-	tguiSetFocus(buttons[3]);
-
-	prepareForScreenGrab1();
-	hqm_draw(bg);
-	prepareForScreenGrab2();
-	fadeIn(black);
-
-	bool break_for_fade_after_draw = false;
-
-	clear_input_events();
-
-	for (;;) {
-		al_wait_cond(wait_cond, wait_mutex);
-		// Logic
-		int tmp_counter = logic_counter;
-		logic_counter = 0;
-		if (tmp_counter > 10)
-			tmp_counter = 1;
-		while  (!break_for_fade_after_draw && tmp_counter > 0) {
-			next_input_event_ready = true;
-
-			tmp_counter--;
-			if (is_close_pressed()) {
-				do_close();
-				close_pressed = false;
-			}
-			if (break_main_loop) {
-				goto done;
-			}
-
-			TGUIWidget *widget = tguiUpdate();
-
-			if (widget == buttons[0]) {
-				if (!hqm_is_downloading()) {
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-					if (wifiConnected())
-#endif
-						hqm_go();
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-					else {
-						prepareForScreenGrab1();
-						hqm_draw(bg);
-						prepareForScreenGrab2();
-
-						notify(
-							"Can only download",
-							"over wifi.",
-							""
-						);
-					}
-#endif
-				}
-			}
-			else if (widget == buttons[1]) {
-				if (hqm_is_downloading()) {
-					hqm_stop();
-				}
-			}
-			else if (widget == buttons[2]) {
-				prepareForScreenGrab1();
-				hqm_draw(bg);
-				prepareForScreenGrab2();
-				if (prompt("Really delete flacs directory", "and all contents?", 0, 0)) {
-					std::string old_music_name = musicName;
-					std::string old_ambience_name = ambienceName;
-					float old_music_volume = getMusicVolume();
-					float old_ambience_volume = getAmbienceVolume();
-					playMusic("");
-					playAmbience("");
-
-#ifdef ALLEGRO_ANDROID
-					hqm_set_download_path(getUserResource("flacs"));
-					hqm_delete();
-					hqm_set_download_path((std::string(get_sdcarddir()) + "/MonsterRPG2").c_str());
-					hqm_delete();
-#else
-					hqm_delete();
-#endif
-
-					playMusic(old_music_name, old_music_volume, true);
-					playAmbience(old_ambience_name, old_ambience_volume);
-				}
-			}
-			else if (widget == buttons[3]) {
-				break_for_fade_after_draw = true;
-				prepareForScreenGrab1();
-				break;
-			}
-
-			INPUT_EVENT ie = get_next_input_event();
-			if (ie.button2 == DOWN || iphone_shaken(0.1)) {
-				use_input_event();
-				iphone_clear_shaken();
-				break_for_fade_after_draw = true;
-				prepareForScreenGrab1();
-				break;
-			}
-		}
-
-		if (break_for_fade_after_draw || draw_counter > 0) {
-			draw_counter = 0;
-
-			if (!break_for_fade_after_draw) {
-				set_target_backbuffer();
-			}
-
-			hqm_draw(bg);
-	
-			if (break_for_fade_after_draw) {
-				break;
-			}
-			m_flip_display();
-		}
-	}
-
-done:
-
-	if (break_for_fade_after_draw) {
-		break_for_fade_after_draw = false;
-		prepareForScreenGrab2();
-		fadeOut(black);
-	}
-
-	m_destroy_bitmap(bg);
-
-	for (int i = 0; i < 4; i++) {
-		tguiDeleteWidget(buttons[i]);
-		delete buttons[i];
-	}
-
-	dpad_on();
-
-	tguiPop();
-
-	waitForRelease(4);
-	waitForRelease(5);
-	clear_input_events();
-}
-
 static void title_draw(MBITMAP *bg)
 {
 	m_draw_bitmap(bg, 0, 0, 0);
@@ -4497,13 +4186,9 @@ int title_menu(void)
 	options.push_back("Continue");
 	options.push_back("Start/Load Game");
 	options.push_back("Tutorial");
-	options.push_back("HQ sound track");
 	options.push_back("Options");
-#if (defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID) && !defined AMAZON
-	options.push_back("Visit WWW site");
-#endif
 #if defined ALLEGRO_ANDROID && defined OUYA
-	if (isOuya() && config.getPurchased() != 1) {
+	if (isAndroidConsole() && config.getPurchased() != 1) {
 		options.push_back("BUY FULL VERSION");
 	}
 #endif
@@ -4567,41 +4252,13 @@ int title_menu(void)
 
 			TGUIWidget *widget = tguiUpdate();
 
-			if (widget == main_menu) {
-#ifdef AMAZON
-				if (main_menu->getSelected() < 3) {
-#else
-				if (main_menu->getSelected() < 3 || main_menu->getSelected() == 5) {
-#endif
-					if (main_menu->getSelected() == 5) {
-						selected = 3;
-					}
-					else {
-						selected = main_menu->getSelected();
-					}
-					break_for_fade_after_draw = true;
-					prepareForScreenGrab1();
-					break;
-				}
-			}
-
-			if (widget == main_menu && main_menu->getSelected() == 3) {
+			if (widget == main_menu && main_menu->getSelected() < 3) {
+				selected = main_menu->getSelected();
+				break_for_fade_after_draw = true;
 				prepareForScreenGrab1();
-				title_draw(bg);
-				prepareForScreenGrab2();
-				fadeOut(black);
-				tguiPush();
-				on_title_screen = false;
-				hqm_menu();
-				on_title_screen = true;
-				main_menu->setSelected(0);
-				tguiPop();
-				prepareForScreenGrab1();
-				title_draw(bg);
-				prepareForScreenGrab2();
-				fadeIn(black);
+				break;
 			}
-			else if (widget == main_menu && main_menu->getSelected() == 4) {
+			else if (widget == main_menu && main_menu->getSelected() == 3) {
 				prepareForScreenGrab1();
 				title_draw(bg);
 				prepareForScreenGrab2();
@@ -4623,8 +4280,8 @@ int title_menu(void)
 				prepareForScreenGrab2();
 				fadeIn(black);
 			}
-#if defined ALLEGRO_ANDROID && defined OUYA
-			else if (widget == main_menu && main_menu->getSelected() == 6 && isOuya()) {
+#if defined OUYA
+			else if (widget == main_menu && main_menu->getSelected() == 4) {
 				int purchased = checkPurchased();
 				if (purchased != 1) {
 					doIAP();

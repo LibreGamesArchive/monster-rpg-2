@@ -33,7 +33,7 @@ extern "C" {
 void create_tmpbuffer()
 {
 	int flags = al_get_new_bitmap_flags();
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_RASPBERRYPI
 	int format = al_get_new_bitmap_format();
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
 #endif
@@ -44,7 +44,7 @@ void create_tmpbuffer()
 		w, h
 	);
 	al_set_new_bitmap_flags(flags);
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE
 	al_set_new_bitmap_format(format);
 #endif
 }
@@ -410,6 +410,10 @@ void register_display(ALLEGRO_DISPLAY *display)
 
 void set_user_joystick(void)
 {
+#ifdef ALLEGRO_ANDROID
+	use_dpad = false;
+#endif
+
 	int nj = al_get_num_joysticks();
 	user_joystick = NULL;
 	for (int k = 0; k < nj; k++) {
@@ -418,6 +422,9 @@ void set_user_joystick(void)
 		int nb = al_get_joystick_num_buttons(j);
 		if (nb > 0) {
 			user_joystick = j;
+#ifdef ALLEGRO_ANDROID
+			use_dpad = true;
+#endif
 			break;
 		}
 	}
@@ -591,7 +598,7 @@ static void *loader_proc(void *arg)
 #endif
 
 #ifdef A5_OGL
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGBA_4444);
 #else
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
@@ -1228,9 +1235,19 @@ void android_assert_handler(char const *expr,
 #endif
 
 #ifndef ALLEGRO_ANDROID
-bool isOuya()
+bool isAndroidConsole()
 {
 	return false;
+}
+bool gamepadConnected()
+{
+	bool ret = false;
+
+	if (al_is_joystick_installed() && al_get_num_joysticks() > 1) {
+		ret = true;
+	}
+
+	return ret;
 }
 #endif
 
@@ -1272,7 +1289,6 @@ bool init(int *argc, char **argv[])
 		exit(1);
 	}
 
-#ifndef ALLEGRO_ANDROID
 	if (al_install_joystick()) {
 		set_user_joystick();
 		if (user_joystick != NULL) {
@@ -1285,12 +1301,6 @@ bool init(int *argc, char **argv[])
 	else {
 		config.setGamepadAvailable(false);
 	}
-#else
-	config.setGamepadAvailable(false);
-	if (isOuya()) {
-		use_dpad = true;
-	}
-#endif
 
 #if !defined ALLEGRO_IPHONE
 	for (int i = 0; i < 10; i++) {
@@ -1486,7 +1496,7 @@ bool init(int *argc, char **argv[])
 	dpad_mutex = al_create_mutex();
 	touch_mutex = al_create_mutex();
 
-#if defined A5_D3D || defined ALLEGRO_ANDROID
+#if defined A5_D3D
 	use_fixed_pipeline = true;
 #if defined A5_D3D
 	if (check_arg(*argc, *argv, "-programmable-pipeline") > 0) {
@@ -1640,9 +1650,7 @@ bool init(int *argc, char **argv[])
 	al_register_event_source(input_event_queue, (ALLEGRO_EVENT_SOURCE *)display);
 #ifndef ALLEGRO_IPHONE
 	al_register_event_source(input_event_queue, al_get_keyboard_event_source());
-#ifndef ALLEGRO_ANDROID
 	al_register_event_source(input_event_queue, al_get_joystick_event_source());
-#endif
 #endif
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_register_event_source(input_event_queue, al_get_touch_input_event_source());
@@ -1674,7 +1682,7 @@ bool init(int *argc, char **argv[])
 	al_set_window_title(display, "Monster RPG 2");
 
 #ifdef A5_OGL
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGBA_4444);
 #else
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
@@ -1698,7 +1706,7 @@ bool init(int *argc, char **argv[])
 
 	debug_message("initing shader variables\n");
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#if defined ALLEGRO_IPHONE
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGBA_4444);
 #elif defined A5_OGL
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
@@ -1995,9 +2003,11 @@ static int dpad_count = 1;
 
 void dpad_off(bool count)
 {
-	if (isOuya()) return;
-
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+	if (gamepadConnected()) {
+		return;
+	}
+
 	if (count)
 		dpad_count++;
 	if (dpad_count > 0 || !count) {
@@ -2030,9 +2040,11 @@ void dpad_off(bool count)
 
 void dpad_on(bool count)
 {
-	if (isOuya()) return;
-
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+	if (gamepadConnected()) {
+		return;
+	}
+
 	if (count)
 		dpad_count--;
 	if (dpad_count <= 0 || !count) {

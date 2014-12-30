@@ -20,8 +20,6 @@ void unmuteMusic(void);
 void unmuteAmbience(void);
 void playMusic(std::string name, float vol = 1.0f, bool force = false);
 void playAmbience(std::string name, float vol = 1.0f);
-void setMusicVolume(float volume);
-void setAmbienceVolume(float volume);
 void playPreloadedSample(std::string name);
 void destroySound(void);
 void initSound(void);
@@ -31,8 +29,6 @@ void loadPlayDestroy(std::string name);
 void stopAmbience(void);
 void destroyAmbience(void);
 void playSample(MSAMPLE sample, MSAMPLE_ID *id = NULL);
-float getMusicVolume(void);
-float getAmbienceVolume(void);
 void stopAllSamples(void);
 void restartMusic(void);
 void restartAmbience(void);
@@ -43,6 +39,18 @@ void destroyStream(MSAMPLE stream);
 
 bool loadSamples(void (*cb)(int, int));
 std::string check_music_name(std::string name, bool *is_flac);
+
+// Called from JNI
+#ifdef __cplusplus
+extern "C" {
+#endif
+	void setMusicVolume(float volume);
+	void setAmbienceVolume(float volume);
+	float getMusicVolume(void);
+	float getAmbienceVolume(void);
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

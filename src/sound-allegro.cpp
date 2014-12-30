@@ -1,7 +1,5 @@
 #include "monster2.hpp"
 
-#include "tftp_get.h"
-
 static void destroyMusic(void);
 
 static std::string shutdownMusicName = "";
@@ -192,16 +190,6 @@ void loadPlayDestroy(std::string name)
 
 std::string check_music_name(std::string name, bool *is_flac)
 {
-	if (hqm_get_status(NULL) == HQM_STATUS_COMPLETE) {
-		std::string::size_type p = name.rfind(".");
-		if (p != std::string::npos) {
-			name = name.substr(0, p) + ".flac";
-			name = getUserResource((std::string("flacs/") + name).c_str());
-			*is_flac = true;
-			return name;
-		}
-	}
-
 	*is_flac = false;
 	
 	return getResource("music/%s", name.c_str());

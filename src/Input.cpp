@@ -394,30 +394,6 @@ void KeyboardInput::handle_event(ALLEGRO_EVENT *event)
 		 down = onoff;
 	}
 
-	if (!isOuya()) {
-		/* X does weird crap with my macbook keyboard. Holding space
-		 * makes left and right return home/end. This fixes it.
-		 */
-		if (keycode == ALLEGRO_KEY_HOME) {
-			if (onoff) {
-				right = false;
-				left = true;
-			}
-			else {
-				left = false;
-			}
-		}
-		else if (keycode == ALLEGRO_KEY_END) {
-			if (onoff) {
-				left = false;
-				right = true;
-			}
-			else {
-				right = false;
-			}
-		}
-	}
-
 	set(left, right, up, down, button1, button2, button3);
 }
 

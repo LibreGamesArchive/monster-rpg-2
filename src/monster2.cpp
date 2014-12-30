@@ -1,7 +1,5 @@
 #include "monster2.hpp"
 
-#include "tftp_get.h"
-
 #ifdef ALLEGRO_ANDROID
 #include "java.h"
 #endif
@@ -50,7 +48,6 @@ bool switched_in = true;
 
 #ifdef ALLEGRO_ANDROID
 extern "C" {
-void openURL(const char *url);
 }
 #endif
 
@@ -577,6 +574,61 @@ top:
 			continue;
 		}
 
+#ifdef ALLEGRO_ANDROID
+		if (event.type == ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN) {
+			if (event.joystick.button == 6) {
+				event.type = ALLEGRO_EVENT_JOYSTICK_AXIS;
+				event.joystick.stick = 0;
+				event.joystick.axis = 0;
+				event.joystick.pos = -1;
+			}
+			else if (event.joystick.button == 7) {
+				event.type = ALLEGRO_EVENT_JOYSTICK_AXIS;
+				event.joystick.stick = 0;
+				event.joystick.axis = 0;
+				event.joystick.pos = 1;
+			}
+			else if (event.joystick.button == 8) {
+				event.type = ALLEGRO_EVENT_JOYSTICK_AXIS;
+				event.joystick.stick = 0;
+				event.joystick.axis = 1;
+				event.joystick.pos = -1;
+			}
+			else if (event.joystick.button == 9) {
+				event.type = ALLEGRO_EVENT_JOYSTICK_AXIS;
+				event.joystick.stick = 0;
+				event.joystick.axis = 1;
+				event.joystick.pos = 1;
+			}
+		}
+		else if (event.type == ALLEGRO_EVENT_JOYSTICK_BUTTON_UP) {
+			if (event.joystick.button == 6) {
+				event.type = ALLEGRO_EVENT_JOYSTICK_AXIS;
+				event.joystick.stick = 0;
+				event.joystick.axis = 0;
+				event.joystick.pos = 0;
+			}
+			else if (event.joystick.button == 7) {
+				event.type = ALLEGRO_EVENT_JOYSTICK_AXIS;
+				event.joystick.stick = 0;
+				event.joystick.axis = 0;
+				event.joystick.pos = 0;
+			}
+			else if (event.joystick.button == 8) {
+				event.type = ALLEGRO_EVENT_JOYSTICK_AXIS;
+				event.joystick.stick = 0;
+				event.joystick.axis = 1;
+				event.joystick.pos = 0;
+			}
+			else if (event.joystick.button == 9) {
+				event.type = ALLEGRO_EVENT_JOYSTICK_AXIS;
+				event.joystick.stick = 0;
+				event.joystick.axis = 1;
+				event.joystick.pos = 0;
+			}
+		}
+#endif
+
 		al_lock_mutex(input_mutex);
 		if (getInput())
 			getInput()->handle_event(&event);
@@ -629,7 +681,7 @@ top:
 			}
 		}
 		else if (event.type == ALLEGRO_EVENT_KEY_UP || event.type == USER_KEY_UP) {
-			if (!isOuya() && is_modifier(event.keyboard.keycode)) {
+			if (is_modifier(event.keyboard.keycode)) {
 				if (event.keyboard.keycode == config.getKey1()) {
 					if (area && !battle && !in_pause && config.getAlwaysCenter() == PAN_HYBRID) {
 						area_panned_x = floor(area_panned_x);
@@ -1152,8 +1204,8 @@ top:
 			config.write();
 
 #ifdef ALLEGRO_ANDROID
-#ifndef AMAZON
-			if (isOuya() && dontbail == false) {
+#ifdef OUYA
+			if (isAndroidConsole() && dontbail == false) {
 				exit(0);
 			}
 #endif
@@ -1245,7 +1297,7 @@ top:
 		}
 
 		if (!getting_input_config && (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN)) {
-			if (!isOuya() && is_modifier(event.keyboard.keycode)) {
+			if (is_modifier(event.keyboard.keycode)) {
 				if (event.keyboard.keycode == config.getKey1()) {
 					joy_b1_down();
 				}
@@ -2013,13 +2065,6 @@ int main(int argc, char *argv[])
 	//#endif
 #endif
 
-	// Setup HQM (High Quality Music) download path
-#ifdef ALLEGRO_ANDROID
-	hqm_set_download_path((std::string(get_sdcarddir()) + "/MonsterRPG2").c_str());
-#else
-	hqm_set_download_path(getUserResource("flacs"));
-#endif
-
 #ifdef ALLEGRO_IPHONE
 	initiOSKeyboard();
 	al_register_event_source(input_event_queue, &user_event_source);
@@ -2297,31 +2342,6 @@ int main(int argc, char *argv[])
 			tutorial_started = true;
 			startNewGame("tutorial");
 		}
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-		else if (choice == 4) {
-			config.write();
-#ifdef ALLEGRO_ANDROID
-			dontbail = true;
-			openURL("http://www.monster-rpg.com");
-			al_rest(1.0);
-			continue;
-#else
-			openRatingSite();
-#endif
-		}
-		#endif
-#if 0
-		else if (choice == 0xBEEF) {
-#ifndef ALLEGRO_ANDROID
-			config.write();
-			destroy();
-			exit(0);
-#else
-			goHome();
-			continue;
-#endif
-		}
-#endif
 		else {
 			config.write();
 			break;
@@ -2395,3 +2415,4 @@ int main(int argc, char *argv[])
 	return 0;
 }
 #endif
+

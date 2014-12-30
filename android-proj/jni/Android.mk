@@ -17,112 +17,117 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := liballegro-prebuilt
-LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro.so
+LOCAL_SRC_FILES := ../libs/liballegro.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := liballegro_memfile-prebuilt
-LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_memfile.so
+LOCAL_SRC_FILES := ../libs/liballegro_memfile.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := liballegro_primitives-prebuilt
-LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_primitives.so
+LOCAL_SRC_FILES := ../libs/liballegro_primitives.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := liballegro_image-prebuilt
-LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_image.so
+LOCAL_SRC_FILES := ../libs/liballegro_image.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := liballegro_font-prebuilt
-LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_font.so
+LOCAL_SRC_FILES := ../libs/liballegro_font.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := liballegro_ttf-prebuilt
-LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_ttf.so
+LOCAL_SRC_FILES := ../libs/liballegro_ttf.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := liballegro_color-prebuilt
-LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_color.so
+LOCAL_SRC_FILES := ../libs/liballegro_color.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := libbass-prebuilt
-LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/libbass.so
+LOCAL_SRC_FILES := ../libs/libbass.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := libbassflac-prebuilt
-LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/libbassflac.so
-include $(PREBUILT_SHARED_LIBRARY)
+LOCAL_MODULE := liblua5.2-prebuilt
+LOCAL_SRC_FILES := ../libs/liblua5.2.a
+include $(PREBUILT_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := libphysfs-prebuilt
+LOCAL_SRC_FILES := ../libs/libphysfs.a
+include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 
 LOCAL_ALLOW_UNDEFINED_SYMBOLS := false
-LOCAL_MODULE    := monsterrpg2
+LOCAL_MODULE := monsterrpg2
 LOCAL_SRC_FILES := \
-	3d.cpp\
-	Animation.cpp\
-	AnimationSet.cpp\
-	Area.cpp\
-	atlas.cpp\
-	atlas_accessor.cpp\
-	battle.cpp\
-	CombatActions.cpp\
-	Combatant.cpp\
-	CombatEntity.cpp\
-	CombatEnemy.cpp\
-	CombatPlayer.cpp\
-	Configuration.cpp\
-	debug.cpp\
-	equipment.cpp\
-	Frame.cpp\
-	ftpget.cpp\
-	GenericEffect.cpp\
-	graphics.cpp\
-	tftp_get.c\
-	Image.cpp\
-	Input.cpp\
-	inventory.cpp\
-	io.cpp\
-	Items.cpp\
-	java.cpp\
-	lander.cpp\
-	monster2.cpp\
-	my_load_bitmap.cpp\
-	Object.cpp\
-	pause.cpp\
-	Player.cpp\
-	redundant.cpp\
-	script.cpp\
-	shooter.cpp\
-	sound.cpp\
-	Spells.cpp\
-	tgui.cpp\
-	Tile.cpp\
-	translate.cpp\
-	util.cpp\
-	widgets.cpp\
-	xml.cpp\
-	init.cpp\
+	../../src/3d.cpp\
+	../../src/android.cpp\
+	../../src/Animation.cpp\
+	../../src/AnimationSet.cpp\
+	../../src/Area.cpp\
+	../../src/atlas.cpp\
+	../../src/atlas_accessor.cpp\
+	../../src/battle.cpp\
+	../../src/CombatActions.cpp\
+	../../src/Combatant.cpp\
+	../../src/CombatEntity.cpp\
+	../../src/CombatEnemy.cpp\
+	../../src/CombatPlayer.cpp\
+	../../src/Configuration.cpp\
+	../../src/debug.cpp\
+	../../src/equipment.cpp\
+	../../src/Frame.cpp\
+	../../src/GenericEffect.cpp\
+	../../src/graphics.cpp\
+	../../src/Image.cpp\
+	../../src/Input.cpp\
+	../../src/inventory.cpp\
+	../../src/io.cpp\
+	../../src/Items.cpp\
+	../../src/lander.cpp\
+	../../src/monster2.cpp\
+	../../src/my_load_bitmap.cpp\
+	../../src/Object.cpp\
+	../../src/pause.cpp\
+	../../src/Player.cpp\
+	../../src/redundant.cpp\
+	../../src/script.cpp\
+	../../src/shooter.cpp\
+	../../src/sound.cpp\
+	../../src/Spells.cpp\
+	../../src/tgui.cpp\
+	../../src/Tile.cpp\
+	../../src/translate.cpp\
+	../../src/util.cpp\
+	../../src/widgets.cpp\
+	../../src/xml.cpp\
+	../../src/init.cpp
 
 LOCAL_ARM_MODE := arm
-#LOCAL_CFLAGS    := -DDEBUGMODE -DA5_OGL -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/include -I../include -DOPENGLES -DNO_JOYPAD -Wall -DOUYA -Os
-LOCAL_CFLAGS    := -DDEBUGMODE -DA5_OGL -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/include -I../include -DOPENGLES -DNO_JOYPAD -Wall -Os
+LOCAL_CFLAGS := -DAMAZON=1 -DDEBUGMODE -DA5_OGL -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/include -I../include -DOPENGLES -DNO_JOYPAD -Wall -Os
 
-LOCAL_LDLIBS    := -L$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/lib -L$(LOCAL_PATH)/$(TARGET_ARCH_ABI) -llog libs/$(TARGET_ARCH_ABI)/liballegro.so libs/$(TARGET_ARCH_ABI)/liballegro_memfile.so libs/$(TARGET_ARCH_ABI)/liballegro_primitives.so libs/$(TARGET_ARCH_ABI)/liballegro_image.so libs/$(TARGET_ARCH_ABI)/liballegro_font.so libs/$(TARGET_ARCH_ABI)/liballegro_ttf.so libs/$(TARGET_ARCH_ABI)/liballegro_color.so -lGLESv1_CM -lstdc++ -llua5.2 -lz -lbass -lbassflac -lphysfs -lcurl
+LOCAL_SHARED_LIBRARIES := liballegro-prebuilt liballegro_memfile-prebuilt liballegro_primitives-prebuilt liballegro_image-prebuilt liballegro_font-prebuilt liballegro_ttf-prebuilt liballegro_color-prebuilt libbass-prebuilt
+LOCAL_STATIC_LIBRARIES := libphysfs-prebuilt liblua5.2-prebuilt
+LOCAL_LDLIBS := -L$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/lib -L$(LOCAL_PATH)/$(TARGET_ARCH_ABI) -llog -lGLESv1_CM -lstdc++ -lz
 
 include $(BUILD_SHARED_LIBRARY)
 
