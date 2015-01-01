@@ -100,6 +100,8 @@ void clear_input_events(double older_than)
 		joystick_repeat_events[i] = EMPTY_INPUT_EVENT;
 	}
 
+	joy_axes[0] = joy_axes[1] = 0;
+
 	Input *i = getInput();
 	if (i) {
 		i->reset();
@@ -378,6 +380,11 @@ void KeyboardInput::handle_event(ALLEGRO_EVENT *event)
 	else if (keycode == config.getKey2()) {
 		 button2 = onoff;
 	}
+#ifdef ALLEGRO_ANDROID
+	else if (keycode == ALLEGRO_KEY_BACK) {
+		button2 = onoff;
+	}
+#endif
 	else if (keycode == config.getKey3()) {
 		 button3 = onoff;
 	}

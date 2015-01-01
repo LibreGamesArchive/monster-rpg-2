@@ -13,10 +13,6 @@
 extern double my_last_shake_time;
 extern ALLEGRO_FONT *my_load_ttf_font(const char *filename, int sz, int flags);
 
-#ifdef ALLEGRO_ANDROID
-static bool dontbail = false;
-#endif
-
 extern bool center_button_pressed;
 
 int modifier_repeat_count[7] = { 0, };
@@ -231,8 +227,6 @@ void connect_second_display(void)
 	setMusicVolume(1);
 
 	airplay_connected = true;
-	
-	glDisable(GL_DITHER);
 	
 	disableMic();
 #endif
@@ -679,6 +673,12 @@ top:
 				ie.button3 = DOWN;
 				add_input_event(ie);
 			}
+#ifdef ALLEGRO_ANDROID
+			else if (event.keyboard.keycode == ALLEGRO_KEY_BACK) {
+				ie.button2 = DOWN;
+				add_input_event(ie);
+			}
+#endif
 		}
 		else if (event.type == ALLEGRO_EVENT_KEY_UP || event.type == USER_KEY_UP) {
 			if (is_modifier(event.keyboard.keycode)) {
@@ -763,6 +763,12 @@ top:
 					f6_time = -1;
 					f6_cheated = false;
 				}
+#ifdef ALLEGRO_ANDROID
+				else if (code == ALLEGRO_KEY_BACK) {
+					ie.button2 = UP;
+					add_input_event(ie);
+				}
+#endif
 			}
 		}
 
@@ -871,15 +877,6 @@ top:
 						}
 					}
 				}
-			}
-		}
-#endif
-
-#ifdef ALLEGRO_ANDROID
-		else if ((event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN) && event.keyboard.keycode == ALLEGRO_KEY_BACK) {
-			if (al_current_time() > next_shake) {
-				iphone_shake_time = al_current_time();
-				next_shake = al_current_time()+0.5;
 			}
 		}
 #endif
@@ -1203,15 +1200,6 @@ top:
 #endif
 			config.write();
 
-#ifdef ALLEGRO_ANDROID
-#ifdef OUYA
-			if (isAndroidConsole() && dontbail == false) {
-				exit(0);
-			}
-#endif
-			dontbail = false;
-#endif
-
 			al_stop_timer(logic_timer);
 			al_stop_timer(draw_timer);
 			// halt
@@ -1265,7 +1253,6 @@ top:
 			m_clear(black);
 			al_set_target_bitmap(old_target);
 #endif
-			glDisable(GL_DITHER);
 			al_start_timer(logic_timer);
 			al_start_timer(draw_timer);
 		}
@@ -1490,8 +1477,6 @@ top:
 			setMusicVolume(1);
 			
 			airplay_connected = false;
-			
-			glDisable(GL_DITHER);
 		}
 	}
 #endif
@@ -1940,7 +1925,18 @@ static void run()
 						!speechDialog && !path_head) {
 					InputDescriptor ie = getInput()->getDescriptor();
 					if (area->getName() != "tutorial") {
-						if (ie.button2 || iphone_shaken(0.1)) {
+						bool menu_pressed = false;
+#ifdef ALLEGRO_ANDROID
+						if (user_joystick) {
+							ALLEGRO_JOYSTICK_STATE joystate;
+							al_get_joystick_state(user_joystick, &joystate);
+							// FIXME: 10 is the menu button on Android
+							if (joystate.button[10]) {
+								menu_pressed = true;
+							}
+						}
+#endif
+						if (ie.button2 || iphone_shaken(0.1) || menu_pressed) {
 							waitForRelease(4);
 							iphone_clear_shaken();
 							int posx, posy;

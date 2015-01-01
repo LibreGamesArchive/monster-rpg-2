@@ -153,7 +153,6 @@ extern bool switched_out;
 extern ALLEGRO_COND *switch_cond;
 extern ALLEGRO_MUTEX *switch_mutex;
 
-extern char versionString[10];
 extern uint32_t my_opengl_version;
 extern bool use_programmable_pipeline;
 extern int screen_offset_x, screen_offset_y;
@@ -187,9 +186,6 @@ extern bool airplay_connected;
 #endif
 
 extern volatile int curr_touches;
-
-extern int versionMajor;
-extern int versionMinor;
 
 extern bool do_acknowledge_resize;
 	

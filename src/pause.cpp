@@ -4160,10 +4160,6 @@ static void title_draw(MBITMAP *bg)
 
 	tguiDraw();
 
-	mTextout(game_font, versionString,
-		BW-m_text_length(game_font, versionString)-1,
-		1, white, black, WGT_TEXT_NORMAL, false);
-
 	drawBufferToScreen();
 }
 

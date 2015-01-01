@@ -283,10 +283,6 @@ bool scr_smaller = false;
 bool scr_small = false;
 bool scr_medium = false;
 
-char versionString[10];
-int versionMajor = 1;
-int versionMinor = 0;
-
 bool switched_out = false;
 uint32_t my_opengl_version;
 
@@ -598,11 +594,7 @@ static void *loader_proc(void *arg)
 #endif
 
 #ifdef A5_OGL
-#if defined ALLEGRO_IPHONE
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGBA_4444);
-#else
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
-#endif
 #else
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 #endif
@@ -1380,17 +1372,6 @@ bool init(int *argc, char **argv[])
 	al_set_mouse_emulation_mode(ALLEGRO_MOUSE_EMULATION_5_0_x);
 #endif
 
-	ALLEGRO_FILE *f = al_fopen(getResource("Version"), "rb");
-	if (f) {
-		versionMajor = al_fread32le(f);
-		versionMinor = al_fread32le(f);
-		sprintf(versionString, "%d.%d", versionMajor, versionMinor);
-		al_fclose(f);
-	}
-	else {
-		strcpy(versionString, "-1");
-	}
-
 	al_init_font_addon();
 	al_init_ttf_addon();
 	al_init_image_addon();
@@ -1682,11 +1663,7 @@ bool init(int *argc, char **argv[])
 	al_set_window_title(display, "Monster RPG 2");
 
 #ifdef A5_OGL
-#if defined ALLEGRO_IPHONE
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGBA_4444);
-#else
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
-#endif
 #else
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 #endif
@@ -1706,9 +1683,7 @@ bool init(int *argc, char **argv[])
 
 	debug_message("initing shader variables\n");
 
-#if defined ALLEGRO_IPHONE
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGBA_4444);
-#elif defined A5_OGL
+#if defined A5_OGL
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
 #else
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
