@@ -444,18 +444,7 @@ static void *thread_proc(void *arg)
 	al_register_event_source(events, (ALLEGRO_EVENT_SOURCE *)draw_timer);
 	al_register_event_source(events, (ALLEGRO_EVENT_SOURCE *)logic_timer);
 	
-#if defined __linux__ && !(defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI)
-	double next_screensaver_disable = al_current_time() + 45;
-#endif
-	
 	while  (exit_event_thread != 1) {
-#if defined __linux__ && !(defined ALLEGRO_ANDROID || defined ALLEGRO_RASPBERRYPI)
-		if (al_get_time() > next_screensaver_disable) {
-			system("xscreensaver-command -deactivate >/dev/null 2>/dev/null");
-			system("gnome-screensaver-command -d >/dev/null 2>/dev/null");
-			next_screensaver_disable = al_get_time() + 45;
-		}
-#endif
 		if (reinstall_timer) {
 			al_destroy_timer(draw_timer);
 			draw_timer = al_create_timer(1.0/config.getTargetFPS());
@@ -1218,14 +1207,6 @@ static void draw_loading_screen(MBITMAP *tmp, int percent, ScreenDescriptor *sd)
 	m_flip_display();
 }
 
-#ifdef ALLEGRO_ANDROID
-void android_assert_handler(char const *expr,
-	char const *file, int line, char const *func)
-{
-	debug_message("BOOYA %s %s:%d", func, file, line);
-}
-#endif
-
 #ifndef ALLEGRO_ANDROID
 bool isAndroidConsole()
 {
@@ -1272,11 +1253,7 @@ bool init(int *argc, char **argv[])
 		use_fixed_pipeline = true;
 #endif
 
-#ifdef ALLEGRO_ANDROID
-	if (!al_install_system(ALLEGRO_VERSION_INT, NULL)) {
-#else
 	if (!al_init()) {
-#endif
 		printf("al_init failed.\n");
 		exit(1);
 	}
@@ -1301,10 +1278,6 @@ bool init(int *argc, char **argv[])
 		}
 		al_rest(0.25);
 	}
-#endif
-
-#ifdef ALLEGRO_ANDROID
-	al_register_assert_handler(android_assert_handler);
 #endif
 
 #if !defined ALLEGRO_IPHONE
@@ -1768,9 +1741,6 @@ bool init(int *argc, char **argv[])
 
 	al_set_new_bitmap_flags(ALLEGRO_CONVERT_BITMAP);
 
-	//shadow_sheet = m_create_alpha_bitmap(4*16, 2*16, create_shadows, NULL, destroy_shadows);
-	//shadow_sheet = m_load_alpha_bitmap(getResource("media/shadows.png"));
-
 	AnimationSet *shadow_tmp = new_AnimationSet(getResource("media/shadows.png"));
 	shadow_sheet = shadow_tmp->clone(CLONE_COPY_BORDERS);
 	delete shadow_tmp;
@@ -1938,10 +1908,6 @@ void destroy()
 #endif
 
 	al_shutdown_ttf_addon();
-
-#ifdef ALLEGRO_ANDROID
-	//al_destroy_display(display);
-#endif
 
 	if (saveFilename)
 		free(saveFilename);
