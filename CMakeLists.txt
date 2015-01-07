@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 2.6)
 
 OPTION(KCM_AUDIO "Use Allegro audio instead of BASS" off)
 OPTION(WITH_SVG "Enable SVG loader" off)
-OPTION(WITH_JOYPAD "Enable Joypad app support" off)
 OPTION(RASPBERRYPI "Compile for Raspberry Pi" off)
 OPTION(DEMO "Build demo version" off)
 
@@ -40,9 +39,14 @@ if(WIN32)
 		endif()
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows")
 	else(MINGW)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DA5_OGL")
-		#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DA5_D3D")
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
+		if (D3D)
+			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /D_USE_MATH_DEFINES /DALLEGRO_STATICLINK /EHsc /D_WIN32_WINNT=0x501 /DA5_D3D")
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D_USE_MATH_DEFINES /DALLEGRO_STATICLINK /EHsc /D_WIN32_WINNT=0x501 /DA5_D3D")
+		else()
+			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /D_USE_MATH_DEFINES /DALLEGRO_STATICLINK /EHsc /D_WIN32_WINNT=0x501 /DA5_OGL")
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D_USE_MATH_DEFINES /DALLEGRO_STATICLINK /EHsc /D_WIN32_WINNT=0x501 /DA5_OGL")
+		endif()
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO /SUBSYSTEM:WINDOWS")
 	endif(MINGW)
 else(WIN32)
 	if(RASPBERRYPI)
@@ -96,7 +100,6 @@ set(COMMON_SRCS
 	src/battle.cpp
 	src/debug.cpp
 	src/equipment.cpp
-	src/ftpget.cpp
 	src/graphics.cpp
 	src/inventory.cpp
 	src/io.cpp
@@ -107,7 +110,6 @@ set(COMMON_SRCS
 	src/script.cpp
 	src/shooter.cpp
 	src/sound.cpp
-	src/tftp_get.c
 	src/tgui.cpp
 	src/translate.cpp
 	src/util.cpp
@@ -119,10 +121,6 @@ if(WIN32)
 	set(COMMON_SRCS ${COMMON_SRCS} src/init.cpp)
 else(WIN32)
 if(APPLE)
-	if(NOT WITH_JOYPAD)
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNO_JOYPAD")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNO_JOYPAD")
-	endif()
 	set(COMMON_SRCS ${COMMON_SRCS} src/init.mm src/joypad.mm src/joypad_handler.mm src/gamecenter.mm src/mygamecentervc.m)
 else(APPLE)
 	set(COMMON_SRCS ${COMMON_SRCS} src/init.cpp)
@@ -141,8 +139,18 @@ if(WITH_SVG AND NOT D3D)
 endif()
 
 if(DEMO)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEMO=1")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEMO=1")
+	if(WIN32)
+		if(MINGW)
+			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEMO=1")
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEMO=1")
+		else()
+			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /DDEMO=1")
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DDEMO=1")
+		endif()
+	else()
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEMO=1")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEMO=1")
+	endif()
 endif()
 
 add_library(mo2-engine
@@ -186,8 +194,13 @@ if(WIN32)
 		"freetype"
 		"z"
 	)
+	if (MINGW)
+		set(ICON_OBJ ${CMAKE_SOURCE_DIR}/src/icon.res)
+	else()
+		set(ICON_OBJ ${CMAKE_SOURCE_DIR}/src/icon.lib)
+	endif()
 	SET(MAIN_LIBS 
-		${CMAKE_SOURCE_DIR}/src/icon.res
+		${ICON_OBJ}
 		mo2-engine
 		allegro_ttf${ALLEG_SUFFIX}
 		allegro_font${ALLEG_SUFFIX}
@@ -195,13 +208,11 @@ if(WIN32)
 		allegro_dialog${ALLEG_SUFFIX}
 		allegro_memfile${ALLEG_SUFFIX}
 		allegro_image${ALLEG_SUFFIX}
-		allegro_physfs${ALLEG_SUFFIX}
 		allegro${ALLEG_SUFFIX}
 		${ALLEGRO_MAIN_LIB}
 		${EXTRA_LIBS}
 		lua5.2
 		d3dx9
-		physfs
 		"opengl32"
 	)
 	if(KCM_AUDIO)
@@ -229,19 +240,13 @@ if(APPLE)
 		allegro_dialog${ALLEG_SUFFIX}
 		allegro_memfile${ALLEG_SUFFIX}
 		allegro_image${ALLEG_SUFFIX}
-		allegro_physfs${ALLEG_SUFFIX}
 		allegro${ALLEG_SUFFIX} ${ALLEGRO_MAIN_LIB}
 		${EXTRA_LIBS}
 		lua5.2
 		curl
-		physfs
 		png
 		jpeg
 	)
-	if (WITH_JOYPAD)
-		LIST(APPEND MAIN_LIBS JoypadMac)
-	endif()
-
 	if(KCM_AUDIO)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -framework OpenAL")
 	else(KCM_AUDIO)
@@ -261,7 +266,6 @@ else(APPLE)
 		allegro_primitives${ALLEG_SUFFIX}
 		allegro_memfile${ALLEG_SUFFIX}
 		allegro_image${ALLEG_SUFFIX}
-		allegro_physfs${ALLEG_SUFFIX}
 		allegro_color${ALLEG_SUFFIX}
 		allegro${ALLEG_SUFFIX}
 		${ALLEGRO_MAIN_LIB}
@@ -278,12 +282,12 @@ else(APPLE)
 		LIST(APPEND MAIN_LIBS "${CMAKE_BINARY_DIR}/libbass.so")
 	endif(KCM_AUDIO)
 	if(RASPBERRYPI)
-		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host /usr/lib/arm-linux-gnueabihf/libfreetype.a /usr/lib/arm-linux-gnueabihf/libz.a /usr/lib/arm-linux-gnueabihf/libpng.a /usr/lib/arm-linux-gnueabihf/liblua5.2.a /usr/lib/libphysfs.a /usr/local/lib/libcurl.a)
+		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host /usr/lib/arm-linux-gnueabihf/libfreetype.a /usr/lib/arm-linux-gnueabihf/libz.a /usr/lib/arm-linux-gnueabihf/libpng.a /usr/lib/arm-linux-gnueabihf/liblua5.2.a /usr/local/lib/libcurl.a)
 	else(RASPBERYPI)
 		# trentg's build
-		LIST(APPEND MAIN_LIBS allegro_dialog${ALLEG_SUFFIX} GL GLU /usr/lib/libfreetype.a /usr/lib/libz.a /usr/lib/libpng.a /usr/lib/libjpeg.a /usr/local/lib/liblua5.2.a /usr/lib/libphysfs.a /usr/local/lib/libcurl.a)
+		LIST(APPEND MAIN_LIBS allegro_dialog${ALLEG_SUFFIX} GL GLU /usr/lib/libfreetype.a /usr/lib/libz.a /usr/lib/libpng.a /usr/lib/libjpeg.a /usr/local/lib/liblua5.2.a /usr/local/lib/libcurl.a)
 		# normal build
-		#LIST(APPEND MAIN_LIBS allegro_dialog${ALLEG_SUFFIX} GL GLU freetype z png jpeg lua5.2 physfs curl)
+		#LIST(APPEND MAIN_LIBS allegro_dialog${ALLEG_SUFFIX} GL GLU freetype z png jpeg lua5.2 curl)
 	endif(RASPBERRYPI)
 endif(APPLE)
 endif(WIN32)

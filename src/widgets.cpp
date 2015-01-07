@@ -9,7 +9,6 @@
 MFONT *big_font;
 #endif
 MFONT *game_font;
-MFONT *game_font_second_display;
 MSpeechDialog *speechDialog = NULL;
 
 

@@ -188,8 +188,6 @@ bool isAndroidConsole()
 	
 	const char *native = _al_android_get_jnienv()->GetStringUTFChars(s, 0);
 
-logString(native);
-
 	if (strstr(native, "OUYA")) {
 		is_console = true;
 	}
@@ -197,7 +195,6 @@ logString(native);
 		jmethodID method_id2 = _jni_call(env, jmethodID, GetMethodID, class_id, "getManufacturer", "()Ljava/lang/String;");
 		jstring s2 = (jstring)_jni_call(env, jobject, CallObjectMethod, object, method_id2);
 		const char *native2 = _al_android_get_jnienv()->GetStringUTFChars(s2, 0);
-logString(native2);
 		if (!strcmp(native2, "Amazon")) {
 			is_console = true;
 		}

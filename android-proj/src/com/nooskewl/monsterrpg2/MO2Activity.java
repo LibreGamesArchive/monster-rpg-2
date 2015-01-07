@@ -32,6 +32,7 @@ public class MO2Activity extends AllegroActivity {
       System.loadLibrary("allegro_font");
       System.loadLibrary("allegro_ttf");
       System.loadLibrary("allegro_color");
+      System.loadLibrary("allegro_physfs");
       System.loadLibrary("bass");
    }
 

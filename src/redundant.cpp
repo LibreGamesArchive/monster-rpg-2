@@ -2,6 +2,10 @@
 
 #include <allegro5/allegro_opengl.h>
 
+#ifdef ALLEGRO_ANDROID
+#include "java.h"
+#endif
+
 static std::vector<LoadedBitmap *> loaded_bitmaps;
 
 ALLEGRO_BITMAP *my_al_create_bitmap(int w, int h)
@@ -572,15 +576,6 @@ void m_flip_display(void)
 	);
 	m_clear(black);
 	al_set_clipping_rectangle(xxx, yyy, www, hhh);
-
-	if (controller_display && controller_display_drawn_to)
-	{
-		controller_display_drawn_to = false;
-		ALLEGRO_BITMAP *target = al_get_target_bitmap();
-		al_set_target_backbuffer(controller_display);
-		al_flip_display();
-		al_set_target_bitmap(target);
-	}
 
 	fps_frames++;
 	double elapsed = al_get_time() - fps_counter;

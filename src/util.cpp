@@ -6,6 +6,10 @@
 
 #include <sys/stat.h>
 
+#ifdef ALLEGRO_ANDROID
+#include "java.h"
+#endif
+
 int myArgc;
 char **myArgv;
 double last_shake_check;
@@ -104,10 +108,10 @@ const char *getResource(const char *fmt, ...)
 	va_list ap;
 	static char name[MAX_PATH];
 
-#ifndef ALLEGRO_ANDROID // FIXME
+#ifndef ALLEGRO_ANDROID
 	strcpy(name, resourcePath());
 #else
-	strcpy(name, "data/");
+	strcpy(name, "assets/data/");
 #endif
 	va_start(ap, fmt);
 	vsnprintf(name+strlen(name), (sizeof(name)/sizeof(*name))-1, fmt, ap);

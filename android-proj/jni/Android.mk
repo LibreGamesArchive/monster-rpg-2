@@ -58,21 +58,15 @@ include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := libbass-prebuilt
-LOCAL_SRC_FILES := ../libs/libbass.so
+LOCAL_MODULE := liballegro_physfs-prebuilt
+LOCAL_SRC_FILES := ../libs/liballegro_physfs.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := liblua5.2-prebuilt
-LOCAL_SRC_FILES := ../libs/liblua5.2.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := libphysfs-prebuilt
-LOCAL_SRC_FILES := ../libs/libphysfs.a
-include $(PREBUILT_STATIC_LIBRARY)
+LOCAL_MODULE := libbass-prebuilt
+LOCAL_SRC_FILES := ../libs/libbass.so
+include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 
@@ -123,11 +117,10 @@ LOCAL_SRC_FILES := \
 	../../src/init.cpp
 
 LOCAL_ARM_MODE := arm
-LOCAL_CFLAGS := -DAMAZON=1 -DDEBUGMODE -DA5_OGL -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/include -I../include -DOPENGLES -DNO_JOYPAD -Wall -Os
+LOCAL_CFLAGS := -Wall -O2 -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/include -I../include -DA5_OGL
 
-LOCAL_SHARED_LIBRARIES := liballegro-prebuilt liballegro_memfile-prebuilt liballegro_primitives-prebuilt liballegro_image-prebuilt liballegro_font-prebuilt liballegro_ttf-prebuilt liballegro_color-prebuilt libbass-prebuilt
-LOCAL_STATIC_LIBRARIES := libphysfs-prebuilt liblua5.2-prebuilt
-LOCAL_LDLIBS := -L$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/lib -L$(LOCAL_PATH)/$(TARGET_ARCH_ABI) -llog -lGLESv1_CM -lstdc++ -lz
+LOCAL_SHARED_LIBRARIES := liballegro-prebuilt liballegro_memfile-prebuilt liballegro_primitives-prebuilt liballegro_image-prebuilt liballegro_font-prebuilt liballegro_ttf-prebuilt liballegro_color-prebuilt liballegro_physfs-prebuilt libbass-prebuilt
+LOCAL_LDLIBS := -L$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/lib -llog -lGLESv1_CM -lstdc++ -lphysfs -lpng -llua5.2 -lz
 
 include $(BUILD_SHARED_LIBRARY)
 

@@ -7,8 +7,6 @@ extern ALLEGRO_DISPLAY *display;
 
 #ifdef ALLEGRO_IPHONE
 extern volatile bool modalViewShowing;
-extern bool airplay_connected;
-extern ALLEGRO_DISPLAY *controller_display;
 UIWindow *al_iphone_get_window(ALLEGRO_DISPLAY *display);
 
 @implementation MyGameCenterVC
@@ -68,7 +66,7 @@ UIWindow *al_iphone_get_window(ALLEGRO_DISPLAY *display);
 	if (achievements != nil)
 	{
 		achievements.achievementDelegate = self;
-		UIWindow *window = al_iphone_get_window(airplay_connected ? controller_display : display);
+		UIWindow *window = al_iphone_get_window(display);
 		[window addSubview:self.view];
 		[self presentModalViewController:achievements animated:NO];
 		[window bringSubviewToFront:achievements.view];

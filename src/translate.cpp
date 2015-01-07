@@ -82,24 +82,6 @@ void load_translation(const char *filename)
 		native_error("Load error.", filename);
 	}
 
-	int pos = 0;
-	int32_t ch;
-	ALLEGRO_USTR *fullstr = al_ustr_new((const char *)bytes);
-	ALLEGRO_USTR *newstr = al_ustr_new("");
-	while ((ch = al_ustr_get_next(fullstr, &pos)) >= 0) {
-		if (ch != '\n' && ch != '\r') {
-			if (al_ustr_find_chr(newstr, 0, ch) == -1) {
-				al_ustr_append_chr(newstr, ch);
-			}
-		}
-	}
-	for (int i = 0; i < 10; i++) {
-		al_ustr_append_chr(newstr, '0'+i);
-	}
-	al_get_ustr_width(game_font, newstr);
-	al_ustr_free(fullstr);
-	al_ustr_free(newstr);
-
 	ALLEGRO_FILE *f = al_open_memfile(bytes, sz, "rb");
 
 	ALLEGRO_USTR *ustr;

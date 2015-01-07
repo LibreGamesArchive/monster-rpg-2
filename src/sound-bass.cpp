@@ -379,13 +379,15 @@ std::string check_music_name(std::string name, bool *is_flac)
 {
 	*is_flac = false;
 
+/*
 #ifdef ALLEGRO_ANDROID
 	static char buffer[1000];
 	sprintf(buffer, "assets/data/music/%s", name.c_str());
 	return buffer;
 #else
+*/
 	return getResource("music/%s", name.c_str());
-#endif
+//#endif
 }
 
 void playMusic(std::string name, float vol, bool force)
@@ -414,7 +416,7 @@ void playMusic(std::string name, float vol, bool force)
 	if (is_flac) {
 		al_set_standard_file_interface();
 		ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
-		al_android_set_apk_file_interface();
+		al_set_physfs_file_interface();
 		music = BASS_StreamCreateFileUser(
 			STREAMFILE_NOBUFFER,
 			BASS_SAMPLE_LOOP,
@@ -484,7 +486,7 @@ void playAmbience(std::string name, float vol)
 	if (is_flac) {
 		al_set_standard_file_interface();
 		ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
-		al_android_set_apk_file_interface();
+		al_set_physfs_file_interface();
 		ambience = BASS_StreamCreateFileUser(
 			STREAMFILE_NOBUFFER,
 			BASS_SAMPLE_LOOP,
@@ -598,7 +600,7 @@ MSAMPLE streamSample(std::string name, float vol)
 	if (is_flac) {
 		al_set_standard_file_interface();
 		ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
-		al_android_set_apk_file_interface();
+		al_set_physfs_file_interface();
 		samp = BASS_StreamCreateFileUser(
 			STREAMFILE_NOBUFFER,
 			BASS_SAMPLE_LOOP,

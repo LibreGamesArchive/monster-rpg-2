@@ -4,6 +4,10 @@
 #include "iphone.h"
 #endif
 
+#ifdef ALLEGRO_ANDROID
+#include "java.h"
+#endif
+
 static Player *pushed_players[MAX_PARTY] = { NULL, };
 static Player **strategy_players;
 bool player_scripted = false;

@@ -3,12 +3,6 @@
 #define NO_SIN
 #include "monster2.hpp"
 
-#ifndef NO_JOYPAD
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
-#include "joypad.hpp"
-#endif
-#endif
-
 // stuff allegro doesn't have yet
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 #define glFrustum glFrustumf
@@ -584,22 +578,7 @@ static int real_archery(int *accuracy_pts)
 		NUM_GOBLINS = 50;
 	}
 
-#ifdef ALLEGRO_IPHONE
-#if defined NO_JOYPAD
-	if (use_dpad || airplay_connected)
-#elif defined WITH_60BEAT
-	if (use_dpad || joypad_connected() || airplay_connected || is_sb_connected())
-#else
-	if (use_dpad || joypad_connected() || airplay_connected)
-#endif
-#else
-#if defined ALLEGRO_MACOSX && !defined NO_JOYPAD
-	bool jp_conn = joypad_connected();
-#else
-	bool jp_conn = false;
-#endif
-	if (use_dpad || jp_conn)
-#endif
+	if (use_dpad)
 		goblin_speed = 0.015f;
 	else
 		goblin_speed = 0.03f;

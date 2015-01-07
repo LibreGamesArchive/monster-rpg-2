@@ -1,20 +1,8 @@
 #include "monster2.hpp"
 
-#ifndef NO_JOYPAD
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
-#include "joypad.hpp"
-#endif
-#endif
-
 #ifdef ALLEGRO_ANDROID
 #include "java.h"
 #endif
-
-extern "C" {
-void lock_joypad_mutex();
-void unlock_joypad_mutex();
-}
-
 
 TripleInput *tripleInput = NULL;
 
@@ -108,12 +96,6 @@ void clear_input_events(double older_than)
 	}
 
 	clear_touches();
-
-#ifndef NO_JOYPAD
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
-	reset_joypad_state();
-#endif
-#endif
 
 	released = true;
 }
@@ -301,12 +283,8 @@ void Input::setDirection(int direction)
 	
 void Input::waitForReleaseOr(int button_id, unsigned long wait_time)
 {
-	lock_joypad_mutex();
-
 	orRelease = button_id;
 	timeOfNextNotification = tguiCurrentTimeMillis() + wait_time;
-
-	unlock_joypad_mutex();
 }
 
 void Input::setTimeTillNextNotification(int t)
@@ -542,16 +520,9 @@ void TripleInput::update()
 			false;
 
 	InputDescriptor id3;
-#ifndef NO_JOYPAD
-#if defined ALLEGRO_MACOSX
-	if (joypad_connected())
-		id3 = get_joypad_state();
-	else
-#endif
-#endif
-		id3.left = id3.right = id3.up = id3.down =
-			id3.button1 = id3.button2 = id3.button3 =
-			false;
+	id3.left = id3.right = id3.up = id3.down =
+		id3.button1 = id3.button2 = id3.button3 =
+		false;
 
 	set(
 		sets.left || id1.left || id2.left || id3.left,
@@ -569,23 +540,11 @@ void TripleInput::update()
 	InputDescriptor id1 = kb->getDescriptor();
 
 	InputDescriptor id3;
-#ifndef NO_JOYPAD
-	if (joypad_connected()) {
-		id3 = get_joypad_state();
-	}
-	else
-#endif
-	{
-		id3.left = id3.right = id3.up = id3.down = id3.button1 = id3.button2 = id3.button3 = false;
-	}
+	id3.left = id3.right = id3.up = id3.down = id3.button1 = id3.button2 = id3.button3 = false;
 
 	InputDescriptor id4;
-#if defined WITH_60BEAT
-	get_sb_state(&id4.left, &id4.right, &id4.up, &id4.down, &id4.button1, &id4.button2, &id4.button3);
-#else
 	id4.left = id4.right = id4.up = id4.down = id4.button1 = id4.button2 = id4.button3 = false;
-#endif
-		
+
 	set(
 	    sets.left || id1.left || id3.left || id4.left,
 	    sets.right || id1.right || id3.right || id4.right,
@@ -641,8 +600,6 @@ void joy_b1_down(bool skip_initial_event, bool long_delay)
 		joystick_initial_repeat_countdown[JOY_REPEAT_B1] = JOY_INITIAL_REPEAT_TIME;
 	}
 	joystick_repeat_countdown[JOY_REPEAT_B1] = JOY_REPEAT_TIME;
-
-	blueblock_times[4] = al_get_time();
 }
 
 void joy_b2_down(bool skip_initial_event, bool long_delay)
@@ -661,8 +618,6 @@ void joy_b2_down(bool skip_initial_event, bool long_delay)
 		joystick_initial_repeat_countdown[JOY_REPEAT_B2] = JOY_INITIAL_REPEAT_TIME;
 	}
 	joystick_repeat_countdown[JOY_REPEAT_B2] = JOY_REPEAT_TIME;
-
-	blueblock_times[5] = al_get_time();
 }
 
 void joy_b3_down(bool skip_initial_event, bool long_delay)
@@ -681,8 +636,6 @@ void joy_b3_down(bool skip_initial_event, bool long_delay)
 		joystick_initial_repeat_countdown[JOY_REPEAT_B3] = JOY_INITIAL_REPEAT_TIME;
 	}
 	joystick_repeat_countdown[JOY_REPEAT_B3] = JOY_REPEAT_TIME;
-
-	blueblock_times[6] = al_get_time();
 }
 
 void joy_b1_up()
@@ -732,8 +685,6 @@ void joy_l_down(bool skip_initial_event, bool long_delay)
 		joystick_initial_repeat_countdown[JOY_REPEAT_AXIS0] = JOY_INITIAL_REPEAT_TIME;
 	}
 	joystick_repeat_countdown[JOY_REPEAT_AXIS0] = JOY_REPEAT_TIME;
-
-	blueblock_times[0] = al_get_time();
 }
 
 void joy_r_down(bool skip_initial_event, bool long_delay)
@@ -752,8 +703,6 @@ void joy_r_down(bool skip_initial_event, bool long_delay)
 		joystick_initial_repeat_countdown[JOY_REPEAT_AXIS0] = JOY_INITIAL_REPEAT_TIME;
 	}
 	joystick_repeat_countdown[JOY_REPEAT_AXIS0] = JOY_REPEAT_TIME;
-
-	blueblock_times[1] = al_get_time();
 }
 
 void joy_u_down(bool skip_initial_event, bool long_delay)
@@ -772,8 +721,6 @@ void joy_u_down(bool skip_initial_event, bool long_delay)
 		joystick_initial_repeat_countdown[JOY_REPEAT_AXIS1] = JOY_INITIAL_REPEAT_TIME;
 	}
 	joystick_repeat_countdown[JOY_REPEAT_AXIS1] = JOY_REPEAT_TIME;
-
-	blueblock_times[2] = al_get_time();
 }
 
 void joy_d_down(bool skip_initial_event, bool long_delay)
@@ -792,8 +739,6 @@ void joy_d_down(bool skip_initial_event, bool long_delay)
 		joystick_initial_repeat_countdown[JOY_REPEAT_AXIS1] = JOY_INITIAL_REPEAT_TIME;
 	}
 	joystick_repeat_countdown[JOY_REPEAT_AXIS1] = JOY_REPEAT_TIME;
-
-	blueblock_times[3] = al_get_time();
 }
 
 void joy_l_up()

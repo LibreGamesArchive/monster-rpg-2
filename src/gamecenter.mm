@@ -221,10 +221,8 @@ void showAchievements(void)
 	}
 	[uv release];
 	
-	ALLEGRO_DISPLAY *d = airplay_connected ? controller_display : display;
-	
-	UIWindow *window = al_iphone_get_window(d);
-	UIView *view = al_iphone_get_view(d);
+	UIWindow *window = al_iphone_get_window(display);
+	UIView *view = al_iphone_get_view(display);
 	[window bringSubviewToFront:view];
 	clear_input_events();
 #else

@@ -152,7 +152,7 @@ MSAMPLE loadSample(std::string name)
 	debug_message("loading sample '%s'\n", fn);
 	al_set_standard_file_interface();
 	s = al_load_sample(fn);
-	al_android_set_apk_file_interface();
+	al_set_physfs_file_interface();
 #else
 	s = al_load_sample(getResource("sfx/%s", name.c_str()));
 #endif
@@ -221,7 +221,7 @@ void playMusic(std::string name, float vol, bool force)
 	if (is_flac) {
 		al_set_standard_file_interface();
 		music = al_load_audio_stream(name.c_str(), 4, 2048);
-		al_android_set_apk_file_interface();
+		al_set_physfs_file_interface();
 	}
 	else {
 		music = al_load_audio_stream(name.c_str(), 4, 2048);

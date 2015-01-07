@@ -165,7 +165,7 @@ void save_auto_save_to_disk()
 		al_save_bitmap(getUserResource("auto0.bmp"), screenshot->bitmap);
 		al_unlock_mutex(ss_mutex);
 #ifdef ALLEGRO_ANDROID
-		al_android_set_apk_file_interface();
+		al_set_physfs_file_interface();
 #endif
 	}
 }

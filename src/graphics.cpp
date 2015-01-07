@@ -4,8 +4,6 @@
 #include "java.h"
 #endif
 
-bool controller_display_drawn_to = false;
-
 MBITMAP *battle_buf = NULL;
 
 bool transitioning;
@@ -13,13 +11,6 @@ bool transitioning;
 bool global_draw_controls = true;
 static TemporaryTextWidget omnipotentTexts[MAX_PARTY];
 static double current_time = -1;
-
-MBITMAP *blueblocks[8];
-MBITMAP *airplay_dpad;
-MBITMAP *white_button;
-MBITMAP *black_button;
-MBITMAP *airplay_logo;
-double blueblock_times[7] = { -1.0, };
 
 void stopAllOmni()
 {
@@ -47,95 +38,8 @@ float orientation_angle;
 
 static void draw_the_controls(bool draw_controls, ALLEGRO_COLOR tint)
 {
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-#if defined ALLEGRO_IPHONE
-	if (airplay_connected || (use_dpad && dpad_buttons && draw_controls && global_draw_controls)) {
-		if (controller_display) {
-			controller_display_drawn_to = true;
-#else
 	if (use_dpad && dpad_buttons && draw_controls && global_draw_controls) {
-		if (false) {
-#endif
-			ALLEGRO_STATE state;
-			al_store_state(&state, ALLEGRO_STATE_BLENDER);
-			al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ONE);
-			
-			// 4 because the screen is scaled to have 960x640 "pixels" when created (960/240 = 4 etc)
-			float scalex = 4;
-			float scaley = 4;
-			
-			const int BUFW = BW*scalex;
-			const int BUFH = BH*scaley;
-			const int BSZX = BUTTON_SIZE*scalex;
-			const int BSZY = BUTTON_SIZE*scaley;
-
-			int padx = 10*scalex, pady;
-			int b1x = BUFW-BSZX*2-25*scalex, b2y;
-			int b2x = BUFW-BSZX-20*scalex, b1y;
-
-			if (dpad_at_top) {
-				pady = 5*scaley;
-				b1y = 5*scaley;
-				b2y = 5*scaley;
-			}
-			else {
-				pady = BUFH-BSZY*3-5*scaley;
-				b1y = BUFH-BSZY-5*scaley;
-				b2y = BUFH-BSZY-5*scaley;
-			}
-
-			if (config.getSwapButtons()) {
-				int tx = b1x;
-				int ty = b1y;
-				b1x = b2x;
-				b1y = b2y;
-				b2x = tx;
-				b2y = ty;
-			}
-
-			int centers[6][2] = {
-				{ padx+BSZX/2, pady+BSZY*3/2 },
-				{ padx+BSZX*2.5, pady+BSZY*3/2 },
-				{ padx+BSZX*3/2, pady+BSZY/2 },
-				{ padx+BSZX*3/2, pady+BSZY*2.5 },
-				{ b1x+BSZX/2, b1y+BSZY/2 },
-				{ b2x+BSZX/2, b2y+BSZY/2 }
-			};
-
-			double now = al_get_time();
-			
-			for (int i = 0; i < 6; i++) {
-				double t = now - blueblock_times[i];
-				if (t >= 0.5) {
-					blueblock_times[i] = -1;
-					continue;
-				}
-				if (t < 0)
-					continue;
-				int frame = (t / 0.5) * 8;
-				float alpha = 1.0;
-				int sizex = m_get_bitmap_width(blueblocks[frame]);
-				int sizey = m_get_bitmap_height(blueblocks[frame]);
-				al_draw_tinted_bitmap(blueblocks[frame]->bitmap,
-					al_map_rgba_f(alpha, alpha, alpha, alpha),
-					centers[i][0]-sizex/2, centers[i][1]-sizey/2,
-					0
-				);
-			}
-			
-			al_restore_state(&state);
-
-			al_draw_bitmap(airplay_dpad->bitmap, padx, pady, 0);
-			al_draw_bitmap(white_button->bitmap, b1x, b1y, 0);
-			al_draw_bitmap(black_button->bitmap, b2x, b2y, 0);
-			
-			al_draw_bitmap(airplay_logo->bitmap,
-				960/2-m_get_bitmap_width(airplay_logo)/2,
-				640/2-m_get_bitmap_height(airplay_logo)/2-100,
-				0
-			);
-		}
-		else if ((dpad_type == DPAD_TOTAL_2 || dpad_type == DPAD_HYBRID_2)) {
+		if ((dpad_type == DPAD_TOTAL_2 || dpad_type == DPAD_HYBRID_2)) {
 			ALLEGRO_COLOR light = al_map_rgba(100*tint.r, 200*tint.g, 100*tint.b, 255*tint.a);
 			ALLEGRO_COLOR dark = al_map_rgba(150*tint.r, 250*tint.g, 150*tint.b, 255*tint.a);
 			int x = BUTTON_SIZE+10;
@@ -382,7 +286,6 @@ static void draw_the_controls(bool draw_controls, ALLEGRO_COLOR tint)
 				ALLEGRO_PRIM_TRIANGLE_LIST);
 		}
 	}
-#endif
 }
 
 static void drawOverlay(bool draw_controls, ALLEGRO_COLOR tint)
@@ -394,11 +297,7 @@ static void drawOverlay(bool draw_controls, ALLEGRO_COLOR tint)
 	long now = al_get_time();
 	bool draw_red = ((now - last_shake_check) < 0.5) && !on_title_screen;
 
-#if defined ALLEGRO_IPHONE
-	if (draw_red && global_draw_red && !path_head && !airplay_connected) {
-#else
 	if (!gamepadConnected() && draw_red && global_draw_red && !path_head) {
-#endif
 		m_draw_triangle(0, 0, 16, 0, 0, 16, al_map_rgba_f(tint.r*tint.a, 0, 0, tint.a));
 	}
 	
@@ -424,20 +323,7 @@ static void drawOverlay(bool draw_controls, ALLEGRO_COLOR tint)
 	}
 #endif
 
-#ifdef ALLEGRO_IPHONE
-	if (controller_display) {
-		al_set_target_backbuffer(controller_display);
-		m_clear(al_map_rgb(0, 0, 0));
-	}
-#endif
-
 	draw_the_controls(draw_controls, tint);
-
-#ifdef ALLEGRO_IPHONE
-	if (controller_display) {
-		set_target_backbuffer();
-	}
-#endif
 }
 
 void drawBufferToScreen(bool draw_controls)
@@ -923,7 +809,7 @@ void battleTransition()
 
 		m_draw_scaled_target(tmpbuffer, dx, dy, dw, dh, 0, 0, dw, dh, bufcopy2);
 
-		float heights[dw];
+		float *heights = new float[dw];
 		int phases = rand() % 3 + 1;
 		int *phase_lengths = new int[phases];
 		int *phase_peaks = new int[phases];
@@ -1000,6 +886,7 @@ void battleTransition()
 
 		delete[] phase_lengths;
 		delete[] phase_peaks;
+		delete[] heights;
 	
 		transitioning = false;
 		return;

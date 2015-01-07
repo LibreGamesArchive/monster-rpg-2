@@ -8,12 +8,6 @@
 #include <allegro5/allegro_direct3d.h>
 #endif
 
-#ifndef NO_JOYPAD
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
-#include "joypad.hpp"
-#endif
-#endif
-
 #ifdef ALLEGRO_IPHONE
 extern "C" {
 #include <allegro5/allegro_iphone_objc.h>
@@ -191,11 +185,9 @@ double allegro_iphone_shaken = 0;
 #endif
 bool sound_was_playing_at_program_start;
 ALLEGRO_DISPLAY *display = 0;
-ALLEGRO_DISPLAY *controller_display = 0;
 ALLEGRO_COND *wait_cond;
 ALLEGRO_MUTEX *wait_mutex;
 ALLEGRO_MUTEX *ss_mutex;
-ALLEGRO_MUTEX *joypad_mutex;
 int exit_event_thread = 0;
 ALLEGRO_SHADER *tinter;
 ALLEGRO_SHADER *warp;
@@ -217,12 +209,6 @@ std::vector<WaterData> waterData;
 float screenScaleX = 2;
 float screenScaleY = 2;
 bool use_programmable_pipeline = true;
-
-#ifdef ALLEGRO_IPHONE
-bool create_airplay_mirror = false;
-bool delete_airplay_mirror = false;
-bool airplay_connected = false;
-#endif
 
 MBITMAP *cursor;
 MFONT *huge_font;
@@ -344,14 +330,6 @@ void load_fonts(void)
 	
 	// NOTE: This has to be after display creation and loading of fonts
 	load_translation(get_language_name(config.getLanguage()).c_str());
-
-	al_get_text_width(huge_font, ":0123456789");
-
-	/*
-	char buf[1000];
-	sprintf(buf, "%s%s\n", _t("SWIPE TO ATTACK!"), _t("Drag to use!"));
-	al_get_text_width(medium_font, buf);
-	*/
 }
 
 ScreenSize small_screen(void)
@@ -533,7 +511,6 @@ static void *thread_proc(void *arg)
 				}
 #endif
 
-				al_lock_mutex(joypad_mutex);
 				if (!pause_joystick_repeat_events) {
 					for (int i = 0; i < JOY_NUM_REPEATABLE; i++) {
 						if (joystick_repeat_started[i] == false) {
@@ -551,7 +528,6 @@ static void *thread_proc(void *arg)
 						}
 					}
 				}
-				al_unlock_mutex(joypad_mutex);
 			}
 			al_signal_cond(wait_cond);
 		}
@@ -579,7 +555,7 @@ static void *loader_proc(void *arg)
 #endif
 
 #ifdef ALLEGRO_ANDROID
-	al_android_set_apk_file_interface();
+	al_set_physfs_file_interface();
 #endif
 
 #ifdef A5_OGL
@@ -662,8 +638,6 @@ static void *loader_proc(void *arg)
 
 	ss_mutex = al_create_mutex();
 	
-	joypad_mutex = al_create_mutex_recursive();
-
 	m_push_target_bitmap();
 	orb_bmp = m_create_alpha_bitmap(80, 80);
 	m_set_target_bitmap(orb_bmp);
@@ -1287,7 +1261,7 @@ bool init(int *argc, char **argv[])
 
 	debug_message("after set_app/org_name");
 
-	// must be before al_android_set_apk_file_interface
+	// must be before al_set_physfs_file_interface
 	bool config_read = false;
 	try {
 		config_read = config.read();
@@ -1297,12 +1271,6 @@ bool init(int *argc, char **argv[])
 	}
 
 	debug_message("config read");
-
-#ifdef ALLEGRO_ANDROID
-	al_android_set_apk_file_interface();
-#endif
-
-	debug_message("apk interface set");
 
 #if defined ALLEGRO_LINUX
 	ALLEGRO_CONFIG *syscfg = al_get_system_config();
@@ -1487,6 +1455,14 @@ bool init(int *argc, char **argv[])
 		exit(1);
 	}
 
+#ifdef ALLEGRO_ANDROID
+	ALLEGRO_PATH *apkname = al_get_standard_path(ALLEGRO_EXENAME_PATH);
+	PHYSFS_init(al_path_cstr(apkname, '/'));
+	PHYSFS_addToSearchPath(al_path_cstr(apkname, '/'), 1);
+	al_destroy_path(apkname);
+	al_set_physfs_file_interface();
+#endif
+
 	// Set an icon
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_MACOSX && !defined ALLEGRO_ANDROID
 	int icon_format = al_get_new_bitmap_format();
@@ -1546,10 +1522,6 @@ bool init(int *argc, char **argv[])
 
 	set_screen_params();
       
-#ifdef A5_OGL
-	glDisable(GL_DITHER);
-#endif
-
 #ifdef ALLEGRO_ANDROID
 	uint32_t vers1 = parse_version(al_android_get_os_version());
 	uint32_t vers2 = parse_version("2.3");
@@ -1564,16 +1536,10 @@ bool init(int *argc, char **argv[])
 
 	al_set_new_bitmap_flags(PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
 
-#ifndef NO_JOYPAD
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
-	init_joypad();
-#endif
-#endif
-
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	authenticatePlayer();
 #endif
-	
+
 	custom_cursor_bmp = m_load_bitmap(getResource("media/mouse_cursor.png"));
 	custom_cursor_w = m_get_bitmap_width(custom_cursor_bmp);
 	custom_cursor_h = m_get_bitmap_height(custom_cursor_bmp);
@@ -1804,18 +1770,6 @@ bool init(int *argc, char **argv[])
 	m_flip_display(); // backup bitmaps (slow)
 	m_clear(black);
 
-#ifdef ALLEGRO_ANDROID
-	ALLEGRO_PATH *apkname = al_get_standard_path(ALLEGRO_EXENAME_PATH);
-	debug_message("exename='%s'", al_path_cstr(apkname, '/'));
-	if (!PHYSFS_init(al_path_cstr(apkname, '/'))) {
-		return false;
-	}
-	PHYSFS_addToSearchPath(al_path_cstr(apkname, '/'), 1);
-	al_destroy_path(apkname);
-#else
-	PHYSFS_init(*argv[0]);
-#endif
-
 	return true;
 }
 
@@ -1837,8 +1791,6 @@ void destroy()
 
 	al_destroy_mutex(ss_mutex);
 	
-	al_destroy_mutex(joypad_mutex);
-
 	if (party[heroSpot] && party[heroSpot]->getObject()
 			&& party[heroSpot]->getObject()->getInput()
 			&& party[heroSpot]->getObject()->getInput() == tripleInput) {
@@ -1865,6 +1817,7 @@ void destroy()
 	m_destroy_bitmap(webbed);
 	m_destroy_bitmap(dpad_buttons);
 	m_destroy_bitmap(batteryIcon);
+	m_destroy_bitmap(achievement_bmp);
 	delete terrain;
 	m_destroy_bitmap(cursor);
 	delete guiAnims;
@@ -1906,14 +1859,17 @@ void destroy()
 	al_get_d3d_device(display)->SetDepthStencilSurface(NULL);
 	big_depth_surface->Release();
 #endif
+	
+	m_destroy_bitmap(tmpbuffer);
 
-	al_shutdown_ttf_addon();
+	if (custom_mouse_cursor) {
+		al_destroy_mouse_cursor(custom_mouse_cursor);
+	}
 
 	if (saveFilename)
 		free(saveFilename);
 
 	cleanup_astar();
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	al_destroy_mutex(click_mutex);
 	al_destroy_mutex(input_mutex);
 	al_destroy_mutex(dpad_mutex);
@@ -1921,21 +1877,18 @@ void destroy()
 #ifdef ALLEGRO_IPHONE
 	shutdownIpod();
 #endif
-#endif
 
 	al_destroy_mutex(input_event_mutex);
 
 	destroySound();
 
 	destroy_translation();
-	
-#if defined ALLEGRO_WINDOWS
-	al_uninstall_system();
+
+#ifdef ALLEGRO_ANDROID
+	PHYSFS_deinit();
 #endif
 
 	inited = false;
-
-	debug_message("END OF DESTROY\n");
 }
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -2200,25 +2153,6 @@ bool imperfect_aspect(void)
 		return true;
 	}
 	return false;
-}
-
-void connect_external_controls(void)
-{
-	connect_airplay_controls();
-}
-
-void disconnect_external_controls(void)
-{
-	disconnect_airplay_controls();
-}
-
-void lock_joypad_mutex(void)
-{
-	al_lock_mutex(joypad_mutex);
-}
-void unlock_joypad_mutex(void)
-{
-	al_unlock_mutex(joypad_mutex);
 }
 
 static bool cursor_hidden = false;

@@ -5,7 +5,7 @@
 
 #ifdef _MSC_VER
 #define snprintf _snprintf
-#define M_PI 3.141592654
+#define strcasecmp _stricmp
 #endif
 
 #define R2D(a) ((a)*180/M_PI)
@@ -32,14 +32,12 @@
 #define MS_CELL_SCENE 1
 #define MS_ON_MOON 152
 #define MS_GOT_ORB 166
-//#define MS_GOLEM_TIMER_STARTED 54
 #define MS_MET_HORSE 23
 #define MS_FIRST_POISON 177
 #define MS_FOREST_GOLD 179
 #define MS_SWIPE_TO_ATTACK 190
 #define MS_DRAG_TO_USE 191
 
-#define ALLEGRO_STATICLINK
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
@@ -49,9 +47,9 @@
 //#include <allegro5/allegro_shader.h>
 //#include <allegro5/allegro_shader_glsl.h>
 #include <allegro5/allegro_memfile.h>
-#include <physfs.h>
-#ifndef ALLEGRO_ANDROID
+#ifdef ALLEGRO_ANDROID
 #include <allegro5/allegro_physfs.h>
+#include <physfs.h>
 #endif
 
 #include "user_events.h"
@@ -92,10 +90,6 @@ ALLEGRO_DEBUG_CHANNEL("morpg2")
 #include <bass.h>
 #endif
 #include "sound.hpp"
-
-#ifdef WITH_60BEAT
-#include "60beat.h"
-#endif
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 #define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_RGBA_4444

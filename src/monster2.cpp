@@ -4,10 +4,6 @@
 #include "java.h"
 #endif
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
-#include "joypad.hpp"
-#endif
-
 #include "svg.hpp"
 
 extern double my_last_shake_time;
@@ -97,140 +93,6 @@ void check_some_stuff_in_shooter(void);
 int old_control_mode = -1;
 
 bool prompt_for_close_on_next_flip = false;
-
-void connect_airplay_controls(bool really_airplay)
-{
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	al_lock_mutex(dpad_mutex);
-	getInput()->reset();
-#if !defined ALLEGRO_ANDROID
-	if (really_airplay) {
-		old_control_mode = config.getDpadType();
-		config.setDpadType(DPAD_TOTAL_2);
-		dpad_type = DPAD_TOTAL_2;
-	}
-#endif
-	joystick_repeat_started[JOY_REPEAT_AXIS0] = false;
-	joystick_repeat_started[JOY_REPEAT_AXIS1] = false;
-	joystick_repeat_started[JOY_REPEAT_B1] = false;
-	joystick_repeat_started[JOY_REPEAT_B2] = false;
-	joystick_repeat_started[JOY_REPEAT_B3] = false;
-	al_unlock_mutex(dpad_mutex);
-#if !defined ALLEGRO_ANDROID
-	dpad_on(false);
-#endif
-#endif
-}
-
-void disconnect_airplay_controls(bool really_airplay)
-{
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	al_lock_mutex(dpad_mutex);
-	getInput()->reset();
-#if !defined ALLEGRO_ANDROID
-	if (really_airplay) {
-		config.setDpadType(old_control_mode);
-		dpad_type = old_control_mode;
-	}
-#endif
-	joystick_repeat_started[JOY_REPEAT_AXIS0] = false;
-	joystick_repeat_started[JOY_REPEAT_AXIS1] = false;
-	joystick_repeat_started[JOY_REPEAT_B1] = false;
-	joystick_repeat_started[JOY_REPEAT_B2] = false;
-	joystick_repeat_started[JOY_REPEAT_B3] = false;
-	al_unlock_mutex(dpad_mutex);
-#if !defined ALLEGRO_ANDROID
-	if (old_control_mode == DPAD_TOTAL_1 || old_control_mode == DPAD_TOTAL_2) {
-		dpad_on(false);
-	}
-	else {
-		dpad_off(false);
-	}
-	old_control_mode = -1;
-#endif
-#endif
-}
-
-void connect_second_display(void)
-{
-#ifdef ALLEGRO_IPHONE
-	int mvol = config.getMusicVolume();
-	int svol = config.getSFXVolume();
-
-	//al_set_target_bitmap(NULL);
-
-	connect_airplay_controls(true);
-	
-	m_destroy_bitmap(tmpbuffer);
-	destroy_fonts();
-	destroyIcons();
-
-	_destroy_loaded_bitmaps();
-	destroy_shaders();
-	al_destroy_display(display);
-	
-	int flags = al_get_new_display_flags();
-
-	al_set_new_display_adapter(1);
-	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_PROGRAMMABLE_PIPELINE);
-	display = al_create_display(1, 1);
-
-	al_set_new_display_flags(flags);
-
-	init_shaders();
-
-	set_screen_params();
-
-	_reload_loaded_bitmaps();
-	load_fonts();
-	loadIcons();
-
-	_reload_loaded_bitmaps_delayed();
-
-	create_tmpbuffer();
-
-	al_set_new_display_adapter(0);
-	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
-	controller_display = al_create_display(1, 1);
-	al_set_new_display_flags(flags);
-	register_display(controller_display);
-	int w = al_get_display_width(controller_display);
-	int h = al_get_display_height(controller_display);
-	ALLEGRO_TRANSFORM scale;
-	al_identity_transform(&scale);
-	al_scale_transform(&scale, w/960.0, h/640.0);
-	al_use_transform(&scale);
-	int format = al_get_new_bitmap_format();
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
-	for (int i = 0; i < 8; i++) {
-		blueblocks[i] = m_load_bitmap(getResource("media/blueblocks%d.png", i+1));
-	}
-	al_set_new_bitmap_format(format);
-	game_font_second_display = my_load_ttf_font(getResource("DejaVuSans.gif"), 10, 0);
-	if (!game_font_second_display) {
-		native_error("Couldn't load DejaVuSans.gif.");
-	}
-	
-	airplay_dpad = m_load_alpha_bitmap(getResource("media/airplay_pad.png"));
-	white_button = m_load_alpha_bitmap(getResource("media/whitebutton.png"));
-	black_button = m_load_alpha_bitmap(getResource("media/blackbutton.png"));
-	airplay_logo = m_load_alpha_bitmap(getResource("media/m2_controller_logo.png"));
-
-	m_set_target_bitmap(tmpbuffer);
-	m_clear(black);
-
-	set_target_backbuffer();
-	
-
-	config.setMusicVolume(mvol);
-	config.setSFXVolume(svol);
-	setMusicVolume(1);
-
-	airplay_connected = true;
-	
-	disableMic();
-#endif
-}
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 static void set_transform()
@@ -533,13 +395,6 @@ static bool is_input_event(ALLEGRO_EVENT *e)
 
 void get_mouse_pos_in_buffer_coords(int *this_x, int *this_y)
 {
-#ifdef ALLEGRO_IPHONE
-	if (airplay_connected) {
-		*this_x = ((float)*this_x / al_get_display_width(controller_display)) * 240;
-		*this_y = ((float)*this_y / al_get_display_height(controller_display)) * 160;
-	}
-	else
-#endif
 	if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN)
 		tguiConvertMousePosition(this_x, this_y, 0, 0, screen_ratio_x, screen_ratio_y);
 	else
@@ -1106,15 +961,6 @@ top:
 			
 			al_unlock_mutex(input_mutex);
 		}
-#ifdef ALLEGRO_IPHONE
-		else if (event.type == ALLEGRO_EVENT_DISPLAY_CONNECTED) {
-			create_airplay_mirror = true;
-		}
-		else if (event.type == ALLEGRO_EVENT_DISPLAY_DISCONNECTED) {
-			delete_airplay_mirror = true;
-		}
-#endif
-
 #if defined ALLEGRO_ANDROID
 		else if (event.type == ALLEGRO_EVENT_DISPLAY_RESIZE) {
 			do_acknowledge_resize = true;
@@ -1415,72 +1261,6 @@ top:
 		reload_translation = false;
 		playPreloadedSample("blip.ogg");
 	}
-
-#ifdef ALLEGRO_IPHONE
-	if (create_airplay_mirror)
-	{
-		create_airplay_mirror = false;
-		connect_second_display();
-	}
-	else if (delete_airplay_mirror)
-	{
-		delete_airplay_mirror = false;
-		if (controller_display) {
-			int mvol = config.getMusicVolume();
-			int svol = config.getSFXVolume();
-
-			disconnect_airplay_controls(true);
-		
-			m_destroy_bitmap(tmpbuffer);
-
-			_destroy_loaded_bitmaps();
-			destroy_fonts();
-			destroyIcons();
-
-			destroy_shaders();
-			al_destroy_display(display);
-
-			_reload_loaded_bitmaps();
-			
-			al_destroy_font(game_font_second_display);
-			for (int i = 0; i < 8; i++) {
-				m_destroy_bitmap(blueblocks[i]);
-			}
-			m_destroy_bitmap(airplay_dpad);
-			m_destroy_bitmap(white_button);
-			m_destroy_bitmap(black_button);
-			m_destroy_bitmap(airplay_logo);
-			al_destroy_display(controller_display);
-			controller_display = NULL;
-
-			al_set_new_display_adapter(0);
-			al_set_new_display_option(ALLEGRO_AUTO_CONVERT_BITMAPS, 1, ALLEGRO_REQUIRE);
-			int flags = al_get_new_display_flags();
-			al_set_new_display_flags(flags | ALLEGRO_PROGRAMMABLE_PIPELINE | ALLEGRO_FULLSCREEN_WINDOW);
-			display = al_create_display(1, 1);
-			al_set_new_display_flags(flags);
-			register_display(display);
-			init_shaders();
-			_reload_loaded_bitmaps_delayed();
-
-			set_screen_params();
-
-			load_fonts();
-			loadIcons();
-	
-			create_tmpbuffer();
-
-			set_target_backbuffer();
-			
-			config.setMusicVolume(mvol);
-			config.setSFXVolume(svol);
-			setMusicVolume(1);
-			
-			airplay_connected = false;
-		}
-	}
-#endif
-
 #ifdef A5_D3D
 	if (should_reset) {
 		al_get_d3d_device(display)->SetDepthStencilSurface(NULL);
@@ -2167,12 +1947,6 @@ int main(int argc, char *argv[])
 	set_target_backbuffer();
 	
 	fps_on = fps_save;
-
-#if defined ALLEGRO_IPHONE
-	if (al_get_num_video_adapters() > 1) {
-		connect_second_display();
-	}
-#endif
 
 #ifndef ALLEGRO_ANDROID
 	if (check_arg(argc, argv, "-volcano") != -1) {
