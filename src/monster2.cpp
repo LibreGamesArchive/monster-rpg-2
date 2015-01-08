@@ -661,6 +661,46 @@ top:
 				else if (event.joystick.button == config.getJoyButton3()) {
 					joy_b3_down();
 				}
+				else if (event.joystick.button == config.getJoyButtonMusicDown()) {
+					int v = config.getMusicVolume();
+					if (v <= 26) v = 0;
+					else v = v - 26; 
+					config.setMusicVolume(v);
+					setMusicVolume(getMusicVolume());
+					setAmbienceVolume(getAmbienceVolume());
+				}
+				else if (event.joystick.button == config.getJoyButtonMusicUp()) {
+					int v = config.getMusicVolume();
+					if (v >= 230) v = 255;
+					else v = v + 26; 
+					config.setMusicVolume(v);
+					setMusicVolume(getMusicVolume());
+					setAmbienceVolume(getAmbienceVolume());
+				}
+				else if (event.joystick.button == config.getJoyButtonSFXDown()) {
+					int v = config.getSFXVolume();
+					if (v <= 26) v = 0;
+					else v = v - 26; 
+					config.setSFXVolume(v);
+					if (boost) {
+						setStreamVolume(
+							boost,
+							boost_volume
+						);
+					}
+				}
+				else if (event.joystick.button == config.getJoyButtonSFXUp()) {
+					int v = config.getSFXVolume();
+					if (v >= 230) v = 255;
+					else v = v + 26; 
+					config.setSFXVolume(v);
+					if (boost) {
+						setStreamVolume(
+							boost,
+							boost_volume
+						);
+					}
+				}
 			}
 		}
 		else if (event.type == ALLEGRO_EVENT_JOYSTICK_BUTTON_UP) {

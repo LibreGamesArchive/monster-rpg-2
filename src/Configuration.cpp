@@ -704,10 +704,10 @@ void Configuration::setDefaultInputs()
 	joyB1 = 0;
 	joyB2 = 1;
 	joyB3 = 2;
-	joyMusicUp = 3;
-	joyMusicDown = 4;
-	joySFXUp = 5;
-	joySFXDown = 6;
+	joyMusicUp = 4;
+	joyMusicDown = 5;
+	joySFXUp = 6;
+	joySFXDown = 7;
 #endif
 
 #ifndef ALLEGRO_IPHONE

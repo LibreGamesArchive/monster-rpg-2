@@ -836,6 +836,33 @@ static bool choose_save_slot(int num, bool exists, void *data)
 // return false on quit
 bool pause(bool can_save, bool change_music_volume, std::string map_name)
 {
+	/* Save a screenshot in case user saves their game */
+	if (in_map) {
+		al_lock_mutex(ss_mutex);
+		ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
+		m_set_target_bitmap(screenshot);
+		ALLEGRO_TRANSFORM t;
+		al_identity_transform(&t);
+		al_scale_transform(&t, 0.5f, 0.5f);
+		al_use_transform(&t);
+		m_clear(black);
+		tguiDraw();
+		al_set_target_bitmap(old_target);
+		al_unlock_mutex(ss_mutex);
+	}
+	else if (area) {
+		al_lock_mutex(ss_mutex);
+		ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
+		m_set_target_bitmap(screenshot);
+		ALLEGRO_TRANSFORM t;
+		al_identity_transform(&t);
+		al_scale_transform(&t, 0.5f, 0.5f);
+		al_use_transform(&t);
+		area->draw();
+		al_set_target_bitmap(old_target);
+		al_unlock_mutex(ss_mutex);
+	}
+
 	in_pause = true;
 	
 	dpad_off();
