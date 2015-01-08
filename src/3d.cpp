@@ -913,20 +913,6 @@ static int real_archery(int *accuracy_pts)
 
 			set_projection(1, 1000);
 
-#ifdef ALLEGRO_WINDOWS
-			D3DVIEWPORT9 backup_vp;
-			if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
-				al_get_d3d_device(display)->GetViewport(&backup_vp);
-				D3DVIEWPORT9 d3d_vp;
-				d3d_vp.X = 0;
-				d3d_vp.Y = 0;
-				d3d_vp.Width = al_get_display_width(display);
-				d3d_vp.Height = al_get_display_height(display);
-				d3d_vp.MinZ = 0;
-				d3d_vp.MaxZ = 1;
-				al_get_d3d_device(display)->SetViewport(&d3d_vp);
-			}
-#endif
 
 			// without this the feathers sometimes go invisible
 			float old_xrot = xrot;
@@ -943,11 +929,6 @@ static int real_archery(int *accuracy_pts)
 				al_rotate_transform_3d(&view_transform, 1, 0, 0, -xrot);
 				al_rotate_transform_3d(&view_transform, 0, 1, 0, -yrot);
 				al_translate_transform_3d(&view_transform, 0, 0, bow_z);
-#ifdef ALLEGRO_WINDOWS
-				if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
-					al_translate_transform_3d(&view_transform, 0.5f, 0.5f, 0.0f);
-				}
-#endif
 				al_use_transform(&view_transform);
 				draw_model_tex(bow_model, bow_tex);
 
@@ -957,11 +938,6 @@ static int real_archery(int *accuracy_pts)
 					al_rotate_transform_3d(&view_transform, 1, 0, 0, -xrot);
 					al_rotate_transform_3d(&view_transform, 0, 1, 0, -yrot);
 					al_translate_transform_3d(&view_transform, arrow_dist, 0, arrow_start_z);
-#ifdef ALLEGRO_WINDOWS
-					if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
-						al_translate_transform_3d(&view_transform, 0.5f, 0.5f, 0.0f);
-					}
-#endif
 					al_use_transform(&view_transform);
 					draw_model_tex(arrow_model, arrow_tex);
 				}
@@ -973,11 +949,6 @@ static int real_archery(int *accuracy_pts)
 			xrot = old_xrot;
 			yrot = old_yrot;
 
-#ifdef ALLEGRO_WINDOWS
-			if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
-				al_get_d3d_device(display)->SetViewport(&backup_vp);
-			}
-#endif
 
 			al_use_transform(&view_push);
 			al_set_projection_transform(display, &proj_push);
@@ -1250,7 +1221,7 @@ void volcano_scene(void)
 
 	float staff_oy = 0.0f;
 	float staff_dy1 = 0.0002f;
-	float staff_oz = 0.0f;
+	float staff_oz = 1;
 	float staff_dz = 0.015f;
 	float staff_a = 0;
 
@@ -1416,24 +1387,6 @@ void volcano_scene(void)
 			al_identity_transform(&proj_transform);
 			al_perspective_transform(&proj_transform, -1, -(float)BH/BW, 1, 1, (float)BH/BW, 1000);
 			al_set_projection_transform(display, &proj_transform);
-
-#ifdef ALLEGRO_WINDOWS
-			D3DVIEWPORT9 old;
-			LPDIRECT3DDEVICE9 device;
-			if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
-				device = al_get_d3d_device(display);
-				D3DVIEWPORT9 d3d_vp;
-				device->GetViewport(&old);
-				d3d_vp.X = 0;
-				d3d_vp.Y = 0;
-				d3d_vp.Width = al_get_display_width(display);
-				d3d_vp.Height = al_get_display_height(display);
-				d3d_vp.MinZ = 0;
-				d3d_vp.MaxZ = 1;
-				device->SetViewport(&d3d_vp);
-			}
-#endif
-
 			enable_zbuffer();
 			enable_cull_face(true);
 
@@ -1447,20 +1400,17 @@ void volcano_scene(void)
 				draw_model_tex(land_model, land_texture);
 
 				clear_zbuffer();
+
 				enable_cull_face(false);
 
 				al_identity_transform(&view_transform);
+				al_scale_transform_3d(&view_transform, 2, 2, 2);
 				al_rotate_transform_3d(&view_transform, 0, 1, 0, -land_angle);
 				al_rotate_transform_3d(&view_transform, 1, 0, 0, M_PI);
 				al_rotate_transform_3d(&view_transform, 1, 0, 0, staff_a);
 				al_translate_transform_3d(&view_transform, 0, 0, -1.25f);
 				al_translate_transform_3d(&view_transform, 0, 0.25f, -(staff_oz+staff_z_translate));
 				al_rotate_transform_3d(&view_transform, 0, 1, 0, -land_angle);
-#ifdef ALLEGRO_WINDOWS
-				if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
-					al_translate_transform_3d(&view_transform, 0.5f, 0.5f, 0.0f);
-				}
-#endif
 				al_use_transform(&view_transform);
 
 				if (stage != STAGE_POOFING) {
@@ -1480,12 +1430,6 @@ void volcano_scene(void)
 
 			al_set_projection_transform(display, &proj_push);
 			al_use_transform(&view_push);
-
-#ifdef ALLEGRO_WINDOWS
-			if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
-				device->SetViewport(&old);
-			}
-#endif
 			if (break_for_fade_after_draw) {
 				break;
 			}

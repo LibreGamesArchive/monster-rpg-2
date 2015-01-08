@@ -1338,19 +1338,17 @@ bool init(int *argc, char **argv[])
 
 	al_set_new_display_flags(flags);
 
+/*
 #if defined ALLEGRO_ANDROID
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 8, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 16, ALLEGRO_REQUIRE);
 #else
+*/
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_SUGGEST);
 	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 8, ALLEGRO_REQUIRE);
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_RASPBERRYPI
-	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 16, ALLEGRO_REQUIRE);
-#else
 	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 32, ALLEGRO_REQUIRE);
-#endif
-#endif
+//#endif
 
 #if !defined(ALLEGRO_IPHONE) && !defined(ALLEGRO_ANDROID)
 	al_set_new_display_adapter(config.getAdapter());
@@ -1624,8 +1622,12 @@ bool init(int *argc, char **argv[])
 #endif
 
 	debug_message("setting window title\n");
-	
+
+#ifdef DEMO
+	al_set_window_title(display, "Monster RPG 2 Demo");
+#else
 	al_set_window_title(display, "Monster RPG 2");
+#endif
 
 	if (al_get_display_flags(display) & ALLEGRO_OPENGL) {
 		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
