@@ -1,6 +1,6 @@
 package com.nooskewl.monsterrpg2;
 
-import org.liballeg.app.AllegroActivity;
+import org.liballeg.android.AllegroActivity;
 import android.net.Uri;
 import android.content.Intent;
 import android.text.ClipboardManager;
@@ -37,38 +37,18 @@ public class MO2Activity extends AllegroActivity {
 		System.loadLibrary("allegro_font");
 		System.loadLibrary("allegro_ttf");
 		System.loadLibrary("allegro_color");
+		System.loadLibrary("allegro_physfs");
 		System.loadLibrary("bass");
-		System.loadLibrary("bassflac");
+	}
+
+	public MO2Activity()
+	{
+		super("libmonsterrpg2.so");
 	}
 
 	public void logString(String s)
 	{
-		Log.d("MRPG2", s);
-	}
-
-	public String getSDCardPrivateDir()
-	{
-		File f = getExternalFilesDir(null);
-		if (f != null) {
-			return f.getAbsolutePath();
-		}
-		else {
-			return getFilesDir().getAbsolutePath();
-		}
-	}
-
-	public boolean wifiConnected()
-	{
-		ConnectivityManager connManager = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
-		NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
-		return mWifi.isConnected();
-	}
-
-	public void openURL(String url)
-	{
-		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.monster-rpg.com"));
-		startActivity(intent);
+		Log.d("MoRPG2", s);
 	}
 
 	private boolean clip_thread_done = false;
@@ -117,7 +97,7 @@ public class MO2Activity extends AllegroActivity {
 		return clipdata;
 	}
 
-	static String keyS = "base64 encoded key goes here";
+	static String keyS = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDA+ZZQMGJfMY7axPHJueyrw4J4LcJNJ2R5FMUI9qDYjsLRZNi5fbyxYsYYyyI/3kIEFCfyq5GyPMchtHm0WRzZpDlpk85m/VsgE2No2fjDAQg+L6f9IW/e9Zd60riq25ozDYTOIDHjarEcqPsjQJnu0fAgbENmTvN3Bv3n3cGJIwIDAQAB";
 
 	static HashMap<String, Product> mOutstandingPurchaseRequests = new HashMap<String, Product>();
 	static PublicKey mPublicKey;
@@ -301,7 +281,7 @@ public class MO2Activity extends AllegroActivity {
 		OuyaFacade.getInstance().requestReceipts(receiptListListener);
 	}
 
-	public static final String DEVELOPER_ID = "developer id goes here";
+	public static final String DEVELOPER_ID = "0c2367c2-59f0-4c2c-a02e-79a391c427c0";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)

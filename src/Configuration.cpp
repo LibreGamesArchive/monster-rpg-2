@@ -748,6 +748,12 @@ void Configuration::setDefaultInputs()
 bool Configuration::read()
 {
 #ifdef OUYA
+#ifdef NO_DRM
+	bool unlocked = true;
+#else
+	bool unlocked = false;
+#endif
+
 	if (isAndroidConsole()) {
 		purchased = unlocked;
 	}

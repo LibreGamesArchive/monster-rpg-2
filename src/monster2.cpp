@@ -94,6 +94,8 @@ int old_control_mode = -1;
 
 bool prompt_for_close_on_next_flip = false;
 
+bool menu_pressed = false;
+
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 static void set_transform()
 {
@@ -409,6 +411,9 @@ bool is_close_pressed(bool pump_events_only)
 	 */
 	get_next_input_event();
 
+	/* On OUYA the menu button press/release events come at the same time so we need a workaround. */
+	menu_pressed = false;
+
 #ifdef ALLEGRO_ANDROID	
 top:
 #endif
@@ -448,6 +453,9 @@ top:
 				event.joystick.stick = 0;
 				event.joystick.axis = 1;
 				event.joystick.pos = 1;
+			}
+			else if (event.joystick.button == 10) {
+				menu_pressed = true;
 			}
 		}
 		else if (event.type == ALLEGRO_EVENT_JOYSTICK_BUTTON_UP) {
@@ -494,12 +502,6 @@ top:
 		else if (event.type == ALLEGRO_EVENT_KEY_CHAR || event.type == USER_KEY_CHAR) {
 			INPUT_EVENT ie = EMPTY_INPUT_EVENT;
 			int code = event.keyboard.keycode;
-			if (area && !battle && !in_pause && code == ALLEGRO_KEY_MENU && config.getAlwaysCenter() == PAN_MANUAL) {
-				area_panned_x = floor(area_panned_x);
-				area_panned_y = floor(area_panned_y);
-				area->center_view = true;
-				center_button_pressed = true;
-			}
 			if (code == config.getKeyLeft()) {
 				ie.left = DOWN;
 				add_input_event(ie);
@@ -1705,18 +1707,8 @@ static void run()
 						!speechDialog && !path_head) {
 					InputDescriptor ie = getInput()->getDescriptor();
 					if (area->getName() != "tutorial") {
-						bool menu_pressed = false;
-#ifdef ALLEGRO_ANDROID
-						if (user_joystick) {
-							ALLEGRO_JOYSTICK_STATE joystate;
-							al_get_joystick_state(user_joystick, &joystate);
-							// FIXME: 10 is the menu button on Android
-							if (joystate.button[10]) {
-								menu_pressed = true;
-							}
-						}
-#endif
 						if (ie.button2 || iphone_shaken(0.1) || menu_pressed) {
+							menu_pressed = false;
 							waitForRelease(4);
 							iphone_clear_shaken();
 							int posx, posy;

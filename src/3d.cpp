@@ -25,7 +25,7 @@ MODEL::~MODEL() {
 	for (size_t i = 0; i < verts.size(); i++) {
 		delete[] verts[i];
 	}
-	delete_vbos(this);
+	//delete_vbos(this);
 }
 
 void disable_zbuffer(void)
@@ -206,7 +206,7 @@ static MODEL *load_model2(const char *filename, MBITMAP *tex)
 
 	delete[] bytes;
 
-	create_vbos(m);
+	//create_vbos(m);
 
 	return m;
 }
@@ -409,7 +409,7 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 
 	delete[] bytes;
 
-	create_vbos(m);
+	//create_vbos(m);
 
 	return m;
 }
@@ -418,13 +418,14 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 static void draw_model_tex(MODEL *m, MBITMAP *texture)
 {
 	for (size_t i = 0; i < m->verts.size(); i++) {
+		/*
 		al_draw_vertex_buffer(
 			m->vbos[i],
 			texture->bitmap,
 			0, m->num_verts[i],
 			ALLEGRO_PRIM_TRIANGLE_LIST
 		);
-#if 0
+		*/
 		m_draw_prim(
 			m->verts[i],
 			0,
@@ -433,7 +434,6 @@ static void draw_model_tex(MODEL *m, MBITMAP *texture)
 			m->num_verts[i],
 			ALLEGRO_PRIM_TRIANGLE_LIST
 		);
-#endif
 	}
 }
 
@@ -1202,7 +1202,7 @@ static MODEL *create_ring(int sd /* subdivisions */, MBITMAP *texture)
 		m->verts[0][i*6+5].color = trans_white;
 	}
 
-	create_vbos(m);
+	//create_vbos(m);
 
 	return m;
 }

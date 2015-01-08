@@ -2298,6 +2298,7 @@ void credits(void)
 		{
 			"GRAPHICS",
 			" ",
+			"JACOB DAWID",
 			"TRENT GAMBLIN",
 			"TONY HUISMAN",
 			"RAMON FREDERICK RABANG",

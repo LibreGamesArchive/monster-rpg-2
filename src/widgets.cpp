@@ -20,6 +20,8 @@ bool getting_input_config = false;
 
 int show_item_info_on_flip = -1;
 
+extern bool menu_pressed;
+
 void loadIcons()
 {
 	#define N 40
@@ -2936,18 +2938,8 @@ int MMap::update(int millis)
 			return TGUI_RETURN;
 		}
 	}
-	bool menu_pressed = false;
-#ifdef ALLEGRO_ANDROID
-	if (user_joystick) {
-		ALLEGRO_JOYSTICK_STATE joystate;
-		al_get_joystick_state(user_joystick, &joystate);
-		// FIXME: 10 is the menu button on Android
-		if (joystate.button[10]) {
-			menu_pressed = true;
-		}
-	}
-#endif
 	if (!shouldFlash && (ie.button2 == DOWN || iphone_shaken(0.1) || menu_pressed)) {
+		menu_pressed = false;
 		use_input_event();
 		iphone_clear_shaken();
 		//playPreloadedSample("select.ogg");

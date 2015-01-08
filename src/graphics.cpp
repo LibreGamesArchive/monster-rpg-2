@@ -38,6 +38,7 @@ float orientation_angle;
 
 static void draw_the_controls(bool draw_controls, ALLEGRO_COLOR tint)
 {
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 	if (use_dpad && dpad_buttons && draw_controls && global_draw_controls) {
 		if ((dpad_type == DPAD_TOTAL_2 || dpad_type == DPAD_HYBRID_2)) {
 			ALLEGRO_COLOR light = al_map_rgba(100*tint.r, 200*tint.g, 100*tint.b, 255*tint.a);
@@ -286,6 +287,7 @@ static void draw_the_controls(bool draw_controls, ALLEGRO_COLOR tint)
 				ALLEGRO_PRIM_TRIANGLE_LIST);
 		}
 	}
+#endif
 }
 
 static void drawOverlay(bool draw_controls, ALLEGRO_COLOR tint)
