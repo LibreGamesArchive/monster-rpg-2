@@ -231,7 +231,6 @@ if(APPLE)
 		${EXTRA_LIBS}
 		lua5.2
 		png
-		jpeg
 	)
 	if(KCM_AUDIO)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -framework OpenAL")
@@ -256,7 +255,7 @@ else(APPLE)
 		allegro${ALLEG_SUFFIX}
 		${ALLEGRO_MAIN_LIB}
 		${EXTRA_LIBS}
-		m pthread SM ICE X11 Xext Xcursor Xinerama Xrandr Xpm
+		Xcursor Xi Xinerama Xrandr GLU GL SM ICE X11 Xext
 	)
         if(KCM_AUDIO)
 		if(RASPBERRYPI)
@@ -271,9 +270,9 @@ else(APPLE)
 		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host /usr/lib/arm-linux-gnueabihf/libfreetype.a /usr/lib/arm-linux-gnueabihf/libz.a /usr/lib/arm-linux-gnueabihf/libpng.a /usr/lib/arm-linux-gnueabihf/liblua5.2.a)
 	else(RASPBERYPI)
 		# trentg's build
-		LIST(APPEND MAIN_LIBS allegro_dialog${ALLEG_SUFFIX} GL GLU /usr/lib/libfreetype.a /usr/lib/libz.a /usr/lib/libpng.a /usr/lib/libjpeg.a /usr/local/lib/liblua5.2.a)
+		LIST(APPEND MAIN_LIBS GL GLU /usr/local/lib/libfreetype.a /usr/local/lib/libz.a /usr/local/lib/libpng.a /usr/local/lib/liblua5.2.a)
 		# normal build
-		#LIST(APPEND MAIN_LIBS allegro_dialog${ALLEG_SUFFIX} GL GLU freetype z png jpeg lua5.2)
+		#LIST(APPEND MAIN_LIBS GL GLU freetype z png lua5.2)
 	endif(RASPBERRYPI)
 endif(APPLE)
 endif(WIN32)

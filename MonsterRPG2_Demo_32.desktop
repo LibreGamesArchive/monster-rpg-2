@@ -1,0 +1,15 @@
+# NOTE: Change the paths to match your setup.
+# Then copy to ~/.local/share/applications.
+
+[Desktop Entry]
+Encoding=UTF-8
+Value=1.0
+Type=Application
+Name=Monster RPG 2 Demo
+GenericName=Monster RPG 2 Demo
+Comment=Monster RPG 2 Demo
+Icon=/home/trent/Monster RPG 2 Demo 2.11 (32 bit)/icon.png
+Exec="/home/trent/Monster RPG 2 Demo 2.11 (32 bit)/monster2"
+Categories=Game;
+Path=/home/trent/Monster RPG 2 Demo 2.11 (32 bit)
+

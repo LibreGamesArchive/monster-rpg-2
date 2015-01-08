@@ -41,11 +41,9 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
-#if !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
+#if !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI && !defined __linux__
 #include <allegro5/allegro_native_dialog.h>
 #endif
-//#include <allegro5/allegro_shader.h>
-//#include <allegro5/allegro_shader_glsl.h>
 #include <allegro5/allegro_memfile.h>
 #ifdef ALLEGRO_ANDROID
 #include <allegro5/allegro_physfs.h>
