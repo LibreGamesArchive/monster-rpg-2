@@ -1,4 +1,4 @@
-package com.nooskewl.morpg2;
+package com.nooskewl.monsterrpg2;
 
 import org.liballeg.android.AllegroActivity;
 
@@ -19,6 +19,7 @@ import java.util.*;
 import java.security.spec.*;
 import android.app.Activity;
 import android.view.View;
+import android.content.IntentFilter;
 
 public class MO2Activity extends AllegroActivity {
 
@@ -31,8 +32,8 @@ public class MO2Activity extends AllegroActivity {
       System.loadLibrary("allegro_font");
       System.loadLibrary("allegro_ttf");
       System.loadLibrary("allegro_color");
+      System.loadLibrary("allegro_physfs");
       System.loadLibrary("bass");
-      System.loadLibrary("bassflac");
    }
 
 	public MO2Activity()
@@ -43,31 +44,6 @@ public class MO2Activity extends AllegroActivity {
 	public void logString(String s)
 	{
 		Log.d("MoRPG2", s);
-	}
-
-	public String getSDCardPrivateDir()
-	{
-		File f = getExternalFilesDir(null);
-		if (f != null) {
-			return f.getAbsolutePath();
-		}
-		else {
-			return getFilesDir().getAbsolutePath();
-		}
-	}
-
-	public boolean wifiConnected()
-	{
-		ConnectivityManager connManager = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
-		NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
-		return mWifi.isConnected();
-	}
-
-	public void openURL(String url)
-	{
-		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.monster-rpg.com"));
-		startActivity(intent);
 	}
 
 	private boolean clip_thread_done = false;
@@ -114,6 +90,28 @@ public class MO2Activity extends AllegroActivity {
 		clip_thread_done = false;
 
 		return clipdata;
+	}
+
+	MyBroadcastReceiver bcr;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		bcr = new MyBroadcastReceiver();
+	}
+	
+	public void onPause() {
+		super.onPause();
+
+		unregisterReceiver(bcr);
+	}
+	
+	public void onResume() {
+		super.onResume();
+
+		registerReceiver(bcr, new IntentFilter("android.intent.action.DREAMING_STARTED"));
+		registerReceiver(bcr, new IntentFilter("android.intent.action.DREAMING_STOPPED"));
 	}
 }
 
