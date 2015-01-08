@@ -159,7 +159,7 @@ extern int screen_offset_x, screen_offset_y;
 extern float screen_ratio_x, screen_ratio_y;
 extern bool pause_f_to_toggle_fullscreen;
 extern bool do_toggle_fullscreen;
-#ifdef A5_D3D
+#ifdef ALLEGRO_WINDOWS
 extern bool d3d_device_lost;
 extern LPDIRECT3DSURFACE9 big_depth_surface;
 #endif
@@ -229,5 +229,7 @@ extern std::map<std::string, int> object_atlas_map;
 
 extern float textScaleX;
 extern float textScaleY;
+
+extern int ALPHA_FMT;
 
 #endif

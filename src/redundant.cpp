@@ -21,7 +21,6 @@ static float get_trap_peak(int topw, int bottomw, int length)
 	return tan(a) * (topw/2.0f);
 }
 
-#if defined ALLEGRO_ANDROID || defined A5_D3D
 static void null_lb(LoadedBitmap *lb)
 {
 	lb->load_type = (LoadType)0;
@@ -37,7 +36,6 @@ static void null_lb(LoadedBitmap *lb)
 	lb->format = 0;
 	lb->delayed = 0;
 }
-#endif
 
 MCOLOR m_map_rgba(int r, int g, int b, int a)
 {
@@ -90,9 +88,14 @@ MBITMAP *m_create_alpha_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, Rec
 		create(m, data);
 	}
 
-#if defined ALLEGRO_ANDROID || defined A5_D3D
-	if ((al_get_bitmap_flags(bitmap) & ALLEGRO_NO_PRESERVE_TEXTURE) &&
-			!(al_get_bitmap_flags(bitmap) & ALLEGRO_MEMORY_BITMAP)) {
+#if defined ALLEGRO_ANDROID || defined ALLEGRO_WINDOWS
+	if (
+#ifdef ALLEGRO_WINDOWS
+			(al_get_display_flags(display) & ALLEGRO_DIRECT3D) &&
+#endif
+			(al_get_bitmap_flags(bitmap) & ALLEGRO_NO_PRESERVE_TEXTURE) &&
+			!(al_get_bitmap_flags(bitmap) & ALLEGRO_MEMORY_BITMAP)
+	) {
 		LoadedBitmap *lb = new LoadedBitmap;
 		null_lb(lb);
 		lb->load_type = LOAD_CREATE;
@@ -112,7 +115,7 @@ MBITMAP *m_create_alpha_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, Rec
 	if (data) {
 		delete data;
 	}
-#if defined ALLEGRO_ANDROID || defined A5_D3D
+#if defined ALLEGRO_ANDROID || defined ALLEGRO_WINDOWS
 	}
 #endif
 
@@ -271,9 +274,14 @@ MBITMAP *m_load_bitmap(const char *name, bool force_memory, bool ok_to_fail)
 
 	MBITMAP *m = new_mbitmap(bitmap);
 
-#if defined ALLEGRO_ANDROID || defined A5_D3D
-	if ((al_get_bitmap_flags(bitmap) & ALLEGRO_NO_PRESERVE_TEXTURE) &&
-			!(al_get_bitmap_flags(bitmap) & ALLEGRO_MEMORY_BITMAP)) {
+#if defined ALLEGRO_ANDROID || defined ALLEGRO_WINDOWS
+	if (
+#ifdef ALLEGRO_WINDOWS
+			(al_get_display_flags(display) & ALLEGRO_DIRECT3D) &&
+#endif
+			(al_get_bitmap_flags(bitmap) & ALLEGRO_NO_PRESERVE_TEXTURE) &&
+			!(al_get_bitmap_flags(bitmap) & ALLEGRO_MEMORY_BITMAP)
+	) {
 		LoadedBitmap *lb = new LoadedBitmap;
 		null_lb(lb);
 		lb->load_type = LOAD_LOAD;
@@ -308,9 +316,14 @@ MBITMAP *m_load_bitmap_redraw(const char *name, void (*redraw)(MBITMAP *bmp, Rec
 		redraw(m, data);
 	}
 
-#if defined ALLEGRO_ANDROID || defined A5_D3D
-	if ((al_get_bitmap_flags(bitmap) & ALLEGRO_NO_PRESERVE_TEXTURE) &&
-			!(al_get_bitmap_flags(bitmap) & ALLEGRO_MEMORY_BITMAP)) {
+#if defined ALLEGRO_ANDROID || defined ALLEGRO_WINDOWS
+	if (
+#ifdef ALLEGRO_WINDOWS
+			(al_get_display_flags(display) & ALLEGRO_DIRECT3D) &&
+#endif
+			(al_get_bitmap_flags(bitmap) & ALLEGRO_NO_PRESERVE_TEXTURE) &&
+			!(al_get_bitmap_flags(bitmap) & ALLEGRO_MEMORY_BITMAP)
+	) {
 		LoadedBitmap *lb = new LoadedBitmap;
 		null_lb(lb);
 		lb->load_type = LOAD_LOAD;
@@ -355,9 +368,14 @@ MBITMAP *m_load_alpha_bitmap(const char *name, bool force_memory)
 
 	MBITMAP *m = new_mbitmap(bitmap);
 
-#if defined ALLEGRO_ANDROID || defined A5_D3D
-	if ((al_get_bitmap_flags(bitmap) & ALLEGRO_NO_PRESERVE_TEXTURE) &&
-			!(al_get_bitmap_flags(bitmap) & ALLEGRO_MEMORY_BITMAP)) {
+#if defined ALLEGRO_ANDROID || defined ALLEGRO_WINDOWS
+	if (
+#ifdef ALLEGRO_WINDOWS
+			(al_get_display_flags(display) & ALLEGRO_DIRECT3D) &&
+#endif
+			(al_get_bitmap_flags(bitmap) & ALLEGRO_NO_PRESERVE_TEXTURE) &&
+			!(al_get_bitmap_flags(bitmap) & ALLEGRO_MEMORY_BITMAP)
+	) {
 		LoadedBitmap *lb = new LoadedBitmap;
 		null_lb(lb);
 		lb->load_type = LOAD_LOAD;
@@ -437,9 +455,14 @@ MBITMAP *m_create_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateD
 		create(m, data);
 	}
 
-#if defined ALLEGRO_ANDROID || defined A5_D3D
-	if ((al_get_bitmap_flags(bitmap) & ALLEGRO_NO_PRESERVE_TEXTURE) &&
-			!(al_get_bitmap_flags(bitmap) & ALLEGRO_MEMORY_BITMAP)) {
+#if defined ALLEGRO_ANDROID || defined ALLEGRO_WINDOWS
+	if (
+#ifdef ALLEGRO_WINDOWS
+			(al_get_display_flags(display) & ALLEGRO_DIRECT3D) &&
+#endif
+			(al_get_bitmap_flags(bitmap) & ALLEGRO_NO_PRESERVE_TEXTURE) &&
+			!(al_get_bitmap_flags(bitmap) & ALLEGRO_MEMORY_BITMAP)
+	) {
 		LoadedBitmap *lb = new LoadedBitmap;
 		null_lb(lb);
 		lb->load_type = LOAD_CREATE;
@@ -459,7 +482,7 @@ MBITMAP *m_create_bitmap(int w, int h, void (*create)(MBITMAP *bitmap, RecreateD
 	if (data) {
 		delete data;
 	}
-#if defined ALLEGRO_ANDROID || defined A5_D3D
+#if defined ALLEGRO_ANDROID || defined ALLEGRO_WINDOWS
 	}
 #endif
 

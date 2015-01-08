@@ -4,10 +4,6 @@
 
 #include "monster2.hpp"
 
-#ifdef A5_D3D
-#include <allegro5/allegro_direct3d.h>
-#endif
-
 #ifdef ALLEGRO_IPHONE
 extern "C" {
 #include <allegro5/allegro_iphone_objc.h>
@@ -70,7 +66,7 @@ static uint32_t parse_version(const char *v)
 }
 #endif
 
-#ifdef A5_D3D
+#ifdef ALLEGRO_WINDOWS
 LPDIRECT3DSURFACE9 big_depth_surface = NULL;
 
 static int pot(int n)
@@ -157,13 +153,8 @@ bool is_android_lessthan_2_3 = false;
 bool achievement_show = false;
 double achievement_time = 0;
 MBITMAP *achievement_bmp;
-#if defined A5_D3D
-int PRESERVE_TEXTURE = 0;
-int NO_PRESERVE_TEXTURE = ALLEGRO_NO_PRESERVE_TEXTURE;
-#else
-int PRESERVE_TEXTURE = ALLEGRO_NO_PRESERVE_TEXTURE;
-int NO_PRESERVE_TEXTURE = ALLEGRO_NO_PRESERVE_TEXTURE;
-#endif
+int PRESERVE_TEXTURE;
+int NO_PRESERVE_TEXTURE;
 bool reload_translation = false;
 static std::string replayMusicName = "";
 
@@ -275,6 +266,8 @@ uint32_t my_opengl_version;
 MBITMAP *custom_cursor_bmp;
 ALLEGRO_MOUSE_CURSOR *custom_mouse_cursor;
 int custom_cursor_w, custom_cursor_h;
+
+int ALPHA_FMT;
 
 void destroy_fonts(void)
 {
@@ -415,8 +408,14 @@ static void *thread_proc(void *arg)
 	
 	ALLEGRO_EVENT event;
 
-#if defined A5_D3D || defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-	al_register_event_source(events, al_get_display_event_source(display));
+#if defined ALLEGRO_WINDOWS || defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
+#ifdef defined ALLEGRO_WINDOWS
+	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+#endif
+		al_register_event_source(events, al_get_display_event_source(display));
+#ifdef defined ALLEGRO_WINDOWS
+	}
+#endif
 #endif
 
 	al_register_event_source(events, (ALLEGRO_EVENT_SOURCE *)draw_timer);
@@ -558,11 +557,15 @@ static void *loader_proc(void *arg)
 	al_set_physfs_file_interface();
 #endif
 
-#ifdef A5_OGL
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
-#else
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
+#ifdef ALLEGRO_WINDOWS
+	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
+	}
+	else
 #endif
+	{
+		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
+	}
 	
 	config.setUseOnlyMemoryBitmaps(true);
 
@@ -731,7 +734,8 @@ bool loadTilemap(void)
 
 void init_shaders(void)
 {
-#ifdef A5_OGL
+	if (al_get_display_flags(display) & ALLEGRO_OPENGL) {
+
 	if (use_programmable_pipeline) {
 		static const char *default_vertex_source =
 		"attribute vec4 " ALLEGRO_SHADER_VAR_POS ";\n"
@@ -943,7 +947,11 @@ void init_shaders(void)
 			printf("tinter: %s\n", shader_log);
 		}
 	}
-#else
+
+	}
+#ifdef ALLEGRO_WINDOWS
+	else {
+
 	if (use_programmable_pipeline) {
 		const char *default_vertex_source =
 		"struct VS_INPUT\n"
@@ -1146,19 +1154,19 @@ void init_shaders(void)
 			printf("tinter: %s\n", shader_log);
 		}
 	}
+
+	}
 #endif
 }
 
 void destroy_shaders(void)
 {
-#ifdef A5_OGL
 	if (use_programmable_pipeline) {
 		al_destroy_shader(tinter);
 		al_destroy_shader(brighten);
 		al_destroy_shader(warp);
 		al_destroy_shader(shadow_shader);
 	}
-#endif
 }
 
 static void draw_loading_screen(MBITMAP *tmp, int percent, ScreenDescriptor *sd)
@@ -1320,8 +1328,12 @@ bool init(int *argc, char **argv[])
 	
 	int flags = 0;
 
-#if defined A5_OGL
-	flags |= ALLEGRO_OPENGL;
+#ifdef ALLEGRO_WINDOWS
+	if (check_arg(*argc, *argv, "-opengl") > 0) {
+#endif
+		flags |= ALLEGRO_OPENGL;
+#ifdef ALLEGRO_WINDOWS
+	}
 #endif
 
 	al_set_new_display_flags(flags);
@@ -1331,10 +1343,8 @@ bool init(int *argc, char **argv[])
 	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 8, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 16, ALLEGRO_REQUIRE);
 #else
-#if !defined A5_D3D // we manage depth stencil ourselves for D3D
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_SUGGEST);
 	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 8, ALLEGRO_REQUIRE);
-#endif
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_RASPBERRYPI
 	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 16, ALLEGRO_REQUIRE);
 #else
@@ -1418,15 +1428,6 @@ bool init(int *argc, char **argv[])
 	dpad_mutex = al_create_mutex();
 	touch_mutex = al_create_mutex();
 
-#if defined A5_D3D
-	use_fixed_pipeline = true;
-#if defined A5_D3D
-	if (check_arg(*argc, *argv, "-programmable-pipeline") > 0) {
-		use_fixed_pipeline = false;
-	}
-#endif
-#endif
-	
 	if (!use_fixed_pipeline) {
 		al_set_new_display_flags(
 			al_get_new_display_flags() |
@@ -1453,6 +1454,28 @@ bool init(int *argc, char **argv[])
 	if (!display) {
 		config.write();
 		exit(1);
+	}
+
+#ifdef ALLEGRO_WINDOWS
+	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+		ALPHA_FMT = ALLEGRO_PIXEL_FORMAT_ARGB_8888;
+	}
+	else
+#endif
+	{
+		ALPHA_FMT = ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE;
+	}
+
+#if defined ALLEGRO_WINDOWS
+	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+		PRESERVE_TEXTURE = 0;
+		NO_PRESERVE_TEXTURE = ALLEGRO_NO_PRESERVE_TEXTURE;
+	}
+	else
+#endif
+	{
+		PRESERVE_TEXTURE = ALLEGRO_NO_PRESERVE_TEXTURE;
+		NO_PRESERVE_TEXTURE = ALLEGRO_NO_PRESERVE_TEXTURE;
 	}
 
 #ifdef ALLEGRO_ANDROID
@@ -1485,16 +1508,17 @@ bool init(int *argc, char **argv[])
 	sd->height = al_get_display_height(display);
 #endif
 	
-#ifdef A5_OGL
-	if (use_fixed_pipeline) {
-		my_opengl_version = 0x01;
+	if (al_get_display_flags(display) & ALLEGRO_OPENGL) {
+		if (use_fixed_pipeline) {
+			my_opengl_version = 0x01;
+		}
+		else {
+			my_opengl_version = al_get_opengl_version();
+		}
 	}
 	else {
-		my_opengl_version = al_get_opengl_version();
+		my_opengl_version = 0x0;
 	}
-#else
-	my_opengl_version = 0x0;
-#endif
 
 	if (use_fixed_pipeline) {
 		use_programmable_pipeline = false;
@@ -1588,10 +1612,12 @@ bool init(int *argc, char **argv[])
 	blue = m_map_rgb(30, 0, 150);
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
-#ifdef A5_D3D
-	init_big_depth_surface();
-	al_set_d3d_device_restore_callback(d3d_resource_restore);
-	al_set_d3d_device_release_callback(d3d_resource_release);
+#ifdef ALLEGRO_WINDOWS
+	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+		init_big_depth_surface();
+		al_set_d3d_device_restore_callback(d3d_resource_restore);
+		al_set_d3d_device_release_callback(d3d_resource_release);
+	}
 #endif
 	m_clear(black);
 	m_flip_display();
@@ -1601,11 +1627,12 @@ bool init(int *argc, char **argv[])
 	
 	al_set_window_title(display, "Monster RPG 2");
 
-#ifdef A5_OGL
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
-#else
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
-#endif
+	if (al_get_display_flags(display) & ALLEGRO_OPENGL) {
+		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
+	}
+	else {
+		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
+	}
 
 	debug_message("creating screenshot buffer\n");
 	
@@ -1622,11 +1649,12 @@ bool init(int *argc, char **argv[])
 
 	debug_message("initing shader variables\n");
 
-#if defined A5_OGL
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
-#else
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
-#endif
+	if (al_get_display_flags(display) & ALLEGRO_OPENGL) {
+		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
+	}
+	else {
+		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
+	}
 
 	if (!screenshot) {
 		native_error("Failed to create SS buffer.");
@@ -1851,13 +1879,13 @@ void destroy()
 
 	atlas_destroy(object_atlas);
 
-#if !defined A5_D3D
 	destroy_shaders();
-#endif
 
-#ifdef A5_D3D
-	al_get_d3d_device(display)->SetDepthStencilSurface(NULL);
-	big_depth_surface->Release();
+#ifdef ALLEGRO_WINDOWS
+	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+		al_get_d3d_device(display)->SetDepthStencilSurface(NULL);
+		big_depth_surface->Release();
+	}
 #endif
 	
 	m_destroy_bitmap(tmpbuffer);
@@ -2074,14 +2102,17 @@ void toggle_fullscreen()
 	al_flip_display();
 
 	sd->fullscreen = !sd->fullscreen;
-#ifdef A5_D3D
-	is_fs_toggle = true;
-	bool inited_depth_surface = big_depth_surface != NULL;
-	if (inited_depth_surface) {
-		al_get_d3d_device(display)->SetDepthStencilSurface(NULL);
-		big_depth_surface->Release();
+#ifdef ALLEGRO_WINDOWS
+	bool inited_depth_surface = false;
+	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+		is_fs_toggle = true;
+		inited_depth_surface = big_depth_surface != NULL;
+		if (inited_depth_surface) {
+			al_get_d3d_device(display)->SetDepthStencilSurface(NULL);
+			big_depth_surface->Release();
+		}
+		_destroy_loaded_bitmaps();
 	}
-	_destroy_loaded_bitmaps();
 #endif
 
 	if (inited) {
@@ -2093,12 +2124,14 @@ void toggle_fullscreen()
 
 	al_rest(0.1);
 
-#ifdef A5_D3D
-	if (inited_depth_surface) {
-		init_big_depth_surface();
+#ifdef ALLEGRO_WINDOWS
+	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+		if (inited_depth_surface) {
+			init_big_depth_surface();
+		}
+		_reload_loaded_bitmaps();
+		_reload_loaded_bitmaps_delayed();
 	}
-	_reload_loaded_bitmaps();
-	_reload_loaded_bitmaps_delayed();
 #endif
 	set_target_backbuffer();
 	set_screen_params();
@@ -2107,11 +2140,13 @@ void toggle_fullscreen()
 		loadIcons();
 	}
 
-#ifdef A5_D3D
-	if (in_shooter) {
-		shooter_restoring = true;
+#ifdef ALLEGRO_WINDOWS
+	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+		if (in_shooter) {
+			shooter_restoring = true;
+		}
+		is_fs_toggle = false;
 	}
-	is_fs_toggle = false;
 #endif
 	pause_joystick_repeat_events = false;
 

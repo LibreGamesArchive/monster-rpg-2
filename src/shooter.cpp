@@ -1,7 +1,7 @@
 #include "monster2.hpp"
 
 #include <allegro5/allegro_opengl.h>
-#ifdef A5_D3D
+#ifdef ALLEGRO_WINDOWS
 #include <allegro5/allegro_direct3d.h>
 #endif
 
@@ -535,22 +535,26 @@ static void draw(double cx, double cy, bool draw_objects = true)
 	al_perspective_transform(&proj, -BW/2, -BH/2, 1, BW/2, BH/2, 1000);
 	al_set_projection_transform(display, &proj);
 
-#ifdef A5_D3D
-	D3DVIEWPORT9 backup_vp;
-	al_get_d3d_device(display)->GetViewport(&backup_vp);
-	D3DVIEWPORT9 vp;
-	vp.X = dx;
-	vp.Y = dy;
-	vp.Width = dw;
-	vp.Height = dh;
-	vp.MinZ = 0;
-	vp.MaxZ = 1;
-	al_get_d3d_device(display)->SetViewport(&vp);
-#else
 	GLint vp[4];
-	glGetIntegerv(GL_VIEWPORT, vp);
-	glViewport(dx, al_get_display_height(display)-(dy+dh), dw, dh);
+#ifdef ALLEGRO_WINDOWS
+	D3DVIEWPORT9 backup_vp;
+	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+		al_get_d3d_device(display)->GetViewport(&backup_vp);
+		D3DVIEWPORT9 d3d_vp;
+		d3d_vp.X = dx;
+		d3d_vp.Y = dy;
+		d3d_vp.Width = dw;
+		d3d_vp.Height = dh;
+		d3d_vp.MinZ = 0;
+		d3d_vp.MaxZ = 1;
+		al_get_d3d_device(display)->SetViewport(&d3d_vp);
+	}
+	else
 #endif
+	{
+		glGetIntegerv(GL_VIEWPORT, vp);
+		glViewport(dx, al_get_display_height(display)-(dy+dh), dw, dh);
+	}
 
 	disable_cull_face();
 	disable_zbuffer();
@@ -561,11 +565,15 @@ static void draw(double cx, double cy, bool draw_objects = true)
 	al_set_projection_transform(display, &proj_push);
 	al_use_transform(&view_push);
 	
-#ifdef A5_D3D
-	al_get_d3d_device(display)->SetViewport(&backup_vp);
-#else
-	glViewport(vp[0], vp[1], vp[2], vp[3]);
+#ifdef ALLEGRO_WINDOWS
+	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+		al_get_d3d_device(display)->SetViewport(&backup_vp);
+	}
+	else
 #endif
+	{
+		glViewport(vp[0], vp[1], vp[2], vp[3]);
+	}
 
 	if (!draw_objects) return;
 
@@ -729,10 +737,6 @@ bool shooter(bool for_points)
 
 	int mipmap = 0;
 	int linear = 0;
-#if 0 //!defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI  && !defined A5_D3D && !defined __linux__ && !defined ALLEGRO_MACOSX && !defined ALLEGRO_WINDOWS
-	mipmap = ALLEGRO_MIPMAP;
-	linear = ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR;
-#endif
 
 	al_set_new_bitmap_flags(flags | linear | mipmap);
 	crab = new_AnimationSet(getResource("media/crab.png"));

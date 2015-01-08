@@ -92,11 +92,15 @@ static MODEL *load_model2(const char *filename, MBITMAP *tex)
 		return NULL;
 	
 	int true_w, true_h;
-#ifdef A5_D3D
-	al_get_d3d_texture_size(tex->bitmap, &true_w, &true_h);
-#else
-	al_get_opengl_texture_size(tex->bitmap, &true_w, &true_h);
+#ifdef ALLEGRO_WINDOWS
+	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+		al_get_d3d_texture_size(tex->bitmap, &true_w, &true_h);
+	}
+	else
 #endif
+	{
+		al_get_opengl_texture_size(tex->bitmap, &true_w, &true_h);
+	}
 
 	VERT v;
 	TEXCOORD t;
@@ -610,10 +614,6 @@ static int real_archery(int *accuracy_pts)
 
 	int mipmap = 0;
 	int linear = 0;
-#if 0 //!defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI  && !defined A5_D3D && !defined __linux__ && !defined ALLEGRO_MACOSX && !defined ALLEGRO_WINDOWS
-	mipmap = ALLEGRO_MIPMAP;
-	linear = ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR;
-#endif
 
 	al_set_new_bitmap_flags(flags | linear | mipmap);
 	MBITMAP *bow_tex = m_load_bitmap(getResource("models/bow.png"));
@@ -913,17 +913,19 @@ static int real_archery(int *accuracy_pts)
 
 			set_projection(1, 1000);
 
-#ifdef A5_D3D
+#ifdef ALLEGRO_WINDOWS
 			D3DVIEWPORT9 backup_vp;
-			al_get_d3d_device(display)->GetViewport(&backup_vp);
-			D3DVIEWPORT9 vp;
-			vp.X = 0;
-			vp.Y = 0;
-			vp.Width = al_get_display_width(display);
-			vp.Height = al_get_display_height(display);
-			vp.MinZ = 0;
-			vp.MaxZ = 1;
-			al_get_d3d_device(display)->SetViewport(&vp);
+			if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+				al_get_d3d_device(display)->GetViewport(&backup_vp);
+				D3DVIEWPORT9 d3d_vp;
+				d3d_vp.X = 0;
+				d3d_vp.Y = 0;
+				d3d_vp.Width = al_get_display_width(display);
+				d3d_vp.Height = al_get_display_height(display);
+				d3d_vp.MinZ = 0;
+				d3d_vp.MaxZ = 1;
+				al_get_d3d_device(display)->SetViewport(&d3d_vp);
+			}
 #endif
 
 			// without this the feathers sometimes go invisible
@@ -941,8 +943,10 @@ static int real_archery(int *accuracy_pts)
 				al_rotate_transform_3d(&view_transform, 1, 0, 0, -xrot);
 				al_rotate_transform_3d(&view_transform, 0, 1, 0, -yrot);
 				al_translate_transform_3d(&view_transform, 0, 0, bow_z);
-#ifdef A5_D3D
-				al_translate_transform_3d(&view_transform, 0.5f, 0.5f, 0.0f);
+#ifdef ALLEGRO_WINDOWS
+				if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+					al_translate_transform_3d(&view_transform, 0.5f, 0.5f, 0.0f);
+				}
 #endif
 				al_use_transform(&view_transform);
 				draw_model_tex(bow_model, bow_tex);
@@ -953,8 +957,10 @@ static int real_archery(int *accuracy_pts)
 					al_rotate_transform_3d(&view_transform, 1, 0, 0, -xrot);
 					al_rotate_transform_3d(&view_transform, 0, 1, 0, -yrot);
 					al_translate_transform_3d(&view_transform, arrow_dist, 0, arrow_start_z);
-#ifdef A5_D3D
-					al_translate_transform_3d(&view_transform, 0.5f, 0.5f, 0.0f);
+#ifdef ALLEGRO_WINDOWS
+					if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+						al_translate_transform_3d(&view_transform, 0.5f, 0.5f, 0.0f);
+					}
 #endif
 					al_use_transform(&view_transform);
 					draw_model_tex(arrow_model, arrow_tex);
@@ -967,8 +973,10 @@ static int real_archery(int *accuracy_pts)
 			xrot = old_xrot;
 			yrot = old_yrot;
 
-#ifdef A5_D3D
-			al_get_d3d_device(display)->SetViewport(&backup_vp);
+#ifdef ALLEGRO_WINDOWS
+			if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+				al_get_d3d_device(display)->SetViewport(&backup_vp);
+			}
 #endif
 
 			al_use_transform(&view_push);
@@ -1123,23 +1131,31 @@ bool archery(bool for_points)
 
 void enable_cull_face(bool ccw)
 {
-#ifdef A5_OGL
-	glCullFace(ccw ? GL_FRONT : GL_BACK);
-	glEnable(GL_CULL_FACE);
-#else
-	LPDIRECT3DDEVICE9 device = al_get_d3d_device(display);
-	device->SetRenderState(D3DRS_CULLMODE, ccw ? D3DCULL_CCW : D3DCULL_CW);
+#ifdef ALLEGRO_WINDOWS
+	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+		LPDIRECT3DDEVICE9 device = al_get_d3d_device(display);
+		device->SetRenderState(D3DRS_CULLMODE, ccw ? D3DCULL_CCW : D3DCULL_CW);
+	}
+	else
 #endif
+	{
+		glCullFace(ccw ? GL_FRONT : GL_BACK);
+		glEnable(GL_CULL_FACE);
+	}
 }
 
 void disable_cull_face(void)
 {
-#ifdef A5_OGL
-	glDisable(GL_CULL_FACE);
-#else
-	LPDIRECT3DDEVICE9 device = al_get_d3d_device(display);
-	device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+#ifdef ALLEGRO_WINDOWS
+	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+		LPDIRECT3DDEVICE9 device = al_get_d3d_device(display);
+		device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	}
+	else
 #endif
+	{
+		glDisable(GL_CULL_FACE);
+	}
 }
 
 
@@ -1256,10 +1272,6 @@ void volcano_scene(void)
 
 	int mipmap = 0;
 	int linear = 0;
-#if 0 //!defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI  && !defined A5_D3D && !defined __linux__ && !defined ALLEGRO_MACOSX && !defined ALLEGRO_WINDOWS
-	mipmap = ALLEGRO_MIPMAP;
-	linear = ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR;
-#endif
 
 	al_set_new_bitmap_flags(flags | linear | mipmap);
 	MBITMAP *land_texture = m_load_bitmap(getResource("media/volcano_texture.png"));
@@ -1405,17 +1417,21 @@ void volcano_scene(void)
 			al_perspective_transform(&proj_transform, -1, -(float)BH/BW, 1, 1, (float)BH/BW, 1000);
 			al_set_projection_transform(display, &proj_transform);
 
-#ifdef A5_D3D
-			LPDIRECT3DDEVICE9 device = al_get_d3d_device(display);
-			D3DVIEWPORT9 vp, old;
-			device->GetViewport(&old);
-			vp.X = 0;
-			vp.Y = 0;
-			vp.Width = al_get_display_width(display);
-			vp.Height = al_get_display_height(display);
-			vp.MinZ = 0;
-			vp.MaxZ = 1;
-			device->SetViewport(&vp);
+#ifdef ALLEGRO_WINDOWS
+			D3DVIEWPORT9 old;
+			LPDIRECT3DDEVICE9 device;
+			if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+				device = al_get_d3d_device(display);
+				D3DVIEWPORT9 d3d_vp;
+				device->GetViewport(&old);
+				d3d_vp.X = 0;
+				d3d_vp.Y = 0;
+				d3d_vp.Width = al_get_display_width(display);
+				d3d_vp.Height = al_get_display_height(display);
+				d3d_vp.MinZ = 0;
+				d3d_vp.MaxZ = 1;
+				device->SetViewport(&d3d_vp);
+			}
 #endif
 
 			enable_zbuffer();
@@ -1440,8 +1456,10 @@ void volcano_scene(void)
 				al_translate_transform_3d(&view_transform, 0, 0, -1.25f);
 				al_translate_transform_3d(&view_transform, 0, 0.25f, -(staff_oz+staff_z_translate));
 				al_rotate_transform_3d(&view_transform, 0, 1, 0, -land_angle);
-#ifdef A5_D3D
-				al_translate_transform_3d(&view_transform, 0.5f, 0.5f, 0.0f);
+#ifdef ALLEGRO_WINDOWS
+				if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+					al_translate_transform_3d(&view_transform, 0.5f, 0.5f, 0.0f);
+				}
 #endif
 				al_use_transform(&view_transform);
 
@@ -1463,8 +1481,10 @@ void volcano_scene(void)
 			al_set_projection_transform(display, &proj_push);
 			al_use_transform(&view_push);
 
-#ifdef A5_D3D
-			device->SetViewport(&old);
+#ifdef ALLEGRO_WINDOWS
+			if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+				device->SetViewport(&old);
+			}
 #endif
 			if (break_for_fade_after_draw) {
 				break;
@@ -1481,10 +1501,10 @@ done:
 		fadeOut(black);
 	}
 
-#if defined A5_OGL
-	disable_cull_face();
-	disable_zbuffer();
-#endif
+	if (al_get_display_flags(display) & ALLEGRO_OPENGL) {
+		disable_cull_face();
+		disable_zbuffer();
+	}
 
 	delete land_model;
 	delete staff_model;

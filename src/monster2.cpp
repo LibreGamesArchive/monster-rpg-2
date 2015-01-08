@@ -1303,8 +1303,8 @@ top:
 		reload_translation = false;
 		playPreloadedSample("blip.ogg");
 	}
-#ifdef A5_D3D
-	if (should_reset) {
+#ifdef ALLEGRO_WINDOWS
+	if ((al_get_display_flags(display) & ALLEGRO_DIRECT3D) && should_reset) {
 		al_get_d3d_device(display)->SetDepthStencilSurface(NULL);
 		big_depth_surface->Release();
 		_destroy_loaded_bitmaps();
@@ -1890,8 +1890,14 @@ int main(int argc, char *argv[])
 	int flags = al_get_new_bitmap_flags();
 	
 	int linear = 0;
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI  && !defined A5_D3D
-	linear = ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR;
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
+#ifdef ALLEGRO_WINDOWS
+	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+#endif
+		linear = ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR;
+#ifdef ALLEGRO_WINDOWS
+	}
+#endif
 #endif
 	al_set_new_bitmap_flags(linear);
 	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);

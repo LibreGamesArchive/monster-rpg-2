@@ -91,15 +91,6 @@ ALLEGRO_DEBUG_CHANNEL("morpg2")
 #endif
 #include "sound.hpp"
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-#define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_RGBA_4444
-#elif defined A5_OGL
-#define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE
-#else
-#define ALPHA_FMT ALLEGRO_PIXEL_FORMAT_ARGB_8888
-#endif
-
-
 const int LETTER_INDEX = 3;
 
 const int CURE_INDEX = 2;
@@ -135,11 +126,8 @@ extern "C" {
 #define lua_open luaL_newstate
 }
 
-#ifdef A5_D3D
+#ifdef ALLEGRO_WINDOWS
 #include <d3d9.h>
-#endif
-
-#if (defined ALLEGRO_WINDOWS) && !(defined A5_OGL)
 #include <d3dx9.h>
 #endif
 
@@ -157,9 +145,7 @@ extern "C" {
 #define glLinkProgramARB glLinkProgram
 #endif
 
-#ifdef A5_OGL
 #include <allegro5/allegro_opengl.h>
-#endif
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 #define POOL_BEGIN NSAutoreleasePool *___p = [[NSAutoreleasePool alloc] init];

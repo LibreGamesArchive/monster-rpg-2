@@ -1115,37 +1115,49 @@ void WhirlpoolEffect::draw(void)
 	int vpw = w*screenScaleX;
 	int vph = h*screenScaleY;
 	int vpx = dx + (spx*screenScaleX) - vpw/2;
-	/* 8 is the depth of the water! */
-#ifdef A5_D3D
-	int vpy = (dy + (spy*screenScaleY) + vph/2 - (8*screenScaleY)) - vph;
-	float xx = 0.0f;
-	float yy = 0;
-	float trans_z = -1.75f*2.0f;
-	float scale = 2.0f;
-#else
-	int vpy = dy + (spy*screenScaleY) + vph/2 - (8*screenScaleY);
-	float xx = 0.0f;
-	float yy = 0.0f;
-	float trans_z = -1.75f;
-	float scale = 1.0f;
-#endif
 
-#ifdef A5_D3D
-	D3DVIEWPORT9 backup_vp;
-	al_get_d3d_device(display)->GetViewport(&backup_vp);
-	D3DVIEWPORT9 vp;
-	vp.X = vpx;
-	vp.Y = vpy;
-	vp.Width = vpw;
-	vp.Height = vph;
-	vp.MinZ = 0;
-	vp.MaxZ = 1;
-	al_get_d3d_device(display)->SetViewport(&vp);
-#else
-	GLint vp[4];
-	glGetIntegerv(GL_VIEWPORT, vp);
-	glViewport(vpx, al_get_display_height(display)-vpy, vpw, vph);
+	int vpy;
+	float xx, yy, trans_z, scale;
+
+	/* 8 is the depth of the water! */
+#ifdef ALLEGRO_WINDOWS
+	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+		vpy = (dy + (spy*screenScaleY) + vph/2 - (8*screenScaleY)) - vph;
+		xx = 0.0f;
+		yy = 0;
+		trans_z = -1.75f*2.0f;
+		scale = 2.0f;
+	}
+	else
 #endif
+	{
+		vpy = dy + (spy*screenScaleY) + vph/2 - (8*screenScaleY);
+		xx = 0.0f;
+		yy = 0.0f;
+		trans_z = -1.75f;
+		scale = 1.0f;
+	}
+
+	GLint vp[4];
+#ifdef ALLEGRO_WINDOWS
+	D3DVIEWPORT9 backup_vp;
+	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+		al_get_d3d_device(display)->GetViewport(&backup_vp);
+		D3DVIEWPORT9 d3d_vp;
+		d3d_vp.X = vpx;
+		d3d_vp.Y = vpy;
+		d3d_vp.Width = vpw;
+		d3d_vp.Height = vph;
+		d3d_vp.MinZ = 0;
+		d3d_vp.MaxZ = 1;
+		al_get_d3d_device(display)->SetViewport(&d3d_vp);
+	}
+	else
+#endif
+	{
+		glGetIntegerv(GL_VIEWPORT, vp);
+		glViewport(vpx, al_get_display_height(display)-vpy, vpw, vph);
+	}
 
 	ALLEGRO_TRANSFORM proj_backup, view_backup, t;
 	al_copy_transform(&proj_backup, al_get_projection_transform(display));
@@ -1171,11 +1183,15 @@ void WhirlpoolEffect::draw(void)
 	al_set_projection_transform(display, &proj_backup);
 	al_use_transform(&view_backup);
 
-#ifdef A5_D3D
-	al_get_d3d_device(display)->SetViewport(&backup_vp);
-#else
-	glViewport(vp[0], vp[1], vp[2], vp[3]);
+#ifdef ALLEGRO_WINDOWS
+	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+		al_get_d3d_device(display)->SetViewport(&backup_vp);
+	}
+	else
 #endif
+	{
+		glViewport(vp[0], vp[1], vp[2], vp[3]);
+	}
 }
 
 
@@ -2803,11 +2819,15 @@ static void draw_bolt_arc_worker2(MPoint &p1, MPoint &p2)
 		float angle = M_PI*2*p*2;
 		float x = interpolate(p1.x, p2.x, p);
 		float y = interpolate(p1.y, p2.y, p) - sin(angle)*amplitude;
-#if defined A5_D3D
-		m_draw_pixel(x+0.5, y+0.5, white);
-#else
-		m_draw_pixel(x, y, white);
+#ifdef ALLEGRO_WINDOWS
+		if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
+			m_draw_pixel(x+0.5, y+0.5, white);
+		}
+		else
 #endif
+		{
+			m_draw_pixel(x, y, white);
+		}
 	}
 }
 
