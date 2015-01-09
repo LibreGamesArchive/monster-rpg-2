@@ -109,7 +109,7 @@ const char *getResource(const char *fmt, ...)
 	static char name[MAX_PATH];
 
 #ifndef ALLEGRO_ANDROID
-	strcpy(name, resourcePath());
+	strcpy(name, "data/");
 #else
 	strcpy(name, "assets/data/");
 #endif

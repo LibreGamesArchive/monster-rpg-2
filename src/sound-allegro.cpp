@@ -144,18 +144,7 @@ MSAMPLE loadSample(std::string name)
 
 	if (!sound_inited) return s;
 
-#ifdef ALLEGRO_ANDROID
-	ALLEGRO_PATH *p = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
-	char fn[1000];
-	sprintf(fn, "%s/unpack/sfx/%s", al_path_cstr(p, '/'), name.c_str());
-	al_destroy_path(p);
-	debug_message("loading sample '%s'\n", fn);
-	al_set_standard_file_interface();
-	s = al_load_sample(fn);
-	al_set_physfs_file_interface();
-#else
 	s = al_load_sample(getResource("sfx/%s", name.c_str()));
-#endif
 	if (s == 0) {
 		native_error("Load error.", ((std::string("sfx/") + name).c_str()));
 	}
@@ -217,7 +206,6 @@ void playMusic(std::string name, float vol, bool force)
 	bool is_flac;
 	name = check_music_name(name, &is_flac);
 
-#ifdef ALLEGRO_ANDROID
 	if (is_flac) {
 		al_set_standard_file_interface();
 		music = al_load_audio_stream(name.c_str(), 4, 2048);
@@ -226,9 +214,6 @@ void playMusic(std::string name, float vol, bool force)
 	else {
 		music = al_load_audio_stream(name.c_str(), 4, 2048);
 	}
-#else
-	music = al_load_audio_stream(name.c_str(), 4, 2048);
-#endif
 	if (music == 0) {
 		native_error("Load error.", name.c_str());
 	}

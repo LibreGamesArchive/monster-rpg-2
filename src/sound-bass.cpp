@@ -1,10 +1,6 @@
 #include "monster2.hpp"
 
 #ifdef ALLEGRO_ANDROID
-#include <physfs.h>
-#endif
-
-#ifdef ALLEGRO_ANDROID
 #include "java.h"
 #endif
 
@@ -83,7 +79,6 @@ static std::string preloaded_names[] = {
 	""
 };
 
-#ifdef ALLEGRO_ANDROID
 BASS_FILEPROCS fileprocs;
 BASS_FILEPROCS physfs_fileprocs;
 
@@ -134,7 +129,6 @@ static BOOL CALLBACK physfs_my_seek(QWORD offset, void *user)
 	bool ret = PHYSFS_seek(f, offset);
 	return ret;
 }
-#endif
 
 void initSound(void)
 {
@@ -144,7 +138,6 @@ void initSound(void)
 		total_samples++;
 	}
 
-#ifdef ALLEGRO_ANDROID
 	fileprocs.close = my_close;
 	fileprocs.length = my_len;
 	fileprocs.read = my_read;
@@ -154,7 +147,6 @@ void initSound(void)
 	physfs_fileprocs.length = physfs_my_len;
 	physfs_fileprocs.read = physfs_my_read;
 	physfs_fileprocs.seek = physfs_my_seek;
-#endif
 
 #ifdef ALLEGRO_RASPBERRYPI
 	BASS_SetConfig(BASS_CONFIG_DEV_BUFFER, 250);
@@ -214,7 +206,6 @@ void playPreloadedSample(std::string name)
 	playSample(preloaded_samples[name]);
 }
 
-#ifdef ALLEGRO_ANDROID
 static unsigned char *load_from_zip(std::string filename, int *ret_size, bool terminate_with_0, bool use_malloc)
 {
 	ALLEGRO_FILE *f = al_fopen(filename.c_str(), "rb");
@@ -283,7 +274,6 @@ static HSTREAM get_decode_stream(const char *name, unsigned char **buf)
 	);
 	return stream;
 }
-#endif
 
 MSAMPLE loadSample(std::string name)
 {
@@ -291,7 +281,6 @@ MSAMPLE loadSample(std::string name)
 
 	if (!sound_inited) return s;
 
-#ifdef ALLEGRO_ANDROID
 	unsigned char *buf0;
 	HSTREAM stream = get_decode_stream(getResource("sfx/%s", name.c_str()), &buf0);
 	if (stream == 0) {
@@ -329,15 +318,6 @@ MSAMPLE loadSample(std::string name)
 	free(buf0);
 	free(buf);
 	return samp;
-#else
-	s = BASS_SampleLoad(false,
-		getResource("sfx/%s", name.c_str()),
-		0, 0, 8,
-		BASS_SAMPLE_OVER_POS);
-	if (s == 0) {
-		native_error((std::string("Couldn't sfx/") + name + ".").c_str());
-	}
-#endif
 
 	return s;
 }
@@ -379,15 +359,7 @@ std::string check_music_name(std::string name, bool *is_flac)
 {
 	*is_flac = false;
 
-/*
-#ifdef ALLEGRO_ANDROID
-	static char buffer[1000];
-	sprintf(buffer, "assets/data/music/%s", name.c_str());
-	return buffer;
-#else
-*/
 	return getResource("music/%s", name.c_str());
-//#endif
 }
 
 void playMusic(std::string name, float vol, bool force)
@@ -412,7 +384,6 @@ void playMusic(std::string name, float vol, bool force)
 	bool is_flac;
 	name = check_music_name(name, &is_flac);
 
-#ifdef ALLEGRO_ANDROID
 	if (is_flac) {
 		al_set_standard_file_interface();
 		ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
@@ -433,11 +404,6 @@ void playMusic(std::string name, float vol, bool force)
 			(void *)f
 		);
 	}
-#else
-	music = BASS_StreamCreateFile(false,
-		name.c_str(),
-		0, 0, 0);
-#endif
 	
 	if (music == 0) {
 	   native_error("Load error.", name.c_str());
@@ -482,7 +448,6 @@ void playAmbience(std::string name, float vol)
 	bool is_flac;
 	name = check_music_name(name, &is_flac);
 
-#ifdef ALLEGRO_ANDROID
 	if (is_flac) {
 		al_set_standard_file_interface();
 		ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
@@ -503,11 +468,6 @@ void playAmbience(std::string name, float vol)
 			(void *)f
 		);
 	}
-#else
-	ambience = BASS_StreamCreateFile(false,
-		name.c_str(),
-		0, 0, 0);
-#endif
 	
 	if (ambience == 0) {
 		native_error("Load error.", name.c_str());
@@ -596,7 +556,6 @@ MSAMPLE streamSample(std::string name, float vol)
 	bool is_flac;
 	name = check_music_name(name, &is_flac);
 
-#ifdef ALLEGRO_ANDROID
 	if (is_flac) {
 		al_set_standard_file_interface();
 		ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
@@ -617,11 +576,6 @@ MSAMPLE streamSample(std::string name, float vol)
 			(void *)f
 		);
 	}
-#else
-	samp = BASS_StreamCreateFile(false,
-		name.c_str(),
-		0, 0, 0);
-#endif
 	
 	if (samp == 0) {
 	   native_error("Load error.", name.c_str());

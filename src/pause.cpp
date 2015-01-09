@@ -308,13 +308,9 @@ void showSaveStateInfo(const char *basename)
 	int x = (BW-w)/2;
 	int y = (BH-h)/2;
 
-#ifdef ALLEGRO_ANDROID
 	al_set_standard_file_interface();
-#endif
 	ALLEGRO_BITMAP *ss = al_load_bitmap(getUserResource("%s.bmp", basename));
-#ifdef ALLEGRO_ANDROID
 	al_set_physfs_file_interface();
-#endif
 
 	char d[100];
 	strcpy(d, file_date(getUserResource("%s.save", basename)));
@@ -790,13 +786,9 @@ static bool choose_save_slot(int num, bool exists, void *data)
 			if (prompt("Overwrite?", "", 0, 0)) {
 				saveGame(getUserResource("%d.save", num), map_name);
 				if (screenshot) {
-#ifdef ALLEGRO_ANDROID
 					al_set_standard_file_interface();
-#endif
 					al_save_bitmap(getUserResource("%d.bmp", num), screenshot->bitmap);
-#ifdef ALLEGRO_ANDROID
 					al_set_physfs_file_interface();
-#endif
 				}
 				else {
 					delete_file(getUserResource("%d.bmp", num));
@@ -811,13 +803,9 @@ static bool choose_save_slot(int num, bool exists, void *data)
 		else {
 			saveGame(getUserResource("%d.save", num), map_name);
 			if (screenshot) {
-#ifdef ALLEGRO_ANDROID
-					al_set_standard_file_interface();
-#endif
+				al_set_standard_file_interface();
 				al_save_bitmap(getUserResource("%d.bmp", num), screenshot->bitmap);
-#ifdef ALLEGRO_ANDROID
-					al_set_physfs_file_interface();
-#endif
+				al_set_physfs_file_interface();
 			}
 			else {
 				delete_file(getUserResource("%d.png", num));
@@ -3231,14 +3219,10 @@ static bool choose_copy_state(int n, bool exists, void *data)
 
 	if (n >= 0) {
 		if (exists) {
-#ifdef ALLEGRO_ANDROID
 			al_set_standard_file_interface();
-#endif
 			int sz;
 			unsigned char *bytes = slurp_file(getUserResource("%d.save", n), &sz);
-#ifdef ALLEGRO_ANDROID
 			al_set_physfs_file_interface();
-#endif
 			char *encoded = create_url(bytes, sz);
 			set_clipboard(encoded);
 			notify("", "Save state copied.", "");
@@ -3662,18 +3646,6 @@ bool config_menu(bool start_on_fullscreen)
 	difficulty_toggle->setSelected(curr_difficulty);
 	y += 13;
 
-/* FIXME: This doesn't work with the iCade code! */
-#if defined ALLEGRO_IPHONE_XXX
-	std::vector<std::string> shake_choices;
-	shake_choices.push_back("{027} Shake cancels");
-	shake_choices.push_back("{027} Shake changes songs (iPod)");
-	MSingleToggle *shake_toggle = new MSingleToggle(xx, y, shake_choices);
-	int curr_shake = config.getShakeAction();
-	shake_toggle->setSelected(curr_shake);
-	y += 13;
-#endif
-
-
 	MSingleToggle *tuning_toggle = NULL;
 	int curr_tuning = 2;
 	if (!isAndroidConsole()) {
@@ -3962,28 +3934,12 @@ bool config_menu(bool start_on_fullscreen)
 		}
 #endif
 
-#ifdef ALLEGRO_ANDROID_XXX
-		sel = zeemote_toggle->getSelected();
-		if (config.getAutoconnectToZeemote() != sel) {
-			config.setAutoconnectToZeemote(sel);
-		}
-#endif
-
 		sel = difficulty_toggle->getSelected();
 		if (sel != curr_difficulty) {
 			curr_difficulty = sel;
 			config.setDifficulty(sel);
 		}
 		
-#ifdef ALLEGRO_IPHONE_XXX
-		sel = shake_toggle->getSelected();
-		if (sel != curr_shake) {
-			curr_shake = sel;
-			config.setShakeAction(sel);
-		}
-#endif
-	
-
 		if (tuning_toggle) {
 			sel = tuning_toggle->getSelected();
 			if (sel != curr_tuning) {
@@ -4000,30 +3956,6 @@ bool config_menu(bool start_on_fullscreen)
 		}
 #endif
 		
-#if defined ALLEGRO_IPHONE_XXX
-		sel = flip_screen_toggle->getSelected();
-		if (sel != curr_flip_screen)
-		{
-			curr_flip_screen = sel;
-			if (sel == 0)
-			{
-				config.setAutoRotation(2);
-			}
-			else
-			{
-				int o = al_get_display_orientation(display);
-				if (o == ALLEGRO_DISPLAY_ORIENTATION_270_DEGREES)
-				{
-					config.setAutoRotation(0);
-				}
-				else
-				{
-					config.setAutoRotation(1);
-				}
-			}
-		}
-#endif
-
 		sel = aspect_toggle->getSelected();
 		if (aspect_real_to_option(config.getMaintainAspectRatio()) != sel) {
 			config.setMaintainAspectRatio(aspect_option_to_real(sel));
@@ -4145,8 +4077,8 @@ int title_menu(void)
 	options.push_back("Start/Load Game");
 	options.push_back("Tutorial");
 	options.push_back("Options");
-#if defined ALLEGRO_ANDROID && defined OUYA
-	if (isAndroidConsole() && config.getPurchased() != 1) {
+#if defined OUYA
+	if (config.getPurchased() != 1) {
 		options.push_back("BUY FULL VERSION");
 	}
 #endif

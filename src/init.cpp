@@ -553,9 +553,7 @@ static void *loader_proc(void *arg)
 	POOL_BEGIN
 #endif
 
-#ifdef ALLEGRO_ANDROID
 	al_set_physfs_file_interface();
-#endif
 
 #ifdef ALLEGRO_WINDOWS
 	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
@@ -1475,14 +1473,21 @@ bool init(int *argc, char **argv[])
 		PRESERVE_TEXTURE = ALLEGRO_NO_PRESERVE_TEXTURE;
 		NO_PRESERVE_TEXTURE = ALLEGRO_NO_PRESERVE_TEXTURE;
 	}
-
-#ifdef ALLEGRO_ANDROID
-	ALLEGRO_PATH *apkname = al_get_standard_path(ALLEGRO_EXENAME_PATH);
-	PHYSFS_init(al_path_cstr(apkname, '/'));
-	PHYSFS_addToSearchPath(al_path_cstr(apkname, '/'), 1);
-	al_destroy_path(apkname);
-	al_set_physfs_file_interface();
+	ALLEGRO_PATH *exename = al_get_standard_path(ALLEGRO_EXENAME_PATH);
+#ifndef ALLEGRO_ANDROID
+	al_set_path_filename(exename, "data.zip");
+	int ret = PHYSFS_init(myArgv[0]);
+	printf("ret1=%d\n", ret);
+#else
+	PHYSFS_init(al_path_cstr(exename, '/'));
 #endif
+	ret = PHYSFS_addToSearchPath(al_path_cstr(exename, '/'), 1);
+	printf("ret2=%d\n", ret);
+	printf("sp='%s' myArgv[0]='%s'\n", al_path_cstr(exename, '/'), myArgv[0]);
+	printf("gr='%s'\n", getResource("staff.png"));
+	fflush(stdout);
+	al_destroy_path(exename);
+	al_set_physfs_file_interface();
 
 	// Set an icon
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_MACOSX && !defined ALLEGRO_ANDROID
@@ -1914,9 +1919,7 @@ void destroy()
 
 	destroy_translation();
 
-#ifdef ALLEGRO_ANDROID
 	PHYSFS_deinit();
-#endif
 
 	inited = false;
 }

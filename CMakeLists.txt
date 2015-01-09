@@ -179,7 +179,11 @@ if(WIN32)
 		"wsock32"
 		"ws2_32"
 		"freetype"
+		"physfs"
 		"z"
+		"lua5.2"
+		"d3dx9"
+		"opengl32"
 	)
 	if (MINGW)
 		set(ICON_OBJ ${CMAKE_SOURCE_DIR}/src/icon.res)
@@ -195,12 +199,10 @@ if(WIN32)
 		allegro_dialog${ALLEG_SUFFIX}
 		allegro_memfile${ALLEG_SUFFIX}
 		allegro_image${ALLEG_SUFFIX}
+		allegro_physfs${ALLEG_SUFFIX}
 		allegro${ALLEG_SUFFIX}
 		${ALLEGRO_MAIN_LIB}
 		${EXTRA_LIBS}
-		lua5.2
-		d3dx9
-		"opengl32"
 	)
 	if(KCM_AUDIO)
 		LIST(APPEND MAIN_LIBS "ws2_32" "dsound")
@@ -218,7 +220,7 @@ if(APPLE)
 	FIND_LIBRARY(AUDIOTOOLBOX_LIBRARY AudioToolbox)
 	FIND_LIBRARY(GAMEKIT_LIBRARY GameKit)
 	FIND_LIBRARY(SECURITY_LIBRARY Security)
-	LIST(APPEND EXTRA_LIBS ${IOKIT_LIBRARY} ${OPENGL_LIBRARY} ${FOUNDATION_LIBRARY} ${APPSERVICES_LIBRARY} ${APPKIT_LIBRARY} ${AUDIOTOOLBOX_LIBRARY} ${GAMEKIT_LIBRARY} ${SECURITY_LIBRARY} freetype z)
+	LIST(APPEND EXTRA_LIBS ${IOKIT_LIBRARY} ${OPENGL_LIBRARY} ${FOUNDATION_LIBRARY} ${APPSERVICES_LIBRARY} ${APPKIT_LIBRARY} ${AUDIOTOOLBOX_LIBRARY} ${GAMEKIT_LIBRARY} ${SECURITY_LIBRARY} freetype physfs z)
 	SET(MAIN_LIBS 
 		mo2-engine
 		allegro_ttf${ALLEG_SUFFIX}
@@ -227,6 +229,7 @@ if(APPLE)
 		allegro_dialog${ALLEG_SUFFIX}
 		allegro_memfile${ALLEG_SUFFIX}
 		allegro_image${ALLEG_SUFFIX}
+		allegro_physfs${ALLEG_SUFFIX}
 		allegro${ALLEG_SUFFIX} ${ALLEGRO_MAIN_LIB}
 		${EXTRA_LIBS}
 		lua5.2
@@ -251,7 +254,7 @@ else(APPLE)
 		allegro_primitives${ALLEG_SUFFIX}
 		allegro_memfile${ALLEG_SUFFIX}
 		allegro_image${ALLEG_SUFFIX}
-		allegro_color${ALLEG_SUFFIX}
+		allegro_physfs${ALLEG_SUFFIX}
 		allegro${ALLEG_SUFFIX}
 		${ALLEGRO_MAIN_LIB}
 		${EXTRA_LIBS}
@@ -267,10 +270,10 @@ else(APPLE)
 		LIST(APPEND MAIN_LIBS "${CMAKE_BINARY_DIR}/libbass.so")
 	endif(KCM_AUDIO)
 	if(RASPBERRYPI)
-		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host /usr/lib/arm-linux-gnueabihf/libfreetype.a /usr/lib/arm-linux-gnueabihf/libz.a /usr/lib/arm-linux-gnueabihf/libpng.a /usr/lib/arm-linux-gnueabihf/liblua5.2.a)
+		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host physfs /usr/lib/arm-linux-gnueabihf/libfreetype.a /usr/lib/arm-linux-gnueabihf/libz.a /usr/lib/arm-linux-gnueabihf/libpng.a /usr/lib/arm-linux-gnueabihf/liblua5.2.a)
 	else(RASPBERYPI)
 		# trentg's build
-		LIST(APPEND MAIN_LIBS GL GLU /usr/local/lib/libfreetype.a /usr/local/lib/libz.a /usr/local/lib/libpng.a /usr/local/lib/liblua5.2.a)
+		LIST(APPEND MAIN_LIBS GL GLU /usr/local/lib/libphysfs.a /usr/local/lib/libfreetype.a /usr/local/lib/libz.a /usr/local/lib/libpng.a /usr/local/lib/liblua5.2.a)
 		# normal build
 		#LIST(APPEND MAIN_LIBS GL GLU freetype z png lua5.2)
 	endif(RASPBERRYPI)

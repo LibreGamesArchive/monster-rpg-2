@@ -45,10 +45,8 @@
 #include <allegro5/allegro_native_dialog.h>
 #endif
 #include <allegro5/allegro_memfile.h>
-#ifdef ALLEGRO_ANDROID
 #include <allegro5/allegro_physfs.h>
 #include <physfs.h>
-#endif
 
 #include "user_events.h"
 
