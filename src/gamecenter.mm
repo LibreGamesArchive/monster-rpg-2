@@ -1,4 +1,4 @@
-#import <GameKit/GameKit.h>
+#import <AppKit/AppKit.h>
 
 // Game Center stuff
 #define NOSOUND
@@ -11,17 +11,19 @@
 #include <allegro5/allegro_iphone_objc.h>
 #endif
 
+int is_authenticated = NOTYET;
+
+#ifndef NO_GAMECENTER
 #include "mygamecentervc.h"
 
-int is_authenticated = NOTYET;
 NSMutableDictionary *achievementsDictionary;
+#endif
 
 BOOL isGameCenterAPIAvailable()
 {
 #ifdef NO_GAMECENTER
 	return FALSE;
-#endif
-
+#else
 	// Check for presence of GKLocalPlayer class.
 	BOOL localPlayerClassAvailable = (NSClassFromString(@"GKLocalPlayer")) != nil;
 
@@ -45,11 +47,14 @@ BOOL isGameCenterAPIAvailable()
 #endif
 
 	return (localPlayerClassAvailable && osVersionSupported);
+#endif
 }
 
 #define NUM_ACHIEVEMENTS 30
 
+#ifndef NO_GAMECENTER
 void reportAchievementIdentifier(NSString* identifier, bool notification);
+#endif
 
 void authenticatePlayer(void)
 {
@@ -58,6 +63,7 @@ void authenticatePlayer(void)
 		return;
 	}
 
+#ifndef NO_GAMECENTER
 	GKLocalPlayer *localPlayer = [GKLocalPlayer localPlayer];
 
 #ifdef ALLEGRO_IPHONE
@@ -96,6 +102,7 @@ void authenticatePlayer(void)
 			}
 		}];
 	}
+#endif
 }
 
 bool reset_complete = false;
@@ -105,6 +112,7 @@ void resetAchievements(void)
 	if (!isGameCenterAPIAvailable() || !is_authenticated)
 		return;
 
+#ifndef NO_GAMECENTER
 	// Clear all locally saved achievement objects.
 	achievementsDictionary = [[NSMutableDictionary alloc] init];
 
@@ -116,8 +124,10 @@ void resetAchievements(void)
 		 }
 		 reset_complete = true;
 	 }];
+#endif
 }
 
+#ifndef NO_GAMECENTER
 void reportAchievementIdentifier(NSString* identifier, bool notification)
 {
 	if (!isGameCenterAPIAvailable() || !is_authenticated)
@@ -148,13 +158,13 @@ struct Holder
 	int num;
 	NSString *ident;
 };
+#endif
 
 void do_milestone(int num, bool visual)
 {
 #ifdef NO_GAMECENTER
 	return;
-#endif
-
+#else
 	num++;
 
 	Holder holders[NUM_ACHIEVEMENTS] = {
@@ -201,6 +211,7 @@ void do_milestone(int num, bool visual)
 			return;
 		}
 	}
+#endif
 }
 
 volatile bool modalViewShowing = false;
@@ -209,6 +220,7 @@ extern bool show_item_info_on_flip; // FIXME
 
 void showAchievements(void)
 {
+#ifndef NO_GAMECENTER
 	set_target_backbuffer();
 	m_clear(black);
 	m_flip_display();
@@ -250,6 +262,7 @@ void showAchievements(void)
 	}
 
 	clear_input_events();
+#endif
 #endif
 }
 

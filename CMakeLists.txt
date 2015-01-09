@@ -109,6 +109,12 @@ if(WIN32)
 	set(COMMON_SRCS ${COMMON_SRCS} src/init.cpp)
 else(WIN32)
 if(APPLE)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNO_GAMECENTER=1")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNO_GAMECENTER=1")
+	if(NOT WITH_JOYPAD)
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNO_JOYPAD")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNO_JOYPAD")
+	endif()
 	set(COMMON_SRCS ${COMMON_SRCS} src/init.mm src/joypad.mm src/joypad_handler.mm src/gamecenter.mm src/mygamecentervc.m)
 else(APPLE)
 	set(COMMON_SRCS ${COMMON_SRCS} src/init.cpp)
@@ -218,9 +224,8 @@ if(APPLE)
 	FIND_LIBRARY(APPKIT_LIBRARY AppKit)
 	FIND_LIBRARY(IOKIT_LIBRARY IOKit)
 	FIND_LIBRARY(AUDIOTOOLBOX_LIBRARY AudioToolbox)
-	FIND_LIBRARY(GAMEKIT_LIBRARY GameKit)
 	FIND_LIBRARY(SECURITY_LIBRARY Security)
-	LIST(APPEND EXTRA_LIBS ${IOKIT_LIBRARY} ${OPENGL_LIBRARY} ${FOUNDATION_LIBRARY} ${APPSERVICES_LIBRARY} ${APPKIT_LIBRARY} ${AUDIOTOOLBOX_LIBRARY} ${GAMEKIT_LIBRARY} ${SECURITY_LIBRARY} freetype physfs z)
+	LIST(APPEND EXTRA_LIBS ${IOKIT_LIBRARY} ${OPENGL_LIBRARY} ${FOUNDATION_LIBRARY} ${APPSERVICES_LIBRARY} ${APPKIT_LIBRARY} ${AUDIOTOOLBOX_LIBRARY} ${GAMEKIT_LIBRARY} ${SECURITY_LIBRARY})
 	SET(MAIN_LIBS 
 		mo2-engine
 		allegro_ttf${ALLEG_SUFFIX}
@@ -232,8 +237,10 @@ if(APPLE)
 		allegro_physfs${ALLEG_SUFFIX}
 		allegro${ALLEG_SUFFIX} ${ALLEGRO_MAIN_LIB}
 		${EXTRA_LIBS}
-		lua5.2
-		png
+		/Users/trent/code/local/lib/libfreetype.a
+		/Users/trent/code/local/lib/libphysfs.a
+		/Users/trent/code/local/lib/libz.a
+		/Users/trent/code/local/lib/liblua5.2.a
 	)
 	if(KCM_AUDIO)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -framework OpenAL")
@@ -275,7 +282,7 @@ else(APPLE)
 		# trentg's build
 		LIST(APPEND MAIN_LIBS GL GLU /usr/local/lib/libphysfs.a /usr/local/lib/libfreetype.a /usr/local/lib/libz.a /usr/local/lib/libpng.a /usr/local/lib/liblua5.2.a)
 		# normal build
-		#LIST(APPEND MAIN_LIBS GL GLU freetype z png lua5.2)
+		#LIST(APPEND MAIN_LIBS GL GLU physfs freetype z png lua5.2)
 	endif(RASPBERRYPI)
 endif(APPLE)
 endif(WIN32)
