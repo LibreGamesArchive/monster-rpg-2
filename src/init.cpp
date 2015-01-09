@@ -1473,20 +1473,20 @@ bool init(int *argc, char **argv[])
 		PRESERVE_TEXTURE = ALLEGRO_NO_PRESERVE_TEXTURE;
 		NO_PRESERVE_TEXTURE = ALLEGRO_NO_PRESERVE_TEXTURE;
 	}
+#ifdef ALLEGRO_MACOSX
+	PHYSFS_init(myArgv[0]);
+	PHYSFS_addToSearchPath("data.zip", 1);
+#else
 	ALLEGRO_PATH *exename = al_get_standard_path(ALLEGRO_EXENAME_PATH);
 #ifndef ALLEGRO_ANDROID
 	al_set_path_filename(exename, "data.zip");
-	int ret = PHYSFS_init(myArgv[0]);
-	printf("ret1=%d\n", ret);
+	PHYSFS_init(myArgv[0]);
 #else
 	PHYSFS_init(al_path_cstr(exename, '/'));
 #endif
-	ret = PHYSFS_addToSearchPath(al_path_cstr(exename, '/'), 1);
-	printf("ret2=%d\n", ret);
-	printf("sp='%s' myArgv[0]='%s'\n", al_path_cstr(exename, '/'), myArgv[0]);
-	printf("gr='%s'\n", getResource("staff.png"));
-	fflush(stdout);
+	PHYSFS_addToSearchPath(al_path_cstr(exename, '/'), 1);
 	al_destroy_path(exename);
+#endif
 	al_set_physfs_file_interface();
 
 	// Set an icon

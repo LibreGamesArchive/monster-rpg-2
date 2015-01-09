@@ -111,11 +111,7 @@ else(WIN32)
 if(APPLE)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNO_GAMECENTER=1")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNO_GAMECENTER=1")
-	if(NOT WITH_JOYPAD)
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNO_JOYPAD")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNO_JOYPAD")
-	endif()
-	set(COMMON_SRCS ${COMMON_SRCS} src/init.mm src/joypad.mm src/joypad_handler.mm src/gamecenter.mm src/mygamecentervc.m)
+	set(COMMON_SRCS ${COMMON_SRCS} src/init.mm src/gamecenter.mm)
 else(APPLE)
 	set(COMMON_SRCS ${COMMON_SRCS} src/init.cpp)
 endif(APPLE)
@@ -240,7 +236,7 @@ if(APPLE)
 		/Users/trent/code/local/lib/libfreetype.a
 		/Users/trent/code/local/lib/libphysfs.a
 		/Users/trent/code/local/lib/libz.a
-		/Users/trent/code/local/lib/liblua5.2.a
+		/Users/trent/code/local/lib/liblua.a
 	)
 	if(KCM_AUDIO)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -framework OpenAL")
