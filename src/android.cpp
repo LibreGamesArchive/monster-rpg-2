@@ -213,6 +213,7 @@ bool gamepadConnected()
 {
 	bool ret = false;
 
+	/* FIXME: 1 here means ignore accelerometer */
 	if (al_is_joystick_installed() && al_get_num_joysticks() > 1) {
 		ret = true;
 	}

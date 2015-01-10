@@ -117,10 +117,10 @@ LOCAL_SRC_FILES := \
 	../../src/init.cpp
 
 LOCAL_ARM_MODE := arm
-LOCAL_CFLAGS := -Wall -O2 -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/include -I../include -DA5_OGL
+LOCAL_CFLAGS := -Wall -O2 -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/include -I../include
 
 LOCAL_SHARED_LIBRARIES := liballegro-prebuilt liballegro_memfile-prebuilt liballegro_primitives-prebuilt liballegro_image-prebuilt liballegro_font-prebuilt liballegro_ttf-prebuilt liballegro_color-prebuilt liballegro_physfs-prebuilt libbass-prebuilt
-LOCAL_LDLIBS := -L$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/lib -llog -lGLESv1_CM -lstdc++ -lphysfs -lpng -llua5.2 -lz
+LOCAL_LDLIBS := -L$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/lib -llog -lGLESv1_CM -lstdc++ -lfreetype -lphysfs -lpng -lz -llua5.2
 
 include $(BUILD_SHARED_LIBRARY)
 

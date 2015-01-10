@@ -408,16 +408,6 @@ static void *thread_proc(void *arg)
 	
 	ALLEGRO_EVENT event;
 
-#if defined ALLEGRO_WINDOWS || defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
-#ifdef defined ALLEGRO_WINDOWS
-	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
-#endif
-		al_register_event_source(events, al_get_display_event_source(display));
-#ifdef defined ALLEGRO_WINDOWS
-	}
-#endif
-#endif
-
 	al_register_event_source(events, (ALLEGRO_EVENT_SOURCE *)draw_timer);
 	al_register_event_source(events, (ALLEGRO_EVENT_SOURCE *)logic_timer);
 	
@@ -1196,7 +1186,7 @@ bool gamepadConnected()
 {
 	bool ret = false;
 
-	if (al_is_joystick_installed() && al_get_num_joysticks() > 1) {
+	if (al_is_joystick_installed() && al_get_num_joysticks() > 0) {
 		ret = true;
 	}
 

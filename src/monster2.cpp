@@ -424,6 +424,15 @@ top:
 		ALLEGRO_EVENT event;
 		al_get_next_event(input_event_queue, &event);
 
+#ifdef ALLEGRO_ANDROID
+		if (gamepadConnected() && (
+			event.type == ALLEGRO_EVENT_TOUCH_BEGIN ||
+			event.type == ALLEGRO_EVENT_TOUCH_END ||
+			event.type == ALLEGRO_EVENT_TOUCH_MOVE
+		)) {
+			continue;
+		}
+#endif
 		if (is_input_event(&event) && event.any.timestamp < drop_input_events_older_than) {
 			continue;
 		}

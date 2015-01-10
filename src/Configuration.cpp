@@ -711,7 +711,11 @@ void Configuration::setDefaultInputs()
 #endif
 
 #ifndef ALLEGRO_IPHONE
+#ifdef AMAZON
+	key1 = ALLEGRO_KEY_ENTER;
+#else
 	key1 = ALLEGRO_KEY_SPACE;
+#endif
 	key2 = ALLEGRO_KEY_ESCAPE;
 	key3 = ALLEGRO_KEY_V;
 	keyLeft = ALLEGRO_KEY_LEFT;

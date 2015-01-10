@@ -625,6 +625,11 @@ TGUIWidget* tguiUpdate()
 	while (!al_event_queue_is_empty(mouse_events)) {
 		ALLEGRO_EVENT event;
 		al_get_next_event(mouse_events, &event);
+#ifdef ALLEGRO_ANDROID
+		if (gamepadConnected()) {
+			continue;
+		}
+#endif
 		if (event.any.timestamp < drop_input_events_older_than) {
 			continue;
 		}

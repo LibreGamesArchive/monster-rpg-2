@@ -244,12 +244,7 @@ if(APPLE)
 		LIST(APPEND MAIN_LIBS "bass")
 	endif(KCM_AUDIO)
 else(APPLE)
-	if(NOT KCM_AUDIO)
-		# Ubuntu software center build:
-		#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,/opt/monster-rpg-2")
-		# Normal build:
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,.")
-	endif(NOT KCM_AUDIO)
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,\$ORIGIN")
 	SET(MAIN_LIBS 
 		mo2-engine
 		allegro_ttf${ALLEG_SUFFIX}
@@ -261,7 +256,7 @@ else(APPLE)
 		allegro${ALLEG_SUFFIX}
 		${ALLEGRO_MAIN_LIB}
 		${EXTRA_LIBS}
-		Xcursor Xi Xinerama Xrandr GLU GL SM ICE X11 Xext
+		Xcursor Xi Xinerama Xrandr SM ICE X11 Xext
 	)
         if(KCM_AUDIO)
 		if(RASPBERRYPI)
@@ -273,7 +268,7 @@ else(APPLE)
 		LIST(APPEND MAIN_LIBS "${CMAKE_BINARY_DIR}/libbass.so")
 	endif(KCM_AUDIO)
 	if(RASPBERRYPI)
-		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host physfs /usr/lib/arm-linux-gnueabihf/libfreetype.a /usr/lib/arm-linux-gnueabihf/libz.a /usr/lib/arm-linux-gnueabihf/libpng.a /usr/lib/arm-linux-gnueabihf/liblua5.2.a)
+		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host m pthread /usr/local/lib/libfreetype.a physfs /usr/local/lib/libpng.a /usr/local/lib/libz.a lua5.2)
 	else(RASPBERYPI)
 		# trentg's build
 		LIST(APPEND MAIN_LIBS GL GLU /usr/local/lib/libphysfs.a /usr/local/lib/libfreetype.a /usr/local/lib/libz.a /usr/local/lib/libpng.a /usr/local/lib/liblua5.2.a)
