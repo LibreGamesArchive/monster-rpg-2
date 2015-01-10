@@ -246,13 +246,8 @@ extern "C" {
 
 static float backup_music_volume, backup_ambience_volume;
 
-#ifdef AMAZON
 JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_MyBroadcastReceiver_pauseSound
   (JNIEnv *env, jobject obj)
-#else
-JNIEXPORT void JNICALL Java_com_nooskewl_morpg2_MyBroadcastReceiver_pauseSound
-  (JNIEnv *env, jobject obj)
-#endif
 {
 	backup_music_volume = getMusicVolume();
 	backup_ambience_volume = getAmbienceVolume();
@@ -260,13 +255,8 @@ JNIEXPORT void JNICALL Java_com_nooskewl_morpg2_MyBroadcastReceiver_pauseSound
 	setAmbienceVolume(0.0);
 }
 
-#ifdef AMAZON
 JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_MyBroadcastReceiver_resumeSound
   (JNIEnv *env, jobject obj)
-#else
-JNIEXPORT void JNICALL Java_com_nooskewl_morpg2_MyBroadcastReceiver_resumeSound
-  (JNIEnv *env, jobject obj)
-#endif
 {
 	setMusicVolume(backup_music_volume);
 	setAmbienceVolume(backup_ambience_volume);
