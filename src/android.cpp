@@ -246,11 +246,11 @@ extern "C" {
 
 static float backup_music_volume, backup_ambience_volume;
 
-#ifdef GOOGLEPLAY
-JNIEXPORT void JNICALL Java_com_nooskewl_morpg2_MyBroadcastReceiver_pauseSound
+#ifdef AMAZON
+JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_MyBroadcastReceiver_pauseSound
   (JNIEnv *env, jobject obj)
 #else
-JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_MyBroadcastReceiver_pauseSound
+JNIEXPORT void JNICALL Java_com_nooskewl_morpg2_MyBroadcastReceiver_pauseSound
   (JNIEnv *env, jobject obj)
 #endif
 {
@@ -260,11 +260,11 @@ JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_MyBroadcastReceiver_pauseSo
 	setAmbienceVolume(0.0);
 }
 
-#ifdef GOOGLEPLAY
-JNIEXPORT void JNICALL Java_com_nooskewl_morpg2_MyBroadcastReceiver_resumeSound
+#ifdef AMAZON
+JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_MyBroadcastReceiver_resumeSound
   (JNIEnv *env, jobject obj)
 #else
-JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_MyBroadcastReceiver_resumeSound
+JNIEXPORT void JNICALL Java_com_nooskewl_morpg2_MyBroadcastReceiver_resumeSound
   (JNIEnv *env, jobject obj)
 #endif
 {

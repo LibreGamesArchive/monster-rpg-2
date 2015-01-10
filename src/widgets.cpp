@@ -1842,7 +1842,54 @@ void MInputGetter::draw()
 			WGT_TEXT_NORMAL, false);
 
 		char buf[100];
-		sprintf(buf, "%s", type == TYPE_KB ? keycode_to_keyname(value) : my_itoa(value));
+		char text[200];
+		if (type == TYPE_KB) {
+			sprintf(text, "%s", keycode_to_keyname(value));
+		}
+		else {
+#ifdef ALLEGRO_ANDROID
+			const char *txt = "";
+			switch (value) {
+				case 0:
+					txt = "A";
+					break;
+				case 1:
+					txt = "B";
+					break;
+				case 2:
+					txt = "X";
+					break;
+				case 3:
+					txt = "Y";
+					break;
+				case 4:
+					txt = "LB";
+					break;
+				case 5:
+					txt = "RB";
+					break;
+				case 6:
+					txt = "DPAD_L";
+					break;
+				case 7:
+					txt = "DPAD_R";
+					break;
+				case 8:
+					txt = "DPAD_U";
+					break;
+				case 9:
+					txt = "DPAD_D";
+					break;
+				case 10:
+					txt = "MENU";
+					break;
+			}
+			strcpy(text, txt);
+#else
+			sprintf(text, "%s", my_itoa(value));
+#endif
+		}
+		sprintf(buf, "%s", text);
 		mTextout(game_font, buf, x+width-m_text_length(game_font, buf), y-2,
 			color, black,
 			WGT_TEXT_NORMAL, false);

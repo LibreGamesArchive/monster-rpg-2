@@ -34,6 +34,7 @@ public class MO2Activity extends AllegroActivity {
       System.loadLibrary("allegro_color");
       System.loadLibrary("allegro_physfs");
       System.loadLibrary("bass");
+      System.loadLibrary("monsterrpg2");
    }
 
 	public MO2Activity()
@@ -78,7 +79,14 @@ public class MO2Activity extends AllegroActivity {
 				ClipboardManager m = 
 					(ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
 
-				clipdata = m.getText().toString();
+				CharSequence cs = m.getText();
+
+				if (cs == null) {
+					clipdata = null;
+				}
+				else {
+					clipdata = cs.toString();
+				}
 
 				clip_thread_done = true;
 			}
