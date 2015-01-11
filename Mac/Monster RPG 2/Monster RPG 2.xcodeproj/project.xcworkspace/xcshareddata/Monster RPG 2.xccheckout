@@ -10,46 +10,54 @@
 	<string>Monster RPG 2</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>1D7A1D0D-39FD-4543-84F9-190569070314</key>
+		<key>837ADC6BBEDD2FA952A635BB0DD18ACB81D13923</key>
+		<string>https://www.nooskewl.com/svn</string>
+		<key>f4189080-a3fe-f748-8954-90d10a85fca3++1610</key>
 		<string>https://www.nooskewl.com/svn/monster2/trunk/morpgpc</string>
-		<key>6CD61567-9CA9-488E-95D1-0FB7B4485EF5</key>
-		<string>ssh://192.168.1.110/mnt/git/monster-rpg-2.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>monster-rpg-2/Mac/Monster RPG 2/Monster RPG 2.xcodeproj/project.xcworkspace</string>
+	<string>Mac/Monster RPG 2/Monster RPG 2.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>1D7A1D0D-39FD-4543-84F9-190569070314</key>
-		<string>../../../../..</string>
-		<key>6CD61567-9CA9-488E-95D1-0FB7B4485EF5</key>
+		<key>837ADC6BBEDD2FA952A635BB0DD18ACB81D13923</key>
 		<string>../../../..</string>
+		<key>f4189080-a3fe-f748-8954-90d10a85fca3++1610</key>
+		<string>../../../../..</string>
 	</dict>
 	<key>IDESourceControlProjectRepositoryRootDictionary</key>
 	<dict>
-		<key>1D7A1D0D-39FD-4543-84F9-190569070314</key>
+		<key>f4189080-a3fe-f748-8954-90d10a85fca3++1610</key>
 		<string>https://www.nooskewl.com/svn</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>ssh://192.168.1.110/mnt/git/monster-rpg-2.git</string>
+	<string>https://www.nooskewl.com/svn</string>
 	<key>IDESourceControlProjectVersion</key>
-	<integer>110</integer>
+	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>1D7A1D0D-39FD-4543-84F9-190569070314</string>
+	<string>837ADC6BBEDD2FA952A635BB0DD18ACB81D13923</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.subversion</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>1D7A1D0D-39FD-4543-84F9-190569070314</string>
+			<string>f4189080-a3fe-f748-8954-90d10a85fca3++1610</string>
 			<key>IDESourceControlWCCName</key>
-			<string>code</string>
+			<string></string>
 		</dict>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>6CD61567-9CA9-488E-95D1-0FB7B4485EF5</string>
+			<string>837ADC6BBEDD2FA952A635BB0DD18ACB81D13923</string>
+			<key>IDESourceControlWCCName</key>
+			<string>monster-rpg-2</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.subversion</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>837ADC6BBEDD2FA952A635BB0DD18ACB81D13923</string>
 			<key>IDESourceControlWCCName</key>
 			<string>monster-rpg-2</string>
 		</dict>
