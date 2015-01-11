@@ -158,11 +158,15 @@ void save_auto_save_to_disk()
 	memory_saved = false;
 
 	if (screenshot && save_screenshot) {
+#ifndef NO_PHYSFS
 		al_set_standard_file_interface();
+#endif
 		al_lock_mutex(ss_mutex);
 		al_save_bitmap(getUserResource("auto0.bmp"), screenshot->bitmap);
 		al_unlock_mutex(ss_mutex);
+#ifndef NO_PHYSFS
 		al_set_physfs_file_interface();
+#endif
 	}
 }
 

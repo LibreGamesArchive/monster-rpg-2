@@ -543,7 +543,9 @@ static void *loader_proc(void *arg)
 	POOL_BEGIN
 #endif
 
+#ifndef NO_PHYSFS
 	al_set_physfs_file_interface();
+#endif
 
 #ifdef ALLEGRO_WINDOWS
 	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
@@ -1463,10 +1465,9 @@ bool init(int *argc, char **argv[])
 		PRESERVE_TEXTURE = ALLEGRO_NO_PRESERVE_TEXTURE;
 		NO_PRESERVE_TEXTURE = ALLEGRO_NO_PRESERVE_TEXTURE;
 	}
-#ifdef ALLEGRO_MACOSX
-	PHYSFS_init(myArgv[0]);
-	PHYSFS_addToSearchPath("data.zip", 1);
-#else
+
+#ifndef NO_PHYSFS
+#ifndef ALLEGRO_MACOSX
 	ALLEGRO_PATH *exename = al_get_standard_path(ALLEGRO_EXENAME_PATH);
 #ifndef ALLEGRO_ANDROID
 	al_set_path_filename(exename, "data.zip");
@@ -1476,8 +1477,12 @@ bool init(int *argc, char **argv[])
 #endif
 	PHYSFS_addToSearchPath(al_path_cstr(exename, '/'), 1);
 	al_destroy_path(exename);
+#else
+	PHYSFS_init(myArgv[0]);
+	PHYSFS_addToSearchPath("data.zip", 1);
 #endif
 	al_set_physfs_file_interface();
+#endif
 
 	// Set an icon
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_MACOSX && !defined ALLEGRO_ANDROID
@@ -1909,7 +1914,9 @@ void destroy()
 
 	destroy_translation();
 
+#ifndef NO_PHYSFS
 	PHYSFS_deinit();
+#endif
 
 	inited = false;
 }

@@ -79,8 +79,8 @@ static std::string preloaded_names[] = {
 	""
 };
 
+#ifdef NO_PHYSFS
 BASS_FILEPROCS fileprocs;
-BASS_FILEPROCS physfs_fileprocs;
 
 static void CALLBACK my_close(void *user)
 {
@@ -106,6 +106,9 @@ static BOOL CALLBACK my_seek(QWORD offset, void *user)
 	return b;
 }
 
+#else
+BASS_FILEPROCS physfs_fileprocs;
+
 static void CALLBACK physfs_my_close(void *user)
 {
 	PHYSFS_File *f = (PHYSFS_File *)user;
@@ -129,6 +132,7 @@ static BOOL CALLBACK physfs_my_seek(QWORD offset, void *user)
 	bool ret = PHYSFS_seek(f, offset);
 	return ret;
 }
+#endif
 
 void initSound(void)
 {
@@ -138,15 +142,17 @@ void initSound(void)
 		total_samples++;
 	}
 
+#ifdef NO_PHYSFS
 	fileprocs.close = my_close;
 	fileprocs.length = my_len;
 	fileprocs.read = my_read;
 	fileprocs.seek = my_seek;
-
+#else
 	physfs_fileprocs.close = physfs_my_close;
 	physfs_fileprocs.length = physfs_my_len;
 	physfs_fileprocs.read = physfs_my_read;
 	physfs_fileprocs.seek = physfs_my_seek;
+#endif
 
 #ifdef ALLEGRO_RASPBERRYPI
 	BASS_SetConfig(BASS_CONFIG_DEV_BUFFER, 250);
@@ -384,26 +390,23 @@ void playMusic(std::string name, float vol, bool force)
 	bool is_flac;
 	name = check_music_name(name, &is_flac);
 
-	if (is_flac) {
-		al_set_standard_file_interface();
-		ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
-		al_set_physfs_file_interface();
-		music = BASS_StreamCreateFileUser(
-			STREAMFILE_NOBUFFER,
-			BASS_SAMPLE_LOOP,
-			&fileprocs,
-			(void *)f
-		);
-	}
-	else {
-		PHYSFS_File *f = PHYSFS_openRead(name.c_str());
-		music = BASS_StreamCreateFileUser(
-			STREAMFILE_NOBUFFER,
-			BASS_SAMPLE_LOOP,
-			&physfs_fileprocs,
-			(void *)f
-		);
-	}
+#ifdef NO_PHYSFS
+	ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
+	music = BASS_StreamCreateFileUser(
+		STREAMFILE_NOBUFFER,
+		BASS_SAMPLE_LOOP,
+		&fileprocs,
+		(void *)f
+	);
+#else
+	PHYSFS_File *f = PHYSFS_openRead(name.c_str());
+	music = BASS_StreamCreateFileUser(
+		STREAMFILE_NOBUFFER,
+		BASS_SAMPLE_LOOP,
+		&physfs_fileprocs,
+		(void *)f
+	);
+#endif
 	
 	if (music == 0) {
 	   native_error("Load error.", name.c_str());
@@ -448,27 +451,24 @@ void playAmbience(std::string name, float vol)
 	bool is_flac;
 	name = check_music_name(name, &is_flac);
 
-	if (is_flac) {
-		al_set_standard_file_interface();
-		ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
-		al_set_physfs_file_interface();
-		ambience = BASS_StreamCreateFileUser(
-			STREAMFILE_NOBUFFER,
-			BASS_SAMPLE_LOOP,
-			&fileprocs,
-			(void *)f
-		);
-	}
-	else {
-		PHYSFS_File *f = PHYSFS_openRead(name.c_str());
-		ambience = BASS_StreamCreateFileUser(
-			STREAMFILE_NOBUFFER,
-			BASS_SAMPLE_LOOP,
-			&physfs_fileprocs,
-			(void *)f
-		);
-	}
-	
+#ifdef NO_PHYSFS
+	ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
+	ambience = BASS_StreamCreateFileUser(
+		STREAMFILE_NOBUFFER,
+		BASS_SAMPLE_LOOP,
+		&fileprocs,
+		(void *)f
+	);
+#else
+	PHYSFS_File *f = PHYSFS_openRead(name.c_str());
+	ambience = BASS_StreamCreateFileUser(
+		STREAMFILE_NOBUFFER,
+		BASS_SAMPLE_LOOP,
+		&physfs_fileprocs,
+		(void *)f
+	);
+#endif
+
 	if (ambience == 0) {
 		native_error("Load error.", name.c_str());
 	}
@@ -556,27 +556,24 @@ MSAMPLE streamSample(std::string name, float vol)
 	bool is_flac;
 	name = check_music_name(name, &is_flac);
 
-	if (is_flac) {
-		al_set_standard_file_interface();
-		ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
-		al_set_physfs_file_interface();
-		samp = BASS_StreamCreateFileUser(
-			STREAMFILE_NOBUFFER,
-			BASS_SAMPLE_LOOP,
-			&fileprocs,
-			(void *)f
-		);
-	}
-	else {
-		PHYSFS_File *f = PHYSFS_openRead(name.c_str());
-		samp = BASS_StreamCreateFileUser(
-			STREAMFILE_NOBUFFER,
-			BASS_SAMPLE_LOOP,
-			&physfs_fileprocs,
-			(void *)f
-		);
-	}
-	
+#ifdef NO_PHYSFS
+	ALLEGRO_FILE *f = al_fopen(name.c_str(), "rb");
+	samp = BASS_StreamCreateFileUser(
+		STREAMFILE_NOBUFFER,
+		BASS_SAMPLE_LOOP,
+		&fileprocs,
+		(void *)f
+	);
+#else
+	PHYSFS_File *f = PHYSFS_openRead(name.c_str());
+	samp = BASS_StreamCreateFileUser(
+		STREAMFILE_NOBUFFER,
+		BASS_SAMPLE_LOOP,
+		&physfs_fileprocs,
+		(void *)f
+	);
+#endif
+
 	if (samp == 0) {
 	   native_error("Load error.", name.c_str());
 	}

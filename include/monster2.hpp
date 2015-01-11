@@ -45,8 +45,10 @@
 #include <allegro5/allegro_native_dialog.h>
 #endif
 #include <allegro5/allegro_memfile.h>
+#ifndef NO_PHYSFS
 #include <allegro5/allegro_physfs.h>
 #include <physfs.h>
+#endif
 
 #include "user_events.h"
 

@@ -308,9 +308,13 @@ void showSaveStateInfo(const char *basename)
 	int x = (BW-w)/2;
 	int y = (BH-h)/2;
 
+#ifndef NO_PHYSFS
 	al_set_standard_file_interface();
+#endif
 	ALLEGRO_BITMAP *ss = al_load_bitmap(getUserResource("%s.bmp", basename));
+#ifndef NO_PHYSFS
 	al_set_physfs_file_interface();
+#endif
 
 	char d[100];
 	strcpy(d, file_date(getUserResource("%s.save", basename)));
@@ -786,9 +790,13 @@ static bool choose_save_slot(int num, bool exists, void *data)
 			if (prompt("Overwrite?", "", 0, 0)) {
 				saveGame(getUserResource("%d.save", num), map_name);
 				if (screenshot) {
+#ifndef NO_PHYSFS
 					al_set_standard_file_interface();
+#endif
 					al_save_bitmap(getUserResource("%d.bmp", num), screenshot->bitmap);
+#ifndef NO_PHYSFS
 					al_set_physfs_file_interface();
+#endif
 				}
 				else {
 					delete_file(getUserResource("%d.bmp", num));
@@ -803,9 +811,13 @@ static bool choose_save_slot(int num, bool exists, void *data)
 		else {
 			saveGame(getUserResource("%d.save", num), map_name);
 			if (screenshot) {
+#ifndef NO_PHYSFS
 				al_set_standard_file_interface();
+#endif
 				al_save_bitmap(getUserResource("%d.bmp", num), screenshot->bitmap);
+#ifndef NO_PHYSFS
 				al_set_physfs_file_interface();
+#endif
 			}
 			else {
 				delete_file(getUserResource("%d.png", num));
@@ -3219,10 +3231,14 @@ static bool choose_copy_state(int n, bool exists, void *data)
 
 	if (n >= 0) {
 		if (exists) {
+#ifndef NO_PHYSFS
 			al_set_standard_file_interface();
+#endif
 			int sz;
 			unsigned char *bytes = slurp_file(getUserResource("%d.save", n), &sz);
+#ifndef NO_PHYSFS
 			al_set_physfs_file_interface();
+#endif
 			char *encoded = create_url(bytes, sz);
 			set_clipboard(encoded);
 			notify("", "Save state copied.", "");

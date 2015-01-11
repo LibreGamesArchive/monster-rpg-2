@@ -207,9 +207,13 @@ void playMusic(std::string name, float vol, bool force)
 	name = check_music_name(name, &is_flac);
 
 	if (is_flac) {
+#ifndef NO_PHYSFS
 		al_set_standard_file_interface();
+#endif
 		music = al_load_audio_stream(name.c_str(), 4, 2048);
+#ifndef NO_PHYSFS
 		al_set_physfs_file_interface();
+#endif
 	}
 	else {
 		music = al_load_audio_stream(name.c_str(), 4, 2048);

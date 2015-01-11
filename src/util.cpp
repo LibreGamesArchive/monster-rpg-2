@@ -108,7 +108,7 @@ const char *getResource(const char *fmt, ...)
 	va_list ap;
 	static char name[MAX_PATH];
 
-#ifndef ALLEGRO_ANDROID
+#if !defined ALLEGRO_ANDROID
 	strcpy(name, "data/");
 #else
 	strcpy(name, "assets/data/");
