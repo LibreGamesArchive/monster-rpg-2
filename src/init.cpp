@@ -5,6 +5,10 @@
 #include "monster2.hpp"
 
 #ifdef ALLEGRO_IPHONE
+#import <UIKit/UIKit.h>
+#endif
+
+#ifdef ALLEGRO_IPHONE
 extern "C" {
 #include <allegro5/allegro_iphone_objc.h>
 }
@@ -23,10 +27,6 @@ extern "C" {
 void create_tmpbuffer()
 {
 	int flags = al_get_new_bitmap_flags();
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_RASPBERRYPI
-	int format = al_get_new_bitmap_format();
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
-#endif
 	al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
 	int w = al_get_display_width(display);
 	int h = al_get_display_height(display);
@@ -34,9 +34,6 @@ void create_tmpbuffer()
 		w, h
 	);
 	al_set_new_bitmap_flags(flags);
-#if defined ALLEGRO_IPHONE
-	al_set_new_bitmap_format(format);
-#endif
 }
 
 #ifdef ALLEGRO_ANDROID
@@ -174,7 +171,6 @@ float screen_ratio_x, screen_ratio_y;
 #ifdef ALLEGRO_IPHONE
 double allegro_iphone_shaken = 0;
 #endif
-bool sound_was_playing_at_program_start;
 ALLEGRO_DISPLAY *display = 0;
 ALLEGRO_COND *wait_cond;
 ALLEGRO_MUTEX *wait_mutex;
@@ -578,17 +574,6 @@ static void *loader_proc(void *arg)
 	debug_message("Input initialized.\n");
 
 	show_progress(85);
-
-#ifdef ALLEGRO_IPHONE
-	if (iPodIsPlaying()) {
-		config.setMusicVolume(0);
-		setMusicVolume(1);
-	}
-#endif
-
-#ifdef ALLEGRO_IPHONE
-	sound_was_playing_at_program_start = iPodIsPlaying();
-#endif
 
 	// load terrain file
 
@@ -1230,6 +1215,7 @@ bool init(int *argc, char **argv[])
 		exit(1);
 	}
 
+#if !defined ALLEGRO_IPHONE
 	if (al_install_joystick()) {
 		set_user_joystick();
 		if (user_joystick != NULL) {
@@ -1242,6 +1228,7 @@ bool init(int *argc, char **argv[])
 	else {
 		config.setGamepadAvailable(false);
 	}
+#endif
 
 #if !defined ALLEGRO_IPHONE
 	for (int i = 0; i < 10; i++) {
@@ -1904,9 +1891,6 @@ void destroy()
 	al_destroy_mutex(input_mutex);
 	al_destroy_mutex(dpad_mutex);
 	al_destroy_mutex(touch_mutex);
-#ifdef ALLEGRO_IPHONE
-	shutdownIpod();
-#endif
 
 	al_destroy_mutex(input_event_mutex);
 

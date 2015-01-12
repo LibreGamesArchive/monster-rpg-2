@@ -7,15 +7,6 @@ extern "C" {
 
 void addImageView();
 void removeImageView();
-void showIpod();
-void shutdownIpod();
-bool iPodIsPlaying();
-void iPodPrevious();
-void iPodNext();
-void iPodPlay();
-void iPodPause();
-void iPodStop();
-bool isIpodPresented();
 bool get_clipboard(char *buf, int len);
 void set_clipboard(char *buf);
 float getBatteryLevel();

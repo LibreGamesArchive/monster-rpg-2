@@ -85,7 +85,9 @@ ALLEGRO_DEBUG_CHANNEL("morpg2")
 #include <zlib.h>
 
 #if !defined KCM_AUDIO
+#ifndef NO_BASS
 #include <bass.h>
+#endif
 #endif
 #include "sound.hpp"
 

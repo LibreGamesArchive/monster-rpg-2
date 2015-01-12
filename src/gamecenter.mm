@@ -1,4 +1,10 @@
+#include <allegro5/allegro.h>
+
+#ifdef ALLEGRO_IPHONE
+#import <UIKit/UIKit.h>
+#else
 #import <AppKit/AppKit.h>
+#endif
 
 // Game Center stuff
 #define NOSOUND
@@ -19,7 +25,7 @@ int is_authenticated = NOTYET;
 NSMutableDictionary *achievementsDictionary;
 #endif
 
-BOOL isGameCenterAPIAvailable()
+bool isGameCenterAPIAvailable()
 {
 #ifdef NO_GAMECENTER
 	return FALSE;

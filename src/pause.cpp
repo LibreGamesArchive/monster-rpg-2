@@ -119,164 +119,6 @@ static std::string getTimeString(uint32_t runtime)
 	return std::string(s);
 }
 
-#ifdef ALLEGRO_IPHONE
-static void showIpodControls(void)
-{
-	tguiPush();
-
-	MFrame *frame = new MFrame(SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE,
-		BW-SHADOW_CORNER_SIZE*2, BH-SHADOW_CORNER_SIZE*2);
-
-	int y = SHADOW_CORNER_SIZE+8;
-	
-	std::vector<std::string> toggle_choices;
-	toggle_choices.push_back("{027} Sound on");
-	toggle_choices.push_back("{027} SFX only");
-	toggle_choices.push_back("{027} Silence");
-	MSingleToggle *sound_toggle = new MSingleToggle(SHADOW_CORNER_SIZE+8, y, toggle_choices, false);
-	bool music_on = config.getMusicVolume();
-	bool sound_on = config.getSFXVolume();
-	if (music_on && sound_on) sound_toggle->setSelected(0);
-	else if (sound_on) sound_toggle->setSelected(1);
-	else sound_toggle->setSelected(2);
-
-	MIcon *prevIcon = new MIcon(74, 65, std::string(getResource("media/prevIcon.png")), m_map_rgb(255, 255, 255), true);
-
-	std::string playOrPause;
-
-	if (iPodIsPlaying()) {
-		playOrPause = std::string(getResource("media/pauseIcon.png"));
-	}
-	else {
-		playOrPause = std::string(getResource("media/playIcon.png"));
-	}
-
-	MIcon *playIcon = new MIcon(108, 65, playOrPause, m_map_rgb(255, 255, 255), true);
-	MIcon *nextIcon = new MIcon(143, 65, std::string(getResource("media/nextIcon.png")), m_map_rgb(255, 255, 255), true);
-
-	MTextButton *chooseButton = new MTextButton(90, 105, "Choose Songs");
-	
-	tguiSetParent(0);
-	tguiAddWidget(frame);
-	tguiSetParent(frame);
-	tguiAddWidget(sound_toggle);
-	tguiAddWidget(prevIcon);
-	tguiAddWidget(playIcon);
-	tguiAddWidget(nextIcon);
-	tguiAddWidget(chooseButton);
-	tguiSetFocus(sound_toggle);
-	
-	std::string startAmbienceName = ambienceName;
-
-	clear_input_events();
-
-	for (;;) {
-		al_wait_cond(wait_cond, wait_mutex);
-		// Logic
-		int tmp_counter = logic_counter;
-		logic_counter = 0;
-		if (tmp_counter > 10)
-			tmp_counter = 1;
-		while  (tmp_counter > 0) {
-			next_input_event_ready = true;
-
-			tmp_counter--;
-			if (is_close_pressed()) {
-				do_close();
-				close_pressed = false;
-			}
-			if (break_main_loop) {
-				goto done;
-			}
-		
-			int sel = sound_toggle->getSelected();
-			if (sel == 0) {
-				ambienceName = startAmbienceName;
-				config.setMusicVolume(255);
-				config.setSFXVolume(255);
-				setMusicVolume(1);
-			}
-			else if (sel == 1) {
-				config.setMusicVolume(0);
-				config.setSFXVolume(255);
-				setMusicVolume(1);
-			}
-			else {
-				config.setMusicVolume(0);
-				config.setSFXVolume(0);
-				setMusicVolume(1);
-			}
-
-			INPUT_EVENT ie = get_next_input_event();
-
-			if (ie.button2 == DOWN || iphone_shaken(0.1)) {
-				use_input_event();
-				playPreloadedSample("select.ogg");
-				iphone_clear_shaken();
-				goto done;
-			}
-
-			if (iPodIsPlaying()) {
-				playIcon->setBitmap(
-					std::string(getResource("media/pauseIcon.png"))
-				);
-			}
-			else {
-				playIcon->setBitmap(
-					std::string(getResource("media/playIcon.png"))
-				);
-			}
-
-			// update gui
-			TGUIWidget *widget = tguiUpdate();
-			if (!widget) {
-				continue;
-			}
-
-			if (widget == prevIcon) {
-				iPodPrevious();
-			}
-			if (widget == playIcon) {
-				if (iPodIsPlaying()) {
-					iPodPause();
-				}
-				else {
-					iPodPlay();
-				}
-			}
-			else if (widget == nextIcon) {
-				iPodNext();
-			}
-			else if (widget == chooseButton) {
-				getInput()->set(false, false, false, false, false, false, false);
-				showIpod();
-			}
-		}
-
-		if (draw_counter > 0) {
-			draw_counter = 0;
-			set_target_backbuffer();
-			m_clear(black);
-			tguiDraw();
-			drawBufferToScreen();
-			m_flip_display();
-		}
-	}
-done:
-	tguiDeleteWidget(frame);
-
-	delete frame;
-	delete sound_toggle;
-	delete prevIcon;
-	delete playIcon;
-	delete nextIcon;
-	delete chooseButton;
-
-	tguiPop();
-}
-#endif
-
-
 static void maybeShowItemHelp(void)
 {
 	// Give help message the first time
@@ -990,10 +832,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	yy += yinc;
 	MTextButton *mainResume = new MTextButton(162, yy, "Play", false, left_widget, NULL, false);
 
-#if defined ALLEGRO_IPHONE
-	MTextButton *mainMusic = new MTextButton(162, yy, "Music", false, left_widget, NULL, false);
-	yy += yinc;
-#elif defined ALLEGRO_ANDROID
+#if defined ALLEGRO_ANDROID || defined ALLEGRO_IPHONE
 	MTextButton *mainMusic = new MTextButton(162, yy, "Options", false, left_widget, NULL, false);
 	yy += yinc;
 #endif
@@ -1071,7 +910,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 	tguiAddWidget(mainStats);
 	tguiAddWidget(mainSave);
 #ifdef ALLEGRO_IPHONE
-#ifdef DEBUG
+#ifdef DEBUG_XXX
 	tguiAddWidget(mainLevelUp);
 #endif
 #endif
@@ -1499,11 +1338,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			else if (widget == mainMusic) {
 				getInput()->set(false, false, false, false, false, false, false);
-#if defined ALLEGRO_IPHONE
-				showIpodControls();
-#elif defined ALLEGRO_ANDROID
 				config_menu(false);
-#endif
 				tguiSetFocus(mainMusic);
 				section = MAIN;
 			}
@@ -1679,6 +1514,9 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				showAchievements();
 				al_start_timer(logic_timer);
 				al_start_timer(draw_timer);
+#ifdef ALLEGRO_IPHONE
+				switchiOSKeyboardIn();
+#endif
 			}
 #endif
 
@@ -4254,7 +4092,7 @@ done:
 	return selected;
 }
 
-#ifdef DEBUG
+#ifdef DEBUG_XXX
 class MNumGetter : public TGUIWidget {
 public:
 	void draw(void)

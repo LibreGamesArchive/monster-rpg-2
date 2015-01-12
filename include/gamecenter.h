@@ -35,7 +35,7 @@
 #define MS_SUN_SCENE_176 @"grp.M2.0030"
 #define MS_DONE_CREDITS_177 @"grp.M2.0031"
 
-BOOL isGameCenterAPIAvailable();
+bool isGameCenterAPIAvailable();
 void authenticatePlayer(void);
 void resetAchievements(void);
 void do_milestone(int num, bool visual);

@@ -1076,13 +1076,7 @@ top:
 				break_shooter_pause = true;
 			}
 			save_auto_save_to_disk();
-#if defined ALLEGRO_IPHONE
-			if (!isMultitaskingSupported()) {
-				if (!sound_was_playing_at_program_start)
-					iPodStop();
-				exit(0);
-			}
-#elif defined ALLEGRO_ANDROID
+#if defined ALLEGRO_ANDROID
 			int cx, cy, cw, ch;
 			al_get_clipping_rectangle(&cx, &cy, &cw, &ch);
 			
@@ -1158,21 +1152,6 @@ top:
 
 		if (ALLEGRO_EVENT_TYPE_IS_USER(event.type)) {
 			al_unref_user_event((ALLEGRO_USER_EVENT *)&event);
-		}
-#endif
-
-/* FIXME: This doesn't work with the iCade code! */
-#ifdef ALLEGRO_IPHONE_XXX
-		double shake = al_iphone_get_last_shake_time();
-		if (shake > allegro_iphone_shaken) {
-			allegro_iphone_shaken = shake;
-			if (config.getShakeAction() == CFG_SHAKE_CHANGE_SONG) {
-				iPodNext();
-			}
-			else if (al_current_time() > next_shake) {
-				iphone_shake_time = al_current_time();
-				next_shake = al_current_time()+0.5;
-			}
 		}
 #endif
 
@@ -1269,8 +1248,6 @@ top:
 			
 		if ((((event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == USER_KEY_DOWN) && event.keyboard.keycode == config.getKeyQuit() && !getting_input_config) || event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) && !shooter_paused) {
 #ifdef ALLEGRO_IPHONE
-			if (!sound_was_playing_at_program_start)
-				iPodStop();
 			if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
 				forced_closed = true;
 			}

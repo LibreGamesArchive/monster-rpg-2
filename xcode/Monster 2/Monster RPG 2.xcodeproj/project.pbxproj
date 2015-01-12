@@ -142,13 +142,11 @@
 		96798ACB17C36945009EDBD9 /* Default-Portrait@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 96798ACA17C36945009EDBD9 /* Default-Portrait@2x~ipad.png */; };
 		96798ACD17C36957009EDBD9 /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 96798ACC17C36957009EDBD9 /* Default-Landscape~ipad.png */; };
 		96798ACF17C36961009EDBD9 /* Default-Landscape@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 96798ACE17C36961009EDBD9 /* Default-Landscape@2x~ipad.png */; };
-		968C1E5B13BBB51D00615225 /* libbass.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 968C1E5A13BBB51D00615225 /* libbass.a */; };
 		968C1E7A13BCED5E00615225 /* libbassflac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 968C1E7913BCED5D00615225 /* libbassflac.a */; };
 		968D3EFE15CAD4FE0080197D /* libjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96CB82621596A89100AD6979 /* libjpeg.a */; };
 		968D3F8B15CAE0EE0080197D /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 968D3F8A15CAE0EE0080197D /* libcurl.a */; };
 		9691EA87154AF63800927975 /* libbassflac.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0CF143BBA8400ACA64C /* libbassflac.dylib */; };
 		9692632116CC7BFF00E09689 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9692632016CC7BFF00E09689 /* icon.icns */; };
-		9695A140138D706500FB0417 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9695A133138D706400FB0417 /* libfreetype.a */; };
 		9697997B1587A59E006E8AFA /* libbassflac.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 969799791587A59E006E8AFA /* libbassflac.dylib */; };
 		9697997C1587B21C006E8AFA /* libbass.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B4B0CE143BBA8400ACA64C /* libbass.dylib */; };
 		969A9E3D16083E3000F4DBE2 /* ftpget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 969A9E3C16083E3000F4DBE2 /* ftpget.cpp */; };
@@ -498,19 +496,10 @@
 		96798ACE17C36961009EDBD9 /* Default-Landscape@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape@2x~ipad.png"; sourceTree = "<group>"; };
 		967C33D715CC4AC7003FD960 /* icon144.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon144.png; sourceTree = "<group>"; };
 		967C33ED15CC56A0003FD960 /* libJoypadCocoaTouch.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libJoypadCocoaTouch.a; path = ../../../JoypadSDKs/Cocoa/iOS/JoypadiOS/libJoypadCocoaTouch.a; sourceTree = "<group>"; };
-		968C1E5A13BBB51D00615225 /* libbass.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbass.a; path = ../../../iphone_libs_r/libbass.a; sourceTree = "<group>"; };
 		968C1E5C13BBB55900615225 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		968C1E7913BCED5D00615225 /* libbassflac.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbassflac.a; path = ../../../iphone_libs_r/libbassflac.a; sourceTree = "<group>"; };
 		968D3F8A15CAE0EE0080197D /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcurl.a; path = ../../../local/lib/libcurl.a; sourceTree = "<group>"; };
 		9692632016CC7BFF00E09689 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = icon.icns; path = "../../mac-icons/icon.icns"; sourceTree = "<group>"; };
-		9695A12C138D706400FB0417 /* liballegro_font-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_font-static.a"; path = "../../../iphone_libs_r/liballegro_font-static.a"; sourceTree = "<group>"; };
-		9695A12D138D706400FB0417 /* liballegro_image-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_image-static.a"; path = "../../../iphone_libs_r/liballegro_image-static.a"; sourceTree = "<group>"; };
-		9695A12E138D706400FB0417 /* liballegro_main-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_main-static.a"; path = "../../../iphone_libs_r/liballegro_main-static.a"; sourceTree = "<group>"; };
-		9695A12F138D706400FB0417 /* liballegro_primitives-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_primitives-static.a"; path = "../../../iphone_libs_r/liballegro_primitives-static.a"; sourceTree = "<group>"; };
-		9695A130138D706400FB0417 /* liballegro_shader-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_shader-static.a"; path = "../../../iphone_libs_r/liballegro_shader-static.a"; sourceTree = "<group>"; };
-		9695A131138D706400FB0417 /* liballegro_ttf-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_ttf-static.a"; path = "../../../iphone_libs_r/liballegro_ttf-static.a"; sourceTree = "<group>"; };
-		9695A132138D706400FB0417 /* liballegro-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro-static.a"; path = "../../../iphone_libs_r/liballegro-static.a"; sourceTree = "<group>"; };
-		9695A133138D706400FB0417 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = ../../../iphone_libs_r/libfreetype.a; sourceTree = "<group>"; };
 		969799791587A59E006E8AFA /* libbassflac.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbassflac.dylib; path = ../../../local/lib/libbassflac.dylib; sourceTree = "<group>"; };
 		969A7CE7159F7293001BE047 /* libJoypadCocoa.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libJoypadCocoa.a; path = ../../../JoypadSDKs/Cocoa/Mac/JoypadMac/libJoypadCocoa.a; sourceTree = "<group>"; };
 		969A9E3C16083E3000F4DBE2 /* ftpget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ftpget.cpp; path = ../../src/ftpget.cpp; sourceTree = "<group>"; };
@@ -591,8 +580,6 @@
 				96A460A7151D836A001BC99C /* libAllegro.a in Frameworks */,
 				96B7D08613D09EF7004D7ED6 /* libz.a in Frameworks */,
 				968C1E7A13BCED5E00615225 /* libbassflac.a in Frameworks */,
-				968C1E5B13BBB51D00615225 /* libbass.a in Frameworks */,
-				9695A140138D706500FB0417 /* libfreetype.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -786,15 +773,6 @@
 				96B7D08413D09EF7004D7ED6 /* libz.a */,
 				968C1E7913BCED5D00615225 /* libbassflac.a */,
 				968C1E5C13BBB55900615225 /* CFNetwork.framework */,
-				968C1E5A13BBB51D00615225 /* libbass.a */,
-				9695A12C138D706400FB0417 /* liballegro_font-static.a */,
-				9695A12D138D706400FB0417 /* liballegro_image-static.a */,
-				9695A12E138D706400FB0417 /* liballegro_main-static.a */,
-				9695A12F138D706400FB0417 /* liballegro_primitives-static.a */,
-				9695A130138D706400FB0417 /* liballegro_shader-static.a */,
-				9695A131138D706400FB0417 /* liballegro_ttf-static.a */,
-				9695A132138D706400FB0417 /* liballegro-static.a */,
-				9695A133138D706400FB0417 /* libfreetype.a */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,

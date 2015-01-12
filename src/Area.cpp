@@ -1,3 +1,4 @@
+#define NO_BASS
 #include "monster2.hpp"
 #ifdef ALLEGRO_IPHONE
 #import <Foundation/Foundation.h>

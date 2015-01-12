@@ -4,7 +4,7 @@
 #if defined KCM_AUDIO
 typedef ALLEGRO_SAMPLE *MSAMPLE;
 typedef ALLEGRO_SAMPLE_ID MSAMPLE_ID;
-#elif defined ALLEGRO_ANDROID
+#elif defined ALLEGRO_ANDROID || defined NO_BASS
 typedef int MSAMPLE;
 typedef int MSAMPLE_ID;
 #else
