@@ -1269,7 +1269,7 @@ void volcano_scene(void)
 
 
 	ALLEGRO_TRANSFORM orig_proj;
-	al_copy_transform(&orig_proj, al_get_projection_transform(display));
+	al_copy_transform(&orig_proj, al_get_current_projection_transform());
 	ALLEGRO_TRANSFORM proj_transform, view_transform;
 
 	clear_input_events();

@@ -1106,92 +1106,31 @@ int WhirlpoolEffect::getLifetime(void)
 
 void WhirlpoolEffect::draw(void)
 {
+	ALLEGRO_TRANSFORM view_backup, t;
+	al_copy_transform(&view_backup, al_get_current_transform());
+
+	al_identity_transform(&t);
+	al_scale_transform_3d(&t, 1, 0.5f, 1);
+	al_use_transform(&t);
+
 	int dx, dy, dw, dh;
 	get_screen_offset_size(&dx, &dy, &dw, &dh);
 
 	int spx = target->getX();
 	int spy = target->getY();
 
-	int vpw = w*screenScaleX;
-	int vph = h*screenScaleY;
-	int vpx = dx + (spx*screenScaleX) - vpw/2;
+	int xx = dx + (spx * screenScaleX);
+	int yy = (dy + (spy * screenScaleY) - (8*screenScaleY)) * 2; // 8 == depth of water
 
-	int vpy;
-	float xx, yy, trans_z, scale;
-
-	/* 8 is the depth of the water! */
-#ifdef ALLEGRO_WINDOWS
-	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
-		vpy = (dy + (spy*screenScaleY) + vph/2 - (8*screenScaleY)) - vph;
-		xx = 0.0f;
-		yy = 0;
-		trans_z = -1.75f*2.0f;
-		scale = 2.0f;
-	}
-	else
-#endif
-	{
-		vpy = dy + (spy*screenScaleY) + vph/2 - (8*screenScaleY);
-		xx = 0.0f;
-		yy = 0.0f;
-		trans_z = -1.75f;
-		scale = 1.0f;
-	}
-
-	GLint vp[4];
-#ifdef ALLEGRO_WINDOWS
-	D3DVIEWPORT9 backup_vp;
-	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
-		al_get_d3d_device(display)->GetViewport(&backup_vp);
-		D3DVIEWPORT9 d3d_vp;
-		d3d_vp.X = vpx;
-		d3d_vp.Y = vpy;
-		d3d_vp.Width = vpw;
-		d3d_vp.Height = vph;
-		d3d_vp.MinZ = 0;
-		d3d_vp.MaxZ = 1;
-		al_get_d3d_device(display)->SetViewport(&d3d_vp);
-	}
-	else
-#endif
-	{
-		glGetIntegerv(GL_VIEWPORT, vp);
-		glViewport(vpx, al_get_display_height(display)-vpy, vpw, vph);
-	}
-
-	ALLEGRO_TRANSFORM proj_backup, view_backup, t;
-	al_copy_transform(&proj_backup, al_get_current_projection_transform());
-	al_copy_transform(&view_backup, al_get_current_transform());
-
-	al_identity_transform(&t);
-
-	al_use_transform(&t);
-
-	al_rotate_transform_3d(&t, 1, 0, 0, D2R(1));
-	al_scale_transform_3d(&t, 1*scale, 0.5f*scale, 1);
-	al_translate_transform_3d(&t, 0, 0, trans_z);
-	al_perspective_transform(&t, -w/2, -h/2, 1, w/2, h/2, 1000);
-	al_use_projection_transform(&t);
-
-	al_draw_rotated_bitmap(
+	al_draw_scaled_rotated_bitmap(
 		spiral->bitmap,
 		w/2, h/2,
 		xx, yy,
+		screenScaleX/2, screenScaleY/2,
 		angle, 0
 	);
 
-	al_use_projection_transform(&proj_backup);
 	al_use_transform(&view_backup);
-
-#ifdef ALLEGRO_WINDOWS
-	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {
-		al_get_d3d_device(display)->SetViewport(&backup_vp);
-	}
-	else
-#endif
-	{
-		glViewport(vp[0], vp[1], vp[2], vp[3]);
-	}
 }
 
 
