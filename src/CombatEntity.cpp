@@ -1160,7 +1160,7 @@ void WhirlpoolEffect::draw(void)
 	}
 
 	ALLEGRO_TRANSFORM proj_backup, view_backup, t;
-	al_copy_transform(&proj_backup, al_get_projection_transform(display));
+	al_copy_transform(&proj_backup, al_get_current_projection_transform());
 	al_copy_transform(&view_backup, al_get_current_transform());
 
 	al_identity_transform(&t);
@@ -1171,7 +1171,7 @@ void WhirlpoolEffect::draw(void)
 	al_scale_transform_3d(&t, 1*scale, 0.5f*scale, 1);
 	al_translate_transform_3d(&t, 0, 0, trans_z);
 	al_perspective_transform(&t, -w/2, -h/2, 1, w/2, h/2, 1000);
-	al_set_projection_transform(display, &t);
+	al_use_projection_transform(&t);
 
 	al_draw_rotated_bitmap(
 		spiral->bitmap,
@@ -1180,7 +1180,7 @@ void WhirlpoolEffect::draw(void)
 		angle, 0
 	);
 
-	al_set_projection_transform(display, &proj_backup);
+	al_use_projection_transform(&proj_backup);
 	al_use_transform(&view_backup);
 
 #ifdef ALLEGRO_WINDOWS

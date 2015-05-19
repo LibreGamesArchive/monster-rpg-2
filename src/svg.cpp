@@ -125,14 +125,14 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 
 	if (multisample) {
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined A5_D3D && !defined ALLEGRO_RASPBERRYPI
-		al_copy_transform(&old_proj_transform, al_get_projection_transform(al_get_current_display()));
+		al_copy_transform(&old_proj_transform, al_get_current_projection_transform());
 		al_copy_transform(&old_view_transform, al_get_current_transform());
 
 		ALLEGRO_TRANSFORM t;
 
 		al_identity_transform(&t);
 		al_orthographic_transform(&t, 0, 0, -1, diagram_w, diagram_h, 1);
-		al_set_projection_transform(al_get_current_display(), &t);
+		al_use_projection_transform(&t);
 
 		al_identity_transform(&t);
 		al_scale_transform(&t, scale, scale);
@@ -161,7 +161,7 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 	else {
 		al_set_target_backbuffer(al_get_current_display());
 
-		al_copy_transform(&old_proj_transform, al_get_projection_transform(al_get_current_display()));
+		al_copy_transform(&old_proj_transform, al_get_current_projection_transform());
 		al_copy_transform(&old_view_transform, al_get_current_transform());
 
 		al_clear_to_color(al_map_rgba_f(0, 0, 0, 0));
@@ -384,11 +384,11 @@ ALLEGRO_BITMAP *load_svg(const char *filename, float scale)
 
 	if (multisample) {
 		al_set_target_bitmap(old_target);
-		al_set_projection_transform(al_get_current_display(), &old_proj_transform);
+		al_use_projection_transform(&old_proj_transform);
 		al_use_transform(&old_view_transform);
 	}
 	else {
-		al_set_projection_transform(al_get_current_display(), &old_proj_transform);
+		al_use_projection_transform(&old_proj_transform);
 		al_use_transform(&old_view_transform);
 		al_set_target_bitmap(old_target);
 	}

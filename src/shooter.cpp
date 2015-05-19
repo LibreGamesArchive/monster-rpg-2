@@ -519,7 +519,7 @@ static void draw(double cx, double cy, bool draw_objects = true)
 	ALLEGRO_TRANSFORM proj_push, view_push;
 	ALLEGRO_TRANSFORM proj, view;
 
-	al_copy_transform(&proj_push, al_get_projection_transform(display));
+	al_copy_transform(&proj_push, al_get_current_projection_transform());
 	al_copy_transform(&view_push, al_get_current_transform());
 
 	int dx, dy, dw, dh;
@@ -533,7 +533,7 @@ static void draw(double cx, double cy, bool draw_objects = true)
 	al_translate_transform_3d(&proj, 0, 137, -1);
 	al_scale_transform_3d(&proj, 4, 2, 1);
 	al_perspective_transform(&proj, -BW/2, -BH/2, 1, BW/2, BH/2, 1000);
-	al_set_projection_transform(display, &proj);
+	al_use_projection_transform(&proj);
 
 	GLint vp[4];
 #ifdef ALLEGRO_WINDOWS
@@ -562,7 +562,7 @@ static void draw(double cx, double cy, bool draw_objects = true)
 	m_draw_bitmap(btop, x, y, 0);
 	m_draw_bitmap(bbot, x, y+1024, 0);
 
-	al_set_projection_transform(display, &proj_push);
+	al_use_projection_transform(&proj_push);
 	al_use_transform(&view_push);
 	
 #ifdef ALLEGRO_WINDOWS

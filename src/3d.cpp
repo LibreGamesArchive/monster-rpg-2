@@ -459,7 +459,7 @@ void set_projection(float neer, float farr, bool reverse_y, bool rotate)
 	al_identity_transform(&t);
 	/* Not really sure why ymin/ymax are swapped here */
 	al_perspective_transform(&t, xmin, ymax, neer, xmax, ymin, farr);
-	al_set_projection_transform(display, &t);
+	al_use_projection_transform(&t);
 }
 
 float goblin_speed;
@@ -909,7 +909,7 @@ static int real_archery(int *accuracy_pts)
 			ALLEGRO_TRANSFORM view_push;
 			ALLEGRO_TRANSFORM view_transform;
 			al_copy_transform(&view_push, al_get_current_transform());
-			al_copy_transform(&proj_push, al_get_projection_transform(display));
+			al_copy_transform(&proj_push, al_get_current_projection_transform());
 
 			set_projection(1, 1000);
 
@@ -951,7 +951,7 @@ static int real_archery(int *accuracy_pts)
 
 
 			al_use_transform(&view_push);
-			al_set_projection_transform(display, &proj_push);
+			al_use_projection_transform(&proj_push);
 
 			drawBufferToScreen();
 
@@ -1381,12 +1381,12 @@ void volcano_scene(void)
 			clear_zbuffer();
 
 			ALLEGRO_TRANSFORM proj_push, view_push;
-			al_copy_transform(&proj_push, al_get_projection_transform(display));
+			al_copy_transform(&proj_push, al_get_current_projection_transform());
 			al_copy_transform(&view_push, al_get_current_transform());
 
 			al_identity_transform(&proj_transform);
 			al_perspective_transform(&proj_transform, -1, -(float)BH/BW, 1, 1, (float)BH/BW, 1000);
-			al_set_projection_transform(display, &proj_transform);
+			al_use_projection_transform(&proj_transform);
 			enable_zbuffer();
 			enable_cull_face(true);
 
@@ -1428,7 +1428,7 @@ void volcano_scene(void)
 			disable_cull_face();
 			disable_zbuffer();
 
-			al_set_projection_transform(display, &proj_push);
+			al_use_projection_transform(&proj_push);
 			al_use_transform(&view_push);
 			if (break_for_fade_after_draw) {
 				break;
@@ -1464,7 +1464,7 @@ done:
 
 	if (true /*use_programmable_pipeline*/)
 	{
-		al_set_projection_transform(display, &orig_proj);
+		al_use_projection_transform(&orig_proj);
 	}
 
 	dpad_on();
