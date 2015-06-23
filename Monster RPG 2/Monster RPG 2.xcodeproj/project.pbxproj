@@ -53,7 +53,6 @@
 		9660CEB61A636CC80064D34F /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9660CE871A636CC80064D34F /* util.cpp */; };
 		9660CEB71A636CC80064D34F /* widgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9660CE881A636CC80064D34F /* widgets.cpp */; };
 		9660CEB81A636CC80064D34F /* xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9660CE891A636CC80064D34F /* xml.cpp */; };
-		9660CEBE1A6374610064D34F /* libAllegro 5 iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9660CEB91A6374610064D34F /* libAllegro 5 iOS.a */; };
 		9660CEBF1A6374610064D34F /* libbass.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9660CEBA1A6374610064D34F /* libbass.a */; };
 		9660CEC01A6374610064D34F /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9660CEBB1A6374610064D34F /* libfreetype.a */; };
 		9660CEC11A6374610064D34F /* liblua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9660CEBC1A6374610064D34F /* liblua.a */; };
@@ -63,7 +62,8 @@
 		9660CEC81A6376640064D34F /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9660CEC71A6376640064D34F /* AVFoundation.framework */; };
 		969874D81A6377A200E0FD12 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9660CECD1A6377260064D34F /* Accelerate.framework */; };
 		969874DA1A63789700E0FD12 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 969874D91A63789700E0FD12 /* MobileCoreServices.framework */; };
-		969874DC1A637B2000E0FD12 /* data.zip in Resources */ = {isa = PBXBuildFile; fileRef = 969874DB1A637B2000E0FD12 /* data.zip */; };
+		96D35D151B398B12000B18FD /* data.zip in Resources */ = {isa = PBXBuildFile; fileRef = 969874DB1A637B2000E0FD12 /* data.zip */; };
+		96D35D171B398EE2000B18FD /* libAllegro5_iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96D35D161B398EE2000B18FD /* libAllegro5_iOS.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -128,6 +128,7 @@
 		9660CECD1A6377260064D34F /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		969874D91A63789700E0FD12 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		969874DB1A637B2000E0FD12 /* data.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; name = data.zip; path = ../data.zip; sourceTree = "<group>"; };
+		96D35D161B398EE2000B18FD /* libAllegro5_iOS.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAllegro5_iOS.a; path = ../../iphone_libs_r/lib/libAllegro5_iOS.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -135,12 +136,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96D35D171B398EE2000B18FD /* libAllegro5_iOS.a in Frameworks */,
 				969874DA1A63789700E0FD12 /* MobileCoreServices.framework in Frameworks */,
 				969874D81A6377A200E0FD12 /* Accelerate.framework in Frameworks */,
 				9660CEC81A6376640064D34F /* AVFoundation.framework in Frameworks */,
 				9660CEC51A6375F70064D34F /* AudioToolbox.framework in Frameworks */,
 				9660CEC61A6375F70064D34F /* libz.dylib in Frameworks */,
-				9660CEBE1A6374610064D34F /* libAllegro 5 iOS.a in Frameworks */,
 				9660CEBF1A6374610064D34F /* libbass.a in Frameworks */,
 				9660CEC01A6374610064D34F /* libfreetype.a in Frameworks */,
 				9660CEC11A6374610064D34F /* liblua.a in Frameworks */,
@@ -155,6 +156,7 @@
 		9660CE211A6369970064D34F = {
 			isa = PBXGroup;
 			children = (
+				96D35D161B398EE2000B18FD /* libAllegro5_iOS.a */,
 				969874DB1A637B2000E0FD12 /* data.zip */,
 				969874D91A63789700E0FD12 /* MobileCoreServices.framework */,
 				9660CECD1A6377260064D34F /* Accelerate.framework */,
@@ -306,8 +308,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96D35D151B398B12000B18FD /* data.zip in Resources */,
 				9660CE3F1A6369970064D34F /* Images.xcassets in Resources */,
-				969874DC1A637B2000E0FD12 /* data.zip in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -470,17 +472,17 @@
 				);
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Nooskewl";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Nooskewl";
 				INFOPLIST_FILE = "Monster RPG 2/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/trent/code/iphone_libs_r/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "e7ea98ea-dac7-4024-8c54-361ac9396ac4";
+				PROVISIONING_PROFILE = "1daa79cc-821f-4f3c-8a9f-f9a5521a214c";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -495,17 +497,17 @@
 				);
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Nooskewl";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Nooskewl";
 				INFOPLIST_FILE = "Monster RPG 2/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/trent/code/iphone_libs_r/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "e7ea98ea-dac7-4024-8c54-361ac9396ac4";
+				PROVISIONING_PROFILE = "1daa79cc-821f-4f3c-8a9f-f9a5521a214c";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

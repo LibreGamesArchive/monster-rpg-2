@@ -35,7 +35,8 @@ void set_clipboard(char *buf)
 
 float getBatteryLevel(void)
 {
-	return al_iphone_get_battery_level();
+	// this was removed from Allegro
+	return 1.0f;//al_iphone_get_battery_level();
 }
 
 bool isMultitaskingSupported(void)
