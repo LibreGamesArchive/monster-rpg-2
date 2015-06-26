@@ -1,4 +1,4 @@
-package com.nooskewl.monsterrpg2;
+package ca.nooskewl.monsterrpg2;
 
 import android.content.Context;
 import android.content.Intent;

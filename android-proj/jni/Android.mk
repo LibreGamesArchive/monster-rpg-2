@@ -11,61 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
+
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := liballegro-prebuilt
-LOCAL_SRC_FILES := ../libs/liballegro.so
-include $(PREBUILT_SHARED_LIBRARY)
-
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := liballegro_memfile-prebuilt
-LOCAL_SRC_FILES := ../libs/liballegro_memfile.so
-include $(PREBUILT_SHARED_LIBRARY)
-
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := liballegro_primitives-prebuilt
-LOCAL_SRC_FILES := ../libs/liballegro_primitives.so
-include $(PREBUILT_SHARED_LIBRARY)
-
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := liballegro_image-prebuilt
-LOCAL_SRC_FILES := ../libs/liballegro_image.so
-include $(PREBUILT_SHARED_LIBRARY)
-
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := liballegro_font-prebuilt
-LOCAL_SRC_FILES := ../libs/liballegro_font.so
-include $(PREBUILT_SHARED_LIBRARY)
-
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := liballegro_ttf-prebuilt
-LOCAL_SRC_FILES := ../libs/liballegro_ttf.so
-include $(PREBUILT_SHARED_LIBRARY)
-
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := liballegro_color-prebuilt
-LOCAL_SRC_FILES := ../libs/liballegro_color.so
-include $(PREBUILT_SHARED_LIBRARY)
-
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := liballegro_physfs-prebuilt
-LOCAL_SRC_FILES := ../libs/liballegro_physfs.so
+LOCAL_MODULE := liballegro_monolith-prebuilt
+LOCAL_SRC_FILES := ../${TARGET_ARCH_ABI}/liballegro_monolith.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := libbass-prebuilt
-LOCAL_SRC_FILES := ../libs/libbass.so
+LOCAL_SRC_FILES := ../${TARGET_ARCH_ABI}/libbass.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
@@ -117,10 +75,9 @@ LOCAL_SRC_FILES := \
 	../../src/init.cpp
 
 LOCAL_ARM_MODE := arm
-LOCAL_CFLAGS := -Wall -O2 -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/include -I../include
+LOCAL_CFLAGS := -Wall -O2 -I/Users/Trent/bin/android/$(TARGET_ARCH_ABI)/include -I../include
 
-LOCAL_SHARED_LIBRARIES := liballegro-prebuilt liballegro_memfile-prebuilt liballegro_primitives-prebuilt liballegro_image-prebuilt liballegro_font-prebuilt liballegro_ttf-prebuilt liballegro_color-prebuilt liballegro_physfs-prebuilt libbass-prebuilt
-LOCAL_LDLIBS := -L$(ANDROID_NDK_TOOLCHAIN_ROOT)/sysroot/usr/lib -llog -lGLESv1_CM -lstdc++ -lfreetype -lphysfs -lpng -lz -llua5.2
+LOCAL_SHARED_LIBRARIES := liballegro_monolith-prebuilt libbass-prebuilt
+LOCAL_LDLIBS := -L/Users/Trent/bin/android/$(TARGET_ARCH_ABI)/lib -llog -lGLESv1_CM -lstdc++ -lz -llua5.2
 
 include $(BUILD_SHARED_LIBRARY)
-
