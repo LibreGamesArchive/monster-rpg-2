@@ -29,4 +29,4 @@ Basic Process
 
 - To build for Windows, you'll need the prerequisites first. Then use CMake to generate a project (MSVC and MinGW should work but we use MSVC for official builds.)
 - data.zip needs to be created by zipping the data/ directory (you will have a data/ toplevel directory in the ZIP file)
-- You'll need to put the datafile with the EXE and BASS DLLs (if applicable) to run the game
+- You'll need to put the datafile with the EXE and BASS DLL (if applicable) to run the game
