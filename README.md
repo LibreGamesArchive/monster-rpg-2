@@ -1,7 +1,8 @@
+Monster RPG 2 is a JRPG by Nooskewl. The git history is incomplete. Sorry.
+
+
 Introduction
 ============
-
-Monster RPG 2 is a JRPG by Nooskewl. The git history is incomplete. Sorry.
 
 See http://nooskewl.ca/monster-rpg-2 for more info.
 
