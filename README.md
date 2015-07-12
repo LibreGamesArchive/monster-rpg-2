@@ -5,6 +5,7 @@ Monster RPG 2 is a JRPG by Nooskewl. The git history is incomplete. Sorry.
 
 See http://nooskewl.ca/monster-rpg-2 for more info.
 
+The code and data are zlib licensed. The files FamilyLicense.txt and FreewareLicense.txt refer to the binaries that we distribute and are not relevant to the code or any binaries you create. They only in the repo to make it easier when building releases.
 
 
 Building
