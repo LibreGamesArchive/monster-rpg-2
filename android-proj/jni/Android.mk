@@ -17,13 +17,13 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := liballegro_monolith-prebuilt
-LOCAL_SRC_FILES := ../${TARGET_ARCH_ABI}/liballegro_monolith.so
+LOCAL_SRC_FILES := ${TARGET_ARCH_ABI}/liballegro_monolith.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := libbass-prebuilt
-LOCAL_SRC_FILES := ../${TARGET_ARCH_ABI}/libbass.so
+LOCAL_SRC_FILES := ${TARGET_ARCH_ABI}/libbass.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
