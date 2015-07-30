@@ -1924,9 +1924,9 @@ int main(int argc, char *argv[])
 
 	bool fps_save = fps_on;
 	fps_on = false;
-	
+
 	prepareForScreenGrab1();
-	m_clear(black);
+	m_clear(m_map_rgb(0x00, 0xd8, 0xff));
 	m_draw_bitmap_identity_view(
 		nooskewl,
 		dx+dw/2-m_get_bitmap_width(nooskewl)/2,
@@ -1938,7 +1938,7 @@ int main(int argc, char *argv[])
 	bool cancelled = transitionIn(true, false);
 
 	if (!cancelled) {
-		m_clear(black);
+		m_clear(m_map_rgb(0x00, 0xd8, 0xff));
 		m_draw_bitmap_identity_view(
 			nooskewl,
 			dx+dw/2-m_get_bitmap_width(nooskewl)/2,
@@ -1952,7 +1952,7 @@ int main(int argc, char *argv[])
 					
 		m_rest(1.5);
 		prepareForScreenGrab1();
-		m_clear(black);
+		m_clear(m_map_rgb(0x00, 0xd8, 0xff));
 		m_draw_bitmap_identity_view(
 			nooskewl,
 			dx+dw/2-m_get_bitmap_width(nooskewl)/2,
