@@ -13,6 +13,7 @@
 
 bool in_archery = false;
 
+/*
 static void delete_vbos(MODEL *m)
 {
 	for (size_t i = 0; i < m->verts.size(); i++) {
@@ -20,6 +21,7 @@ static void delete_vbos(MODEL *m)
 	}
 	m->vbos.clear();
 }
+*/
 	
 MODEL::~MODEL() {
 	for (size_t i = 0; i < verts.size(); i++) {
@@ -66,6 +68,7 @@ struct FACE {
 	int n;
 };
 
+/*
 static void create_vbos(MODEL *m)
 {
 	for (size_t i = 0; i < m->verts.size(); i++) {
@@ -79,6 +82,7 @@ static void create_vbos(MODEL *m)
 		);
 	}
 }
+*/
 
 static MODEL *load_model2(const char *filename, MBITMAP *tex)
 {
