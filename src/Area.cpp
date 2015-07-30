@@ -1459,7 +1459,7 @@ void Area::update(int step)
 
 	if (!player_scripted && !battle && !manChooser
 			&& this == area && !speechDialog) {
-		if (!use_dpad && config.getAlwaysCenter() != PAN_CENTER && !dpad_panning) {
+		if (!use_dpad && !dpad_panning) {
 			if (!released && !down) {
 				down = true;
 				al_lock_mutex(click_mutex);
@@ -1478,7 +1478,7 @@ void Area::update(int step)
 				int cx = current_mouse_x;
 				int cy = current_mouse_y;
 				al_unlock_mutex(click_mutex);
-				if ((abs(cx-start_mx) > 5 || abs(cy-start_my) > 5) && cx >= 0 && !path_head) {
+				if ((abs(cx-start_mx) > 5 || abs(cy-start_my) > 5) && cx >= 0 && !path_head && config.getAlwaysCenter() != PAN_CENTER) {
 					// panning
 					area_panned_x += (start_mx - cx);
 					area_panned_y += (start_my - cy);
@@ -1499,7 +1499,7 @@ void Area::update(int step)
 					panned = true;
 					adjusted_pan = true;
 				}
-				if (released) {
+				if (released || config.getAlwaysCenter() == PAN_CENTER) {
 					down = false;
 					if (!panned) {
 						int tx = (start_mx + area->getOriginX()) / TILE_SIZE;
