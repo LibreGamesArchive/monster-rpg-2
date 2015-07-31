@@ -32,8 +32,8 @@ if(WIN32)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -fcheck-new -Wno-unknown-pragmas -Wno-comment -Wno-strict-aliasing")
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows")
 	else(MINGW)
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /D_USE_MATH_DEFINES /DALLEGRO_STATICLINK /EHsc /D_WIN32_WINNT=0x501")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D_USE_MATH_DEFINES /DALLEGRO_STATICLINK /EHsc /D_WIN32_WINNT=0x501")
+		set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS} /D_USE_MATH_DEFINES /DALLEGRO_STATICLINK /EHsc /D_WIN32_WINNT=0x501 /MT")
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} /D_USE_MATH_DEFINES /DALLEGRO_STATICLINK /EHsc /D_WIN32_WINNT=0x501 /MT")
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO /SUBSYSTEM:WINDOWS")
 	endif(MINGW)
 else(WIN32)
@@ -153,39 +153,41 @@ add_executable(monster2${M2_SUFFIX}
 )
 
 if(KCM_AUDIO)
-	if(RASPBERRYPI)
-		LIST(APPEND EXTRA_LIBS "allegro_audio${ALLEG_SUFFIX}" "allegro_acodec${ALLEG_SUFFIX}" "/usr/lib/arm-linux-gnueabihf/libFLAC.a" "/usr/lib/arm-linux-gnueabihf/libvorbisfile.a" "/usr/lib/arm-linux-gnueabihf/libvorbis.a" "/usr/lib/arm-linux-gnueabihf/libogg.a")
-	else()
+	if(NOT WIN32)
 		LIST(APPEND EXTRA_LIBS "allegro_audio${ALLEG_SUFFIX}" "allegro_acodec${ALLEG_SUFFIX}" "FLAC" "vorbisfile" "vorbis" "ogg")
 	endif()
 endif(KCM_AUDIO)
 
 
 if(WIN32)
-	set(ALLEGRO_MAIN_LIB "")
 	list(APPEND EXTRA_LIBS
 		"dxguid"
 		"dinput8"
 		"dsound"
 		"d3d9"
-		"kernel32"
-		"user32"
-		"gdi32"
-		"comdlg32"
-		"ole32"
-		"winmm"
-		"psapi"
-		"gdiplus"
-		"uuid"
-		"shlwapi"
-		"wsock32"
-		"ws2_32"
-		"freetype"
-		"physfs"
-		"z"
-		"lua5.2"
 		"d3dx9"
 		"opengl32"
+		"comdlg32"
+		"gdi32"
+		"gdiplus"
+		"kernel32"
+		"ole32"
+		"psapi"
+		"shlwapi"
+		"user32"
+		"uuid"
+		"winmm"
+		"lua5.2"
+		"dumb_static"
+		"FLAC_static"
+		"freetype_static"
+		"ogg_static"
+		"physfs_static"
+		"theoradec_static"
+		"vorbis_static"
+		"vorbisfile_static"
+		"zlibstatic"
+		"allegro_monolith-static"
 	)
 	if (MINGW)
 		set(ICON_OBJ ${CMAKE_SOURCE_DIR}/src/icon.res)
@@ -195,15 +197,6 @@ if(WIN32)
 	SET(MAIN_LIBS 
 		${ICON_OBJ}
 		mo2-engine
-		allegro_ttf${ALLEG_SUFFIX}
-		allegro_font${ALLEG_SUFFIX}
-		allegro_primitives${ALLEG_SUFFIX}
-		allegro_dialog${ALLEG_SUFFIX}
-		allegro_memfile${ALLEG_SUFFIX}
-		allegro_image${ALLEG_SUFFIX}
-		allegro_physfs${ALLEG_SUFFIX}
-		allegro${ALLEG_SUFFIX}
-		${ALLEGRO_MAIN_LIB}
 		${EXTRA_LIBS}
 	)
 	if(KCM_AUDIO)
