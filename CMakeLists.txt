@@ -148,7 +148,7 @@ add_library(mo2-engine
 	${COMMON_SRCS}
 )
 
-add_executable(monster2${M2_SUFFIX}
+add_executable(MonsterRPG2${M2_SUFFIX}
 	src/monster2.cpp
 )
 
@@ -272,7 +272,7 @@ endif(APPLE)
 endif(WIN32)
 
 target_link_libraries(
-	monster2${M2_SUFFIX}
+	MonsterRPG2${M2_SUFFIX}
 	${MAIN_LIBS}
 ) 
 
