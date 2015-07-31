@@ -1,6 +1,5 @@
-Various open source and commercial libraries are used by the game
-including Allegro, FreeType, Lua, libogg/libvorbis, PhysicsFS and
-zlib.
+Various open source libraries are used by the game including Allegro,
+FreeType, Lua, libogg/libvorbis, PhysicsFS and zlib.
 
 --
 
