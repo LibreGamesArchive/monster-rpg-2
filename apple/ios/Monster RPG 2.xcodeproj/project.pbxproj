@@ -1,0 +1,546 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9650E7F41B6B25090030C5EB /* 3d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7C41B6B25090030C5EB /* 3d.cpp */; };
+		9650E7F51B6B25090030C5EB /* Animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7C51B6B25090030C5EB /* Animation.cpp */; };
+		9650E7F61B6B25090030C5EB /* AnimationSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7C61B6B25090030C5EB /* AnimationSet.cpp */; };
+		9650E7F71B6B25090030C5EB /* Area.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7C71B6B25090030C5EB /* Area.cpp */; };
+		9650E7F81B6B25090030C5EB /* atlas_accessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7C81B6B25090030C5EB /* atlas_accessor.cpp */; };
+		9650E7F91B6B25090030C5EB /* atlas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7C91B6B25090030C5EB /* atlas.cpp */; };
+		9650E7FA1B6B25090030C5EB /* battle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7CA1B6B25090030C5EB /* battle.cpp */; };
+		9650E7FB1B6B25090030C5EB /* CombatActions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7CB1B6B25090030C5EB /* CombatActions.cpp */; };
+		9650E7FC1B6B25090030C5EB /* Combatant.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7CC1B6B25090030C5EB /* Combatant.cpp */; };
+		9650E7FD1B6B25090030C5EB /* CombatEnemy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7CD1B6B25090030C5EB /* CombatEnemy.cpp */; };
+		9650E7FE1B6B25090030C5EB /* CombatEntity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7CE1B6B25090030C5EB /* CombatEntity.cpp */; };
+		9650E7FF1B6B25090030C5EB /* CombatPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7CF1B6B25090030C5EB /* CombatPlayer.cpp */; };
+		9650E8001B6B25090030C5EB /* Configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7D01B6B25090030C5EB /* Configuration.cpp */; };
+		9650E8011B6B25090030C5EB /* debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7D11B6B25090030C5EB /* debug.cpp */; };
+		9650E8021B6B25090030C5EB /* equipment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7D21B6B25090030C5EB /* equipment.cpp */; };
+		9650E8031B6B25090030C5EB /* Frame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7D31B6B25090030C5EB /* Frame.cpp */; };
+		9650E8041B6B25090030C5EB /* gamecenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7D41B6B25090030C5EB /* gamecenter.mm */; };
+		9650E8051B6B25090030C5EB /* GenericEffect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7D51B6B25090030C5EB /* GenericEffect.cpp */; };
+		9650E8061B6B25090030C5EB /* graphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7D61B6B25090030C5EB /* graphics.cpp */; };
+		9650E8071B6B25090030C5EB /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7D71B6B25090030C5EB /* Image.cpp */; };
+		9650E80A1B6B25090030C5EB /* Input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7DA1B6B25090030C5EB /* Input.cpp */; };
+		9650E80B1B6B25090030C5EB /* inventory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7DB1B6B25090030C5EB /* inventory.cpp */; };
+		9650E80C1B6B25090030C5EB /* io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7DC1B6B25090030C5EB /* io.cpp */; };
+		9650E80D1B6B25090030C5EB /* iphone.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7DD1B6B25090030C5EB /* iphone.mm */; };
+		9650E80E1B6B25090030C5EB /* Items.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7DE1B6B25090030C5EB /* Items.cpp */; };
+		9650E80F1B6B25090030C5EB /* lander.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7DF1B6B25090030C5EB /* lander.cpp */; };
+		9650E8101B6B25090030C5EB /* monster2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7E01B6B25090030C5EB /* monster2.cpp */; };
+		9650E8111B6B25090030C5EB /* my_load_bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7E11B6B25090030C5EB /* my_load_bitmap.cpp */; };
+		9650E8121B6B25090030C5EB /* mygamecentervc.m in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7E21B6B25090030C5EB /* mygamecentervc.m */; };
+		9650E8131B6B25090030C5EB /* Object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7E31B6B25090030C5EB /* Object.cpp */; };
+		9650E8141B6B25090030C5EB /* pause.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7E41B6B25090030C5EB /* pause.cpp */; };
+		9650E8151B6B25090030C5EB /* Player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7E51B6B25090030C5EB /* Player.cpp */; };
+		9650E8161B6B25090030C5EB /* redundant.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7E61B6B25090030C5EB /* redundant.cpp */; };
+		9650E8171B6B25090030C5EB /* script.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7E71B6B25090030C5EB /* script.cpp */; };
+		9650E8181B6B25090030C5EB /* shooter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7E81B6B25090030C5EB /* shooter.cpp */; };
+		9650E81B1B6B25090030C5EB /* sound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7EB1B6B25090030C5EB /* sound.cpp */; };
+		9650E81C1B6B25090030C5EB /* Spells.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7EC1B6B25090030C5EB /* Spells.cpp */; };
+		9650E81E1B6B25090030C5EB /* tgui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7EE1B6B25090030C5EB /* tgui.cpp */; };
+		9650E81F1B6B25090030C5EB /* Tile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7EF1B6B25090030C5EB /* Tile.cpp */; };
+		9650E8201B6B25090030C5EB /* translate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7F01B6B25090030C5EB /* translate.cpp */; };
+		9650E8211B6B25090030C5EB /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7F11B6B25090030C5EB /* util.cpp */; };
+		9650E8221B6B25090030C5EB /* widgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7F21B6B25090030C5EB /* widgets.cpp */; };
+		9650E8231B6B25090030C5EB /* xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7F31B6B25090030C5EB /* xml.cpp */; };
+		9650E8291B6B26DB0030C5EB /* libAllegro5_iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9650E8241B6B26DB0030C5EB /* libAllegro5_iOS.a */; };
+		9650E82A1B6B26DB0030C5EB /* libbass.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9650E8251B6B26DB0030C5EB /* libbass.a */; };
+		9650E82B1B6B26DB0030C5EB /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9650E8261B6B26DB0030C5EB /* libfreetype.a */; };
+		9650E82C1B6B26DB0030C5EB /* liblua5.2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9650E8271B6B26DB0030C5EB /* liblua5.2.a */; };
+		9650E82D1B6B26DB0030C5EB /* libphysfs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9650E8281B6B26DB0030C5EB /* libphysfs.a */; };
+		9650E82F1B6B28570030C5EB /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E82E1B6B28570030C5EB /* init.cpp */; };
+		9650E8311B6B28CC0030C5EB /* data.zip in Resources */ = {isa = PBXBuildFile; fileRef = 9650E8301B6B28CC0030C5EB /* data.zip */; };
+		9650E8371B6B2C030030C5EB /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9650E8361B6B2C030030C5EB /* GameKit.framework */; };
+		9650E83B1B6B2EB50030C5EB /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9650E83A1B6B2EB50030C5EB /* StoreKit.framework */; };
+		9660CE3F1A6369970064D34F /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9660CE3E1A6369970064D34F /* Images.xcassets */; };
+		9660CEC51A6375F70064D34F /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9660CEC31A6375F70064D34F /* AudioToolbox.framework */; };
+		9660CEC61A6375F70064D34F /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9660CEC41A6375F70064D34F /* libz.dylib */; };
+		9660CEC81A6376640064D34F /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9660CEC71A6376640064D34F /* AVFoundation.framework */; };
+		969874D81A6377A200E0FD12 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9660CECD1A6377260064D34F /* Accelerate.framework */; };
+		969874DA1A63789700E0FD12 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 969874D91A63789700E0FD12 /* MobileCoreServices.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		9650E7C41B6B25090030C5EB /* 3d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = 3d.cpp; path = ../../src/3d.cpp; sourceTree = "<group>"; };
+		9650E7C51B6B25090030C5EB /* Animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Animation.cpp; path = ../../src/Animation.cpp; sourceTree = "<group>"; };
+		9650E7C61B6B25090030C5EB /* AnimationSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AnimationSet.cpp; path = ../../src/AnimationSet.cpp; sourceTree = "<group>"; };
+		9650E7C71B6B25090030C5EB /* Area.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp.preprocessed; fileEncoding = 4; name = Area.cpp; path = ../../src/Area.cpp; sourceTree = "<group>"; };
+		9650E7C81B6B25090030C5EB /* atlas_accessor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atlas_accessor.cpp; path = ../../src/atlas_accessor.cpp; sourceTree = "<group>"; };
+		9650E7C91B6B25090030C5EB /* atlas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atlas.cpp; path = ../../src/atlas.cpp; sourceTree = "<group>"; };
+		9650E7CA1B6B25090030C5EB /* battle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = battle.cpp; path = ../../src/battle.cpp; sourceTree = "<group>"; };
+		9650E7CB1B6B25090030C5EB /* CombatActions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CombatActions.cpp; path = ../../src/CombatActions.cpp; sourceTree = "<group>"; };
+		9650E7CC1B6B25090030C5EB /* Combatant.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Combatant.cpp; path = ../../src/Combatant.cpp; sourceTree = "<group>"; };
+		9650E7CD1B6B25090030C5EB /* CombatEnemy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CombatEnemy.cpp; path = ../../src/CombatEnemy.cpp; sourceTree = "<group>"; };
+		9650E7CE1B6B25090030C5EB /* CombatEntity.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CombatEntity.cpp; path = ../../src/CombatEntity.cpp; sourceTree = "<group>"; };
+		9650E7CF1B6B25090030C5EB /* CombatPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CombatPlayer.cpp; path = ../../src/CombatPlayer.cpp; sourceTree = "<group>"; };
+		9650E7D01B6B25090030C5EB /* Configuration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Configuration.cpp; path = ../../src/Configuration.cpp; sourceTree = "<group>"; };
+		9650E7D11B6B25090030C5EB /* debug.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = debug.cpp; path = ../../src/debug.cpp; sourceTree = "<group>"; };
+		9650E7D21B6B25090030C5EB /* equipment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = equipment.cpp; path = ../../src/equipment.cpp; sourceTree = "<group>"; };
+		9650E7D31B6B25090030C5EB /* Frame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Frame.cpp; path = ../../src/Frame.cpp; sourceTree = "<group>"; };
+		9650E7D41B6B25090030C5EB /* gamecenter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = gamecenter.mm; path = ../../src/gamecenter.mm; sourceTree = "<group>"; };
+		9650E7D51B6B25090030C5EB /* GenericEffect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GenericEffect.cpp; path = ../../src/GenericEffect.cpp; sourceTree = "<group>"; };
+		9650E7D61B6B25090030C5EB /* graphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = graphics.cpp; path = ../../src/graphics.cpp; sourceTree = "<group>"; };
+		9650E7D71B6B25090030C5EB /* Image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Image.cpp; path = ../../src/Image.cpp; sourceTree = "<group>"; };
+		9650E7DA1B6B25090030C5EB /* Input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Input.cpp; path = ../../src/Input.cpp; sourceTree = "<group>"; };
+		9650E7DB1B6B25090030C5EB /* inventory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = inventory.cpp; path = ../../src/inventory.cpp; sourceTree = "<group>"; };
+		9650E7DC1B6B25090030C5EB /* io.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = io.cpp; path = ../../src/io.cpp; sourceTree = "<group>"; };
+		9650E7DD1B6B25090030C5EB /* iphone.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = iphone.mm; path = ../../src/iphone.mm; sourceTree = "<group>"; };
+		9650E7DE1B6B25090030C5EB /* Items.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Items.cpp; path = ../../src/Items.cpp; sourceTree = "<group>"; };
+		9650E7DF1B6B25090030C5EB /* lander.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lander.cpp; path = ../../src/lander.cpp; sourceTree = "<group>"; };
+		9650E7E01B6B25090030C5EB /* monster2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = monster2.cpp; path = ../../src/monster2.cpp; sourceTree = "<group>"; };
+		9650E7E11B6B25090030C5EB /* my_load_bitmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = my_load_bitmap.cpp; path = ../../src/my_load_bitmap.cpp; sourceTree = "<group>"; };
+		9650E7E21B6B25090030C5EB /* mygamecentervc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = mygamecentervc.m; path = ../../src/mygamecentervc.m; sourceTree = "<group>"; };
+		9650E7E31B6B25090030C5EB /* Object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Object.cpp; path = ../../src/Object.cpp; sourceTree = "<group>"; };
+		9650E7E41B6B25090030C5EB /* pause.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pause.cpp; path = ../../src/pause.cpp; sourceTree = "<group>"; };
+		9650E7E51B6B25090030C5EB /* Player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Player.cpp; path = ../../src/Player.cpp; sourceTree = "<group>"; };
+		9650E7E61B6B25090030C5EB /* redundant.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = redundant.cpp; path = ../../src/redundant.cpp; sourceTree = "<group>"; };
+		9650E7E71B6B25090030C5EB /* script.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = script.cpp; path = ../../src/script.cpp; sourceTree = "<group>"; };
+		9650E7E81B6B25090030C5EB /* shooter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = shooter.cpp; path = ../../src/shooter.cpp; sourceTree = "<group>"; };
+		9650E7EB1B6B25090030C5EB /* sound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sound.cpp; path = ../../src/sound.cpp; sourceTree = "<group>"; };
+		9650E7EC1B6B25090030C5EB /* Spells.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Spells.cpp; path = ../../src/Spells.cpp; sourceTree = "<group>"; };
+		9650E7EE1B6B25090030C5EB /* tgui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tgui.cpp; path = ../../src/tgui.cpp; sourceTree = "<group>"; };
+		9650E7EF1B6B25090030C5EB /* Tile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Tile.cpp; path = ../../src/Tile.cpp; sourceTree = "<group>"; };
+		9650E7F01B6B25090030C5EB /* translate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = translate.cpp; path = ../../src/translate.cpp; sourceTree = "<group>"; };
+		9650E7F11B6B25090030C5EB /* util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util.cpp; path = ../../src/util.cpp; sourceTree = "<group>"; };
+		9650E7F21B6B25090030C5EB /* widgets.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = widgets.cpp; path = ../../src/widgets.cpp; sourceTree = "<group>"; };
+		9650E7F31B6B25090030C5EB /* xml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = xml.cpp; path = ../../src/xml.cpp; sourceTree = "<group>"; };
+		9650E8241B6B26DB0030C5EB /* libAllegro5_iOS.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAllegro5_iOS.a; path = ../../../iphone_libs_r/lib/libAllegro5_iOS.a; sourceTree = "<group>"; };
+		9650E8251B6B26DB0030C5EB /* libbass.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbass.a; path = ../../../iphone_libs_r/lib/libbass.a; sourceTree = "<group>"; };
+		9650E8261B6B26DB0030C5EB /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = ../../../iphone_libs_r/lib/libfreetype.a; sourceTree = "<group>"; };
+		9650E8271B6B26DB0030C5EB /* liblua5.2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua5.2.a; path = ../../../iphone_libs_r/lib/liblua5.2.a; sourceTree = "<group>"; };
+		9650E8281B6B26DB0030C5EB /* libphysfs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libphysfs.a; path = ../../../iphone_libs_r/lib/libphysfs.a; sourceTree = "<group>"; };
+		9650E82E1B6B28570030C5EB /* init.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp.preprocessed; fileEncoding = 4; name = init.cpp; path = ../../src/init.cpp; sourceTree = "<group>"; };
+		9650E8301B6B28CC0030C5EB /* data.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; name = data.zip; path = ../../data.zip; sourceTree = "<group>"; };
+		9650E8361B6B2C030030C5EB /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
+		9650E83A1B6B2EB50030C5EB /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		9660CE2A1A6369970064D34F /* Monster RPG 2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Monster RPG 2.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9660CE2E1A6369970064D34F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9660CE3E1A6369970064D34F /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		9660CEC31A6375F70064D34F /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		9660CEC41A6375F70064D34F /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		9660CEC71A6376640064D34F /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		9660CEC91A6376BB0064D34F /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
+		9660CECB1A6376EA0064D34F /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		9660CECD1A6377260064D34F /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		969874D91A63789700E0FD12 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9660CE271A6369970064D34F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9650E8371B6B2C030030C5EB /* GameKit.framework in Frameworks */,
+				9650E8291B6B26DB0030C5EB /* libAllegro5_iOS.a in Frameworks */,
+				9650E82A1B6B26DB0030C5EB /* libbass.a in Frameworks */,
+				9650E83B1B6B2EB50030C5EB /* StoreKit.framework in Frameworks */,
+				9650E82B1B6B26DB0030C5EB /* libfreetype.a in Frameworks */,
+				9650E82C1B6B26DB0030C5EB /* liblua5.2.a in Frameworks */,
+				9650E82D1B6B26DB0030C5EB /* libphysfs.a in Frameworks */,
+				969874DA1A63789700E0FD12 /* MobileCoreServices.framework in Frameworks */,
+				969874D81A6377A200E0FD12 /* Accelerate.framework in Frameworks */,
+				9660CEC81A6376640064D34F /* AVFoundation.framework in Frameworks */,
+				9660CEC51A6375F70064D34F /* AudioToolbox.framework in Frameworks */,
+				9660CEC61A6375F70064D34F /* libz.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		9650E7C31B6B24CE0030C5EB /* src */ = {
+			isa = PBXGroup;
+			children = (
+				9650E82E1B6B28570030C5EB /* init.cpp */,
+				9650E7C41B6B25090030C5EB /* 3d.cpp */,
+				9650E7C51B6B25090030C5EB /* Animation.cpp */,
+				9650E7C61B6B25090030C5EB /* AnimationSet.cpp */,
+				9650E7C71B6B25090030C5EB /* Area.cpp */,
+				9650E7C81B6B25090030C5EB /* atlas_accessor.cpp */,
+				9650E7C91B6B25090030C5EB /* atlas.cpp */,
+				9650E7CA1B6B25090030C5EB /* battle.cpp */,
+				9650E7CB1B6B25090030C5EB /* CombatActions.cpp */,
+				9650E7CC1B6B25090030C5EB /* Combatant.cpp */,
+				9650E7CD1B6B25090030C5EB /* CombatEnemy.cpp */,
+				9650E7CE1B6B25090030C5EB /* CombatEntity.cpp */,
+				9650E7CF1B6B25090030C5EB /* CombatPlayer.cpp */,
+				9650E7D01B6B25090030C5EB /* Configuration.cpp */,
+				9650E7D11B6B25090030C5EB /* debug.cpp */,
+				9650E7D21B6B25090030C5EB /* equipment.cpp */,
+				9650E7D31B6B25090030C5EB /* Frame.cpp */,
+				9650E7D41B6B25090030C5EB /* gamecenter.mm */,
+				9650E7D51B6B25090030C5EB /* GenericEffect.cpp */,
+				9650E7D61B6B25090030C5EB /* graphics.cpp */,
+				9650E7D71B6B25090030C5EB /* Image.cpp */,
+				9650E7DA1B6B25090030C5EB /* Input.cpp */,
+				9650E7DB1B6B25090030C5EB /* inventory.cpp */,
+				9650E7DC1B6B25090030C5EB /* io.cpp */,
+				9650E7DD1B6B25090030C5EB /* iphone.mm */,
+				9650E7DE1B6B25090030C5EB /* Items.cpp */,
+				9650E7DF1B6B25090030C5EB /* lander.cpp */,
+				9650E7E01B6B25090030C5EB /* monster2.cpp */,
+				9650E7E11B6B25090030C5EB /* my_load_bitmap.cpp */,
+				9650E7E21B6B25090030C5EB /* mygamecentervc.m */,
+				9650E7E31B6B25090030C5EB /* Object.cpp */,
+				9650E7E41B6B25090030C5EB /* pause.cpp */,
+				9650E7E51B6B25090030C5EB /* Player.cpp */,
+				9650E7E61B6B25090030C5EB /* redundant.cpp */,
+				9650E7E71B6B25090030C5EB /* script.cpp */,
+				9650E7E81B6B25090030C5EB /* shooter.cpp */,
+				9650E7EB1B6B25090030C5EB /* sound.cpp */,
+				9650E7EC1B6B25090030C5EB /* Spells.cpp */,
+				9650E7EE1B6B25090030C5EB /* tgui.cpp */,
+				9650E7EF1B6B25090030C5EB /* Tile.cpp */,
+				9650E7F01B6B25090030C5EB /* translate.cpp */,
+				9650E7F11B6B25090030C5EB /* util.cpp */,
+				9650E7F21B6B25090030C5EB /* widgets.cpp */,
+				9650E7F31B6B25090030C5EB /* xml.cpp */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
+		9660CE211A6369970064D34F = {
+			isa = PBXGroup;
+			children = (
+				9650E83A1B6B2EB50030C5EB /* StoreKit.framework */,
+				9650E8361B6B2C030030C5EB /* GameKit.framework */,
+				9650E8301B6B28CC0030C5EB /* data.zip */,
+				9650E8241B6B26DB0030C5EB /* libAllegro5_iOS.a */,
+				9650E8251B6B26DB0030C5EB /* libbass.a */,
+				9650E8261B6B26DB0030C5EB /* libfreetype.a */,
+				9650E8271B6B26DB0030C5EB /* liblua5.2.a */,
+				9650E8281B6B26DB0030C5EB /* libphysfs.a */,
+				9650E7C31B6B24CE0030C5EB /* src */,
+				969874D91A63789700E0FD12 /* MobileCoreServices.framework */,
+				9660CECD1A6377260064D34F /* Accelerate.framework */,
+				9660CECB1A6376EA0064D34F /* Security.framework */,
+				9660CEC91A6376BB0064D34F /* AudioUnit.framework */,
+				9660CEC71A6376640064D34F /* AVFoundation.framework */,
+				9660CEC31A6375F70064D34F /* AudioToolbox.framework */,
+				9660CEC41A6375F70064D34F /* libz.dylib */,
+				9660CE2C1A6369970064D34F /* Monster RPG 2 */,
+				9660CE2B1A6369970064D34F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9660CE2B1A6369970064D34F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9660CE2A1A6369970064D34F /* Monster RPG 2.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9660CE2C1A6369970064D34F /* Monster RPG 2 */ = {
+			isa = PBXGroup;
+			children = (
+				9660CE3E1A6369970064D34F /* Images.xcassets */,
+				9660CE2D1A6369970064D34F /* Supporting Files */,
+			);
+			path = "Monster RPG 2";
+			sourceTree = "<group>";
+		};
+		9660CE2D1A6369970064D34F /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				9660CE2E1A6369970064D34F /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		9660CE291A6369970064D34F /* Monster RPG 2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9660CE511A6369980064D34F /* Build configuration list for PBXNativeTarget "Monster RPG 2" */;
+			buildPhases = (
+				9660CE261A6369970064D34F /* Sources */,
+				9660CE271A6369970064D34F /* Frameworks */,
+				9660CE281A6369970064D34F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Monster RPG 2";
+			productName = "Monster RPG 2";
+			productReference = 9660CE2A1A6369970064D34F /* Monster RPG 2.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9660CE221A6369970064D34F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0610;
+				ORGANIZATIONNAME = Nooskewl;
+				TargetAttributes = {
+					9660CE291A6369970064D34F = {
+						CreatedOnToolsVersion = 6.1.1;
+						DevelopmentTeam = ZCLK6CUZ99;
+						SystemCapabilities = {
+							com.apple.GameCenter = {
+								enabled = 1;
+							};
+							com.apple.InAppPurchase = {
+								enabled = 1;
+							};
+						};
+					};
+				};
+			};
+			buildConfigurationList = 9660CE251A6369970064D34F /* Build configuration list for PBXProject "Monster RPG 2" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 9660CE211A6369970064D34F;
+			productRefGroup = 9660CE2B1A6369970064D34F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9660CE291A6369970064D34F /* Monster RPG 2 */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9660CE281A6369970064D34F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9650E8311B6B28CC0030C5EB /* data.zip in Resources */,
+				9660CE3F1A6369970064D34F /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9660CE261A6369970064D34F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9650E8171B6B25090030C5EB /* script.cpp in Sources */,
+				9650E8051B6B25090030C5EB /* GenericEffect.cpp in Sources */,
+				9650E7FA1B6B25090030C5EB /* battle.cpp in Sources */,
+				9650E8021B6B25090030C5EB /* equipment.cpp in Sources */,
+				9650E8161B6B25090030C5EB /* redundant.cpp in Sources */,
+				9650E8211B6B25090030C5EB /* util.cpp in Sources */,
+				9650E8001B6B25090030C5EB /* Configuration.cpp in Sources */,
+				9650E7FB1B6B25090030C5EB /* CombatActions.cpp in Sources */,
+				9650E8041B6B25090030C5EB /* gamecenter.mm in Sources */,
+				9650E8231B6B25090030C5EB /* xml.cpp in Sources */,
+				9650E80E1B6B25090030C5EB /* Items.cpp in Sources */,
+				9650E7FE1B6B25090030C5EB /* CombatEntity.cpp in Sources */,
+				9650E81F1B6B25090030C5EB /* Tile.cpp in Sources */,
+				9650E80F1B6B25090030C5EB /* lander.cpp in Sources */,
+				9650E81E1B6B25090030C5EB /* tgui.cpp in Sources */,
+				9650E8031B6B25090030C5EB /* Frame.cpp in Sources */,
+				9650E8221B6B25090030C5EB /* widgets.cpp in Sources */,
+				9650E7F61B6B25090030C5EB /* AnimationSet.cpp in Sources */,
+				9650E80D1B6B25090030C5EB /* iphone.mm in Sources */,
+				9650E8101B6B25090030C5EB /* monster2.cpp in Sources */,
+				9650E8071B6B25090030C5EB /* Image.cpp in Sources */,
+				9650E8201B6B25090030C5EB /* translate.cpp in Sources */,
+				9650E7F91B6B25090030C5EB /* atlas.cpp in Sources */,
+				9650E7F81B6B25090030C5EB /* atlas_accessor.cpp in Sources */,
+				9650E7F51B6B25090030C5EB /* Animation.cpp in Sources */,
+				9650E8131B6B25090030C5EB /* Object.cpp in Sources */,
+				9650E8111B6B25090030C5EB /* my_load_bitmap.cpp in Sources */,
+				9650E8151B6B25090030C5EB /* Player.cpp in Sources */,
+				9650E8141B6B25090030C5EB /* pause.cpp in Sources */,
+				9650E7F71B6B25090030C5EB /* Area.cpp in Sources */,
+				9650E8181B6B25090030C5EB /* shooter.cpp in Sources */,
+				9650E81B1B6B25090030C5EB /* sound.cpp in Sources */,
+				9650E80C1B6B25090030C5EB /* io.cpp in Sources */,
+				9650E7FF1B6B25090030C5EB /* CombatPlayer.cpp in Sources */,
+				9650E7F41B6B25090030C5EB /* 3d.cpp in Sources */,
+				9650E7FD1B6B25090030C5EB /* CombatEnemy.cpp in Sources */,
+				9650E7FC1B6B25090030C5EB /* Combatant.cpp in Sources */,
+				9650E82F1B6B28570030C5EB /* init.cpp in Sources */,
+				9650E80B1B6B25090030C5EB /* inventory.cpp in Sources */,
+				9650E8061B6B25090030C5EB /* graphics.cpp in Sources */,
+				9650E81C1B6B25090030C5EB /* Spells.cpp in Sources */,
+				9650E80A1B6B25090030C5EB /* Input.cpp in Sources */,
+				9650E8121B6B25090030C5EB /* mygamecentervc.m in Sources */,
+				9650E8011B6B25090030C5EB /* debug.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		9660CE4F1A6369980064D34F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
+				CLANG_CXX_LIBRARY = "libstdc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/Users/trent/code/iphone_libs_r/include,
+					"/Users/trent/code/monster-rpg-2/include",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				LIBRARY_SEARCH_PATHS = /Users/trent/code/iphone_libs_r/lib;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9660CE501A6369980064D34F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
+				CLANG_CXX_LIBRARY = "libstdc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/Users/trent/code/iphone_libs_r/include,
+					"/Users/trent/code/monster-rpg-2/include",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				LIBRARY_SEARCH_PATHS = /Users/trent/code/iphone_libs_r/lib;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9660CE521A6369980064D34F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Nooskewl";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Nooskewl";
+				INFOPLIST_FILE = "Monster RPG 2/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/trent/code/iphone_libs_r/lib,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "1daa79cc-821f-4f3c-8a9f-f9a5521a214c";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 armv7";
+			};
+			name = Debug;
+		};
+		9660CE531A6369980064D34F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Nooskewl";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Nooskewl";
+				INFOPLIST_FILE = "Monster RPG 2/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/trent/code/iphone_libs_r/lib,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "1daa79cc-821f-4f3c-8a9f-f9a5521a214c";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 armv7";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9660CE251A6369970064D34F /* Build configuration list for PBXProject "Monster RPG 2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9660CE4F1A6369980064D34F /* Debug */,
+				9660CE501A6369980064D34F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9660CE511A6369980064D34F /* Build configuration list for PBXNativeTarget "Monster RPG 2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9660CE521A6369980064D34F /* Debug */,
+				9660CE531A6369980064D34F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9660CE221A6369970064D34F /* Project object */;
+}

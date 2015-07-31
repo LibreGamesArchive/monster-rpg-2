@@ -12,10 +12,6 @@
 		9656F9FA1A625642005D487E /* libphysfs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9656F9F81A625642005D487E /* libphysfs.a */; };
 		9675393319F6DA22001B02D9 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9675393219F6DA22001B02D9 /* icon.icns */; };
 		967823D719F6AD7A00E0429C /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 967823D619F6AD7A00E0429C /* Cocoa.framework */; };
-		967823F619F6AD7A00E0429C /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 967823F519F6AD7A00E0429C /* XCTest.framework */; };
-		967823F719F6AD7A00E0429C /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 967823D619F6AD7A00E0429C /* Cocoa.framework */; };
-		967823FF19F6AD7A00E0429C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 967823FD19F6AD7A00E0429C /* InfoPlist.strings */; };
-		9678240119F6AD7A00E0429C /* Monster_RPG_2Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9678240019F6AD7A00E0429C /* Monster_RPG_2Tests.m */; };
 		9678241419F6B15300E0429C /* libbass.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9678241219F6B15300E0429C /* libbass.dylib */; };
 		9678244C19F6B21F00E0429C /* 3d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9678241919F6B21D00E0429C /* 3d.cpp */; };
 		9678244D19F6B21F00E0429C /* Animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9678241A19F6B21D00E0429C /* Animation.cpp */; };
@@ -79,16 +75,6 @@
 		96D291B21A04703D00C3AA96 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96D291B11A04703D00C3AA96 /* GameKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		967823F819F6AD7A00E0429C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 967823CB19F6AD7A00E0429C /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 967823D219F6AD7A00E0429C;
-			remoteInfo = "Monster RPG 2";
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXCopyFilesBuildPhase section */
 		9678241119F6B12400E0429C /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -116,7 +102,6 @@
 		967823E019F6AD7A00E0429C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		967823E419F6AD7A00E0429C /* Monster RPG 2-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Monster RPG 2-Prefix.pch"; sourceTree = "<group>"; };
 		967823E619F6AD7A00E0429C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
-		967823F419F6AD7A00E0429C /* Monster RPG 2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Monster RPG 2Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		967823F519F6AD7A00E0429C /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		967823FC19F6AD7A00E0429C /* Monster RPG 2Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Monster RPG 2Tests-Info.plist"; sourceTree = "<group>"; };
 		967823FE19F6AD7A00E0429C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -212,15 +197,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		967823F119F6AD7A00E0429C /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				967823F719F6AD7A00E0429C /* Cocoa.framework in Frameworks */,
-				967823F619F6AD7A00E0429C /* XCTest.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -284,7 +260,6 @@
 			isa = PBXGroup;
 			children = (
 				967823D319F6AD7A00E0429C /* Monster RPG 2.app */,
-				967823F419F6AD7A00E0429C /* Monster RPG 2Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -386,24 +361,6 @@
 			productReference = 967823D319F6AD7A00E0429C /* Monster RPG 2.app */;
 			productType = "com.apple.product-type.application";
 		};
-		967823F319F6AD7A00E0429C /* Monster RPG 2Tests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 9678240719F6AD7A00E0429C /* Build configuration list for PBXNativeTarget "Monster RPG 2Tests" */;
-			buildPhases = (
-				967823F019F6AD7A00E0429C /* Sources */,
-				967823F119F6AD7A00E0429C /* Frameworks */,
-				967823F219F6AD7A00E0429C /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				967823F919F6AD7A00E0429C /* PBXTargetDependency */,
-			);
-			name = "Monster RPG 2Tests";
-			productName = "Monster RPG 2Tests";
-			productReference = 967823F419F6AD7A00E0429C /* Monster RPG 2Tests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -424,9 +381,6 @@
 							};
 						};
 					};
-					967823F319F6AD7A00E0429C = {
-						TestTargetID = 967823D219F6AD7A00E0429C;
-					};
 				};
 			};
 			buildConfigurationList = 967823CE19F6AD7A00E0429C /* Build configuration list for PBXProject "Monster RPG 2" */;
@@ -443,7 +397,6 @@
 			projectRoot = "";
 			targets = (
 				967823D219F6AD7A00E0429C /* Monster RPG 2 */,
-				967823F319F6AD7A00E0429C /* Monster RPG 2Tests */,
 			);
 		};
 /* End PBXProject section */
@@ -455,14 +408,6 @@
 			files = (
 				9675393319F6DA22001B02D9 /* icon.icns in Resources */,
 				9656F9F61A62560C005D487E /* data.zip in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		967823F219F6AD7A00E0429C /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				967823FF19F6AD7A00E0429C /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -519,23 +464,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		967823F019F6AD7A00E0429C /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				9678240119F6AD7A00E0429C /* Monster_RPG_2Tests.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		967823F919F6AD7A00E0429C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 967823D219F6AD7A00E0429C /* Monster RPG 2 */;
-			targetProxy = 967823F819F6AD7A00E0429C /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		967823DF19F6AD7A00E0429C /* InfoPlist.strings */ = {
@@ -705,46 +634,6 @@
 			};
 			name = Release;
 		};
-		9678240819F6AD7A00E0429C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Monster RPG 2.app/Contents/MacOS/Monster RPG 2";
-				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-					"$(inherited)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Monster RPG 2/Monster RPG 2-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "Monster RPG 2Tests/Monster RPG 2Tests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Debug;
-		};
-		9678240919F6AD7A00E0429C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Monster RPG 2.app/Contents/MacOS/Monster RPG 2";
-				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-					"$(inherited)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Monster RPG 2/Monster RPG 2-Prefix.pch";
-				INFOPLIST_FILE = "Monster RPG 2Tests/Monster RPG 2Tests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -762,15 +651,6 @@
 			buildConfigurations = (
 				9678240519F6AD7A00E0429C /* Debug */,
 				9678240619F6AD7A00E0429C /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		9678240719F6AD7A00E0429C /* Build configuration list for PBXNativeTarget "Monster RPG 2Tests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				9678240819F6AD7A00E0429C /* Debug */,
-				9678240919F6AD7A00E0429C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
