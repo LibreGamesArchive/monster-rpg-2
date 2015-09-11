@@ -2208,6 +2208,7 @@ void credits(void)
 			"MICHAL CICHON",
 			"MICHAEL CROFT",
 			"KUMAR DARYANANI",
+			"STEVEN PAGAN",
 			NULL
 		},
 		{
