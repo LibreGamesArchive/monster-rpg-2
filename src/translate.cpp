@@ -72,6 +72,53 @@ void destroy_translation(void)
 	v.clear();
 }
 
+static std::string get_entire_translation(const char *filename)
+{
+	int sz;
+	unsigned char *bytes = slurp_file(getResource("%s.utf8", filename), &sz);
+	if (!bytes) {
+		native_error("Load error.", filename);
+	}
+
+	ALLEGRO_FILE *f = al_open_memfile(bytes, sz, "rb");
+
+	ALLEGRO_USTR *ustr;
+
+	std::string whole_translation;
+
+	while ((ustr = al_fget_ustr(f)) != NULL) {
+		// remove newline
+		int size = (int)al_ustr_size(ustr);
+		const char *cstr = al_cstr(ustr);
+		int count = 0;
+		if (cstr[strlen(cstr)-1] == 0xa)
+			count++;
+		if (cstr[strlen(cstr)-2] == 0xd)
+			count++;
+		if (count > 0) {
+			al_ustr_remove_range(ustr, size-count, size);
+		}
+		ustr_replace_all(ustr, '^', '\n');
+		whole_translation += al_cstr(ustr);
+	}
+
+	al_fclose(f);
+	delete[] bytes;
+
+	return whole_translation;
+}
+
+void cache_all_glyphs()
+{
+	std::string characters;
+
+	for (int i = 0; translation_languages[i][0] != ""; i++) {
+		characters += get_entire_translation(translation_languages[i][0].c_str());
+	}
+
+	al_get_text_width(game_font, characters.c_str());
+}
+
 void load_translation(const char *filename)
 {
 	destroy_translation();
@@ -85,7 +132,7 @@ void load_translation(const char *filename)
 	ALLEGRO_FILE *f = al_open_memfile(bytes, sz, "rb");
 
 	ALLEGRO_USTR *ustr;
-	
+
 	while ((ustr = al_fget_ustr(f)) != NULL) {
 		// remove newline
 		int size = (int)al_ustr_size(ustr);
@@ -101,7 +148,7 @@ void load_translation(const char *filename)
 		ustr_replace_all(ustr, '^', '\n');
 		post_translated_strings.push_back(ustr);
 	}
-	
+
 	al_fclose(f);
 	delete[] bytes;
 }

@@ -27,6 +27,10 @@ extern "C" {
 void create_tmpbuffer()
 {
 	int flags = al_get_new_bitmap_flags();
+#ifdef ALLEGRO_ANDROID
+	int format = al_get_new_bitmap_format();
+	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGB_565);
+#endif
 	al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
 	int w = al_get_display_width(display);
 	int h = al_get_display_height(display);
@@ -34,6 +38,9 @@ void create_tmpbuffer()
 		w, h
 	);
 	al_set_new_bitmap_flags(flags);
+#ifdef ALLEGRO_ANDROID
+	al_set_new_bitmap_format(format);
+#endif
 }
 
 #ifdef ALLEGRO_ANDROID
@@ -78,7 +85,7 @@ static int pot(int n)
 void init_big_depth_surface(void)
 {
 	LPDIRECT3DDEVICE9 dev = al_get_d3d_device(display);
-	
+
 	int w = al_get_display_width(display);
 	int h = al_get_display_height(display);
 
@@ -301,10 +308,11 @@ void load_fonts(void)
 	}
 
 	game_font = my_load_ttf_font(getResource("DejaVuSans.gif"), 9*(MIN(screenScaleX, screenScaleY)/2), ttf_flags);
+
 	if (!game_font) {
 		native_error("Failed to load game_font.");
 	}
-		
+
 	medium_font = my_load_ttf_font(getResource("DejaVuSans.gif"), 32, ttf_flags);
 	if (!medium_font) {
 		native_error("Failed to load medium_font.");
@@ -316,8 +324,9 @@ void load_fonts(void)
 	}
 
 	debug_message("done loading fonts");
-	
+
 	// NOTE: This has to be after display creation and loading of fonts
+	cache_all_glyphs();
 	load_translation(get_language_name(config.getLanguage()).c_str());
 }
 
@@ -340,7 +349,7 @@ bool is_ipad(void)
 {
 	static bool first = true;
 	static bool value;
-	
+
 	if (first) {
 		first = false;
 #if (__IPHONE_OS_VERSION_MAX_ALLOWED >= 30200)
@@ -354,7 +363,7 @@ bool is_ipad(void)
 		value = false;
 #endif
 	}
-	
+
 	return value;
 }
 
@@ -392,7 +401,7 @@ void set_user_joystick(void)
 		}
 	}
 }
-	
+
 bool f5_cheated = false, f6_cheated = false;
 double f5_time = -1, f6_time = -1;
 
@@ -401,12 +410,12 @@ double f5_time = -1, f6_time = -1;
 static void *thread_proc(void *arg)
 {
 	events = al_create_event_queue();
-	
+
 	ALLEGRO_EVENT event;
 
 	al_register_event_source(events, (ALLEGRO_EVENT_SOURCE *)draw_timer);
 	al_register_event_source(events, (ALLEGRO_EVENT_SOURCE *)logic_timer);
-	
+
 	while  (exit_event_thread != 1) {
 		if (reinstall_timer) {
 			al_destroy_timer(draw_timer);
@@ -415,7 +424,7 @@ static void *thread_proc(void *arg)
 			al_register_event_source(events, (ALLEGRO_EVENT_SOURCE *)draw_timer);
 			reinstall_timer = false;
 		}
-		
+
 		if (!f5_cheated && f5_time > 0 && al_get_time() > f5_time+5) {
 			f5_cheated = true;
 			superpower = !superpower;
@@ -517,12 +526,12 @@ static void *thread_proc(void *arg)
 			al_signal_cond(wait_cond);
 		}
 	}
-	
+
 	al_destroy_timer(draw_timer);
 	al_destroy_timer(logic_timer);
-	
+
 	al_destroy_event_queue(events);
-	
+
 	exit_event_thread = 2;
 
 	return NULL;
@@ -550,9 +559,13 @@ static void *loader_proc(void *arg)
 	else
 #endif
 	{
+#ifdef ALLEGRO_ANDROID
+		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGBA_4444);
+#else
 		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
+#endif
 	}
-	
+
 	config.setUseOnlyMemoryBitmaps(true);
 
 	show_progress(80);
@@ -615,7 +628,7 @@ static void *loader_proc(void *arg)
 	al_lock_mutex(wait_mutex);
 
 	ss_mutex = al_create_mutex();
-	
+
 	m_push_target_bitmap();
 	orb_bmp = m_create_alpha_bitmap(80, 80);
 	m_set_target_bitmap(orb_bmp);
@@ -651,7 +664,7 @@ static void *loader_proc(void *arg)
 		prepareForScreenGrab2();
 		notify("Desired mode could not be", "set. Using default", "(safe) mode...");
 	}
-	
+
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	POOL_END
 #endif
@@ -662,7 +675,7 @@ static void *loader_proc(void *arg)
 
 	al_set_target_bitmap(NULL);
 	m_destroy_bitmap(deter_display_access_bmp);
-	
+
 	show_progress(95);
 
 	return NULL;
@@ -705,7 +718,7 @@ bool loadTilemap(void)
 #define LOWP ""
 #else
 #define LOWP "lowp"
-#endif	
+#endif
 
 void init_shaders(void)
 {
@@ -763,7 +776,7 @@ void init_shaders(void)
 		"   color.b = color.b - (ratio * (color.b - db));\n"
 		"   gl_FragColor = color;\n"
 		"}";
-		
+
 		const char *warp_pixel_source =
 #if defined ALLEGRO_RASPBERRYPI
 		"precision lowp float;\n"
@@ -797,7 +810,7 @@ void init_shaders(void)
 		"      gl_FragColor = c;\n"
 		"   }\n"
 		"}\n";
-		
+
 		const char *shadow_pixel_source =
 #if defined ALLEGRO_RASPBERRYPI
 		"precision lowp float;\n"
@@ -824,7 +837,7 @@ void init_shaders(void)
 		"   float alpha = 1.0 - (dist / radius);\n"
 		"   gl_FragColor = vec4(0.0, 0.0, 0.0, alpha);\n"
 		"}\n";
-		
+
 		const char *brighten_pixel_source =
 #if defined ALLEGRO_RASPBERRYPI
 		"precision lowp float;\n"
@@ -856,7 +869,7 @@ void init_shaders(void)
 		"      gl_FragColor = color;\n"
 		"   }\n"
 		"}";
-		
+
 		const char *shader_log;
 		warp = al_create_shader(ALLEGRO_SHADER_GLSL);
 		al_attach_shader_source(
@@ -873,7 +886,7 @@ void init_shaders(void)
 		if ((shader_log = al_get_shader_log(warp))[0] != 0) {
 			printf("warp: %s\n", shader_log);
 		}
-		
+
 		shadow_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
 		al_attach_shader_source(
 			shadow_shader,
@@ -889,7 +902,7 @@ void init_shaders(void)
 		if ((shader_log = al_get_shader_log(shadow_shader))[0] != 0) {
 			printf("shadow: %s\n", shader_log);
 		}
-		
+
 		brighten = al_create_shader(ALLEGRO_SHADER_GLSL);
 		al_attach_shader_source(
 			brighten,
@@ -905,7 +918,7 @@ void init_shaders(void)
 		if ((shader_log = al_get_shader_log(brighten))[0] != 0) {
 			printf("brighten: %s\n", shader_log);
 		}
-		
+
 		tinter = al_create_shader(ALLEGRO_SHADER_GLSL);
 		al_attach_shader_source(
 			tinter,
@@ -952,7 +965,7 @@ void init_shaders(void)
 		"	Output.ClipPos = Output.Position;\n"
 		"	return Output;\n"
 		"}\n";
-		
+
 		const char *tinter_pixel_source =
 		"texture al_tex;\n"
 		"sampler2D s = sampler_state {\n"
@@ -979,7 +992,7 @@ void init_shaders(void)
 		"   color.b = color.b - (ratio * (color.b - db));\n"
 		"   return color;\n"
 		"}";
-		
+
 		const char *warp_pixel_source =
 		"texture al_tex;\n"
 		"sampler2D s = sampler_state {\n"
@@ -1009,7 +1022,7 @@ void init_shaders(void)
 		"      return c;\n"
 		"   }\n"
 		"}\n";
-		
+
 		const char *shadow_pixel_source =
 		"float x1;\n"
 		"float y1;\n"
@@ -1034,7 +1047,7 @@ void init_shaders(void)
 		"   float alpha = 1.0 - (dist / radius);\n"
 		"   return float4(0.0, 0.0, 0.0, alpha);\n"
 		"}\n";
-		
+
 		const char *brighten_pixel_source =
 		"texture al_tex;\n"
 		"sampler2D s = sampler_state {\n"
@@ -1080,7 +1093,7 @@ void init_shaders(void)
 		if ((shader_log = al_get_shader_log(warp))[0] != 0) {
 			printf("warp: %s\n", shader_log);
 		}
-		
+
 		shadow_shader = al_create_shader(ALLEGRO_SHADER_HLSL);
 		al_attach_shader_source(
 			shadow_shader,
@@ -1096,7 +1109,7 @@ void init_shaders(void)
 		if ((shader_log = al_get_shader_log(shadow_shader))[0] != 0) {
 			printf("shadow: %s\n", shader_log);
 		}
-		
+
 		brighten = al_create_shader(ALLEGRO_SHADER_HLSL);
 		al_attach_shader_source(
 			brighten,
@@ -1112,7 +1125,7 @@ void init_shaders(void)
 		if ((shader_log = al_get_shader_log(brighten))[0] != 0) {
 			printf("brighten: %s\n", shader_log);
 		}
-		
+
 		tinter = al_create_shader(ALLEGRO_SHADER_HLSL);
 		al_attach_shader_source(
 			tinter,
@@ -1195,7 +1208,7 @@ bool init(int *argc, char **argv[])
 #endif
 
 	srand((int)time(NULL));
-	
+
 	bool use_fixed_pipeline = false;
 
 #if !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
@@ -1302,7 +1315,7 @@ bool init(int *argc, char **argv[])
 	al_init_ttf_addon();
 	al_init_image_addon();
 	al_init_primitives_addon();
-	
+
 	int flags = 0;
 
 #ifdef ALLEGRO_WINDOWS
@@ -1315,21 +1328,19 @@ bool init(int *argc, char **argv[])
 
 	al_set_new_display_flags(flags);
 
-/*
 #if defined ALLEGRO_ANDROID
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 8, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 16, ALLEGRO_REQUIRE);
 #else
-*/
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_SUGGEST);
 	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 8, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 32, ALLEGRO_REQUIRE);
-//#endif
+#endif
 
 #if !defined(ALLEGRO_IPHONE) && !defined(ALLEGRO_ANDROID)
 	al_set_new_display_adapter(config.getAdapter());
-	
+
 	ALLEGRO_MONITOR_INFO mi;
 	al_get_monitor_info(config.getAdapter(), &mi);
 	int w = mi.x2 - mi.x1;
@@ -1436,7 +1447,11 @@ bool init(int *argc, char **argv[])
 	else
 #endif
 	{
+#ifdef ALLEGRO_ANDROID
+		ALPHA_FMT = ALLEGRO_PIXEL_FORMAT_RGBA_4444;
+#else
 		ALPHA_FMT = ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE;
+#endif
 	}
 
 #if defined ALLEGRO_WINDOWS
@@ -1490,7 +1505,7 @@ bool init(int *argc, char **argv[])
 	sd->width = al_get_display_width(display);
 	sd->height = al_get_display_height(display);
 #endif
-	
+
 	if (al_get_display_flags(display) & ALLEGRO_OPENGL) {
 		if (use_fixed_pipeline) {
 			my_opengl_version = 0x01;
@@ -1520,15 +1535,15 @@ bool init(int *argc, char **argv[])
 
 	draw_timer = al_create_timer(1.0/config.getTargetFPS());
 	logic_timer = al_create_timer(1.0/LOGIC_RATE);
-	
+
 	al_start_timer(draw_timer);
 	al_start_timer(logic_timer);
-	
+
 	tguiInit();
 	tguiSetRotation(0);
 
 	set_screen_params();
-      
+
 #ifdef ALLEGRO_ANDROID
 	uint32_t vers1 = parse_version(al_android_get_os_version());
 	uint32_t vers2 = parse_version("2.3");
@@ -1615,21 +1630,25 @@ bool init(int *argc, char **argv[])
 #endif
 
 	if (al_get_display_flags(display) & ALLEGRO_OPENGL) {
+#ifdef ALLEGRO_ANDROID
+		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGBA_4444);
+#else
 		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
+#endif
 	}
 	else {
 		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 	}
 
 	debug_message("creating screenshot buffer\n");
-	
+
 	{
 		flags = al_get_new_bitmap_flags();
 		al_set_new_bitmap_flags(flags | ALLEGRO_NO_PRESERVE_TEXTURE);
 		screenshot = m_create_bitmap(BW/2, BH/2);
 		al_set_new_bitmap_flags(flags);
 	}
-	
+
 	debug_message("creating tmpbuffer\n");
 
 	create_tmpbuffer();
@@ -1637,7 +1656,11 @@ bool init(int *argc, char **argv[])
 	debug_message("initing shader variables\n");
 
 	if (al_get_display_flags(display) & ALLEGRO_OPENGL) {
+#ifdef ALLEGRO_ANDROID
+		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_RGBA_4444);
+#else
 		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE);
+#endif
 	}
 	else {
 		al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
@@ -1646,9 +1669,9 @@ bool init(int *argc, char **argv[])
 	if (!screenshot) {
 		native_error("Failed to create SS buffer.");
 	}
-	
+
 	debug_message("loading some bitmaps\n");
-	
+
 	corner_bmp = m_load_bitmap(getResource("media/corner.png"));
 	stomach_circle = m_load_bitmap(getResource("combat_media/stomach_circle.png"));
 	if (!loadTilemap()) {
@@ -1669,7 +1692,7 @@ bool init(int *argc, char **argv[])
 	/* ON IPHONE WE LOAD EVERYTHING AS MEMORY BITMAP FIRST THEN
 	 * CONVERT THEM TO DISPLAY BITMAPS SO WE CAN SHOW A SMOOTH
 	 * PROGRESS BAR */
-	
+
 	bool done_loading_samples = false;
 	double start = al_get_time();
 
@@ -1688,7 +1711,7 @@ bool init(int *argc, char **argv[])
 				al_run_detached_thread(loader_proc, NULL);
 			}
 		}
-		
+
  		int percent = progress_percent;
 		draw_loading_screen(tmp, percent, sd);
 		if (percent >= 95) {
@@ -1737,7 +1760,7 @@ bool init(int *argc, char **argv[])
 
 	load_translation_tags();
 	load_fonts();
-	
+
 	AnimationSet *tmpAnimSet = new_AnimationSet(getResource("gui.png"));
 	guiAnims = tmpAnimSet->clone(CLONE_COPY_BORDERS);
 	delete tmpAnimSet;
@@ -1748,7 +1771,7 @@ bool init(int *argc, char **argv[])
 	orb_bmp = m_make_alpha_display_bitmap(orb_bmp);
 
 	al_set_new_bitmap_flags(PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
-	
+
 	cursor = m_load_bitmap(getResource("media/cursor.png"));
 	tile = m_create_bitmap(TILE_SIZE, TILE_SIZE); // check
 	stoneTexture = m_load_bitmap(getResource("combat_media/stone.png"));
@@ -1776,7 +1799,7 @@ bool init(int *argc, char **argv[])
 		delete tmp_animsets[i];
 	}
 	tmp_animsets.clear();
-	
+
 	al_set_new_bitmap_flags(PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
 
 	inited = true;
@@ -1805,7 +1828,7 @@ void destroy()
 	al_destroy_mutex(wait_mutex);
 
 	al_destroy_mutex(ss_mutex);
-	
+
 	if (party[heroSpot] && party[heroSpot]->getObject()
 			&& party[heroSpot]->getObject()->getInput()
 			&& party[heroSpot]->getObject()->getInput() == tripleInput) {
@@ -1818,7 +1841,7 @@ void destroy()
 		destroyInput();
 
 	destroyTilemap();
-	
+
 	if (cached_bitmap) {
 		al_destroy_bitmap(cached_bitmap);
 		cached_bitmap = NULL;
@@ -1874,7 +1897,7 @@ void destroy()
 		big_depth_surface->Release();
 	}
 #endif
-	
+
 	m_destroy_bitmap(tmpbuffer);
 
 	if (custom_mouse_cursor) {
@@ -2002,7 +2025,7 @@ void set_screen_params(void)
 	screen_offset_y = (sd->height - (screenScaleY*BH)) / 2;
 	screen_ratio_x = sd->width / (screenScaleX*BW);
 	screen_ratio_y = sd->height / (screenScaleY*BH);
-	 
+
 	if (tguiIsInitialized()) {
 		tguiSetScreenSize(screenScaleX*BW, screenScaleY*BH);
 
@@ -2035,7 +2058,7 @@ void set_screen_params(void)
 void get_screen_offset_size(int *dx, int *dy, int *dw, int *dh)
 {
 	ScreenDescriptor *sd = config.getWantedGraphicsMode();
-	
+
 	if (config.getMaintainAspectRatio() == ASPECT_FILL_SCREEN) {
 		*dx = *dy = 0;
 		*dw = sd->width;
@@ -2073,7 +2096,7 @@ void toggle_fullscreen()
 		al_set_target_bitmap(old_target);
 		m_destroy_bitmap(tmpbuffer);
 	}
-		
+
 	ScreenDescriptor *sd = config.getWantedGraphicsMode();
 
 	if (!sd->fullscreen) {
@@ -2192,7 +2215,7 @@ void hide_mouse_cursor()
 	if (have_mouse) {
 		al_hide_mouse_cursor(display);
 	}
-#endif	
+#endif
 	cursor_hidden = true;
 }
 

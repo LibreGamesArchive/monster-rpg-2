@@ -140,8 +140,8 @@ static void mTextout_real(MFONT *font, const char *text, int x, int y,
 				m_get_bitmap_height(icons[index]),
 				x*screenScaleX/textScaleX,
 				(y+m_text_height(game_font)/2-m_get_bitmap_height(icons[index])/2)*screenScaleY/textScaleY,
-				m_get_bitmap_width(icons[index])*screenScaleX/2,
-				m_get_bitmap_height(icons[index])*screenScaleY/2,
+				m_get_bitmap_width(icons[index])*screenScaleX/textScaleX,
+				m_get_bitmap_height(icons[index])*screenScaleY/textScaleY,
 				0
 			);
 		}

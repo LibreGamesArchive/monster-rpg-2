@@ -199,7 +199,7 @@ int m_text_height(const MFONT *font)
 	if (font != game_font) {
 		return al_get_font_line_height(font);
 	}
-	return al_get_font_line_height(font)/(MIN(screenScaleX, screenScaleY)/2);
+	return al_get_font_line_height(font) / (screenScaleX < screenScaleY ? (screenScaleX / textScaleX) : (screenScaleY / textScaleY));
 }
 
 void m_draw_rectangle(float x1, float y1, float x2, float y2, MCOLOR color,
@@ -663,7 +663,7 @@ static int m_text_length_real(const MFONT *font, const char *text)
 	if (font != game_font) {
 		return al_get_text_width(font, text);
 	}
-	return al_get_text_width(font, text)/(MIN(screenScaleX, screenScaleY)/2);
+	return al_get_text_width(font, text) / (screenScaleX < screenScaleY ? (screenScaleX / textScaleX) : (screenScaleY / textScaleY));
 }
 
 void m_set_target_bitmap(MBITMAP *bmp)
