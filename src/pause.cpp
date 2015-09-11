@@ -3078,7 +3078,7 @@ static bool choose_copy_state(int n, bool exists, void *data)
 			al_set_physfs_file_interface();
 #endif
 			char *encoded = create_url(bytes, sz);
-			set_clipboard(encoded);
+			al_set_clipboard_text(display, encoded);
 			notify("", "Save state copied.", "");
 		}
 		else {
@@ -3103,8 +3103,8 @@ static bool choose_paste_state(int n, bool exists, void *data)
 				saveit = false;
 		}
 		if (saveit) {
-			char buf[5000*3];
-			if (get_clipboard(buf, 5000*3)) {
+			char *buf;
+			if ((buf = al_get_clipboard_text(display)) != NULL) {
 				save_url(getUserResource("%d.save", n), buf);
 				if (prompt("Run this game now?", "", 0, 1)) {
 					i->num = n;

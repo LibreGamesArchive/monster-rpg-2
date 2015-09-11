@@ -40,59 +40,6 @@ public class MO2Activity extends AllegroActivity {
 		Log.d("MoRPG2", s);
 	}
 
-	private boolean clip_thread_done = false;
-
-	public void setClipData(String saveState)
-	{
-		final String ss = saveState;
-
-		Runnable runnable = new Runnable() {
-			public void run() {
-				ClipboardManager m = 
-					(ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
-
-				m.setText(ss);
-
-				clip_thread_done = true;
-				}
-			};
-		runOnUiThread(runnable);
-
-		while (!clip_thread_done)
-			;
-		clip_thread_done = false;
-	}
-
-	private String clipdata;
-
-	public String getClipData()
-	{
-		Runnable runnable = new Runnable() {
-			public void run() {
-				ClipboardManager m = 
-					(ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
-
-				CharSequence cs = m.getText();
-
-				if (cs == null) {
-					clipdata = null;
-				}
-				else {
-					clipdata = cs.toString();
-				}
-
-				clip_thread_done = true;
-			}
-		};
-		runOnUiThread(runnable);
-
-		while (!clip_thread_done)
-			;
-		clip_thread_done = false;
-
-		return clipdata;
-	}
-
 	MyBroadcastReceiver bcr;
 
 	@Override

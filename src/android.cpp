@@ -87,44 +87,6 @@ static jobject _jni_callObjectMethod(JNIEnv *env, jobject object, const char *na
    return ret;
 }
 
-// return true on success
-bool get_clipboard(char *buf, int len)
-{
-	jstring s =
-		(jstring)_jni_callObjectMethod(
-			_al_android_get_jnienv(),
-			_al_android_activity_object(),
-			"getClipData",
-			"()Ljava/lang/String;"
-		);
-	
-	if (s == NULL)
-		return false;
-	
-	const char *native = _al_android_get_jnienv()->GetStringUTFChars(s, 0);
-
-	strncpy(buf, native, len);
-
-	_al_android_get_jnienv()->ReleaseStringUTFChars(s, native);
-
-	return true;
-}
-
-void set_clipboard(char *buf)
-{
-	jstring saveS = _al_android_get_jnienv()->NewStringUTF(buf);
-
-	_jni_callVoidMethodV(
-		_al_android_get_jnienv(),
-		_al_android_activity_object(),
-		"setClipData",
-		"(Ljava/lang/String;)V",
-		saveS
-	);
-
-	_al_android_get_jnienv()->DeleteLocalRef(saveS);
-}
-
 const char * get_sdcarddir()
 {
 	static char buf[2000];
