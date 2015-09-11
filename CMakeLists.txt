@@ -32,8 +32,8 @@ if(WIN32)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -fcheck-new -Wno-unknown-pragmas -Wno-comment -Wno-strict-aliasing")
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows")
 	else(MINGW)
-		set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS} /D_USE_MATH_DEFINES /DALLEGRO_STATICLINK /EHsc /D_WIN32_WINNT=0x501 /MT")
-		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} /D_USE_MATH_DEFINES /DALLEGRO_STATICLINK /EHsc /D_WIN32_WINNT=0x501 /MT")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /D_USE_MATH_DEFINES /DALLEGRO_STATICLINK /EHsc /D_WIN32_WINNT=0x501")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D_USE_MATH_DEFINES /DALLEGRO_STATICLINK /EHsc /D_WIN32_WINNT=0x501")
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO /SUBSYSTEM:WINDOWS")
 	endif(MINGW)
 else(WIN32)
@@ -178,14 +178,8 @@ if(WIN32)
 		"uuid"
 		"winmm"
 		"lua5.2"
-		"dumb_static"
-		"FLAC_static"
 		"freetype_static"
-		"ogg_static"
 		"physfs_static"
-		"theoradec_static"
-		"vorbis_static"
-		"vorbisfile_static"
 		"zlibstatic"
 		"allegro_monolith-static"
 	)
@@ -204,6 +198,8 @@ if(WIN32)
 	else(KCM_AUDIO)
 		LIST(APPEND MAIN_LIBS "bass")
 	endif(KCM_AUDIO)
+	set_target_properties(mo2-engine PROPERTIES COMPILE_FLAGS "/MT /MP")
+	set_target_properties(MonsterRPG2 PROPERTIES COMPILE_FLAGS "/MT /MP")
 else(WIN32)
 if(APPLE)
 	set(ALLEGRO_MAIN_LIB "allegro_main${ALLEG_SUFFIX}")
