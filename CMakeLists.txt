@@ -154,7 +154,7 @@ add_executable(MonsterRPG2${M2_SUFFIX}
 
 if(KCM_AUDIO)
 	if(NOT WIN32)
-		LIST(APPEND EXTRA_LIBS "allegro_audio${ALLEG_SUFFIX}" "allegro_acodec${ALLEG_SUFFIX}" "FLAC" "vorbisfile" "vorbis" "ogg")
+		LIST(APPEND EXTRA_LIBS "asound" "pulse-simple" "pulse" "vorbisfile" "vorbis" "ogg")
 	endif()
 endif(KCM_AUDIO)
 
@@ -236,31 +236,18 @@ else(APPLE)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,\$ORIGIN")
 	SET(MAIN_LIBS 
 		mo2-engine
-		allegro_ttf${ALLEG_SUFFIX}
-		allegro_font${ALLEG_SUFFIX}
-		allegro_primitives${ALLEG_SUFFIX}
-		allegro_memfile${ALLEG_SUFFIX}
-		allegro_image${ALLEG_SUFFIX}
-		allegro_physfs${ALLEG_SUFFIX}
-		allegro${ALLEG_SUFFIX}
-		${ALLEGRO_MAIN_LIB}
+		allegro_monolith${ALLEG_SUFFIX}
 		${EXTRA_LIBS}
 		Xcursor Xi Xinerama Xrandr SM ICE X11 Xext
 	)
-        if(KCM_AUDIO)
-		if(RASPBERRYPI)
-			LIST(APPEND MAIN_LIBS "asound")
-		else()
-			LIST(APPEND MAIN_LIBS "pulse-simple" "pulse" "asound" "openal")
-		endif()
-	else(KCM_AUDIO)
+        if(NOT KCM_AUDIO)
 		LIST(APPEND MAIN_LIBS "${CMAKE_BINARY_DIR}/libbass.so")
 	endif(KCM_AUDIO)
 	if(RASPBERRYPI)
 		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host m pthread /usr/local/lib/libfreetype.a physfs /usr/local/lib/libpng.a /usr/local/lib/libz.a lua5.2)
 	else(RASPBERYPI)
 		# trentg's build
-		LIST(APPEND MAIN_LIBS GL GLU /usr/local/lib/libphysfs.a /usr/local/lib/libfreetype.a /usr/local/lib/libz.a /usr/local/lib/libpng.a /usr/local/lib/liblua5.2.a)
+		LIST(APPEND MAIN_LIBS GL GLU /usr/local/lib/libphysfs.a /usr/local/lib/libfreetype.a /usr/local/lib/libz.a /usr/local/lib/libpng.a /usr/local/lib/liblua5.2.a pthread)
 		# normal build
 		#LIST(APPEND MAIN_LIBS GL GLU physfs freetype z png lua5.2)
 	endif(RASPBERRYPI)
