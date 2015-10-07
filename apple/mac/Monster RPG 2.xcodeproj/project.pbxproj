@@ -7,8 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		960C21531BC50742006B62CD /* liballegro_monolith-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 960C21521BC50742006B62CD /* liballegro_monolith-static.a */; };
+		960C21551BC508AA006B62CD /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 960C21541BC508AA006B62CD /* init.cpp */; settings = {ASSET_TAGS = (); }; };
+		960C21581BC5093C006B62CD /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 960C21561BC50916006B62CD /* libz.tbd */; };
 		9656F9F61A62560C005D487E /* data.zip in Resources */ = {isa = PBXBuildFile; fileRef = 9656F9F51A62560C005D487E /* data.zip */; };
-		9656F9F91A625642005D487E /* liballegro_physfs-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9656F9F71A625642005D487E /* liballegro_physfs-static.a */; };
 		9656F9FA1A625642005D487E /* libphysfs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9656F9F81A625642005D487E /* libphysfs.a */; };
 		9675393319F6DA22001B02D9 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9675393219F6DA22001B02D9 /* icon.icns */; };
 		967823D719F6AD7A00E0429C /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 967823D619F6AD7A00E0429C /* Cocoa.framework */; };
@@ -60,18 +62,8 @@
 		9678248519F6B33D00E0429C /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9678248119F6B33D00E0429C /* OpenGL.framework */; };
 		9678248619F6B33D00E0429C /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9678248219F6B33D00E0429C /* Security.framework */; };
 		9678248919F6B66200E0429C /* libbass.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9678241219F6B15300E0429C /* libbass.dylib */; };
-		9678249719F6B66300E0429C /* liballegro_font-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9678248A19F6B66300E0429C /* liballegro_font-static.a */; };
-		9678249819F6B66300E0429C /* liballegro_image-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9678248B19F6B66300E0429C /* liballegro_image-static.a */; };
-		9678249919F6B66300E0429C /* liballegro_main-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9678248C19F6B66300E0429C /* liballegro_main-static.a */; };
-		9678249A19F6B66300E0429C /* liballegro_memfile-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9678248D19F6B66300E0429C /* liballegro_memfile-static.a */; };
-		9678249C19F6B66300E0429C /* liballegro_primitives-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9678248F19F6B66300E0429C /* liballegro_primitives-static.a */; };
-		9678249D19F6B66300E0429C /* liballegro_ttf-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9678249019F6B66300E0429C /* liballegro_ttf-static.a */; };
-		9678249E19F6B66300E0429C /* liballegro-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9678249119F6B66300E0429C /* liballegro-static.a */; };
 		967824A019F6B66300E0429C /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9678249319F6B66300E0429C /* libfreetype.a */; };
 		967824A119F6B66300E0429C /* liblua5.2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9678249419F6B66300E0429C /* liblua5.2.a */; };
-		967824A319F6B66300E0429C /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9678249619F6B66300E0429C /* libz.a */; };
-		967824A719F6B75800E0429C /* init.mm in Sources */ = {isa = PBXBuildFile; fileRef = 967824A619F6B75800E0429C /* init.mm */; };
-		967824A919F6B8C800E0429C /* liballegro_dialog-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 967824A819F6B8C800E0429C /* liballegro_dialog-static.a */; };
 		96D291B21A04703D00C3AA96 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96D291B11A04703D00C3AA96 /* GameKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
@@ -89,6 +81,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		960C21521BC50742006B62CD /* liballegro_monolith-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_monolith-static.a"; path = "../../../local/lib/liballegro_monolith-static.a"; sourceTree = "<group>"; };
+		960C21541BC508AA006B62CD /* init.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = init.cpp; path = ../../src/init.cpp; sourceTree = "<group>"; };
+		960C21561BC50916006B62CD /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		9656F9F51A62560C005D487E /* data.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; name = data.zip; path = ../../data.zip; sourceTree = "<group>"; };
 		9656F9F71A625642005D487E /* liballegro_physfs-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_physfs-static.a"; path = "../../../local/lib/liballegro_physfs-static.a"; sourceTree = "<group>"; };
 		9656F9F81A625642005D487E /* libphysfs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libphysfs.a; path = ../../../local/lib/libphysfs.a; sourceTree = "<group>"; };
@@ -164,7 +159,6 @@
 		9678249319F6B66300E0429C /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = ../../../local/lib/libfreetype.a; sourceTree = "<group>"; };
 		9678249419F6B66300E0429C /* liblua5.2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua5.2.a; path = ../../../local/lib/liblua5.2.a; sourceTree = "<group>"; };
 		9678249619F6B66300E0429C /* libz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libz.a; path = ../../../local/lib/libz.a; sourceTree = "<group>"; };
-		967824A619F6B75800E0429C /* init.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = init.mm; path = ../../src/init.mm; sourceTree = "<group>"; };
 		967824A819F6B8C800E0429C /* liballegro_dialog-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "liballegro_dialog-static.a"; path = "../../../local/lib/liballegro_dialog-static.a"; sourceTree = "<group>"; };
 		96D291B11A04703D00C3AA96 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/GameKit.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
@@ -174,20 +168,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9656F9F91A625642005D487E /* liballegro_physfs-static.a in Frameworks */,
+				960C21581BC5093C006B62CD /* libz.tbd in Frameworks */,
+				960C21531BC50742006B62CD /* liballegro_monolith-static.a in Frameworks */,
 				9656F9FA1A625642005D487E /* libphysfs.a in Frameworks */,
-				967824A919F6B8C800E0429C /* liballegro_dialog-static.a in Frameworks */,
-				9678249719F6B66300E0429C /* liballegro_font-static.a in Frameworks */,
-				9678249819F6B66300E0429C /* liballegro_image-static.a in Frameworks */,
-				9678249919F6B66300E0429C /* liballegro_main-static.a in Frameworks */,
-				9678249A19F6B66300E0429C /* liballegro_memfile-static.a in Frameworks */,
-				9678249C19F6B66300E0429C /* liballegro_primitives-static.a in Frameworks */,
-				9678249D19F6B66300E0429C /* liballegro_ttf-static.a in Frameworks */,
-				9678249E19F6B66300E0429C /* liballegro-static.a in Frameworks */,
 				96D291B21A04703D00C3AA96 /* GameKit.framework in Frameworks */,
 				967824A019F6B66300E0429C /* libfreetype.a in Frameworks */,
 				967824A119F6B66300E0429C /* liblua5.2.a in Frameworks */,
-				967824A319F6B66300E0429C /* libz.a in Frameworks */,
 				9678248919F6B66200E0429C /* libbass.dylib in Frameworks */,
 				9678248319F6B33D00E0429C /* AudioToolbox.framework in Frameworks */,
 				9678248419F6B33D00E0429C /* IOKit.framework in Frameworks */,
@@ -203,9 +189,9 @@
 		967823CA19F6AD7900E0429C = {
 			isa = PBXGroup;
 			children = (
+				960C21541BC508AA006B62CD /* init.cpp */,
 				9656F9F51A62560C005D487E /* data.zip */,
 				9675393219F6DA22001B02D9 /* icon.icns */,
-				967824A619F6B75800E0429C /* init.mm */,
 				9678241919F6B21D00E0429C /* 3d.cpp */,
 				9678241A19F6B21D00E0429C /* Animation.cpp */,
 				9678241B19F6B21D00E0429C /* AnimationSet.cpp */,
@@ -267,6 +253,8 @@
 		967823D519F6AD7A00E0429C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				960C21561BC50916006B62CD /* libz.tbd */,
+				960C21521BC50742006B62CD /* liballegro_monolith-static.a */,
 				9656F9F71A625642005D487E /* liballegro_physfs-static.a */,
 				9656F9F81A625642005D487E /* libphysfs.a */,
 				96D291B11A04703D00C3AA96 /* GameKit.framework */,
@@ -374,7 +362,7 @@
 						DevelopmentTeam = ZCLK6CUZ99;
 						SystemCapabilities = {
 							com.apple.GameCenter = {
-								enabled = 1;
+								enabled = 0;
 							};
 							com.apple.Sandbox = {
 								enabled = 1;
@@ -443,7 +431,7 @@
 				9678246419F6B21F00E0429C /* io.cpp in Sources */,
 				9678247319F6B21F00E0429C /* shooter.cpp in Sources */,
 				9678245F19F6B21F00E0429C /* graphics.cpp in Sources */,
-				967824A719F6B75800E0429C /* init.mm in Sources */,
+				960C21551BC508AA006B62CD /* init.cpp in Sources */,
 				9678246B19F6B21F00E0429C /* monster2.cpp in Sources */,
 				9678245719F6B21F00E0429C /* CombatPlayer.cpp in Sources */,
 				9678244C19F6B21F00E0429C /* 3d.cpp in Sources */,
@@ -567,17 +555,20 @@
 		9678240519F6AD7A00E0429C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
 				CLANG_CXX_LIBRARY = "libstdc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CODE_SIGN_ENTITLEMENTS = "Monster RPG 2/Monster RPG 2.entitlements";
 				CODE_SIGN_IDENTITY = "Developer ID Application";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "3rd Party Mac Developer Application: Nooskewl (ZCLK6CUZ99)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application: Nooskewl (ZCLK6CUZ99)";
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Monster RPG 2/Monster RPG 2-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"NO_GAMECENTER=1",
+					"DEMO=1",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -592,8 +583,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CFLAGS = "-mmacosx-version-min=10.6";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "4c734172-f949-4ead-8749-e1b3a9a8a19e";
-				SDKROOT = macosx10.10;
+				PROVISIONING_PROFILE = "";
+				SDKROOT = macosx;
 				VALID_ARCHS = "x86_64 i386";
 				WRAPPER_EXTENSION = app;
 			};
@@ -602,17 +593,20 @@
 		9678240619F6AD7A00E0429C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
 				CLANG_CXX_LIBRARY = "libstdc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CODE_SIGN_ENTITLEMENTS = "Monster RPG 2/Monster RPG 2.entitlements";
 				CODE_SIGN_IDENTITY = "Developer ID Application";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "3rd Party Mac Developer Application: Nooskewl (ZCLK6CUZ99)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application: Nooskewl (ZCLK6CUZ99)";
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Monster RPG 2/Monster RPG 2-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"NO_GAMECENTER=1",
+					"DEMO=1",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -627,8 +621,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CFLAGS = "-mmacosx-version-min=10.6";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "4c734172-f949-4ead-8749-e1b3a9a8a19e";
-				SDKROOT = macosx10.10;
+				PROVISIONING_PROFILE = "";
+				SDKROOT = macosx;
 				VALID_ARCHS = "x86_64 i386";
 				WRAPPER_EXTENSION = app;
 			};
