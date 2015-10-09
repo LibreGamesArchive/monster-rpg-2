@@ -91,6 +91,8 @@ ALLEGRO_DEBUG_CHANNEL("morpg2")
 #endif
 #include "sound.hpp"
 
+#define NUM_ACHIEVEMENTS 30
+
 const int LETTER_INDEX = 3;
 
 const int CURE_INDEX = 2;

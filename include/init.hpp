@@ -232,4 +232,8 @@ extern float textScaleY;
 
 extern int ALPHA_FMT;
 
+#ifdef STEAMWORKS
+void do_milestone(int num, bool visual);
+#endif
+
 #endif

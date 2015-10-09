@@ -24,6 +24,228 @@ extern "C" {
 
 #include <object_filenames.hpp>
 
+#ifdef STEAMWORKS
+#include <steam/steam_api.h>
+
+#define _ACH_ID( id, name ) { id, #id, name, "", 0, 0 }
+struct Achievement_t
+{
+	int m_eAchievementID;
+	const char *m_pchAchievementID;
+	char m_rgchName[128];
+	char m_rgchDescription[256];
+	bool m_bAchieved;
+	int m_iIconImage;
+};
+
+class CSteamAchievements
+{
+private:
+	int64 m_iAppID; // Our current AppID
+	Achievement_t *m_pAchievements; // Achievements data
+	int m_iNumAchievements; // The number of Achievements
+	bool m_bInitialized; // Have we called Request stats and received the callback?
+
+public:
+	CSteamAchievements(Achievement_t *Achievements, int NumAchievements);
+	~CSteamAchievements() {}
+	
+	bool RequestStats();
+	bool SetAchievement(const char* ID);
+
+	STEAM_CALLBACK( CSteamAchievements, OnUserStatsReceived, UserStatsReceived_t, 
+		m_CallbackUserStatsReceived );
+	STEAM_CALLBACK( CSteamAchievements, OnUserStatsStored, UserStatsStored_t, 
+		m_CallbackUserStatsStored );
+	STEAM_CALLBACK( CSteamAchievements, OnAchievementStored, 
+		UserAchievementStored_t, m_CallbackAchievementStored );
+};
+
+CSteamAchievements::CSteamAchievements(Achievement_t *Achievements, int NumAchievements): 				
+ m_iAppID( 0 ),
+ m_bInitialized( false ),
+ m_CallbackUserStatsReceived( this, &CSteamAchievements::OnUserStatsReceived ),
+ m_CallbackUserStatsStored( this, &CSteamAchievements::OnUserStatsStored ),
+ m_CallbackAchievementStored( this, &CSteamAchievements::OnAchievementStored )
+{
+     m_iAppID = SteamUtils()->GetAppID();
+     m_pAchievements = Achievements;
+     m_iNumAchievements = NumAchievements;
+     RequestStats();
+}
+
+bool CSteamAchievements::RequestStats()
+{
+	// Is Steam loaded? If not we can't get stats.
+	if ( NULL == SteamUserStats() || NULL == SteamUser() )
+	{
+		return false;
+	}
+	// Is the user logged on?  If not we can't get stats.
+	if ( !SteamUser()->BLoggedOn() )
+	{
+		return false;
+	}
+	// Request user stats.
+	return SteamUserStats()->RequestCurrentStats();
+}
+
+bool CSteamAchievements::SetAchievement(const char* ID)
+{
+	// Have we received a call back from Steam yet?
+	if (m_bInitialized)
+	{
+		SteamUserStats()->SetAchievement(ID);
+		return SteamUserStats()->StoreStats();
+	}
+	// If not then we can't set achievements yet
+	return false;
+}
+
+void CSteamAchievements::OnUserStatsReceived( UserStatsReceived_t *pCallback )
+{
+ // we may get callbacks for other games' stats arriving, ignore them
+ if ( m_iAppID == pCallback->m_nGameID )
+ {
+   if ( k_EResultOK == pCallback->m_eResult )
+   {
+     OutputDebugString("Received stats and achievements from Steam\n");
+     m_bInitialized = true;
+
+     // load achievements
+     for ( int iAch = 0; iAch < m_iNumAchievements; ++iAch )
+     {
+       Achievement_t &ach = m_pAchievements[iAch];
+
+       SteamUserStats()->GetAchievement(ach.m_pchAchievementID, &ach.m_bAchieved);
+       _snprintf( ach.m_rgchName, sizeof(ach.m_rgchName), "%s", 
+          SteamUserStats()->GetAchievementDisplayAttribute(ach.m_pchAchievementID, 
+          "name"));
+       _snprintf( ach.m_rgchDescription, sizeof(ach.m_rgchDescription), "%s", 
+          SteamUserStats()->GetAchievementDisplayAttribute(ach.m_pchAchievementID, 
+          "desc"));			
+     }
+   }
+   else
+   {
+     char buffer[128];
+     _snprintf( buffer, 128, "RequestStats - failed, %d\n", pCallback->m_eResult );
+     OutputDebugString( buffer );
+   }
+ }
+}
+
+void CSteamAchievements::OnUserStatsStored( UserStatsStored_t *pCallback )
+{
+ // we may get callbacks for other games' stats arriving, ignore them
+ if ( m_iAppID == pCallback->m_nGameID )	
+ {
+   if ( k_EResultOK == pCallback->m_eResult )
+   {
+     OutputDebugString( "Stored stats for Steam\n" );
+   }
+   else
+   {
+     char buffer[128];
+     _snprintf( buffer, 128, "StatsStored - failed, %d\n", pCallback->m_eResult );
+     OutputDebugString( buffer );
+   }
+ }
+}
+
+void CSteamAchievements::OnAchievementStored( UserAchievementStored_t *pCallback )
+{
+     // we may get callbacks for other games' stats arriving, ignore them
+     if ( m_iAppID == pCallback->m_nGameID )	
+     {
+          OutputDebugString( "Stored Achievement for Steam\n" );
+     }
+}
+
+Achievement_t g_Achievements[] = 
+{
+	{ 0, "1", "Escaped cell", 0, 0 },
+	{ 1, "2", "Rider joined party", 0, 0 },
+	{ 2, "3", "Defeat the water monster", 0, 0 },
+	{ 3, "4", "Get the badge", 0, 0 },
+	{ 4, "5", "Rios joined", 0, 0 },
+	{ 5, "6", "Gunnar joined", 0, 0 },
+	{ 6, "7", "Got the ring", 0, 0 },
+	{ 7, "8", "Beat the Witch", 0, 0 },
+	{ 8, "9", "Save Flowey", 0, 0 },
+	{ 9, "10", "Got key", 0, 0 },
+	{ 10, "11", "Get the medallion", 0, 0 },
+	{ 11, "12", "Win the beach battle", 0, 0 },
+	{ 12, "13", "Got milk", 0, 0 },
+	{ 13, "14", "Navigate the underwater trench", 0, 0 },
+	{ 14, "15", "Get the looking scope", 0, 0 },
+	{ 15, "16", "Drained pool", 0, 0 },
+	{ 16, "17", "Defeat the evil tig", 0, 0 },
+	{ 17, "18", "Free the prisoner", 0, 0 },
+	{ 18, "19", "Beat the archery game", 0, 0 },
+	{ 19, "20", "Get the staff back", 0, 0 },
+	{ 20, "21", "Find the forest gold", 0, 0 },
+	{ 21, "22", "Beat the possessed tree", 0, 0 },
+	{ 22, "23", "The Dragon Witch", 0, 0 },
+	{ 23, "24", "Another world", 0, 0 },
+	{ 24, "25", "Tipper joined", 0, 0 },
+	{ 25, "26", "Get the orb", 0, 0 },
+	{ 26, "27", "Recover the staff AGAIN", 0, 0 },
+	{ 27, "28", "Final boss", 0, 0 },
+	{ 28, "29", "Destroy the staff", 0, 0 },
+	{ 29, "30", "Roll the credits", 0, 0 }
+};
+
+CSteamAchievements*	g_SteamAchievements = NULL;
+
+void do_milestone(int num, bool visual)
+{
+	(void)visual;
+
+	int ach[NUM_ACHIEVEMENTS] = {
+		{ 3 },
+		{ 15 },
+		{ 20 },
+		{ 26 },
+		{ 30 },
+		{ 40 },
+		{ 43 },
+		{ 48 },
+		{ 56 },
+		{ 59 },
+		{ 65 },
+		{ 67 },
+		{ 74 },
+		{ 76 },
+		{ 89 },
+		{ 87 },
+		{ 96 },
+		{ 102 },
+		{ 98 },
+		{ 123 },
+		{ 180 },
+		{ 135 },
+		{ 149 },
+		{ 153 },
+		{ 154 },
+		{ 167 },
+		{ 168 },
+		{ 171 },
+		{ 176 },
+		{ 177 }
+	};
+
+	for (int i = 0; i < NUM_ACHIEVEMENTS; i++) {
+		if (num+1 == ach[i]) {
+			char s[100];
+			sprintf(s, "%d", i+1);
+			g_SteamAchievements->SetAchievement(s);
+			return;
+		}
+	}
+}
+#endif
+
 void create_tmpbuffer()
 {
 	int flags = al_get_new_bitmap_flags();
@@ -1196,6 +1418,16 @@ bool gamepadConnected()
 
 bool init(int *argc, char **argv[])
 {
+#ifdef STEAMWORKS
+// Initialize Steam
+bool bRet = SteamAPI_Init();
+// Create the SteamAchievements object if Steam was successfully initialized
+if (bRet)
+{
+	g_SteamAchievements = new CSteamAchievements(g_Achievements, NUM_ACHIEVEMENTS);
+}
+#endif
+
 	myArgc = *argc;
 	myArgv = *argv;
 
@@ -1814,6 +2046,14 @@ bool init(int *argc, char **argv[])
 
 void destroy()
 {
+#ifdef STEAMWORKS
+// Shutdown Steam
+SteamAPI_Shutdown();
+// Delete the SteamAchievements object
+if (g_SteamAchievements)
+	delete g_SteamAchievements;
+#endif
+
 	debug_message("Destroying resources...\n");
 
 	tguiShutdown();

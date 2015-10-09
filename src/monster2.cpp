@@ -6,6 +6,10 @@
 
 #include "svg.hpp"
 
+#ifdef STEAMWORKS
+#include <steam/steam_api.h>
+#endif
+
 extern double my_last_shake_time;
 extern ALLEGRO_FONT *my_load_ttf_font(const char *filename, int sz, int flags);
 
@@ -406,6 +410,10 @@ void get_mouse_pos_in_buffer_coords(int *this_x, int *this_y)
 // called from everywhere
 bool is_close_pressed(bool pump_events_only)
 {
+#ifdef STEAMWORKS
+SteamAPI_RunCallbacks();
+#endif
+
 	/* This is a bit of a hack, to make sure "input events" don't
 	 * stack up forever in places that don't use them.
 	 */

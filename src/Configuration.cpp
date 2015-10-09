@@ -1182,5 +1182,9 @@ Configuration::Configuration() :
 	wantedMode.width = 800;
 	wantedMode.height = 500;
 #endif
+#ifdef STEAMWORKS
+	wantedMode.fullscreen = true;
+#else
 	wantedMode.fullscreen = false;
+#endif
 }

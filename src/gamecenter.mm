@@ -56,7 +56,6 @@ bool isGameCenterAPIAvailable()
 #endif
 }
 
-#define NUM_ACHIEVEMENTS 30
 
 #ifndef NO_GAMECENTER
 void reportAchievementIdentifier(NSString* identifier, bool notification);
