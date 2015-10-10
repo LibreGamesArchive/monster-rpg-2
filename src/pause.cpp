@@ -1505,7 +1505,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				mainResume->set_left_widget(lwidget);
 				mainQuit->set_left_widget(lwidget);
 			}
-			
+#ifndef NO_GAMECENTER
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 			else if (game_center && widget == game_center)
 			{
@@ -1518,6 +1518,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 				switchiOSKeyboardIn();
 #endif
 			}
+#endif
 #endif
 
 			INPUT_EVENT ie = get_next_input_event();
@@ -3664,7 +3665,8 @@ bool config_menu(bool start_on_fullscreen)
 			}
 			
 			TGUIWidget *w = tguiUpdate();
-			
+
+#ifndef NO_GAMECENTER
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 			if (w && w == reset_game_center) {
 				char buf[200];
@@ -3678,6 +3680,7 @@ bool config_menu(bool start_on_fullscreen)
 				}
 			}
 			else
+#endif
 #endif
 			if (w && w == controls) {
 #ifdef ALLEGRO_ANDROID

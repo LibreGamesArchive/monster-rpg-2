@@ -302,7 +302,8 @@ static void drawOverlay(bool draw_controls, ALLEGRO_COLOR tint)
 	if (!gamepadConnected() && draw_red && global_draw_red && !path_head) {
 		m_draw_triangle(0, 0, 16, 0, 0, 16, al_map_rgba_f(tint.r*tint.a, 0, 0, tint.a));
 	}
-	
+
+#ifndef NO_GAMECENTER
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	if (isGameCenterAPIAvailable())
 	{
@@ -323,6 +324,7 @@ static void drawOverlay(bool draw_controls, ALLEGRO_COLOR tint)
 			);
 		}
 	}
+#endif
 #endif
 
 	draw_the_controls(draw_controls, tint);

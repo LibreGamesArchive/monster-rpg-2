@@ -109,7 +109,7 @@ void CSteamAchievements::OnUserStatsReceived( UserStatsReceived_t *pCallback )
  {
    if ( k_EResultOK == pCallback->m_eResult )
    {
-     OutputDebugString("Received stats and achievements from Steam\n");
+     //OutputDebugString("Received stats and achievements from Steam\n");
      m_bInitialized = true;
 
      // load achievements
@@ -130,7 +130,7 @@ void CSteamAchievements::OnUserStatsReceived( UserStatsReceived_t *pCallback )
    {
      char buffer[128];
      _snprintf( buffer, 128, "RequestStats - failed, %d\n", pCallback->m_eResult );
-     OutputDebugString( buffer );
+     //OutputDebugString( buffer );
    }
  }
 }
@@ -142,13 +142,13 @@ void CSteamAchievements::OnUserStatsStored( UserStatsStored_t *pCallback )
  {
    if ( k_EResultOK == pCallback->m_eResult )
    {
-     OutputDebugString( "Stored stats for Steam\n" );
+     //OutputDebugString( "Stored stats for Steam\n" );
    }
    else
    {
      char buffer[128];
      _snprintf( buffer, 128, "StatsStored - failed, %d\n", pCallback->m_eResult );
-     OutputDebugString( buffer );
+     //OutputDebugString( buffer );
    }
  }
 }
@@ -158,7 +158,7 @@ void CSteamAchievements::OnAchievementStored( UserAchievementStored_t *pCallback
      // we may get callbacks for other games' stats arriving, ignore them
      if ( m_iAppID == pCallback->m_nGameID )	
      {
-          OutputDebugString( "Stored Achievement for Steam\n" );
+          //OutputDebugString( "Stored Achievement for Steam\n" );
      }
 }
 
@@ -203,36 +203,36 @@ void do_milestone(int num, bool visual)
 	(void)visual;
 
 	int ach[NUM_ACHIEVEMENTS] = {
-		{ 3 },
-		{ 15 },
-		{ 20 },
-		{ 26 },
-		{ 30 },
-		{ 40 },
-		{ 43 },
-		{ 48 },
-		{ 56 },
-		{ 59 },
-		{ 65 },
-		{ 67 },
-		{ 74 },
-		{ 76 },
-		{ 89 },
-		{ 87 },
-		{ 96 },
-		{ 102 },
-		{ 98 },
-		{ 123 },
-		{ 180 },
-		{ 135 },
-		{ 149 },
-		{ 153 },
-		{ 154 },
-		{ 167 },
-		{ 168 },
-		{ 171 },
-		{ 176 },
-		{ 177 }
+		3,
+		15,
+		20,
+		26,
+		30,
+		40,
+		43,
+		48,
+		56,
+		59,
+		65,
+		67,
+		74,
+		76,
+		89,
+		87,
+		96,
+		102,
+		98,
+		123,
+		180,
+		135,
+		149,
+		153,
+		154,
+		167,
+		168,
+		171,
+		176,
+		177
 	};
 
 	for (int i = 0; i < NUM_ACHIEVEMENTS; i++) {
@@ -1790,8 +1790,10 @@ if (bRet)
 
 	al_set_new_bitmap_flags(PRESERVE_TEXTURE | ALLEGRO_CONVERT_BITMAP);
 
+#ifndef NO_GAMECENTER
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
 	authenticatePlayer();
+#endif
 #endif
 
 	custom_cursor_bmp = m_load_bitmap(getResource("media/mouse_cursor.png"));
