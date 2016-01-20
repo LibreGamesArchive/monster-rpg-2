@@ -25,22 +25,18 @@ import android.app.Activity;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.content.IntentFilter;
 
 public class MO2Activity extends AllegroActivity {
 
 	/* load libs */
 	static {
-		System.loadLibrary("allegro");
-		System.loadLibrary("allegro_memfile");
-		System.loadLibrary("allegro_primitives");
-		System.loadLibrary("allegro_image");
-		System.loadLibrary("allegro_font");
-		System.loadLibrary("allegro_ttf");
-		System.loadLibrary("allegro_color");
-		System.loadLibrary("allegro_physfs");
+		System.loadLibrary("allegro_monolith");
 		System.loadLibrary("bass");
 		System.loadLibrary("monsterrpg2");
 	}
+
+	MyBroadcastReceiver bcr;
 
 	public MO2Activity()
 	{
@@ -52,126 +48,73 @@ public class MO2Activity extends AllegroActivity {
 		Log.d("MoRPG2", s);
 	}
 
-	static String keyS = "";
-
-	static HashMap<String, Product> mOutstandingPurchaseRequests = new HashMap<String, Product>();
-	static PublicKey mPublicKey;
-
 	static int purchased = -1;
 
-	public void requestPurchase(final Product product)
-		throws GeneralSecurityException, UnsupportedEncodingException, JSONException {
-		SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
+	public void requestPurchase(final Product product) {
+		Purchasable purchasable = new Purchasable(product.getIdentifier());
 
-		// This is an ID that allows you to associate a successful purchase with
-		// it's original request. The server does nothing with this string except
-		// pass it back to you, so it only needs to be unique within this instance
-		// of your app to allow you to pair responses with requests.
-		String uniqueId = Long.toHexString(sr.nextLong());
-
-		JSONObject purchaseRequest = new JSONObject();
-		purchaseRequest.put("uuid", uniqueId);
-		purchaseRequest.put("identifier", product.getIdentifier());
-		// This value is only needed for testing, not setting it results in a live purchase
-		purchaseRequest.put("testing", "true"); 
-		String purchaseRequestJson = purchaseRequest.toString();
-
-		byte[] keyBytes = new byte[16];
-		sr.nextBytes(keyBytes);
-		SecretKey key = new SecretKeySpec(keyBytes, "AES");
-
-		byte[] ivBytes = new byte[16];
-		sr.nextBytes(ivBytes);
-		IvParameterSpec iv = new IvParameterSpec(ivBytes);
-
-		Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding", "BC");
-		cipher.init(Cipher.ENCRYPT_MODE, key, iv);
-		byte[] payload = cipher.doFinal(purchaseRequestJson.getBytes("UTF-8"));
-
-		cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding", "BC");
-		cipher.init(Cipher.ENCRYPT_MODE, mPublicKey);
-		byte[] encryptedKey = cipher.doFinal(keyBytes);
-
-		Purchasable purchasable =
-			new Purchasable(
-				product.getIdentifier(),
-				Base64.encodeToString(encryptedKey, Base64.NO_WRAP),
-				Base64.encodeToString(ivBytes, Base64.NO_WRAP),
-				Base64.encodeToString(payload, Base64.NO_WRAP) );
-	
-		synchronized (mOutstandingPurchaseRequests) {
-		    mOutstandingPurchaseRequests.put(uniqueId, product);
-		}
-		OuyaResponseListener<String> purchaseListener =
-		new OuyaResponseListener<String>() {
-		    @Override
-		    public void onCancel() {
-		    	purchased = 0;
-		    }
-		    @Override
-		    public void onSuccess(String result) {
-		    	purchased = 0;
-			try {
-			    OuyaEncryptionHelper helper = new OuyaEncryptionHelper();
-
-			    JSONObject response = new JSONObject(result);
-
-			    String id = helper.decryptPurchaseResponse(response, mPublicKey);
-			    Product storedProduct;
-			    synchronized (mOutstandingPurchaseRequests) {
-				storedProduct = mOutstandingPurchaseRequests.remove(id);
-			    }
-			    if(storedProduct == null) {
-				onFailure(
-				    OuyaErrorCodes.THROW_DURING_ON_SUCCESS, 
-				    "No purchase outstanding for the given purchase request",
-				    Bundle.EMPTY);
-				return;
-			    }
-
-			    Log.d("Purchase", "Congrats you bought: " + storedProduct.getName());
-
-			    if (storedProduct.getName().equals("Monster RPG 2")) {
-			    	purchased = 1;
-			    }
-			} catch (Exception e) {
-			    Log.e("Purchase", "Your purchase failed.", e);
+		OuyaResponseListener<PurchaseResult> purchaseListener =	new OuyaResponseListener<PurchaseResult>() {
+			@Override
+			public void onCancel() {
+				purchased = 0;
 			}
-		    }
-
-		    @Override
-		    public void onFailure(int errorCode, String errorMessage, Bundle errorBundle) {
-		    	purchased = 0;
-			Log.d("Error", errorMessage);
-		    }
+			@Override
+			public void onSuccess(PurchaseResult result) {
+				if (result.getProductIdentifier().equals("MONSTER_RPG_2")) {
+					Log.d("MonsterRPG2", "Congrats on your purchase");
+					writeReceipt();
+					purchased = 1;
+				}
+				else {
+					purchased = 0;
+					Log.e("MonsterRPG2", "Your purchase failed.");
+				}
+			}
+			@Override
+			public void onFailure(int errorCode, String errorMessage, Bundle errorBundle) {
+				purchased = 0;
+				Log.d("MonsterRPG2", errorMessage);
+			}
 		};
-		OuyaFacade.getInstance().requestPurchase(purchasable, purchaseListener);
+
+		OuyaFacade.getInstance().requestPurchase(this, purchasable, purchaseListener);
+	}
+
+	static void writeReceipt()
+	{
+		OuyaFacade.getInstance().putGameData("MonsterRPG2", "PURCHASED");
 	}
 
 	public void doIAP()
 	{
 		purchased = -1;
-		if (OuyaFacade.getInstance().isRunningOnOUYAHardware()) {
+
+		if (OuyaFacade.getInstance().isRunningOnOUYASupportedHardware()) {
+			// This is the set of product IDs which our app knows about
 			List<Purchasable> PRODUCT_ID_LIST =
 				Arrays.asList(new Purchasable("MONSTER_RPG_2"));
-			OuyaResponseListener<ArrayList<Product>> productListListener =
-				new OuyaResponseListener<ArrayList<Product>>() {
+
+			OuyaResponseListener<List<Product>> productListListener =
+				new OuyaResponseListener<List<Product>>() {
 					@Override
 					public void onCancel() {
 						purchased = 0;
 					}
 					@Override
-					public void onSuccess(ArrayList<Product> products) {
+					public void onSuccess(List<Product> products) {
 						if (products.size() == 0) {
 							purchased = 0;
 						}
 						else {
 							for (Product p : products) {
-								Log.d("Product", p.getName() + " costs " + p.getPriceInCents());
+								Log.d("MonsterRPG2", p.getName() + " costs " + p.getPriceInCents());
 								try {
-									requestPurchase(p);
+									if (p.getIdentifier().equals("MONSTER_RPG_2")) {
+										requestPurchase(p);
+									}
 								} catch (Exception e) {
-									Log.e("ERROR", "requestPurcase failure", e);
+									purchased = 0;
+									Log.e("MonsterRPG2", "requestPurcase failure", e);
 								}
 							}
 						}
@@ -180,10 +123,11 @@ public class MO2Activity extends AllegroActivity {
 					@Override
 					public void onFailure(int errorCode, String errorMessage, Bundle errorBundle) {
 						purchased = 0;
-						Log.d("Error", errorMessage);
+						Log.d("MonsterRPG2", errorMessage);
 					}
 			};
-			OuyaFacade.getInstance().requestProductList(PRODUCT_ID_LIST, productListListener);
+
+			OuyaFacade.getInstance().requestProductList(this, PRODUCT_ID_LIST, productListListener);
 		}
 		else {
 			purchased = 0;
@@ -198,64 +142,124 @@ public class MO2Activity extends AllegroActivity {
 	public void queryPurchased()
 	{
 		purchased = -1;
-		OuyaResponseListener<String> receiptListListener =
-		new OuyaResponseListener<String>() {
-		    @Override
-		    public void onCancel() {
-		    	purchased = 0;
-		    }
-		    @Override
-		    public void onSuccess(String receiptResponse) {
-			OuyaEncryptionHelper helper = new OuyaEncryptionHelper();
-			List<Receipt> receipts = null;
-			try {
-			    JSONObject response = new JSONObject(receiptResponse);
-			    receipts = helper.decryptReceiptResponse(response, mPublicKey);
-			} catch (Exception e) {
-		    	    purchased = 0;
-			    throw new RuntimeException(e);
-			}
-			Log.d("Receipt", "Listing purchases:");
-			for (Receipt r : receipts) {
-			    Log.d("Receipt", "You have purchased: " + r.getIdentifier());
-			    if (r.getIdentifier().equals("MONSTER_RPG_2")) {
-			    	purchased = 1;
-			    }
-			}
-			if (purchased == -1) {
-			    purchased = 0;
-			}
-		    }
 
-		    @Override
-		    public void onFailure(int errorCode, String errorMessage, Bundle errorBundle) {
-		    	purchased = 0;
-			Log.d("Error", errorMessage);
-		    }
-		};
-		OuyaFacade.getInstance().requestReceipts(receiptListListener);
+		// The receipt listener now receives a collection of tv.ouya.console.api.Receipt objects.
+		OuyaResponseListener<Collection<Receipt>> receiptListListener =
+			new OuyaResponseListener<Collection<Receipt>>() {
+				@Override
+				public void onSuccess(Collection<Receipt> receipts) {
+					for (Receipt r : receipts) {
+						Log.d("MonsterRPG2", r.getIdentifier() + " purchased for " + r.getFormattedPrice());
+						if (r.getIdentifier().equals("MONSTER_RPG_2")) {
+							purchased = 1;
+						}
+					}
+					if (purchased == -1) {
+						purchased = 0;
+					}
+				}
+
+				@Override
+				public void onFailure(int errorCode, String errorMessage, Bundle errorBundle) {
+					Log.d("MonsterRPG2", errorMessage);
+					purchased = 0;
+				}
+
+				@Override
+				public void onCancel() {
+					Log.d("MonsterRPG2", "Cancelled checking receipts");
+					purchased = 0;
+				}
+			};
+
+		try {
+			if (OuyaFacade.getInstance().getGameData("MonsterRPG2").equals("PURCHASED")) {
+				purchased = 1;
+			}
+			else {
+				purchased = 0;
+			}
+		}
+		catch (Exception e) {
+			if (OuyaFacade.getInstance().isRunningOnOUYASupportedHardware()) {
+				OuyaFacade.getInstance().requestReceipts(this, receiptListListener);
+			}
+			else {
+				purchased = 0;
+			}
+		}
 	}
 
-	public static final String DEVELOPER_ID = "";
+	public static final String DEVELOPER_ID = "FIXME";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
-		OuyaFacade.getInstance().init(this, DEVELOPER_ID);
-		try {
-			X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.decode(keyS, Base64.DEFAULT));
-			KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-			mPublicKey = keyFactory.generatePublic(keySpec);
-		} catch (Exception e) {
-			Log.e("ERROR", "Unable to create encryption key", e);
-		}
+		Bundle developerInfo = new Bundle();
+
+		// Your developer id can be found in the Developer Portal
+		developerInfo.putString(OuyaFacade.OUYA_DEVELOPER_ID, DEVELOPER_ID);
+
+		// There are a variety of ways to store and access your application key.
+		// Two of them are demoed in the samples 'game-sample' and 'iap-sample-app'
+		developerInfo.putByteArray(OuyaFacade.OUYA_DEVELOPER_PUBLIC_KEY, loadApplicationKey());
+
+		OuyaFacade.getInstance().init(this, developerInfo);
 		super.onCreate(savedInstanceState);
+
+		bcr = new MyBroadcastReceiver();
 	}
 
 	@Override
 	public void onDestroy() {
 		OuyaFacade.getInstance().shutdown();
 		super.onDestroy();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		registerReceiver(bcr, new IntentFilter("android.intent.action.DREAMING_STARTED"));
+		registerReceiver(bcr, new IntentFilter("android.intent.action.DREAMING_STOPPED"));
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+
+		unregisterReceiver(bcr);
+	}
+
+	byte[] loadApplicationKey() {
+		// Create a PublicKey object from the key data downloaded from the developer portal.
+		try {
+			// Read in the key.der file (downloaded from the developer portal)
+			InputStream inputStream = getResources().openRawResource(R.raw.key);
+			byte[] applicationKey = new byte[inputStream.available()];
+			inputStream.read(applicationKey);
+			inputStream.close();
+			return applicationKey;
+		} catch (Exception e) {
+			Log.e("MonsterRPG2", "Unable to load application key", e);
+		}
+
+		return null;
+	}
+
+	@Override
+	public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (null != OuyaFacade.getInstance())
+		{
+			if (OuyaFacade.getInstance().processActivityResult(requestCode, resultCode, data)) {
+				// handled activity result
+			} else {
+				// unhandled activity result
+			}
+		} else {
+		// OuyaFacade not initialized
+		}
 	}
 }
 

@@ -128,6 +128,10 @@ void goHome()
 
 bool isAndroidConsole()
 {
+#if defined OUYA
+	return true;
+#endif
+
 	static bool first = true;
 	static bool is_console;
 
