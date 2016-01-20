@@ -1,8 +1,19 @@
 diff --git a/addons/ttf/ttf.c b/addons/ttf/ttf.c
-index b8e0325..b935118 100644
+index 5ced7d4..2beb4bd 100644
 --- a/addons/ttf/ttf.c
 +++ b/addons/ttf/ttf.c
-@@ -249,7 +249,7 @@ static unsigned char *alloc_glyph_region(ALLEGRO_TTF_FONT_DATA *data,
+@@ -149,6 +149,10 @@ static void unlock_current_page(ALLEGRO_TTF_FONT_DATA *data)
+       ASSERT(al_is_bitmap_locked(*back));
+       al_unlock_bitmap(*back);
+       data->page_lr = NULL;
++      //al_set_standard_file_interface();
++      //ALLEGRO_FILE *f = al_fopen("/sdcard/tmp.txt", "a");
++      //al_fprintf(f, "UNLOCKED FONT PAGE\n");
++      //al_fclose(f);
+    }
+ }
+ 
+@@ -249,10 +253,10 @@ static unsigned char *alloc_glyph_region(ALLEGRO_TTF_FONT_DATA *data,
        relock = true;
     }
  
@@ -10,8 +21,12 @@ index b8e0325..b935118 100644
 +   if (new || data->page_lr == NULL) {
        char *ptr;
        int i;
-       unlock_current_page(data);
-@@ -268,22 +268,21 @@ static unsigned char *alloc_glyph_region(ALLEGRO_TTF_FONT_DATA *data,
+-      unlock_current_page(data);
++      //unlock_current_page(data);
+ 
+       data->lock_rect.x = glyph->region.x;
+       data->lock_rect.y = glyph->region.y;
+@@ -268,22 +272,21 @@ static unsigned char *alloc_glyph_region(ALLEGRO_TTF_FONT_DATA *data,
           data->lock_rect.h = h4;
        }
  
@@ -44,7 +59,7 @@ index b8e0325..b935118 100644
        }
     }
  
-@@ -291,8 +290,8 @@ static unsigned char *alloc_glyph_region(ALLEGRO_TTF_FONT_DATA *data,
+@@ -291,8 +294,8 @@ static unsigned char *alloc_glyph_region(ALLEGRO_TTF_FONT_DATA *data,
  
     /* Copy a displaced pointer for the glyph. */
     return (unsigned char *)data->page_lr->data
@@ -54,4 +69,109 @@ index b8e0325..b935118 100644
 +      + (glyph->region.x + 1) * sizeof(int32_t);
  }
  
+ 
+@@ -370,7 +373,6 @@ static void copy_glyph_color(ALLEGRO_TTF_FONT_DATA *font_data, FT_Face face,
+    }
+ }
+ 
+-
+ /* NOTE: this function may disable the bitmap hold drawing state
+  * and leave the current page bitmap locked.
+  */
+@@ -432,7 +434,7 @@ static void cache_glyph(ALLEGRO_TTF_FONT_DATA *font_data, FT_Face face,
+        copy_glyph_color(font_data, face, glyph_data);
+ 
+     if (!lock_more) {
+-       unlock_current_page(font_data);
++       //unlock_current_page(font_data);
+     }
+ }
+ 
+@@ -485,6 +487,8 @@ static int render_glyph(ALLEGRO_FONT const *f,
+ 
+    advance += glyph->advance;
+ 
++   unlock_current_page(data);
++
+    return advance;
+ }
+ 
+@@ -563,6 +567,7 @@ static int ttf_char_length(ALLEGRO_FONT const *f, int ch)
+       return 0;
+    cache_glyph(data, face, ft_index, glyph, false);
+    result = glyph->region.w - 2;
++   unlock_current_page(data);
+      
+    return result;
+ }
+@@ -618,6 +623,9 @@ static int ttf_text_length(ALLEGRO_FONT const *f, const ALLEGRO_USTR *text)
+       x += al_get_glyph_advance(f, ch, nch < 0 ?
+          ALLEGRO_NO_KERNING : nch);
+    }
++   
++   ALLEGRO_TTF_FONT_DATA *data = f->data;
++   unlock_current_page(data);
+ 
+    return x;
+ }
+@@ -661,27 +669,28 @@ static void ttf_get_text_dimensions(ALLEGRO_FONT const *f,
+    *bbh = f->height; // FIXME, we want the bounding box!
+ }
+ 
+-
+-#ifdef DEBUG_CACHE
++/*
+ #include "allegro5/allegro_image.h"
+-static void debug_cache(ALLEGRO_FONT *f)
++void debug_cache(ALLEGRO_FONT *f)
+ {
+    ALLEGRO_TTF_FONT_DATA *data = f->data;
+    _AL_VECTOR *v = &data->page_bitmaps;
+    static int j = 0;
+    int i;
+ 
+-   al_init_image_addon();
++	al_set_standard_file_interface();
++   //al_init_image_addon();
+ 
+    for (i = 0; i < (int)_al_vector_size(v); i++) {
+       ALLEGRO_BITMAP **bmp = _al_vector_ref(v, i);
+-      ALLEGRO_USTR *u = al_ustr_newf("font%d_%d.png", j, i);
++      ALLEGRO_USTR *u = al_ustr_newf("/sdcard/font%d_%d.png", j, i);
+       al_save_bitmap(al_cstr(u), *bmp);
+       al_ustr_free(u);
+    }
+    j++;
++   exit(0);
+ }
+-#endif
++*/
+ 
+ 
+ static void ttf_destroy(ALLEGRO_FONT *f)
+@@ -689,7 +698,7 @@ static void ttf_destroy(ALLEGRO_FONT *f)
+    ALLEGRO_TTF_FONT_DATA *data = f->data;
+    int i;
+ 
+-   unlock_current_page(data);
++   //unlock_current_page(data);
+ 
+ #ifdef DEBUG_CACHE
+    debug_cache(f);
+@@ -951,6 +960,7 @@ static bool ttf_get_glyph_dimensions(ALLEGRO_FONT const *f,
+    *bbw = glyph->region.w - 2;
+    *bbh = glyph->region.h;
+    *bby = glyph->offset_y;
++   unlock_current_page(data);
+       
+    return true;
+ }
+@@ -983,7 +993,7 @@ static int ttf_get_glyph_advance(ALLEGRO_FONT const *f, int codepoint1,
+    }
+    
+    advance = glyph->advance;
+-   unlock_current_page(data);
++   //unlock_current_page(data);
+    return advance + kerning;
+ }
  
