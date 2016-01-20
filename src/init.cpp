@@ -547,8 +547,13 @@ void load_fonts(void)
 
 	debug_message("done loading fonts");
 
+#if defined ALLEGRO_ANDROID
 	// NOTE: This has to be after display creation and loading of fonts
 	cache_all_glyphs();
+	al_get_text_width(medium_font, (std::string(_t("SWIPE TO ATTACK!")) + std::string(_t("Drag to use!"))).c_str());
+	al_get_text_width(huge_font, "0123456789:");
+#endif
+
 	load_translation(get_language_name(config.getLanguage()).c_str());
 }
 
