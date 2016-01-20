@@ -4015,14 +4015,12 @@ int title_menu(void)
 			}
 #endif
 			break_main_loop = false; // AGAIN (SEE ABOVE)
-#ifndef OUYA
 			INPUT_EVENT ie = get_next_input_event();
 			// Back button on android is a shake. other shakes (hot corner) suppressed on this menu (see monster2.cpp)
 			if (ie.button2 == DOWN || iphone_shaken(0.1)) {
 				selected = 0xBEEF;
 				goto done;
 			}
-#endif
 		}
 
 		if (break_for_fade_after_draw || draw_counter > 0) {
@@ -4042,9 +4040,7 @@ int title_menu(void)
 		}
 	}
 
-#ifndef OUYA
 done:
-#endif
 
 	if (break_for_fade_after_draw) {
 		break_for_fade_after_draw = false;

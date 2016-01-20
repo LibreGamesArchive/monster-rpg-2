@@ -1565,7 +1565,7 @@ if (bRet)
 
 	al_set_new_display_flags(flags);
 
-#if defined ALLEGRO_ANDROID
+#if defined ALLEGRO_ANDROID_XXX
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_STENCIL_SIZE, 8, ALLEGRO_REQUIRE);
 	al_set_new_display_option(ALLEGRO_COLOR_SIZE, 16, ALLEGRO_REQUIRE);
@@ -1676,6 +1676,10 @@ if (bRet)
 		config.write();
 		exit(1);
 	}
+
+#ifdef ALLEGRO_ANDROID
+	glDisable(GL_DITHER);
+#endif
 
 #ifdef ALLEGRO_WINDOWS
 	if (al_get_display_flags(display) & ALLEGRO_DIRECT3D) {

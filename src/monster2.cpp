@@ -1121,6 +1121,8 @@ top:
 			// resume
 			al_acknowledge_drawing_resume(display);
 #ifdef ALLEGRO_ANDROID
+			glDisable(GL_DITHER);
+
 			init_shaders();
 
 			_reload_loaded_bitmaps();
