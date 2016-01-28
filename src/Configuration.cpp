@@ -800,7 +800,7 @@ bool Configuration::read()
 	if (xml->getFailed()) {
 		debug_message("couldn't read config");
 		delete xml;
-#if defined OUYA
+#if defined OUYA && !defined NO_DRM
 		int purchased = checkPurchased();
 		if (purchased == 1) {
 			config.setPurchased(1);
