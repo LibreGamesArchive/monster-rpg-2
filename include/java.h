@@ -38,6 +38,9 @@ void autoconnect_zeemote();
 void goHome();
 void logString(const char *s);
 
+void init_play_services();
+void do_milestone(int num, bool visual);
+
 #if defined OUYA
 int isPurchased();
 void queryPurchased();

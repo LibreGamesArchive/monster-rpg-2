@@ -589,7 +589,7 @@ static int CSetMilestone(lua_State *stack)
 	bool value = (bool)lua_toboolean(stack, 2);
 
 	if (num >= 0 && num < MAX_MILESTONES) {
-#if defined(ALLEGRO_IPHONE) || defined (ALLEGRO_MACOSX) || defined (STEAMWORKS)
+#if defined(ALLEGRO_IPHONE) || defined (ALLEGRO_MACOSX) || defined (STEAMWORKS) || defined (GOOGLEPLAY)
 		if (value == true && gameInfo.milestones[num] == false)
 			do_milestone(num, true);
 #endif

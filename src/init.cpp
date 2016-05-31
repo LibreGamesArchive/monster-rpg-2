@@ -529,30 +529,34 @@ void load_fonts(void)
 		textScaleY = 2 * (screenScaleY/screenScaleX);
 	}
 
+	/* Load all the text in one big go because some Androids are buggy and can't cache glyphs separately */
+
+	ALLEGRO_CONFIG *sysconfig = al_get_system_config();
+
+	al_set_config_value(sysconfig, "ttf", "skip_cache_misses", "true");
+
+	std::string all_text = get_all_glyphs();
+	all_text += "0123456789`~!@#$%^&*()_-+={[}]|\\;:'\",<.>/?";
+	al_set_config_value(sysconfig, "ttf", "cache_text", all_text.c_str());
 	game_font = my_load_ttf_font(getResource("DejaVuSans.gif"), 9*(MIN(screenScaleX, screenScaleY)/2), ttf_flags);
 
 	if (!game_font) {
 		native_error("Failed to load game_font.");
 	}
 
+	al_set_config_value(sysconfig, "ttf", "cache_text", (std::string(_t("SWIPE TO ATTACK!")) + std::string(_t("Drag to use!"))).c_str());
 	medium_font = my_load_ttf_font(getResource("DejaVuSans.gif"), 32, ttf_flags);
 	if (!medium_font) {
 		native_error("Failed to load medium_font.");
 	}
 
+	al_set_config_value(sysconfig, "ttf", "cache_text", "0123456789:");
 	huge_font = my_load_ttf_font(getResource("heavy.gif"), 24, ttf_flags);
 	if (!huge_font) {
 		native_error("Failed to load huge_font.");
 	}
 
 	debug_message("done loading fonts");
-
-#if defined ALLEGRO_ANDROID
-	// NOTE: This has to be after display creation and loading of fonts
-	cache_all_glyphs();
-	al_get_text_width(medium_font, (std::string(_t("SWIPE TO ATTACK!")) + std::string(_t("Drag to use!"))).c_str());
-	al_get_text_width(huge_font, "0123456789:");
-#endif
 
 	load_translation(get_language_name(config.getLanguage()).c_str());
 }
@@ -2050,6 +2054,10 @@ if (bRet)
 	m_clear(black);
 	m_flip_display(); // backup bitmaps (slow)
 	m_clear(black);
+
+#ifdef GOOGLEPLAY
+	init_play_services();
+#endif
 
 	return true;
 }

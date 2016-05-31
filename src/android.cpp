@@ -212,6 +212,22 @@ extern "C" {
 
 static float backup_music_volume, backup_ambience_volume;
 
+JNIEXPORT void JNICALL Java_ca_nooskewl_monsterrpg2_MyBroadcastReceiver_pauseSound
+  (JNIEnv *env, jobject obj)
+{
+	backup_music_volume = getMusicVolume();
+	backup_ambience_volume = getAmbienceVolume();
+	setMusicVolume(0.0);
+	setAmbienceVolume(0.0);
+}
+
+JNIEXPORT void JNICALL Java_ca_nooskewl_monsterrpg2_MyBroadcastReceiver_resumeSound
+  (JNIEnv *env, jobject obj)
+{
+	setMusicVolume(backup_music_volume);
+	setAmbienceVolume(backup_ambience_volume);
+}
+
 JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_MyBroadcastReceiver_pauseSound
   (JNIEnv *env, jobject obj)
 {
@@ -228,6 +244,126 @@ JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_MyBroadcastReceiver_resumeS
 	setAmbienceVolume(backup_ambience_volume);
 }
 
+#define NUM_ACHIEVEMENTS 30
+
+const char *achievement_ids[] = {
+	/* codes from Google Play Developer Console */
+	"CgkIyobkjZsMEAIQAQ",
+	"CgkIyobkjZsMEAIQAg",
+	"CgkIyobkjZsMEAIQAw",
+	"CgkIyobkjZsMEAIQBA",
+	"CgkIyobkjZsMEAIQBQ",
+	"CgkIyobkjZsMEAIQBg",
+	"CgkIyobkjZsMEAIQBw",
+	"CgkIyobkjZsMEAIQCA",
+	"CgkIyobkjZsMEAIQCQ",
+	"CgkIyobkjZsMEAIQCg",
+	"CgkIyobkjZsMEAIQCw",
+	"CgkIyobkjZsMEAIQDA",
+	"CgkIyobkjZsMEAIQDQ",
+	"CgkIyobkjZsMEAIQDg",
+	"CgkIyobkjZsMEAIQDw",
+	"CgkIyobkjZsMEAIQEA",
+	"CgkIyobkjZsMEAIQEg",
+	"CgkIyobkjZsMEAIQEw",
+	"CgkIyobkjZsMEAIQFA",
+	"CgkIyobkjZsMEAIQFQ",
+	"CgkIyobkjZsMEAIQFg",
+	"CgkIyobkjZsMEAIQFw",
+	"CgkIyobkjZsMEAIQGA",
+	"CgkIyobkjZsMEAIQGQ",
+	"CgkIyobkjZsMEAIQGg",
+	"CgkIyobkjZsMEAIQGw",
+	"CgkIyobkjZsMEAIQHA",
+	"CgkIyobkjZsMEAIQHQ",
+	"CgkIyobkjZsMEAIQHg",
+	"CgkIyobkjZsMEAIQHw"
+};
+
+void achieve(const char *id)
+{
+	JNIEnv *env = _al_android_get_jnienv();
+
+	const char *s = NULL;
+
+	for (int i = 0; i < NUM_ACHIEVEMENTS; i++) {
+		if (!strcmp(achievement_ids[i], id)) {
+			s = achievement_ids[i];
+			break;
+		}
+	}
+
+	if (s == NULL) {
+		return;
+	}
+
+	jstring S = env->NewStringUTF(s);
+
+	_jni_callVoidMethodV(
+		env,
+		_al_android_activity_object(),
+		"unlock_achievement",
+		"(Ljava/lang/String;)V",
+		S
+	);
+
+	env->DeleteLocalRef(S);
+}
+
+void do_milestone(int num, bool visual)
+{
+	(void)visual;
+
+	int ach[NUM_ACHIEVEMENTS] = {
+		3,
+		15,
+		20,
+		26,
+		30,
+		40,
+		43,
+		48,
+		56,
+		59,
+		65,
+		67,
+		74,
+		76,
+		89,
+		87,
+		96,
+		102,
+		98,
+		123,
+		180,
+		135,
+		149,
+		153,
+		154,
+		167,
+		168,
+		171,
+		176,
+		177
+	};
+
+	for (int i = 0; i < NUM_ACHIEVEMENTS; i++) {
+		if (num+1 == ach[i]) {
+			achieve(achievement_ids[i]);
+			return;
+		}
+	}
+}
+
+void init_play_services()
+{
+	_jni_callVoidMethodV(
+		_al_android_get_jnienv(),
+		_al_android_activity_object(),
+		"init_play_services",
+		"()V"
+	);
+}
 #ifdef __cplusplus
 }
 #endif

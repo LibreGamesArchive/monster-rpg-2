@@ -9,7 +9,7 @@ extern std::vector<ALLEGRO_USTR *> post_translated_strings;
 
 std::string get_language_name(int index);
 std::string get_language_friendly_name(int index);
-void cache_all_glyphs();
+std::string get_all_glyphs();
 void load_translation(const char *filename);
 void load_translation_tags(void);
 const char *_t(const char *tag);

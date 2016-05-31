@@ -1111,6 +1111,26 @@ top:
 				if (event.type == ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING) {
 					break;
 				}
+				else if (event.type == ALLEGRO_EVENT_JOYSTICK_CONFIGURATION) {
+					al_reconfigure_joysticks();
+					int nj = al_get_num_joysticks();
+					if (nj == 0) {
+						num_joystick_buttons = 0;
+						config.setGamepadAvailable(false);
+					}
+					else if (nj > 0) {
+						set_user_joystick();
+						if (user_joystick != NULL) {
+							num_joystick_buttons = al_get_joystick_num_buttons(user_joystick);
+							config.setGamepadAvailable(true);
+						}
+						else {
+							num_joystick_buttons = 0;
+							config.setGamepadAvailable(false);
+						}
+					}
+					getInput()->reconfig();
+				}
 				if (event.type == USER_KEY_DOWN || event.type == USER_KEY_UP || event.type == USER_KEY_CHAR) {
 					al_unref_user_event((ALLEGRO_USER_EVENT *)&event);
 				}
@@ -1936,7 +1956,7 @@ int main(int argc, char *argv[])
 	fps_on = false;
 
 	prepareForScreenGrab1();
-	m_clear(m_map_rgb(0x00, 0xd8, 0xff));
+	m_clear(m_map_rgb(0x00, 0x00, 0x00));
 	m_draw_bitmap_identity_view(
 		nooskewl,
 		dx+dw/2-m_get_bitmap_width(nooskewl)/2,
@@ -1948,7 +1968,7 @@ int main(int argc, char *argv[])
 	bool cancelled = transitionIn(true, false);
 
 	if (!cancelled) {
-		m_clear(m_map_rgb(0x00, 0xd8, 0xff));
+		m_clear(m_map_rgb(0x00, 0x00, 0x00));
 		m_draw_bitmap_identity_view(
 			nooskewl,
 			dx+dw/2-m_get_bitmap_width(nooskewl)/2,
@@ -1962,7 +1982,7 @@ int main(int argc, char *argv[])
 					
 		m_rest(1.5);
 		prepareForScreenGrab1();
-		m_clear(m_map_rgb(0x00, 0xd8, 0xff));
+		m_clear(m_map_rgb(0x00, 0x00, 0x00));
 		m_draw_bitmap_identity_view(
 			nooskewl,
 			dx+dw/2-m_get_bitmap_width(nooskewl)/2,

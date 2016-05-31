@@ -108,7 +108,7 @@ static std::string get_entire_translation(const char *filename)
 	return whole_translation;
 }
 
-void cache_all_glyphs()
+std::string get_all_glyphs()
 {
 	std::string characters;
 
@@ -116,7 +116,7 @@ void cache_all_glyphs()
 		characters += get_entire_translation(translation_languages[i][0].c_str());
 	}
 
-	al_get_text_width(game_font, characters.c_str());
+	return characters;
 }
 
 void load_translation(const char *filename)

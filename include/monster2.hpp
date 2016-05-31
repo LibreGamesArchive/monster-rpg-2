@@ -38,6 +38,8 @@
 #define MS_SWIPE_TO_ATTACK 190
 #define MS_DRAG_TO_USE 191
 
+#define ALLEGRO_UNSTABLE
+
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
