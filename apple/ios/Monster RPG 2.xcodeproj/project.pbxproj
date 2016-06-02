@@ -50,19 +50,20 @@
 		9650E8211B6B25090030C5EB /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7F11B6B25090030C5EB /* util.cpp */; };
 		9650E8221B6B25090030C5EB /* widgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7F21B6B25090030C5EB /* widgets.cpp */; };
 		9650E8231B6B25090030C5EB /* xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E7F31B6B25090030C5EB /* xml.cpp */; };
-		9650E8291B6B26DB0030C5EB /* libAllegro5_iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9650E8241B6B26DB0030C5EB /* libAllegro5_iOS.a */; };
-		9650E82A1B6B26DB0030C5EB /* libbass.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9650E8251B6B26DB0030C5EB /* libbass.a */; };
-		9650E82B1B6B26DB0030C5EB /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9650E8261B6B26DB0030C5EB /* libfreetype.a */; };
-		9650E82C1B6B26DB0030C5EB /* liblua5.2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9650E8271B6B26DB0030C5EB /* liblua5.2.a */; };
-		9650E82D1B6B26DB0030C5EB /* libphysfs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9650E8281B6B26DB0030C5EB /* libphysfs.a */; };
 		9650E82F1B6B28570030C5EB /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9650E82E1B6B28570030C5EB /* init.cpp */; };
 		9650E8311B6B28CC0030C5EB /* data.zip in Resources */ = {isa = PBXBuildFile; fileRef = 9650E8301B6B28CC0030C5EB /* data.zip */; };
 		9650E8371B6B2C030030C5EB /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9650E8361B6B2C030030C5EB /* GameKit.framework */; };
-		9650E83B1B6B2EB50030C5EB /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9650E83A1B6B2EB50030C5EB /* StoreKit.framework */; };
 		9660CE3F1A6369970064D34F /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9660CE3E1A6369970064D34F /* Images.xcassets */; };
 		9660CEC51A6375F70064D34F /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9660CEC31A6375F70064D34F /* AudioToolbox.framework */; };
-		9660CEC61A6375F70064D34F /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9660CEC41A6375F70064D34F /* libz.dylib */; };
 		9660CEC81A6376640064D34F /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9660CEC71A6376640064D34F /* AVFoundation.framework */; };
+		966BD1A81CFFCEA3002D049A /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 966BD1A71CFFCEA3002D049A /* Launch Screen.storyboard */; };
+		966BD1AF1CFFCF1B002D049A /* libAllegro5_iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 966BD1A91CFFCF1B002D049A /* libAllegro5_iOS.a */; };
+		966BD1B01CFFCF1B002D049A /* libbass.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 966BD1AA1CFFCF1B002D049A /* libbass.a */; };
+		966BD1B11CFFCF1B002D049A /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 966BD1AB1CFFCF1B002D049A /* libfreetype.a */; };
+		966BD1B21CFFCF1B002D049A /* liblua5.2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 966BD1AC1CFFCF1B002D049A /* liblua5.2.a */; };
+		966BD1B31CFFCF1B002D049A /* libphysfs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 966BD1AD1CFFCF1B002D049A /* libphysfs.a */; };
+		966BD1B41CFFCF1B002D049A /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 966BD1AE1CFFCF1B002D049A /* libpng.a */; };
+		966BD1B61CFFD04F002D049A /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 966BD1B51CFFD04F002D049A /* libz.tbd */; };
 		969874D81A6377A200E0FD12 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9660CECD1A6377260064D34F /* Accelerate.framework */; };
 		969874DA1A63789700E0FD12 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 969874D91A63789700E0FD12 /* MobileCoreServices.framework */; };
 /* End PBXBuildFile section */
@@ -111,24 +112,25 @@
 		9650E7F11B6B25090030C5EB /* util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util.cpp; path = ../../src/util.cpp; sourceTree = "<group>"; };
 		9650E7F21B6B25090030C5EB /* widgets.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = widgets.cpp; path = ../../src/widgets.cpp; sourceTree = "<group>"; };
 		9650E7F31B6B25090030C5EB /* xml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = xml.cpp; path = ../../src/xml.cpp; sourceTree = "<group>"; };
-		9650E8241B6B26DB0030C5EB /* libAllegro5_iOS.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAllegro5_iOS.a; path = ../../../iphone_libs_r/lib/libAllegro5_iOS.a; sourceTree = "<group>"; };
-		9650E8251B6B26DB0030C5EB /* libbass.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbass.a; path = ../../../iphone_libs_r/lib/libbass.a; sourceTree = "<group>"; };
-		9650E8261B6B26DB0030C5EB /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = ../../../iphone_libs_r/lib/libfreetype.a; sourceTree = "<group>"; };
-		9650E8271B6B26DB0030C5EB /* liblua5.2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua5.2.a; path = ../../../iphone_libs_r/lib/liblua5.2.a; sourceTree = "<group>"; };
-		9650E8281B6B26DB0030C5EB /* libphysfs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libphysfs.a; path = ../../../iphone_libs_r/lib/libphysfs.a; sourceTree = "<group>"; };
 		9650E82E1B6B28570030C5EB /* init.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp.preprocessed; fileEncoding = 4; name = init.cpp; path = ../../src/init.cpp; sourceTree = "<group>"; };
 		9650E8301B6B28CC0030C5EB /* data.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; name = data.zip; path = ../../data.zip; sourceTree = "<group>"; };
 		9650E8361B6B2C030030C5EB /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
-		9650E83A1B6B2EB50030C5EB /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		9660CE2A1A6369970064D34F /* Monster RPG 2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Monster RPG 2.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9660CE2E1A6369970064D34F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9660CE3E1A6369970064D34F /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		9660CEC31A6375F70064D34F /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
-		9660CEC41A6375F70064D34F /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		9660CEC71A6376640064D34F /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		9660CEC91A6376BB0064D34F /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
 		9660CECB1A6376EA0064D34F /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		9660CECD1A6377260064D34F /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		966BD1A71CFFCEA3002D049A /* Launch Screen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = "Launch Screen.storyboard"; path = "Monster RPG 2/Launch Screen.storyboard"; sourceTree = "<group>"; };
+		966BD1A91CFFCF1B002D049A /* libAllegro5_iOS.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAllegro5_iOS.a; path = ../../../libs/ios/lib/libAllegro5_iOS.a; sourceTree = "<group>"; };
+		966BD1AA1CFFCF1B002D049A /* libbass.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbass.a; path = ../../../libs/ios/lib/libbass.a; sourceTree = "<group>"; };
+		966BD1AB1CFFCF1B002D049A /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = ../../../libs/ios/lib/libfreetype.a; sourceTree = "<group>"; };
+		966BD1AC1CFFCF1B002D049A /* liblua5.2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua5.2.a; path = ../../../libs/ios/lib/liblua5.2.a; sourceTree = "<group>"; };
+		966BD1AD1CFFCF1B002D049A /* libphysfs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libphysfs.a; path = ../../../libs/ios/lib/libphysfs.a; sourceTree = "<group>"; };
+		966BD1AE1CFFCF1B002D049A /* libpng.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpng.a; path = ../../../libs/ios/lib/libpng.a; sourceTree = "<group>"; };
+		966BD1B51CFFD04F002D049A /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		969874D91A63789700E0FD12 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -137,18 +139,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				966BD1B61CFFD04F002D049A /* libz.tbd in Frameworks */,
+				966BD1AF1CFFCF1B002D049A /* libAllegro5_iOS.a in Frameworks */,
+				966BD1B01CFFCF1B002D049A /* libbass.a in Frameworks */,
+				966BD1B11CFFCF1B002D049A /* libfreetype.a in Frameworks */,
+				966BD1B21CFFCF1B002D049A /* liblua5.2.a in Frameworks */,
+				966BD1B31CFFCF1B002D049A /* libphysfs.a in Frameworks */,
+				966BD1B41CFFCF1B002D049A /* libpng.a in Frameworks */,
 				9650E8371B6B2C030030C5EB /* GameKit.framework in Frameworks */,
-				9650E8291B6B26DB0030C5EB /* libAllegro5_iOS.a in Frameworks */,
-				9650E82A1B6B26DB0030C5EB /* libbass.a in Frameworks */,
-				9650E83B1B6B2EB50030C5EB /* StoreKit.framework in Frameworks */,
-				9650E82B1B6B26DB0030C5EB /* libfreetype.a in Frameworks */,
-				9650E82C1B6B26DB0030C5EB /* liblua5.2.a in Frameworks */,
-				9650E82D1B6B26DB0030C5EB /* libphysfs.a in Frameworks */,
 				969874DA1A63789700E0FD12 /* MobileCoreServices.framework in Frameworks */,
 				969874D81A6377A200E0FD12 /* Accelerate.framework in Frameworks */,
 				9660CEC81A6376640064D34F /* AVFoundation.framework in Frameworks */,
 				9660CEC51A6375F70064D34F /* AudioToolbox.framework in Frameworks */,
-				9660CEC61A6375F70064D34F /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -209,14 +211,16 @@
 		9660CE211A6369970064D34F = {
 			isa = PBXGroup;
 			children = (
-				9650E83A1B6B2EB50030C5EB /* StoreKit.framework */,
+				966BD1B51CFFD04F002D049A /* libz.tbd */,
+				966BD1A91CFFCF1B002D049A /* libAllegro5_iOS.a */,
+				966BD1AA1CFFCF1B002D049A /* libbass.a */,
+				966BD1AB1CFFCF1B002D049A /* libfreetype.a */,
+				966BD1AC1CFFCF1B002D049A /* liblua5.2.a */,
+				966BD1AD1CFFCF1B002D049A /* libphysfs.a */,
+				966BD1AE1CFFCF1B002D049A /* libpng.a */,
+				966BD1A71CFFCEA3002D049A /* Launch Screen.storyboard */,
 				9650E8361B6B2C030030C5EB /* GameKit.framework */,
 				9650E8301B6B28CC0030C5EB /* data.zip */,
-				9650E8241B6B26DB0030C5EB /* libAllegro5_iOS.a */,
-				9650E8251B6B26DB0030C5EB /* libbass.a */,
-				9650E8261B6B26DB0030C5EB /* libfreetype.a */,
-				9650E8271B6B26DB0030C5EB /* liblua5.2.a */,
-				9650E8281B6B26DB0030C5EB /* libphysfs.a */,
 				9650E7C31B6B24CE0030C5EB /* src */,
 				969874D91A63789700E0FD12 /* MobileCoreServices.framework */,
 				9660CECD1A6377260064D34F /* Accelerate.framework */,
@@ -224,7 +228,6 @@
 				9660CEC91A6376BB0064D34F /* AudioUnit.framework */,
 				9660CEC71A6376640064D34F /* AVFoundation.framework */,
 				9660CEC31A6375F70064D34F /* AudioToolbox.framework */,
-				9660CEC41A6375F70064D34F /* libz.dylib */,
 				9660CE2C1A6369970064D34F /* Monster RPG 2 */,
 				9660CE2B1A6369970064D34F /* Products */,
 			);
@@ -292,7 +295,7 @@
 								enabled = 1;
 							};
 							com.apple.InAppPurchase = {
-								enabled = 1;
+								enabled = 0;
 							};
 						};
 					};
@@ -321,6 +324,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				966BD1A81CFFCEA3002D049A /* Launch Screen.storyboard in Resources */,
 				9650E8311B6B28CC0030C5EB /* data.zip in Resources */,
 				9660CE3F1A6369970064D34F /* Images.xcassets in Resources */,
 			);
@@ -424,7 +428,7 @@
 					"/Users/trent/code/monster-rpg-2/include",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
-				LIBRARY_SEARCH_PATHS = /Users/trent/code/iphone_libs_r/lib;
+				LIBRARY_SEARCH_PATHS = "";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -467,7 +471,7 @@
 					"/Users/trent/code/monster-rpg-2/include",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
-				LIBRARY_SEARCH_PATHS = /Users/trent/code/iphone_libs_r/lib;
+				LIBRARY_SEARCH_PATHS = "";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -481,17 +485,24 @@
 				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				ENABLE_BITCODE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/Users/trent/code/libs/ios/include,
+					"/Users/trent/code/monster-rpg-2/include",
+				);
 				INFOPLIST_FILE = "Monster RPG 2/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
+					/Users/trent/code/libs/ios/lib,
 					"$(inherited)",
-					/Users/trent/code/iphone_libs_r/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "f4bd4d1b-d8c2-46ba-93b2-c923dc7311d5";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 armv7";
 			};
@@ -503,17 +514,24 @@
 				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Trent Gamblin (5923J6TNDK)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				ENABLE_BITCODE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/Users/trent/code/libs/ios/include,
+					"/Users/trent/code/monster-rpg-2/include",
+				);
 				INFOPLIST_FILE = "Monster RPG 2/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
+					/Users/trent/code/libs/ios/lib,
 					"$(inherited)",
-					/Users/trent/code/iphone_libs_r/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "f4bd4d1b-d8c2-46ba-93b2-c923dc7311d5";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 armv7";
 			};

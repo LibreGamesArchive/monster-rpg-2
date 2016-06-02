@@ -147,6 +147,8 @@ void reportAchievementIdentifier(NSString* identifier, bool notification)
 	GKAchievement *achievement = [[[GKAchievement alloc] initWithIdentifier: identifier] autorelease];
 	if (achievement)
 	{
+		achievement.
+		showsCompletionBanner = YES;
 		[achievementsDictionary setObject:achievement forKey:identifier];
 		achievement.percentComplete = percent;
 		[achievement reportAchievementWithCompletionHandler:^(NSError *error)
