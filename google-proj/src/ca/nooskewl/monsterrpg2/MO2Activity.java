@@ -223,7 +223,11 @@ public class MO2Activity extends AllegroActivity implements ConnectionCallbacks,
 	public void unlock_achievement(String id) {
 		if (play_services_available) {
 			logString("Achieving " + id);
-			Games.Achievements.unlock(api_client, id);
+			try {
+				Games.Achievements.unlock(api_client, id);
+			}
+			catch (Exception e) {
+			}
 		}
 		else {
 			logString("Play Services not available, can't achieve :(");
