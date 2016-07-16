@@ -6,11 +6,7 @@ OPTION(WITH_SVG "Enable SVG loader" off)
 OPTION(RASPBERRYPI "Compile for Raspberry Pi" off)
 OPTION(DEMO "Build demo version" off)
 OPTION(STEAMWORKS "Enable Steamworks" off)
-
-if(KCM_AUDIO)
-	set(CMAKE_C_FLAGS "-DKCM_AUDIO")
-	set(CMAKE_CXX_FLAGS "-DKCM_AUDIO")
-endif()
+OPTION(STOCK_ALLEGRO "Use stock Allegro libraries" off)
 
 # function to copy files to build dir:
 function(copy_file_to_build target file dest)
@@ -26,12 +22,17 @@ endfunction(copy_file_to_build)
 
 # Option configuration
 
+if(STOCK_ALLEGRO)
+	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DSTOCK_ALLEGRO")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DSTOCK_ALLEGRO")
+endif()
+
 if(WIN32)
 	set(M2_SUFFIX "")
 else(WIN32)
 	if(RASPBERRYPI)
-		set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -Os -march=armv6 -mfpu=vfp -mfloat-abi=hard")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Os -march=armv6 -mfpu=vfp -mfloat-abi=hard")
+		set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Os -march=armv6 -mfpu=vfp -mfloat-abi=hard")
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Os -march=armv6 -mfpu=vfp -mfloat-abi=hard")
    		include_directories(
 			"/opt/vc/include"
 			"/opt/vc/include/interface/vcos/pthreads"
@@ -41,12 +42,12 @@ else(WIN32)
 			"/opt/vc/lib"
 		)
 	else()
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+		set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 	endif()
 	if(STEAMWORKS)
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSTEAMWORKS=1")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSTEAMWORKS=1")
+		set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DSTEAMWORKS")
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DSTEAMWORKS")
 	endif()
 endif()
 
@@ -101,52 +102,27 @@ set(COMMON_SRCS
 	src/xml.cpp
 )
 
-if(WIN32)
-	set(COMMON_SRCS ${COMMON_SRCS} src/init.cpp)
-else()
 if(APPLE)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNO_GAMECENTER=1")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNO_GAMECENTER=1")
+	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DNO_GAMECENTER")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNO_GAMECENTER")
 	set(COMMON_SRCS ${COMMON_SRCS} src/init.mm src/gamecenter.mm)
 else()
 	set(COMMON_SRCS ${COMMON_SRCS} src/init.cpp)
 endif()
-endif()
-
 
 set(EXTRA_LIBS "")
 
 if(WITH_SVG)
 	list(APPEND EXTRA_LIBS "allegro_color${ALLEG_SUFFIX}" "svgtiny" "hubbub" "dom" "parserutils" "wapcaplet" "expat")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DWITH_SVG -I/opt/netsurf/include")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWITH_SVG -I/opt/netsurf/include")
+	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DWITH_SVG -I/opt/netsurf/include")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DWITH_SVG -I/opt/netsurf/include")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/opt/netsurf/lib")
 	set(COMMON_SRCS ${COMMON_SRCS} src/svg.cpp)
 endif()
 
-if(DEMO)
-	if(WIN32)
-		if(MINGW)
-			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEMO=1")
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEMO=1")
-		else()
-			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /DDEMO=1")
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DDEMO=1")
-		endif()
-	else()
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEMO=1")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEMO=1")
-	endif()
-endif()
+add_library(mo2-engine STATIC ${COMMON_SRCS})
 
-add_library(mo2-engine
-	STATIC
-	${COMMON_SRCS}
-)
-
-add_executable(MonsterRPG2${M2_SUFFIX}
-	src/monster2.cpp
-)
+add_executable(MonsterRPG2${M2_SUFFIX} src/monster2.cpp)
 
 if(KCM_AUDIO)
 	if(NOT WIN32)
@@ -154,21 +130,26 @@ if(KCM_AUDIO)
 	endif()
 endif()
 
-
 if(WIN32)
-	if(MINGW)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -fcheck-new -Wno-unknown-pragmas -Wno-comment -Wno-strict-aliasing")
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows")
-	else()
-		set(CFLAGS "/MT /MP /D_USE_MATH_DEFINES /DALLEGRO_STATICLINK /EHsc /D_WIN32_WINNT=0x501")
-		if(STEAMWORKS)
-			set(CFLAGS "${CFLAGS} /DSTEAMWORKS=1")
-		endif()
-		set_target_properties(mo2-engine PROPERTIES COMPILE_FLAGS "${CFLAGS}")
-		set_target_properties(MonsterRPG2 PROPERTIES COMPILE_FLAGS "${CFLAGS}")
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO /SUBSYSTEM:WINDOWS")
+	set(CFLAGS "/MT /MP /D_USE_MATH_DEFINES /DALLEGRO_STATICLINK /EHsc /D_WIN32_WINNT=0x501")
+
+	if(KCM_AUDIO)
+		set(CFLAGS "/DKCM_AUDIO")
 	endif()
+
+	if(DEMO)
+		set(CFLAGS "${CFLAGS} /DDEMO")
+	endif()
+
+	if(STEAMWORKS)
+		set(CFLAGS "${CFLAGS} /DSTEAMWORKS")
+	endif()
+
+	set_target_properties(mo2-engine PROPERTIES COMPILE_FLAGS "${CFLAGS}")
+	set_target_properties(MonsterRPG2 PROPERTIES COMPILE_FLAGS "${CFLAGS}")
+
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO /SUBSYSTEM:WINDOWS")
+
 	list(APPEND EXTRA_LIBS
 		"dxguid"
 		"dinput8"
@@ -192,79 +173,86 @@ if(WIN32)
 		"zlibstatic"
 		"allegro_monolith-static"
 	)
+
 	if(STEAMWORKS)
 		list(APPEND EXTRA_LIBS "steam_api")
 	endif()
-	if (MINGW)
-		set(ICON_OBJ ${CMAKE_SOURCE_DIR}/src/icon.res)
-	else()
-		set(ICON_OBJ ${CMAKE_SOURCE_DIR}/src/icon.lib)
-	endif()
+
+	set(ICON_OBJ ${CMAKE_SOURCE_DIR}/src/icon.lib)
+
 	SET(MAIN_LIBS 
 		${ICON_OBJ}
 		mo2-engine
 		${EXTRA_LIBS}
 	)
+
 	if(KCM_AUDIO)
 		LIST(APPEND MAIN_LIBS "ws2_32" "dsound")
 	else()
 		LIST(APPEND MAIN_LIBS "bass")
 	endif(KCM_AUDIO)
 else(WIN32)
-if(APPLE)
-	set(ALLEGRO_MAIN_LIB "allegro_main${ALLEG_SUFFIX}")
-	FIND_LIBRARY(OPENGL_LIBRARY OpenGL)
-	FIND_LIBRARY(FOUNDATION_LIBRARY Foundation)
-	FIND_LIBRARY(APPSERVICES_LIBRARY ApplicationServices)
-	FIND_LIBRARY(APPKIT_LIBRARY AppKit)
-	FIND_LIBRARY(IOKIT_LIBRARY IOKit)
-	FIND_LIBRARY(AUDIOTOOLBOX_LIBRARY AudioToolbox)
-	FIND_LIBRARY(SECURITY_LIBRARY Security)
-	LIST(APPEND EXTRA_LIBS ${IOKIT_LIBRARY} ${OPENGL_LIBRARY} ${FOUNDATION_LIBRARY} ${APPSERVICES_LIBRARY} ${APPKIT_LIBRARY} ${AUDIOTOOLBOX_LIBRARY} ${GAMEKIT_LIBRARY} ${SECURITY_LIBRARY})
-	SET(MAIN_LIBS 
-		mo2-engine
-		allegro_ttf${ALLEG_SUFFIX}
-		allegro_font${ALLEG_SUFFIX}
-		allegro_primitives${ALLEG_SUFFIX}
-		allegro_dialog${ALLEG_SUFFIX}
-		allegro_memfile${ALLEG_SUFFIX}
-		allegro_image${ALLEG_SUFFIX}
-		allegro_physfs${ALLEG_SUFFIX}
-		allegro${ALLEG_SUFFIX} ${ALLEGRO_MAIN_LIB}
-		${EXTRA_LIBS}
-		/Users/trent/code/local/lib/libfreetype.a
-		/Users/trent/code/local/lib/libphysfs.a
-		/Users/trent/code/local/lib/libz.a
-		/Users/trent/code/local/lib/liblua.a
-	)
 	if(KCM_AUDIO)
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -framework OpenAL")
+		set(CMAKE_C_FLAGS_RELEASE "-DKCM_AUDIO")
+		set(CMAKE_CXX_FLAGS_RELEASE "-DKCM_AUDIO")
+	endif()
+
+	if(DEMO)
+		set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DDEMO")
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DDEMO")
+	endif()
+
+	if(APPLE)
+		set(ALLEGRO_MAIN_LIB "allegro_main${ALLEG_SUFFIX}")
+		FIND_LIBRARY(OPENGL_LIBRARY OpenGL)
+		FIND_LIBRARY(FOUNDATION_LIBRARY Foundation)
+		FIND_LIBRARY(APPSERVICES_LIBRARY ApplicationServices)
+		FIND_LIBRARY(APPKIT_LIBRARY AppKit)
+		FIND_LIBRARY(IOKIT_LIBRARY IOKit)
+		FIND_LIBRARY(AUDIOTOOLBOX_LIBRARY AudioToolbox)
+		FIND_LIBRARY(SECURITY_LIBRARY Security)
+		LIST(APPEND EXTRA_LIBS ${IOKIT_LIBRARY} ${OPENGL_LIBRARY} ${FOUNDATION_LIBRARY} ${APPSERVICES_LIBRARY} ${APPKIT_LIBRARY} ${AUDIOTOOLBOX_LIBRARY} ${GAMEKIT_LIBRARY} ${SECURITY_LIBRARY})
+		SET(MAIN_LIBS 
+			mo2-engine
+			allegro_ttf${ALLEG_SUFFIX}
+			allegro_font${ALLEG_SUFFIX}
+			allegro_primitives${ALLEG_SUFFIX}
+			allegro_dialog${ALLEG_SUFFIX}
+			allegro_memfile${ALLEG_SUFFIX}
+			allegro_image${ALLEG_SUFFIX}
+			allegro_physfs${ALLEG_SUFFIX}
+			allegro${ALLEG_SUFFIX} ${ALLEGRO_MAIN_LIB}
+			${EXTRA_LIBS}
+			/Users/trent/code/local/lib/libfreetype.a
+			/Users/trent/code/local/lib/libphysfs.a
+			/Users/trent/code/local/lib/libz.a
+			/Users/trent/code/local/lib/liblua.a
+		)
+		if(KCM_AUDIO)
+			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -framework OpenAL")
+		else()
+			LIST(APPEND MAIN_LIBS "bass")
+		endif()
 	else()
-		LIST(APPEND MAIN_LIBS "bass")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,\$ORIGIN")
+		SET(MAIN_LIBS 
+			mo2-engine
+			allegro_monolith${ALLEG_SUFFIX}
+			${EXTRA_LIBS}
+			Xcursor Xi Xinerama Xrandr SM ICE X11 Xext
+		)
+		if(NOT KCM_AUDIO)
+			LIST(APPEND MAIN_LIBS "${CMAKE_BINARY_DIR}/libbass.so")
+		endif()
+		if(STEAMWORKS)
+			LIST(APPEND MAIN_LIBS "${CMAKE_BINARY_DIR}/libsteam_api.so")
+		endif()
+		if(RASPBERRYPI)
+			LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host m pthread freetype physfs png z lua5.2)
+		else()
+			LIST(APPEND MAIN_LIBS GL GLU physfs freetype z png lua5.2)
+		endif()
 	endif()
-else()
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,\$ORIGIN")
-	SET(MAIN_LIBS 
-		mo2-engine
-		allegro_monolith${ALLEG_SUFFIX}
-		${EXTRA_LIBS}
-		Xcursor Xi Xinerama Xrandr SM ICE X11 Xext
-	)
-        if(NOT KCM_AUDIO)
-		LIST(APPEND MAIN_LIBS "${CMAKE_BINARY_DIR}/libbass.so")
-	endif()
-	if(STEAMWORKS)
-		LIST(APPEND MAIN_LIBS "${CMAKE_BINARY_DIR}/libsteam_api.so")
-	endif()
-	if(RASPBERRYPI)
-		LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host m pthread /usr/local/lib/libfreetype.a physfs /usr/local/lib/libpng.a /usr/local/lib/libz.a lua5.2)
-	else()
-		# trentg's build
-		LIST(APPEND MAIN_LIBS GL GLU /usr/local/lib/libphysfs.a /usr/local/lib/libfreetype.a /usr/local/lib/libz.a /usr/local/lib/libpng.a /usr/local/lib/liblua5.2.a pthread)
-		# normal build
-		#LIST(APPEND MAIN_LIBS GL GLU physfs freetype z png lua5.2)
-	endif()
-endif()
 endif()
 
 target_link_libraries(
