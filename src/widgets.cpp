@@ -86,7 +86,7 @@ void loadIcons()
 		int cols = 128 / 16;
 		int row = i / cols;
 		int col = i % cols;
-		al_draw_bitmap_region(
+		quick_draw(
 			tmp->bitmap,
 			pos[i*4+0], pos[i*4+1],
 			pos[i*4+2], pos[i*4+3],
@@ -133,7 +133,7 @@ static void mTextout_real(MFONT *font, const char *text, int x, int y,
 		}
 		int index = atoi(num);
 		if (drawing_text()) {
-			al_draw_scaled_bitmap(
+			quick_draw(
 				icons[index]->bitmap,
 				0, 0,
 				m_get_bitmap_width(icons[index]),
@@ -267,22 +267,22 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 		al_use_shader(NULL);
 	}
 
-	bool held = al_is_bitmap_drawing_held();
-	al_hold_bitmap_drawing(true);
+	bool was_quick = is_quick_on();
+	quick(true);
 
 	guiAnims->setSubAnimation("wide");
 	MBITMAP *b = guiAnims->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 	int sprite_w = m_get_bitmap_width(b);
 	int sprite_h = m_get_bitmap_height(b);
-	al_draw_scaled_bitmap(b->bitmap, 0, 0, sprite_w, sprite_h, x, y-sprite_h, w, sprite_h, 0);
-	al_draw_scaled_bitmap(b->bitmap, 0, 0, sprite_w, sprite_h, x, y+h, w, sprite_h, ALLEGRO_FLIP_VERTICAL);
+	quick_draw(b->bitmap, 0, 0, sprite_w, sprite_h, x, y-sprite_h, w, sprite_h, 0);
+	quick_draw(b->bitmap, 0, 0, sprite_w, sprite_h, x, y+h, w, sprite_h, ALLEGRO_FLIP_VERTICAL);
 
 	guiAnims->setSubAnimation("tall");
 	b = guiAnims->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 	sprite_w = m_get_bitmap_width(b);
 	sprite_h = m_get_bitmap_height(b);
-	al_draw_scaled_bitmap(b->bitmap, 0, 0, sprite_w, sprite_h, x-sprite_w, y, sprite_w, h, 0);
-	al_draw_scaled_bitmap(b->bitmap, 0, 0, sprite_w, sprite_h, x+w, y, sprite_w, h, ALLEGRO_FLIP_HORIZONTAL);
+	quick_draw(b->bitmap, 0, 0, sprite_w, sprite_h, x-sprite_w, y, sprite_w, h, 0);
+	quick_draw(b->bitmap, 0, 0, sprite_w, sprite_h, x+w, y, sprite_w, h, ALLEGRO_FLIP_HORIZONTAL);
 
 	guiAnims->setSubAnimation("corner");
 	b = guiAnims->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
@@ -293,7 +293,7 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 	m_draw_bitmap(b, x+w, y+h, M_FLIP_HORIZONTAL | M_FLIP_VERTICAL);
 	m_draw_bitmap(b, x-sprite_w, y+h, M_FLIP_VERTICAL);
 
-	al_hold_bitmap_drawing(false);
+	quick(false);
 
 	m_draw_rectangle(x, y, x+w, y+h, blue, M_FILLED);
 
@@ -307,7 +307,7 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 	al_set_clipping_rectangle(xxx, yyy, www, hhh);
 
 	if (!use_programmable_pipeline && shadow) {
-		al_hold_bitmap_drawing(true);
+		quick(true);
 
 		MBITMAP *bmp;
 
@@ -357,24 +357,24 @@ void mDrawFrame(int x, int y, int w, int h, bool shadow)
 
 		shadow_sheet->setSubAnimation("topleft");
 		bmp = shadow_sheet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
-		al_draw_bitmap_region(bmp->bitmap, 0, 0, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x-3-SHADOW_CORNER_SIZE, y-3-SHADOW_CORNER_SIZE, 0);
+		quick_draw(bmp->bitmap, 0, 0, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x-3-SHADOW_CORNER_SIZE, y-3-SHADOW_CORNER_SIZE, 0);
 
 		shadow_sheet->setSubAnimation("topright");
 		bmp = shadow_sheet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
-		al_draw_bitmap_region(bmp->bitmap, 0, 0, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x+w+3, y-3-SHADOW_CORNER_SIZE, 0);
+		quick_draw(bmp->bitmap, 0, 0, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x+w+3, y-3-SHADOW_CORNER_SIZE, 0);
 
 		shadow_sheet->setSubAnimation("bottomright");
 		bmp = shadow_sheet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
-		al_draw_bitmap_region(bmp->bitmap, 0, 0, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x+w+3, y+h+3, 0);
+		quick_draw(bmp->bitmap, 0, 0, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x+w+3, y+h+3, 0);
 
 		shadow_sheet->setSubAnimation("bottomleft");
 		bmp = shadow_sheet->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
-		al_draw_bitmap_region(bmp->bitmap, 0, 0, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x-3-SHADOW_CORNER_SIZE, y+h+3, 0);
+		quick_draw(bmp->bitmap, 0, 0, SHADOW_CORNER_SIZE, SHADOW_CORNER_SIZE, x-3-SHADOW_CORNER_SIZE, y+h+3, 0);
 
-		al_hold_bitmap_drawing(false);
+		quick(false);
 	}
 	
-	al_hold_bitmap_drawing(held);
+	quick(was_quick);
 }
 
 
@@ -514,7 +514,6 @@ static void _drawSimpleStatus_real(Player *p, int x, int y, CombatantInfo info)
 
 	y -= 1;
 
-	al_hold_bitmap_drawing(true);
 	start_text();
 	
 	mTextout(game_font, _t(p->getName().c_str()), x+w+2, y,
@@ -536,7 +535,6 @@ static void _drawSimpleStatus_real(Player *p, int x, int y, CombatantInfo info)
 				grey, black,
 				WGT_TEXT_NORMAL, false);
 	
-	al_hold_bitmap_drawing(false);
 	end_text();
 }
 
@@ -672,7 +670,6 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
 			// Draw messages
-			al_hold_bitmap_drawing(true);
 			start_text();
 			mTextout(game_font, _t(msg1.c_str()), BW/2, y+5+m_text_height(game_font)/2,
 				grey, black,
@@ -687,7 +684,6 @@ void notify(std::string msg1, std::string msg2, std::string msg3)
 			mTextout(game_font, _t("OK"), BW/2, y+5+48,
 				grey, black,
 				WGT_TEXT_NORMAL, true);
-			al_hold_bitmap_drawing(false);
 			end_text();
 			// Draw "cursor"
 			int tick = (unsigned)tguiCurrentTimeMillis() % 1000;
@@ -819,7 +815,6 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
 			// Draw messages
-			al_hold_bitmap_drawing(true);
 			start_text();
 			mTextout(game_font, _t(msg1.c_str()), BW/2, my1,
 				grey, black,
@@ -840,7 +835,6 @@ int triple_prompt(std::string msg1, std::string msg2, std::string msg3,
 			mTextout(game_font, _t(b3text.c_str()), x3, ty,
 				grey, black,
 				WGT_TEXT_NORMAL, true);
-			al_hold_bitmap_drawing(false);
 			end_text();
 			// Draw "cursor"
 			if (w1->getFocus()) choice = 0;
@@ -989,7 +983,6 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 			// Draw frame
 			mDrawFrame(x, y, w, h, true);
 			// Draw messages
-			al_hold_bitmap_drawing(true);
 			start_text();
 			mTextout(game_font, _t(msg1.c_str()), BW/2, y+5+m_text_height(game_font)/2,
 				grey, black,
@@ -1007,7 +1000,6 @@ bool prompt(std::string msg1, std::string msg2, bool shake_choice, bool choice, 
 			mTextout(game_font, _t(bottom_msg.c_str()), BW/2, BH-10,
 				grey, black,
 				WGT_TEXT_NORMAL, true);
-			al_hold_bitmap_drawing(false);
 			end_text();
 			// Draw "cursor"
 			int tick = (unsigned)tguiCurrentTimeMillis() % 1000;
@@ -1415,19 +1407,15 @@ void MSpeechDialog::drawText(void)
 		int xxx, yyy, www, hhh;
 		al_get_clipping_rectangle(&xxx, &yyy, &www, &hhh);
 		m_set_clip(xx+5, yy+3, xx+w-10, yy+h-10);
-		al_hold_bitmap_drawing(true);
 		start_text();
 		realDrawText(currentSection-1, 10, 4-(h-offset));
 		realDrawText(currentSection, 10, 4+offset);
-		al_hold_bitmap_drawing(false);
 		end_text();
 		al_set_clipping_rectangle(xxx, yyy, www, hhh);
 	}
 	else {
-		al_hold_bitmap_drawing(true);
 		start_text();
 		realDrawText(currentSection, 10, 4);
-		al_hold_bitmap_drawing(false);
 		end_text();
 	}
 }
@@ -1836,7 +1824,6 @@ void MInputGetter::draw()
 		}
 
 		start_text();
-		al_hold_bitmap_drawing(true);
 		mTextout(game_font, _t(text.c_str()), x+m_get_bitmap_width(cursor)+1, y,
 			color, black,
 			WGT_TEXT_NORMAL, false);
@@ -1893,7 +1880,6 @@ void MInputGetter::draw()
 		mTextout(game_font, buf, x+width-m_text_length(game_font, buf), y-2,
 			color, black,
 			WGT_TEXT_NORMAL, false);
-		al_hold_bitmap_drawing(false);
 		end_text();
 	}
 }
@@ -2404,7 +2390,6 @@ void MStats::draw()
 
 	char text[100];
 
-	al_hold_bitmap_drawing(true);
 	start_text();
 
 	strcpy(text, _t("Exp:"));
@@ -2493,7 +2478,6 @@ void MStats::draw()
 		yy += 12;
 	}
 
-	al_hold_bitmap_drawing(false);
 	end_text();
 
 	if (can_change) {
@@ -2578,7 +2562,6 @@ static void drawSimpleEquipment(int partyMember, int x, int y, int height)
 
 	// Draw labels
 
-	al_hold_bitmap_drawing(true);
 	start_text();
 
 	sprintf(text, "%s", _t(getItemName(info.equipment.lhand).c_str()));
@@ -2619,12 +2602,9 @@ static void drawSimpleEquipment(int partyMember, int x, int y, int height)
 		grey, black,
 		WGT_TEXT_NORMAL, false);
 	
-	al_hold_bitmap_drawing(false);
 	end_text();
 
 	// Drw icons
-
-	al_hold_bitmap_drawing(true);
 
 	sprintf(text, "%s", getItemIcon(info.equipment.lhand).c_str());
 	mTextout(game_font, text, x, y,
@@ -2646,8 +2626,6 @@ static void drawSimpleEquipment(int partyMember, int x, int y, int height)
 	mTextout(game_font, text, x, y+m_text_height(game_font)*4+extra*4,
 		grey, black,
 		WGT_TEXT_NORMAL, false);
-	
-	al_hold_bitmap_drawing(false);
 }
 
 void MMap::flash(void) { shouldFlash = true; }
@@ -3617,7 +3595,6 @@ void MSpellSelector::draw()
 	m_set_clip(0, dy-4, BW, dy+height-4);
 
 	// draw names
-	al_hold_bitmap_drawing(true);
 	start_text();
 	for (int i = top; i < top+(rows+1)*2 && i < MAX_SPELLS_IN_THIS_GAME; i++) {
 		MCOLOR color;
@@ -3644,13 +3621,11 @@ loop:
 		if ((i % 2) == 1)
 			dy += 15;
 	}
-	al_hold_bitmap_drawing(false);
 	end_text();
 
 	// draw icons
 
 	dy = y+1;
-	al_hold_bitmap_drawing(true);
 	for (int i = top; i < top+(rows+1)*2 && i < MAX_SPELLS_IN_THIS_GAME; i++) {
 		MCOLOR color;
 		std::string name = info.spells[i];
@@ -3676,7 +3651,6 @@ loop2:
 		if ((i % 2) == 1)
 			dy += 15;
 	}
-	al_hold_bitmap_drawing(false);
 	
 	m_set_clip(0, 0, BW, BH);
 	
@@ -3718,7 +3692,6 @@ loop2:
 
 	mDrawFrame(fx, fy, fw, fh);
 
-	al_hold_bitmap_drawing(true);
 	start_text();
 
 	mTextout(game_font, _t("Cost:"), fx+3, fy+2,
@@ -3746,12 +3719,11 @@ loop2:
 		grey, black,
 		WGT_TEXT_NORMAL, false);
 	
-	al_hold_bitmap_drawing(false);
 	end_text();
 
 
 	// draw arrows
-	al_hold_bitmap_drawing(true);
+	quick(true);
 	if (top > 0) {
 		dx = x + width - m_get_bitmap_width(up_arrow);
 		dy = y;
@@ -3762,7 +3734,7 @@ loop2:
 		dy = y + height - m_get_bitmap_height(up_arrow);
 		m_draw_bitmap(up_arrow, dx, dy, M_FLIP_VERTICAL);
 	}
-	al_hold_bitmap_drawing(false);
+	quick(false);
 }
 
 
@@ -4701,9 +4673,6 @@ void MScrollingList::draw()
 	al_get_clipping_rectangle(&cx, &cy, &cw, &ch);
 	m_set_clip(x, y-1, width-30+x, 15*rows+1+y-1);
 
-	bool held = al_is_bitmap_drawing_held();
-	al_hold_bitmap_drawing(false);
-	al_hold_bitmap_drawing(true);
 	start_text();
 
 	for (int i = 0; i < rows; i++) {
@@ -4722,8 +4691,6 @@ void MScrollingList::draw()
 		yy += 15;
 	}
 	end_text();
-	al_hold_bitmap_drawing(false);
-	al_hold_bitmap_drawing(held);
 
 	al_set_clipping_rectangle(cx, cy, cw, ch);
 	
@@ -5257,7 +5224,6 @@ void MItemSelector::draw()
 	
 	m_set_clip(0, dy-4, BW, dy+height-4);
 
-	al_hold_bitmap_drawing(true);
 	start_text();
 	for (int i = top; i < top+(rows+1)*2 && i < MAX_INVENTORY; i++) {
 		Inventory *inv = &inventory[i];
@@ -5290,12 +5256,10 @@ loop:
 		if ((i % 2) == 1)
 			dy += 15;
 	}
-	al_hold_bitmap_drawing(false);
 	end_text();
 	
 	dy = y+1;
 	
-	al_hold_bitmap_drawing(true);
 	for (int i = top; i < top+(rows+1)*2 && i < MAX_INVENTORY; i++) {
 		Inventory *inv = &inventory[i];
 		char s[100];
@@ -5323,7 +5287,6 @@ loop2:
 		if ((i % 2) == 1)
 			dy += 15;
 	}
-	al_hold_bitmap_drawing(false);
 
 	al_set_clipping_rectangle(cx, cy, cw, ch);
 
@@ -5354,7 +5317,7 @@ loop2:
 	}
 
 	// draw arrows
-	al_hold_bitmap_drawing(true);
+	quick(true);
 	if (top > 0) {
 		dx = x + width - m_get_bitmap_width(up_arrow);
 		dy = y;
@@ -5365,7 +5328,7 @@ loop2:
 		dy = y + height - m_get_bitmap_height(up_arrow);
 		m_draw_bitmap(up_arrow, dx, dy, M_FLIP_VERTICAL);
 	}
-	al_hold_bitmap_drawing(false);
+	quick(false);
 }
 					
 void MItemSelector::reset(void)
@@ -5894,7 +5857,7 @@ void MManSelector::mouseUp(int x, int y, int b)
 
 void MManSelector::draw()
 {
-	al_hold_bitmap_drawing(true);
+	quick(true);
 
 	for (int i = 0; i < (int)mans.size(); i++) {
 		if (i == 6) continue;
@@ -5908,7 +5871,7 @@ void MManSelector::draw()
 		}
 	}
 
-	al_hold_bitmap_drawing(false);
+	quick(false);
 
 	// Draw arrow
 	int xx = mans[pos].x * TILE_SIZE - area->getOriginX() + TILE_SIZE/2 - m_get_bitmap_width(arrow)/2;
@@ -6257,12 +6220,12 @@ void MMultiChooser::draw()
 		}
 		if (current.size() > 1 && points[current[0]].west == p->west && alpha == 255) {
 			if (show) {
-				al_draw_tinted_bitmap(arrow->bitmap, al_map_rgba(alpha, alpha, alpha, alpha), draw_x, draw_y, flags);
+				quick_draw(arrow->bitmap, al_map_rgba(alpha, alpha, alpha, alpha), draw_x, draw_y, flags);
 			}
 		}
 		else
 		{
-			al_draw_tinted_bitmap(arrow->bitmap, al_map_rgba(alpha, alpha, alpha, alpha), draw_x, draw_y, flags);
+			quick_draw(arrow->bitmap, al_map_rgba(alpha, alpha, alpha, alpha), draw_x, draw_y, flags);
 		}
 	}
 }
@@ -6934,7 +6897,7 @@ void MIcon::draw()
 		double t = fmod(al_get_time(), 1.0);
 		if (t >= 0.5) t = 0.5 - (t-0.5);
 		float a = t / 0.5;
-		al_draw_tinted_bitmap(bitmap->bitmap, al_map_rgba_f(a, a, a, a), x, y, 0);
+		quick_draw(bitmap->bitmap, al_map_rgba_f(a, a, a, a), x, y, 0);
 		al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA);
 	}
 	if (down && show_name) {
@@ -7484,7 +7447,6 @@ void MTable::draw(void)
 		m_draw_line(x, curr, x+total_width, curr, line_color);
 	}
 
-	al_hold_bitmap_drawing(true);
 	start_text();
 	for (int r = 0; r < rows; r++) {
 		for (int c = 0; c < columns; c++) {
@@ -7521,7 +7483,6 @@ void MTable::draw(void)
 			}
 		}
 	}
-	al_hold_bitmap_drawing(false);
 	end_text();
 }
 
@@ -7644,7 +7605,7 @@ void MDragNDropForm::post_draw(void)
 		m_get_mouse_state(&state);
 		int w = m_get_bitmap_width(icon);
 		int h = m_get_bitmap_height(icon);
-		al_draw_tinted_scaled_bitmap(icon->bitmap, al_map_rgba_f(0.75f, 0.75f, 0.75f, 0.75f), 0, 0, w, h,
+		quick_draw(icon->bitmap, al_map_rgba_f(0.75f, 0.75f, 0.75f, 0.75f), 0, 0, w, h,
 			state.x-w, state.y-h, w*2, h*2, 0);
 	}
 }

@@ -1591,8 +1591,10 @@ if (bRet)
 	int w = mi.x2 - mi.x1;
 	int h = mi.y2 - mi.y1;
 #ifdef ALLEGRO_RASPBERRYPI
-	w = 1280;
-	h = 720;
+	while (w > 1280 || h > 720) { // big modes are too much for gfx mem on Pi
+		w /= 2;
+		h /= 2;
+	}
 	sd->width = w;
 	sd->height = h;
 	config_save_width = w;
@@ -2355,7 +2357,7 @@ void toggle_fullscreen()
 		tmp = my_al_create_bitmap(dw, dh);
 		al_set_new_bitmap_flags(old_flags);
 		al_set_target_bitmap(tmp);
-		al_draw_bitmap(tmpbuffer->bitmap, -dx, -dy, 0);
+		quick_draw(tmpbuffer->bitmap, -dx, -dy, 0);
 		al_set_target_bitmap(old_target);
 		m_destroy_bitmap(tmpbuffer);
 	}
@@ -2444,7 +2446,7 @@ void toggle_fullscreen()
 		create_tmpbuffer();
 		ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
 		m_set_target_bitmap(tmpbuffer);
-		al_draw_scaled_bitmap(tmp, 0, 0, dw, dh, dx2, dy2, dw2, dh2, 0);
+		quick_draw(tmp, 0, 0, dw, dh, dx2, dy2, dw2, dh2, 0);
 		al_set_target_bitmap(old_target);
 		al_destroy_bitmap(tmp);
 	}

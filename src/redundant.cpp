@@ -139,22 +139,30 @@ void start_text()
 {
 	if (!text_draw_on) {
 		text_draw_on = true;
-		int dx, dy, dw, dh;
-		get_screen_offset_size(&dx, &dy, &dw, &dh);
 		al_copy_transform(&old_view, al_get_current_transform());
 		ALLEGRO_TRANSFORM v;
 		al_identity_transform(&v);
-		al_scale_transform(&v, textScaleX, textScaleY);
-		if (al_get_bitmap_width(al_get_target_bitmap()) == al_get_display_width(display) && al_get_bitmap_height(al_get_target_bitmap()) == al_get_display_height(display)) {
-			al_translate_transform(&v, dx, dy);
+		if (al_get_target_bitmap() == screenshot->bitmap) {
+			al_scale_transform(&v, 0.5f/textScaleX, 0.5f/textScaleY);
 		}
+		else {
+			int dx, dy, dw, dh;
+			get_screen_offset_size(&dx, &dy, &dw, &dh);
+			al_scale_transform(&v, textScaleX, textScaleY);
+			if (al_get_bitmap_width(al_get_target_bitmap()) == al_get_display_width(display) && al_get_bitmap_height(al_get_target_bitmap()) == al_get_display_height(display)) {
+				al_translate_transform(&v, dx, dy);
+			}
+		}
+		ttf_quick(false);
 		al_use_transform(&v);
+		ttf_quick(true);
 	}
 }
 
 void end_text()
 {
 	if (text_draw_on) {
+		ttf_quick(false);
 		al_use_transform(&old_view);
 		text_draw_on = false;
 	}
@@ -171,8 +179,14 @@ void m_textout_f(const MFONT *font, const char *text, float x, float y, MCOLOR c
 
 	if (font == game_font) {
 		start_text();
-		x *= (screenScaleX/textScaleX);
-		y *= (screenScaleY/textScaleY);
+		if (al_get_target_bitmap() == screenshot->bitmap) {
+			x *= textScaleX;
+			y *= textScaleY;
+		}
+		else {
+			x *= (screenScaleX/textScaleX);
+			y *= (screenScaleY/textScaleY);
+		}
 	}
 
 	al_draw_text(font, color, x, y, 0, text);
@@ -230,7 +244,7 @@ void m_draw_scaled_bitmap(MBITMAP *bmp, float sx, float sy, float sw, float sh,
 	float dx, float dy, float dw, float dh, int flags, float alpha)
 {
 	float alpha_f = alpha/255.0;
-	al_draw_tinted_scaled_bitmap(bmp->bitmap, al_map_rgba_f(alpha_f, alpha_f, alpha_f, alpha_f), sx, sy, sw, sh, dx, dy, dw, dh, flags);
+	quick_draw(bmp->bitmap, al_map_rgba_f(alpha_f, alpha_f, alpha_f, alpha_f), sx, sy, sw, sh, dx, dy, dw, dh, flags);
 }
 
 
@@ -568,7 +582,7 @@ void m_flip_display(void)
 		);
 		al_set_target_bitmap(tmp);
 		al_clear_to_color(black);
-		al_draw_bitmap(tmpbuffer->bitmap, 0, 0, 0);
+		quick_draw(tmpbuffer->bitmap, 0, 0, 0);
 		al_restore_state(&state);
 		config_menu();
 		int __dx, __dy, __dw, __dh;
@@ -576,7 +590,7 @@ void m_flip_display(void)
 		al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
 		al_set_target_bitmap(tmpbuffer->bitmap);
 		al_clear_to_color(black);
-		al_draw_scaled_bitmap(
+		quick_draw(
 			tmp,
 			_dx, _dy, _dw, _dh,
 			__dx, __dy, __dw, __dh,
@@ -703,7 +717,7 @@ void m_draw_trans_pixel(int x, int y, MCOLOR color)
 void m_draw_tinted_rotated_bitmap(MBITMAP *bitmap, MCOLOR tint, int cx, int cy,
 	int dx, int dy, float angle, int flags)
 {
-	al_draw_tinted_rotated_bitmap(bitmap->bitmap, tint, cx, cy, dx, dy, -angle, flags);
+	quick_draw(bitmap->bitmap, tint, cx, cy, dx, dy, -angle, flags);
 }
 
 void m_draw_rotated_bitmap(MBITMAP *bitmap, int cx, int cy,
@@ -1173,10 +1187,10 @@ void m_draw_scaled_backbuffer(int sx, int sy, int sw, int sh, int dx, int dy, in
 	al_unlock_bitmap(al_get_backbuffer(display));
 #else
 	m_set_target_bitmap(tmp);
-	al_draw_bitmap_region(al_get_backbuffer(display), sx, sy, sw, sh, 0, 0, 0);
+	quick_draw(al_get_backbuffer(display), sx, sy, sw, sh, 0, 0, 0);
 #endif
 	m_set_target_bitmap(dest);
-	al_draw_scaled_bitmap(
+	quick_draw(
 		tmp->bitmap,
 		0, 0, sw, sh,
 		dx, dy, dw, dh,
@@ -1210,7 +1224,7 @@ void m_draw_tinted_scaled_bitmap_identity_view(
 	al_copy_transform(&backup, al_get_current_transform());
 	al_identity_transform(&t);
 	al_use_transform(&t);
-	al_draw_tinted_scaled_bitmap(
+	quick_draw(
 		bmp->bitmap,
 		tint,
 		sx, sy, sw, sh,
@@ -1232,7 +1246,7 @@ void m_draw_scaled_target(MBITMAP *src, int sx, int sy, int sw, int sh,
 {
 	ALLEGRO_BITMAP *old_target = al_get_target_bitmap();
 	m_set_target_bitmap(dst);
-	al_draw_scaled_bitmap(src->bitmap, sx, sy, sw, sh, dx, dy, dw, dh, 0);
+	quick_draw(src->bitmap, sx, sy, sw, sh, dx, dy, dw, dh, 0);
 	al_set_target_bitmap(old_target);
 }
 
@@ -1293,3 +1307,383 @@ void my_get_keyboard_state(ALLEGRO_KEYBOARD_STATE *state)
 	al_get_keyboard_state(state);
 }
 
+static ALLEGRO_VERTEX *vertex_cache;
+static int cache_size = 0;
+static ALLEGRO_BITMAP *cache_bitmap;
+static bool caching;
+static int vcount = 0;
+
+static ALLEGRO_BITMAP *real_bitmap(ALLEGRO_BITMAP *bitmap)
+{
+	if (bitmap == 0) {
+		return 0;
+	}
+	ALLEGRO_BITMAP *parent = bitmap;
+	while (al_is_sub_bitmap(parent)) {
+		parent = al_get_parent_bitmap(parent);
+	}
+	return parent;
+}
+
+static void quick_resize_cache(int num_verts)
+{
+	if (vcount + num_verts <= cache_size) {
+		return;
+	}
+
+	int resize_amount = ((num_verts / 256) + 1) * 256;
+
+	cache_size += resize_amount;
+
+	vertex_cache = (ALLEGRO_VERTEX *)realloc(vertex_cache, cache_size * sizeof(ALLEGRO_VERTEX));
+}
+
+static void quick_flush()
+{
+	if (vcount > 0) {
+		al_draw_prim(vertex_cache, 0, cache_bitmap, 0, vcount, ALLEGRO_PRIM_TRIANGLE_LIST);
+		vcount = 0;
+	}
+	cache_bitmap = 0;
+}
+
+void quick(bool onoff)
+{
+	if (caching == onoff) {
+		return;
+	}
+
+	caching = onoff;
+
+	if (onoff == false) {
+		quick_flush();
+	}
+}
+
+bool is_quick_on()
+{
+	return caching;
+}
+
+void quick_draw(ALLEGRO_BITMAP *bitmap, float sx, float sy, float sw, float sh, ALLEGRO_COLOR tint, float cx, float cy, float dx, float dy, float xscale, float yscale, float angle, int flags)
+{
+	ALLEGRO_BITMAP *real = real_bitmap(bitmap);
+	if (cache_bitmap != real) {
+		quick_flush();
+		cache_bitmap = real;
+	}
+
+	quick_resize_cache(6);
+
+	ALLEGRO_VERTEX *v = &vertex_cache[vcount];
+
+	sx += al_get_bitmap_x(bitmap);
+	sy += al_get_bitmap_y(bitmap);
+	int u1 = sx;
+	int u2 = sx + sw;
+	int v1 = sy;
+	int v2 = sy + sh;
+
+	if (flags & ALLEGRO_FLIP_HORIZONTAL) {
+		int tmp = u1;
+		u1 = u2;
+		u2 = tmp;
+	}
+	if (flags & ALLEGRO_FLIP_VERTICAL) {
+		int tmp = v1;
+		v1 = v2;
+		v2 = tmp;
+	}
+
+	ALLEGRO_TRANSFORM t;
+	al_identity_transform(&t);
+	al_translate_transform(&t, -cx, -cy);
+	al_scale_transform(&t, xscale, yscale);
+	al_rotate_transform(&t, angle);
+	al_translate_transform(&t, dx, dy);
+
+	float x1 = 0;
+	float y1 = 0;
+	float x2 = sw;
+	float y2 = 0;
+	float x3 = sw;
+	float y3 = sh;
+	float x4 = 0;
+	float y4 = sh;
+
+	al_transform_coordinates(&t, &x1, &y1);
+	al_transform_coordinates(&t, &x2, &y2);
+	al_transform_coordinates(&t, &x3, &y3);
+	al_transform_coordinates(&t, &x4, &y4);
+
+	v[0].x = x1;
+	v[0].y = y1;
+	v[0].z = 0;
+	v[0].u = u1;
+	v[0].v = v1;
+	v[0].color = tint;
+
+	v[1].x = x2;
+	v[1].y = y2;
+	v[1].z = 0;
+	v[1].u = u2;
+	v[1].v = v1;
+	v[1].color = tint;
+	
+	v[2].x = x3;
+	v[2].y = y3;
+	v[2].z = 0;
+	v[2].u = u2;
+	v[2].v = v2;
+	v[2].color = tint;
+
+	v[3].x = x1;
+	v[3].y = y1;
+	v[3].z = 0;
+	v[3].u = u1;
+	v[3].v = v1;
+	v[3].color = tint;
+
+	v[4].x = x3;
+	v[4].y = y3;
+	v[4].z = 0;
+	v[4].u = u2;
+	v[4].v = v2;
+	v[4].color = tint;
+
+	v[5].x = x4;
+	v[5].y = y4;
+	v[5].z = 0;
+	v[5].u = u1;
+	v[5].v = v2;
+	v[5].color = tint;
+
+	vcount += 6;
+
+	if (caching == false) {
+		quick_flush();
+	}
+}
+
+void quick_draw(ALLEGRO_BITMAP *bitmap, float sx, float sy, float sw, float sh, float cx, float cy, float dx, float dy, float xscale, float yscale, float angle, int flags)
+{
+	quick_draw(bitmap, sx, sy, sw, sh, al_map_rgb(255, 255, 255), cx, cy, dx, dy, xscale, yscale, angle, flags);
+}
+
+void quick_draw(ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR tint, float cx, float cy, float dx, float dy, float xscale, float yscale, float angle, int flags)
+{
+	quick_draw(bitmap, 0, 0, al_get_bitmap_width(bitmap), al_get_bitmap_height(bitmap), tint, cx, cy, dx, dy, xscale, yscale, angle, flags);
+}
+
+void quick_draw(ALLEGRO_BITMAP *bitmap, float cx, float cy, float dx, float dy, float xscale, float yscale, float angle, int flags)
+{
+	quick_draw(bitmap, 0, 0, al_get_bitmap_width(bitmap), al_get_bitmap_height(bitmap), al_map_rgb(255, 255, 255), cx, cy, dx, dy, xscale, yscale, angle, flags);
+}
+
+void quick_draw(ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR tint, float cx, float cy, float dx, float dy, float angle, int flags)
+{
+	quick_draw(bitmap, 0, 0, al_get_bitmap_width(bitmap), al_get_bitmap_height(bitmap), tint, cx, cy, dx, dy, 1.0f, 1.0f, angle, flags);
+}
+
+void quick_draw(ALLEGRO_BITMAP *bitmap, float cx, float cy, float dx, float dy, float angle, int flags)
+{
+	quick_draw(bitmap, 0, 0, al_get_bitmap_width(bitmap), al_get_bitmap_height(bitmap), al_map_rgb(255, 255, 255), cx, cy, dx, dy, 1.0f, 1.0f, angle, flags);
+}
+
+void quick_draw(ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR tint, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh, int flags)
+{
+	ALLEGRO_BITMAP *real = real_bitmap(bitmap);
+	if (cache_bitmap != real) {
+		quick_flush();
+		cache_bitmap = real;
+	}
+
+	quick_resize_cache(6);
+
+	ALLEGRO_VERTEX *v = &vertex_cache[vcount];
+	
+	sx += al_get_bitmap_x(bitmap);
+	sy += al_get_bitmap_y(bitmap);
+	int u1 = sx;
+	int u2 = sx + sw;
+	int v1 = sy;
+	int v2 = sy + sh;
+
+	if (flags & ALLEGRO_FLIP_HORIZONTAL) {
+		int tmp = u1;
+		u1 = u2;
+		u2 = tmp;
+	}
+	if (flags & ALLEGRO_FLIP_VERTICAL) {
+		int tmp = v1;
+		v1 = v2;
+		v2 = tmp;
+	}
+
+	v[0].x = dx;
+	v[0].y = dy;
+	v[0].z = 0;
+	v[0].u = u1;
+	v[0].v = v1;
+	v[0].color = tint;
+
+	v[1].x = dx+dw;
+	v[1].y = dy;
+	v[1].z = 0;
+	v[1].u = u2;
+	v[1].v = v1;
+	v[1].color = tint;
+	
+	v[2].x = dx+dw;
+	v[2].y = dy+dh;
+	v[2].z = 0;
+	v[2].u = u2;
+	v[2].v = v2;
+	v[2].color = tint;
+
+	v[3].x = dx;
+	v[3].y = dy;
+	v[3].z = 0;
+	v[3].u = u1;
+	v[3].v = v1;
+	v[3].color = tint;
+
+	v[4].x = dx+dw;
+	v[4].y = dy+dh;
+	v[4].z = 0;
+	v[4].u = u2;
+	v[4].v = v2;
+	v[4].color = tint;
+
+	v[5].x = dx;
+	v[5].y = dy+dh;
+	v[5].z = 0;
+	v[5].u = u1;
+	v[5].v = v2;
+	v[5].color = tint;
+
+	vcount += 6;
+
+	if (caching == false) {
+		quick_flush();
+	}
+}
+
+void quick_draw(ALLEGRO_BITMAP *bitmap, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh, int flags)
+{
+	quick_draw(bitmap, al_map_rgb(255, 255, 255), sx, sy, sw, sh, dx, dy, dw, dh, flags);
+}
+
+void quick_draw(ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR tint, float sx, float sy, float sw, float sh, float dx, float dy, int flags)
+{
+	quick_draw(bitmap, tint, sx, sy, sw, sh, dx, dy, sw, sh, flags);
+}
+
+void quick_draw(ALLEGRO_BITMAP *bitmap, float sx, float sy, float sw, float sh, float dx, float dy, int flags)
+{
+	quick_draw(bitmap, al_map_rgb(255, 255, 255), sx, sy, sw, sh, dx, dy, sw, sh, flags);
+}
+
+void quick_draw(ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR tint, float dx, float dy, int flags)
+{
+	quick_draw(bitmap, tint, 0, 0, al_get_bitmap_width(bitmap), al_get_bitmap_height(bitmap), dx, dy, al_get_bitmap_width(bitmap), al_get_bitmap_height(bitmap), flags);
+}
+
+void quick_draw(ALLEGRO_BITMAP *bitmap, float dx, float dy, int flags)
+{
+	quick_draw(bitmap, al_map_rgb(255, 255, 255), 0, 0, al_get_bitmap_width(bitmap), al_get_bitmap_height(bitmap), dx, dy, al_get_bitmap_width(bitmap), al_get_bitmap_height(bitmap), flags);
+}
+
+void quick_cache(ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR tint, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, int flags)
+{
+	ALLEGRO_BITMAP *real = real_bitmap(bitmap);
+	if (cache_bitmap != real) {
+		quick_flush();
+		cache_bitmap = real;
+	}
+
+	quick_resize_cache(6);
+
+	ALLEGRO_VERTEX *v = &vertex_cache[vcount];
+
+	int u1 = al_get_bitmap_x(bitmap);
+	int u2 = u1 + al_get_bitmap_width(bitmap);
+	int v1 = al_get_bitmap_y(bitmap);
+	int v2 = v1 + al_get_bitmap_height(bitmap);
+
+	if (flags & ALLEGRO_FLIP_HORIZONTAL) {
+		int tmp = u1;
+		u1 = u2;
+		u2 = tmp;
+	}
+	if (flags & ALLEGRO_FLIP_VERTICAL) {
+		int tmp = v1;
+		v1 = v2;
+		v2 = tmp;
+	}
+
+	v[0].x = x1;
+	v[0].y = y1;
+	v[0].z = 0;
+	v[0].u = u1;
+	v[0].v = v1;
+	v[0].color = tint;
+
+	v[1].x = x2;
+	v[1].y = y2;
+	v[1].z = 0;
+	v[1].u = u2;
+	v[1].v = v1;
+	v[1].color = tint;
+	
+	v[2].x = x3;
+	v[2].y = y3;
+	v[2].z = 0;
+	v[2].u = u2;
+	v[2].v = v2;
+	v[2].color = tint;
+
+	v[3].x = x1;
+	v[3].y = y1;
+	v[3].z = 0;
+	v[3].u = u1;
+	v[3].v = v1;
+	v[3].color = tint;
+
+	v[4].x = x3;
+	v[4].y = y3;
+	v[4].z = 0;
+	v[4].u = u2;
+	v[4].v = v2;
+	v[4].color = tint;
+
+	v[5].x = x4;
+	v[5].y = y4;
+	v[5].z = 0;
+	v[5].u = u1;
+	v[5].v = v2;
+	v[5].color = tint;
+
+	vcount += 6;
+
+	if (caching == false) {
+		quick_flush();
+	}
+}
+
+void quick_shutdown()
+{
+	free(vertex_cache);
+}
+
+#ifdef STOCK_ALLEGRO
+bool ttf_is_quick()
+{
+	return al_is_bitmap_drawing_held();
+}
+
+void ttf_quick(bool onoff)
+{
+	al_hold_bitmap_drawing(onoff);
+}
+#endif

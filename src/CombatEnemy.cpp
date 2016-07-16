@@ -691,7 +691,7 @@ void CombatEnemy::draw(void)
 			al_set_shader_float("b", 0.8);
 			int dx = (int)(x - (w/2));
 			int dy = (int)(y - h);
-			al_hold_bitmap_drawing(true);
+			quick(true);
 			for (int i = 0; i < h; i++, dy++) {
 				float f = fl + (((float)i/h) * (M_PI*2));
 				int new_dx = (int)(dx + (sin(f)*6));
@@ -708,13 +708,13 @@ void CombatEnemy::draw(void)
 					}
 				}
 			}
-			al_hold_bitmap_drawing(false);
+			quick(false);
 			al_use_shader(NULL);
 		}
 		else {
 			int dx = (int)(x - (w/2));
 			int dy = (int)(y - h);
-			al_hold_bitmap_drawing(true);
+			quick(true);
 			for (int i = 0; i < h; i++, dy++) {
 				float f = fl + (((float)i/h) * (M_PI*2));
 				int dxo = sin(f)*6;
@@ -733,7 +733,7 @@ void CombatEnemy::draw(void)
 					}
 				}
 			}
-			al_hold_bitmap_drawing(false);
+			quick(false);
 		}
 	}
 	else {
@@ -1224,7 +1224,7 @@ void CombatEnemyTode::draw(void)
 			al_set_shader_float("b", 0.8);
 			int dx = (int)(x - w/2);
 			int dy = (int)(y - h);
-			al_hold_bitmap_drawing(true);
+			quick(true);
 			for (int i = 0; i < h; i++, dy++) {
 				float f = fl + (((float)i/h) * (M_PI*2));
 				int new_dx = (int)(dx + (sin(f)*6));
@@ -1241,7 +1241,7 @@ void CombatEnemyTode::draw(void)
 					}
 				}
 			}
-			al_hold_bitmap_drawing(false);
+			quick(false);
 			al_use_shader(NULL);
 		}
 		else {

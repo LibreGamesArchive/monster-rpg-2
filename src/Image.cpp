@@ -115,7 +115,7 @@ Image *Image::clone(int type, MBITMAP *clone_from, MBITMAP *clone_to, int x, int
 
 		al_set_target_bitmap(clone_to->bitmap);
 
-		al_draw_bitmap_region(
+		quick_draw(
 			clone_from->bitmap,
 			x1, y1, w, h,
 			dx, dy,

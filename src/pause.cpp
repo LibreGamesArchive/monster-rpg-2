@@ -227,7 +227,7 @@ void showSaveStateInfo(const char *basename)
 
 			// draw ss and date
 			if (ss) {
-				al_draw_bitmap(ss, BW/2-BW/4, BH/3-BH/4, 0);
+				quick_draw(ss, BW/2-BW/4, BH/3-BH/4, 0);
 			}
 			else {
 				mTextout(game_font, _t("<No Screenshot>"), BW/2, BH/3,
@@ -294,7 +294,6 @@ static void draw_item_desc(lua_State *luaState, int index, int y)
 	callLua(luaState, "get_item_description", "i>s", index);
 	const char *desc = lua_tostring(luaState, -1);
 
-	al_hold_bitmap_drawing(true);
 	start_text();
 	
 	mTextout(game_font, _t(desc), BW/2, y+m_text_height(game_font),
@@ -344,7 +343,6 @@ static void draw_item_desc(lua_State *luaState, int index, int y)
 			break;
 	}
 
-	al_hold_bitmap_drawing(false);
 	end_text();
 }
 
@@ -2930,9 +2928,7 @@ void choose_savestate_old(std::string caption, bool paused, bool autosave, bool 
 			draw_counter = 0;
 			set_target_backbuffer();
 
-			al_hold_bitmap_drawing(true);
 			tguiDraw();
-			al_hold_bitmap_drawing(false);
 			
 			drawBufferToScreen();
 			m_flip_display();

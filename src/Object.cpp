@@ -261,9 +261,9 @@ void Object::draw()
 
 void Object::drawUpper()
 {
-	bool held = al_is_bitmap_drawing_held();
-	if (held) {
-		al_hold_bitmap_drawing(false);
+	bool was_quick = is_quick_on();
+	if (was_quick) {
+		quick(false);
 	}
 	if (poisoned && poisonBlocks[0].color.a > 0.0f) {
 		int dx = poisonBlocks[0].x;
@@ -324,8 +324,8 @@ void Object::drawUpper()
 		col.a = tmp.a;
 		m_draw_tinted_bitmap(poison_bmp_tmp2, col, dx-5, dy-5, 0);
 	}
-	if (held) {
-		al_hold_bitmap_drawing(true);
+	if (was_quick) {
+		quick(true);
 	}
 }
 
@@ -817,9 +817,9 @@ bool Light::update(Area *area, int step)
 
 void Light::draw()
 {
-	bool held = al_is_bitmap_drawing_held();
-	if (held) {
-		al_hold_bitmap_drawing(false);
+	bool was_quick = is_quick_on();
+	if (was_quick) {
+		quick(false);
 	}
 
 	al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_ONE);
@@ -828,8 +828,8 @@ void Light::draw()
 
 	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA);
 	
-	if (held) {
-		al_hold_bitmap_drawing(true);
+	if (was_quick) {
+		quick(true);
 	}
 }
 
@@ -856,9 +856,9 @@ Light::~Light()
 
 void Fish::draw()
 {
-	bool held = al_is_bitmap_drawing_held();
-	if (held) {
-		al_hold_bitmap_drawing(false);
+	bool was_quick = is_quick_on();
+	if (was_quick) {
+		quick(false);
 	}
 
 	m_push_target_bitmap();
@@ -877,11 +877,11 @@ void Fish::draw()
 	m_pop_target_bitmap();
 
 	ALLEGRO_COLOR tint = al_map_rgba(alpha, alpha, alpha, alpha);
-	al_draw_tinted_rotated_bitmap(tmpbmp->bitmap, tint, w/2, (h+MAX_WIGGLE*2)/2,
+	quick_draw(tmpbmp->bitmap, tint, w/2, (h+MAX_WIGGLE*2)/2,
 		x-area->getOriginX(), y-area->getOriginY(), angle, 0);
 
-	if (held) {
-		al_hold_bitmap_drawing(true);
+	if (was_quick) {
+		quick(true);
 	}
 }
 

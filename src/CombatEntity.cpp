@@ -1122,7 +1122,7 @@ void WhirlpoolEffect::draw(void)
 	int xx = dx + (spx * screenScaleX);
 	int yy = (dy + (spy * screenScaleY) - (8*screenScaleY)) * 2; // 8 == depth of water
 
-	al_draw_scaled_rotated_bitmap(
+	quick_draw(
 		spiral->bitmap,
 		w/2, h/2,
 		xx, yy,
@@ -3011,14 +3011,14 @@ void TwisterEffect::draw(void)
 	float fl = ((float)count / getLifetime()) * (M_PI*6);
 	int dx = x - w/2;
 	int dy = y - h;
-	al_hold_bitmap_drawing(true);
+	quick(true);
 	for (int i = 0; i < h; i++, dy++) {
 		float f = fl + (((float)i/h) * (M_PI*2));
 		int new_dx = dx + (sin(f)*6);
 		m_draw_bitmap_region(bmp,
 			0, i, w, 1, new_dx, dy, 0);
 	}
-	al_hold_bitmap_drawing(false);
+	quick(false);
 }
 
 

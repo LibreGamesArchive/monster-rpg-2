@@ -1,5 +1,7 @@
 #include "monster2.hpp"
 
+#include <allegro5/internal/aintern_pixels.h>
+
 MSAMPLE boost = 0;
 float boost_volume = 0.0f;
 
@@ -279,6 +281,11 @@ top:
 			
 			// end game logic check
 			// this drawing really has to be done here unfortunately
+
+			ALLEGRO_LOCKED_REGION *lr1 = al_lock_bitmap(lander_tmp->bitmap, ALLEGRO_PIXEL_FORMAT_ANY, 0);
+			ALLEGRO_LOCKED_REGION *lr2 = al_lock_bitmap(land_mem->bitmap, ALLEGRO_PIXEL_FORMAT_ANY, 0);
+			ALLEGRO_LOCKED_REGION *lr3 = al_lock_bitmap(lander_mem->bitmap, ALLEGRO_PIXEL_FORMAT_ANY, 0);
+
 			m_set_target_bitmap(lander_tmp);
 			m_clear(al_map_rgba(0, 0, 0, 0));
 			m_draw_rotated_bitmap(lander_mem, 15, 15, 15, 15, -(lander_angle-M_PI*3/2), 0);
@@ -288,9 +295,16 @@ top:
 			int x1, x2, y1, y2;
 
 			for (y1 = 0, y2 = lander_y - 15; y1 < 30; y1++, y2++) {
+				char *data1 = (char *)lr1->data + y1 * lr1->pitch;
+				char *data2 = (char *)lr2->data + y2 * lr2->pitch + ((int)lander_x - 15) * al_get_pixel_size(lr2->format);
+
 				for (x1 = 0, x2 = lander_x - 15; x1 < 30; x1++, x2++) {
-					MCOLOR c1 = m_get_pixel(lander_tmp, x1, y1);
-					MCOLOR c2 = m_get_pixel(land_mem, x2, y2);
+					MCOLOR c1;
+					MCOLOR c2;
+
+					_AL_INLINE_GET_PIXEL(lr1->format, data1, c1, true);
+					_AL_INLINE_GET_PIXEL(lr2->format, data2, c2, true);
+
 					unsigned char r1, g1, b1, a1;
 					unsigned char r2, g2, b2, a2;
 					m_unmap_rgba(c1, &r1, &g1, &b1, &a1);
@@ -322,6 +336,11 @@ top:
 					}
 				}
 			}
+			
+			al_unlock_bitmap(lander_tmp->bitmap);
+			al_unlock_bitmap(land_mem->bitmap);
+			al_unlock_bitmap(lander_mem->bitmap);
+
 
 			if (!dead && green > 3) {
 				draw_counter++;

@@ -1182,7 +1182,7 @@ void Area::draw(int bw, int bh)
 		}
 	}
 
-	al_hold_bitmap_drawing(true);
+	quick(true);
 	/* Draw low objects */
 	for (unsigned int i = 0; i < sorted_objects.size(); i++) {
 		if (sorted_objects[i]->isLow() && !sorted_objects[i]->isHidden()) {
@@ -1196,7 +1196,7 @@ void Area::draw(int bw, int bh)
 			drawObject(sorted_objects[i]);
 		}
 	}
-	al_hold_bitmap_drawing(false);
+	quick(false);
 
 
 	for (int i = TILE_LAYERS/2; i < TILE_LAYERS; i++) {
@@ -1221,13 +1221,13 @@ void Area::draw(int bw, int bh)
 #endif
 
 	// Draw high and flying objects
-	al_hold_bitmap_drawing(true);
+	quick(true);
 	for (unsigned int i = 0; i < objects.size(); i++) {
 		if (objects[i]->isHigh() && !objects[i]->isHidden())
 			objects[i]->draw();
 	}
 
-	al_hold_bitmap_drawing(false);
+	quick(false);
 
 	if (name == "darkside") {
 		if (gameInfo.milestones[MS_GOT_ORB]) {
@@ -1905,7 +1905,7 @@ static void draw_tile_with_borders(MBITMAP *tile, int x, int y)
 
 	// do sides
 	for (int i = 0; i < 4; i++) {
-		al_draw_bitmap_region(
+		quick_draw(
 			tile->bitmap,
 			sides[i][0],
 			sides[i][1],
@@ -1919,7 +1919,7 @@ static void draw_tile_with_borders(MBITMAP *tile, int x, int y)
 
 	// do corners
 	for (int i = 0; i < 4; i++) {
-		al_draw_bitmap_region(
+		quick_draw(
 			tile->bitmap,
 			corners[i][0],
 			corners[i][1],
@@ -1931,7 +1931,7 @@ static void draw_tile_with_borders(MBITMAP *tile, int x, int y)
 		);
 	}
 
-	al_draw_bitmap(tile->bitmap, x, y, 0);
+	quick_draw(tile->bitmap, x, y, 0);
 }
 
 void Area::loadAnimation(int index, bool addIndex)

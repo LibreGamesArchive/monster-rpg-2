@@ -593,9 +593,9 @@ static void draw(double cx, double cy, bool draw_objects = true)
 	}
 	// draw crabs
 	crab_bmp = crab->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
+	bool was_quick = is_quick_on();
+	quick(true);
 	for (int i = 0; i < (int)crabs.size(); i++) {
-		bool held = al_is_bitmap_drawing_held();
-		al_hold_bitmap_drawing(true);
 		if (crabs[i].y > o-600 && crabs[i].y < o+64) {
 			draw_billboard_bitmap(
 				&proj,
@@ -604,27 +604,23 @@ static void draw(double cx, double cy, bool draw_objects = true)
 				crabs[i].y-cy+m_get_bitmap_height(crab_bmp)
 			);
 		}
-		al_hold_bitmap_drawing(false);
-		al_hold_bitmap_drawing(held);
 	}
+	quick(false);
 	// draw bullets
+	quick(true);
 	for (int i = 0; i < (int)bullets.size(); i++) {
-		bool held = al_is_bitmap_drawing_held();
-		al_hold_bitmap_drawing(true);
 		draw_billboard_bitmap(
 			&proj,
 			bullet,
 			bullets[i].x-cx,
 			bullets[i].y-cy+m_get_bitmap_height(bullet)
 		);
-		al_hold_bitmap_drawing(false);
-		al_hold_bitmap_drawing(held);
 	}
+	quick(false);
 	// draw sharks
+	quick(true);
 	shark_bmp = shark_anim->getCurrentAnimation()->getCurrentFrame()->getImage()->getBitmap();
 	for (int i = 0; i < (int)sharks.size(); i++) {
-		bool held = al_is_bitmap_drawing_held();
-		al_hold_bitmap_drawing(true);
 		if (sharks[i].y > o-600 && sharks[i].y < o+64) {
 			draw_billboard_bitmap(
 				&proj,
@@ -633,9 +629,9 @@ static void draw(double cx, double cy, bool draw_objects = true)
 				sharks[i].y-cy+m_get_bitmap_height(shark_bmp)
 			);
 		}
-		al_hold_bitmap_drawing(false);
-		al_hold_bitmap_drawing(held);
 	}
+	quick(false);
+	quick(was_quick);
 }
 
 static void draw_all(void)

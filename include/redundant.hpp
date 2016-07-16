@@ -3,6 +3,34 @@
 
 #include <stack>
 
+#ifndef STOCK_ALLEGRO
+extern "C" {
+#endif
+// ttf quick
+bool ttf_is_quick();
+void ttf_quick(bool onoff);
+#ifndef STOCK_ALLEGRO
+}
+#endif
+
+// quick
+void quick(bool onoff);
+bool is_quick_on();
+void quick_draw(ALLEGRO_BITMAP *bitmap, float sx, float sy, float sw, float sh, ALLEGRO_COLOR tint, float cx, float cy, float dx, float dy, float xscale, float yscale, float angle, int flags);
+void quick_draw(ALLEGRO_BITMAP *bitmap, float sx, float sy, float sw, float sh, float cx, float cy, float dx, float dy, float xscale, float yscale, float angle, int flags);
+void quick_draw(ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR tint, float cx, float cy, float dx, float dy, float xscale, float yscale, float angle, int flags);
+void quick_draw(ALLEGRO_BITMAP *bitmap, float cx, float cy, float dx, float dy, float xscale, float yscale, float angle, int flags);
+void quick_draw(ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR tint, float cx, float cy, float dx, float dy, float angle, int flags);
+void quick_draw(ALLEGRO_BITMAP *bitmap, float cx, float cy, float dx, float dy, float angle, int flags);
+void quick_draw(ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR tint, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh, int flags);
+void quick_draw(ALLEGRO_BITMAP *bitmap, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh, int flags);
+void quick_draw(ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR tint, float sx, float sy, float sw, float sh, float dx, float dy, int flags);
+void quick_draw(ALLEGRO_BITMAP *bitmap, float sx, float sy, float sw, float sh, float dx, float dy, int flags);
+void quick_draw(ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR tint, float dx, float dy, int flags);
+void quick_draw(ALLEGRO_BITMAP *bitmap, float dx, float dy, int flags);
+void quick_cache(ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR tint, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, int flags);
+void quick_shutdown();
+
 void m_get_mouse_state(ALLEGRO_MOUSE_STATE *s);
 float my_get_opengl_version(void);
 
@@ -17,20 +45,20 @@ const int M_FLIP_VERTICAL = 2;
 
 void my_clear_bitmap(MBITMAP *b);
 #define m_draw_tinted_bitmap(bmp, tint, x, y, flags) \
-	al_draw_tinted_bitmap(bmp->bitmap, tint, (int)x, (int)y, flags)
+	quick_draw(bmp->bitmap, tint, (int)x, (int)y, flags)
 #define m_draw_bitmap(bmp, x, y, flags) \
 	m_draw_tinted_bitmap(bmp, white, (int)x, (int)y, flags)
 #define m_draw_tinted_bitmap_region(bmp, tint, sx, sy, sw, sh, dx, dy, flags) \
-	al_draw_tinted_bitmap_region(bmp->bitmap, tint, (int)sx, (int)sy, sw, sh, (int)dx, (int)dy, flags)
+	quick_draw(bmp->bitmap, tint, (int)sx, (int)sy, sw, sh, (int)dx, (int)dy, flags)
 #define m_draw_bitmap_region(bmp, sx, sy, sw, sh, dx, dy, flags) \
 	m_draw_tinted_bitmap_region(bmp, white, (int)sx, (int)sy, sw, sh, (int)dx, (int)dy, flags)
-#define m_draw_tinted_bitmap(bmp, tint, x, y, flags) al_draw_tinted_bitmap(bmp->bitmap, tint, (int)x, (int)y, flags)
+#define m_draw_tinted_bitmap(bmp, tint, x, y, flags) quick_draw(bmp->bitmap, tint, (int)x, (int)y, flags)
 #define m_draw_scaled_rotated_bitmap(bmp, cx, cy, dx, dy, xscale, yscale, angle, flags) \
-	al_draw_scaled_rotated_bitmap(bmp->bitmap, cx, cy, (int)dx, (int)dy, xscale, yscale, angle, flags)
+	quick_draw(bmp->bitmap, cx, cy, (int)dx, (int)dy, xscale, yscale, angle, flags)
 #define m_draw_tinted_scaled_rotated_bitmap(bmp, tint, cx, cy, dx, dy, xscale, yscale, angle, flags) \
-	al_draw_tinted_scaled_rotated_bitmap(bmp->bitmap, tint, cx, cy, (int)dx, (int)dy, xscale, yscale, angle, flags)
+	quick_draw(bmp->bitmap, tint, cx, cy, (int)dx, (int)dy, xscale, yscale, angle, flags)
 #define m_draw_tinted_scaled_bitmap(bmp, tint, sx, sy, sw, sh, dx, dy, dw, dh, flags) \
-	al_draw_tinted_scaled_bitmap(bmp->bitmap, tint, (int)sx, (int)sy, sw, sh, (int)dx, (int)dy, dw, dh, flags)
+	quick_draw(bmp->bitmap, tint, (int)sx, (int)sy, sw, sh, (int)dx, (int)dy, dw, dh, flags)
 
 void my_do_line(int x1, int y1, int x2, int y2, void *data, void (*proc)(int, int, void *));
 void my_do_circle(int x, int y, int radius, MCOLOR d,

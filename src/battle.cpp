@@ -330,8 +330,6 @@ void Battle::drawStatus(void)
 		mDrawFrame(separator+9, BH-height-2, BW-(separator+9)-3, height);
 	}
 
-	bool held = al_is_bitmap_drawing_held();
-	al_hold_bitmap_drawing(true);
 	start_text();
 	
 	if (draw_enemy_status) {
@@ -391,8 +389,6 @@ void Battle::drawStatus(void)
 		}
 	}
 
-	al_hold_bitmap_drawing(false);
-	al_hold_bitmap_drawing(held);
 	end_text();
 }
 

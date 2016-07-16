@@ -316,7 +316,7 @@ static void drawOverlay(bool draw_controls, ALLEGRO_COLOR tint)
 			
 			float alpha = 1.0 - (diff / 3.0);
 			float scale = diff;
-			al_draw_tinted_scaled_rotated_bitmap(
+			quick_draw(
 				achievement_bmp->bitmap,
 				al_map_rgba_f(alpha*tint.r, alpha*tint.g, alpha*tint.b, alpha*tint.a),
 				m_get_bitmap_width(achievement_bmp)/2, m_get_bitmap_height(achievement_bmp)/2,
@@ -716,12 +716,12 @@ static bool transition(bool focusing, double length, bool can_cancel = false, bo
 		if (recth < 1) recth = 1;
 
 		m_set_target_bitmap(tmp);
-		al_draw_scaled_bitmap(tmpbuffer->bitmap, dx, dy, dw, dh, 0, 0, dw/size, dh/size, 0);
+		quick_draw(tmpbuffer->bitmap, dx, dy, dw, dh, 0, 0, dw/size, dh/size, 0);
 
 		set_target_backbuffer();
 		m_clear(black);
 
-		al_draw_scaled_bitmap(tmp->bitmap, 0, 0, dw/size, dh/size, dx, dy, dw, dh, 0);
+		quick_draw(tmp->bitmap, 0, 0, dw/size, dh/size, dx, dy, dw, dh, 0);
 
 		al_draw_filled_rectangle(0, 0, dx+(dw-rectw)/2, disp_h, black);
 		al_draw_filled_rectangle(0, 0, disp_w, dy+(dh-recth)/2, black);
@@ -858,7 +858,7 @@ void battleTransition()
 
 				m_draw_bitmap(tmp, dx, dy, 0);
 
-				al_hold_bitmap_drawing(true);
+				quick(true);
 				for (int i = 0; i < dw; i++) {
 					float p = (float)elapsed/length;
 					int h = (heights[i] + p*(dh+max));
@@ -866,7 +866,7 @@ void battleTransition()
 						m_draw_bitmap_region(bufcopy2,
 							i, 0, 1, h, dx+i, dy, 0);
 				}
-				al_hold_bitmap_drawing(false);
+				quick(false);
 
 				drawBufferToScreen(false);
 

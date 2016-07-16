@@ -76,7 +76,7 @@ static void draw_bitmap_with_borders(MBITMAP *bmp, int x, int y)
 
 	// do sides
 	for (int i = 0; i < 4; i++) {
-		al_draw_bitmap_region(
+		quick_draw(
 			bmp->bitmap,
 			sides[i][0],
 			sides[i][1],
@@ -90,7 +90,7 @@ static void draw_bitmap_with_borders(MBITMAP *bmp, int x, int y)
 
 	// do corners
 	for (int i = 0; i < 4; i++) {
-		al_draw_bitmap_region(
+		quick_draw(
 			bmp->bitmap,
 			corners[i][0],
 			corners[i][1],
@@ -102,7 +102,7 @@ static void draw_bitmap_with_borders(MBITMAP *bmp, int x, int y)
 		);
 	}
 
-	al_draw_bitmap(bmp->bitmap, x, y, 0);
+	quick_draw(bmp->bitmap, x, y, 0);
 }
 
 ATLAS *atlas_create(int width, int height, int flags, int border, bool destroy_bmps)
@@ -208,7 +208,7 @@ int atlas_finish(ATLAS *atlas)
 					);
 				}
 				else {
-					al_draw_bitmap(
+					quick_draw(
 						bmp->bitmap,
 						rect->x+atlas->border,
 						rect->y+atlas->border,

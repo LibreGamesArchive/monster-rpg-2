@@ -1926,7 +1926,7 @@ int main(int argc, char *argv[])
 	m_push_target_bitmap();
 	m_set_target_bitmap(nooskewl);
 	m_clear(m_map_rgba(0, 0, 0, 0));
-	al_draw_scaled_bitmap(
+	quick_draw(
 		tmp->bitmap,
 		0, 0,
 		m_get_bitmap_width(tmp), m_get_bitmap_height(tmp),
