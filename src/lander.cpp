@@ -327,7 +327,6 @@ top:
 
 					if (!exploding) {
 						if ((done || r2 != 0 || g2 != 255 || b2 != 0 || fabs(lander_angle-(M_PI*3/2)) > (M_PI/12))) {
-						printf("r2=%d g2=%d b2=%d x2=%d y2=%d fabs(lander_angle-(M_PI*3/2))=%f\n", r2, g2, b2, x2, y2, fabs(lander_angle-(M_PI*3/2)));
 							exploding = true;
 							expl_x = lander_x-explosion->getWidth()/2,
 							expl_y = lander_y-explosion->getHeight()/2,
