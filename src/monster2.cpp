@@ -2004,7 +2004,8 @@ int main(int argc, char *argv[])
 
 #ifndef ALLEGRO_ANDROID
 	if (check_arg(argc, argv, "-volcano") != -1) {
-		playMusic("volcano.ogg"); volcano_scene();
+		playMusic("volcano.ogg");
+		volcano_scene();
 	}
 	if (check_arg(argc, argv, "-lander") != -1) {
 		do_lander();
