@@ -98,7 +98,7 @@ bool do_lander(void)
 	p.color = m_map_rgb(255, 0, 0); \
 	particles.push_back(p); \
 	}
-	
+
 top:
 	hide_mouse_cursor();
 
@@ -110,10 +110,10 @@ top:
 	MBITMAP *lander_bmp = m_load_alpha_bitmap(getResource("media/lander.png"));
 	MBITMAP *land_bmp = m_load_alpha_bitmap(getResource("media/landing_area.png"));
 	MBITMAP *sky_bmp = m_load_bitmap(getResource("media/landing_area_sky.png"));
-	
+
 	MBITMAP *land_mem = m_load_alpha_bitmap(getResource("media/landing_area.png"), true);
 	MBITMAP *lander_mem = m_load_alpha_bitmap(getResource("media/lander.png"), true);
-	
+
 	ALLEGRO_STATE state;
 	al_store_state(&state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS | ALLEGRO_STATE_TARGET_BITMAP);
 	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
@@ -122,7 +122,7 @@ top:
 	m_clear(al_map_rgba(0, 0, 0, 0));
 	m_draw_bitmap(lander_mem, 3, 3, 0);
 	al_restore_state(&state);
-	
+
 	AnimationSet *explosion = new_AnimationSet(getResource("media/explosion.png"));
 
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -158,15 +158,15 @@ top:
 
 	while  (1) {
 		int green = 0;
-		
+
 		al_wait_cond(wait_cond, wait_mutex);
-		
+
 		// Logic
 		int tmp_counter = logic_counter;
 		logic_counter = 0;
 		if (tmp_counter > 10)
 			tmp_counter = 1;
-			
+
 		while  (!break_for_fade_after_draw && tmp_counter > 0) {
 			next_input_event_ready = true;
 
@@ -219,7 +219,7 @@ top:
 				}
 #endif
 			}
-				
+
 			if (left) {
 				if (lastVolume != 1) {
 					setStreamVolume(boost, 1);
@@ -278,50 +278,56 @@ top:
 				else
 					it++;
 			}
-			
+
 			// end game logic check
 			// this drawing really has to be done here unfortunately
 
 			ALLEGRO_LOCKED_REGION *lr1 = al_lock_bitmap(lander_tmp->bitmap, ALLEGRO_PIXEL_FORMAT_ANY, 0);
 			ALLEGRO_LOCKED_REGION *lr2 = al_lock_bitmap(land_mem->bitmap, ALLEGRO_PIXEL_FORMAT_ANY, 0);
-			ALLEGRO_LOCKED_REGION *lr3 = al_lock_bitmap(lander_mem->bitmap, ALLEGRO_PIXEL_FORMAT_ANY, 0);
+			al_lock_bitmap(lander_mem->bitmap, ALLEGRO_PIXEL_FORMAT_ANY, 0);
 
 			m_set_target_bitmap(lander_tmp);
 			m_clear(al_map_rgba(0, 0, 0, 0));
 			m_draw_rotated_bitmap(lander_mem, 15, 15, 15, 15, -(lander_angle-M_PI*3/2), 0);
-			
+
 			green = 0;
-			
+
 			int x1, x2, y1, y2;
 
 			for (y1 = 0, y2 = lander_y - 15; y1 < 30; y1++, y2++) {
+				x2 = lander_x - 15;
+
 				char *data1 = (char *)lr1->data + y1 * lr1->pitch;
-				char *data2 = (char *)lr2->data + y2 * lr2->pitch + ((int)lander_x - 15) * al_get_pixel_size(lr2->format);
+				char *data2 = (char *)lr2->data + y2 * lr2->pitch + x2 * al_get_pixel_size(lr2->format);
 
-				for (x1 = 0, x2 = lander_x - 15; x1 < 30; x1++, x2++) {
-					MCOLOR c1;
-					MCOLOR c2;
-
-					_AL_INLINE_GET_PIXEL(lr1->format, data1, c1, true);
-					_AL_INLINE_GET_PIXEL(lr2->format, data2, c2, true);
+				for (x1 = 0; x1 < 30; x1++, x2++) {
+					bool done = false;
 
 					unsigned char r1, g1, b1, a1;
 					unsigned char r2, g2, b2, a2;
-					m_unmap_rgba(c1, &r1, &g1, &b1, &a1);
-					m_unmap_rgba(c2, &r2, &g2, &b2, &a2);
-					
-					bool done = false;
-					
-					if (x2 < -3 || x2 >= BW+3 || y2 < -3 || y2 >= BH+3) {
+
+					if (x2 < 0 || y2 < 0 || x2 >= al_get_bitmap_width(land_mem->bitmap) || y2 >= al_get_bitmap_height(land_mem->bitmap)) {
 						done = true;
 					}
-					else if (a1 < 255 || a2 < 255) {
-						continue;
+
+					if (!done) {
+						MCOLOR c1;
+						MCOLOR c2;
+
+						_AL_INLINE_GET_PIXEL(lr1->format, data1, c1, true);
+						_AL_INLINE_GET_PIXEL(lr2->format, data2, c2, true);
+
+						m_unmap_rgba(c1, &r1, &g1, &b1, &a1);
+						m_unmap_rgba(c2, &r2, &g2, &b2, &a2);
+
+						if (a1 < 255 || a2 < 255) {
+							continue;
+						}
 					}
-					
+
 					if (!exploding) {
-					// 5 degrees ->
-						if ((done || r2 != 0 || g2 != 255 || b2 != 0 || fabs(lander_angle-(M_PI*3/2)) > (M_PI/36))) {
+						if ((done || r2 != 0 || g2 != 255 || b2 != 0 || fabs(lander_angle-(M_PI*3/2)) > (M_PI/12))) {
+						printf("r2=%d g2=%d b2=%d x2=%d y2=%d fabs(lander_angle-(M_PI*3/2))=%f\n", r2, g2, b2, x2, y2, fabs(lander_angle-(M_PI*3/2)));
 							exploding = true;
 							expl_x = lander_x-explosion->getWidth()/2,
 							expl_y = lander_y-explosion->getHeight()/2,
@@ -336,7 +342,7 @@ top:
 					}
 				}
 			}
-			
+
 			al_unlock_bitmap(lander_tmp->bitmap);
 			al_unlock_bitmap(land_mem->bitmap);
 			al_unlock_bitmap(lander_mem->bitmap);
@@ -345,7 +351,7 @@ top:
 			if (!dead && green > 3) {
 				draw_counter++;
 				break;
-			}			
+			}
 		}
 
 		if (break_for_fade_after_draw || draw_counter > 0) {
@@ -354,7 +360,7 @@ top:
 			if (!break_for_fade_after_draw) {
 				set_target_backbuffer();
 			}
-			
+
 			m_draw_bitmap(sky_bmp, 0, 0, 0);
 			m_draw_bitmap(land_bmp, 0, 0, 0);
 
@@ -365,7 +371,7 @@ top:
 				m_draw_rotated_bitmap(lander_bmp, 15, 15,
 						      lander_x, lander_y, -(lander_angle-M_PI*3/2), 0);
 			}
-			
+
 			/* draw particles */
 
 			ALLEGRO_VERTEX *verts = new ALLEGRO_VERTEX[particles.size()];
@@ -389,7 +395,7 @@ top:
 			m_draw_prim(verts, 0, 0, 0, vcount, ALLEGRO_PRIM_POINT_LIST);
 
 			delete[] verts;
-		
+
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
 			if (!use_dpad)
 				tguiDraw();
