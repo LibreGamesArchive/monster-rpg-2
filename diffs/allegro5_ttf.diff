@@ -1,5 +1,5 @@
 diff --git a/addons/ttf/ttf.c b/addons/ttf/ttf.c
-index a8e753b..93ff63d 100644
+index a8e753b..0642f36 100644
 --- a/addons/ttf/ttf.c
 +++ b/addons/ttf/ttf.c
 @@ -15,6 +15,8 @@
@@ -11,7 +11,7 @@ index a8e753b..93ff63d 100644
  ALLEGRO_DEBUG_CHANNEL("font")
  
  
-@@ -33,6 +35,151 @@ ALLEGRO_DEBUG_CHANNEL("font")
+@@ -33,6 +35,152 @@ ALLEGRO_DEBUG_CHANNEL("font")
  
  #define RANGE_SIZE   128
  
@@ -158,12 +158,13 @@ index a8e753b..93ff63d 100644
 +{
 +	free(ttf_vertex_cache);
 +	ttf_vertex_cache = 0;
++        ttf_cache_size = 0;
 +}
 +
  
  typedef struct REGION
  {
-@@ -389,7 +536,7 @@ static void copy_glyph_color(ALLEGRO_TTF_FONT_DATA *font_data, FT_Face face,
+@@ -389,7 +537,7 @@ static void copy_glyph_color(ALLEGRO_TTF_FONT_DATA *font_data, FT_Face face,
  /* NOTE: this function may disable the bitmap hold drawing state
   * and leave the current page bitmap locked.
   * 
@@ -172,7 +173,7 @@ index a8e753b..93ff63d 100644
   * glyphs during incidental cache misses, but found that approach to be slower.
   */
  static void cache_glyph(ALLEGRO_TTF_FONT_DATA *font_data, FT_Face face,
-@@ -520,11 +667,20 @@ static int render_glyph(ALLEGRO_FONT const *f, ALLEGRO_COLOR color,
+@@ -520,11 +668,20 @@ static int render_glyph(ALLEGRO_FONT const *f, ALLEGRO_COLOR color,
  
     if (glyph->page_bitmap) {
        /* Each glyph has a 1-pixel border all around. */
@@ -193,7 +194,7 @@ index a8e753b..93ff63d 100644
     }
     else if (glyph->region.x > 0) {
        ALLEGRO_ERROR("Glyph %d not on any page.\n", ft_index);
-@@ -620,8 +776,8 @@ static int ttf_render(ALLEGRO_FONT const *f, ALLEGRO_COLOR color,
+@@ -620,8 +777,8 @@ static int ttf_render(ALLEGRO_FONT const *f, ALLEGRO_COLOR color,
     int32_t ch;
     bool hold;
  
@@ -204,7 +205,7 @@ index a8e753b..93ff63d 100644
  
     while ((ch = al_ustr_get_next(text, &pos)) >= 0) {
        int ft_index = FT_Get_Char_Index(face, ch);
-@@ -630,7 +786,7 @@ static int ttf_render(ALLEGRO_FONT const *f, ALLEGRO_COLOR color,
+@@ -630,7 +787,7 @@ static int ttf_render(ALLEGRO_FONT const *f, ALLEGRO_COLOR color,
        prev_ft_index = ft_index;
     }
  
@@ -213,7 +214,7 @@ index a8e753b..93ff63d 100644
  
     return advance;
  }
-@@ -1097,6 +1253,8 @@ void al_shutdown_ttf_addon(void)
+@@ -1097,6 +1254,8 @@ void al_shutdown_ttf_addon(void)
  
     FT_Done_FreeType(ft);
  
