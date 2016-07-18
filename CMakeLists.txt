@@ -122,7 +122,13 @@ endif()
 
 add_library(mo2-engine STATIC ${COMMON_SRCS})
 
-add_executable(MonsterRPG2${M2_SUFFIX} src/monster2.cpp)
+if(DEMO)
+	set(EXENAME MonsterRPG2Demo${M2_SUFFIX})
+else()
+	set(EXENAME MonsterRPG2${M2_SUFFIX})
+endif()
+
+add_executable(${EXENAME} src/monster2.cpp)
 
 if(KCM_AUDIO)
 	if(NOT WIN32)
@@ -146,7 +152,7 @@ if(WIN32)
 	endif()
 
 	set_target_properties(mo2-engine PROPERTIES COMPILE_FLAGS "${CFLAGS}")
-	set_target_properties(MonsterRPG2 PROPERTIES COMPILE_FLAGS "${CFLAGS}")
+	set_target_properties(${EXENAME} PROPERTIES COMPILE_FLAGS "${CFLAGS}")
 
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO /SUBSYSTEM:WINDOWS")
 
@@ -256,7 +262,7 @@ else(WIN32)
 endif()
 
 target_link_libraries(
-	MonsterRPG2${M2_SUFFIX}
+	${EXENAME}
 	${MAIN_LIBS}
 ) 
 
