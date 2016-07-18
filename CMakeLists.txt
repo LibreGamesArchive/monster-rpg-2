@@ -168,8 +168,8 @@ if(WIN32)
 		"uuid"
 		"winmm"
 		"lua5.2"
-		"freetype_static"
-		"physfs_static"
+		"freetype"
+		"physfs"
 		"zlibstatic"
 		"allegro_monolith-static"
 	)
