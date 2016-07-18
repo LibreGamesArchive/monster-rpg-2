@@ -131,7 +131,8 @@ bool isAndroidConsole()
 #if defined OUYA
 	return true;
 #endif
-
+	return false;
+/*
 	static bool first = true;
 	static bool is_console;
 
@@ -173,6 +174,7 @@ bool isAndroidConsole()
 	_jni_callv(env, DeleteLocalRef, class_id);
 
 	return is_console;
+	*/
 }
 
 bool gamepadConnected()
