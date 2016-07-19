@@ -1,3 +1,5 @@
+#ifndef NO_GAMECENTER
+
 #include <allegro5/allegro.h>
 
 #ifdef ALLEGRO_IPHONE
@@ -273,3 +275,4 @@ void showAchievements(void)
 #endif
 }
 
+#endif // NO_GAMECENTER

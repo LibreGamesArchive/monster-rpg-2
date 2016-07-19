@@ -1,3 +1,5 @@
+#ifndef NO_GAMECENTER
+
 #include <allegro5/allegro.h>
 #import <GameKit/GameKit.h>
 #include "mygamecentervc.h"
@@ -180,3 +182,4 @@ extern NSWindow *al_osx_get_window(ALLEGRO_DISPLAY *);
 
 #endif
 
+#endif // NO_GAMECENTER

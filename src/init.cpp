@@ -24,6 +24,13 @@ extern "C" {
 
 #include <object_filenames.hpp>
 
+#if defined NO_GAMECENTER && !defined STEAMWORKS
+void do_milestone(int num, bool visual)
+{
+	return;
+}
+#endif
+
 #ifdef STEAMWORKS
 #include <steam/steam_api.h>
 
