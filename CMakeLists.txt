@@ -8,6 +8,8 @@ OPTION(DEMO "Build demo version" off)
 OPTION(STEAMWORKS "Enable Steamworks" off)
 OPTION(STOCK_ALLEGRO "Use stock Allegro libraries" off)
 
+set(ALLEGRO_SUFFIX "-static" CACHE STRING "Allegro library suffix")
+
 # function to copy files to build dir:
 function(copy_file_to_build target file dest)
    add_custom_target(${target} ALL DEPENDS ${dest})
@@ -113,7 +115,7 @@ endif()
 set(EXTRA_LIBS "")
 
 if(WITH_SVG)
-	list(APPEND EXTRA_LIBS "allegro_color${ALLEG_SUFFIX}" "svgtiny" "hubbub" "dom" "parserutils" "wapcaplet" "expat")
+	list(APPEND EXTRA_LIBS "allegro_color${ALLEGRO_SUFFIX}" "svgtiny" "hubbub" "dom" "parserutils" "wapcaplet" "expat")
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DWITH_SVG -I/opt/netsurf/include")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DWITH_SVG -I/opt/netsurf/include")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/opt/netsurf/lib")
@@ -209,7 +211,7 @@ else(WIN32)
 	endif()
 
 	if(APPLE)
-		set(ALLEGRO_MAIN_LIB "allegro_main${ALLEG_SUFFIX}")
+		set(ALLEGRO_MAIN_LIB "allegro_main${ALLEGRO_SUFFIX}")
 		FIND_LIBRARY(OPENGL_LIBRARY OpenGL)
 		FIND_LIBRARY(FOUNDATION_LIBRARY Foundation)
 		FIND_LIBRARY(APPSERVICES_LIBRARY ApplicationServices)
@@ -220,14 +222,14 @@ else(WIN32)
 		LIST(APPEND EXTRA_LIBS ${IOKIT_LIBRARY} ${OPENGL_LIBRARY} ${FOUNDATION_LIBRARY} ${APPSERVICES_LIBRARY} ${APPKIT_LIBRARY} ${AUDIOTOOLBOX_LIBRARY} ${GAMEKIT_LIBRARY} ${SECURITY_LIBRARY})
 		SET(MAIN_LIBS 
 			mo2-engine
-			allegro_ttf${ALLEG_SUFFIX}
-			allegro_font${ALLEG_SUFFIX}
-			allegro_primitives${ALLEG_SUFFIX}
-			allegro_dialog${ALLEG_SUFFIX}
-			allegro_memfile${ALLEG_SUFFIX}
-			allegro_image${ALLEG_SUFFIX}
-			allegro_physfs${ALLEG_SUFFIX}
-			allegro${ALLEG_SUFFIX} ${ALLEGRO_MAIN_LIB}
+			allegro_ttf${ALLEGRO_SUFFIX}
+			allegro_font${ALLEGRO_SUFFIX}
+			allegro_primitives${ALLEGRO_SUFFIX}
+			allegro_dialog${ALLEGRO_SUFFIX}
+			allegro_memfile${ALLEGRO_SUFFIX}
+			allegro_image${ALLEGRO_SUFFIX}
+			allegro_physfs${ALLEGRO_SUFFIX}
+			allegro${ALLEGRO_SUFFIX} ${ALLEGRO_MAIN_LIB}
 			${EXTRA_LIBS}
 			/Users/trent/code/local/lib/libfreetype.a
 			/Users/trent/code/local/lib/libphysfs.a
@@ -243,7 +245,7 @@ else(WIN32)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,\$ORIGIN")
 		SET(MAIN_LIBS 
 			mo2-engine
-			allegro_monolith${ALLEG_SUFFIX}
+			allegro_monolith${ALLEGRO_SUFFIX}
 			${EXTRA_LIBS}
 			Xcursor Xi Xinerama Xrandr SM ICE X11 Xext
 		)
@@ -256,7 +258,7 @@ else(WIN32)
 		if(RASPBERRYPI)
 			LIST(APPEND MAIN_LIBS GLESv2 EGL bcm_host m pthread freetype physfs png z lua5.2)
 		else()
-			LIST(APPEND MAIN_LIBS GL GLU physfs freetype z png lua5.2)
+			LIST(APPEND MAIN_LIBS GL GLU physfs freetype z png lua5.2 pthread)
 		endif()
 	endif()
 endif()
