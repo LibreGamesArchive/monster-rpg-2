@@ -62,7 +62,7 @@ if(NOT ("${USER_LIBRARY_PATH}" STREQUAL ""))
 	link_directories(${USER_LIBRARY_PATH})
 endif()
 
-set(COMMON_SRCS
+set(COMMON_SOURCES
 	src/3d.cpp
 	src/Animation.cpp
 	src/AnimationSet.cpp
@@ -107,9 +107,9 @@ set(COMMON_SRCS
 if(APPLE)
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DNO_GAMECENTER")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNO_GAMECENTER")
-	set(COMMON_SRCS ${COMMON_SRCS} src/init.mm src/gamecenter.mm)
+	set(COMMON_SOURCES ${COMMON_SOURCES} src/init.mm src/gamecenter.mm)
 else()
-	set(COMMON_SRCS ${COMMON_SRCS} src/init.cpp)
+	set(COMMON_SOURCES ${COMMON_SOURCES} src/init.cpp)
 endif()
 
 set(EXTRA_LIBS "")
@@ -119,10 +119,10 @@ if(WITH_SVG)
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DWITH_SVG -I/opt/netsurf/include")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DWITH_SVG -I/opt/netsurf/include")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/opt/netsurf/lib")
-	set(COMMON_SRCS ${COMMON_SRCS} src/svg.cpp)
+	set(COMMON_SOURCES ${COMMON_SOURCES} src/svg.cpp)
 endif()
 
-add_library(mo2-engine STATIC ${COMMON_SRCS})
+add_library(mo2-engine STATIC ${COMMON_SOURCES})
 
 if(DEMO)
 	set(EXENAME MonsterRPG2Demo${M2_SUFFIX})
@@ -130,7 +130,12 @@ else()
 	set(EXENAME MonsterRPG2${M2_SUFFIX})
 endif()
 
-add_executable(${EXENAME} src/monster2.cpp)
+set(EXE_SOURCES src/monster2.cpp)
+if(WIN32)
+	list(APPEND EXE_SOURCES icons/windows_icon.rc)
+endif()
+
+add_executable(${EXENAME} ${EXE_SOURCES})
 
 if(KCM_AUDIO)
 	if(NOT WIN32)
@@ -185,8 +190,6 @@ if(WIN32)
 	if(STEAMWORKS)
 		list(APPEND EXTRA_LIBS "steam_api")
 	endif()
-
-	set(ICON_OBJ ${CMAKE_SOURCE_DIR}/src/icon.lib)
 
 	SET(MAIN_LIBS 
 		${ICON_OBJ}
