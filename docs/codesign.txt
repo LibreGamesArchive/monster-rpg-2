@@ -1,1 +1,0 @@
-codesign --force --sign "Developer ID Application: MY ID HERE"  Monster\ RPG\ 2.app
