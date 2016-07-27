@@ -26,3 +26,4 @@ The following files are not included under the above license.
 - data/DejaVuSans.ttf    (See ReadMe.txt)
 - data/music/lander.ogg  (Royalty Free)
 - data/music/landing.ogg (Royalty Free)
+- possibly others, need to check
