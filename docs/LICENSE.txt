@@ -23,7 +23,8 @@ freely, subject to the following restrictions:
 
 The following files are not included under the above license.
 
-- data/DejaVuSans.ttf    (See ReadMe.txt)
-- data/music/lander.ogg  (Royalty Free)
-- data/music/landing.ogg (Royalty Free)
-- possibly others, need to check
+- data/DejaVuSans.gif              (DejaVu Sans, See ReadMe.txt)
+- data/heavy.gif                   (DejaVu Sans, See ReadMe.txt)
+- data/music/jungle_ambience.ogg   (Unknown license)
+- data/music/lander.ogg            (Royalty free)
+- data/music/landing.ogg           (Royalty free)
