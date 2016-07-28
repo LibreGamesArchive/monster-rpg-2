@@ -189,7 +189,9 @@ void m_textout_f(const MFONT *font, const char *text, float x, float y, MCOLOR c
 		}
 	}
 
-	al_draw_text(font, color, x, y, 0, text);
+	ALLEGRO_USTR_INFO info;
+	const ALLEGRO_USTR *u = al_ref_cstr(&info, text);
+	draw_ustr(font, color, x, y, 0, u);
 
 	if (font == game_font && end) {
 		end_text();
@@ -1307,6 +1309,12 @@ void my_get_keyboard_state(ALLEGRO_KEYBOARD_STATE *state)
 	al_get_keyboard_state(state);
 }
 
+static ALLEGRO_VERTEX *ttf_vertex_cache;
+static int ttf_cache_size = 0;
+static ALLEGRO_BITMAP *ttf_cache_bitmap;
+static bool ttf_caching;
+static int ttf_vcount = 0;
+
 static ALLEGRO_VERTEX *vertex_cache;
 static int cache_size = 0;
 static ALLEGRO_BITMAP *cache_bitmap;
@@ -1323,6 +1331,147 @@ static ALLEGRO_BITMAP *real_bitmap(ALLEGRO_BITMAP *bitmap)
 		parent = al_get_parent_bitmap(parent);
 	}
 	return parent;
+}
+
+static void ttf_quick_resize_cache(int num_verts)
+{
+	if (ttf_vcount + num_verts <= ttf_cache_size) {
+		return;
+	}
+
+	int resize_amount = ((num_verts / 256) + 1) * 256;
+
+	ttf_cache_size += resize_amount;
+
+	ttf_vertex_cache = (ALLEGRO_VERTEX *)realloc(ttf_vertex_cache, ttf_cache_size * sizeof(ALLEGRO_VERTEX));
+}
+
+static void ttf_quick_flush()
+{
+	if (ttf_vcount > 0) {
+		al_draw_prim(ttf_vertex_cache, 0, ttf_cache_bitmap, 0, ttf_vcount, ALLEGRO_PRIM_TRIANGLE_LIST);
+		ttf_vcount = 0;
+	}
+	ttf_cache_bitmap = 0;
+}
+
+void ttf_quick(bool onoff)
+{
+	if (ttf_caching == onoff) {
+		return;
+	}
+
+	ttf_caching = onoff;
+
+	if (onoff == false) {
+		ttf_quick_flush();
+	}
+}
+
+bool ttf_is_quick()
+{
+	return ttf_caching;
+}
+
+void draw_ustr(const ALLEGRO_FONT *font, ALLEGRO_COLOR color, float x, float y, int flags, const ALLEGRO_USTR *ustr)
+{
+	int pos = 0;
+	int codepoint;
+	int prev_codepoint = -1;
+	ALLEGRO_GLYPH glyph;
+
+	int len = al_ustr_length(ustr);
+
+	if (len == 0) {
+		return;
+	}
+	
+	ttf_quick_resize_cache(6 * len);
+
+	if (flags & ALLEGRO_ALIGN_CENTRE) {
+		int w = al_get_ustr_width(font, ustr);
+		x -= w / 2;
+	}
+	else if (flags & ALLEGRO_ALIGN_RIGHT) {
+		int w = al_get_ustr_width(font, ustr);
+		x -= w;
+	}
+
+	while ((codepoint = al_ustr_get(ustr, pos)) >= 0) {
+		if (al_get_glyph(font, prev_codepoint, codepoint, &glyph)) {
+			if (glyph.bitmap) {
+				ALLEGRO_BITMAP *real = real_bitmap(glyph.bitmap);
+				if (ttf_cache_bitmap != real) {
+					ttf_quick_flush();
+					ttf_cache_bitmap = real;
+				}
+
+				ALLEGRO_VERTEX *v = &ttf_vertex_cache[ttf_vcount];
+				
+				int u1 = al_get_bitmap_x(glyph.bitmap) + glyph.x;
+				int v1 = al_get_bitmap_y(glyph.bitmap) + glyph.y;
+				int u2 = u1 + glyph.w;
+				int v2 = v1 + glyph.h;
+
+				float dx = x + glyph.kerning + glyph.offset_x;
+				float dy = y + glyph.offset_y;
+
+				v[0].x = dx;
+				v[0].y = dy;
+				v[0].z = 0;
+				v[0].u = u1;
+				v[0].v = v1;
+				v[0].color = color;
+
+				v[1].x = dx+glyph.w;
+				v[1].y = dy;
+				v[1].z = 0;
+				v[1].u = u2;
+				v[1].v = v1;
+				v[1].color = color;
+				
+				v[2].x = dx+glyph.w;
+				v[2].y = dy+glyph.h;
+				v[2].z = 0;
+				v[2].u = u2;
+				v[2].v = v2;
+				v[2].color = color;
+
+				v[3].x = dx;
+				v[3].y = dy;
+				v[3].z = 0;
+				v[3].u = u1;
+				v[3].v = v1;
+				v[3].color = color;
+
+				v[4].x = dx+glyph.w;
+				v[4].y = dy+glyph.h;
+				v[4].z = 0;
+				v[4].u = u2;
+				v[4].v = v2;
+				v[4].color = color;
+
+				v[5].x = dx;
+				v[5].y = dy+glyph.h;
+				v[5].z = 0;
+				v[5].u = u1;
+				v[5].v = v2;
+				v[5].color = color;
+
+				ttf_vcount += 6;
+			}
+
+			x += glyph.advance;
+		}
+
+		prev_codepoint = codepoint;
+
+		al_ustr_next(ustr, &pos);
+	}
+
+	if (ttf_caching == false) {
+		ttf_quick_flush();
+	}
 }
 
 static void quick_resize_cache(int num_verts)
@@ -1675,15 +1824,3 @@ void quick_shutdown()
 {
 	free(vertex_cache);
 }
-
-#ifdef STOCK_ALLEGRO
-bool ttf_is_quick()
-{
-	return al_is_bitmap_drawing_held();
-}
-
-void ttf_quick(bool onoff)
-{
-	al_hold_bitmap_drawing(onoff);
-}
-#endif

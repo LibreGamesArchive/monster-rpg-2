@@ -3,15 +3,10 @@
 
 #include <stack>
 
-#ifndef STOCK_ALLEGRO
-extern "C" {
-#endif
 // ttf quick
 bool ttf_is_quick();
 void ttf_quick(bool onoff);
-#ifndef STOCK_ALLEGRO
-}
-#endif
+void draw_ustr(const ALLEGRO_FONT *font, ALLEGRO_COLOR color, float x, float y, int flags, const ALLEGRO_USTR *ustr);
 
 // quick
 void quick(bool onoff);

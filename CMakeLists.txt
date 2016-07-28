@@ -6,7 +6,6 @@ OPTION(WITH_SVG "Enable SVG loader" off)
 OPTION(RASPBERRYPI "Compile for Raspberry Pi" off)
 OPTION(DEMO "Build demo version" off)
 OPTION(STEAMWORKS "Enable Steamworks" off)
-OPTION(STOCK_ALLEGRO "Use stock Allegro libraries" off)
 
 set(ALLEGRO_SUFFIX "-static" CACHE STRING "Allegro library suffix")
 
@@ -23,11 +22,6 @@ function(copy_file_to_build target file dest)
 endfunction(copy_file_to_build)
 
 # Option configuration
-
-if(STOCK_ALLEGRO)
-	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DSTOCK_ALLEGRO")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DSTOCK_ALLEGRO")
-endif()
 
 if(WIN32)
 	set(M2_SUFFIX "")
