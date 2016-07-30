@@ -32,7 +32,7 @@ function get_action(step)
 		end
 	end
 
-	return COMBAT_ATTACKING, #targets, unpack(targets, 1, #targets)
+	return COMBAT_ATTACKING, #targets, table.unpack(targets, 1, #targets)
 end
 
 function die()
