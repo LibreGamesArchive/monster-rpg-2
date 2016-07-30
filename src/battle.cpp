@@ -1394,6 +1394,19 @@ Battle::~Battle(void)
 		destroySample(s);
 	}
 	preloaded_samples.clear();
+
+	if (name == "1Tode") {
+		for (int i = 0; i < MAX_PARTY; i++) {
+			Player *p = party[i];
+			if (!p)
+				continue;
+			CombatantInfo &info = p->getInfo();
+
+			info.abilities.hp = info.abilities.maxhp;
+			info.abilities.mp = info.abilities.maxmp;
+			info.condition = CONDITION_NORMAL;
+		}
+	}
 }
 
 
