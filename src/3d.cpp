@@ -13,6 +13,12 @@
 
 bool in_archery = false;
 
+#ifdef ALLEGRO_ANDROID_XXX
+#define USE_VBOS false
+#else
+#define USE_VBOS true
+#endif
+
 static void delete_vbos(MODEL *m)
 {
 	for (size_t i = 0; i < m->verts.size(); i++) {
@@ -25,7 +31,9 @@ MODEL::~MODEL() {
 	for (size_t i = 0; i < verts.size(); i++) {
 		delete[] verts[i];
 	}
-	delete_vbos(this);
+	if (USE_VBOS) {
+		delete_vbos(this);
+	}
 }
 
 void disable_zbuffer(void)
@@ -210,7 +218,9 @@ static MODEL *load_model2(const char *filename, MBITMAP *tex)
 
 	delete[] bytes;
 
-	create_vbos(m);
+	if (USE_VBOS) {
+		create_vbos(m);
+	}
 
 	return m;
 }
@@ -413,7 +423,9 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 
 	delete[] bytes;
 
-	create_vbos(m);
+	if (USE_VBOS) {
+		create_vbos(m);
+	}
 
 	return m;
 }
@@ -422,22 +434,24 @@ static MODEL *load_model(const char *filename, bool is_volcano = false, int tex_
 static void draw_model_tex(MODEL *m, MBITMAP *texture)
 {
 	for (size_t i = 0; i < m->verts.size(); i++) {
-		al_draw_vertex_buffer(
-			m->vbos[i],
-			texture->bitmap,
-			0, m->num_verts[i],
-			ALLEGRO_PRIM_TRIANGLE_LIST
-		);
-		/*
-		m_draw_prim(
-			m->verts[i],
-			0,
-			texture,
-			0,
-			m->num_verts[i],
-			ALLEGRO_PRIM_TRIANGLE_LIST
-		);
-		*/
+		if (USE_VBOS) {
+			al_draw_vertex_buffer(
+				m->vbos[i],
+				texture->bitmap,
+				0, m->num_verts[i],
+				ALLEGRO_PRIM_TRIANGLE_LIST
+			);
+		}
+		else {
+			m_draw_prim(
+				m->verts[i],
+				0,
+				texture,
+				0,
+				m->num_verts[i],
+				ALLEGRO_PRIM_TRIANGLE_LIST
+			);
+		}
 	}
 }
 
@@ -1189,7 +1203,9 @@ static MODEL *create_ring(int sd /* subdivisions */, MBITMAP *texture)
 		m->verts[0][i*6+5].color = trans_white;
 	}
 
-	create_vbos(m);
+	if (USE_VBOS) {
+		create_vbos(m);
+	}
 
 	return m;
 }
@@ -1378,6 +1394,8 @@ void volcano_scene(void)
 
 			drawBufferToScreen(false);
 
+			enable_zbuffer();
+			enable_cull_face(true);
 			clear_zbuffer();
 
 			ALLEGRO_TRANSFORM proj_push, view_push;
@@ -1387,8 +1405,6 @@ void volcano_scene(void)
 			al_identity_transform(&proj_transform);
 			al_perspective_transform(&proj_transform, -1, -(float)BH/BW, 1, 1, (float)BH/BW, 1000);
 			al_use_projection_transform(&proj_transform);
-			enable_zbuffer();
-			enable_cull_face(true);
 
 			if (!prompt_for_close_on_next_flip) {
 				al_identity_transform(&view_transform);
