@@ -5484,11 +5484,14 @@ int MItemSelector::update(int millis)
 		}
 	}
 
-#ifndef ALLEGRO_IPHONE // FIXME: fix when iphone gets keyboard support
 	if (canArrange) {
-		ALLEGRO_KEYBOARD_STATE st;
-		my_get_keyboard_state(&st);
-		if (al_key_down(&st, config.getKeySortItems())) {
+		ALLEGRO_KEYBOARD_STATE state;
+#ifdef ALLEGRO_IPHONE
+		memcpy(&state, &icade_keyboard_state, sizeof state);
+#else
+		my_get_keyboard_state(&state);
+#endif
+		if (al_key_down(&state, config.getKeySortItems())) {
 			playPreloadedSample("select.ogg");
 			sortInventory();
 			downCount = 0;
@@ -5496,7 +5499,6 @@ int MItemSelector::update(int millis)
 			al_rest(1);
 		}
 	}
-#endif
 
 	INPUT_EVENT ie;
 	InputDescriptor _id;
