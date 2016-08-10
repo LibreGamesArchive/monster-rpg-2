@@ -150,7 +150,7 @@ void reportAchievementIdentifier(NSString* identifier, bool notification)
 	if (achievement)
 	{
 		achievement.
-		showsCompletionBanner = YES;
+		showsCompletionBanner = notification ? YES : NO;
 		[achievementsDictionary setObject:achievement forKey:identifier];
 		achievement.percentComplete = percent;
 		[achievement reportAchievementWithCompletionHandler:^(NSError *error)
@@ -174,6 +174,11 @@ void do_milestone(int num, bool visual)
 #ifdef NO_GAMECENTER
 	return;
 #else
+
+	if (visual == false) {
+		return;
+	}
+
 	num++;
 
 	Holder holders[NUM_ACHIEVEMENTS] = {
@@ -212,7 +217,7 @@ void do_milestone(int num, bool visual)
 	for (int i = 0; i < NUM_ACHIEVEMENTS; i++)
 	{
 		if (holders[i].num == num) {
-			reportAchievementIdentifier(holders[i].ident, true);
+			reportAchievementIdentifier(holders[i].ident, visual);
 			if (visual) {
 				achievement_time = al_get_time();
 				achievement_show = true;

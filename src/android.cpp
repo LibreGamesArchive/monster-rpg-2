@@ -314,7 +314,9 @@ void achieve(const char *id)
 
 void do_milestone(int num, bool visual)
 {
-	(void)visual;
+	if (visual == false) {
+		return;
+	}
 
 	int ach[NUM_ACHIEVEMENTS] = {
 		3,

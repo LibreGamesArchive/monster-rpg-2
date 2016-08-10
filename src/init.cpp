@@ -207,7 +207,9 @@ CSteamAchievements*	g_SteamAchievements = NULL;
 
 void do_milestone(int num, bool visual)
 {
-	(void)visual;
+	if (visual == false) {
+		return;
+	}
 
 	int ach[NUM_ACHIEVEMENTS] = {
 		3,
