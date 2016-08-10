@@ -1376,11 +1376,14 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 						sound = false;
 					}
 					party[who]->getInfo().abilities.mp -= getSpellCost(spellName);
-					tguiDeleteWidget(formChooser_target);
-					delete formChooser_target;
-					formChooser_target = NULL;
-					tguiSetFocus(mainMagic);
-					section = MAIN;
+					// HERE
+					if (party[who]->getInfo().abilities.mp < getSpellCost(spellName)) {
+						tguiDeleteWidget(formChooser_target);
+						delete formChooser_target;
+						formChooser_target = NULL;
+						tguiSetFocus(mainMagic);
+						section = MAIN;
+					}
 				}
 				else if (v.size() > 0) {
 					for (int i = 0; i < (int)v.size(); i++) {
