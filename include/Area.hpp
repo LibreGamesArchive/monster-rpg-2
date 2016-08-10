@@ -79,6 +79,8 @@ public:
 	
 	void loadAnimation(int index, bool addIndex);
 
+	void setDown(bool down);
+
 	Area(void);
 	~Area(void);
 	

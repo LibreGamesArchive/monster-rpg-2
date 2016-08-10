@@ -1407,6 +1407,10 @@ Battle::~Battle(void)
 			info.condition = CONDITION_NORMAL;
 		}
 	}
+
+	if (area) {
+		area->setDown(false); // avoid panning when coming out of battle
+	}
 }
 
 

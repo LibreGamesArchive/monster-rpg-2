@@ -2241,6 +2241,11 @@ void Area::setOriginY(int oy)
 	focusY = oy;
 }
 
+void Area::setDown(bool down)
+{
+	this->down = down;
+}
+
 Area::Area(void)
 {
 	tinting = false;
