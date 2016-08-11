@@ -7,7 +7,7 @@
 !endif
 
 !define Company "Nooskewl"
-!define Version "2.12.1"
+!define Version "2.12.2"
 !define Game "Monster RPG 2"
 !define ExeName "MonsterRPG2"
 
