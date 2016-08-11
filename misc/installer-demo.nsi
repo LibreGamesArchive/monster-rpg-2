@@ -14,11 +14,11 @@
 !define MULTIUSER_EXECUTIONLEVEL Highest
 !define MULTIUSER_MUI
 !define MULTIUSER_INSTALLMODE_COMMANDLINE
-!define MULTIUSER_INSTALLMODE_DEFAULT_REGISTRY_KEY "Software\${Company}\${Game}\${Version}"
+!define MULTIUSER_INSTALLMODE_DEFAULT_REGISTRY_KEY "Software\${Company}\${Game}"
 !define MULTIUSER_INSTALLMODE_DEFAULT_REGISTRY_VALUENAME ""
-!define MULTIUSER_INSTALLMODE_INSTDIR_REGISTRY_KEY "Software\${Company}\${Game}\${Version}"
+!define MULTIUSER_INSTALLMODE_INSTDIR_REGISTRY_KEY "Software\${Company}\${Game}"
 !define MULTIUSER_INSTALLMODE_INSTDIR_REGISTRY_VALUENAME ""
-!define MULTIUSER_INSTALLMODE_INSTDIR "${Company}\${Game} ${Version}"
+!define MULTIUSER_INSTALLMODE_INSTDIR "${Company}\${Game}"
 
 !include 'LogicLib.nsh'
 !include "MultiUser.nsh"
@@ -51,7 +51,7 @@
   ; That will have written an uninstaller binary for us.  Now we sign it with your
   ; favourite code signing tool.
  
-  !system "SIGNTOOL.EXE SIGN /f C:\Users\Trent\Documents\codesign-2016-2017.pfx /p MYPASSWORDHERE /t http://timestamp.comodoca.com/authenticode $%TEMP%\Uninstall.exe" = 0
+  !system "SIGNTOOL.EXE SIGN /f C:\Users\Trent\Documents\codesign-2016-2017.pfx /p PASSWORD /t http://timestamp.comodoca.com/authenticode $%TEMP%\Uninstall.exe" = 0
  
   ; Good.  Now we can carry on writing the real installer.
  
@@ -77,7 +77,7 @@
  
   ;Remember the installer language
   !define MUI_LANGDLL_REGISTRY_ROOT "SHCTX" 
-  !define MUI_LANGDLL_REGISTRY_KEY "Software\${Company}\${Game}\${Version}" 
+  !define MUI_LANGDLL_REGISTRY_KEY "Software\${Company}\${Game}" 
   !define MUI_LANGDLL_REGISTRY_VALUENAME "Installer Language"
  
 ;--------------------------------
@@ -92,7 +92,7 @@
   ;Start Menu Folder Page Configuration
   !define MUI_STARTMENUPAGE_DEFAULTFOLDER "${Company}\${Game}"
   !define MUI_STARTMENUPAGE_REGISTRY_ROOT "SHCTX" 
-  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\${Company}\${Game}\${Version}" 
+  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\${Company}\${Game}" 
   !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
  
   !insertmacro MUI_PAGE_STARTMENU Application $StartMenuFolder
@@ -158,18 +158,18 @@ Section ; Main section
   File /r /x .* misc\REDIST\DIRECTX
 
   ;For Programs and Features
-  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game} ${Version}" "Contact" "contact@nooskewl.ca"
-  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game} ${Version}" "DisplayIcon" "$INSTDIR\${ExeName}.exe,0"
-  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game} ${Version}" "DisplayName" "${Game} ${Version}"
-  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game} ${Version}" "DisplayVersion" "${Version}"
-  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game} ${Version}" "HelpLink" "http://nooskewl.ca"
-  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game} ${Version}" "Publisher" "${Company}"
-  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game} ${Version}" "UninstallString" "$\"$INSTDIR\Uninstall.exe$\" /$MultiUser.InstallMode"
-  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game} ${Version}" "QuietUninstallString" "$\"$INSTDIR\Uninstall.exe$\" /$MultiUser.InstallMode /S"
-  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game} ${Version}" "URLInfoAbout" "http://nooskewl.ca/contact"
-  WriteRegDWORD SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game} ${Version}" "EstimatedSize" 30000
-  WriteRegDWORD SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game} ${Version}" "NoModify" 1
-  WriteRegDWORD SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game} ${Version}" "NoRepair" 1
+  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game}" "Contact" "contact@nooskewl.ca"
+  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game}" "DisplayIcon" "$INSTDIR\${ExeName}.exe,0"
+  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game}" "DisplayName" "${Game} ${Version}"
+  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game}" "DisplayVersion" "${Version}"
+  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game}" "HelpLink" "http://nooskewl.ca"
+  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game}" "Publisher" "${Company}"
+  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game}" "UninstallString" "$\"$INSTDIR\Uninstall.exe$\" /$MultiUser.InstallMode"
+  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game}" "QuietUninstallString" "$\"$INSTDIR\Uninstall.exe$\" /$MultiUser.InstallMode /S"
+  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game}" "URLInfoAbout" "http://nooskewl.ca/contact"
+  WriteRegDWORD SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game}" "EstimatedSize" 30000
+  WriteRegDWORD SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game}" "NoModify" 1
+  WriteRegDWORD SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game}" "NoRepair" 1
 
   ; Install DirectX redist if not installed
   ReadRegStr $1 HKLM "SOFTWARE\Microsoft\DirectX" "SDKVersion"
@@ -189,7 +189,7 @@ Section /o "Desktop Shortcut" DesktopShortcutSection
 
   CreateShortCut "$DESKTOP\${Game}.lnk" "$INSTDIR\${ExeName}.exe"
 
-  WriteRegDWORD SHCTX "Software\${Company}\${Game}\${Version}" "UninstallDesktopShortcut" 1
+  WriteRegDWORD SHCTX "Software\${Company}\${Game}" "UninstallDesktopShortcut" 1
 
 SectionEnd
 
@@ -243,16 +243,16 @@ Section "Uninstall"
   Delete "$SMPROGRAMS\$StartMenuFolder\${Game}.lnk"
   RMDir "$SMPROGRAMS\$StartMenuFolder"
 
-  ReadRegDWORD $1 SHCTX "Software\${Company}\${Game}\${Version}" "UninstallDesktopShortcut"
+  ReadRegDWORD $1 SHCTX "Software\${Company}\${Game}" "UninstallDesktopShortcut"
 
   ${If} $1 == 1
     Delete "$DESKTOP\${Game}.lnk"
   ${EndIf}
 
-  DeleteRegKey SHCTX "Software\${Company}\${Game}\${Version}"
+  DeleteRegKey SHCTX "Software\${Company}\${Game}"
   DeleteRegKey /ifempty SHCTX "Software\${Company}\${Game}"
   DeleteRegKey /ifempty SHCTX "Software\${Company}"
-  DeleteRegKey SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game} ${Version}"
+  DeleteRegKey SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${Game}"
  
 SectionEnd
 
