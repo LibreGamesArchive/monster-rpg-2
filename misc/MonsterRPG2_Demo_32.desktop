@@ -8,8 +8,8 @@ Type=Application
 Name=Monster RPG 2 Demo
 GenericName=Monster RPG 2 Demo
 Comment=Monster RPG 2 Demo
-Icon=/home/trent/Monster RPG 2 Demo 2.11 (32 bit)/icon.png
-Exec="/home/trent/Monster RPG 2 Demo 2.11 (32 bit)/monster2"
+Icon=/home/trent/Monster RPG 2 Demo 2.12.2 (Linux 32 bit)/icon.png
+Exec="/home/trent/Monster RPG 2 Demo 2.12.2 (Linux 32 bit)/MonsterRPG2Demo"
 Categories=Game;
-Path=/home/trent/Monster RPG 2 Demo 2.11 (32 bit)
+Path=/home/trent/Monster RPG 2 Demo 2.12.2 (Linux 32 bit)
 
