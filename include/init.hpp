@@ -232,6 +232,8 @@ extern float textScaleY;
 
 extern int ALPHA_FMT;
 
+extern bool hide_mouse;
+
 #ifdef STEAMWORKS
 void do_milestone(int num, bool visual);
 #endif

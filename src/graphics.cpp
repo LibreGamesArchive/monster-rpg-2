@@ -432,7 +432,7 @@ void drawBufferToScreen(bool draw_controls)
 	}
 
 #ifdef ALLEGRO_RASPBERRYPI
-	if (!preparingForScreenGrab && !is_cursor_hidden()) {
+	if (!preparingForScreenGrab && !is_cursor_hidden() && !hide_mouse) {
 		ALLEGRO_BITMAP *target = al_get_target_bitmap();
 		if (target == al_get_backbuffer(display)) {
 			int cx, cy, cw, ch;

@@ -503,6 +503,8 @@ int custom_cursor_w, custom_cursor_h;
 
 int ALPHA_FMT;
 
+bool hide_mouse = false;
+
 void destroy_fonts(void)
 {
 	m_destroy_font(game_font);
@@ -1484,6 +1486,8 @@ if (bRet)
 		use_fixed_pipeline = true;
 #endif
 
+	hide_mouse = check_arg(*argc, *argv, "-hide-mouse") > 0;
+
 	if (!al_init()) {
 		printf("al_init failed.\n");
 		exit(1);
@@ -1834,13 +1838,19 @@ if (bRet)
 	custom_cursor_bmp = m_load_bitmap(getResource("media/mouse_cursor.png"));
 	custom_cursor_w = m_get_bitmap_width(custom_cursor_bmp);
 	custom_cursor_h = m_get_bitmap_height(custom_cursor_bmp);
-#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
-	if (have_mouse) {
-		custom_mouse_cursor = al_create_mouse_cursor(custom_cursor_bmp->bitmap, 0, 0);
-		al_set_mouse_cursor(display, custom_mouse_cursor);
+
+	if (hide_mouse) {
+		hide_mouse_cursor();
 	}
+	else {
+#if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID && !defined ALLEGRO_RASPBERRYPI
+		if (have_mouse) {
+			custom_mouse_cursor = al_create_mouse_cursor(custom_cursor_bmp->bitmap, 0, 0);
+			al_set_mouse_cursor(display, custom_mouse_cursor);
+		}
 #endif
-	show_mouse_cursor();
+		show_mouse_cursor();
+	}
 
 #if !defined ALLEGRO_IPHONE && !defined ALLEGRO_ANDROID
 	if (sd->fullscreen) {
