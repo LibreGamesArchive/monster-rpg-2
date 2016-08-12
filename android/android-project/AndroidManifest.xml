@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="ca.nooskewl.monsterrpg2"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="ca.nooskewl.monsterrpg2"
 	android:versionCode="29"
 	android:versionName="2.12.1">
 	<application android:label="@string/app_name" android:icon="@drawable/icon" android:logo="@drawable/logo" android:banner="@drawable/banner" android:theme="@style/NoActionBar">
@@ -8,7 +7,7 @@
 			android:label="@string/app_name"
 			android:launchMode="singleTask"
 			android:screenOrientation="sensorLandscape"
-			android:configChanges="screenLayout|uiMode|orientation"
+			android:configChanges="screenLayout|uiMode|orientation|screenSize"
 			>
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
@@ -33,8 +32,10 @@
 	<uses-feature android:glEsVersion="0x00020000"/>
 	<uses-feature android:name="android.hardware.faketouch" android:required="false"/>
 	<uses-feature android:name="android.hardware.gamepad" android:required="false"/>
-	<uses-feature android:name="android.software.leanback" android:required="false"/>
+	<uses-feature android:name="android.hardware.screen.landscape"/>
 	<uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
+	<uses-feature android:name="android.software.leanback" android:required="false"/>
 	<uses-sdk android:minSdkVersion="9"/>
+	<uses-sdk android:targetSdkVersion="23"/>
 </manifest>
 
