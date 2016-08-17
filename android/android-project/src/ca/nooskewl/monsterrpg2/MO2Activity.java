@@ -61,5 +61,10 @@ public class MO2Activity extends AllegroActivity {
 		registerReceiver(bcr, new IntentFilter("android.intent.action.DREAMING_STARTED"));
 		registerReceiver(bcr, new IntentFilter("android.intent.action.DREAMING_STOPPED"));
 	}
+	
+	public boolean gamepadAlwaysConnected()
+	{
+		return getPackageManager().hasSystemFeature("android.hardware.touchscreen") == false;
+	}
 }
 
