@@ -75,6 +75,7 @@ jobject _al_android_activity_object();
    ret; \
 })
 
+#define _jni_callBooleanMethod(env, obj, name) _jni_callBooleanMethodV(env, obj, name, "()Z")
 #define _jni_callIntMethod(env, obj, name) _jni_callIntMethodV(env, obj, name, "()I");
 
 static jobject _jni_callObjectMethod(JNIEnv *env, jobject object, const char *name, const char *sig)
@@ -188,6 +189,14 @@ bool gamepadConnected()
 
 	if (!ret) {
 		ret = isAndroidConsole();
+	}
+
+	if (!ret) {
+		ret = _jni_callBooleanMethod(
+			_al_android_get_jnienv(),
+			_al_android_activity_object(),
+			"gamepadAlwaysConnected"
+		);
 	}
 
 	return ret;
