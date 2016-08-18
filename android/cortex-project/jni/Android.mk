@@ -75,7 +75,7 @@ LOCAL_SRC_FILES := \
 	../../../src/init.cpp
 
 LOCAL_ARM_MODE := arm
-LOCAL_CFLAGS := -Wall -O2 -I$(ANDROID_DIR)/$(TARGET_ARCH_ABI)/include -I../../include -DOUYA $(NO_DRM)
+LOCAL_CFLAGS := -Wall -O2 -I$(ANDROID_DIR)/$(TARGET_ARCH_ABI)/include -I../../include -DALLEGRO_UNSTABLE -DOUYA $(NO_DRM)
 
 LOCAL_SHARED_LIBRARIES := liballegro_monolith-prebuilt libbass-prebuilt
 LOCAL_LDLIBS := -L$(ANDROID_DIR)/$(TARGET_ARCH_ABI)/lib -llog -lGLESv1_CM -lstdc++ -lphysfs -llua5.2 -lz
