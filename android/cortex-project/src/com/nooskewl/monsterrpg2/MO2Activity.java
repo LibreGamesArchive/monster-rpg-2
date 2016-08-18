@@ -261,5 +261,10 @@ public class MO2Activity extends AllegroActivity {
 		// OuyaFacade not initialized
 		}
 	}
+
+	public boolean gamepadAlwaysConnected()
+	{
+		return getPackageManager().hasSystemFeature("android.hardware.touchscreen") == false;
+	}
 }
 
