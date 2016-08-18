@@ -233,5 +233,10 @@ public class MO2Activity extends AllegroActivity implements ConnectionCallbacks,
 			logString("Play Services not available, can't achieve :(");
 		}
 	}
+
+	public boolean gamepadAlwaysConnected()
+	{
+		return getPackageManager().hasSystemFeature("android.hardware.touchscreen") == false;
+	}
 }
 
