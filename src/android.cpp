@@ -257,7 +257,8 @@ JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_MyBroadcastReceiver_resumeS
 
 #define NUM_ACHIEVEMENTS 30
 
-const char *achievement_ids[] = {
+#ifdef GOOGLEPLAY
+const char *achievement_ids[NUM_ACHIEVEMENTS] = {
 	/* codes from Google Play Developer Console */
 	"CgkIyobkjZsMEAIQAQ",
 	"CgkIyobkjZsMEAIQAg",
@@ -290,19 +291,46 @@ const char *achievement_ids[] = {
 	"CgkIyobkjZsMEAIQHg",
 	"CgkIyobkjZsMEAIQHw"
 };
+#else // Amazon
+const char *achievement_ids[NUM_ACHIEVEMENTS] = {
+	"1",
+	"2",
+	"3",
+	"4",
+	"5",
+	"6",
+	"7",
+	"8",
+	"9",
+	"10",
+	"11",
+	"12",
+	"13",
+	"14",
+	"15",
+	"16",
+	"17",
+	"18",
+	"19",
+	"20",
+	"21",
+	"22",
+	"23",
+	"24",
+	"25",
+	"26",
+	"27",
+	"28",
+	"29",
+	"30"
+};
+#endif
 
 void achieve(const char *id)
 {
 	JNIEnv *env = _al_android_get_jnienv();
 
-	const char *s = NULL;
-
-	for (int i = 0; i < NUM_ACHIEVEMENTS; i++) {
-		if (!strcmp(achievement_ids[i], id)) {
-			s = achievement_ids[i];
-			break;
-		}
-	}
+	const char *s = id;
 
 	if (s == NULL) {
 		return;
@@ -380,6 +408,16 @@ void init_play_services()
 #ifdef __cplusplus
 }
 #endif
+
+void show_achievements()
+{
+	_jni_callVoidMethodV(
+		_al_android_get_jnienv(),
+		_al_android_activity_object(),
+		"show_achievements",
+		"()V"
+	);
+}
 
 #if defined OUYA
 int isPurchased()

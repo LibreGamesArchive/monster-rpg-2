@@ -24,7 +24,7 @@ extern "C" {
 
 #include <object_filenames.hpp>
 
-#if defined NO_GAMECENTER && !defined STEAMWORKS && !defined GOOGLEPLAY
+#if defined NO_GAMECENTER && !defined STEAMWORKS && !defined GOOGLEPLAY && !defined AMAZON
 void do_milestone(int num, bool visual)
 {
 	return;

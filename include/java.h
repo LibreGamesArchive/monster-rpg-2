@@ -41,6 +41,8 @@ void logString(const char *s);
 void init_play_services();
 void do_milestone(int num, bool visual);
 
+void show_achievements();
+
 #if defined OUYA
 int isPurchased();
 void queryPurchased();

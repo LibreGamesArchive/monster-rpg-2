@@ -756,6 +756,10 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 		yyy += 26;
 	}
 #endif
+#elif defined AMAZON
+	MIcon *game_center = NULL;
+	game_center = new MIcon(128, yyy, getResource("gamecircle.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
+	yyy += 26;
 #endif
 	
 	MIcon *fairy = new MIcon(128, yyy, getResource("fairy.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
@@ -805,7 +809,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 		}
 	}
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined AMAZON
 	TGUIWidget *left_widget = game_center;
 #else
 	TGUIWidget *left_widget = NULL;
@@ -837,7 +841,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 
 	MTextButton *mainLevelUp = new MTextButton(162, yy, "Cheat", false, left_widget, NULL, false);
 	MTextButton *mainQuit = new MTextButton(162, yy, "Quit", false, left_widget, NULL, false);
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined AMAZON
 	if (game_center)
 		game_center->set_right_widget(mainItem);
 #endif
@@ -919,7 +923,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 
 	tguiAddWidget(mainQuit);
 
-#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+#if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX || defined AMAZON
 	if (game_center)
 		tguiAddWidget(game_center);
 #endif
@@ -1491,7 +1495,7 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 
 				TGUIWidget *lwidget;
 
-#if (defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX) && !defined NO_GAMECENTER
+#if ((defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX) && !defined NO_GAMECENTER) || defined AMAZON
 				lwidget = game_center;
 #else
 				lwidget = NULL;
@@ -1520,6 +1524,15 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 #endif
 			}
 #endif
+#endif
+#if defined AMAZON
+			else if (game_center && widget == game_center) {
+				al_stop_timer(logic_timer);
+				al_stop_timer(draw_timer);
+				show_achievements();
+				al_start_timer(logic_timer);
+				al_start_timer(draw_timer);
+			}
 #endif
 
 			INPUT_EVENT ie = get_next_input_event();
@@ -1599,6 +1612,8 @@ done:
 	
 	delete fairy;
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_MACOSX
+	delete game_center;
+#elif defined AMAZON
 	delete game_center;
 #endif
 
