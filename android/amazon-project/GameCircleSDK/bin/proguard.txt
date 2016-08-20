@@ -1,0 +1,6 @@
+# view AndroidManifest.xml #generated:12
+-keep class com.amazon.ags.html5.overlay.GameCircleAlertUserInterface { <init>(...); }
+
+# view AndroidManifest.xml #generated:11
+-keep class com.amazon.ags.html5.overlay.GameCircleUserInterface { <init>(...); }
+

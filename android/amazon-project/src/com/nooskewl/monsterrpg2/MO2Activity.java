@@ -20,15 +20,39 @@ import java.security.spec.*;
 import android.app.Activity;
 import android.view.View;
 import android.content.IntentFilter;
+import com.amazon.ags.api.*;
+import com.amazon.ags.api.achievements.*;
+import com.amazon.ags.api.overlay.PopUpLocation;
 
-public class MO2Activity extends AllegroActivity {
+public class MO2Activity extends AllegroActivity
+{
+	/* load libs */
+	static {
+		System.loadLibrary("allegro_monolith");
+		System.loadLibrary("bass");
+		System.loadLibrary("monsterrpg2");
+	}
 
-   /* load libs */
-   static {
-      System.loadLibrary("allegro_monolith");
-      System.loadLibrary("bass");
-      System.loadLibrary("monsterrpg2");
-   }
+	//reference to the agsClient
+	AmazonGamesClient agsClient;
+
+	AmazonGamesCallback callback = new AmazonGamesCallback() {
+		@Override
+		public void onServiceNotReady(AmazonGamesStatus status) {
+			//unable to use service
+			Log.d("MoRPG2", "GameCircle not initialized: " + status.toString());
+		}
+		@Override
+		public void onServiceReady(AmazonGamesClient amazonGamesClient) {
+			Log.d("MoRPG2", "GameCircle initialized!");
+			agsClient = amazonGamesClient;
+			//ready to use GameCircle
+			agsClient.setPopUpLocation(PopUpLocation.TOP_CENTER);
+		}
+	};
+
+	//list of features your game uses (in this example, achievements and leaderboards)
+	EnumSet<AmazonGamesFeature> myGameFeatures = EnumSet.of(AmazonGamesFeature.Achievements);
 
 	public MO2Activity()
 	{
@@ -60,11 +84,31 @@ public class MO2Activity extends AllegroActivity {
 
 		registerReceiver(bcr, new IntentFilter("android.intent.action.DREAMING_STARTED"));
 		registerReceiver(bcr, new IntentFilter("android.intent.action.DREAMING_STOPPED"));
+
+		AmazonGamesClient.initialize(this, callback, myGameFeatures);
 	}
 	
 	public boolean gamepadAlwaysConnected()
 	{
 		return getPackageManager().hasSystemFeature("android.hardware.touchscreen") == false;
 	}
-}
 
+	public void unlock_achievement(String id) {
+		if (agsClient != null) {
+			AchievementsClient acClient = agsClient.getAchievementsClient();
+			if (acClient != null) {
+				AGResponseHandle<UpdateProgressResponse> handle = acClient.updateProgress(id, 100.0f);
+			}
+		}
+	}
+
+	public void show_achievements()
+	{
+		if (agsClient != null) {
+			AchievementsClient acClient = agsClient.getAchievementsClient();
+			if (acClient != null) {
+				acClient.showAchievementsOverlay();
+			}
+		}
+	}
+}
