@@ -758,8 +758,10 @@ bool pause(bool can_save, bool change_music_volume, std::string map_name)
 #endif
 #elif defined AMAZON
 	MIcon *game_center = NULL;
-	game_center = new MIcon(128, yyy, getResource("gamecircle.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
-	yyy += 26;
+	if (amazon_initialized() == 1) {
+		game_center = new MIcon(128, yyy, getResource("gamecircle.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);
+		yyy += 26;
+	}
 #endif
 	
 	MIcon *fairy = new MIcon(128, yyy, getResource("fairy.png"), al_map_rgb(255, 255, 255), true, NULL, false, true, true, true, false);

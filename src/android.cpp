@@ -419,6 +419,15 @@ void show_achievements()
 	);
 }
 
+int amazon_initialized()
+{
+	return _jni_callIntMethod(
+		_al_android_get_jnienv(),
+		_al_android_activity_object(),
+		"initialized"
+	);
+}
+
 #if defined OUYA
 int isPurchased()
 {

@@ -42,6 +42,7 @@ void init_play_services();
 void do_milestone(int num, bool visual);
 
 void show_achievements();
+int amazon_initialized();
 
 #if defined OUYA
 int isPurchased();

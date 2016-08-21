@@ -32,6 +32,8 @@ public class MO2Activity extends AllegroActivity {
 		System.loadLibrary("monsterrpg2");
 	}
 
+	int initialize_success = -1;
+
 	//reference to the agsClient
 	AmazonGamesClient agsClient;
 
@@ -40,6 +42,7 @@ public class MO2Activity extends AllegroActivity {
 		public void onServiceNotReady(AmazonGamesStatus status) {
 			//unable to use service
 			Log.d("MoRPG2", "GameCircle not initialized: " + status.toString());
+			initialize_success = 0;
 		}
 		@Override
 		public void onServiceReady(AmazonGamesClient amazonGamesClient) {
@@ -47,6 +50,7 @@ public class MO2Activity extends AllegroActivity {
 			agsClient = amazonGamesClient;
 			//ready to use GameCircle
 			agsClient.setPopUpLocation(PopUpLocation.TOP_CENTER);
+			initialize_success = 1;
 		}
 	};
 
@@ -84,6 +88,8 @@ public class MO2Activity extends AllegroActivity {
 		registerReceiver(bcr, new IntentFilter("android.intent.action.DREAMING_STARTED"));
 		registerReceiver(bcr, new IntentFilter("android.intent.action.DREAMING_STOPPED"));
 
+		initialize_success = -1;
+
 		AmazonGamesClient.initialize(this, callback, myGameFeatures);
 	}
 	
@@ -109,6 +115,11 @@ public class MO2Activity extends AllegroActivity {
 				acClient.showAchievementsOverlay();
 			}
 		}
+	}
+
+	public int initialized()
+	{
+		return initialize_success;
 	}
 }
 
