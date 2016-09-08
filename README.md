@@ -1,0 +1,1 @@
+Monster RPG 2 is an old school Japanese-style RPG.
