@@ -5,6 +5,8 @@
 
 #include "monster2.hpp"
 
+bool music_replayed = true;
+
 /*
 static bool ok = false;
 */
@@ -235,8 +237,7 @@ JNIEXPORT void JNICALL Java_ca_nooskewl_monsterrpg2_MyBroadcastReceiver_pauseSou
 JNIEXPORT void JNICALL Java_ca_nooskewl_monsterrpg2_MyBroadcastReceiver_resumeSound
   (JNIEnv *env, jobject obj)
 {
-	setMusicVolume(backup_music_volume);
-	setAmbienceVolume(backup_ambience_volume);
+	music_replayed = false;
 }
 
 JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_MyBroadcastReceiver_pauseSound
@@ -251,8 +252,7 @@ JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_MyBroadcastReceiver_pauseSo
 JNIEXPORT void JNICALL Java_com_nooskewl_monsterrpg2_MyBroadcastReceiver_resumeSound
   (JNIEnv *env, jobject obj)
 {
-	setMusicVolume(backup_music_volume);
-	setAmbienceVolume(backup_ambience_volume);
+	music_replayed = false;
 }
 
 #define NUM_ACHIEVEMENTS 30

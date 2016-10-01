@@ -35,7 +35,6 @@ static std::string old_music_name;
 static std::string old_ambience_name;
 static float old_music_volume;
 static float old_ambience_volume;
-static bool music_replayed = true;
 #endif
 
 #if defined ALLEGRO_ANDROID || defined ALLEGRO_IPHONE
@@ -118,6 +117,25 @@ static bool should_pause_game(void)
 static float backup_music_volume = 1.0f;
 static float backup_ambience_volume = 1.0f;
 #endif
+#endif
+
+#ifdef ALLEGRO_ANDROID
+void switch_in()
+{
+	switched_in = true;
+	music_replayed = false;
+}
+
+void switch_out()
+{
+	old_music_name = musicName;
+	old_ambience_name = ambienceName;
+	old_music_volume = getMusicVolume();
+	old_ambience_volume = getAmbienceVolume();
+	playMusic("");
+	playAmbience("");
+	switched_in = false;
+}
 #endif
 
 static void get_inputs(int x, int y, bool *l, bool *r, bool *u, bool *d, bool *b1, bool *b2, bool *b3)
@@ -1046,9 +1064,7 @@ top:
 		{
 			setMusicVolume(backup_music_volume);
 			setAmbienceVolume(backup_ambience_volume);
-#ifdef ALLEGRO_IPHONE
 			switchiOSKeyboardIn();
-#endif
 		}
 #endif
 #if defined ALLEGRO_IPHONE || defined ALLEGRO_ANDROID
@@ -1064,17 +1080,10 @@ top:
 
 #ifdef ALLEGRO_ANDROID
 		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN) {
-			switched_in = true;
+			switch_in();
 		}
 		else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT) {
-			old_music_name = musicName;
-			old_ambience_name = ambienceName;
-			old_music_volume = getMusicVolume();
-			old_ambience_volume = getAmbienceVolume();
-			playMusic("");
-			playAmbience("");
-			switched_in = false;
-			music_replayed = false;
+			switch_out();
 		}
 #endif
 
@@ -1111,6 +1120,12 @@ top:
 				if (event.type == ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING) {
 					break;
 				}
+				else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_IN) {
+					switch_in();
+				}
+				else if (event.type == ALLEGRO_EVENT_DISPLAY_SWITCH_OUT) {
+					switch_out();
+				}
 				else if (event.type == ALLEGRO_EVENT_JOYSTICK_CONFIGURATION) {
 					al_reconfigure_joysticks();
 					int nj = al_get_num_joysticks();
@@ -1135,8 +1150,6 @@ top:
 					al_unref_user_event((ALLEGRO_USER_EVENT *)&event);
 				}
 			}
-
-			switched_in = true;
 
 			// resume
 			al_acknowledge_drawing_resume(display);

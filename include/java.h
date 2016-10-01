@@ -51,6 +51,8 @@ void doIAP();
 int checkPurchased();
 #endif
 
+extern bool music_replayed;
+
 #ifdef __cplusplus
 }
 #endif
