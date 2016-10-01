@@ -143,35 +143,6 @@ public class MO2Activity extends AllegroActivity {
 	{
 		purchased = -1;
 
-		// The receipt listener now receives a collection of tv.ouya.console.api.Receipt objects.
-		OuyaResponseListener<Collection<Receipt>> receiptListListener =
-			new OuyaResponseListener<Collection<Receipt>>() {
-				@Override
-				public void onSuccess(Collection<Receipt> receipts) {
-					for (Receipt r : receipts) {
-						Log.d("MonsterRPG2", r.getIdentifier() + " purchased for " + r.getFormattedPrice());
-						if (r.getIdentifier().equals("MONSTER_RPG_2")) {
-							purchased = 1;
-						}
-					}
-					if (purchased == -1) {
-						purchased = 0;
-					}
-				}
-
-				@Override
-				public void onFailure(int errorCode, String errorMessage, Bundle errorBundle) {
-					Log.d("MonsterRPG2", errorMessage);
-					purchased = 0;
-				}
-
-				@Override
-				public void onCancel() {
-					Log.d("MonsterRPG2", "Cancelled checking receipts");
-					purchased = 0;
-				}
-			};
-
 		try {
 			if (OuyaFacade.getInstance().getGameData("MonsterRPG2").equals("PURCHASED")) {
 				purchased = 1;
@@ -182,6 +153,36 @@ public class MO2Activity extends AllegroActivity {
 		}
 		catch (Exception e) {
 			if (OuyaFacade.getInstance().isRunningOnOUYASupportedHardware()) {
+				// The receipt listener now receives a collection of tv.ouya.console.api.Receipt objects.
+				OuyaResponseListener<Collection<Receipt>> receiptListListener =
+					new OuyaResponseListener<Collection<Receipt>>() {
+						@Override
+						public void onSuccess(Collection<Receipt> receipts) {
+							for (Receipt r : receipts) {
+								Log.d("MonsterRPG2", r.getIdentifier() + " purchased for " + r.getFormattedPrice());
+								if (r.getIdentifier().equals("MONSTER_RPG_2")) {
+									writeReceipt();
+									purchased = 1;
+								}
+							}
+							if (purchased == -1) {
+								purchased = 0;
+							}
+						}
+
+						@Override
+						public void onFailure(int errorCode, String errorMessage, Bundle errorBundle) {
+							Log.d("MonsterRPG2", errorMessage);
+							purchased = 0;
+						}
+
+						@Override
+						public void onCancel() {
+							Log.d("MonsterRPG2", "Cancelled checking receipts");
+							purchased = 0;
+						}
+					};
+
 				OuyaFacade.getInstance().requestReceipts(this, receiptListListener);
 			}
 			else {
